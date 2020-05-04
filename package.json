@@ -1,7 +1,7 @@
 {
   "name": "erdjs",
   "version": "1.0.0",
-  "description": "Smart Contracts interaction framework (for interacting with Arwen Debug in unit tests)",
+  "description": "Smart Contracts interaction framework",
   "main": "out-node/index.js",
   "types": "out-node/index.d.js",
   "files": [

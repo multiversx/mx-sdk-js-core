@@ -2,11 +2,17 @@
 
 Elrond SDK for JavaScript and TypeScript (written in TypeScript).
 
-**Under development, stay tuned!**
+## Documentation
 
-Features:
- - Transaction construction, signing, broadcasting and querying.
- - Smart Contracts deployment and interaction (execution and querying).
+[TypeDoc](https://elrondnetwork.github.io/elrond-sdk-docs/erdjs/latest)
+
+## CHANGELOG
+
+[CHANGELOG](CHANGELOG.md)
+
+## Distribution
+
+[npm](https://www.npmjs.com/package/@elrondnetwork/erdjs)
 
 ## Usage
 

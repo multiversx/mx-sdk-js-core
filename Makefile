@@ -17,6 +17,12 @@ out-browser-tests/erdjs-tests-mainnet.js: out-tests
 out-tests:
 	npx tsc -p tsconfig.tests.json
 
+publish-erdjs-beta:
+	npm publish --tag=beta --access=public
+
+publish-erdjs:
+	npm publish --access=public
+
 clean:
 	rm -rf out-tests
 	rm -rf out-browser-tests

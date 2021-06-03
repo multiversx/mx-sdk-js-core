@@ -7,6 +7,7 @@ import { Stats } from "./stats";
 import { TransactionHash } from "./transaction";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { ESDTToken } from "./esdtToken";
+import { NFTToken } from "./nftToken";
 const JSONbig = require("json-bigint");
 
 /**
@@ -51,6 +52,10 @@ export class ApiProvider implements IApiProvider {
 
   async getESDTToken(tokenIdentifier: string): Promise<ESDTToken> {
     return this.doGetGeneric(`tokens/${tokenIdentifier}`, (response) => ESDTToken.fromHttpResponse(response));
+  }
+
+  async getNFTToken(tokenIdentifier: string): Promise<ESDTToken> {
+    return this.doGetGeneric(`nfts/${tokenIdentifier}`, (response) => NFTToken.fromHttpResponse(response));
   }
 
   /**

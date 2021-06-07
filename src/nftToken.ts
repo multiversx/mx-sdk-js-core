@@ -1,12 +1,12 @@
 
-export class ESDTToken {
+export class NFTToken {
     token: string = '';
     name: string = '';
     type: string = '';
     owner: string = '';
     minted: string = '';
     burnt: string = '';
-    decimals: number = 18;
+    decimals: number = 0;
     isPaused: boolean = false;
     canUpgrade: boolean = false;
     canMint: boolean = false;
@@ -15,8 +15,12 @@ export class ESDTToken {
     canPause: boolean = false;
     canFreeze: boolean = false;
     canWipe: boolean = false;
+    canAddSpecialRoles: boolean = false;
+    canTransferNFTCreateRole: boolean = false;
+    NFTCreateStopped: boolean = false;
+    wiped: string = '0';
 
-    constructor(init?: Partial<ESDTToken>) {
+    constructor(init?: Partial<NFTToken>) {
         Object.assign(this, init);
     }
 
@@ -35,10 +39,14 @@ export class ESDTToken {
         canChangeOwner: boolean,
         canPause: boolean,
         canFreeze: boolean,
-        canWipe: boolean
+        canWipe: boolean,
+        canAddSpecialRoles: boolean,
+        canTransferNFTCreateRole: boolean,
+        NFTCreateStopped: boolean,
+        wiped: string
     }) {
-        let esdtToken = new ESDTToken(response);
-        return esdtToken
+        let nftToken = new NFTToken(response);
+        return nftToken
     }
 
     getTokenName() {
@@ -49,4 +57,7 @@ export class ESDTToken {
         return this.token;
     }
 
+    getTokenType() {
+        return this.type;
+    }
 }

@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [5.0.1] - 07.06.2021
+
+-   [Feat/nft token #3](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/3)
+
 ## [5.0.0] - 19.05.2021
 
 -   [Remove event target and add callback #310](https://github.com/ElrondNetwork/elrond-sdk/pull/310)

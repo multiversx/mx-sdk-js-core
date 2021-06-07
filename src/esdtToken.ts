@@ -2,6 +2,7 @@
 export class ESDTToken {
     token: string = '';
     name: string = '';
+    type: string = '';
     owner: string = '';
     minted: string = '';
     burnt: string = '';
@@ -22,6 +23,7 @@ export class ESDTToken {
     static fromHttpResponse(response: {
         token: string,
         name: string,
+        type: string,
         owner: string,
         minted: string,
         burnt: string,

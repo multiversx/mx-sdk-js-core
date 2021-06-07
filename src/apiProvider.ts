@@ -54,7 +54,7 @@ export class ApiProvider implements IApiProvider {
     return this.doGetGeneric(`tokens/${tokenIdentifier}`, (response) => ESDTToken.fromHttpResponse(response));
   }
 
-  async getNFTToken(tokenIdentifier: string): Promise<ESDTToken> {
+  async getNFTToken(tokenIdentifier: string): Promise<NFTToken> {
     return this.doGetGeneric(`nfts/${tokenIdentifier}`, (response) => NFTToken.fromHttpResponse(response));
   }
 

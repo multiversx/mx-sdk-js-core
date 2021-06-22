@@ -43,4 +43,23 @@ export class EncryptedData {
       }
     };
   }
+
+  static fromJSON(data: any): EncryptedData {
+    return new EncryptedData({
+      version: data.version,
+      id: data.id,
+      ciphertext: data.crypto.ciphertext,
+      iv: data.crypto.cipherparams.iv,
+      cipher: data.crypto.cipher,
+      kdf: data.crypto.kdf,
+      kdfparams: new ScryptKeyDerivationParams(
+        data.crypto.kdfparams.n,
+        data.crypto.kdfparams.r,
+        data.crypto.kdfparams.p,
+        data.crypto.kdfparams.dklen,
+      ),
+      salt: data.crypto.kdfparams.salt,
+      mac: data.crypto.mac,
+    });
+  }
 }

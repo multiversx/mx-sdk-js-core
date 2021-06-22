@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import { Encryptor } from "./encryptor";
 import { Decryptor } from "./decryptor";
+import { EncryptedData } from "./encryptedData";
 
 describe("test address", () => {
   it("encrypts/decrypts",  () => {
@@ -9,5 +10,13 @@ describe("test address", () => {
     const decryptedBuffer = Decryptor.decrypt(encryptedData, "password123");
 
     assert.equal(sensitiveData.toString('hex'), decryptedBuffer.toString('hex'));
+  });
+
+  it("encodes/decodes kdfparams", () => {
+    const sensitiveData = Buffer.from("my mnemonic");
+    const encryptedData = Encryptor.encrypt(sensitiveData, "password123");
+    const decodedData = EncryptedData.fromJSON(encryptedData.toJSON());
+
+    assert.deepEqual(decodedData, encryptedData, "invalid decoded data");
   });
 });

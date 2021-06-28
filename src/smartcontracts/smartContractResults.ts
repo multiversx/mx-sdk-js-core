@@ -1,4 +1,3 @@
-import * as errors from "../errors";
 import { Address } from "../address";
 import { Balance } from "../balance";
 import { Hash } from "../hash";
@@ -7,19 +6,22 @@ import { Nonce } from "../nonce";
 import { TransactionHash } from "../transaction";
 import { ArgSerializer } from "./argSerializer";
 import { EndpointDefinition, TypedValue } from "./typesystem";
-import { guardValueIsSet } from "../utils";
 import { ReturnCode } from "./returnCode";
+import { Result } from "./result";
 
 export class SmartContractResults {
     private readonly items: SmartContractResultItem[] = [];
-    private readonly immediate: ImmediateResult = new ImmediateResult();
-    private readonly resultingCalls: ResultingCall[] = [];
+    private readonly immediate: TypedResult = new TypedResult();
+    private readonly resultingCalls: TypedResult[] = [];
 
     constructor(items: SmartContractResultItem[]) {
         this.items = items;
 
         if (this.items.length > 0) {
-            this.immediate = this.findImmediateResult();
+            let immediateResult = this.findImmediateResult();
+            if (immediateResult) {
+                this.immediate = immediateResult;
+            }
             this.resultingCalls = this.findResultingCalls();
         }
     }
@@ -33,25 +35,35 @@ export class SmartContractResults {
         return new SmartContractResults(items);
     }
 
-    private findImmediateResult(): ImmediateResult {
-        let immediateItem = this.items[0];
-        guardValueIsSet("immediateItem", immediateItem);
-        return new ImmediateResult(immediateItem);
+    private findImmediateResult(): TypedResult | undefined {
+        let immediateItem = this.items.filter(item => isImmediateResult(item))[0];
+        if (immediateItem) {
+            return new TypedResult(immediateItem);
+        }
+        return undefined;
     }
 
-    private findResultingCalls(): ResultingCall[] {
-        let otherItems = this.items.slice(1);
-        let resultingCalls = otherItems.map(item => new ResultingCall(item));
+    private findResultingCalls(): TypedResult[] {
+        let otherItems = this.items.filter(item => !isImmediateResult(item));
+        let resultingCalls = otherItems.map(item => new TypedResult(item));
         return resultingCalls;
     }
 
-    getImmediate(): ImmediateResult {
+    getImmediate(): TypedResult {
         return this.immediate;
     }
 
-    getResultingCalls(): ResultingCall[] {
+    getResultingCalls(): TypedResult[] {
         return this.resultingCalls;
     }
+
+    getAllResults(): TypedResult[] {
+        return this.items.map(item => new TypedResult(item));
+    }
+}
+
+function isImmediateResult(item: SmartContractResultItem): boolean {
+    return item.nonce.valueOf() != 0;
 }
 
 export class SmartContractResultItem {
@@ -101,16 +113,15 @@ export class SmartContractResultItem {
     }
 
     getDataTokens(): Buffer[] {
-        let serializer = new ArgSerializer();
-        return serializer.stringToBuffers(this.data);
+        return new ArgSerializer().stringToBuffers(this.data);
     }
 }
 
-export class ImmediateResult extends SmartContractResultItem {
+export class TypedResult extends SmartContractResultItem implements Result.IResult {
     /**
-     * If available, will provide typed output arguments (with typed values).
-     */
-    private endpointDefinition?: EndpointDefinition;
+    * If available, will provide typed output arguments (with typed values).
+    */
+    endpointDefinition?: EndpointDefinition;
 
     constructor(init?: Partial<SmartContractResultItem>) {
         super();
@@ -118,52 +129,46 @@ export class ImmediateResult extends SmartContractResultItem {
     }
 
     assertSuccess() {
-        if (this.isSuccess()) {
-            return;
-        }
-
-        throw new errors.ErrContract(`${this.getReturnCode()}: ${this.returnMessage}`);
+        Result.assertSuccess(this);
     }
 
     isSuccess(): boolean {
-        return this.getReturnCode().equals(ReturnCode.Ok);
+        return this.getReturnCode().isSuccess();
     }
 
     getReturnCode(): ReturnCode {
-        // Question for review: is this correct? Is the first parameter of a SCR always void and unused? E.g.: @6f6b@2b.
-        let returnCodeToken = this.getDataTokens()[1];
+        let tokens = this.getDataTokens();
+        if (tokens.length < 2) {
+            return ReturnCode.None;
+        }
+        let returnCodeToken = tokens[1];
         return ReturnCode.fromBuffer(returnCodeToken);
     }
-
 
     outputUntyped(): Buffer[] {
         this.assertSuccess();
 
-        // Question for review: is this correct? Is the first parameter of a SCR always void and unused? E.g.: @6f6b@2b.
+        // Skip the first 2 SCRs (eg. the @6f6b from @6f6b@2b).
         return this.getDataTokens().slice(2);
-    }
-
-    outputTyped(): TypedValue[] {
-        this.assertSuccess();
-
-        guardValueIsSet("endpointDefinition", this.endpointDefinition);
-
-        let buffers = this.outputUntyped();
-        let values = new ArgSerializer().buffersToValues(buffers, this.endpointDefinition!.output);
-        return values;
     }
 
     setEndpointDefinition(endpointDefinition: EndpointDefinition) {
         this.endpointDefinition = endpointDefinition;
     }
-}
 
-export class ResultingCall extends SmartContractResultItem {
-    constructor(init?: Partial<ResultingCall>) {
-        super();
-        Object.assign(this, init);
+    getEndpointDefinition(): EndpointDefinition | undefined {
+        return this.endpointDefinition;
     }
 
-    // TODO: Get as contract call (function, arguments).
-    // TODO: Tests for ESDT, which call a built-in function.
+    getReturnMessage(): string {
+        return this.returnMessage;
+    }
+
+    outputTyped(): TypedValue[] {
+        return Result.outputTyped(this);
+    }
+
+    unpackOutput(): any {
+        return Result.unpackOutput(this);
+    }
 }

@@ -1,5 +1,6 @@
 import { assert } from "chai";
 import { Balance } from "./balance";
+import { Egld } from "./balanceBuilder";
 
 describe("test balance", () => {
     it("should have desired precision", () => {
@@ -27,7 +28,10 @@ describe("test balance", () => {
         assert.equal(Balance.egld("0.123456789123456789777777888888").toCurrencyString(), "0.123456789123456789 EGLD");
     });
 
-    it("should format as denominated", () => {
-        assert.equal(new Balance('1000000000').toDenominated(), "0.000000001000000000");
+    it("test Egld builder", () => {
+        assert.equal(Egld(3.14).toDenominated(), "3.140000000000000000");
+        assert.equal(Egld(0.01).toDenominated(), "0.010000000000000000");
+        assert.equal(Egld.raw('5000000000000000042').toDenominated(), "5.000000000000000042");
+        assert.equal(Egld.raw('1000000000').toDenominated(), "0.000000001000000000");
     });
 });

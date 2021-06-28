@@ -1,4 +1,4 @@
-import {IDappProvider, IDappMessageEvent} from "./interface";
+import { IDappProvider, IDappMessageEvent } from "./interface";
 import {
     DAPP_MESSAGE_INIT,
     DAPP_DEFAULT_TIMEOUT,
@@ -8,8 +8,8 @@ import {
     DAPP_MESSAGE_SEND_TRANSACTION_URL,
     DAPP_MESSAGE_LOG_OUT
 } from "./constants";
-import {mainFrameStyle} from "./dom";
-import {Transaction} from "../transaction";
+import { mainFrameStyle } from "./dom";
+import { Transaction } from "../transaction";
 
 export class WalletProvider implements IDappProvider {
     walletUrl: string;
@@ -22,7 +22,7 @@ export class WalletProvider implements IDappProvider {
     constructor(walletURL: string = '') {
         this.walletUrl = walletURL;
         this.attachMainFrame();
-        this.init().then();
+        let _ = this.init();
     }
 
     /**
@@ -55,7 +55,7 @@ export class WalletProvider implements IDappProvider {
             return false;
         }
 
-        const {contentWindow} = this.mainFrame;
+        const { contentWindow } = this.mainFrame;
         if (!contentWindow) {
             return false;
         }
@@ -76,7 +76,7 @@ export class WalletProvider implements IDappProvider {
                     return;
                 }
 
-                const {data} = ev;
+                const { data } = ev;
                 if (data.type !== DAPP_MESSAGE_IS_CONNECTED) {
                     return;
                 }
@@ -93,12 +93,12 @@ export class WalletProvider implements IDappProvider {
     /**
      * Fetches the login hook url and redirects the client to the wallet login.
      */
-    async login(options?:{callbackUrl?:string}): Promise<string> {
+    async login(options?: { callbackUrl?: string }): Promise<string> {
         if (!this.mainFrame) {
             return '';
         }
 
-        const {contentWindow} = this.mainFrame;
+        const { contentWindow } = this.mainFrame;
         if (!contentWindow) {
             console.warn("something went wrong, main wallet iframe does not contain a contentWindow");
             return '';
@@ -119,7 +119,7 @@ export class WalletProvider implements IDappProvider {
                     return;
                 }
 
-                const {data} = ev;
+                const { data } = ev;
                 if (data.type !== DAPP_MESSAGE_CONNECT_URL) {
                     return;
                 }
@@ -138,15 +138,15 @@ export class WalletProvider implements IDappProvider {
         });
     }
 
-     /**
-     * Fetches the logout hook url and redirects the client to the wallet logout.
-     */
+    /**
+    * Fetches the logout hook url and redirects the client to the wallet logout.
+    */
     async logout(): Promise<boolean> {
         if (!this.mainFrame) {
             return false;
         }
 
-        const {contentWindow} = this.mainFrame;
+        const { contentWindow } = this.mainFrame;
         if (!contentWindow) {
             console.warn("something went wrong, main wallet iframe does not contain a contentWindow");
             return false;
@@ -167,7 +167,7 @@ export class WalletProvider implements IDappProvider {
                     return;
                 }
 
-                const {data} = ev;
+                const { data } = ev;
                 if (data.type !== DAPP_MESSAGE_LOG_OUT) {
                     return;
                 }
@@ -178,7 +178,7 @@ export class WalletProvider implements IDappProvider {
             };
 
             window.addEventListener('message', logout);
-        })
+        });
     }
 
     /**
@@ -189,7 +189,7 @@ export class WalletProvider implements IDappProvider {
             return '';
         }
 
-        const {contentWindow} = this.mainFrame;
+        const { contentWindow } = this.mainFrame;
         if (!contentWindow) {
             return '';
         }
@@ -209,7 +209,7 @@ export class WalletProvider implements IDappProvider {
                     return;
                 }
 
-                const {data} = ev;
+                const { data } = ev;
                 if (data.type !== DAPP_MESSAGE_GET_ADDRESS) {
                     return;
                 }
@@ -228,12 +228,12 @@ export class WalletProvider implements IDappProvider {
      *   the client to the send transaction hook
      * @param transaction
      */
-    async sendTransaction(transaction: Transaction, options?: {callbackUrl?: string}): Promise<Transaction> {
+    async sendTransaction(transaction: Transaction, options?: { callbackUrl?: string }): Promise<Transaction> {
         if (!this.mainFrame) {
             throw new Error("Wallet provider is not initialised, call init() first");
         }
 
-        const {contentWindow} = this.mainFrame;
+        const { contentWindow } = this.mainFrame;
         if (!contentWindow) {
             throw new Error("Wallet provider is not initialised, call init() first");
         }
@@ -263,7 +263,7 @@ export class WalletProvider implements IDappProvider {
                     return;
                 }
 
-                const {data} = ev;
+                const { data } = ev;
                 if (data.type !== DAPP_MESSAGE_SEND_TRANSACTION_URL) {
                     return;
                 }
@@ -285,7 +285,7 @@ export class WalletProvider implements IDappProvider {
         });
     }
 
-    private async waitForRemote(): Promise<boolean>{
+    private async waitForRemote(): Promise<boolean> {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(_ => reject(false), DAPP_DEFAULT_TIMEOUT);
             const setConnected = (ev: IDappMessageEvent) => {
@@ -296,7 +296,7 @@ export class WalletProvider implements IDappProvider {
                 if (!this.isValidWalletSource(ev.origin)) {
                     return;
                 }
-                const {data} = ev;
+                const { data } = ev;
                 if (data.type !== DAPP_MESSAGE_INIT) {
                     return;
                 }
@@ -332,7 +332,7 @@ export class WalletProvider implements IDappProvider {
     }
 
     private baseWalletUrl(): string {
-        const pathArray = this.walletUrl.split( '/' );
+        const pathArray = this.walletUrl.split('/');
         const protocol = pathArray[0];
         const host = pathArray[2];
         return protocol + '//' + host;

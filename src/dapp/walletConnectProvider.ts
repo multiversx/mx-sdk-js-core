@@ -67,7 +67,7 @@ export class WalletConnectProvider implements IDappProvider {
         }
 
         await this.walletConnector?.createSession({ chainId: WALLETCONNECT_ELROND_CHAIN_ID });
-        if (!this.walletConnector?.uri) return "";
+        if (!this.walletConnector?.uri) { return ""; }
         return this.walletConnector?.uri;
     }
 
@@ -125,7 +125,7 @@ export class WalletConnectProvider implements IDappProvider {
             accounts: [account],
         } = params[0];
 
-        this.loginAccount(account);
+        let _ = this.loginAccount(account);
     }
 
     private async onDisconnect(error: any) {

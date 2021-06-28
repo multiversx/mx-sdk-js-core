@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { IProvider } from "./interface";
 import { Transaction, TransactionHash, TransactionStatus } from "./transaction";
 import { NetworkConfig } from "./networkConfig";
@@ -18,15 +18,18 @@ const JSONbig = require("json-bigint");
 export class ProxyProvider implements IProvider {
     private url: string;
     private timeoutLimit: number;
+    private config: AxiosRequestConfig;
 
     /**
      * Creates a new ProxyProvider.
      * @param url the URL of the Elrond Proxy
      * @param timeout the timeout for any request-response, in milliseconds
+     * @param config axios request config options
      */
-    constructor(url: string, timeout?: number) {
+    constructor(url: string, timeout?: number, config?: AxiosRequestConfig) {
         this.url = url;
         this.timeoutLimit = timeout || 1000;
+        this.config = config || {};
     }
 
     /**
@@ -131,7 +134,7 @@ export class ProxyProvider implements IProvider {
     private async doGet(resourceUrl: string): Promise<any> {
         try {
             let url = `${this.url}/${resourceUrl}`;
-            let response = await axios.get(url, { timeout: this.timeoutLimit });
+            let response = await axios.get(url, {...this.config, timeout: this.timeoutLimit});
             let payload = response.data.data;
             return payload;
         } catch (error) {
@@ -143,6 +146,7 @@ export class ProxyProvider implements IProvider {
         try {
             let url = `${this.url}/${resourceUrl}`;
             let response = await axios.post(url, payload, {
+                ...this.config,
                 timeout: this.timeoutLimit,
                 headers: {
                     "Content-Type": "application/json",

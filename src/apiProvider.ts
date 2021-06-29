@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { IApiProvider } from "./interface";
 import * as errors from "./errors";
 import { Logger } from "./logger";
@@ -15,17 +15,19 @@ const JSONbig = require("json-bigint");
  */
 export class ApiProvider implements IApiProvider {
   private url: string;
-  private timeoutLimit: number;
+  private config: AxiosRequestConfig;
 
   /**
    * Creates a new ApiProvider.
    * @param url the URL of the Elrond Api
-   * @param timeout the timeout for any request-response, in milliseconds
+   * @param config axios request config options
    */
-  constructor(url: string, timeout?: number) {
+   constructor(url: string, config?: AxiosRequestConfig) {
     this.url = url;
-    this.timeoutLimit = timeout || 1000;
-  }
+    this.config = config || {
+      timeout: 1000,
+    };
+}
 
   /**
    * Fetches the Network Stake.
@@ -69,7 +71,7 @@ export class ApiProvider implements IApiProvider {
   private async doGet(resourceUrl: string): Promise<any> {
     try {
       let url = `${this.url}/${resourceUrl}`;
-      let response = await axios.get(url, { timeout: this.timeoutLimit });
+      let response = await axios.get(url, this.config);
 
       return response.data;
     } catch (error) {

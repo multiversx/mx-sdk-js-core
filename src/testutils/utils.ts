@@ -6,15 +6,15 @@ import { TransactionWatcher } from "../transactionWatcher";
 
 // TODO: Adjust with respect to current terminology (localnet instead of devnet).
 export function getDevnetProvider(): ProxyProvider {
-    return new ProxyProvider("http://localhost:7950", 5000);
+    return new ProxyProvider("http://localhost:7950", {timeout: 5000});
 }
 
 export function getTestnetProvider(): ProxyProvider {
-    return new ProxyProvider("https://testnet-gateway.elrond.com", 5000);
+    return new ProxyProvider("https://testnet-gateway.elrond.com", {timeout: 5000});
 }
 
 export function getMainnetProvider(): ProxyProvider {
-    return new ProxyProvider("https://gateway.elrond.com", 20000);
+    return new ProxyProvider("https://gateway.elrond.com", {timeout: 20000});
 }
 
 export async function loadContractCode(path: PathLike): Promise<Code> {

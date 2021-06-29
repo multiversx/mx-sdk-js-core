@@ -4,6 +4,12 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [Unreleased]
+-   [Added option to config the axios requests #10](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/10)
+    - Breaking changes:
+        1. `new ProxyProvider(url: string, timeout?: number)` becomes `new ProxyProvider(url: string, config?: AxiosRequestConfig)` - 
+        note that `timeout` can still be passed in the `config` object
+
 ## [5.0.1] - 07.06.2021
 
 -   [Feat/nft token #3](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/3)

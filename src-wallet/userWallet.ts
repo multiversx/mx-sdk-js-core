@@ -34,7 +34,7 @@ export class UserWallet {
      * From an encrypted keyfile, given the password, loads the secret key and the public key.
      */
     static decryptSecretKey(keyFileObject: any, password: string): UserSecretKey {
-        const encryptedData = UserWallet.ecFromJSON(keyFileObject)
+        const encryptedData = UserWallet.edFromJSON(keyFileObject)
 
         let text = Decryptor.decrypt(encryptedData, password);
         while (text.length < 32) {
@@ -46,7 +46,7 @@ export class UserWallet {
         return new UserSecretKey(seed);
     }
 
-    static ecFromJSON(keyfileObject: any): EncryptedData {
+    static edFromJSON(keyfileObject: any): EncryptedData {
         return new EncryptedData({
             version: Version,
             id: keyfileObject.id,

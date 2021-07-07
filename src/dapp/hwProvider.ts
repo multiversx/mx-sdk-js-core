@@ -68,27 +68,18 @@ export class HWProvider implements IHWProvider {
         return address;
     }
 
-    async getAccounts(startIndex: number = 0, length: number = 10): Promise<string[]> {
+    async getAccounts(page: number = 0, pageSize: number = 10): Promise<string[]> {
         if (!this.hwApp) {
             throw new Error("HWApp not initialised, call init() first");
         }
         const addresses = [];
 
-        const indexesArray = this.generateArray(startIndex, length);
-
-        for await (const index of indexesArray) {
+        const startIndex = page * pageSize;
+        for (let index = startIndex; index < startIndex + length; index++) {
             const { address } = await this.hwApp.getAddress(0, index);
             addresses.push(address);
         }
         return addresses;
-    }
-
-    generateArray(startIndex = 0, length = 10) {
-        var data = [];
-        for (var i = length * startIndex; i < length * startIndex + length; i++) {
-            data.push(i);
-        }
-        return data;
     }
 
     /**
@@ -114,6 +105,13 @@ export class HWProvider implements IHWProvider {
      * @param transaction
      */
     async sendTransaction(transaction: Transaction): Promise<Transaction> {
+        transaction = await this.signTransaction(transaction);
+        await transaction.send(this.provider);
+
+        return transaction;
+    }
+
+    async signTransaction(transaction: Transaction): Promise<Transaction> {
         if (!this.hwApp) {
             throw new Error("HWApp not initialised, call init() first");
         }
@@ -125,12 +123,10 @@ export class HWProvider implements IHWProvider {
             transaction.version = TransactionVersion.withTxHashSignVersion();
         }
         const sig = await this.hwApp.signTransaction(
-            transaction.serializeForSigning(new Address(address)),
-            signUsingHash
+          transaction.serializeForSigning(new Address(address)),
+          signUsingHash
         );
         transaction.applySignature(new Signature(sig), new Address(address));
-
-        await transaction.send(this.provider);
 
         return transaction;
     }

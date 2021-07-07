@@ -241,13 +241,7 @@ export class WalletProvider implements IDappProvider {
         }
 
         return new Promise<Transaction>((resolve, reject) => {
-            let plainTransaction = transaction.toPlainObject();
-
-            // We adjust the fields, in order to make them compatible with what the wallet expected
-            plainTransaction["data"] = transaction.getData().valueOf().toString();
-            plainTransaction["value"] = transaction.getValue().toString();
-            plainTransaction["gasPrice"] = transaction.getGasPrice().valueOf();
-            plainTransaction["gasLimit"] = transaction.getGasLimit().valueOf();
+            let plainTransaction = WalletProvider.prepareWalletTransaction(transaction);
             console.log("postMessage", DAPP_MESSAGE_SEND_TRANSACTION_URL, plainTransaction);
 
             contentWindow.postMessage({
@@ -304,14 +298,7 @@ export class WalletProvider implements IDappProvider {
         }
 
         return new Promise<Transaction>((resolve, reject) => {
-            let plainTransaction = transaction.toPlainObject();
-
-            // We adjust the fields, in order to make them compatible with what the wallet expected
-            plainTransaction["nonce"] = transaction.getNonce().valueOf();
-            plainTransaction["data"] = transaction.getData().valueOf().toString();
-            plainTransaction["value"] = transaction.getValue().toString();
-            plainTransaction["gasPrice"] = transaction.getGasPrice().valueOf();
-            plainTransaction["gasLimit"] = transaction.getGasLimit().valueOf();
+            let plainTransaction = WalletProvider.prepareWalletTransaction(transaction);
             console.log("postMessage", DAPP_MESSAGE_SIGN_TRANSACTION_URL, plainTransaction);
 
             contentWindow.postMessage({
@@ -349,6 +336,19 @@ export class WalletProvider implements IDappProvider {
             window.location.href = `${this.baseWalletUrl()}${url}&callbackUrl=${options !== undefined && options.callbackUrl !== undefined ? options.callbackUrl : window.location.href}`;
             return transaction;
         });
+    }
+
+    static prepareWalletTransaction(transaction: Transaction): any {
+        let plainTransaction = transaction.toPlainObject();
+
+        // We adjust the fields, in order to make them compatible with what the wallet expected
+        plainTransaction["nonce"] = transaction.getNonce().valueOf();
+        plainTransaction["data"] = transaction.getData().valueOf().toString();
+        plainTransaction["value"] = transaction.getValue().toString();
+        plainTransaction["gasPrice"] = transaction.getGasPrice().valueOf();
+        plainTransaction["gasLimit"] = transaction.getGasLimit().valueOf();
+
+        return plainTransaction;
     }
 
     private async waitForRemote(): Promise<boolean>{

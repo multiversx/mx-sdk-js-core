@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [6.1.0]
+-   [Added simple signing function for dapp providers #17](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/17)
+
 ## [6.0.0]
 -   [Added encryption component #11](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/11)
 -   [Added option to config the axios requests #10](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/10)

@@ -102,14 +102,33 @@ export class WalletConnectProvider implements IDappProvider {
             throw new Error("Wallet Connect not initialised, call init() first");
         }
 
-        const address = await this.getAddress();
-        const sig = await this.signTransaction("erd_sign", this.prepareWalletConnectMessage(transaction, address));
-
-        if (sig && sig.signature) {
-            transaction.applySignature(new Signature(sig.signature), new Address(address));
-        }
+        transaction = await this.signTransaction(transaction);
 
         await transaction.send(this.provider);
+        return transaction;
+    }
+
+    /**
+     * Signs a transaction and returns it
+     * @param transaction
+     */
+    async signTransaction(transaction: Transaction): Promise<Transaction> {
+        if (!this.walletConnector) {
+            Logger.error("signTransaction: Wallet Connect not initialised, call init() first");
+            throw new Error("Wallet Connect not initialised, call init() first");
+        }
+
+        const address = await this.getAddress();
+        const sig = await this.walletConnector.sendCustomRequest({
+            method: "erd_sign",
+            params: this.prepareWalletConnectMessage(transaction, address)
+        });
+        if (!sig || !sig.signature) {
+            Logger.error("signTransaction: Wallet Connect could not sign the transaction");
+            throw new Error("Wallet Connect could not sign the transaction");
+        }
+
+        transaction.applySignature(new Signature(sig.signature), new Address(address));
         return transaction;
     }
 
@@ -146,18 +165,6 @@ export class WalletConnectProvider implements IDappProvider {
         if (this.walletConnector?.connected) {
             await this.walletConnector?.killSession();
         }
-    }
-
-    private async signTransaction(method: any, params: any): Promise<any> {
-        if (!this.walletConnector) {
-            Logger.error("signTransaction: Wallet Connect not initialised, call init() first");
-            throw new Error("Wallet Connect not initialised, call init() first");
-        }
-
-        if (this.walletConnector.connected) {
-            return await this.walletConnector.sendCustomRequest({ method, params });
-        }
-        return false;
     }
 
     private prepareWalletConnectMessage(transaction: Transaction, address: string): any {

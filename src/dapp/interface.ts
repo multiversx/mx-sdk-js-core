@@ -8,6 +8,7 @@ export interface IDappProvider {
     isInitialized(): boolean;
     isConnected(): Promise<boolean>;
     sendTransaction(transaction: Transaction, options?: {callbackUrl?: string}): Promise<Transaction>;
+    signTransaction(transaction: Transaction, options?: {callbackUrl?: string}): Promise<Transaction>;
 }
 
 export interface IHWProvider extends IDappProvider {

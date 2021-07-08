@@ -46,7 +46,7 @@ export class ESDTToken {
     }
 
     getTokenIdentifier() {
-        return this.token;
+        return this.identifier;
     }
 
 }

@@ -6,7 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
--   Updated ESDTToken fields to match new API response: `token` is now `identifier`
+-   [Updated ESDTToken fields to match new API response](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/20)
+    -   `token` is now `identifier`
 
 ## [6.1.0]
 

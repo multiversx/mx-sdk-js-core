@@ -6,15 +6,20 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+-   [Updated ESDTToken fields to match new API response](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/20)
+    -   `token` is now `identifier`
+
 ## [6.1.0]
+
 -   [Added simple signing function for dapp providers #17](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/17)
 
 ## [6.0.0]
+
 -   [Added encryption component #11](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/11)
 -   [Added option to config the axios requests #10](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/10)
-    - Breaking changes:
-        1. `new ProxyProvider(url: string, timeout?: number)` becomes `new ProxyProvider(url: string, config?: AxiosRequestConfig)` - 
-        note that `timeout` can still be passed in the `config` object
+    -   Breaking changes:
+        1. `new ProxyProvider(url: string, timeout?: number)` becomes `new ProxyProvider(url: string, config?: AxiosRequestConfig)` -
+           note that `timeout` can still be passed in the `config` object
 
 ## [5.0.1] - 07.06.2021
 

@@ -1,6 +1,6 @@
 
 export class ESDTToken {
-    token: string = '';
+    identifier: string = '';
     name: string = '';
     type: string = '';
     owner: string = '';
@@ -46,7 +46,7 @@ export class ESDTToken {
     }
 
     getTokenIdentifier() {
-        return this.token;
+        return this.identifier;
     }
 
 }

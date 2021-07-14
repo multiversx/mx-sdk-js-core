@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [6.2.1]
+-   [Bugfix for number of accounts returned by getAccounts #26](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/26)
+
 ## [6.2.0]
 -   [Added custom message to the walletconnect provider #23](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/23)
 

@@ -75,7 +75,7 @@ export class HWProvider implements IHWProvider {
         const addresses = [];
 
         const startIndex = page * pageSize;
-        for (let index = startIndex; index < startIndex + length; index++) {
+        for (let index = startIndex; index < startIndex + pageSize; index++) {
             const { address } = await this.hwApp.getAddress(0, index);
             addresses.push(address);
         }

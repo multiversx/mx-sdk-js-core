@@ -132,6 +132,38 @@ export class WalletConnectProvider implements IDappProvider {
         return transaction;
     }
 
+    /**
+     * Sends a custom method and params and returns the response object
+     */    
+
+    async sendCustomMessage({
+        method,
+        params,
+    }: {
+        method: string;
+        params: any;
+    }): Promise<any> {
+        if (!this.walletConnector) {
+            Logger.error(
+                "sendCustomMessage: Wallet Connect not initialised, call init() first"
+            );
+            throw new Error("Wallet Connect not initialised, call init() first");
+        }
+        const customMessageResponse = await this.walletConnector.sendCustomRequest({
+            method,
+            params,
+        });
+
+        if (!customMessageResponse) {
+            Logger.error(
+                "sendCustomMessage: Wallet Connect could not send the message"
+            );
+            throw new Error("Wallet Connect could not send the message");
+        }
+
+        return customMessageResponse;
+    }
+
     private async onConnect(error: any, { params }: any) {
         if (error) {
             throw error;

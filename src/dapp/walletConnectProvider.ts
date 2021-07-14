@@ -6,6 +6,8 @@ import { IDappProvider } from "./interface";
 import { Signature } from "../signature";
 import { WALLETCONNECT_ELROND_CHAIN_ID } from "./constants";
 import { Logger } from "../logger";
+import {SignableMessage} from "../signableMessage";
+import {ErrNotImplemented} from "../errors";
 
 interface IClientConnect {
     onClientLogin: () => void;
@@ -106,6 +108,14 @@ export class WalletConnectProvider implements IDappProvider {
 
         await transaction.send(this.provider);
         return transaction;
+    }
+
+    /**
+     * Method will be available once the Maiar wallet connect hook is implemented
+     * @param _
+     */
+    async signMessage(_: SignableMessage): Promise<SignableMessage> {
+        throw new ErrNotImplemented();
     }
 
     /**

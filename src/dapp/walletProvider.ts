@@ -11,6 +11,8 @@ import {
 } from "./constants";
 import {mainFrameStyle} from "./dom";
 import {Transaction} from "../transaction";
+import {SignableMessage} from "../signableMessage";
+import {ErrNotImplemented} from "../errors";
 
 export class WalletProvider implements IDappProvider {
     walletUrl: string;
@@ -336,6 +338,14 @@ export class WalletProvider implements IDappProvider {
             window.location.href = `${this.baseWalletUrl()}${url}&callbackUrl=${options !== undefined && options.callbackUrl !== undefined ? options.callbackUrl : window.location.href}`;
             return transaction;
         });
+    }
+
+    /**
+     * Method will be available once the ElrondWallet hook will be implemented
+     * @param _
+     */
+    async signMessage(_: SignableMessage): Promise<SignableMessage> {
+        throw new ErrNotImplemented();
     }
 
     static prepareWalletTransaction(transaction: Transaction): any {

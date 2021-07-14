@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [6.2.0]
+-   [Added custom message to the walletconnect provider #23](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/23)
+
 ## [6.1.1]
 
 -   [Updated ESDTToken fields to match new API response #20](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/20)

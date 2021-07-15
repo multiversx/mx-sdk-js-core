@@ -130,7 +130,7 @@ export interface ISignable {
 }
 
 /**
- * Interface that defines a signed and verifieble object
+ * Interface that defines a signed and verifiable object
  */
 export interface IVerifiable {
   /**

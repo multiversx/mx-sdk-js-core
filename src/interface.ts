@@ -3,13 +3,14 @@ import { NetworkConfig } from "./networkConfig";
 import { Signature } from "./signature";
 import { Address } from "./address";
 import { AccountOnNetwork } from "./account";
-import { Query } from "./smartcontracts/query";
-import { QueryResponse } from "./smartcontracts/queryResponse";
+import { Query } from "./smartcontracts";
+import { QueryResponse } from "./smartcontracts";
 import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
 import { NetworkStatus } from "./networkStatus";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { ESDTToken } from "./esdtToken";
+import {SignableMessage} from "./signableMessage";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
@@ -104,6 +105,10 @@ export interface ISigner {
    * Signs a message (e.g. a {@link Transaction}).
    */
   sign(signable: ISignable): Promise<void>;
+}
+
+export interface IVerifier {
+  verify(message: SignableMessage): Promise<boolean>;
 }
 
 /**

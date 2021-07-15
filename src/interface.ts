@@ -108,7 +108,7 @@ export interface ISigner {
 }
 
 export interface IVerifier {
-  verify(message: SignableMessage): Promise<boolean>;
+  verify(message: IVerifiable): boolean;
 }
 
 /**
@@ -127,6 +127,20 @@ export interface ISignable {
    * @param signedBy The address of the {@link Signer}
    */
   applySignature(signature: Signature, signedBy: Address): void;
+}
+
+/**
+ * Interface that defines a signed and verifieble object
+ */
+export interface IVerifiable {
+  /**
+   * Returns the signature that should be verified
+   */
+  getSignature(): Signature;
+  /**
+   * Returns the signable object in its raw form - a sequence of bytes to be verified.
+   */
+  serializeForSigning(signedBy?: Address): Buffer;
 }
 
 /**

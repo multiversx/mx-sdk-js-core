@@ -64,8 +64,8 @@ export class UserPublicKey {
 
     verify(message: Buffer, signature: Buffer): boolean {
         try {
-            const unopenedMessage = Buffer.concat([Buffer.from(message.signature.hex(), "hex"), message]);
-            const unsignedMessage = tweetnacl.sign.open(unopenedMessage, this.address.pubkey());
+            const unopenedMessage = Buffer.concat([signature, message]);
+            const unsignedMessage = tweetnacl.sign.open(unopenedMessage, this.buffer);
             return unsignedMessage != null;
         } catch (err) {
             Logger.error(err);

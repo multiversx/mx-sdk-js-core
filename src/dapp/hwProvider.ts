@@ -13,6 +13,7 @@ import { Signature } from "../signature";
 import { compareVersions } from "../versioning";
 import { LEDGER_TX_HASH_SIGN_MIN_VERSION } from "./constants";
 import {TransactionOptions, TransactionVersion} from "../networkParams";
+import {SignableMessage} from "../signableMessage";
 
 export class HWProvider implements IHWProvider {
     provider: IProvider;
@@ -129,6 +130,17 @@ export class HWProvider implements IHWProvider {
         transaction.applySignature(new Signature(sig), new Address(address));
 
         return transaction;
+    }
+
+    async signMessage(message: SignableMessage): Promise<SignableMessage> {
+        if (!this.hwApp) {
+            throw new Error("HWApp not initialised, call init() first");
+        }
+
+        const signature = await this.hwApp.signMessage(message.serializeForSigningRaw());
+        message.applySignature(new Signature(signature));
+
+        return message;
     }
 
     private async shouldSignUsingHash(): Promise<boolean> {

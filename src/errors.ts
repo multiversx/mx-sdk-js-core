@@ -471,3 +471,12 @@ export class ErrInvalidEsdtTransferDataField extends Err {
     super("Invalid ESDT transfer call data field");
   }
 }
+
+/**
+ * Signals that a method is not yet implemented
+ */
+export class ErrNotImplemented extends Err {
+  public constructor() {
+    super("Method not yet implemented");
+  }
+}

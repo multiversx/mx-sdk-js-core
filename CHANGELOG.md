@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [6.3.0]
+-   [Added message signing component #28](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/28)
+
 ## [6.2.1]
 -   [Bugfix for number of accounts returned by getAccounts #26](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/26)
 

@@ -134,8 +134,14 @@ export class WalletProvider implements IDappProvider {
 
             window.addEventListener('message', connectUrl);
         }).then((connectionUrl: string) => {
-            const callbackUrl = `callbackUrl=${options !== undefined && options.callbackUrl !== undefined ? options.callbackUrl : window.location.href}`;
-            const token = options !== undefined && options.token !== undefined ? `&token=${options.token}` : '';
+            let callbackUrl = `callbackUrl=${window.location.href}`;
+            if (options && options.callbackUrl) {
+              callbackUrl = `callbackUrl=${options.callbackUrl}`;
+            }
+            let token = '';
+            if (options && options.token) {
+              token = `&token=${options.token}`;
+            }
             window.location.href = `${this.baseWalletUrl()}${connectionUrl}?${callbackUrl}${token}`;
             return window.location.href;
         }).catch(_ => {

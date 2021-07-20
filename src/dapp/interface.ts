@@ -3,7 +3,7 @@ import {SignableMessage} from "../signableMessage";
 
 export interface IDappProvider {
     init(): Promise<boolean>;
-    login(options?: {callbackUrl?: string}): Promise<string>;
+    login(options?: {callbackUrl?: string; token?: string}): Promise<string>;
     logout(): Promise<boolean>;
     getAddress(): Promise<string>;
     isInitialized(): boolean;

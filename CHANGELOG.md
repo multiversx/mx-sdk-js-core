@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [6.3.1]
+-   [Bugfix - Exported UserVerifier #31](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/31)
+
 ## [6.3.0]
 -   [Added message signing component #28](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/28)
 

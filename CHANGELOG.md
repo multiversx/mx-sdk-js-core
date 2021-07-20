@@ -6,16 +6,22 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+-   [Add setter for transaction chain ID #34](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/34)
+
 ## [6.3.1]
+
 -   [Bugfix - Exported UserVerifier #31](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/31)
 
 ## [6.3.0]
+
 -   [Added message signing component #28](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/28)
 
 ## [6.2.1]
+
 -   [Bugfix for number of accounts returned by getAccounts #26](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/26)
 
 ## [6.2.0]
+
 -   [Added custom message to the walletconnect provider #23](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/23)
 
 ## [6.1.1]

@@ -148,6 +148,16 @@ describe("test transaction construction", async () => {
         assert.isFalse(result.toString().includes("options"));
     });
 
+    it("should set chain ID", () => {
+        const transaction = new Transaction({
+            receiver: wallets.bob.address,
+            chainID: new ChainID("local-testnet")
+        });
+        transaction.setChainID(new ChainID('T'));
+
+        assert.equal(transaction.getChainID().valueOf(), 'T');
+    });
+
     it("computes correct fee", () => {
         let transaction = new Transaction({
             nonce: new Nonce(92),

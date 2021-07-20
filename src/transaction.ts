@@ -68,7 +68,7 @@ export class Transaction implements ISignable {
     /**
      * The chain ID of the Network (e.g. "1" for Mainnet).
      */
-    private readonly chainID: ChainID;
+    private chainID: ChainID;
 
     /**
      * The version, required by the Network in order to correctly interpret the contents of the transaction.
@@ -200,6 +200,10 @@ export class Transaction implements ISignable {
 
     getChainID(): ChainID {
         return this.chainID;
+    }
+
+    setChainID(chainID: ChainID) {
+        this.chainID = chainID;
     }
 
     getVersion(): TransactionVersion {

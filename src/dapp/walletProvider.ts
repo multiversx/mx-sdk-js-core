@@ -96,7 +96,7 @@ export class WalletProvider implements IDappProvider {
     /**
      * Fetches the login hook url and redirects the client to the wallet login.
      */
-    async login(options?:{callbackUrl?:string}): Promise<string> {
+    async login(options?:{callbackUrl?:string; token?:string}): Promise<string> {
         if (!this.mainFrame) {
             return '';
         }
@@ -134,7 +134,15 @@ export class WalletProvider implements IDappProvider {
 
             window.addEventListener('message', connectUrl);
         }).then((connectionUrl: string) => {
-            window.location.href = `${this.baseWalletUrl()}${connectionUrl}?callbackUrl=${options !== undefined && options.callbackUrl !== undefined ? options.callbackUrl : window.location.href}`;
+            let callbackUrl = `callbackUrl=${window.location.href}`;
+            if (options && options.callbackUrl) {
+              callbackUrl = `callbackUrl=${options.callbackUrl}`;
+            }
+            let token = '';
+            if (options && options.token) {
+              token = `&token=${options.token}`;
+            }
+            window.location.href = `${this.baseWalletUrl()}${connectionUrl}?${callbackUrl}${token}`;
             return window.location.href;
         }).catch(_ => {
             return '';

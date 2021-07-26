@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [6.4.1]
+-   [Keep WalletConnect session alive if still connected on init() #37](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/37)
 
 ## [6.4.0]
 -   [Added web wallet token option for login hook #33](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/33)

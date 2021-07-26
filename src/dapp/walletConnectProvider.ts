@@ -37,6 +37,15 @@ export class WalletConnectProvider implements IDappProvider {
         this.walletConnector.on("connect", this.onConnect.bind(this));
         this.walletConnector.on("session_update", this.onDisconnect.bind(this));
         this.walletConnector.on("disconnect", this.onDisconnect.bind(this));
+
+        if (
+          this.walletConnector.connected &&
+          this.walletConnector.accounts.length
+        ) {
+          const [account] = this.walletConnector.accounts;
+          this.loginAccount(account);
+        }
+
         return true;
     }
 
@@ -88,9 +97,14 @@ export class WalletConnectProvider implements IDappProvider {
     }
 
     /**
-     * Fetches current selected ledger address
+     * Fetches the wallet connect address
      */
     async getAddress(): Promise<string> {
+        if (!this.walletConnector) {
+            Logger.error("getAddress: Wallet Connect not initialised, call init() first");
+            throw new Error("Wallet Connect not initialised, call init() first");
+        }
+      
         return this.address;
     }
 

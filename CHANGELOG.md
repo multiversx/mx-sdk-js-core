@@ -5,7 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
-
+-   [Keep WalletConnect session alive if still connected on init() #37](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/37)
 
 ## [6.4.0]
 -   [Added web wallet token option for login hook #33](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/33)

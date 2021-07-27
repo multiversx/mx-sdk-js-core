@@ -42,6 +42,10 @@ export class OptionValue extends TypedValue {
         return new OptionValue(type);
     }
 
+    static newMissingType(type: Type): OptionValue {
+        return new OptionValue(new OptionType(type));
+    }
+
     /**
      * Creates an OptionValue, as a provided option argument.
      */
@@ -74,7 +78,7 @@ export class List extends TypedValue {
     private readonly items: TypedValue[];
 
     /**
-     * 
+     *
      * @param type the type of this TypedValue (an instance of ListType), not the type parameter of the ListType
      * @param items the items, having the type type.getFirstTypeParameter()
      */
@@ -90,7 +94,7 @@ export class List extends TypedValue {
         if (items.length == 0) {
             return new List(new TypePlaceholder(), []);
         }
-        
+
         let typeParameter = items[0].getType();
         return new List(typeParameter, items);
     }
@@ -104,7 +108,7 @@ export class List extends TypedValue {
     }
 
     valueOf(): any[] {
-        return this.items.map(item => item.valueOf());
+        return this.items.map((item) => item.valueOf());
     }
 
     equals(other: List): boolean {

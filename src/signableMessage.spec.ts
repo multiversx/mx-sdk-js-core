@@ -18,7 +18,7 @@ describe("test signable message", () => {
     const jsonSM = sm.toJSON();
 
     // We just test that the returned object contains what was passed and the hex values are prefixed with 0x
-    assert.equal(jsonSM, {
+    assert.deepEqual(jsonSM, {
       address: 'erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th',
       message: '0x74657374206d657373616765',
       signature: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',

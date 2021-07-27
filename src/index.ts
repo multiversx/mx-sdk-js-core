@@ -9,6 +9,7 @@ export * from "./balance";
 export * from "./networkConfig";
 export * from "./networkStake";
 export * from "./networkParams";
+export * from "./signableMessage";
 export * from "./utils";
 export * from "./proxyProvider";
 export * from "./apiProvider";

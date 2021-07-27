@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import path from "path";
 import { ContractWrapper, SendContext, ContractLogger, EndpointParameterDefinition, AddressType } from "..";
-import { Address, Balance, IProvider, BalanceBuilder, ESDTToken, createBalanceBuilder, Egld, EsdtHelpers } from "../..";
+import { Address, Balance, IProvider, BalanceBuilder, Token, createBalanceBuilder, Egld, EsdtHelpers } from "../..";
 import { MockProvider, TestWallet } from "../../testutils";
 import { NativeSerializer, NativeTypes } from "../nativeSerializer";
 import { ArgumentErrorContext } from "../argumentErrorContext";
@@ -20,9 +20,9 @@ export namespace SystemConstants {
 
 export class SystemWrapper extends ChainSendContext {
     private readonly provider: IProvider;
-    readonly builtinFunctions: ContractWrapper;
+    private readonly builtinFunctions: ContractWrapper;
     readonly esdtSystemContract: ContractWrapper;
-    private readonly issueCost: Balance;
+    readonly issueCost: Balance;
     private readonly sendWrapper: ContractWrapper;
 
     private constructor(provider: IProvider, context: SendContext, sendContract: ContractWrapper, esdtSystemContract: ContractWrapper, issueCost: Balance, builtinFunctions: ContractWrapper) {
@@ -103,8 +103,8 @@ export class SystemWrapper extends ChainSendContext {
 
     async recallToken(tokenIdentifier: string): Promise<BalanceBuilder> {
         let tokenProperties = await this.esdtSystemContract.query.getTokenProperties(tokenIdentifier);
-        let esdtToken = ESDTToken.fromTokenProperties(tokenIdentifier, tokenProperties);
-        return createBalanceBuilder(esdtToken);
+        let token = Token.fromTokenProperties(tokenIdentifier, tokenProperties);
+        return createBalanceBuilder(token);
     }
 
     async getBalance(address: NativeTypes.NativeAddress, balanceBuilder: BalanceBuilder): Promise<Balance> {

@@ -19,7 +19,7 @@ describe("test smart contract interactor", function () {
 
         let answer = await erdSys.loadWrapper("src/testdata", "answer");
 
-        await answer.sender(alice).gas(3_000_000).deploy();
+        await answer.sender(alice).gas(3_000_000).call.deploy();
 
         // Query
         let queryResponse = await answer.query.getUltimateAnswer();
@@ -35,7 +35,7 @@ describe("test smart contract interactor", function () {
 
         let counter = await erdSys.loadWrapper("src/testdata", "counter");
 
-        await counter.sender(alice).gas(3_000_000).deploy();
+        await counter.sender(alice).gas(3_000_000).call.deploy();
         assert.deepEqual(await counter.query.get(), new BigNumber(1));
         assert.deepEqual(await counter.call.increment(), new BigNumber(2));
         assert.deepEqual(await counter.call.decrement(), new BigNumber(1));
@@ -47,7 +47,7 @@ describe("test smart contract interactor", function () {
 
         let lottery = await erdSys.loadWrapper("src/testdata", "lottery_egld");
 
-        await lottery.sender(alice).gas(100_000_000).deploy();
+        await lottery.sender(alice).gas(100_000_000).call.deploy();
 
         lottery.gas(15_000_000);
         await lottery.call.start("lucky", Balance.egld(1), null, null, 1, null, null);

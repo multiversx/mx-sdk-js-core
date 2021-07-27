@@ -16,7 +16,7 @@ export * from "./proxyProvider";
 export * from "./apiProvider";
 export * from "./scArgumentsParser";
 export * from "./esdtHelpers";
-export * from "./esdtToken";
+export * from "./token";
 
 export * from "./walletcore";
 export * from "./nullSigner";

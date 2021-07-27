@@ -37,7 +37,7 @@ export class StringValue extends PrimitiveValue {
      * Returns whether two objects have the same value.
      */
     equals(other: StringValue): boolean {
-        return this.value == other.value;
+        return this.value === other.value;
     }
 
     valueOf(): string {

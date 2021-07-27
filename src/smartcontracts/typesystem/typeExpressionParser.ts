@@ -65,6 +65,7 @@ export class TypeExpressionParser {
             }
         }
 
+        // Split by the delimiters, but exclude the spaces that are found in the middle of "utf-8 string"
         let symbolsRegex = /(:|\{|\}|,|(?<!utf\-8)\s)/;
         let tokens = jsoned.split(symbolsRegex).filter((token) => token);
         jsoned = tokens.map((token) => (symbolsRegex.test(token) ? token : `"${token}"`)).join("");

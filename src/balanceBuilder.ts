@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
-import { Balance, ErrInvalidArgument, ErrInvariantFailed } from ".";
-import { ESDTToken, TokenType } from "./esdtToken";
+import { Balance, ErrInvariantFailed } from ".";
+import { Token, TokenType } from "./token";
 
 /**
  * Creates balances for ESDTs (Fungible, Semi-Fungible (SFT) or Non-Fungible Tokens).
@@ -8,7 +8,7 @@ import { ESDTToken, TokenType } from "./esdtToken";
 export interface BalanceBuilder {
 
     /**
-     * Creates a balance. Identical to {@link BalanceBuilder.denominated}
+     * Creates a balance. Identical to {@link BalanceBuilder.value}
      */
     (value: BigNumber.Value): Balance;
 
@@ -46,7 +46,7 @@ export interface BalanceBuilder {
     /*
      * Get the token.
      */
-    getToken(): ESDTToken;
+    getToken(): Token;
 
     /*
      * Get the token identifier.
@@ -60,9 +60,9 @@ export interface BalanceBuilder {
 }
 
 class BalanceBuilderImpl {
-    readonly token: ESDTToken;
+    readonly token: Token;
     nonce_: BigNumber | null;
-    constructor(token: ESDTToken) {
+    constructor(token: Token) {
         this.token = token;
         this.nonce_ = null;
         if (token.isFungible()) {
@@ -104,7 +104,7 @@ class BalanceBuilderImpl {
         return new BigNumber(this.nonce_);
     }
 
-    getToken(): ESDTToken {
+    getToken(): Token {
         return this.token;
     }
 
@@ -113,7 +113,7 @@ class BalanceBuilderImpl {
     }
 }
 
-export function createBalanceBuilder(token: ESDTToken): BalanceBuilder {
+export function createBalanceBuilder(token: Token): BalanceBuilder {
     let impl = new BalanceBuilderImpl(token);
     let denominated = <BalanceBuilder>impl.value.bind(impl);
     let others = {
@@ -133,7 +133,7 @@ export function createBalanceBuilder(token: ESDTToken): BalanceBuilder {
 /**
  * Builder for an EGLD value.
  */
-export const Egld = createBalanceBuilder(new ESDTToken({ token: "EGLD", name: "eGold", decimals: 18, type: TokenType.FungibleESDT }));
+export const Egld = createBalanceBuilder(new Token({ token: "EGLD", name: "eGold", decimals: 18, type: TokenType.Fungible }));
 
 function applyDenomination(value: BigNumber.Value, decimals: number): BigNumber {
     return new BigNumber(value).shiftedBy(decimals).decimalPlaces(0);

@@ -39,17 +39,20 @@ export class ContractWrapper extends ChainSendContext {
         this.wasmPath = wasmPath;
         this.builtinFunctions = builtinFunctions || this;
 
-        let constructor = this.abi.getConstructorDefinition();
 
         this.call = generateMethods(this, this.abi, this.handleCall);
-        this.call.deploy = this.deploy.bind(this);
 
         this.results = generateMethods(this, this.abi, this.handleResults);
 
         this.query = generateMethods(this, this.abi, this.handleQuery);
 
         this.format = generateMethods(this, this.abi, this.handleFormat);
-        this.format.deploy = this.handleFormat.bind(this, constructor);
+
+        let constructor = this.abi.getConstructorDefinition();
+        if (constructor !== null) {
+            this.call.deploy = this.handleDeployCall.bind(this, constructor);
+            this.format.deploy = this.handleFormat.bind(this, constructor);
+        }
     }
 
     address(address: NativeTypes.NativeAddress): ContractWrapper {
@@ -77,10 +80,9 @@ export class ContractWrapper extends ChainSendContext {
         return await loadContractCode(this.wasmPath);
     }
 
-    private async buildDeployTransaction(args: any[]): Promise<Transaction> {
+    private async buildDeployTransaction(constructorDefinition: EndpointDefinition, args: any[]): Promise<Transaction> {
         let contractCode = await this.getCode();
 
-        let constructorDefinition = this.abi.getConstructorDefinition();
         let convertedArgs = formatEndpoint(constructorDefinition, constructorDefinition, ...args).toTypedValues();
         let transaction = this.smartContract.deploy({
             code: contractCode,
@@ -90,8 +92,8 @@ export class ContractWrapper extends ChainSendContext {
         return transaction;
     }
 
-    async deploy(...args: any[]): Promise<void> {
-        let transaction = await this.buildDeployTransaction(args);
+    private async handleDeployCall(constructorDefinition: EndpointDefinition, ...args: any[]): Promise<void> {
+        let transaction = await this.buildDeployTransaction(constructorDefinition, args);
 
         let transactionOnNetwork = await this.processTransaction(transaction);
 

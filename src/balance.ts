@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { ESDTToken } from "./esdtToken";
+import { Token } from "./token";
 import { ErrInvalidArgument } from "./errors";
 import { Egld } from "./balanceBuilder";
 
@@ -15,14 +15,14 @@ BigNumber.set({ DECIMAL_PLACES: DEFAULT_BIGNUMBER_DECIMAL_PLACES, ROUNDING_MODE:
  * Balance, as an immutable object.
  */
 export class Balance {
-    readonly token: ESDTToken;
+    readonly token: Token;
     private readonly nonce: BigNumber = new BigNumber(0);
     private readonly value: BigNumber = new BigNumber(0);
 
     /**
      * Creates a Balance object.
      */
-    public constructor(token: ESDTToken, nonce: BigNumber.Value, value: BigNumber.Value) {
+    public constructor(token: Token, nonce: BigNumber.Value, value: BigNumber.Value) {
         this.token = token;
         this.nonce = new BigNumber(nonce);
         this.value = new BigNumber(value);
@@ -98,21 +98,21 @@ export class Balance {
     }
 
     plus(other: Balance) {
-        this.checkSameType(other);
+        this.checkSameToken(other);
         return new Balance(this.token, this.nonce, this.value.plus(other.value));
     }
 
     minus(other: Balance) {
-        this.checkSameType(other);
+        this.checkSameToken(other);
         return new Balance(this.token, this.nonce, this.value.minus(other.value));
     }
 
     isEqualTo(other: Balance) {
-        this.checkSameType(other);
+        this.checkSameToken(other);
         return this.value.isEqualTo(other.value);
     }
 
-    checkSameType(other: Balance) {
+    checkSameToken(other: Balance) {
         if (this.token != other.token) {
             throw new ErrInvalidArgument("Different token types");
         }

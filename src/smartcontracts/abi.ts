@@ -32,15 +32,12 @@ export class SmartContractAbi {
         if (name instanceof ContractFunction) {
             name = name.name;
         }
-        if (name == "constructor" || name == "deploy") {
-            return this.getConstructorDefinition();
-        }
-        let result = this.getAllEndpoints().find(item => item.name == name);
+        let result = this.getAllEndpoints().find(item => item.name === name);
         guardValueIsSet("result", result);
         return result!;
     }
 
-    getConstructorDefinition(): EndpointDefinition {
+    getConstructorDefinition(): EndpointDefinition | null {
         let constructors = [];
         for (const iface of this.interfaces) {
             let constructor_definition = iface.getConstructorDefinition();
@@ -48,9 +45,13 @@ export class SmartContractAbi {
                 constructors.push(constructor_definition);
             }
         }
-        if (constructors.length != 1) {
-            throw new ErrInvariantFailed(`Expected 1 constructor in smart contract abi (found ${constructors.length})`);
+        switch (constructors.length) {
+            case 0:
+                return null;
+            case 1:
+                return constructors[0];
+            default:
+                throw new ErrInvariantFailed(`Found more than 1 constructor (found ${constructors.length})`);
         }
-        return constructors[0];
     }
 }

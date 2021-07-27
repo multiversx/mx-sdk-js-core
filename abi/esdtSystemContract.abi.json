@@ -251,7 +251,7 @@
             ],
             "outputs": [
                 {
-                    "name": "esdtTokenName",
+                    "name": "tokenName",
                     "type": "bytes"
                 },
                 {
@@ -328,7 +328,7 @@
             "name": "getSpecialRoles",
             "inputs": [
                 {
-                    "name": "esdtTokenName",
+                    "name": "tokenName",
                     "type": "bytes"
                 }
             ],
@@ -343,7 +343,7 @@
             "name": "setSpecialRole",
             "inputs": [
                 {
-                    "name": "esdtTokenName",
+                    "name": "tokenName",
                     "type": "bytes"
                 },
                 {

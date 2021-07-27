@@ -9,7 +9,7 @@ import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
 import { NetworkStatus } from "./networkStatus";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
-import { ESDTToken } from "./esdtToken";
+import { Token } from "./token";
 import BigNumber from "bignumber.js";
 
 /**
@@ -99,7 +99,7 @@ export interface IApiProvider {
      */
     getTransaction(txHash: TransactionHash): Promise<TransactionOnNetwork>;
 
-    getESDTToken(tokenIdentifier: string): Promise<ESDTToken>;
+    getToken(tokenIdentifier: string): Promise<Token>;
 
     /**
      * Get method that receives the resource url and on callback the method used to map the response.

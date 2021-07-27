@@ -2,15 +2,15 @@ import BigNumber from "bignumber.js";
 import { Address } from "./address";
 
 export enum TokenType {
-    FungibleESDT,
-    SemiFungibleESDT,
-    NonFungibleESDT
+    Fungible,
+    Semifungible,
+    Nonfungible
 }
 
-export class ESDTToken {
+export class Token {
     token: string = ''; // Token identifier (ticker + random string, eg. MYTOKEN-12345)
     name: string = ''; // Token name (eg. MyTokenName123)
-    type: TokenType = TokenType.FungibleESDT;
+    type: TokenType = TokenType.Fungible;
     owner: Address = new Address();
     minted: BigNumber = new BigNumber(0);
     burnt: BigNumber = new BigNumber(0);
@@ -28,7 +28,7 @@ export class ESDTToken {
     nftCreateStopped: boolean = false;
     wiped: boolean = false;
 
-    constructor(init?: Partial<ESDTToken>) {
+    constructor(init?: Partial<Token>) {
         Object.assign(this, init);
     }
 
@@ -48,8 +48,8 @@ export class ESDTToken {
         canPause: boolean,
         canFreeze: boolean,
         canWipe: boolean
-    }): ESDTToken {
-        return new ESDTToken({
+    }): Token {
+        return new Token({
             token: response.token,
             name: response.name,
             type: TokenType[response.type as keyof typeof TokenType],
@@ -68,10 +68,10 @@ export class ESDTToken {
         });
     }
 
-    static fromTokenProperties(tokenIdentifier: string, results: any[]): ESDTToken {
+    static fromTokenProperties(tokenIdentifier: string, results: any[]): Token {
         let [tokenName, tokenType, owner, totalMinted, totalBurned, ...propertiesBuffers] = results;
         let properties = parseTokenProperties(propertiesBuffers);
-        return new ESDTToken({
+        return new Token({
             token: tokenIdentifier,
             type: TokenType[tokenType.toString() as keyof typeof TokenType],
             name: tokenName.toString(),
@@ -116,10 +116,10 @@ export class ESDTToken {
 
     isNft(): boolean {
         switch (this.type) {
-            case TokenType.FungibleESDT:
+            case TokenType.Fungible:
                 return false;
-            case TokenType.SemiFungibleESDT:
-            case TokenType.NonFungibleESDT:
+            case TokenType.Semifungible:
+            case TokenType.Nonfungible:
                 return true;
         }
     }

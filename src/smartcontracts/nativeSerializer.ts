@@ -56,7 +56,7 @@ export namespace NativeSerializer {
     // A function may have one of the following formats:
     // f(arg1, arg2, optional<arg3>, optional<arg4>) returns { min: 2, max: 4, variadic: false }
     // f(arg1, variadic<bytes>) returns { min: 1, max: Infinity, variadic: true }
-    // f(arg1, arg2, optional<arg3>, arg4, optional<arg5>, variadic<bytes>) returns { min: 4, max: Infinity, variadic: true }
+    // f(arg1, arg2, optional<arg3>, arg4, optional<arg5>, variadic<bytes>) returns { min: 2, max: Infinity, variadic: true }
     function getArgumentsCardinality(parameters: EndpointParameterDefinition[]): { min: number, max: number, variadic: boolean } {
         let reversed = [...parameters].reverse(); // keep the original unchanged
         let min = parameters.length;
@@ -197,55 +197,46 @@ export namespace NativeSerializer {
     }
 
     export function convertNativeToAddress(native: NativeTypes.NativeAddress, errorContext: ArgumentErrorContext): Address {
-        if (native instanceof Address) {
-            return native;
+        switch (native.constructor) {
+            case Address:
+            case Buffer:
+            case String:
+                return new Address(<Address | Buffer | string>native);
+            case ContractWrapper:
+                return (<ContractWrapper>native).getAddress();
+            case SmartContract:
+                return (<SmartContract>native).getAddress();
+            case TestWallet:
+                return (<TestWallet>native).address;
+            default:
+                errorContext.convertError(native, "Address");
         }
-        if (typeof native === "string" || native instanceof Buffer) {
-            return new Address(native);
-        }
-        if (native instanceof ContractWrapper) {
-            return native.getAddress();
-        }
-        if (native instanceof SmartContract) {
-            return native.getAddress();
-        }
-        if (native instanceof TestWallet) {
-            return native.address;
-        }
-        errorContext.convertError(native, "Address");
     }
 
     function convertNumericalType(number: BigNumber, type: Type, errorContext: ArgumentErrorContext): TypedValue {
-        if (type instanceof U8Type) {
-            return new U8Value(number);
+        switch (type.constructor) {
+            case U8Type:
+                return new U8Value(number);
+            case I8Type:
+                return new I8Value(number);
+            case U16Type:
+                return new U16Value(number);
+            case I16Type:
+                return new I16Value(number);
+            case U32Type:
+                return new U32Value(number);
+            case I32Type:
+                return new I32Value(number);
+            case U64Type:
+                return new U64Value(number);
+            case I64Type:
+                return new I64Value(number);
+            case BigUIntType:
+                return new BigUIntValue(number);
+            case BigIntType:
+                return new BigIntValue(number);
+            default:
+                errorContext.unhandledType("convertNumericalType", type);
         }
-        if (type instanceof I8Type) {
-            return new I8Value(number);
-        }
-        if (type instanceof U16Type) {
-            return new U16Value(number);
-        }
-        if (type instanceof I16Type) {
-            return new I16Value(number);
-        }
-        if (type instanceof U32Type) {
-            return new U32Value(number);
-        }
-        if (type instanceof I32Type) {
-            return new I32Value(number);
-        }
-        if (type instanceof U64Type) {
-            return new U64Value(number);
-        }
-        if (type instanceof I64Type) {
-            return new I64Value(number);
-        }
-        if (type instanceof BigUIntType) {
-            return new BigUIntValue(number);
-        }
-        if (type instanceof BigIntType) {
-            return new BigIntValue(number);
-        }
-        errorContext.unhandledType("convertNumericalType", type);
     }
 }

@@ -1,4 +1,4 @@
-import { Address, ContractWrapper, createBalanceBuilder, Egld, ESDTToken, setupInteractive, SystemWrapper, TokenType } from "../..";
+import { Address, ContractWrapper, createBalanceBuilder, Egld, Token, setupInteractive, SystemWrapper, TokenType } from "../..";
 import { MockProvider, setupUnitTestWatcherTimeouts, TestWallet } from "../../testutils";
 import { assert } from "chai";
 
@@ -26,7 +26,7 @@ describe("test ESDT transfers via the smart contract wrapper", async function ()
         let egldCallBuffers = market.value(Egld(0.5)).format.auctionToken(minBid, maxBid, deadline, acceptedToken, acceptedTokenNonce).toCallBuffers();
         assert.deepEqual(callBuffersToStrings(egldCallBuffers), ["auctionToken", "64", "01f4", "0f4240", "544553542d31323334", "1388"]);
 
-        let MyNFT = createBalanceBuilder(new ESDTToken({ token: "TEST-1234", decimals: 0, type: TokenType.NonFungibleESDT }));
+        let MyNFT = createBalanceBuilder(new Token({ token: "TEST-1234", decimals: 0, type: TokenType.Nonfungible }));
         let nonFungibleCallBuffers = market.value(MyNFT.nonce(1000).one()).format.auctionToken(minBid, maxBid, deadline, acceptedToken, acceptedTokenNonce).toCallBuffers();
         assert.deepEqual(callBuffersToStrings(nonFungibleCallBuffers), [
             "ESDTNFTTransfer",

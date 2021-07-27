@@ -38,10 +38,10 @@ export class ContractInterface {
 }
 
 function constructorFromJSON(json: any): EndpointDefinition | null {
-    // if the JSON "constructor" field is missing
-    if (json.constructor == Object.constructor) {
+    if (json.constructor.inputs === undefined || json.constructor.outputs === undefined) {
         return null;
     }
+
     // the name will be missing, so we add it manually
     let constructorWithName = { name: "constructor", ...json.constructor };
 

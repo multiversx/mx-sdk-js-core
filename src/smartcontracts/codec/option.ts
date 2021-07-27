@@ -4,7 +4,7 @@ import { BinaryCodec } from "./binary";
 
 /**
  * Encodes and decodes "OptionValue" objects
- * with respect to: {@link https://docs.elrond.com/developers/developer-reference/elrond-serialization-format/ | The Elrond Serialization Format}. 
+ * with respect to: {@link https://docs.elrond.com/developers/developer-reference/elrond-serialization-format/ | The Elrond Serialization Format}.
  */
 export class OptionValueBinaryCodec {
     private readonly binaryCodec: BinaryCodec;
@@ -15,7 +15,7 @@ export class OptionValueBinaryCodec {
 
     decodeNested(buffer: Buffer, type: Type): [OptionValue, number] {
         if (buffer[0] == 0x00) {
-            return [new OptionValue(type), 1];
+            return [OptionValue.newMissingType(type), 1];
         }
 
         if (buffer[0] != 0x01) {
@@ -23,7 +23,7 @@ export class OptionValueBinaryCodec {
         }
 
         let [decoded, decodedLength] = this.binaryCodec.decodeNested(buffer.slice(1), type);
-        return [new OptionValue(type, decoded), decodedLength + 1];
+        return [OptionValue.newProvided(decoded), decodedLength + 1];
     }
 
     decodeTopLevel(buffer: Buffer, type: Type): OptionValue {

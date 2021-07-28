@@ -3,8 +3,8 @@ import { NetworkConfig } from "./networkConfig";
 import { Signature } from "./signature";
 import { Address } from "./address";
 import { AccountOnNetwork } from "./account";
-import { Query } from "./smartcontracts/query";
-import { QueryResponse } from "./smartcontracts/queryResponse";
+import { Query } from "./smartcontracts";
+import { QueryResponse } from "./smartcontracts";
 import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
 import { NetworkStatus } from "./networkStatus";
@@ -122,6 +122,10 @@ export interface ISigner {
     sign(signable: ISignable): Promise<void>;
 }
 
+export interface IVerifier {
+    verify(message: IVerifiable): boolean;
+}
+
 /**
  * An interface that defines a signable object (e.g. a {@link Transaction}).
  */
@@ -138,6 +142,20 @@ export interface ISignable {
      * @param signedBy The address of the {@link Signer}
      */
     applySignature(signature: Signature, signedBy: Address): void;
+}
+
+/**
+ * Interface that defines a signed and verifiable object
+ */
+export interface IVerifiable {
+    /**
+     * Returns the signature that should be verified
+     */
+    getSignature(): Signature;
+    /**
+     * Returns the signable object in its raw form - a sequence of bytes to be verified.
+     */
+    serializeForSigning(signedBy?: Address): Buffer;
 }
 
 /**

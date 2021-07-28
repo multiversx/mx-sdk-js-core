@@ -6,10 +6,13 @@ import {
     DAPP_MESSAGE_GET_ADDRESS,
     DAPP_MESSAGE_CONNECT_URL,
     DAPP_MESSAGE_SEND_TRANSACTION_URL,
+    DAPP_MESSAGE_SIGN_TRANSACTION_URL,
     DAPP_MESSAGE_LOG_OUT
 } from "./constants";
 import { mainFrameStyle } from "./dom";
 import { Transaction } from "../transaction";
+import { SignableMessage } from "../signableMessage";
+import { ErrNotImplemented } from "../errors";
 
 export class WalletProvider implements IDappProvider {
     walletUrl: string;
@@ -93,7 +96,7 @@ export class WalletProvider implements IDappProvider {
     /**
      * Fetches the login hook url and redirects the client to the wallet login.
      */
-    async login(options?: { callbackUrl?: string }): Promise<string> {
+    async login(options?: { callbackUrl?: string; token?: string }): Promise<string> {
         if (!this.mainFrame) {
             return '';
         }
@@ -131,7 +134,15 @@ export class WalletProvider implements IDappProvider {
 
             window.addEventListener('message', connectUrl);
         }).then((connectionUrl: string) => {
-            window.location.href = `${this.baseWalletUrl()}${connectionUrl}?callbackUrl=${options !== undefined && options.callbackUrl !== undefined ? options.callbackUrl : window.location.href}`;
+            let callbackUrl = `callbackUrl=${window.location.href}`;
+            if (options && options.callbackUrl) {
+                callbackUrl = `callbackUrl=${options.callbackUrl}`;
+            }
+            let token = '';
+            if (options && options.token) {
+                token = `&token=${options.token}`;
+            }
+            window.location.href = `${this.baseWalletUrl()}${connectionUrl}?${callbackUrl}${token}`;
             return window.location.href;
         }).catch(_ => {
             return '';
@@ -227,6 +238,7 @@ export class WalletProvider implements IDappProvider {
      * Packs a {@link Transaction} and fetches correct redirect URL from the wallet API. Then redirects
      *   the client to the send transaction hook
      * @param transaction
+     * @param options
      */
     async sendTransaction(transaction: Transaction, options?: { callbackUrl?: string }): Promise<Transaction> {
         if (!this.mainFrame) {
@@ -239,13 +251,7 @@ export class WalletProvider implements IDappProvider {
         }
 
         return new Promise<Transaction>((resolve, reject) => {
-            let plainTransaction = transaction.toPlainObject();
-
-            // We adjust the fields, in order to make them compatible with what the wallet expected
-            plainTransaction["data"] = transaction.getData().valueOf().toString();
-            plainTransaction["value"] = transaction.getValue().toString();
-            plainTransaction["gasPrice"] = transaction.getGasPrice().valueOf();
-            plainTransaction["gasLimit"] = transaction.getGasLimit().valueOf();
+            let plainTransaction = WalletProvider.prepareWalletTransaction(transaction);
             console.log("postMessage", DAPP_MESSAGE_SEND_TRANSACTION_URL, plainTransaction);
 
             contentWindow.postMessage({
@@ -283,6 +289,84 @@ export class WalletProvider implements IDappProvider {
             window.location.href = `${this.baseWalletUrl()}${url}&callbackUrl=${options !== undefined && options.callbackUrl !== undefined ? options.callbackUrl : window.location.href}`;
             return transaction;
         });
+    }
+
+    /**
+     * Packs a {@link Transaction} and fetches correct redirect URL from the wallet API. Then redirects
+     *   the client to the sign transaction hook
+     * @param transaction
+     * @param options
+     */
+    async signTransaction(transaction: Transaction, options?: { callbackUrl?: string }): Promise<Transaction> {
+        if (!this.mainFrame) {
+            throw new Error("Wallet provider is not initialised, call init() first");
+        }
+
+        const { contentWindow } = this.mainFrame;
+        if (!contentWindow) {
+            throw new Error("Wallet provider is not initialised, call init() first");
+        }
+
+        return new Promise<Transaction>((resolve, reject) => {
+            let plainTransaction = WalletProvider.prepareWalletTransaction(transaction);
+            console.log("postMessage", DAPP_MESSAGE_SIGN_TRANSACTION_URL, plainTransaction);
+
+            contentWindow.postMessage({
+                type: DAPP_MESSAGE_SIGN_TRANSACTION_URL,
+                data: {
+                    transaction: plainTransaction
+                }
+            }, this.walletUrl);
+
+            const timeout = setTimeout(_ => reject('sign transaction url not responding'), 5000);
+            const signTransactionUrl = (ev: IDappMessageEvent) => {
+                console.log("event", "signTransactionUrl", ev);
+
+                if (!this.isValidWalletSource(ev.origin)) {
+                    return;
+                }
+
+                const { data } = ev;
+                if (data.type !== DAPP_MESSAGE_SIGN_TRANSACTION_URL) {
+                    return;
+                }
+
+                clearTimeout(timeout);
+                window.removeEventListener('message', signTransactionUrl.bind(this));
+
+                if (data.error) {
+                    return reject(data.error);
+                }
+
+                return resolve(data.data.toString());
+            };
+
+            window.addEventListener('message', signTransactionUrl);
+        }).then((url: any) => {
+            window.location.href = `${this.baseWalletUrl()}${url}&callbackUrl=${options !== undefined && options.callbackUrl !== undefined ? options.callbackUrl : window.location.href}`;
+            return transaction;
+        });
+    }
+
+    /**
+     * Method will be available once the ElrondWallet hook will be implemented
+     * @param _
+     */
+    async signMessage(_: SignableMessage): Promise<SignableMessage> {
+        throw new ErrNotImplemented();
+    }
+
+    static prepareWalletTransaction(transaction: Transaction): any {
+        let plainTransaction = transaction.toPlainObject();
+
+        // We adjust the fields, in order to make them compatible with what the wallet expected
+        plainTransaction["nonce"] = transaction.getNonce().valueOf();
+        plainTransaction["data"] = transaction.getData().valueOf().toString();
+        plainTransaction["value"] = transaction.getValue().toString();
+        plainTransaction["gasPrice"] = transaction.getGasPrice().valueOf();
+        plainTransaction["gasLimit"] = transaction.getGasLimit().valueOf();
+
+        return plainTransaction;
     }
 
     private async waitForRemote(): Promise<boolean> {

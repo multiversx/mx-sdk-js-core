@@ -4,6 +4,47 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [Unreleased]
+
+## [6.5.0]
+-   [Extended SignableMessage to allow export to JSON #40](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/40)
+-   [Bugfix: fixed option decoder #39](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/39)
+
+## [6.4.1]
+-   [Keep WalletConnect session alive if still connected on init() #37](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/37)
+
+## [6.4.0]
+-   [Added web wallet token option for login hook #33](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/33)
+
+## [6.3.1]
+-   [Bugfix - Exported UserVerifier #31](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/31)
+
+## [6.3.0]
+-   [Added message signing component #28](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/28)
+
+## [6.2.1]
+-   [Bugfix for number of accounts returned by getAccounts #26](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/26)
+
+## [6.2.0]
+-   [Added custom message to the walletconnect provider #23](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/23)
+
+## [6.1.1]
+
+-   [Updated ESDTToken fields to match new API response #20](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/20)
+    -   `token` is now `identifier`
+
+## [6.1.0]
+
+-   [Added simple signing function for dapp providers #17](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/17)
+
+## [6.0.0]
+
+-   [Added encryption component #11](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/11)
+-   [Added option to config the axios requests #10](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/10)
+    -   Breaking changes:
+        1. `new ProxyProvider(url: string, timeout?: number)` becomes `new ProxyProvider(url: string, config?: AxiosRequestConfig)` -
+           note that `timeout` can still be passed in the `config` object
+
 ## [5.0.1] - 07.06.2021
 
 -   [Feat/nft token #3](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/3)

@@ -234,6 +234,10 @@ export class Transaction implements ISignable {
     serializeForSigning(signedBy: Address): Buffer {
         // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
         let plain = this.toPlainObject(signedBy);
+        // Make sure we never sign the transaction with another signature set up (useful when using the same method for verification)
+        if (plain.signature) {
+            delete plain.signature;
+        }
         let serialized = JSON.stringify(plain);
 
         return Buffer.from(serialized);

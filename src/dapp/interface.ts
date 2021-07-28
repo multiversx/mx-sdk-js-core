@@ -1,13 +1,16 @@
 import { Transaction } from "../transaction";
+import {SignableMessage} from "../signableMessage";
 
 export interface IDappProvider {
     init(): Promise<boolean>;
-    login(options?: {callbackUrl?: string}): Promise<string>;
+    login(options?: {callbackUrl?: string; token?: string}): Promise<string>;
     logout(): Promise<boolean>;
     getAddress(): Promise<string>;
     isInitialized(): boolean;
     isConnected(): Promise<boolean>;
     sendTransaction(transaction: Transaction, options?: {callbackUrl?: string}): Promise<Transaction>;
+    signTransaction(transaction: Transaction, options?: {callbackUrl?: string}): Promise<Transaction>;
+    signMessage(transaction: SignableMessage, options?: {callbackUrl?: string}): Promise<SignableMessage>;
 }
 
 export interface IHWProvider extends IDappProvider {
@@ -33,6 +36,7 @@ export interface IHWElrondApp {
         chainCode?: string;
     }>;
     signTransaction(rawTx: Buffer, usingHash: boolean): Promise<string>;
+    signMessage(rawMessage: Buffer): Promise<string>;
     getAppConfiguration(): Promise<{
         version: string;
         contractData: number;

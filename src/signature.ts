@@ -26,6 +26,9 @@ export class Signature {
     }
 
     static fromHex(value: string): Signature {
+        if (value.startsWith("0x")) {
+            value = value.slice(2);
+        }
         if (!Signature.isValidHex(value)) {
             throw new errors.ErrSignatureCannotCreate(value);
         }

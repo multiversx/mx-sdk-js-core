@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [6.5.1]
+-   [Adapted message signing for ledger #42](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/42)
+
 ## [6.5.0]
 -   [Extended SignableMessage to allow export to JSON #40](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/40)
 -   [Bugfix: fixed option decoder #39](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/39)

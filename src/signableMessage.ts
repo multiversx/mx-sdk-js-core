@@ -1,6 +1,7 @@
 import {ISignable} from "./interface";
 import {Signature} from "./signature";
 import {Address} from "./address";
+import {sign} from "crypto";
 const createKeccakHash = require("keccak");
 
 export const MESSAGE_PREFIX = "\x17Elrond Signed Message:\n";
@@ -42,12 +43,14 @@ export class SignableMessage implements ISignable {
   }
 
   serializeForSigning(): Buffer {
-    let bytesToHash = Buffer.concat([Buffer.from(MESSAGE_PREFIX), this.message]);
+    const messageSize = Buffer.from(this.message.length.toString());
+    const signableMessage = Buffer.concat([messageSize, this.message]);
+    let bytesToHash = Buffer.concat([Buffer.from(MESSAGE_PREFIX), signableMessage]);
     return createKeccakHash("keccak256").update(bytesToHash).digest();
   }
 
   serializeForSigningRaw(): Buffer {
-    return this.message;
+    return Buffer.concat([this.getMessageSize(), this.message]);
   }
 
   getSignature(): Signature {
@@ -56,6 +59,13 @@ export class SignableMessage implements ISignable {
 
   applySignature(signature: Signature): void {
     this.signature = signature;
+  }
+
+  getMessageSize(): Buffer {
+    const messageSize = Buffer.alloc(4);
+    messageSize.writeUInt32BE(this.message.length, 0);
+
+    return messageSize;
   }
 
   toJSON(): object {

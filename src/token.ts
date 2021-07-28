@@ -8,7 +8,7 @@ export enum TokenType {
 }
 
 export class Token {
-    token: string = ''; // Token identifier (ticker + random string, eg. MYTOKEN-12345)
+    identifier: string = ''; // Token identifier (ticker + random string, eg. MYTOKEN-12345)
     name: string = ''; // Token name (eg. MyTokenName123)
     type: TokenType = TokenType.Fungible;
     owner: Address = new Address();
@@ -50,7 +50,7 @@ export class Token {
         canWipe: boolean
     }): Token {
         return new Token({
-            token: response.token,
+            identifier: response.token,
             name: response.name,
             type: TokenType[response.type as keyof typeof TokenType],
             owner: new Address(response.owner),
@@ -72,7 +72,7 @@ export class Token {
         let [tokenName, tokenType, owner, totalMinted, totalBurned, ...propertiesBuffers] = results;
         let properties = parseTokenProperties(propertiesBuffers);
         return new Token({
-            token: tokenIdentifier,
+            identifier: tokenIdentifier,
             type: TokenType[tokenType.toString() as keyof typeof TokenType],
             name: tokenName.toString(),
             owner,
@@ -103,11 +103,11 @@ export class Token {
     }
 
     getTokenIdentifier(): string {
-        return this.token;
+        return this.identifier;
     }
 
     isEgld(): boolean {
-        return this.token == "EGLD";
+        return this.getTokenIdentifier() == "EGLD";
     }
 
     isFungible(): boolean {

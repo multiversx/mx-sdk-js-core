@@ -6,7 +6,7 @@ import { TransactionStatus } from "../../transaction";
 import { ReturnCode } from "../returnCode";
 import BigNumber from "bignumber.js";
 import { SystemWrapper } from "./systemWrapper";
-import { Egld, setupInteractive } from "../..";
+import { Egld, setupInteractiveWithProvider } from "../..";
 
 describe("test smart contract wrapper", async function () {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");
@@ -14,7 +14,7 @@ describe("test smart contract wrapper", async function () {
     let provider = new MockProvider();
     let alice: TestWallet;
     before(async function () {
-        ({ erdSys, wallets: { alice } } = await setupInteractive(provider));
+        ({ erdSys, wallets: { alice } } = await setupInteractiveWithProvider(provider));
     });
 
     it("should interact with 'answer'", async function () {

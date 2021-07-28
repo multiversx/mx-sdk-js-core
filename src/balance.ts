@@ -65,7 +65,7 @@ export class Balance {
      * Returns the string representation of the value (as EGLD currency).
      */
     toCurrencyString(): string {
-        return `${this.toDenominated()} ${this.token.token}`;
+        return `${this.toDenominated()} ${this.token.getTokenIdentifier()}`;
     }
 
     toDenominated(): string {

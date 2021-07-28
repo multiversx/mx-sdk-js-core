@@ -206,8 +206,8 @@ export class ContractWrapper extends ChainSendContext {
         if (value != null && !endpoint.modifiers.isPayable()) {
             throw new Err("A value was provided for a non-payable method");
         }
-        if (value != null && !endpoint.modifiers.isPayableInToken(value.token.token)) {
-            throw new Err(`Token ${value.token.token} is not accepted by payable method. Accepted tokens: ${endpoint.modifiers.payableInTokens}`);
+        if (value != null && !endpoint.modifiers.isPayableInToken(value.token.getTokenIdentifier())) {
+            throw new Err(`Token ${value.token.getTokenIdentifier()} is not accepted by payable method. Accepted tokens: ${endpoint.modifiers.payableInTokens}`);
         }
         let formattedCall = formatEndpoint(endpoint, endpoint, ...args);
         let preparedCall = new PreparedCall(this.smartContract.getAddress(), Egld(0), formattedCall);
@@ -235,7 +235,7 @@ export class ContractWrapper extends ChainSendContext {
         if (value.token.isFungible()) {
             preparedCall.wrap(
                 this.builtinFunctions.format.ESDTTransfer(
-                    value.token.token,
+                    value.token.getTokenIdentifier(),
                     value.valueOf(),
                     preparedCall.formattedCall
                 )
@@ -244,7 +244,7 @@ export class ContractWrapper extends ChainSendContext {
             preparedCall.receiver = this.context.getSender().address;
             preparedCall.wrap(
                 this.builtinFunctions.format.ESDTNFTTransfer(
-                    value.token.token,
+                    value.token.getTokenIdentifier(),
                     value.getNonce(),
                     value.valueOf(),
                     this.smartContract,

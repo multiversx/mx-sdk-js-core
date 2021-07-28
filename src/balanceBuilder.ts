@@ -133,7 +133,7 @@ export function createBalanceBuilder(token: Token): BalanceBuilder {
 /**
  * Builder for an EGLD value.
  */
-export const Egld = createBalanceBuilder(new Token({ token: "EGLD", name: "eGold", decimals: 18, type: TokenType.Fungible }));
+export const Egld = createBalanceBuilder(new Token({ identifier: "EGLD", name: "eGold", decimals: 18, type: TokenType.Fungible }));
 
 function applyDenomination(value: BigNumber.Value, decimals: number): BigNumber {
     return new BigNumber(value).shiftedBy(decimals).decimalPlaces(0);

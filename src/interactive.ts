@@ -15,12 +15,19 @@ export async function setupInteractiveWithProvider(provider: IProvider): Promise
     return { erdSys, Egld, wallets };
 }
 
-export function chooseProvider(providerChoice: string): IProvider {
-    switch (providerChoice) {
-        case "local-testnet": return new ProxyProvider("http://localhost:7950", { timeout: 5000 });
-        case "elrond-testnet": return new ProxyProvider("https://testnet-gateway.elrond.com", { timeout: 5000 });
-        case "elrond-devnet": return new ProxyProvider("https://devnet-gateway.elrond.com", { timeout: 5000 });
-        case "elrond-mainnet": return new ProxyProvider("https://gateway.elrond.com", { timeout: 20000 });
-        default: throw new ErrInvalidArgument("providerChoice is not recognized (must be one of: \"local-testnet\", \"elrond-testnet\", \"elrond-devnet\", \"elrond-mainnet\")");
+export function getProviders(): Record<string, ProxyProvider> {
+    return {
+        "local-testnet": new ProxyProvider("http://localhost:7950", { timeout: 5000 }),
+        "elrond-testnet": new ProxyProvider("https://testnet-gateway.elrond.com", { timeout: 5000 }),
+        "elrond-devnet": new ProxyProvider("https://devnet-gateway.elrond.com", { timeout: 5000 }),
+        "elrond-mainnet": new ProxyProvider("https://gateway.elrond.com", { timeout: 20000 }),
     }
+}
+
+export function chooseProvider(providerChoice: string): IProvider {
+    let providers = getProviders();
+    if (providerChoice in providers) {
+        return providers[providerChoice];
+    }
+    throw new ErrInvalidArgument(`providerChoice is not recognized (must be one of: ${Object.keys(providers)})`);
 }

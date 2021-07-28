@@ -41,7 +41,7 @@ export class SmartContractAbi {
         let constructors = [];
         for (const iface of this.interfaces) {
             let constructor_definition = iface.getConstructorDefinition();
-            if (constructor_definition != null) {
+            if (constructor_definition !== null) {
                 constructors.push(constructor_definition);
             }
         }

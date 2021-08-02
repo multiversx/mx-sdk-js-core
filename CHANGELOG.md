@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [6.5.2]
+-   [Bugfix - corrected compute hash for transaction with options #44](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/44)
+
 ## [6.5.1]
 -   [Adapted message signing for ledger #42](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/42)
 

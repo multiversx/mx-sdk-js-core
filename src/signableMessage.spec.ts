@@ -26,4 +26,14 @@ describe("test signable message", () => {
       signer: 'ElrondWallet'
     }, "invalid signable message returned");
   });
+
+  it("makes soup", async () => {
+    const sm = new SignableMessage({
+      address: alice.address,
+      message: Buffer.from("", "ascii"),
+      signer: "ElrondWallet"
+    });
+
+    console.log(sm.serializeForSigning());
+  });
 });

@@ -46,6 +46,7 @@ export class SignableMessage implements ISignable {
     const messageSize = Buffer.from(this.message.length.toString());
     const signableMessage = Buffer.concat([messageSize, this.message]);
     let bytesToHash = Buffer.concat([Buffer.from(MESSAGE_PREFIX), signableMessage]);
+
     return createKeccakHash("keccak256").update(bytesToHash).digest();
   }
 

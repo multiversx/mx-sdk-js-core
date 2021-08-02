@@ -206,6 +206,10 @@ export class Transaction implements ISignable {
         return this.version;
     }
 
+    getOptions(): TransactionOptions {
+        return this.options;
+    }
+
     doAfterPropertySetter() {
         this.signature = Signature.empty();
         this.hash = TransactionHash.empty();

@@ -3,6 +3,7 @@ import { Balance } from "../balance";
 import { bigIntToBuffer } from "../smartcontracts/codec/utils";
 import { Transaction } from "../transaction";
 import { proto } from "./compiled";
+import {TRANSACTION_OPTIONS_DEFAULT} from "../constants";
 
 /**
  * Hides away the serialization complexity, for each type of object (e.g. transactions).
@@ -29,6 +30,10 @@ export class ProtoSerializer {
             Version: transaction.getVersion().valueOf(),
             Signature: Buffer.from(transaction.getSignature().hex(), "hex")
         });
+
+        if ( transaction.getOptions().valueOf() !== TRANSACTION_OPTIONS_DEFAULT ) {
+            protoTransaction.Options = transaction.getOptions().valueOf();
+        }
         
         let encoded = proto.Transaction.encode(protoTransaction).finish();
         let buffer = Buffer.from(encoded);

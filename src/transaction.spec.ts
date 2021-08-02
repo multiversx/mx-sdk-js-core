@@ -78,7 +78,7 @@ describe("test transaction construction", async () => {
 
         await wallets.alice.signer.sign(transaction);
         assert.equal("c83e69b853a891bf2130c1839362fe2a7a8db327dcc0c9f130497a4f24b0236140b394801bb2e04ce061a6f873cb432bf1bb1e6072e295610904662ac427a30a", transaction.getSignature().hex());
-        assert.equal(transaction.getHash().toString(), "3e204088f93109ed855ffe1e5619c96c0c5f9ab7d75d3690c296792451b4d1ab");
+        assert.equal(transaction.getHash().toString(), "32fb1681bd532b226b5bdeed61ae62ce9416bf5e92e48caf96253ff72d1670ac");
     });
 
     it("with data, with value", async () => {

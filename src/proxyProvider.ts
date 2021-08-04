@@ -27,8 +27,14 @@ export class ProxyProvider implements IProvider {
      */
     constructor(url: string, config?: AxiosRequestConfig) {
         this.url = url;
+        // See: https://github.com/axios/axios/issues/983
         this.config = config || {
             timeout: 1000,
+            transformResponse: [
+              function(data) {
+                return JSONbig.parse(data);
+              },
+            ],
         };
     }
 
@@ -199,10 +205,3 @@ export class ProxyProvider implements IProvider {
         throw new errors.ErrApiProviderGet(resourceUrl, originalErrorMessage, error);
     }
 }
-
-// See: https://github.com/axios/axios/issues/983
-axios.defaults.transformResponse = [
-    function (data) {
-        return JSONbig.parse(data);
-    },
-];

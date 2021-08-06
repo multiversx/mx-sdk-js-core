@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 import { Balance, ErrInvariantFailed } from ".";
+import { ErrInvalidArgument } from "./errors";
 import { Token, TokenType } from "./token";
 
 /**
@@ -136,5 +137,8 @@ export function createBalanceBuilder(token: Token): BalanceBuilder {
 export const Egld = createBalanceBuilder(new Token({ identifier: "EGLD", name: "eGold", decimals: 18, type: TokenType.Fungible }));
 
 function applyDenomination(value: BigNumber.Value, decimals: number): BigNumber {
+    if (decimals < 0) {
+        throw new ErrInvalidArgument("The number of decimals must be positive");
+    }
     return new BigNumber(value).shiftedBy(decimals).decimalPlaces(0);
 }

@@ -46,7 +46,7 @@ export class NFTToken {
         wiped: string
     }) {
         let nftToken = new NFTToken(response);
-        return nftToken
+        return nftToken;
     }
 
     getTokenName() {

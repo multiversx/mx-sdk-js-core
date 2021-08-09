@@ -1,13 +1,13 @@
 import { assert } from "chai";
 import { Address } from "../address";
 import { ContractFunction } from "./function";
-import { getMainnetProvider } from "../testutils";
 import { SmartContract } from "./smartContract";
 import * as errors from "../errors";
 import { AddressValue } from "./typesystem";
+import { chooseProvider } from "../interactive";
 
 describe("test queries on mainnet", function () {
-    let provider = getMainnetProvider();
+    let provider = chooseProvider("elrond-mainnet");
     let delegationContract = new SmartContract({ address: new Address("erd1qqqqqqqqqqqqqpgqxwakt2g7u9atsnr03gqcgmhcv38pt7mkd94q6shuwt") });
 
     it("delegation: should getTotalStakeByType", async () => {
@@ -30,7 +30,7 @@ describe("test queries on mainnet", function () {
         assert.isAtMost(response.gasUsed.valueOf(), 50000000);
     });
 
-    it("delegation: should getFullWaitingList", async function() {
+    it("delegation: should getFullWaitingList", async function () {
         this.timeout(20000);
 
         let response = await delegationContract.runQuery(provider, {
@@ -41,7 +41,7 @@ describe("test queries on mainnet", function () {
         assert.isAtLeast(response.returnData.length, 20000);
     });
 
-    it("delegation: should getClaimableRewards", async function() {
+    it("delegation: should getClaimableRewards", async function () {
         this.timeout(5000);
 
         // First, expect an error (bad arguments):

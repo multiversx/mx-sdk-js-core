@@ -1,6 +1,6 @@
 import * as errors from "../errors";
 import { assert } from "chai";
-import { TestWallets } from "../testutils";
+import { loadMnemonic, loadPassword, loadTestWallets, TestWallet } from "../testutils";
 import { UserSecretKey } from "./userKeys";
 import { Mnemonic } from "./mnemonic";
 import { UserWallet } from "./userWallet";
@@ -12,15 +12,16 @@ import { Nonce } from "../nonce";
 import { Balance } from "../balance";
 import { ChainID, GasLimit, GasPrice } from "../networkParams";
 import { TransactionPayload } from "../transactionPayload";
-import {UserVerifier} from "./userVerifier";
-import {SignableMessage} from "../signableMessage";
+import { UserVerifier } from "./userVerifier";
+import { SignableMessage } from "../signableMessage";
 
 describe("test user wallets", () => {
-    let wallets = new TestWallets();
-    let alice = wallets.alice;
-    let bob = wallets.bob;
-    let carol = wallets.carol;
-    let password = wallets.password;
+    let alice: TestWallet, bob: TestWallet, carol: TestWallet;
+    let password: string;
+    before(async function () {
+        ({ alice, bob, carol } = await loadTestWallets());
+        password = await loadPassword();
+    });
 
     it("should generate mnemonic", () => {
         let mnemonic = Mnemonic.generate();
@@ -28,8 +29,8 @@ describe("test user wallets", () => {
         assert.lengthOf(words, 24);
     });
 
-    it("should derive keys", () => {
-        let mnemonic = Mnemonic.fromString(wallets.mnemonic);
+    it("should derive keys", async () => {
+        let mnemonic = Mnemonic.fromString(await loadMnemonic());
 
         assert.equal(mnemonic.deriveKey(0).hex(), alice.secretKeyHex);
         assert.equal(mnemonic.deriveKey(1).hex(), bob.secretKeyHex);
@@ -37,7 +38,7 @@ describe("test user wallets", () => {
     });
 
     it("should create secret key", () => {
-        let keyHex = wallets.alice.secretKeyHex;
+        let keyHex = alice.secretKeyHex;
         let fromBuffer = new UserSecretKey(Buffer.from(keyHex, "hex"));
         let fromHex = UserSecretKey.fromString(keyHex);
 
@@ -162,7 +163,7 @@ describe("test user wallets", () => {
 
     it("should sign transactions using PEM files", async () => {
         let signer = UserSigner.fromPem(alice.pemFileText);
-        
+
         let transaction = new Transaction({
             nonce: new Nonce(0),
             value: Balance.Zero(),
@@ -177,7 +178,7 @@ describe("test user wallets", () => {
         assert.equal(transaction.getSignature().hex(), "c0bd2b3b33a07b9cc5ee7435228acb0936b3829c7008aacabceea35163e555e19a34def2c03a895cf36b0bcec30a7e11215c11efc0da29294a11234eb2b3b906");
     });
 
-    it("signs a general message", function() {
+    it("signs a general message", function () {
         let signer = new UserSigner(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf"));
         let verifier = new UserVerifier(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf").generatePublicKey());
         const message = new SignableMessage({

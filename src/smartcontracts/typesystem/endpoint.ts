@@ -1,5 +1,4 @@
 import { TypeExpressionParser } from "./typeExpressionParser";
-import { TypeMapper } from "./typeMapper";
 import { Type } from "./types";
 
 const NamePlaceholder = "?";
@@ -18,6 +17,10 @@ export class EndpointDefinition {
         this.modifiers = modifiers;
     }
 
+    isConstructor(): boolean {
+        return this.name == "constructor";
+    }
+
     static fromJSON(json: {
         name: string,
         storageModifier: string,
@@ -25,7 +28,7 @@ export class EndpointDefinition {
         inputs: any[],
         outputs: []
     }): EndpointDefinition {
-        json.name = json.name || NamePlaceholder;
+        json.name = json.name == null ? NamePlaceholder : json.name;
         json.payableInTokens = json.payableInTokens || [];
         json.inputs = json.inputs || [];
         json.outputs = json.outputs || [];
@@ -65,6 +68,10 @@ export class EndpointModifiers {
         }
 
         return false;
+    }
+
+    isPayable() {
+        return this.payableInTokens.length != 0;
     }
 
     isReadonly() {

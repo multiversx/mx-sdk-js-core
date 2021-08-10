@@ -3,7 +3,7 @@ import {SignableMessage} from "../signableMessage";
 
 export interface IDappProvider {
     init(): Promise<boolean>;
-    login(options?: {callbackUrl?: string; token?: string}): Promise<string>;
+    login(options?: {callbackUrl?: string; token?: string; addressIndex?: number}): Promise<string>;
     logout(): Promise<boolean>;
     getAddress(): Promise<string>;
     isInitialized(): boolean;
@@ -35,6 +35,11 @@ export interface IHWElrondApp {
         address: string;
         chainCode?: string;
     }>;
+    setAddress(
+        account: number,
+        index: number,
+        display?: boolean,
+    ): Promise<any>;
     signTransaction(rawTx: Buffer, usingHash: boolean): Promise<string>;
     signMessage(rawMessage: Buffer): Promise<string>;
     getAppConfiguration(): Promise<{

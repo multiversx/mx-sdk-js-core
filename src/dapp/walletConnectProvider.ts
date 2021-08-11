@@ -18,6 +18,7 @@ export class WalletConnectProvider implements IDappProvider {
     provider: IProvider;
     walletConnectBridge: string;
     address: string = "";
+    signature: string = "";
     walletConnector: WalletClient | undefined;
     private onClientConnect: IClientConnect;
 
@@ -106,6 +107,18 @@ export class WalletConnectProvider implements IDappProvider {
         }
       
         return this.address;
+    }
+
+    /**
+     * Fetches the wallet connect signature
+     */
+    async getSignature(): Promise<string> {
+        if (!this.walletConnector) {
+            Logger.error("getSignature: Wallet Connect not initialised, call init() first");
+            throw new Error("Wallet Connect not initialised, call init() first");
+        }
+        
+        return this.signature;
     }
 
     /**
@@ -200,7 +213,14 @@ export class WalletConnectProvider implements IDappProvider {
             accounts: [account],
         } = params[0];
 
-        let _ = this.loginAccount(account);
+        if (account.includes(".")) {
+            const address = account.split(".");
+            if (address.length > 0) {
+                let _ = this.loginAccount(address[0], address[1]);
+            }
+        } else {
+            let _ = this.loginAccount(account);
+        }
     }
 
     private async onDisconnect(error: any) {
@@ -210,9 +230,12 @@ export class WalletConnectProvider implements IDappProvider {
         this.onClientConnect.onClientLogout();
     }
 
-    private async loginAccount(address: string) {
+    private async loginAccount(address: string, signature?: string) {
         if (this.addressIsValid(address)) {
             this.address = address;
+            if (signature) {
+                this.signature = signature;
+            }
             this.onClientConnect.onClientLogin();
             return;
         }

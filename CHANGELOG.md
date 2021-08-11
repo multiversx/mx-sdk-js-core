@@ -24,6 +24,9 @@ Breaking changes:
     - Removed `TestWallets`
     - Use added function `loadTestWallets` (or `loadInteractive`)
 
+## [6.6.0]
+-   [Added signature to walletConnectProvider to handle Token Login #49](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/49)
+
 ## [6.5.2]
 -   [Bugfix - corrected compute hash for transaction with options #44](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/44)
 

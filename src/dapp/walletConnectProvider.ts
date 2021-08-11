@@ -43,8 +43,15 @@ export class WalletConnectProvider implements IDappProvider {
           this.walletConnector.connected &&
           this.walletConnector.accounts.length
         ) {
-          const [account] = this.walletConnector.accounts;
-          this.loginAccount(account);
+            const [account] = this.walletConnector.accounts;
+            if (account.includes(".")) {
+                const address = account.split(".");
+                if (address.length > 0) {
+                    this.loginAccount(address[0], address[1]);
+                }
+            } else {
+                this.loginAccount(account);
+            }
         }
 
         return true;

@@ -16,7 +16,7 @@ export class AbiRegistry {
      * Convenience factory function to load ABIs (from files or URLs).
      * This function will also remap ABI types to know types (on best-efforts basis).
      */
-    static async load(json: { files?: string[]; urls?: string[] }) {
+    static async load(json: { files?: string[]; urls?: string[] }): Promise<AbiRegistry> {
         let registry = new AbiRegistry();
         for (const file of json.files || []) {
             await registry.extendFromFile(file);
@@ -117,15 +117,10 @@ export class AbiRegistry {
         for (const iface of this.interfaces) {
             let newEndpoints: EndpointDefinition[] = [];
             for (const endpoint of iface.endpoints) {
-                let newInput = endpoint.input.map(
-                    (e) => new EndpointParameterDefinition(e.name, e.description, mapper.mapType(e.type))
-                );
-                let newOutput = endpoint.output.map(
-                    (e) => new EndpointParameterDefinition(e.name, e.description, mapper.mapType(e.type))
-                );
-                newEndpoints.push(new EndpointDefinition(endpoint.name, newInput, newOutput, endpoint.modifiers));
+                newEndpoints.push(mapEndpoint(endpoint, mapper));
             }
-            newInterfaces.push(new ContractInterface(iface.name, newEndpoints));
+            let newConstructor = iface.constructorDefinition ? mapEndpoint(iface.constructorDefinition, mapper) : null;
+            newInterfaces.push(new ContractInterface(iface.name, newConstructor, newEndpoints));
         }
         // Now return the new registry, with all types remapped to known types
         let newRegistry = new AbiRegistry();
@@ -134,4 +129,14 @@ export class AbiRegistry {
 
         return newRegistry;
     }
+}
+
+function mapEndpoint(endpoint: EndpointDefinition, mapper: TypeMapper): EndpointDefinition {
+    let newInput = endpoint.input.map(
+        (e) => new EndpointParameterDefinition(e.name, e.description, mapper.mapType(e.type))
+    );
+    let newOutput = endpoint.output.map(
+        (e) => new EndpointParameterDefinition(e.name, e.description, mapper.mapType(e.type))
+    );
+    return new EndpointDefinition(endpoint.name, newInput, newOutput, endpoint.modifiers);
 }

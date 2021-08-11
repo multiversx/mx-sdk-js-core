@@ -1,32 +1,29 @@
 import { Transaction } from "./transaction";
 import { GasLimit } from "./networkParams";
-import { Account } from "./account";
 import { TransactionPayload } from "./transactionPayload";
 import { NetworkConfig } from "./networkConfig";
 import { Balance } from "./balance";
-import { TestWallets } from "./testutils";
-import { getDevnetProvider } from "./testutils";
+import { loadTestWallets, TestWallet } from "./testutils";
 import { Logger } from "./logger";
 import { assert } from "chai";
+import { chooseProvider } from "./interactive";
 
 describe("test transaction", function () {
-    let wallets = new TestWallets();
-    let aliceWallet = wallets.alice;
-    let alice = new Account(aliceWallet.address);
-    let aliceSigner = aliceWallet.signer;
-    let bobWallet = wallets.bob;
-    let bob = new Account(bobWallet.address);
+    let alice: TestWallet, bob: TestWallet;
+    before(async function () {
+        ({ alice, bob } = await loadTestWallets());
+    });
 
-    it("should send transactions", async function() {
+    it("should send transactions", async function () {
         this.timeout(20000);
 
-        let devnet = getDevnetProvider();
+        let devnet = chooseProvider("local-testnet");
 
         await NetworkConfig.getDefault().sync(devnet);
         await alice.sync(devnet);
 
         await bob.sync(devnet);
-        let initialBalanceOfBob = bob.balance;
+        let initialBalanceOfBob = bob.account.balance;
 
         let transactionOne = new Transaction({
             receiver: bob.address,
@@ -38,12 +35,12 @@ describe("test transaction", function () {
             value: Balance.egld(43)
         });
 
-        transactionOne.setNonce(alice.nonce);
-        alice.incrementNonce();
-        transactionTwo.setNonce(alice.nonce);
+        transactionOne.setNonce(alice.account.nonce);
+        alice.account.incrementNonce();
+        transactionTwo.setNonce(alice.account.nonce);
 
-        await aliceSigner.sign(transactionOne);
-        await aliceSigner.sign(transactionTwo);
+        await alice.signer.sign(transactionOne);
+        await alice.signer.sign(transactionTwo);
 
         await transactionOne.send(devnet);
         await transactionTwo.send(devnet);
@@ -52,15 +49,15 @@ describe("test transaction", function () {
         await transactionTwo.awaitExecuted(devnet);
 
         await bob.sync(devnet);
-        let newBalanceOfBob = bob.balance;
+        let newBalanceOfBob = bob.account.balance;
 
         assert.deepEqual(Balance.egld(85).valueOf(), newBalanceOfBob.valueOf().minus(initialBalanceOfBob.valueOf()));
     });
 
-    it("should simulate transactions", async function() {
+    it("should simulate transactions", async function () {
         this.timeout(20000);
 
-        let devnet = getDevnetProvider();
+        let devnet = chooseProvider("local-testnet");
 
         await NetworkConfig.getDefault().sync(devnet);
         await alice.sync(devnet);
@@ -79,11 +76,11 @@ describe("test transaction", function () {
             value: Balance.egld(1000000)
         });
 
-        transactionOne.setNonce(alice.nonce);
-        transactionTwo.setNonce(alice.nonce);
+        transactionOne.setNonce(alice.account.nonce);
+        transactionTwo.setNonce(alice.account.nonce);
 
-        await aliceSigner.sign(transactionOne);
-        await aliceSigner.sign(transactionTwo);
+        await alice.signer.sign(transactionOne);
+        await alice.signer.sign(transactionTwo);
 
         Logger.trace(JSON.stringify(await transactionOne.simulate(devnet), null, 4));
         Logger.trace(JSON.stringify(await transactionTwo.simulate(devnet), null, 4));

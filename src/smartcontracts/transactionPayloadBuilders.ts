@@ -129,7 +129,7 @@ export class ContractCallPayloadBuilder {
     /**
      * Sets the function to be called (executed).
      */
-    setFunction (contractFunction: ContractFunction): ContractCallPayloadBuilder {
+    setFunction(contractFunction: ContractFunction): ContractCallPayloadBuilder {
         this.contractFunction = contractFunction;
         return this;
     }
@@ -168,7 +168,6 @@ function appendArgumentsToString(to: string, values: TypedValue[]) {
         return to;
     }
 
-    let serializer = new ArgSerializer();
-    let argumentsString = serializer.valuesToString(values);
+    let argumentsString = new ArgSerializer().valuesToString(values);
     return `${to}@${argumentsString}`;
 }

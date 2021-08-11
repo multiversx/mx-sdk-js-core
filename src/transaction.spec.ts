@@ -5,7 +5,7 @@ import { Nonce } from "./nonce";
 import { ChainID, GasLimit, GasPrice, GasPriceModifier, TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
 import { Balance } from "./balance";
-import { TestWallets } from "./testutils";
+import { loadTestWallets, TestWallet } from "./testutils";
 import { NetworkConfig } from "./networkConfig";
 import { Address } from "./address";
 
@@ -31,7 +31,10 @@ describe("test transaction", () => {
 });
 
 describe("test transaction construction", async () => {
-    let wallets = new TestWallets();
+    let wallets: Record<string, TestWallet>;
+    before(async function () {
+        wallets = await loadTestWallets();
+    });
 
     it("with no data, no value", async () => {
         let transaction = new Transaction({

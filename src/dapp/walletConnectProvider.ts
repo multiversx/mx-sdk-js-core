@@ -79,7 +79,7 @@ export class WalletConnectProvider implements IDappProvider {
         }
 
         await this.walletConnector?.createSession({ chainId: WALLETCONNECT_ELROND_CHAIN_ID });
-        if (!this.walletConnector?.uri) return "";
+        if (!this.walletConnector?.uri) { return ""; }
         return this.walletConnector?.uri;
     }
 
@@ -216,10 +216,10 @@ export class WalletConnectProvider implements IDappProvider {
         if (account.includes(".")) {
             const address = account.split(".");
             if (address.length > 0) {
-                this.loginAccount(address[0], address[1]);
+                let _ = this.loginAccount(address[0], address[1]);
             }
         } else {
-            this.loginAccount(account);
+            let _ = this.loginAccount(account);
         }
     }
 

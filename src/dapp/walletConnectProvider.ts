@@ -45,10 +45,8 @@ export class WalletConnectProvider implements IDappProvider {
         ) {
             const [account] = this.walletConnector.accounts;
             if (account.includes(".")) {
-                const address = account.split(".");
-                if (address.length > 0) {
-                    this.loginAccount(address[0], address[1]);
-                }
+                const [address, signature] = account.split(".");
+                this.loginAccount(address, signature);
             } else {
                 this.loginAccount(account);
             }
@@ -221,10 +219,8 @@ export class WalletConnectProvider implements IDappProvider {
         } = params[0];
 
         if (account.includes(".")) {
-            const address = account.split(".");
-            if (address.length > 0) {
-                this.loginAccount(address[0], address[1]);
-            }
+            const [address, signature] = account.split(".");
+            this.loginAccount(address, signature);
         } else {
             this.loginAccount(account);
         }

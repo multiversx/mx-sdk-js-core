@@ -13,6 +13,7 @@ import {mainFrameStyle} from "./dom";
 import {Transaction} from "../transaction";
 import {SignableMessage} from "../signableMessage";
 import {ErrNotImplemented} from "../errors";
+import {main} from "ts-node/dist/bin";
 
 export class WalletProvider implements IDappProvider {
     walletUrl: string;
@@ -412,6 +413,7 @@ export class WalletProvider implements IDappProvider {
 
         let mainFrame = document.createElement('iframe');
         mainFrame.src = this.walletUrl;
+        mainFrame.id = this.customId;
         Object.assign(mainFrame.style, mainFrameStyle());
         mainFrame.dataset.initialized = "false";
         document.body.appendChild(mainFrame);

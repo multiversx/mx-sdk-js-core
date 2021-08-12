@@ -1,9 +1,5 @@
-import { Address } from "../address";
-import { Balance } from "../balance";
-import { GasLimit } from "../networkParams";
 import { SignableMessage } from "../signableMessage";
 import { Transaction } from "../transaction";
-import { TransactionPayload } from "../transactionPayload";
 import { IDappProvider } from "./interface";
 
 export class ExtensionProvider implements IDappProvider {

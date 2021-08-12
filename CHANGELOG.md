@@ -24,6 +24,9 @@ Breaking changes:
     - Removed `TestWallets`
     - Use added function `loadTestWallets` (or `loadInteractive`)
 
+## [6.6.1]
+-   [Bugfixed WalletProvider by adding possibility to match iframe by id #53](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/53)
+
 ## [6.6.0]
 -   [Added signature to walletConnectProvider to handle Token Login #49](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/49)
 

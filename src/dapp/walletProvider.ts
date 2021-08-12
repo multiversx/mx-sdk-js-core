@@ -16,14 +16,17 @@ import { ErrNotImplemented } from "../errors";
 
 export class WalletProvider implements IDappProvider {
     walletUrl: string;
+    customId: string;
     mainFrame: HTMLIFrameElement | undefined;
 
     /**
      * Creates a new WalletProvider
      * @param walletURL
+     * @param customId
      */
-    constructor(walletURL: string = '') {
+    constructor(walletURL: string = '', customId = '') {
         this.walletUrl = walletURL;
+        this.customId = customId;
         this.attachMainFrame();
         let _ = this.init();
     }
@@ -396,7 +399,12 @@ export class WalletProvider implements IDappProvider {
     }
 
     private attachMainFrame() {
-        const currentMainframe = <HTMLIFrameElement>document.querySelector(`iframe[src="${this.walletUrl}"]`);
+        let currentMainframe: HTMLIFrameElement|null;
+        if (this.customId) {
+            currentMainframe = document.querySelector(`iframe[id="${this.customId}"]`);
+        } else {
+            currentMainframe = document.querySelector(`iframe[src="${this.walletUrl}"]`);
+        }
         if (currentMainframe) {
             this.mainFrame = currentMainframe;
             return;

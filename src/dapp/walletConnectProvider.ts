@@ -80,7 +80,7 @@ export class WalletConnectProvider implements IDappProvider {
         }
 
         await this.walletConnector?.createSession({ chainId: WALLETCONNECT_ELROND_CHAIN_ID });
-        if (!this.walletConnector?.uri) return "";
+        if (!this.walletConnector?.uri) { return ""; }
         return this.walletConnector?.uri;
     }
 

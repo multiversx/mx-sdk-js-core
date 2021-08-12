@@ -1,11 +1,10 @@
 import { Balance } from "../balance";
 import { Address } from "../address";
-import { GasLimit } from "../networkParams";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
-import { ISmartContract as ISmartContract } from "./interface";
+import { CallArguments, DeployArguments, ISmartContract as ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
 import { Nonce } from "../nonce";
 import { ContractFunction } from "./function";
@@ -62,7 +61,7 @@ export class SmartContract implements ISmartContract {
             // and returns a prepared contract interaction.
             this.methods[functionName] = function (args: TypedValue[]) {
                 let func = new ContractFunction(functionName);
-                let interaction = new Interaction(contract, func, args || []);
+                let interaction = new Interaction(contract, func, func, args || []);
                 return interaction;
             };
         }
@@ -79,7 +78,6 @@ export class SmartContract implements ISmartContract {
      * Gets the address, as on Network.
      */
     getAddress(): Address {
-        this.address.assertNotEmpty();
         return this.address;
     }
 
@@ -120,9 +118,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
      */
-    deploy({ code, codeMetadata, initArguments, value, gasLimit }
-        : { code: Code, codeMetadata?: CodeMetadata, initArguments?: TypedValue[], value?: Balance, gasLimit: GasLimit }
-    ): Transaction {
+    deploy({ code, codeMetadata, initArguments, value, gasLimit }: DeployArguments): Transaction {
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
         value = value || Balance.Zero();
@@ -159,16 +155,15 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
-    upgrade({ code, codeMetadata, initArgs, value, gasLimit }
-        : { code: Code, codeMetadata?: CodeMetadata, initArgs?: TypedValue[], value?: Balance, gasLimit: GasLimit }): Transaction {
+    upgrade({ code, codeMetadata, initArguments, value, gasLimit }: UpgradeArguments): Transaction {
         codeMetadata = codeMetadata || new CodeMetadata();
-        initArgs = initArgs || [];
+        initArguments = initArguments || [];
         value = value || Balance.Zero();
 
         let payload = TransactionPayload.contractUpgrade()
             .setCode(code)
             .setCodeMetadata(codeMetadata)
-            .setInitArgs(initArgs)
+            .setInitArgs(initArguments)
             .build();
 
         let transaction = new Transaction({
@@ -192,8 +187,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
-    call({ func, args, value, gasLimit }
-        : { func: ContractFunction, args?: TypedValue[], value?: Balance, gasLimit: GasLimit }): Transaction {
+    call({ func, args, value, gasLimit, receiver }: CallArguments): Transaction {
         args = args || [];
         value = value || Balance.Zero();
 
@@ -203,7 +197,7 @@ export class SmartContract implements ISmartContract {
             .build();
 
         let transaction = new Transaction({
-            receiver: this.getAddress(),
+            receiver: receiver ? receiver : this.getAddress(),
             value: value,
             gasLimit: gasLimit,
             data: payload
@@ -220,7 +214,7 @@ export class SmartContract implements ISmartContract {
 
     async runQuery(
         provider: IProvider,
-        { func, args, value, caller }: { func: ContractFunction, args?: TypedValue[], value?: Balance, caller?: Address })
+        { func, args, value, caller }: QueryArguments)
         : Promise<QueryResponse> {
         let query = new Query({
             address: this.address,

@@ -1,13 +1,11 @@
 import { GasLimit } from "../networkParams";
-import * as errors from "../errors";
 import { EndpointDefinition, TypedValue } from "./typesystem";
 import { MaxUint64 } from "./query";
 import { ReturnCode } from "./returnCode";
-import { guardValueIsSet } from "../utils";
-import { ArgSerializer } from "./argSerializer";
 import BigNumber from "bignumber.js";
+import { Result } from "./result";
 
-export class QueryResponse {
+export class QueryResponse implements Result.IResult {
     /**
      * If available, will provide typed output arguments (with typed values).
      */
@@ -43,19 +41,28 @@ export class QueryResponse {
         });
     }
 
-    assertSuccess() {
-        if (this.isSuccess()) {
-            return;
-        }
+    getEndpointDefinition(): EndpointDefinition | undefined {
+        return this.endpointDefinition;
+    }
+    getReturnCode(): ReturnCode {
+        return this.returnCode;
+    }
+    getReturnMessage(): string {
+        return this.returnMessage;
+    }
+    unpackOutput(): any {
+        return Result.unpackOutput(this);
+    }
 
-        throw new errors.ErrContract(`${this.returnCode}: ${this.returnMessage}`);
+    assertSuccess() {
+        Result.assertSuccess(this);
     }
 
     isSuccess(): boolean {
-        return this.returnCode.equals(ReturnCode.Ok);
+        return this.returnCode.isSuccess();
     }
 
-    setEndpointDefinition(endpointDefinition: EndpointDefinition) {
+    setEndpointDefinition(endpointDefinition: EndpointDefinition): void {
         this.endpointDefinition = endpointDefinition;
     }
 
@@ -67,12 +74,7 @@ export class QueryResponse {
     }
 
     outputTyped(): TypedValue[] {
-        this.assertSuccess();
-        guardValueIsSet("endpointDefinition", this.endpointDefinition);
-
-        let buffers = this.outputUntyped();
-        let values = new ArgSerializer().buffersToValues(buffers, this.endpointDefinition!.output);
-        return values;
+        return Result.outputTyped(this);
     }
 
     /**

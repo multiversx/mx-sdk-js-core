@@ -13,7 +13,6 @@ import {mainFrameStyle} from "./dom";
 import {Transaction} from "../transaction";
 import {SignableMessage} from "../signableMessage";
 import {ErrNotImplemented} from "../errors";
-import {main} from "ts-node/dist/bin";
 
 export class WalletProvider implements IDappProvider {
     walletUrl: string;

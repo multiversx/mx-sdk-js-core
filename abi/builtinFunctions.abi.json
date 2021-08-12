@@ -1,0 +1,109 @@
+{
+    "name": "builtinFunctions",
+    "endpoints": [
+        {
+            "name": "ESDTTransfer",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "value",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "functionAndArguments",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "ESDTNFTTransfer",
+            "inputs": [
+                {
+                    "name": "tokenName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "nonce",
+                    "type": "U64"
+                },
+                {
+                    "name": "quantity",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "destination",
+                    "type": "Address"
+                },
+                {
+                    "name": "functionAndArguments",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "ESDTNFTCreate",
+            "inputs": [
+                {
+                    "name": "tokenIdentifier",
+                    "type": "bytes"
+                },
+                {
+                    "name": "initialQuantity",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "NFTName",
+                    "type": "bytes"
+                },
+                {
+                    "name": "royalties",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "hash",
+                    "type": "bytes"
+                },
+                {
+                    "name": "attributes",
+                    "type": "bytes"
+                },
+                {
+                    "name": "URIs",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "name": "tokenNonce",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "ESDTNFTAddQuantity",
+            "inputs": [
+                {
+                    "name": "tokenIdentifier",
+                    "type": "bytes"
+                },
+                {
+                    "name": "tokenNonce",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        }
+    ]
+}

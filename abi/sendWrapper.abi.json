@@ -1,0 +1,13 @@
+{
+    "name": "send",
+    "endpoints": [
+        {
+            "name": "",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": []
+        }
+    ]
+}

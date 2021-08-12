@@ -6,6 +6,24 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+-   [Contract wrapper](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9)
+    - Added `ContractWrapper`, `SystemWrapper` - for more details check the pull request.
+    - Added support for constructors in ABIs
+    - Added ABIs:
+      - builtin functions
+      - ESDT system smart contract
+    - Added `BalanceBuilder` interface
+    - Added `NativeSerializer`
+
+Breaking changes:
+-   Changed how a provider is obtained:
+    - Removed `getDevnetProvider`, `getTestnetProvider`, `getMainnetProvider`
+    - Use added `chooseProvider`
+-   Renamed `ESDTToken` to `Token`
+-   Changed how test wallets (alice, bob, carol etc.) are obtained, added all 12 test wallets:
+    - Removed `TestWallets`
+    - Use added function `loadTestWallets` (or `loadInteractive`)
+
 ## [6.6.2]
 -   [Quickfix - added custom id to iframe creation #55](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/55)
 

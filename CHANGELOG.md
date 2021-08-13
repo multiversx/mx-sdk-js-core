@@ -24,6 +24,9 @@ Breaking changes:
     - Removed `TestWallets`
     - Use added function `loadTestWallets` (or `loadInteractive`)
 
+## [6.6.2]
+-   [Quickfix - added custom id to iframe creation #55](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/55)
+
 ## [6.6.1]
 -   [Bugfixed WalletProvider by adding possibility to match iframe by id #53](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/53)
 

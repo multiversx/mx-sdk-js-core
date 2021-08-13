@@ -10,13 +10,74 @@ export class ExtensionProvider implements IDappProvider {
   private extensionId: string = "";
   private extensionURL: string = "";
   private extensionPopupWindow: Window | null;
-  private account: any;
+  public account: any;
 
   constructor(extensionId: string) {
     this.extensionId = extensionId;
     this.extensionURL = `chrome-extension://${this.extensionId}/index.html`;
     this.extensionPopupWindow = null;
     this.init().then();
+  }
+
+  async init(): Promise<boolean> {
+    return true;
+  }
+
+  async login(
+    options: {
+      callbackUrl?: string;
+      token?: string;
+    } = {}
+  ): Promise<string> {
+    this.openExtensionPopup();
+    const { token } = options;
+    const data = token ? token : "";
+    await this.startExtMsgChannel("connect", data);
+    return this.account.address;
+  }
+
+  async logout(): Promise<boolean> {
+    return true;
+  }
+
+  async getAddress(): Promise<string> {
+    return this.account.address;
+  }
+
+  isInitialized(): boolean {
+    return true;
+  }
+
+  async isConnected(): Promise<boolean> {
+    return true;
+  }
+
+  async sendTransaction(transaction: Transaction): Promise<Transaction> {
+    return (await this.processTransactions([transaction], false))[0];
+  }
+  async sendTransactions(
+    transactions: Array<Transaction>
+  ): Promise<Array<Transaction>> {
+    return await this.processTransactions(transactions, false);
+  }
+
+  async signTransaction(transaction: Transaction): Promise<Transaction> {
+    return (await this.processTransactions([transaction], true))[0];
+  }
+
+  async signTransactions(
+    transactions: Array<Transaction>
+  ): Promise<Array<Transaction>> {
+    return await this.processTransactions(transactions, true);
+  }
+
+  async signMessage(message: SignableMessage): Promise<SignableMessage> {
+    this.openExtensionPopup();
+    const data = {
+      account: this.account.index,
+      message: message.message,
+    };
+    return await this.startExtMsgChannel("signMessage", data);
   }
 
   private openExtensionPopup() {
@@ -41,7 +102,6 @@ export class ExtensionProvider implements IDappProvider {
         ) {
           switch (event.data.type) {
             case "popupReady":
-              console.log("popup ready");
               event.ports[0].postMessage({
                 target: "erdw-inpage",
                 type: operation,
@@ -77,58 +137,6 @@ export class ExtensionProvider implements IDappProvider {
     });
   }
 
-  async init(): Promise<boolean> {
-    return true;
-  }
-
-  async login(
-    options: {
-      callbackUrl?: string;
-      token?: string;
-    } = {}
-  ): Promise<string> {
-    this.openExtensionPopup();
-    const { token } = options;
-    const data = token ? token : "";
-    return await this.startExtMsgChannel("connect", data);
-  }
-
-  async logout(): Promise<boolean> {
-    return true;
-  }
-
-  async getAddress(): Promise<string> {
-    return this.account.address;
-  }
-
-  isInitialized(): boolean {
-    return true;
-  }
-
-  async isConnected(): Promise<boolean> {
-    return true;
-  }
-
-  async sendTransaction(transaction: Transaction): Promise<Transaction> {
-    return (await this.processTransactions([transaction], false))[0];
-  }
-
-  async signTransaction(transaction: Transaction): Promise<Transaction> {
-    return (await this.processTransactions([transaction], true))[0];
-  }
-
-  async sendTransactions(
-    transactions: Array<Transaction>
-  ): Promise<Array<Transaction>> {
-    return await this.processTransactions(transactions, false);
-  }
-
-  async signTransactions(
-    transactions: Array<Transaction>
-  ): Promise<Array<Transaction>> {
-    return await this.processTransactions(transactions, true);
-  }
-
   async processTransactions(
     transactions: Array<Transaction>,
     signOnly: boolean
@@ -141,14 +149,5 @@ export class ExtensionProvider implements IDappProvider {
     };
 
     return await this.startExtMsgChannel("transaction", data);
-  }
-
-  async signMessage(message: SignableMessage): Promise<SignableMessage> {
-    this.openExtensionPopup();
-    const data = {
-      account: this.account.index,
-      message: message.message,
-    };
-    return await this.startExtMsgChannel("signMessage", data);
   }
 }

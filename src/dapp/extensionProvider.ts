@@ -68,7 +68,11 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   async isConnected(): Promise<boolean> {
+<<<<<<< HEAD
     return !!this.account;
+=======
+    return this.account ? true : false;
+>>>>>>> 37672e5... add init and logout functionality for extension provider
   }
 
   async sendTransaction(transaction: Transaction): Promise<Transaction> {

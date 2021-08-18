@@ -2,6 +2,12 @@ import { SignableMessage } from "../signableMessage";
 import { Transaction } from "../transaction";
 import { IDappProvider } from "./interface";
 
+declare global {
+  interface Window {
+    elrondWallet: { extensionId: string };
+  }
+}
+
 export class ExtensionProvider implements IDappProvider {
   private popupName = "connectPopup";
   private popupOptions =
@@ -11,16 +17,20 @@ export class ExtensionProvider implements IDappProvider {
   private extensionURL: string = "";
   private extensionPopupWindow: Window | null;
   public account: any;
+  private initialized: boolean = false;
 
-  constructor(extensionId: string) {
-    this.extensionId = extensionId;
-    this.extensionURL = `chrome-extension://${this.extensionId}/index.html`;
+  constructor() {
     this.extensionPopupWindow = null;
     this.init().then();
   }
 
   async init(): Promise<boolean> {
-    return true;
+    if (window && window.elrondWallet) {
+      this.extensionId = window.elrondWallet.extensionId;
+      this.extensionURL = `chrome-extension://${this.extensionId}/index.html`;
+      this.initialized = true;
+    }
+    return this.initialized;
   }
 
   async login(
@@ -29,6 +39,9 @@ export class ExtensionProvider implements IDappProvider {
       token?: string;
     } = {}
   ): Promise<string> {
+    if (!this.initialized) {
+      throw new Error("Wallet provider is not initialised, call init() first");
+    }
     this.openExtensionPopup();
     const { token } = options;
     const data = token ? token : "";
@@ -37,19 +50,25 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   async logout(): Promise<boolean> {
-    return true;
+    if (!this.initialized) {
+      throw new Error("Wallet provider is not initialised, call init() first");
+    }
+    return await this.startBgrMsgChannel("logout", this.account.address);
   }
 
   async getAddress(): Promise<string> {
+    if (!this.initialized) {
+      throw new Error("Wallet provider is not initialised, call init() first");
+    }
     return this.account.address;
   }
 
   isInitialized(): boolean {
-    return true;
+    return this.initialized;
   }
 
   async isConnected(): Promise<boolean> {
-    return true;
+    return this.account ? true : false;
   }
 
   async sendTransaction(transaction: Transaction): Promise<Transaction> {
@@ -81,11 +100,51 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   private openExtensionPopup() {
+    if (!this.initialized) {
+      throw new Error("Wallet provider is not initialised, call init() first");
+    }
     this.extensionPopupWindow = window.open(
       this.extensionURL,
       this.popupName,
       this.popupOptions
     );
+  }
+
+  private startBgrMsgChannel(
+    operation: string,
+    connectData: any
+  ): Promise<any> {
+    return new Promise((resolve, reject) => {
+      window.postMessage(
+        {
+          target: "erdw-inpage",
+          type: operation,
+          data: connectData,
+        },
+        window.origin
+      );
+
+      const eventHandler = (event: any) => {
+        if (
+          event.isTrusted &&
+          event.data.type &&
+          event.data.target === "erdw-contentScript"
+        ) {
+          switch (event.data.type) {
+            case "logoutResponse":
+              window.removeEventListener("message", eventHandler);
+              resolve(true);
+              break;
+          }
+        }
+      };
+      setTimeout(() => {
+        reject(
+          "Extension logout response timeout. No response from extension."
+        );
+      }, 3000);
+      window.addEventListener("message", eventHandler, false);
+    });
   }
 
   private startExtMsgChannel(

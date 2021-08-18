@@ -23,9 +23,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
       - Changed how test wallets (alice, bob, carol etc.) are obtained, added all 12 test wallets:
         - Removed `TestWallets`
         - Use added function `loadTestWallets` (or `loadInteractive`)
-      - [Fixed Ledger login](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/48)
-        - Removed `addressIndex` from constructor
-        - Use `addressIndex` from `options` object of `login` function
+
+- [Fixed Ledger login](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/48)
+   - Fixed Ledger login by also setting the index to the device.
+  
+   - ### Breaking changes:
+     - Removed `addressIndex` from constructor
+     - Use `addressIndex` from `options` object of `login` function
 
 ## [6.5.2]
 -   [Bugfix - corrected compute hash for transaction with options #44](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/44)

@@ -1,16 +1,19 @@
 import { assert } from "chai";
 import { ProtoSerializer } from "./serializer";
 import { Nonce } from "../nonce";
-import { Transaction,  } from "../transaction";
-import { TestWallets } from "../testutils";
+import { Transaction } from "../transaction";
+import { loadTestWallets, TestWallet } from "../testutils";
 import { Signature } from "../signature";
 import { Balance } from "../balance";
 import { ChainID, GasLimit, GasPrice, TransactionVersion } from "../networkParams";
 import { TransactionPayload } from "../transactionPayload";
 
 describe("serialize transactions", () => {
-    let wallets = new TestWallets();
+    let wallets: Record<string, TestWallet>;
     let serializer = new ProtoSerializer();
+    before(async function () {
+        wallets = await loadTestWallets();
+    });
 
     it("with no data, no value", async () => {
         let transaction = new Transaction({

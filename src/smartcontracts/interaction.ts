@@ -10,6 +10,7 @@ import { SmartContract } from "./smartContract";
 import { EndpointDefinition, TypedValue } from "./typesystem";
 import { Nonce } from "../nonce";
 import { ExecutionResultsBundle, QueryResponseBundle } from "./interface";
+import { ErrInvariantFailed } from "../errors";
 
 /**
  * Interactions can be seen as mutable transaction & query builders.
@@ -19,8 +20,10 @@ import { ExecutionResultsBundle, QueryResponseBundle } from "./interface";
  */
 export class Interaction {
     private readonly contract: SmartContract;
-    private readonly func: ContractFunction;
+    private readonly executingFunction: ContractFunction;
+    private readonly interpretingFunction: ContractFunction;
     private readonly args: TypedValue[];
+    private readonly receiver?: Address;
 
     private nonce: Nonce = new Nonce(0);
     private value: Balance = Balance.Zero();
@@ -28,20 +31,28 @@ export class Interaction {
 
     constructor(
         contract: SmartContract,
-        func: ContractFunction,
-        args: TypedValue[]
+        executingFunction: ContractFunction,
+        interpretingFunction: ContractFunction,
+        args: TypedValue[],
+        receiver?: Address,
     ) {
         this.contract = contract;
-        this.func = func;
+        this.executingFunction = executingFunction;
+        this.interpretingFunction = interpretingFunction;
         this.args = args;
+        this.receiver = receiver;
     }
 
     getContract(): SmartContract {
         return this.contract;
     }
 
-    getFunction(): ContractFunction {
-        return this.func;
+    getInterpretingFunction(): ContractFunction {
+        return this.interpretingFunction;
+    }
+
+    getExecutingFunction(): ContractFunction {
+        return this.executingFunction;
     }
 
     getArguments(): TypedValue[] {
@@ -59,12 +70,13 @@ export class Interaction {
     buildTransaction(): Transaction {
         // TODO: create as "deploy" transaction if the function is "init" (or find a better pattern for deployments).
         let transaction = this.contract.call({
-            func: this.func,
+            func: this.executingFunction,
             // GasLimit will be set using "withGasLimit()".
             gasLimit: this.gasLimit,
             args: this.args,
             // Value will be set using "withValue()".
-            value: this.value
+            value: this.value,
+            receiver: this.receiver,
         });
 
         transaction.setNonce(this.nonce);
@@ -74,7 +86,7 @@ export class Interaction {
     buildQuery(): Query {
         return new Query({
             address: this.contract.getAddress(),
-            func: this.func,
+            func: this.executingFunction,
             args: this.args,
             // Value will be set using "withValue()".
             value: this.value,
@@ -88,23 +100,7 @@ export class Interaction {
      * The outcome is structured such that it allows quick access to each level of detail.
      */
     interpretExecutionResults(transactionOnNetwork: TransactionOnNetwork): ExecutionResultsBundle {
-        let smartContractResults = transactionOnNetwork.getSmartContractResults();
-        let immediateResult = smartContractResults.getImmediate();
-        let endpoint = this.getEndpointDefinition();
-
-        immediateResult.setEndpointDefinition(endpoint);
-
-        let values = immediateResult.outputTyped();
-        let returnCode = immediateResult.getReturnCode();
-
-        return {
-            transactionOnNetwork: transactionOnNetwork,
-            smartContractResults: smartContractResults,
-            immediateResult: immediateResult,
-            values: values,
-            firstValue: values[0],
-            returnCode: returnCode
-        };
+        return interpretExecutionResults(this.getEndpoint(), transactionOnNetwork);
     }
 
     /**
@@ -112,7 +108,7 @@ export class Interaction {
      * The outcome is structured such that it allows quick access to each level of detail.
      */
     interpretQueryResponse(queryResponse: QueryResponse): QueryResponseBundle {
-        let endpoint = this.getEndpointDefinition();
+        let endpoint = this.getEndpoint();
         queryResponse.setEndpointDefinition(endpoint);
 
         let values = queryResponse.outputTyped();
@@ -141,11 +137,28 @@ export class Interaction {
         return this;
     }
 
-    getEndpointDefinition(): EndpointDefinition {
-        let abi = this.getContract().getAbi();
-        let name = this.getFunction().toString();
-        let endpoint = abi.getEndpoint(name);
-
-        return endpoint;
+    getEndpoint(): EndpointDefinition {
+        return this.getContract().getAbi().getEndpoint(this.getInterpretingFunction());
     }
+}
+
+function interpretExecutionResults(endpoint: EndpointDefinition, transactionOnNetwork: TransactionOnNetwork): ExecutionResultsBundle {
+    let smartContractResults = transactionOnNetwork.getSmartContractResults();
+    let immediateResult = smartContractResults.getImmediate();
+    let resultingCalls = smartContractResults.getResultingCalls();
+
+    immediateResult.setEndpointDefinition(endpoint);
+
+    let values = immediateResult.outputTyped();
+    let returnCode = immediateResult.getReturnCode();
+
+    return {
+        transactionOnNetwork: transactionOnNetwork,
+        smartContractResults: smartContractResults,
+        immediateResult,
+        resultingCalls,
+        values,
+        firstValue: values[0],
+        returnCode: returnCode
+    };
 }

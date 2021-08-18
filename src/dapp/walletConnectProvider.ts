@@ -18,6 +18,7 @@ export class WalletConnectProvider implements IDappProvider {
     provider: IProvider;
     walletConnectBridge: string;
     address: string = "";
+    signature: string = "";
     walletConnector: WalletClient | undefined;
     private onClientConnect: IClientConnect;
 
@@ -42,8 +43,9 @@ export class WalletConnectProvider implements IDappProvider {
           this.walletConnector.connected &&
           this.walletConnector.accounts.length
         ) {
-          const [account] = this.walletConnector.accounts;
-          this.loginAccount(account);
+            const [account] = this.walletConnector.accounts;
+            const [address, signature] = account.split(".");
+            await this.loginAccount(address, signature);
         }
 
         return true;
@@ -78,7 +80,7 @@ export class WalletConnectProvider implements IDappProvider {
         }
 
         await this.walletConnector?.createSession({ chainId: WALLETCONNECT_ELROND_CHAIN_ID });
-        if (!this.walletConnector?.uri) return "";
+        if (!this.walletConnector?.uri) { return ""; }
         return this.walletConnector?.uri;
     }
 
@@ -106,6 +108,18 @@ export class WalletConnectProvider implements IDappProvider {
         }
       
         return this.address;
+    }
+
+    /**
+     * Fetches the wallet connect signature
+     */
+    async getSignature(): Promise<string> {
+        if (!this.walletConnector) {
+            Logger.error("getSignature: Wallet Connect not initialised, call init() first");
+            throw new Error("Wallet Connect not initialised, call init() first");
+        }
+        
+        return this.signature;
     }
 
     /**
@@ -200,7 +214,8 @@ export class WalletConnectProvider implements IDappProvider {
             accounts: [account],
         } = params[0];
 
-        this.loginAccount(account);
+        const [address, signature] = account.split(".");
+        await this.loginAccount(address, signature);
     }
 
     private async onDisconnect(error: any) {
@@ -210,9 +225,12 @@ export class WalletConnectProvider implements IDappProvider {
         this.onClientConnect.onClientLogout();
     }
 
-    private async loginAccount(address: string) {
+    private async loginAccount(address: string, signature?: string) {
         if (this.addressIsValid(address)) {
             this.address = address;
+            if (signature) {
+                this.signature = signature;
+            }
             this.onClientConnect.onClientLogin();
             return;
         }

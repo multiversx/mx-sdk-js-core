@@ -151,7 +151,7 @@ export class Transaction implements ISignable {
      * });
      *
      * tx.setNonce(alice.nonce);
-     * await aliceSigner.sign(tx);
+     * await alice.signer.sign(tx);
      * ```
      */
     setNonce(nonce: Nonce) {
@@ -327,19 +327,20 @@ export class Transaction implements ISignable {
      *
      * @param provider The provider to use
      * @param cacheLocally Whether to cache the response locally, on the transaction object
+     * @param awaitNotarized Whether to wait for the transaction to be notarized
+     * @param withResults Whether to wait for the transaction results
      */
-    async getAsOnNetwork(provider: IProvider, cacheLocally: boolean = true): Promise<TransactionOnNetwork> {
+    async getAsOnNetwork(provider: IProvider, cacheLocally = true, awaitNotarized = true, withResults = true): Promise<TransactionOnNetwork> {
         if (this.hash.isEmpty()) {
             throw new errors.ErrTransactionHashUnknown();
         }
 
         // For Smart Contract transactions, wait for their full execution & notarization before returning.
         let isSmartContractTransaction = this.receiver.isContractAddress();
-        if (isSmartContractTransaction) {
+        if (isSmartContractTransaction && awaitNotarized) {
             await this.awaitNotarized(provider);
         }
 
-        let withResults = isSmartContractTransaction;
         let response = await provider.getTransaction(this.hash, this.sender, withResults);
 
         if (cacheLocally) {

@@ -6,6 +6,40 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- [Contract wrapper](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9)
+    - Added `ContractWrapper`, `SystemWrapper` - for more details check the pull request.
+    - Added support for constructors in ABIs
+    - Added ABIs:
+      - builtin functions
+      - ESDT system smart contract
+    - Added `BalanceBuilder` interface
+    - Added `NativeSerializer`
+
+    - ### Breaking changes:
+      - Changed how a provider is obtained:
+        - Removed `getDevnetProvider`, `getTestnetProvider`, `getMainnetProvider`
+        - Use added `chooseProvider`
+      - Renamed `ESDTToken` to `Token`
+      - Changed how test wallets (alice, bob, carol etc.) are obtained, added all 12 test wallets:
+        - Removed `TestWallets`
+        - Use added function `loadTestWallets` (or `loadInteractive`)
+
+- [Fixed Ledger login](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/48)
+   - Fixed Ledger login by also setting the index to the device.
+  
+   - ### Breaking changes:
+     - Removed `addressIndex` from constructor
+     - Use `addressIndex` from `options` object of `login` function
+
+## [6.6.2]
+-   [Quickfix - added custom id to iframe creation #55](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/55)
+
+## [6.6.1]
+-   [Bugfixed WalletProvider by adding possibility to match iframe by id #53](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/53)
+
+## [6.6.0]
+-   [Added signature to walletConnectProvider to handle Token Login #49](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/49)
+
 ## [6.5.2]
 -   [Bugfix - corrected compute hash for transaction with options #44](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/44)
 

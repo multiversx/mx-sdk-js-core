@@ -15,7 +15,7 @@ export class TransactionWatcher {
     static DefaultPollingInterval: number = 6000;
     static DefaultTimeout: number = TransactionWatcher.DefaultPollingInterval * 15;
 
-    static NoopOnStatusReceived = (_: TransactionStatus) => {};
+    static NoopOnStatusReceived = (_: TransactionStatus) => { };
 
     private readonly hash: TransactionHash;
     private readonly provider: IProvider;
@@ -79,7 +79,7 @@ export class TransactionWatcher {
         return this.awaitConditionally<TransactionOnNetwork>(
             isNotarized,
             doFetch,
-            (_) => {},
+            (_) => { },
             errorProvider
         );
     }
@@ -96,7 +96,7 @@ export class TransactionWatcher {
         let stop = false;
         let fetchedData: TData | undefined = undefined;
 
-        timeoutTimer.start(this.timeout).finally(() => {
+        let _ = timeoutTimer.start(this.timeout).finally(() => {
             timeoutTimer.stop();
             stop = true;
         });

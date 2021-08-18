@@ -6,7 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
--   [Contract wrapper](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9)
+- [Contract wrapper](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9)
     - Added `ContractWrapper`, `SystemWrapper` - for more details check the pull request.
     - Added support for constructors in ABIs
     - Added ABIs:
@@ -15,17 +15,17 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
     - Added `BalanceBuilder` interface
     - Added `NativeSerializer`
 
-Breaking changes:
--   Changed how a provider is obtained:
-    - Removed `getDevnetProvider`, `getTestnetProvider`, `getMainnetProvider`
-    - Use added `chooseProvider`
--   Renamed `ESDTToken` to `Token`
--   Changed how test wallets (alice, bob, carol etc.) are obtained, added all 12 test wallets:
-    - Removed `TestWallets`
-    - Use added function `loadTestWallets` (or `loadInteractive`)
--   [Fixed Ledger login](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/48)
-    - Removed `addressIndex` from constructor
-    - Use `addressIndex` from `options` object of `login` function
+    - ### Breaking changes:
+      - Changed how a provider is obtained:
+        - Removed `getDevnetProvider`, `getTestnetProvider`, `getMainnetProvider`
+        - Use added `chooseProvider`
+      - Renamed `ESDTToken` to `Token`
+      - Changed how test wallets (alice, bob, carol etc.) are obtained, added all 12 test wallets:
+        - Removed `TestWallets`
+        - Use added function `loadTestWallets` (or `loadInteractive`)
+      - [Fixed Ledger login](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/48)
+        - Removed `addressIndex` from constructor
+        - Use `addressIndex` from `options` object of `login` function
 
 ## [6.5.2]
 -   [Bugfix - corrected compute hash for transaction with options #44](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/44)

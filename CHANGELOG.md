@@ -14,6 +14,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
       - ESDT system smart contract
     - Added `BalanceBuilder` interface
     - Added `NativeSerializer`
+    - Added `ExtensionProvider`
 
     - ### Breaking changes:
       - Changed how a provider is obtained:

@@ -68,16 +68,11 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   async isConnected(): Promise<boolean> {
-    return this.account ? true : false;
+    return !!this.account;
   }
 
   async sendTransaction(transaction: Transaction): Promise<Transaction> {
     return (await this.processTransactions([transaction], false))[0];
-  }
-  async sendTransactions(
-    transactions: Array<Transaction>
-  ): Promise<Array<Transaction>> {
-    return await this.processTransactions(transactions, false);
   }
 
   async signTransaction(transaction: Transaction): Promise<Transaction> {
@@ -174,7 +169,9 @@ export class ExtensionProvider implements IDappProvider {
               isResolved = true;
               resolve(event.data.data);
               break;
+
             default:
+              this.handleExtResponseErr(event);
               this.extensionPopupWindow?.close();
               window.removeEventListener("message", eventHandler);
               isResolved = true;
@@ -194,6 +191,19 @@ export class ExtensionProvider implements IDappProvider {
 
       window.addEventListener("message", eventHandler, false);
     });
+  }
+
+  private handleExtResponseErr(event: any) {
+    if (!event.data || !event.data.data) {
+      if (
+        event.data.type === "transactionComplete" &&
+        event.data.data.length === 0
+      )
+        throw new Error("Transactions list response is empty.");
+
+      if (event.data.type === "signMessageComplete")
+        throw new Error("Signmessage response is empty.");
+    }
   }
 
   async processTransactions(

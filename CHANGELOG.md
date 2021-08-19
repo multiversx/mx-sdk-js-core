@@ -14,7 +14,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
       - ESDT system smart contract
     - Added `BalanceBuilder` interface
     - Added `NativeSerializer`
-    - Added `ExtensionProvider`
 
     - ### Breaking changes:
       - Changed how a provider is obtained:
@@ -31,6 +30,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
    - ### Breaking changes:
      - Removed `addressIndex` from constructor
      - Use `addressIndex` from `options` object of `login` function
+
+- [Added Extension Provider for dapp integration #59](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/59)
 
 ## [6.6.2]
 -   [Quickfix - added custom id to iframe creation #55](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/55)

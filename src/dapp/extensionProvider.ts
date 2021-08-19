@@ -72,17 +72,26 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   async sendTransaction(transaction: Transaction): Promise<Transaction> {
-    return (await this.processTransactions([transaction], false))[0];
+    return await this.startExtMsgChannel("sendTransactions", {
+      from: this.account.index,
+      transactions: [transaction],
+    })[0];
   }
 
   async signTransaction(transaction: Transaction): Promise<Transaction> {
-    return (await this.processTransactions([transaction], true))[0];
+    return await this.startExtMsgChannel("signTransactions", {
+      from: this.account.index,
+      transactions: [transaction],
+    })[0];
   }
 
   async signTransactions(
     transactions: Array<Transaction>
   ): Promise<Array<Transaction>> {
-    return await this.processTransactions(transactions, true);
+    return await this.startExtMsgChannel("sendTransactions", {
+      from: this.account.index,
+      transactions: transactions,
+    });
   }
 
   async signMessage(message: SignableMessage): Promise<SignableMessage> {
@@ -142,10 +151,7 @@ export class ExtensionProvider implements IDappProvider {
     });
   }
 
-  private startExtMsgChannel(
-    operation: string,
-    connectData: any
-  ): Promise<any> {
+  private startExtMsgChannel(operation: string, connectData: any): any {
     return new Promise((resolve, reject) => {
       var isResolved = false;
       const eventHandler = (event: any) => {
@@ -203,23 +209,6 @@ export class ExtensionProvider implements IDappProvider {
 
       if (event.data.type === "signMessageComplete")
         throw new Error("Signmessage response is empty.");
-    }
-  }
-
-  async processTransactions(
-    transactions: Array<Transaction>,
-    signOnly: boolean
-  ): Promise<Array<Transaction>> {
-    this.openExtensionPopup();
-    const data = {
-      from: this.account.index,
-      transactions: transactions,
-    };
-
-    if (signOnly) {
-      return await this.startExtMsgChannel("signTransactions", data);
-    } else {
-      return await this.startExtMsgChannel("sendTransactions", data);
     }
   }
 }

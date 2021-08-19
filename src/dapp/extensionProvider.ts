@@ -153,7 +153,7 @@ export class ExtensionProvider implements IDappProvider {
 
   private startExtMsgChannel(operation: string, connectData: any): any {
     return new Promise((resolve, reject) => {
-      var isResolved = false;
+      let isResolved = false;
       const eventHandler = (event: any) => {
         if (
           event.isTrusted &&
@@ -186,7 +186,7 @@ export class ExtensionProvider implements IDappProvider {
           }
         }
       };
-      var windowCloseInterval = setInterval(() => {
+      const windowCloseInterval = setInterval(() => {
         if (this.extensionPopupWindow?.closed) {
           window.removeEventListener("message", eventHandler);
           clearInterval(windowCloseInterval);
@@ -200,15 +200,15 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   private handleExtResponseErr(event: any) {
-    if (!event.data || !event.data.data) {
-      if (
-        event.data.type === "transactionComplete" &&
-        event.data.data.length === 0
-      )
-        throw new Error("Transactions list response is empty.");
+    if (!event.data && !event.data.data) {
+      throw new Error("Extension response is empty.");
+    }
 
-      if (event.data.type === "signMessageComplete")
-        throw new Error("Signmessage response is empty.");
+    if (
+      event.data.type === "transactionComplete" &&
+      event.data.data.length === 0
+    ) {
+      throw new Error("Transactions list response is empty.");
     }
   }
 }

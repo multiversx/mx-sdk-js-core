@@ -27,15 +27,15 @@ export class ProxyProvider implements IProvider {
      */
     constructor(url: string, config?: AxiosRequestConfig) {
         this.url = url;
-        // See: https://github.com/axios/axios/issues/983
-        this.config = config || {
-            timeout: 1000,
-            transformResponse: [
-              function(data) {
-                return JSONbig.parse(data);
-              },
-            ],
-        };
+        this.config = Object.assign({}, config, {
+          timeout: 1000,
+          // See: https://github.com/axios/axios/issues/983 regarding transformResponse
+          transformResponse: [
+            function(data: any) {
+              return JSONbig.parse(data);
+            },
+          ],
+        });
     }
 
     /**

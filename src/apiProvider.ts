@@ -22,17 +22,17 @@ export class ApiProvider implements IApiProvider {
      * @param url the URL of the Elrond Api
      * @param config axios request config options
      */
-     constructor(url: string, config?: AxiosRequestConfig) {
+    constructor(url: string, config?: AxiosRequestConfig) {
       this.url = url;
-      // See: https://github.com/axios/axios/issues/983
-      this.config = config || {
+      this.config = Object.assign({}, config, {
         timeout: 1000,
+        // See: https://github.com/axios/axios/issues/983 regarding transformResponse
         transformResponse: [
-          function(data) {
+          function(data: any) {
             return JSONbig.parse(data);
           },
         ],
-      };
+      });
     }
 
     /**

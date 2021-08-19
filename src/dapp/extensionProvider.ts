@@ -214,9 +214,12 @@ export class ExtensionProvider implements IDappProvider {
     const data = {
       from: this.account.index,
       transactions: transactions,
-      signOnly,
     };
 
-    return await this.startExtMsgChannel("transaction", data);
+    if (signOnly) {
+      return await this.startExtMsgChannel("signTransactions", data);
+    } else {
+      return await this.startExtMsgChannel("sendTransactions", data);
+    }
   }
 }

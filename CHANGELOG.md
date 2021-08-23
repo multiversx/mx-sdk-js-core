@@ -6,6 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [7.0.0]
 - [Contract wrapper](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9)
     - Added `ContractWrapper`, `SystemWrapper` - for more details check the pull request.
     - Added support for constructors in ABIs

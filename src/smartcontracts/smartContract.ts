@@ -35,7 +35,7 @@ export class SmartContract implements ISmartContract {
      * This object contains a function for each endpoint defined by the contract.
      * (a bit similar to web3js's "contract.methods").
      */
-    public readonly methods: any = {};
+    public readonly methods: { [key: string]: (args: TypedValue[]) => Interaction } = {};
 
     /**
      * Create a SmartContract object by providing its address on the Network.

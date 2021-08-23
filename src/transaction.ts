@@ -106,11 +106,11 @@ export class Transaction implements ISignable {
      * Creates a new Transaction object.
      */
     public constructor(
-        { nonce, value, receiver, gasPrice, gasLimit, data, chainID, version, options }:
-            { nonce?: Nonce, value?: Balance, receiver: Address, gasPrice?: GasPrice, gasLimit?: GasLimit, data?: TransactionPayload, chainID?: ChainID, version?: TransactionVersion, options?: TransactionOptions }) {
+        { nonce, value, receiver, sender, gasPrice, gasLimit, data, chainID, version, options }:
+            { nonce?: Nonce, value?: Balance, receiver: Address, sender?: Address, gasPrice?: GasPrice, gasLimit?: GasLimit, data?: TransactionPayload, chainID?: ChainID, version?: TransactionVersion, options?: TransactionOptions }) {
         this.nonce = nonce || new Nonce(0);
         this.value = value || Balance.Zero();
-        this.sender = Address.Zero();
+        this.sender = sender || Address.Zero();
         this.receiver = receiver;
         this.gasPrice = gasPrice || NetworkConfig.getDefault().MinGasPrice;
         this.gasLimit = gasLimit || NetworkConfig.getDefault().MinGasLimit;

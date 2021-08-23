@@ -107,6 +107,14 @@ export class Balance {
         return new Balance(this.token, this.nonce, this.value.minus(other.value));
     }
 
+    times(n: BigNumber.Value) {
+        return new Balance(this.token, this.nonce, this.value.times(n));
+    }
+
+    div(n: BigNumber.Value) {
+        return new Balance(this.token, this.nonce, this.value.div(n));
+    }
+
     isEqualTo(other: Balance) {
         this.checkSameToken(other);
         return this.value.isEqualTo(other.value);

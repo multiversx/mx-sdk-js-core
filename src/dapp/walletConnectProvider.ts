@@ -171,6 +171,33 @@ export class WalletConnectProvider implements IDappProvider {
     }
 
     /**
+     * Signs an array of transactions and returns it
+     * @param transactions
+     */
+    async signTransactions(transactions: Transaction[]): Promise<Transaction[]> {
+        if (!this.walletConnector) {
+            Logger.error("signTransactions: Wallet Connect not initialised, call init() first");
+            throw new Error("Wallet Connect not initialised, call init() first");
+        }
+
+        const address = await this.getAddress();
+        const params = transactions.map((transaction) => this.prepareWalletConnectMessage(transaction, address));
+        const signatures = await this.walletConnector.sendCustomRequest({
+            method: "erd_batch_sign",
+            params
+        });
+        if (!signatures || (transactions.length !== signatures.length)) {
+            Logger.error("signTransactions: Wallet Connect could not sign the transactions");
+            throw new Error("Wallet Connect could not sign the transactions");
+        }
+        transactions.map((transaction, key: number) => 
+            transaction.applySignature(new Signature(signatures[key].signature), new Address(address))
+        );
+
+        return transactions;
+    }
+
+    /**
      * Sends a custom method and params and returns the response object
      */    
 

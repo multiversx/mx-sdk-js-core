@@ -164,10 +164,9 @@ export class ContractCallPayloadBuilder {
 }
 
 function appendArgumentsToString(to: string, values: TypedValue[]) {
-    if (values.length == 0) {
+    let { argumentsString, count } = new ArgSerializer().valuesToString(values);
+    if (count == 0) {
         return to;
     }
-
-    let argumentsString = new ArgSerializer().valuesToString(values);
     return `${to}@${argumentsString}`;
 }

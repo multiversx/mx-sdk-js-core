@@ -6,7 +6,7 @@ import {Address} from "../address";
 declare global {
   namespace NodeJS {
     interface Global {
-      window: {
+      window?: {
         location: {
           href: string
         }
@@ -22,6 +22,9 @@ describe("test wallet provider", () => {
         href: "http://return-to-wallet"
       }
     };
+  });
+  after(() => {
+    delete global.window;
   });
 
   it('login redirects correctly', async () => {

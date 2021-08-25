@@ -1,4 +1,4 @@
-import { Balance, ContractLogger, SendContext } from "../..";
+import { Balance, ContractLogger, IProvider, SendContext } from "../..";
 import { TestWallet } from "../../testutils";
 
 export class ChainSendContext {
@@ -31,5 +31,9 @@ export class ChainSendContext {
     logger(logger: ContractLogger | null): this {
         this.context.logger(logger);
         return this;
+    }
+
+    getProvider(): IProvider {
+        return this.context.getProvider();
     }
 }

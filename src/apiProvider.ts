@@ -23,10 +23,16 @@ export class ApiProvider implements IApiProvider {
      * @param config axios request config options
      */
     constructor(url: string, config?: AxiosRequestConfig) {
-        this.url = url;
-        this.config = config || {
-            timeout: 1000,
-        };
+      this.url = url;
+      this.config = Object.assign({}, config, {
+        timeout: 1000,
+        // See: https://github.com/axios/axios/issues/983 regarding transformResponse
+        transformResponse: [
+          function(data: any) {
+            return JSONbig.parse(data);
+          },
+        ],
+      });
     }
 
     /**
@@ -90,10 +96,3 @@ export class ApiProvider implements IApiProvider {
         throw new errors.ErrApiProviderGet(resourceUrl, originalErrorMessage, error);
     }
 }
-
-// See: https://github.com/axios/axios/issues/983
-axios.defaults.transformResponse = [
-    function (data) {
-        return JSONbig.parse(data);
-    },
-];

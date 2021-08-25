@@ -137,6 +137,15 @@ export class HWProvider implements IHWProvider {
         return transaction;
     }
 
+    async signTransactions(transactions: Transaction[]): Promise<Transaction[]> {
+        let retTx: Transaction[] = [];
+        for (let tx of transactions) {
+            retTx.push(await this.signTransaction(tx));
+        }
+
+        return retTx;
+    }
+
     async signMessage(message: SignableMessage): Promise<SignableMessage> {
         if (!this.hwApp) {
             throw new Error("HWApp not initialised, call init() first");

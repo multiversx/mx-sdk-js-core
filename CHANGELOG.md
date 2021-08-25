@@ -44,6 +44,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
      - The above means that we no longer have a way to get some info - so `getAddress` will throw `ErrNotImplemented`
      - Removed `customId` from constructor
 
+- [Added signTransactions to the WalletConnectProvider #62](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/62)
+
+- [Added signTransactions to the HWProvider #64](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/64)
+
 ## [6.6.2]
 -   [Quickfix - added custom id to iframe creation #55](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/55)
 

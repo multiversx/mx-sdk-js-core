@@ -6,6 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [7.0.0]
 - [Contract wrapper](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9)
     - Added `ContractWrapper`, `SystemWrapper` - for more details check the pull request.
     - Added support for constructors in ABIs
@@ -32,6 +33,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
      - Use `addressIndex` from `options` object of `login` function
 
 - [Added Extension Provider for dapp integration #59](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/59)
+
+- [Refactored WalletProvider #60](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/60)
+   - Refactored wallet provider to be compatible with all browsers
+   - Added `signTransactions` so users can sign transaction batches
+   - Added `getTransactionsFromWalletUrl` endpoint so users can retrieve the decoded `Transaction` object from the `callbackUrl`
+  
+   - ### Breaking changes:
+     - The WalletProvider no longer communicates with the ElrondWallet through an iframe
+     - The above means that we no longer have a way to get some info - so `getAddress` will throw `ErrNotImplemented`
+     - Removed `customId` from constructor
 
 - [Added signTransactions to the WalletConnectProvider #62](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/62)
 

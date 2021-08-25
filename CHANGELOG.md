@@ -35,6 +35,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - [Added signTransactions to the WalletConnectProvider #62](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/62)
 
+- [Added signTransactions to the HWProvider #64](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/64)
+
 ## [6.6.2]
 -   [Quickfix - added custom id to iframe creation #55](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/55)
 

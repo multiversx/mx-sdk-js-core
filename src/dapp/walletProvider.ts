@@ -193,7 +193,7 @@ export class WalletProvider implements IDappProvider {
                 receiver: Address.fromString(<string>urlParams["receiver"][i]),
                 gasPrice: new GasPrice(parseInt(<string>urlParams["gasPrice"][i])),
                 gasLimit: new GasLimit(parseInt(<string>urlParams["gasLimit"][i])),
-                data: new TransactionPayload(<string>urlParams["gasLimit"][i]),
+                data: new TransactionPayload(<string>urlParams["data"][i]),
                 chainID: new ChainID(<string>urlParams["chainID"][i]),
                 version: new TransactionVersion(parseInt(<string>urlParams["version"][i])),
 

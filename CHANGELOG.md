@@ -6,6 +6,48 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [7.0.0]
+- [Contract wrapper](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9)
+    - Added `ContractWrapper`, `SystemWrapper` - for more details check the pull request.
+    - Added support for constructors in ABIs
+    - Added ABIs:
+      - builtin functions
+      - ESDT system smart contract
+    - Added `BalanceBuilder` interface
+    - Added `NativeSerializer`
+
+    - ### Breaking changes:
+      - Changed how a provider is obtained:
+        - Removed `getDevnetProvider`, `getTestnetProvider`, `getMainnetProvider`
+        - Use added `chooseProvider`
+      - Renamed `ESDTToken` to `Token`
+      - Changed how test wallets (alice, bob, carol etc.) are obtained, added all 12 test wallets:
+        - Removed `TestWallets`
+        - Use added function `loadTestWallets` (or `loadInteractive`)
+
+- [Fixed Ledger login](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/48)
+   - Fixed Ledger login by also setting the index to the device.
+  
+   - ### Breaking changes:
+     - Removed `addressIndex` from constructor
+     - Use `addressIndex` from `options` object of `login` function
+
+- [Added Extension Provider for dapp integration #59](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/59)
+
+- [Refactored WalletProvider #60](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/60)
+   - Refactored wallet provider to be compatible with all browsers
+   - Added `signTransactions` so users can sign transaction batches
+   - Added `getTransactionsFromWalletUrl` endpoint so users can retrieve the decoded `Transaction` object from the `callbackUrl`
+  
+   - ### Breaking changes:
+     - The WalletProvider no longer communicates with the ElrondWallet through an iframe
+     - The above means that we no longer have a way to get some info - so `getAddress` will throw `ErrNotImplemented`
+     - Removed `customId` from constructor
+
+- [Added signTransactions to the WalletConnectProvider #62](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/62)
+
+- [Added signTransactions to the HWProvider #64](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/64)
+
 ## [6.6.2]
 -   [Quickfix - added custom id to iframe creation #55](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/55)
 

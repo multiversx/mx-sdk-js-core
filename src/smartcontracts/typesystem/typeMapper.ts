@@ -23,7 +23,7 @@ import { TokenIdentifierType } from "./tokenIdentifier";
 import { Type, CustomType } from "./types";
 import { VariadicType } from "./variadic";
 import { OptionalType } from "./algebraic";
-import { TupleType } from ".";
+import { StringType, TupleType } from ".";
 
 type TypeConstructor = new (...typeParameters: Type[]) => Type;
 
@@ -42,6 +42,7 @@ export class TypeMapper {
             ["OptionalArg", OptionalType],
             ["optional", OptionalType],
             ["OptionalResult", OptionalType],
+            ["multi", CompositeType],
             ["MultiArg", CompositeType],
             ["MultiResult", CompositeType],
             ["multi", CompositeType],
@@ -62,16 +63,19 @@ export class TypeMapper {
             ["u16", new U16Type()],
             ["u32", new U32Type()],
             ["u64", new U64Type()],
+            ["U64", new U64Type()],
             ["BigUint", new BigUIntType()],
             ["i8", new I8Type()],
             ["i16", new I16Type()],
             ["i32", new I32Type()],
             ["i64", new I64Type()],
             ["Bigint", new BigIntType()],
+            ["BigInt", new BigIntType()],
             ["bool", new BooleanType()],
             ["bytes", new BytesType()],
             ["Address", new AddressType()],
             ["H256", new H256Type()],
+            ["utf-8 string", new StringType()],
             ["TokenIdentifier", new TokenIdentifierType()],
         ]);
 

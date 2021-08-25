@@ -1,70 +1,60 @@
-import * as errors from "./errors";
 import { BigNumber } from "bignumber.js";
+import { Token } from "./token";
+import { ErrInvalidArgument } from "./errors";
+import { Egld } from "./balanceBuilder";
 
 /**
- * The base used for toString methods to avoid exponential notation
+ * The number of decimals handled when working with EGLD or ESDT values.
  */
-const BASE_10 = 10;
+const DEFAULT_BIGNUMBER_DECIMAL_PLACES = 18;
 
-/**
- * The number of decimals handled when working with EGLD values.
- */
-const DENOMINATION = 18;
 
-/**
- * One EGLD, in its big-integer form (as a string).
- */
-const OneEGLDString = "1000000000000000000";
-
-const EGLDTicker = "EGLD";
-
-BigNumber.set({ DECIMAL_PLACES: DENOMINATION, ROUNDING_MODE: 1 });
+BigNumber.set({ DECIMAL_PLACES: DEFAULT_BIGNUMBER_DECIMAL_PLACES, ROUNDING_MODE: 1 });
 
 /**
  * Balance, as an immutable object.
- * TODO: Re-design, perhaps as new Money(value, currency), with new Currency(denomination, ticker). 
  */
 export class Balance {
+    readonly token: Token;
+    private readonly nonce: BigNumber = new BigNumber(0);
     private readonly value: BigNumber = new BigNumber(0);
 
     /**
      * Creates a Balance object.
      */
-    public constructor(value: string) {
+    public constructor(token: Token, nonce: BigNumber.Value, value: BigNumber.Value) {
+        this.token = token;
+        this.nonce = new BigNumber(nonce);
         this.value = new BigNumber(value);
-
-        if (this.value.isNegative()) {
-            throw new errors.ErrBalanceInvalid(this.value);
-        }
     }
 
     /**
      * Creates a balance object from an EGLD value (denomination will be applied).
      */
-    static egld(value: any): Balance {
-        let bigGold = new BigNumber(value);
-        let bigUnits = bigGold.multipliedBy(new BigNumber(OneEGLDString));
-        let bigUnitsString = bigUnits.integerValue().toString(BASE_10);
-
-        return new Balance(bigUnitsString);
+    static egld(value: BigNumber.Value): Balance {
+        return Egld(value);
     }
 
     /**
      * Creates a balance object from a string (with denomination included).
      */
     static fromString(value: string): Balance {
-        return new Balance(value || "0");
+        return Egld.raw(value || "0");
     }
 
     /**
-     * Creates a zero-valued balance object.
+     * Creates a zero-valued EGLD balance object.
      */
     static Zero(): Balance {
-        return new Balance('0');
+        return Egld(0);
     }
 
     isZero(): boolean {
         return this.value.isZero();
+    }
+
+    isEgld(): boolean {
+        return this.token.isEgld();
     }
 
     isSet(): boolean {
@@ -75,22 +65,18 @@ export class Balance {
      * Returns the string representation of the value (as EGLD currency).
      */
     toCurrencyString(): string {
-        let denominated = this.toDenominated();
-        return `${denominated} ${EGLDTicker}`;
+        return `${this.toDenominated()} ${this.token.getTokenIdentifier()}`;
     }
 
     toDenominated(): string {
-        let padded = this.toString().padStart(DENOMINATION, "0");
-        let decimals = padded.slice(-DENOMINATION);
-        let integer = padded.slice(0, padded.length - DENOMINATION) || 0;
-        return `${integer}.${decimals}`;
+        return this.value.shiftedBy(-this.token.decimals).toFixed(this.token.decimals);
     }
 
     /**
      * Returns the string representation of the value (its big-integer form).
      */
     toString(): string {
-        return this.value.toString(BASE_10);
+        return this.value.toFixed();
     }
 
     /**
@@ -103,7 +89,43 @@ export class Balance {
         };
     }
 
+    getNonce(): BigNumber {
+        return this.nonce;
+    }
+
     valueOf(): BigNumber {
         return this.value;
+    }
+
+    plus(other: Balance) {
+        this.checkSameToken(other);
+        return new Balance(this.token, this.nonce, this.value.plus(other.value));
+    }
+
+    minus(other: Balance) {
+        this.checkSameToken(other);
+        return new Balance(this.token, this.nonce, this.value.minus(other.value));
+    }
+
+    times(n: BigNumber.Value) {
+        return new Balance(this.token, this.nonce, this.value.times(n));
+    }
+
+    div(n: BigNumber.Value) {
+        return new Balance(this.token, this.nonce, this.value.div(n));
+    }
+
+    isEqualTo(other: Balance) {
+        this.checkSameToken(other);
+        return this.value.isEqualTo(other.value);
+    }
+
+    checkSameToken(other: Balance) {
+        if (this.token != other.token) {
+            throw new ErrInvalidArgument("Different token types");
+        }
+        if (!this.nonce.isEqualTo(other.nonce)) {
+            throw new ErrInvalidArgument("Different nonces");
+        }
     }
 }

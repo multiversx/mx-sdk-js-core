@@ -480,3 +480,12 @@ export class ErrNotImplemented extends Err {
     super("Method not yet implemented");
   }
 }
+
+/**
+ * Signals that the data inside the url is not a valid one for a transaction sign response
+ */
+export class ErrInvalidTxSignReturnValue extends Err {
+  public constructor() {
+    super("Invalid response in transaction sign return url");
+  }
+}

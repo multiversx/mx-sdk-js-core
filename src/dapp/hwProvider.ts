@@ -20,9 +20,8 @@ export class HWProvider implements IHWProvider {
     hwApp?: IHWElrondApp;
     addressIndex: number = 0;
 
-    constructor(httpProvider: IProvider, addressIndex: number = 0) {
+    constructor(httpProvider: IProvider) {
         this.provider = httpProvider;
-        this.addressIndex = addressIndex;
     }
 
     /**
@@ -58,13 +57,19 @@ export class HWProvider implements IHWProvider {
     }
 
     /**
-     * Mocks a login request by returning the ledger selected address
+     * Performs a login request by setting the selected index in Ledger and returning that address
      */
-    async login(): Promise<string> {
+    async login(options?: { addressIndex?: number }): Promise<string> {
         if (!this.hwApp) {
             throw new Error("HWApp not initialised, call init() first");
         }
-        const { address } = await this.hwApp.getAddress(0, this.addressIndex, true);
+
+        if(options && options.addressIndex) {
+            this.addressIndex = options.addressIndex;
+        }
+
+        await this.hwApp.setAddress(0, this.addressIndex);
+        const {address} = await this.hwApp.getAddress(0, this.addressIndex, true);
 
         return address;
     }
@@ -130,6 +135,15 @@ export class HWProvider implements IHWProvider {
         transaction.applySignature(new Signature(sig), new Address(address));
 
         return transaction;
+    }
+
+    async signTransactions(transactions: Transaction[]): Promise<Transaction[]> {
+        let retTx: Transaction[] = [];
+        for (let tx of transactions) {
+            retTx.push(await this.signTransaction(tx));
+        }
+
+        return retTx;
     }
 
     async signMessage(message: SignableMessage): Promise<SignableMessage> {

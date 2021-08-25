@@ -10,6 +10,7 @@ import { QueryResponse } from "./smartcontracts/queryResponse";
 import { Logger } from "./logger";
 import { NetworkStatus } from "./networkStatus";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
+import BigNumber from "bignumber.js";
 const JSONbig = require("json-bigint");
 
 /**
@@ -26,9 +27,15 @@ export class ProxyProvider implements IProvider {
      */
     constructor(url: string, config?: AxiosRequestConfig) {
         this.url = url;
-        this.config = config || {
-            timeout: 1000,
-        };
+        this.config = Object.assign({}, config, {
+          timeout: 1000,
+          // See: https://github.com/axios/axios/issues/983 regarding transformResponse
+          transformResponse: [
+            function(data: any) {
+              return JSONbig.parse(data);
+            },
+          ],
+        });
     }
 
     /**
@@ -37,6 +44,24 @@ export class ProxyProvider implements IProvider {
     async getAccount(address: Address): Promise<AccountOnNetwork> {
         return this.doGetGeneric(`address/${address.bech32()}`, (response) =>
             AccountOnNetwork.fromHttpResponse(response.account)
+        );
+    }
+
+    async getAddressEsdtList(address: Address): Promise<any> {
+        return this.doGetGeneric(`address/${address.bech32()}/esdt`, (response) =>
+            response.esdts
+        );
+    }
+
+    async getAddressEsdt(address: Address, tokenIdentifier: string): Promise<any> {
+        return this.doGetGeneric(`address/${address.bech32()}/esdt/${tokenIdentifier}`, (response) =>
+            response.tokenData
+        );
+    }
+
+    async getAddressNft(address: Address, tokenIdentifier: string, nonce: BigNumber): Promise<any> {
+        return this.doGetGeneric(`address/${address.bech32()}/nft/${tokenIdentifier}/nonce/${nonce}`, (response) =>
+            response.tokenData
         );
     }
 
@@ -180,10 +205,3 @@ export class ProxyProvider implements IProvider {
         throw new errors.ErrApiProviderGet(resourceUrl, originalErrorMessage, error);
     }
 }
-
-// See: https://github.com/axios/axios/issues/983
-axios.defaults.transformResponse = [
-    function(data) {
-        return JSONbig.parse(data);
-    },
-];

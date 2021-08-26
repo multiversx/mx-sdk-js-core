@@ -18,10 +18,24 @@ export class ExtensionProvider implements IDappProvider {
   private extensionPopupWindow: Window | null;
   public account: any;
   private initialized: boolean = false;
-
+  private static _instance: ExtensionProvider = new ExtensionProvider();
   constructor() {
+    if (ExtensionProvider._instance) {
+      throw new Error(
+        "Error: Instantiation failed: Use ExtensionProvider.getInstance() instead of new."
+      );
+    }
+    ExtensionProvider._instance = this;
     this.extensionPopupWindow = null;
-    this.init().then();
+  }
+
+  public static getInstance(address: string = ""): ExtensionProvider {
+    if (address !== "" && !ExtensionProvider._instance.account) {
+      ExtensionProvider._instance.account = {};
+      ExtensionProvider._instance.account.address = address;
+    }
+
+    return ExtensionProvider._instance;
   }
 
   async init(): Promise<boolean> {
@@ -40,7 +54,9 @@ export class ExtensionProvider implements IDappProvider {
     } = {}
   ): Promise<string> {
     if (!this.initialized) {
-      throw new Error("Wallet provider is not initialised, call init() first");
+      throw new Error(
+        "Extension provider is not initialised, call init() first"
+      );
     }
     this.openExtensionPopup();
     const { token } = options;
@@ -51,16 +67,26 @@ export class ExtensionProvider implements IDappProvider {
 
   async logout(): Promise<boolean> {
     if (!this.initialized) {
-      throw new Error("Wallet provider is not initialised, call init() first");
+      throw new Error(
+        "Extension provider is not initialised, call init() first"
+      );
     }
-    return await this.startBgrMsgChannel("logout", this.account.address);
+    try {
+      await this.startBgrMsgChannel("logout", this.account.address);
+    } catch (error) {
+      console.warn("Extension origin url is already cleared!", error);
+    }
+
+    return true;
   }
 
   async getAddress(): Promise<string> {
     if (!this.initialized) {
-      throw new Error("Wallet provider is not initialised, call init() first");
+      throw new Error(
+        "Extension provider is not initialised, call init() first"
+      );
     }
-    return this.account.address;
+    return this.account ? this.account.address : "";
   }
 
   isInitialized(): boolean {
@@ -105,7 +131,9 @@ export class ExtensionProvider implements IDappProvider {
 
   private openExtensionPopup() {
     if (!this.initialized) {
-      throw new Error("Wallet provider is not initialised, call init() first");
+      throw new Error(
+        "Extension provider is not initialised, call init() first"
+      );
     }
     this.extensionPopupWindow = window.open(
       this.extensionURL,

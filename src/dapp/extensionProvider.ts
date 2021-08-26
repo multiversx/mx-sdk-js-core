@@ -183,7 +183,6 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   private startExtMsgChannel(operation: string, connectData: any): any {
-    console.log("start message channel: ", operation, connectData);
     return new Promise((resolve, reject) => {
       let isResolved = false;
       const eventHandler = (event: any) => {

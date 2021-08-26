@@ -98,6 +98,7 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   async sendTransaction(transaction: Transaction): Promise<Transaction> {
+    this.openExtensionPopup();
     return await this.startExtMsgChannel("sendTransactions", {
       from: this.account.index,
       transactions: [transaction],
@@ -105,6 +106,7 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   async signTransaction(transaction: Transaction): Promise<Transaction> {
+    this.openExtensionPopup();
     return await this.startExtMsgChannel("signTransactions", {
       from: this.account.index,
       transactions: [transaction],
@@ -114,7 +116,8 @@ export class ExtensionProvider implements IDappProvider {
   async signTransactions(
     transactions: Array<Transaction>
   ): Promise<Array<Transaction>> {
-    return await this.startExtMsgChannel("sendTransactions", {
+    this.openExtensionPopup();
+    return await this.startExtMsgChannel("signTransactions", {
       from: this.account.index,
       transactions: transactions,
     });
@@ -180,6 +183,7 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   private startExtMsgChannel(operation: string, connectData: any): any {
+    console.log("start message channel: ", operation, connectData);
     return new Promise((resolve, reject) => {
       let isResolved = false;
       const eventHandler = (event: any) => {

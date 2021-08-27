@@ -7,16 +7,19 @@ declare global {
     elrondWallet: { extensionId: string };
   }
 }
+interface AccountType {
+  address: string;
+  name?: string;
+  signature?: string;
+}
 
 export class ExtensionProvider implements IDappProvider {
   private popupName = "connectPopup";
-  private popupOptions =
-    "directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no,width=375,height=569";
 
   private extensionId: string = "";
   private extensionURL: string = "";
   private extensionPopupWindow: Window | null;
-  public account: any;
+  public account: AccountType;
   private initialized: boolean = false;
   private static _instance: ExtensionProvider = new ExtensionProvider();
   constructor() {
@@ -25,13 +28,13 @@ export class ExtensionProvider implements IDappProvider {
         "Error: Instantiation failed: Use ExtensionProvider.getInstance() instead of new."
       );
     }
+    this.account = { address: "" };
     ExtensionProvider._instance = this;
     this.extensionPopupWindow = null;
   }
 
   public static getInstance(address: string = ""): ExtensionProvider {
-    if (address !== "" && !ExtensionProvider._instance.account) {
-      ExtensionProvider._instance.account = {};
+    if (address !== "") {
       ExtensionProvider._instance.account.address = address;
     }
 
@@ -100,7 +103,7 @@ export class ExtensionProvider implements IDappProvider {
   async sendTransaction(transaction: Transaction): Promise<Transaction> {
     this.openExtensionPopup();
     return await this.startExtMsgChannel("sendTransactions", {
-      from: this.account.index,
+      from: this.account.address,
       transactions: [transaction],
     })[0];
   }
@@ -108,7 +111,7 @@ export class ExtensionProvider implements IDappProvider {
   async signTransaction(transaction: Transaction): Promise<Transaction> {
     this.openExtensionPopup();
     return await this.startExtMsgChannel("signTransactions", {
-      from: this.account.index,
+      from: this.account.address,
       transactions: [transaction],
     })[0];
   }
@@ -118,7 +121,7 @@ export class ExtensionProvider implements IDappProvider {
   ): Promise<Array<Transaction>> {
     this.openExtensionPopup();
     return await this.startExtMsgChannel("signTransactions", {
-      from: this.account.index,
+      from: this.account.address,
       transactions: transactions,
     });
   }
@@ -126,7 +129,7 @@ export class ExtensionProvider implements IDappProvider {
   async signMessage(message: SignableMessage): Promise<SignableMessage> {
     this.openExtensionPopup();
     const data = {
-      account: this.account.index,
+      account: this.account.address,
       message: message.message,
     };
     return await this.startExtMsgChannel("signMessage", data);
@@ -138,10 +141,13 @@ export class ExtensionProvider implements IDappProvider {
         "Extension provider is not initialised, call init() first"
       );
     }
+    const popupOptions = `directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,left=${window.screenX +
+      window.outerWidth -
+      375},screenY=${window.screenY}resizable=no,width=375,height=569`;
     this.extensionPopupWindow = window.open(
       this.extensionURL,
       this.popupName,
-      this.popupOptions
+      popupOptions
     );
   }
 

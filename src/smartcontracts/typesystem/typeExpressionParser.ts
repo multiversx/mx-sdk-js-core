@@ -66,9 +66,16 @@ export class TypeExpressionParser {
         }
 
         // Split by the delimiters, but exclude the spaces that are found in the middle of "utf-8 string"
-        let symbolsRegex = /(:|\{|\}|,|(?<!utf\-8)\s)/;
-        let tokens = jsoned.split(symbolsRegex).filter((token) => token);
-        jsoned = tokens.map((token) => (symbolsRegex.test(token) ? token : `"${token}"`)).join("");
+        let symbolsRegex = /(:|\{|\}|,|\s)/;
+        let tokens = jsoned
+          // Hack for Safari compatibility, where we can't use negative lookbehind
+          .replace(/utf\-8\sstring/ig, "utf-8-string")
+          .split(symbolsRegex)
+          .filter((token) => token);
+
+        jsoned = tokens.map((token) => (symbolsRegex.test(token) ? token : `"${token}"`))
+          .map((token) => token.replace(/utf\-8\-string/ig, "utf-8 string"))
+          .join("");
 
         if (tokens.length == 1) {
             // Workaround for simple, non-generic types.

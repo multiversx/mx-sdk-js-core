@@ -33,11 +33,12 @@ export class ExtensionProvider implements IDappProvider {
     this.extensionPopupWindow = null;
   }
 
-  public static getInstance(address: string = ""): ExtensionProvider {
-    if (address !== "") {
-      ExtensionProvider._instance.account.address = address;
-    }
+  public static getInstance(): ExtensionProvider {
+    return ExtensionProvider._instance;
+  }
 
+  public setAddress(address: string): ExtensionProvider {
+    this.account.address = address;
     return ExtensionProvider._instance;
   }
 

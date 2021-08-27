@@ -7,6 +7,7 @@ declare global {
     elrondWallet: { extensionId: string };
   }
 }
+
 interface IExtensionAccount {
   address: string;
   name?: string;

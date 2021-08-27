@@ -7,7 +7,7 @@ declare global {
     elrondWallet: { extensionId: string };
   }
 }
-interface AccountType {
+interface IExtensionAccount {
   address: string;
   name?: string;
   signature?: string;
@@ -19,7 +19,7 @@ export class ExtensionProvider implements IDappProvider {
   private extensionId: string = "";
   private extensionURL: string = "";
   private extensionPopupWindow: Window | null;
-  public account: AccountType;
+  public account: IExtensionAccount;
   private initialized: boolean = false;
   private static _instance: ExtensionProvider = new ExtensionProvider();
   constructor() {

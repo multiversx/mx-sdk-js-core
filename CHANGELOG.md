@@ -8,6 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [7.0.1]
 - [Bugfix for Safari - removed negative lookbehind regex #67](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/67)
+- [Bugfix on WalletConnect signTransactions single Tx case #69](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/69)
 
 ## [7.0.0]
 - [Contract wrapper](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9)

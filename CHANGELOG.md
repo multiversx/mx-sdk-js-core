@@ -7,7 +7,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 ## [7.0.1]
-- [Bugfix for Safari - removed negative lookahead regex #67](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/67)
+- [Bugfix for Safari - removed negative lookbehind regex #67](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/67)
 
 ## [7.0.0]
 - [Contract wrapper](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9)

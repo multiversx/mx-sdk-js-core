@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+- [ExtensionProvider] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/66
+
+    - ### Breaking changes:
+      - Extension Provider can no longer be instantiated with `new ExtensionProvider`
+        -Added `static getInstance` method
+
 ## [7.0.1]
 - [Bugfix for Safari - removed negative lookbehind regex #67](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/67)
 - [Bugfix on WalletConnect signTransactions single Tx case #69](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/69)

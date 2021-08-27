@@ -8,20 +8,39 @@ declare global {
   }
 }
 
+interface IExtensionAccount {
+  address: string;
+  name?: string;
+  signature?: string;
+}
+
 export class ExtensionProvider implements IDappProvider {
   private popupName = "connectPopup";
-  private popupOptions =
-    "directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no,width=375,height=569";
 
   private extensionId: string = "";
   private extensionURL: string = "";
   private extensionPopupWindow: Window | null;
-  public account: any;
+  public account: IExtensionAccount;
   private initialized: boolean = false;
-
+  private static _instance: ExtensionProvider = new ExtensionProvider();
   constructor() {
+    if (ExtensionProvider._instance) {
+      throw new Error(
+        "Error: Instantiation failed: Use ExtensionProvider.getInstance() instead of new."
+      );
+    }
+    this.account = { address: "" };
+    ExtensionProvider._instance = this;
     this.extensionPopupWindow = null;
-    this.init().then();
+  }
+
+  public static getInstance(): ExtensionProvider {
+    return ExtensionProvider._instance;
+  }
+
+  public setAddress(address: string): ExtensionProvider {
+    this.account.address = address;
+    return ExtensionProvider._instance;
   }
 
   async init(): Promise<boolean> {
@@ -40,7 +59,9 @@ export class ExtensionProvider implements IDappProvider {
     } = {}
   ): Promise<string> {
     if (!this.initialized) {
-      throw new Error("Wallet provider is not initialised, call init() first");
+      throw new Error(
+        "Extension provider is not initialised, call init() first"
+      );
     }
     this.openExtensionPopup();
     const { token } = options;
@@ -51,16 +72,26 @@ export class ExtensionProvider implements IDappProvider {
 
   async logout(): Promise<boolean> {
     if (!this.initialized) {
-      throw new Error("Wallet provider is not initialised, call init() first");
+      throw new Error(
+        "Extension provider is not initialised, call init() first"
+      );
     }
-    return await this.startBgrMsgChannel("logout", this.account.address);
+    try {
+      await this.startBgrMsgChannel("logout", this.account.address);
+    } catch (error) {
+      console.warn("Extension origin url is already cleared!", error);
+    }
+
+    return true;
   }
 
   async getAddress(): Promise<string> {
     if (!this.initialized) {
-      throw new Error("Wallet provider is not initialised, call init() first");
+      throw new Error(
+        "Extension provider is not initialised, call init() first"
+      );
     }
-    return this.account.address;
+    return this.account ? this.account.address : "";
   }
 
   isInitialized(): boolean {
@@ -72,15 +103,17 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   async sendTransaction(transaction: Transaction): Promise<Transaction> {
+    this.openExtensionPopup();
     return await this.startExtMsgChannel("sendTransactions", {
-      from: this.account.index,
+      from: this.account.address,
       transactions: [transaction],
     })[0];
   }
 
   async signTransaction(transaction: Transaction): Promise<Transaction> {
+    this.openExtensionPopup();
     return await this.startExtMsgChannel("signTransactions", {
-      from: this.account.index,
+      from: this.account.address,
       transactions: [transaction],
     })[0];
   }
@@ -88,8 +121,9 @@ export class ExtensionProvider implements IDappProvider {
   async signTransactions(
     transactions: Array<Transaction>
   ): Promise<Array<Transaction>> {
-    return await this.startExtMsgChannel("sendTransactions", {
-      from: this.account.index,
+    this.openExtensionPopup();
+    return await this.startExtMsgChannel("signTransactions", {
+      from: this.account.address,
       transactions: transactions,
     });
   }
@@ -97,7 +131,7 @@ export class ExtensionProvider implements IDappProvider {
   async signMessage(message: SignableMessage): Promise<SignableMessage> {
     this.openExtensionPopup();
     const data = {
-      account: this.account.index,
+      account: this.account.address,
       message: message.message,
     };
     return await this.startExtMsgChannel("signMessage", data);
@@ -105,12 +139,17 @@ export class ExtensionProvider implements IDappProvider {
 
   private openExtensionPopup() {
     if (!this.initialized) {
-      throw new Error("Wallet provider is not initialised, call init() first");
+      throw new Error(
+        "Extension provider is not initialised, call init() first"
+      );
     }
+    const popupOptions = `directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,left=${window.screenX +
+      window.outerWidth -
+      375},screenY=${window.screenY}resizable=no,width=375,height=569`;
     this.extensionPopupWindow = window.open(
       this.extensionURL,
       this.popupName,
-      this.popupOptions
+      popupOptions
     );
   }
 

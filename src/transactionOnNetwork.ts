@@ -29,7 +29,7 @@ export class TransactionOnNetwork {
     hyperblockHash: Hash = Hash.empty();
 
     private receipt: Receipt = new Receipt();
-    private smartContractResults: SmartContractResults = SmartContractResults.empty();
+    private results: SmartContractResults = SmartContractResults.empty();
 
     constructor(init?: Partial<TransactionOnNetwork>) {
         Object.assign(this, init);
@@ -50,7 +50,7 @@ export class TransactionOnNetwork {
         hyperblockNonce: number,
         hyperblockHash: string,
         receipt: any,
-        smartContractResults: any[]
+        results: any[]
     }): TransactionOnNetwork {
         let transactionOnNetwork = new TransactionOnNetwork();
 
@@ -70,7 +70,7 @@ export class TransactionOnNetwork {
         transactionOnNetwork.hyperblockHash = new Hash(response.hyperblockHash);
 
         transactionOnNetwork.receipt = Receipt.fromHttpResponse(response.receipt || {});
-        transactionOnNetwork.smartContractResults = SmartContractResults.fromHttpResponse(response.smartContractResults || []);
+        transactionOnNetwork.results = SmartContractResults.fromHttpResponse(response.results || []);
 
         return transactionOnNetwork;
     }
@@ -80,7 +80,7 @@ export class TransactionOnNetwork {
     }
 
     getSmartContractResults(): SmartContractResults {
-        return this.smartContractResults;
+        return this.results;
     }
 }
 

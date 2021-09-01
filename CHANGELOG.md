@@ -5,6 +5,10 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
+- [Fix smart contract results to align to the new API field namings]
+    - Breaking changes:
+        - `smartContractResults` property in `TransactionOnNetwork` was renamed to `results` as in the new API,
+        affecting `fromHttpResponse` method 
 
 
 ## [8.0.0]

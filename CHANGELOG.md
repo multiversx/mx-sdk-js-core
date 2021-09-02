@@ -7,7 +7,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
  - [Fix ExtensionProvider sign/send transaction response] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/72
     - Provider's send/sign transaction methonds responded with plainObject transactions instead of Transaction
-    - Added fromPlainObject method as a static methond to transaction 
+    - Added fromPlainObject method as a static method to transaction 
 
 ## [8.0.0]
 - [ExtensionProvider] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/66

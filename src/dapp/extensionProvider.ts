@@ -104,28 +104,38 @@ export class ExtensionProvider implements IDappProvider {
 
   async sendTransaction(transaction: Transaction): Promise<Transaction> {
     this.openExtensionPopup();
-    return await this.startExtMsgChannel("sendTransactions", {
+    const txResponse = await this.startExtMsgChannel("sendTransactions", {
       from: this.account.address,
-      transactions: [transaction],
-    })[0];
+      transactions: [transaction.toPlainObject()],
+    });
+
+    return Transaction.fromPlainObject(txResponse[0]);
   }
 
   async signTransaction(transaction: Transaction): Promise<Transaction> {
     this.openExtensionPopup();
-    return await this.startExtMsgChannel("signTransactions", {
+    const txResponse = await this.startExtMsgChannel("signTransactions", {
       from: this.account.address,
-      transactions: [transaction],
-    })[0];
+      transactions: [transaction.toPlainObject()],
+    });
+    return Transaction.fromPlainObject(txResponse[0]);
   }
 
   async signTransactions(
     transactions: Array<Transaction>
   ): Promise<Array<Transaction>> {
     this.openExtensionPopup();
-    return await this.startExtMsgChannel("signTransactions", {
+    transactions = transactions.map((transaction) =>
+      transaction.toPlainObject()
+    );
+    let txResponse = await this.startExtMsgChannel("signTransactions", {
       from: this.account.address,
       transactions: transactions,
     });
+    txResponse = txResponse.map((transaction: any) =>
+      Transaction.fromPlainObject(transaction)
+    );
+    return txResponse;
   }
 
   async signMessage(message: SignableMessage): Promise<SignableMessage> {
@@ -190,8 +200,11 @@ export class ExtensionProvider implements IDappProvider {
     });
   }
 
-  private startExtMsgChannel(operation: string, connectData: any): any {
-    return new Promise((resolve, reject) => {
+  private async startExtMsgChannel(
+    operation: string,
+    connectData: any
+  ): Promise<any> {
+    const response = await new Promise((resolve, reject) => {
       let isResolved = false;
       const eventHandler = (event: any) => {
         if (
@@ -208,18 +221,18 @@ export class ExtensionProvider implements IDappProvider {
               });
               break;
             case "connectResult":
-              this.extensionPopupWindow?.close();
               this.account = event.data.data;
               window.removeEventListener("message", eventHandler);
               isResolved = true;
+              this.extensionPopupWindow?.close();
               resolve(event.data.data);
               break;
 
             default:
               this.handleExtResponseErr(event);
-              this.extensionPopupWindow?.close();
               window.removeEventListener("message", eventHandler);
               isResolved = true;
+              this.extensionPopupWindow?.close();
               resolve(event.data.data);
               break;
           }
@@ -227,15 +240,17 @@ export class ExtensionProvider implements IDappProvider {
       };
       const windowCloseInterval = setInterval(() => {
         if (this.extensionPopupWindow?.closed) {
-          window.removeEventListener("message", eventHandler);
           clearInterval(windowCloseInterval);
-          if (!isResolved)
+          if (!isResolved) {
+            window.removeEventListener("message", eventHandler);
             reject("Extension window was closed without response.");
+          }
         }
       }, 500);
-
       window.addEventListener("message", eventHandler, false);
     });
+
+    return response;
   }
 
   private handleExtResponseErr(event: any) {

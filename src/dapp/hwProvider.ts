@@ -171,7 +171,7 @@ export class HWProvider implements IHWProvider {
         return {
             signature: new Signature(signature),
             address
-        }
+        };
     }
 
     private async shouldSignUsingHash(): Promise<boolean> {

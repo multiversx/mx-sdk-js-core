@@ -157,7 +157,7 @@ export class HWProvider implements IHWProvider {
         return message;
     }
 
-    async signAuthToken(token: Buffer, options?: { addressIndex?: number }): Promise<Signature> {
+    async tokenLogin(options: { token: Buffer, addressIndex?: number }): Promise<{signature: Signature; address: string}> {
         if (!this.hwApp) {
             throw new Error("HWApp not initialised, call init() first");
         }
@@ -166,9 +166,12 @@ export class HWProvider implements IHWProvider {
             this.addressIndex = options.addressIndex;
         }
 
-        const { signature } = await this.hwApp.getAddressAndSignAuthToken(0, this.addressIndex, token);
+        const { signature, address } = await this.hwApp.getAddressAndSignAuthToken(0, this.addressIndex, options.token);
 
-        return new Signature(signature);
+        return {
+            signature: new Signature(signature),
+            address
+        }
     }
 
     private async shouldSignUsingHash(): Promise<boolean> {

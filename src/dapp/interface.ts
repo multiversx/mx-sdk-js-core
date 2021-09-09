@@ -17,7 +17,7 @@ export interface IDappProvider {
 
 export interface IHWProvider extends IDappProvider {
     getAccounts(startIndex: number, length: number): Promise<string[]>;
-    signAuthToken(token: Buffer, options?: { addressIndex?: number }): Promise<Signature>;
+    tokenLogin(options: { token: Buffer, addressIndex?: number }): Promise<{signature: Signature; address: string}>;
 }
 
 export interface IDappMessageEvent extends MessageEvent {

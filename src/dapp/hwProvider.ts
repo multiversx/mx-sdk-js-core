@@ -165,6 +165,8 @@ export class HWProvider implements IHWProvider {
         if(options && options.addressIndex) {
             this.addressIndex = options.addressIndex;
         }
+        
+        await this.hwApp.setAddress(0, this.addressIndex);
 
         const { signature, address } = await this.hwApp.getAddressAndSignAuthToken(0, this.addressIndex, options.token);
 

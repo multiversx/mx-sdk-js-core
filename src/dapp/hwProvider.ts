@@ -180,9 +180,8 @@ export class HWProvider implements IHWProvider {
         if (!this.hwApp) {
             throw new Error("HWApp not initialised, call init() first");
         }
-        const configuration = await this.hwApp.getAppConfiguration();
         
-        return configuration;
+        return await this.hwApp.getAppConfiguration();
     }
 
     private async shouldSignUsingHash(): Promise<boolean> {

@@ -17,12 +17,6 @@ export interface IDappProvider {
 
 export interface IHWProvider extends IDappProvider {
     getAccounts(startIndex: number, length: number): Promise<string[]>;
-    getConfiguration(): Promise<{
-        version: string;
-        contractData: number;
-        accountIndex: number;
-        addressIndex: number;
-    }>;
     tokenLogin(options: { token: Buffer, addressIndex?: number }): Promise<{signature: Signature; address: string}>;
 }
 

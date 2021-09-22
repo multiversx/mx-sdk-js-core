@@ -176,14 +176,6 @@ export class HWProvider implements IHWProvider {
         };
     }
 
-    async getConfiguration() {
-        if (!this.hwApp) {
-            throw new Error("HWApp not initialised, call init() first");
-        }
-        
-        return await this.hwApp.getAppConfiguration();
-    }
-
     private async shouldSignUsingHash(): Promise<boolean> {
         if (!this.hwApp) {
             throw new Error("HWApp not initialised, call init() first");

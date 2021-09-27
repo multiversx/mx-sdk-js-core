@@ -16,6 +16,16 @@ const JSONbig = require("json-bigint");
 /**
  * This will be deprecated once all the endpoints move to ApiProvider
  */
+
+const defaultConfig ={
+    timeout: 1000,
+    // See: https://github.com/axios/axios/issues/983 regarding transformResponse
+    transformResponse: [
+        function(data: any) {
+            return JSONbig.parse(data);
+        },
+    ],
+};
 export class ProxyProvider implements IProvider {
     private url: string;
     private config: AxiosRequestConfig;
@@ -27,15 +37,7 @@ export class ProxyProvider implements IProvider {
      */
     constructor(url: string, config?: AxiosRequestConfig) {
         this.url = url;
-        this.config = Object.assign({}, config, {
-          timeout: 1000,
-          // See: https://github.com/axios/axios/issues/983 regarding transformResponse
-          transformResponse: [
-            function(data: any) {
-              return JSONbig.parse(data);
-            },
-          ],
-        });
+        this.config = {...defaultConfig, ...config};
     }
 
     /**

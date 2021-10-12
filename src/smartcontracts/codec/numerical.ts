@@ -16,7 +16,7 @@ export class NumericalBinaryCodec {
             // Size of type is not known: arbitrary-size big integer.
             // Therefore, we must read the length from the header.
             offset = SizeOfU32;
-            length = buffer.readUInt32BE();
+            length = buffer.readUInt32BE(0);
         }
 
         let payload = buffer.slice(offset, offset + length);

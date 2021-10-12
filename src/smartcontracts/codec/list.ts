@@ -16,7 +16,7 @@ export class ListBinaryCodec {
     decodeNested(buffer: Buffer, type: Type): [List, number] {
         let typeParameter = type.getFirstTypeParameter();
         let result: TypedValue[] = [];
-        let numItems = buffer.readUInt32BE();
+        let numItems = buffer.readUInt32BE(0);
         this.binaryCodec.constraints.checkListLength(numItems);
 
         let originalBuffer = buffer;

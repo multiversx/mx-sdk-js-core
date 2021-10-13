@@ -70,7 +70,9 @@ export class WalletProvider implements IDappProvider {
             token = `&token=${options.token}`;
         }
 
-        window.location.href = `${this.baseWalletUrl()}${WALLET_PROVIDER_CONNECT_URL}?${callbackUrl}${token}`;
+        const redirect = `${this.baseWalletUrl()}${WALLET_PROVIDER_CONNECT_URL}?${callbackUrl}${token}`;
+        setTimeout(() => { window.location.href =  redirect;}, 10);
+        
         return window.location.href;
     }
 
@@ -83,7 +85,9 @@ export class WalletProvider implements IDappProvider {
             callbackUrl = `callbackUrl=${options.callbackUrl}`;
         }
 
-        window.location.href = `${this.baseWalletUrl()}${WALLET_PROVIDER_DISCONNECT_URL}?${callbackUrl}`;
+        const redirect = `${this.baseWalletUrl()}${WALLET_PROVIDER_DISCONNECT_URL}?${callbackUrl}`;
+        setTimeout(() => { window.location.href =  redirect;}, 10);
+
         return true;
     }
 

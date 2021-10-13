@@ -1,4 +1,5 @@
 import { SignableMessage } from "../signableMessage";
+import { Signature } from "../signature";
 import { Transaction } from "../transaction";
 import { IDappProvider } from "./interface";
 
@@ -142,9 +143,15 @@ export class ExtensionProvider implements IDappProvider {
     this.openExtensionPopup();
     const data = {
       account: this.account.address,
-      message: message.message,
+      message: message.message.toString(),
     };
-    return await this.startExtMsgChannel("signMessage", data);
+    const signResponse = await this.startExtMsgChannel("signMessage", data);
+    const signedMsg = new SignableMessage({
+      message: Buffer.from(signResponse.message),
+      signature: new Signature(signResponse.signature),
+    });
+
+    return signedMsg;
   }
 
   private openExtensionPopup() {

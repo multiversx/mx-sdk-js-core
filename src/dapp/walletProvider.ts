@@ -71,6 +71,7 @@ export class WalletProvider implements IDappProvider {
         }
 
         const redirect = `${this.baseWalletUrl()}${WALLET_PROVIDER_CONNECT_URL}?${callbackUrl}${token}`;
+        window.location.href = redirect;
         setTimeout(() => { window.location.href =  redirect;}, 10);
         
         return window.location.href;
@@ -86,6 +87,7 @@ export class WalletProvider implements IDappProvider {
         }
 
         const redirect = `${this.baseWalletUrl()}${WALLET_PROVIDER_DISCONNECT_URL}?${callbackUrl}`;
+        window.location.href = redirect;
         setTimeout(() => { window.location.href =  redirect;}, 10);
 
         return true;

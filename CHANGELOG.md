@@ -16,7 +16,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  
  - [Add signAuthToken method to HWProvider #73] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/73) 
 
- -[Fixed wallet logout redirect when used in form submit]
+ -[Fixed wallet logout redirect when used in form submit] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/84)
 
 ## [8.0.0]
 - [ExtensionProvider] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/66

@@ -71,13 +71,12 @@ export class WalletProvider implements IDappProvider {
         }
 
         const redirect = `${this.baseWalletUrl()}${WALLET_PROVIDER_CONNECT_URL}?${callbackUrl}${token}`;
-        window.location.href = redirect;
         await new Promise((resolve) => {
-      		setTimeout(() => {
-        		window.location.href = redirect;
-        	resolve(true);
-      		}, 10);
-    	});
+            setTimeout(() => {
+              window.location.href = redirect;
+              resolve(true);
+            }, 10);
+          });
         
         return window.location.href;
     }
@@ -92,8 +91,12 @@ export class WalletProvider implements IDappProvider {
         }
 
         const redirect = `${this.baseWalletUrl()}${WALLET_PROVIDER_DISCONNECT_URL}?${callbackUrl}`;
-        window.location.href = redirect;
-        setTimeout(() => { window.location.href =  redirect;}, 10);
+        await new Promise((resolve) => {
+            setTimeout(() => {
+              window.location.href = redirect;
+              resolve(true);
+            }, 10);
+          });
 
         return true;
     }

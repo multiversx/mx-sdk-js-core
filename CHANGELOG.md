@@ -5,11 +5,18 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
- - [Fix ExtensionProvider sign/send transaction response] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/72
+- [Fix smart contract results to align to the new API field namings]
+    - Breaking changes:
+        - `smartContractResults` property in `TransactionOnNetwork` was renamed to `results` as in the new API,
+        affecting `fromHttpResponse` method 
+
+ - [Fix ExtensionProvider sign/send transaction response #72](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/72)
     - Provider's send/sign transaction methonds responded with plainObject transactions instead of Transaction
-    - Added fromPlainObject method as a static method to transaction
-    - Fixed message signing with extension provider
-    - Fixed wallet logout redirect when used in form submit
+    - Added fromPlainObject method as a static method to transaction 
+ 
+ - [Add signAuthToken method to HWProvider #73] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/73) 
+
+ -[Fixed wallet logout redirect when used in form submit]
 
 ## [8.0.0]
 - [ExtensionProvider] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/66

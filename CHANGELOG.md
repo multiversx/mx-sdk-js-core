@@ -9,6 +9,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
     - Provider's send/sign transaction methonds responded with plainObject transactions instead of Transaction
     - Added fromPlainObject method as a static method to transaction
     - Fixed message signing with extension provider
+    - Fixed wallet logout redirect when used in form submit
 
 ## [8.0.0]
 - [ExtensionProvider] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/66

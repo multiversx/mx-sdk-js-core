@@ -35,7 +35,7 @@ export class SmartContract implements ISmartContract {
      * This object contains a function for each endpoint defined by the contract.
      * (a bit similar to web3js's "contract.methods").
      */
-    public readonly methods: { [key: string]: (args: TypedValue[]) => Interaction } = {};
+    public readonly methods: { [key: string]: (args?: TypedValue[]) => Interaction } = {};
 
     /**
      * Create a SmartContract object by providing its address on the Network.
@@ -60,7 +60,7 @@ export class SmartContract implements ISmartContract {
             // For each endpoint defined by the ABI, we attach a function to the "methods" object,
             // a function that receives typed values as arguments
             // and returns a prepared contract interaction.
-            this.methods[functionName] = function (args: TypedValue[]) {
+            this.methods[functionName] = function (args?: TypedValue[]) {
                 let func = new ContractFunction(functionName);
                 let interaction = new Interaction(contract, func, args || []);
                 return interaction;

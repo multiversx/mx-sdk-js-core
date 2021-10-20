@@ -237,7 +237,12 @@ export class ExtensionProvider implements IDappProvider {
               break;
 
             default:
-              this.handleExtResponseErr(event);
+              try {
+                this.handleExtResponseErr(event);
+              } catch (err) {
+                reject(err.message);
+              }
+
               window.removeEventListener("message", eventHandler);
               isResolved = true;
               this.extensionPopupWindow?.close();
@@ -264,6 +269,9 @@ export class ExtensionProvider implements IDappProvider {
   private handleExtResponseErr(event: any) {
     if (!event.data && !event.data.data) {
       throw new Error("Extension response is empty.");
+    }
+    if (event.data.error) {
+      throw new Error(event.data.error);
     }
 
     if (

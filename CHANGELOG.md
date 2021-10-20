@@ -12,9 +12,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
  - [Fix ExtensionProvider sign/send transaction response #72](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/72)
     - Provider's send/sign transaction methonds responded with plainObject transactions instead of Transaction
-    - Added fromPlainObject method as a static method to transaction 
+    - Added fromPlainObject method as a static method to transaction
  
  - [Add signAuthToken method to HWProvider #73] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/73) 
+
+ - [Fix ExtensionProvider sign message #86](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/86)
+    - Add address to SignableMessage response
 
 ## [8.0.0]
 - [ExtensionProvider] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/66

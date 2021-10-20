@@ -147,6 +147,7 @@ export class ExtensionProvider implements IDappProvider {
     };
     const signResponse = await this.startExtMsgChannel("signMessage", data);
     const signedMsg = new SignableMessage({
+      address: message.address,
       message: Buffer.from(signResponse.message),
       signature: new Signature(signResponse.signature),
     });

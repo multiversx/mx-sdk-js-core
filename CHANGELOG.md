@@ -15,8 +15,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
     - Added fromPlainObject method as a static method to transaction
  
  - [Add signAuthToken method to HWProvider #73] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/73) 
+ - [Fix for ignored config options in proxyProvider and apiProvider #76](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/76)
  - [Fix wallet logout/login redirect when using form submit] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/85)
-
  - [Fix ExtensionProvider sign message #86](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/86)
     - Add address to SignableMessage response
 

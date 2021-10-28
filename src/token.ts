@@ -33,7 +33,7 @@ export class Token {
     }
 
     static fromHttpResponse(response: {
-        token: string,
+        identifier: string,
         name: string,
         type: string,
         owner: string,
@@ -50,7 +50,7 @@ export class Token {
         canWipe: boolean
     }): Token {
         return new Token({
-            identifier: response.token,
+            identifier: response.identifier,
             name: response.name,
             type: TokenType[response.type as keyof typeof TokenType],
             owner: new Address(response.owner),

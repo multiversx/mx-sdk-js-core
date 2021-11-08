@@ -12,8 +12,7 @@ export class Token {
     name: string = ''; // Token name (eg. MyTokenName123)
     type: TokenType = TokenType.Fungible;
     owner: Address = new Address();
-    minted: BigNumber = new BigNumber(0);
-    burnt: BigNumber = new BigNumber(0);
+    supply: string = '0'; // Circulating supply = initial minted supply + local mints - local burns
     decimals: number = 18;
     isPaused: boolean = false;
     canUpgrade: boolean = false;
@@ -37,8 +36,7 @@ export class Token {
         name: string,
         type: string,
         owner: string,
-        minted: string,
-        burnt: string,
+        supply: string,
         decimals: number,
         isPaused: boolean,
         canUpgrade: boolean,
@@ -54,8 +52,7 @@ export class Token {
             name: response.name,
             type: TokenType[response.type as keyof typeof TokenType],
             owner: new Address(response.owner),
-            minted: new BigNumber(response.minted),
-            burnt: new BigNumber(response.burnt),
+            supply: response.supply,
             decimals: response.decimals,
             isPaused: response.isPaused,
             canUpgrade: response.canUpgrade,
@@ -69,15 +66,14 @@ export class Token {
     }
 
     static fromTokenProperties(tokenIdentifier: string, results: any[]): Token {
-        let [tokenName, tokenType, owner, totalMinted, totalBurned, ...propertiesBuffers] = results;
+        let [tokenName, tokenType, owner, supply, ...propertiesBuffers] = results;
         let properties = parseTokenProperties(propertiesBuffers);
         return new Token({
             identifier: tokenIdentifier,
             type: TokenType[tokenType.toString() as keyof typeof TokenType],
             name: tokenName.toString(),
             owner,
-            minted: new BigNumber(totalMinted),
-            burnt: new BigNumber(totalBurned),
+            supply: supply,
             decimals: properties.NumDecimals.toNumber(),
             isPaused: properties.IsPaused,
             canUpgrade: properties.CanUpgrade,

@@ -203,4 +203,4 @@ make clean && npm run browser-tests
 
 #### Notes
 
-For the `devnet` tests, make sure you have a *devnet* running locally. A local *devnet* can be started from the Elrond IDE or from [erdpy](https://docs.elrond.com/developers/setup-a-local-testnet-erdpy).
+For the `devnet` tests, make sure you have a *devnet* running locally. A local *devnet* can be started from the Elrond IDE or from [erdpy](https://docs.elrond.com/developers/setup-local-testnet/).

@@ -1,4 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
+import BigNumber from "bignumber.js";
+
 import { IProvider } from "./interface";
 import { Transaction, TransactionHash, TransactionStatus } from "./transaction";
 import { NetworkConfig } from "./networkConfig";
@@ -10,12 +12,13 @@ import { QueryResponse } from "./smartcontracts/queryResponse";
 import { Logger } from "./logger";
 import { NetworkStatus } from "./networkStatus";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
-import BigNumber from "bignumber.js";
-const JSONbig = require("json-bigint");
+import { defaultConfig } from "./constants";
 
 /**
  * This will be deprecated once all the endpoints move to ApiProvider
  */
+
+
 export class ProxyProvider implements IProvider {
     private url: string;
     private config: AxiosRequestConfig;
@@ -27,15 +30,7 @@ export class ProxyProvider implements IProvider {
      */
     constructor(url: string, config?: AxiosRequestConfig) {
         this.url = url;
-        this.config = Object.assign({}, config, {
-          timeout: 1000,
-          // See: https://github.com/axios/axios/issues/983 regarding transformResponse
-          transformResponse: [
-            function(data: any) {
-              return JSONbig.parse(data);
-            },
-          ],
-        });
+        this.config = {...defaultConfig, ...config};
     }
 
     /**

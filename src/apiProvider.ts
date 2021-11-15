@@ -8,7 +8,7 @@ import { TransactionHash } from "./transaction";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Token } from "./token";
 import { NFTToken } from "./nftToken";
-const JSONbig = require("json-bigint");
+import { defaultConfig } from "./constants";
 
 /**
  * This is a temporary change, this will be the only provider used, ProxyProvider will be deprecated
@@ -24,15 +24,7 @@ export class ApiProvider implements IApiProvider {
      */
     constructor(url: string, config?: AxiosRequestConfig) {
       this.url = url;
-      this.config = Object.assign({}, config, {
-        timeout: 1000,
-        // See: https://github.com/axios/axios/issues/983 regarding transformResponse
-        transformResponse: [
-          function(data: any) {
-            return JSONbig.parse(data);
-          },
-        ],
-      });
+      this.config = {...defaultConfig, ...config};
     }
 
     /**

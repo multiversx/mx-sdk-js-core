@@ -43,7 +43,8 @@ export class HWProvider implements IHWProvider {
     async getTransport(): Promise<Transport<Descriptor>> {
         let webUSBSupported = await TransportWebUSB.isSupported();
         webUSBSupported =
-          webUSBSupported && platform.name !== "Opera";
+          webUSBSupported &&
+            !!platform.os && platform.os.family !== "Windows" && platform.name !== "Opera";
 
         if (webUSBSupported) {
             return await TransportWebUSB.create();

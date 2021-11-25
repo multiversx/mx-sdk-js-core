@@ -1,5 +1,6 @@
 import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
 import TransportWebHID from "@ledgerhq/hw-transport-webhid";
+import TransportU2f from "@ledgerhq/hw-transport-u2f";
 // @ts-ignore
 import AppElrond from "@elrondnetwork/hw-app-elrond";
 
@@ -53,7 +54,7 @@ export class HWProvider implements IHWProvider {
             return await TransportWebHID.create();
         }
 
-        throw new Error("Neither WebUsb nor WebHID are supported.  Please try a different browser.");
+        return await TransportU2f.create();
     }
 
     /**

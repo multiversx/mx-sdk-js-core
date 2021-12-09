@@ -1,5 +1,6 @@
 import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
 import TransportWebHID from "@ledgerhq/hw-transport-webhid";
+import TransportU2f from "@ledgerhq/hw-transport-u2f";
 // @ts-ignore
 import AppElrond from "@elrondnetwork/hw-app-elrond";
 
@@ -42,7 +43,8 @@ export class HWProvider implements IHWProvider {
     async getTransport(): Promise<Transport<Descriptor>> {
         let webUSBSupported = await TransportWebUSB.isSupported();
         webUSBSupported =
-          webUSBSupported && platform.name !== "Opera";
+          webUSBSupported &&
+            !!platform.os && platform.os.family !== "Windows" && platform.name !== "Opera";
 
         if (webUSBSupported) {
             return await TransportWebUSB.create();
@@ -53,7 +55,7 @@ export class HWProvider implements IHWProvider {
             return await TransportWebHID.open("");
         }
 
-        throw new Error("Neither WebUsb nor WebHID are supported.  Please try a different browser.");
+        return await TransportU2f.create();
     }
 
     /**

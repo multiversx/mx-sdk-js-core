@@ -50,7 +50,7 @@ export class HWProvider implements IHWProvider {
 
         let webHIDSupported = await TransportWebHID.isSupported();
         if (webHIDSupported) {
-            return await TransportWebHID.create();
+            return await TransportWebHID.open("");
         }
 
         throw new Error("Neither WebUsb nor WebHID are supported.  Please try a different browser.");

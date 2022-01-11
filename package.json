@@ -16,7 +16,7 @@
     "tests-mainnet": "mocha $(find . -name '*.main.net.spec.ts')",
     "compile": "tsc -p tsconfig.json && npm run copy-files",
     "compile-proto": "npx pbjs -t static-module -w commonjs -o src/proto/compiled.js src/proto/transaction.proto && npx pbts -o src/proto/compiled.d.ts src/proto/compiled.js",
-    "copy-files": "mkdir -p out/testutils/ && cp -R src/testutils/testwallets out/testutils/ && mkdir -p out/abi/ && cp -R abi/ out/abi/",
+    "copy-files": "mkdir -p out/testutils/ && cp -R src/testutils/testwallets out/testutils/ && mkdir -p out/abi/ && cp -R abi/* out/abi/",
     "lint": "tslint --project .",
     "pretest": "npm run compile",
     "prepare": "npm run compile"

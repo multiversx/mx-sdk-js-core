@@ -5,9 +5,9 @@ import { AddressType } from "./address";
 import { BytesType } from "./bytes";
 import { EnumType } from "./enum";
 import { ListType, OptionType } from "./generic";
-import {BigUIntType, I64Type, U32Type, U8Type} from "./numerical";
+import { BigUIntType, I64Type, U32Type, U8Type } from "./numerical";
 import { StructType } from "./struct";
-import {BinaryCodec} from "../codec";
+import { BinaryCodec } from "../codec";
 
 describe("test abi registry", () => {
     it("should extend", async () => {
@@ -71,11 +71,16 @@ describe("test abi registry", () => {
         assert.instanceOf((<StructType>getLotteryInfo.output[0].type).fields[5].type.getFirstTypeParameter(), AddressType);
     });
 
-    it("binary codec correctly decodes numerical top level", function() {
+    it("binary codec correctly decodes perform action result", async () => {
         let bc = new BinaryCodec();
         let buff = Buffer.from("0588c738a5d26c0e3a2b4f9e8110b540ee9c0b71a3be057569a5a7b0fcb482c8f70000000806f05b59d3b200000000000b68656c6c6f20776f726c6400000000", "hex");
-        let res = bc.decodeTopLevel(buff, new U8Type());
 
-        assert.equal(res.valueOf().toString(), "5");
+        let registry = await loadAbiRegistry(["src/testdata/multisig.abi.json"]);
+        let multisig = registry.getInterface("Multisig");
+        let performAction = multisig.getEndpoint("performAction");
+        assert.instanceOf(performAction.output[0].type, EnumType);
+
+        let res = bc.decodeTopLevel(buff, performAction.output[0].type);
+        //assert.equal(res.valueOf().toString(), "5");
     });
 });

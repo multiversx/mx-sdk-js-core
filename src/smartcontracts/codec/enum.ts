@@ -9,8 +9,7 @@ export class EnumBinaryCodec {
     }
 
     decodeTopLevel(buffer: Buffer, type: EnumType): EnumValue {
-        let value = this.binaryCodec.decodeTopLevel(buffer, new U8Type());
-        let enumValue = EnumValue.fromDiscriminant(type, Number(value.valueOf()));
+        let [enumValue, _] = this.decodeNested(buffer, type);
         return enumValue;
     }
 

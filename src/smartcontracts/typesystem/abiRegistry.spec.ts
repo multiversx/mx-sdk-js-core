@@ -77,10 +77,11 @@ describe("test abi registry", () => {
 
         let registry = await loadAbiRegistry(["src/testdata/multisig.abi.json"]);
         let multisig = registry.getInterface("Multisig");
-        let performAction = multisig.getEndpoint("performAction");
-        assert.instanceOf(performAction.output[0].type, EnumType);
+        let performAction = multisig.getEndpoint("getActionData");
+        assert.equal(performAction.output[0].type.getName(), "Action");
 
-        let res = bc.decodeTopLevel(buff, performAction.output[0].type);
-        //assert.equal(res.valueOf().toString(), "5");
+        let result = bc.decodeTopLevel(buff, performAction.output[0].type);
+        assert.equal(JSON.stringify(result), `{"type":{"name":"Action","typeParameters":[]},"name":"SendTransferExecute","discriminant":5}`);
+        assert.equal(result.valueOf().toString(), "SendTransferExecute");
     });
 });

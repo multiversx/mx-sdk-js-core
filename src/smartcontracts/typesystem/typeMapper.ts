@@ -18,7 +18,8 @@ import {
     U64Type,
     U8Type,
 } from "./numerical";
-import { StructFieldDefinition, StructType } from "./struct";
+import { StructType } from "./struct";
+import { FieldDefinition } from "./fields";
 import { TokenIdentifierType } from "./tokenIdentifier";
 import { Type, CustomType } from "./types";
 import { VariadicType } from "./variadic";
@@ -118,7 +119,7 @@ export class TypeMapper {
 
     private mapStructType(type: StructType): StructType {
         let mappedFields = type.fields.map(
-            (item) => new StructFieldDefinition(item.name, item.description, this.mapType(item.type))
+            (item) => new FieldDefinition(item.name, item.description, this.mapType(item.type))
         );
         let mappedStruct = new StructType(type.getName(), mappedFields);
         return mappedStruct;

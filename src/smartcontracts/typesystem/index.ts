@@ -12,6 +12,7 @@ export * from "./composite";
 export * from "./contractInterface";
 export * from "./endpoint";
 export * from "./enum";
+export * from "./fields";
 export * from "./generic";
 export * from "./h256";
 export * from "./matchers";

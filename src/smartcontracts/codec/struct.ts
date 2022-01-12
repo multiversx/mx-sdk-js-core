@@ -1,4 +1,4 @@
-import { StructType, Struct, StructField } from "../typesystem";
+import { StructType, Struct, Field } from "../typesystem";
 import { BinaryCodec } from "./binary";
 
 export class StructBinaryCodec {
@@ -18,11 +18,11 @@ export class StructBinaryCodec {
         let offset = 0;
 
         let fieldDefinitions = type.fields;
-        let fields: StructField[] = [];
+        let fields: Field[] = [];
 
         for (const fieldDefinition of fieldDefinitions) {
             let [decoded, decodedLength] = this.binaryCodec.decodeNested(buffer, fieldDefinition.type);
-            let field = new StructField(decoded, fieldDefinition.name);
+            let field = new Field(decoded, fieldDefinition.name);
             fields.push(field);
             offset += decodedLength;
             buffer = originalBuffer.slice(offset);

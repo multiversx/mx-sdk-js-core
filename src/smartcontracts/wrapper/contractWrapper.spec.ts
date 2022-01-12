@@ -62,7 +62,7 @@ describe("test smart contract wrapper", async function () {
         await mockCall(provider, "@6f6b", lottery.call.start("lucky", Egld(1), null, null, 1, null, null));
 
         let status = await mockCall(provider, "@6f6b@01", lottery.call.status("lucky"));
-        assert.equal(status, "Running");
+        assert.deepEqual(status, { name: "Running" });
 
         let info = await mockCall(
             provider,

@@ -154,7 +154,7 @@ describe("test smart contract interactor", function () {
         assert.equal(lotteryStatusInteraction.buildTransaction().getData().toString(), "status@6c75636b79");
         assert.isTrue(statusReturnCode.equals(ReturnCode.Ok));
         assert.lengthOf(statusReturnvalues, 1);
-        assert.equal(statusFirstValue.valueOf(), "Running");
+        assert.deepEqual(statusFirstValue.valueOf(), { name: "Running" });
 
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
         let [, { returnCode: infoReturnCode, values: infoReturnvalues, firstValue: infoFirstValue }] = await Promise.all([

@@ -559,6 +559,27 @@
     ],
     "hasCallback": false,
     "types": {
+        "CallActionData": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "egld_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "endpoint_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "arguments",
+                    "type": "List<bytes>"
+                }
+            ]
+        },
         "Action": {
             "type": "enum",
             "variants": [
@@ -693,27 +714,6 @@
                 {
                     "name": "signers",
                     "type": "List<Address>"
-                }
-            ]
-        },
-        "CallActionData": {
-            "type": "struct",
-            "fields": [
-                {
-                    "name": "to",
-                    "type": "Address"
-                },
-                {
-                    "name": "egld_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "endpoint_name",
-                    "type": "bytes"
-                },
-                {
-                    "name": "arguments",
-                    "type": "List<bytes>"
                 }
             ]
         },

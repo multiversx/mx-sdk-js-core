@@ -16,6 +16,7 @@ export * from "./fields";
 export * from "./generic";
 export * from "./h256";
 export * from "./matchers";
+export * from "./nothing";
 export * from "./numerical";
 export * from "./string";
 export * from "./struct";

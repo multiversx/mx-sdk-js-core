@@ -26,6 +26,7 @@ import { VariadicType } from "./variadic";
 import { OptionalType } from "./algebraic";
 import { StringType, TupleType } from ".";
 import { CodeMetadataType } from "./codeMetadata";
+import { NothingType } from "./nothing";
 
 type TypeConstructor = new (...typeParameters: Type[]) => Type;
 
@@ -80,6 +81,8 @@ export class TypeMapper {
             ["utf-8 string", new StringType()],
             ["TokenIdentifier", new TokenIdentifierType()],
             ["CodeMetadata", new CodeMetadataType()],
+            ["nothing", new NothingType()],
+            ["AsyncCall", new NothingType()]
         ]);
 
         for (const customType of customTypes) {

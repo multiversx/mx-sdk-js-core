@@ -118,8 +118,8 @@ export class TypeMapper {
     }
 
     private mapStructType(type: StructType): StructType {
-        let mappedFields = type.fields.map(
-            (item) => new FieldDefinition(item.name, item.description, this.mapType(item.type))
+        let mappedFields = type.getFieldsDefinitions().map(
+            (definition) => new FieldDefinition(definition.name, definition.description, this.mapType(definition.type))
         );
         let mappedStruct = new StructType(type.getName(), mappedFields);
         return mappedStruct;

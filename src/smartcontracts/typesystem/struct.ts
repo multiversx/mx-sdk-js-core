@@ -2,16 +2,20 @@ import { FieldDefinition, Field, Fields } from "./fields";
 import { CustomType, TypedValue } from "./types";
 
 export class StructType extends CustomType {
-    readonly fields: FieldDefinition[] = [];
+    private readonly fieldsDefinitions: FieldDefinition[] = [];
 
-    constructor(name: string, fields: FieldDefinition[]) {
+    constructor(name: string, fieldsDefinitions: FieldDefinition[]) {
         super(name);
-        this.fields = fields;
+        this.fieldsDefinitions = fieldsDefinitions;
     }
 
     static fromJSON(json: { name: string, fields: any[] }): StructType {
-        let fields = (json.fields || []).map(field => FieldDefinition.fromJSON(field));
-        return new StructType(json.name, fields);
+        let definitions = (json.fields || []).map(definition => FieldDefinition.fromJSON(definition));
+        return new StructType(json.name, definitions);
+    }
+
+    getFieldsDefinitions() {
+        return this.fieldsDefinitions;
     }
 }
 
@@ -32,7 +36,7 @@ export class Struct extends TypedValue {
 
     private checkTyping() {
         let type = <StructType>this.getType();
-        let definitions = type.fields;
+        let definitions = type.getFieldsDefinitions();
         Fields.checkTyping(this.fields, definitions);
     }
 

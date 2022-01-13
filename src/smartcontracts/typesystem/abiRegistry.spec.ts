@@ -7,7 +7,6 @@ import { EnumType } from "./enum";
 import { ListType, OptionType } from "./generic";
 import { BigUIntType, I64Type, U32Type, U8Type } from "./numerical";
 import { StructType } from "./struct";
-import { BinaryCodec } from "../codec";
 
 describe("test abi registry", () => {
     it("should extend", async () => {
@@ -28,7 +27,7 @@ describe("test abi registry", () => {
         assert.lengthOf(registry.customTypes, 2);
 
         assert.lengthOf(registry.getInterface("Lottery").endpoints, 6);
-        assert.lengthOf(registry.getStruct("LotteryInfo").fields, 8);
+        assert.lengthOf(registry.getStruct("LotteryInfo").getFieldsDefinitions(), 8);
         assert.lengthOf(registry.getEnum("Status").variants, 3);
     });
 
@@ -66,9 +65,11 @@ describe("test abi registry", () => {
         assert.instanceOf(getLotteryInfo.input[0].type, BytesType);
         assert.instanceOf(getLotteryInfo.output[0].type, StructType);
         assert.equal(getLotteryInfo.output[0].type.getName(), "LotteryInfo");
-        assert.instanceOf((<StructType>getLotteryInfo.output[0].type).fields[0].type, BigUIntType);
-        assert.instanceOf((<StructType>getLotteryInfo.output[0].type).fields[5].type, ListType);
-        assert.instanceOf((<StructType>getLotteryInfo.output[0].type).fields[5].type.getFirstTypeParameter(), AddressType);
+
+        let fieldDefinitions = (<StructType>getLotteryInfo.output[0].type).getFieldsDefinitions();
+        assert.instanceOf(fieldDefinitions[0].type, BigUIntType);
+        assert.instanceOf(fieldDefinitions[5].type, ListType);
+        assert.instanceOf(fieldDefinitions[5].type.getFirstTypeParameter(), AddressType);
     });
 
     it("binary codec correctly decodes perform action result", async () => {

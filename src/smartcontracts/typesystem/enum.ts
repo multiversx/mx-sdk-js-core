@@ -33,19 +33,23 @@ export class EnumType extends CustomType {
 export class EnumVariantDefinition {
     readonly name: string;
     readonly discriminant: number;
-    readonly fields: FieldDefinition[] = [];
+    private readonly fieldsDefinitions: FieldDefinition[] = [];
 
-    constructor(name: string, discriminant: number, fields: FieldDefinition[] = []) {
+    constructor(name: string, discriminant: number, fieldsDefinitions: FieldDefinition[] = []) {
         guardTrue(discriminant < SimpleEnumMaxDiscriminant, `discriminant for simple enum should be less than ${SimpleEnumMaxDiscriminant}`);
 
         this.name = name;
         this.discriminant = discriminant;
-        this.fields = fields;
+        this.fieldsDefinitions = fieldsDefinitions;
     }
 
     static fromJSON(json: { name: string, discriminant: number, fields: any[] }): EnumVariantDefinition {
-        let fields = (json.fields || []).map(field => FieldDefinition.fromJSON(field));
-        return new EnumVariantDefinition(json.name, json.discriminant, fields);
+        let definitions = (json.fields || []).map(definition => FieldDefinition.fromJSON(definition));
+        return new EnumVariantDefinition(json.name, json.discriminant, definitions);
+    }
+
+    getFieldsDefinitions() {
+        return this.fieldsDefinitions;
     }
 }
 
@@ -54,13 +58,13 @@ export class EnumValue extends TypedValue {
     readonly discriminant: number;
     private readonly fields: Field[] = [];
 
-    private constructor(type: EnumType, variant: EnumVariantDefinition, fields: Field[]) {
+    constructor(type: EnumType, variant: EnumVariantDefinition, fields: Field[]) {
         super(type);
         this.name = variant.name;
         this.discriminant = variant.discriminant;
         this.fields = fields;
 
-        let definitions = variant.fields;
+        let definitions = variant.getFieldsDefinitions();
         Fields.checkTyping(this.fields, definitions);
     }
 

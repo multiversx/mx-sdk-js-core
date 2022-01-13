@@ -1,5 +1,6 @@
 import { assert } from "chai";
 import { extendAbiRegistry, loadAbiRegistry } from "../../testutils";
+import { BinaryCodec } from "../codec";
 import { AbiRegistry } from "./abiRegistry";
 import { AddressType } from "./address";
 import { BytesType } from "./bytes";
@@ -35,7 +36,7 @@ describe("test abi registry", () => {
         let registry = await loadAbiRegistry([
             "src/testdata/answer.abi.json",
             "src/testdata/counter.abi.json",
-            "src/testdata/lottery_egld.abi.json"
+            "src/testdata/lottery_egld.abi.json",
         ]);
 
         // Ultimate answer
@@ -74,7 +75,10 @@ describe("test abi registry", () => {
 
     it("binary codec correctly decodes perform action result", async () => {
         let bc = new BinaryCodec();
-        let buff = Buffer.from("0588c738a5d26c0e3a2b4f9e8110b540ee9c0b71a3be057569a5a7b0fcb482c8f70000000806f05b59d3b200000000000b68656c6c6f20776f726c6400000000", "hex");
+        let buff = Buffer.from(
+            "0588c738a5d26c0e3a2b4f9e8110b540ee9c0b71a3be057569a5a7b0fcb482c8f70000000806f05b59d3b200000000000b68656c6c6f20776f726c6400000000",
+            "hex"
+        );
 
         let registry = await loadAbiRegistry(["src/testdata/multisig.abi.json"]);
         let multisig = registry.getInterface("Multisig");
@@ -82,7 +86,10 @@ describe("test abi registry", () => {
         assert.equal(performAction.output[0].type.getName(), "Action");
 
         let result = bc.decodeTopLevel(buff, performAction.output[0].type);
-        assert.equal(JSON.stringify(result), `{"type":{"name":"Action","typeParameters":[]},"name":"SendTransferExecute","discriminant":5}`);
-        assert.equal(result.valueOf().toString(), "SendTransferExecute");
+        assert.equal(
+            JSON.stringify(result),
+            `{"type":{"name":"Action","typeParameters":[]},"fields":[{"value":{"type":{"name":"CallActionData","typeParameters":[]},"fields":[{"value":{"type":{"name":"Address","typeParameters":[]},"value":{"bech32":"erd13rrn3fwjds8r5260n6q3pd2qa6wqkudrhczh26d957c0edyzermshds0k8","pubkey":"88c738a5d26c0e3a2b4f9e8110b540ee9c0b71a3be057569a5a7b0fcb482c8f7"}},"name":"to"},{"value":{"type":{"name":"BigUint","typeParameters":[]},"value":"500000000000000000","sizeInBytes":0,"withSign":false},"name":"egld_amount"},{"value":{"type":{"name":"bytes","typeParameters":[]},"value":{"type":"Buffer","data":[104,101,108,108,111,32,119,111,114,108,100]}},"name":"endpoint_name"},{"value":{"type":{"name":"List","typeParameters":[{"name":"bytes","typeParameters":[]}]},"items":[]},"name":"arguments"}]},"name":"0"}],"name":"SendTransferExecute","discriminant":5}`
+        );
+        assert.equal(result.valueOf().name, "SendTransferExecute");
     });
 });

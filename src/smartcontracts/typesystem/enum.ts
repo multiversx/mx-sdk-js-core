@@ -12,19 +12,19 @@ export class EnumType extends CustomType {
         this.variants = variants;
     }
 
-    static fromJSON(json: { name: string, variants: any[] }): EnumType {
-        let variants = (json.variants || []).map(variant => EnumVariantDefinition.fromJSON(variant));
+    static fromJSON(json: { name: string; variants: any[] }): EnumType {
+        let variants = (json.variants || []).map((variant) => EnumVariantDefinition.fromJSON(variant));
         return new EnumType(json.name, variants);
     }
 
     getVariantByDiscriminant(discriminant: number): EnumVariantDefinition {
-        let result = this.variants.find(e => e.discriminant == discriminant);
+        let result = this.variants.find((e) => e.discriminant == discriminant);
         guardValueIsSet("result", result);
         return result!;
     }
 
     getVariantByName(name: string): EnumVariantDefinition {
-        let result = this.variants.find(e => e.name == name);
+        let result = this.variants.find((e) => e.name == name);
         guardValueIsSet("result", result);
         return result!;
     }
@@ -36,15 +36,18 @@ export class EnumVariantDefinition {
     private readonly fieldsDefinitions: FieldDefinition[] = [];
 
     constructor(name: string, discriminant: number, fieldsDefinitions: FieldDefinition[] = []) {
-        guardTrue(discriminant < SimpleEnumMaxDiscriminant, `discriminant for simple enum should be less than ${SimpleEnumMaxDiscriminant}`);
+        guardTrue(
+            discriminant < SimpleEnumMaxDiscriminant,
+            `discriminant for simple enum should be less than ${SimpleEnumMaxDiscriminant}`
+        );
 
         this.name = name;
         this.discriminant = discriminant;
         this.fieldsDefinitions = fieldsDefinitions;
     }
 
-    static fromJSON(json: { name: string, discriminant: number, fields: any[] }): EnumVariantDefinition {
-        let definitions = (json.fields || []).map(definition => FieldDefinition.fromJSON(definition));
+    static fromJSON(json: { name: string; discriminant: number; fields: any[] }): EnumVariantDefinition {
+        let definitions = (json.fields || []).map((definition) => FieldDefinition.fromJSON(definition));
         return new EnumVariantDefinition(json.name, json.discriminant, definitions);
     }
 
@@ -104,14 +107,10 @@ export class EnumValue extends TypedValue {
     }
 
     valueOf() {
-        let result: any = { name: this.name};
+        let result: any = { name: this.name, fields: [] };
 
-        if (this.fields.length === 0) {
-            return result;
-        }
+        this.fields.forEach((field) => (result.fields[field.name] = field.value.valueOf()));
 
-        this.fields.forEach(field => result.fields[field.name] = field.value.valueOf());
-        
         return result;
     }
 }

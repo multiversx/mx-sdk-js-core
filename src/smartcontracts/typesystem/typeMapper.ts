@@ -3,7 +3,7 @@ import { AddressType } from "./address";
 import { BooleanType } from "./boolean";
 import { BytesType } from "./bytes";
 import { CompositeType } from "./composite";
-import { EnumType } from "./enum";
+import { EnumType, EnumVariantDefinition } from "./enum";
 import { ListType, OptionType } from "./generic";
 import { H256Type } from "./h256";
 import {
@@ -91,7 +91,8 @@ export class TypeMapper {
         let isGeneric = type.isGenericType();
 
         if (type instanceof EnumType) {
-            return type;
+            // This will call mapType() recursively, for all the enum variant fields.
+            return this.mapEnumType(type);
         }
 
         if (type instanceof StructType) {
@@ -118,11 +119,28 @@ export class TypeMapper {
     }
 
     private mapStructType(type: StructType): StructType {
-        let mappedFields = type.getFieldsDefinitions().map(
-            (definition) => new FieldDefinition(definition.name, definition.description, this.mapType(definition.type))
-        );
+        let mappedFields = this.mappedFields(type.getFieldsDefinitions());
         let mappedStruct = new StructType(type.getName(), mappedFields);
         return mappedStruct;
+    }
+
+    private mapEnumType(type: EnumType): EnumType {
+        let variants = type.variants.map(
+            (variant) =>
+                new EnumVariantDefinition(
+                    variant.name,
+                    variant.discriminant,
+                    this.mappedFields(variant.getFieldsDefinitions())
+                )
+        );
+        let mappedEnum = new EnumType(type.getName(), variants);
+        return mappedEnum;
+    }
+
+    private mappedFields(definitions: FieldDefinition[]): FieldDefinition[] {
+        return definitions.map(
+            (definition) => new FieldDefinition(definition.name, definition.description, this.mapType(definition.type))
+        );
     }
 
     private mapGenericType(type: Type): Type {

@@ -47,8 +47,13 @@ export class EnumBinaryCodec {
     }
 
     encodeTopLevel(enumValue: EnumValue): Buffer {
-        let value = new U8Value(enumValue.discriminant);
-        let buffer = this.binaryCodec.encodeTopLevel(value);
-        return buffer;
+        let fields = enumValue.getFields();
+        let hasFields = fields.length > 0;
+        let fieldsBuffer = this.fieldsCodec.encodeNested(fields);
+        
+        let discriminant = new U8Value(enumValue.discriminant);
+        let discriminantBuffer = hasFields ? this.binaryCodec.encodeNested(discriminant) : this.binaryCodec.encodeTopLevel(discriminant);
+
+        return Buffer.concat([discriminantBuffer, fieldsBuffer]);
     }
 }

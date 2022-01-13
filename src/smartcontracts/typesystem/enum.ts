@@ -19,13 +19,13 @@ export class EnumType extends CustomType {
 
     getVariantByDiscriminant(discriminant: number): EnumVariantDefinition {
         let result = this.variants.find((e) => e.discriminant == discriminant);
-        guardValueIsSet("result", result);
+        guardValueIsSet(`variant by discriminant (${discriminant})`, result);
         return result!;
     }
 
     getVariantByName(name: string): EnumVariantDefinition {
         let result = this.variants.find((e) => e.name == name);
-        guardValueIsSet("result", result);
+        guardValueIsSet(`variant by name (${name})`, result);
         return result!;
     }
 }

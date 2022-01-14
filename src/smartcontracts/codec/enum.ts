@@ -12,6 +12,7 @@ export class EnumBinaryCodec {
     }
 
     decodeTopLevel(buffer: Buffer, type: EnumType): EnumValue {
+        // This handles enums without fields, with discriminant = 0, as well.
         let [enumValue] = this.decodeNested(buffer, type);
         return enumValue;
     }

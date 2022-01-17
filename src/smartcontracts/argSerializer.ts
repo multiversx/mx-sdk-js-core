@@ -36,7 +36,7 @@ export class ArgSerializer {
         // TODO: Refactor, split (function is quite complex).
 
         buffers = buffers || [];
-        
+
         let values: TypedValue[] = [];
         let bufferIndex = 0;
         let numBuffers = buffers.length;
@@ -99,10 +99,11 @@ export class ArgSerializer {
     /**
      * Serializes a set of typed values into an arguments string (e.g. aa@bb@@cc).
      */
-    valuesToString(values: TypedValue[]): string {
+    valuesToString(values: TypedValue[]): { argumentsString: string, count: number } {
         let strings = this.valuesToStrings(values);
-        let joinedString = strings.join(ArgumentsSeparator);
-        return joinedString;
+        let argumentsString = strings.join(ArgumentsSeparator);
+        let count = strings.length;
+        return { argumentsString, count };
     }
 
     /**
@@ -130,7 +131,7 @@ export class ArgSerializer {
         // This is a recursive function. It appends to the "buffers" variable.
         function handleValue(value: TypedValue): void {
             // TODO: Use matchers.
-            
+
             if (value instanceof OptionalValue) {
                 if (value.isSet()) {
                     handleValue(value.getTypedValue());

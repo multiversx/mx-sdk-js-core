@@ -24,10 +24,17 @@ export class ArgumentErrorContext {
         this.throwError(`Unhandled type (function: ${functionName}, type: ${type})`);
     }
 
-    guardSameLength(native: any[], valueTypes: Type[]) {
+    guardSameLength<T>(native: any[], valueTypes: T[]) {
         native = native || [];
         if (native.length != valueTypes.length) {
             this.throwError(`Incorrect composite type length: have ${native.length}, expected ${valueTypes.length} (argument: ${native})`);
+        }
+    }
+
+    guardHasField(native: any, fieldName: string) {
+        native = native || {};
+        if (!(fieldName in native)) {
+            this.throwError(`Struct argument does not contain a field named "${fieldName}" (argument: ${JSON.stringify(native)})`);
         }
     }
 }

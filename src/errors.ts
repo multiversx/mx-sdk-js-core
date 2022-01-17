@@ -400,15 +400,6 @@ export class ErrTypingSystem extends Err {
 }
 
 /**
- * Signals a generic struct typing error.
- */
-export class ErrStructTyping extends Err {
-    public constructor(reason: string) {
-        super(`Incorrect struct typing: ${reason}`);
-    }
-}
-
-/**
  * Signals a generic codec (encode / decode) error.
  */
 export class ErrCodec extends Err {

@@ -6,6 +6,7 @@ import { EnumType, EnumValue } from "./enum";
 import { OptionType, OptionValue, List, ListType } from "./generic";
 import { H256Type, H256Value } from "./h256";
 import { NumericalType, NumericalValue } from "./numerical";
+import { NothingType, NothingValue } from "./nothing";
 import { Struct, StructType } from "./struct";
 import { TokenIdentifierType, TokenIdentifierValue } from "./tokenIdentifier";
 import { Tuple, TupleType } from "./tuple";
@@ -80,6 +81,7 @@ export function onTypedValueSelect<TResult>(
     if (value instanceof EnumValue) {
         return selectors.onEnum();
     }
+
     if (selectors.onOther) {
         return selectors.onOther();
     }
@@ -96,6 +98,7 @@ export function onPrimitiveValueSelect<TResult>(
         onBytes: () => TResult;
         onH256: () => TResult;
         onTypeIdentifier: () => TResult;
+        onNothing: () => TResult;
         onOther?: () => TResult;
     }
 ): TResult {
@@ -117,6 +120,9 @@ export function onPrimitiveValueSelect<TResult>(
     if (value instanceof TokenIdentifierValue) {
         return selectors.onTypeIdentifier();
     }
+    if (value instanceof NothingValue) {
+        return selectors.onNothing();
+    }
     if (selectors.onOther) {
         return selectors.onOther();
     }
@@ -133,6 +139,7 @@ export function onPrimitiveTypeSelect<TResult>(
         onBytes: () => TResult;
         onH256: () => TResult;
         onTokenIndetifier: () => TResult;
+        onNothing: () => TResult;
         onOther?: () => TResult;
     }
 ): TResult {
@@ -153,6 +160,9 @@ export function onPrimitiveTypeSelect<TResult>(
     }
     if (type instanceof TokenIdentifierType) {
         return selectors.onTokenIndetifier();
+    }
+    if (type instanceof NothingType) {
+        return selectors.onNothing();
     }
     if (selectors.onOther) {
         return selectors.onOther();

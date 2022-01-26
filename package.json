@@ -71,7 +71,7 @@
     "browserify": "17.0.0",
     "buffer": "6.0.3",
     "chai": "4.2.0",
-    "esmify": "^2.1.1",
+    "esmify": "2.1.1",
     "mocha": "7.1.1",
     "tinyify": "3.0.0",
     "ts-node": "9.1.1",

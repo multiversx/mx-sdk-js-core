@@ -1,3 +1,4 @@
+import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";
 import { Account } from "../account";
@@ -5,6 +6,7 @@ import { Address } from "../address";
 import { IProvider, ISigner } from "../interface";
 import { UserSecretKey } from "../walletcore";
 import { UserSigner } from "../walletcore/userSigner";
+import { isBrowser } from "./utils";
 
 export async function loadAndSyncTestWallets(provider: IProvider): Promise<Record<string, TestWallet>> {
     let wallets = await loadTestWallets();
@@ -46,9 +48,19 @@ export async function loadTestWallet(name: string): Promise<TestWallet> {
 }
 
 async function readTestWalletFileContents(name: string): Promise<string> {
-    let basePath = path.join(__dirname, "testwallets");
-    let filePath = path.join(basePath, name);
+    let filePath = path.join("src", "testutils", "testwallets", name);
+
+    if (isBrowser()) {
+        return await downloadTextFile(filePath);
+    }
+
     return await fs.promises.readFile(filePath, { encoding: "utf8" });
+}
+
+async function downloadTextFile(url: string) {
+    let response = await axios.get(url, { responseType: "text", transformResponse: []});
+    let text = response.data.toString();
+    return text;
 }
 
 export class TestWallet {

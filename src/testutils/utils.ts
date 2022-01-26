@@ -31,7 +31,7 @@ export async function extendAbiRegistry(registry: AbiRegistry, path: PathLike): 
     return registry.extendFromFile(source);
 }
 
-function isBrowser() {
+export function isBrowser() {
     return typeof window !== "undefined";
 }
 

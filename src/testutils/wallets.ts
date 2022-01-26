@@ -6,7 +6,7 @@ import { Address } from "../address";
 import { IProvider, ISigner } from "../interface";
 import { UserSecretKey } from "../walletcore";
 import { UserSigner } from "../walletcore/userSigner";
-import { isBrowser } from "./utils";
+import { isOnBrowserTests } from "./utils";
 
 export async function loadAndSyncTestWallets(provider: IProvider): Promise<Record<string, TestWallet>> {
     let wallets = await loadTestWallets();
@@ -50,7 +50,7 @@ export async function loadTestWallet(name: string): Promise<TestWallet> {
 async function readTestWalletFileContents(name: string): Promise<string> {
     let filePath = path.join("src", "testutils", "testwallets", name);
 
-    if (isBrowser()) {
+    if (isOnBrowserTests()) {
         return await downloadTextFile(filePath);
     }
 

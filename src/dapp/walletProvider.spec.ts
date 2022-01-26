@@ -2,7 +2,7 @@ import { assert } from "chai";
 import {WalletProvider} from "./walletProvider";
 import {Transaction} from "../transaction";
 import {Address} from "../address";
-import { isBrowser } from "../testutils";
+import { isOnBrowserTests } from "../testutils";
 
 declare global {
   namespace NodeJS {
@@ -18,7 +18,7 @@ declare global {
 
 describe("test wallet provider", () => {
   before(function() {
-    if (isBrowser()) {
+    if (isOnBrowserTests()) {
       this.skip();
     }
   });
@@ -32,7 +32,7 @@ describe("test wallet provider", () => {
   });
 
   after(function() {
-    if (isBrowser()) {
+    if (isOnBrowserTests()) {
       // Do nothing.
     } else {
       delete global.window;

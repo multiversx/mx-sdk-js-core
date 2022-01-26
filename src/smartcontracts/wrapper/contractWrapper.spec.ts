@@ -1,4 +1,4 @@
-import { AddImmediateResult, MarkNotarized, MockProvider, setupUnitTestWatcherTimeouts, TestWallet } from "../../testutils";
+import { AddImmediateResult, isBrowser, MarkNotarized, MockProvider, setupUnitTestWatcherTimeouts, TestWallet } from "../../testutils";
 import { Address } from "../../address";
 import { assert } from "chai";
 import { QueryResponse } from "../queryResponse";
@@ -14,6 +14,10 @@ describe("test smart contract wrapper", async function () {
     let provider = new MockProvider();
     let alice: TestWallet;
     before(async function () {
+        if (isBrowser()) {
+            this.skip();
+        }
+
         ({ erdSys, wallets: { alice } } = await setupInteractiveWithProvider(provider));
     });
 

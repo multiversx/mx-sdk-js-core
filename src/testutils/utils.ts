@@ -32,7 +32,7 @@ export async function extendAbiRegistry(registry: AbiRegistry, path: PathLike): 
 }
 
 export function isBrowser() {
-    return typeof window !== "undefined";
+    return typeof window !== "undefined" && window.location.href.includes("browser-tests");
 }
 
 export function setupUnitTestWatcherTimeouts() {

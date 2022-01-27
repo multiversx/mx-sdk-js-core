@@ -1,7 +1,7 @@
 import { guardLength, guardTrue, guardValueIsSet } from "../..";
 import { Type, TypedValue, TypePlaceholder } from "./types";
 
-// A type for fixed-length arrays. E.g. "array20", "array32", "array64" etc.
+// A type for known-length arrays. E.g. "array20", "array32", "array64" etc.
 export class ArrayVecType extends Type {
     readonly length: number;
 
@@ -10,24 +10,6 @@ export class ArrayVecType extends Type {
 
         guardTrue(length > 0, "array length > 0");
         this.length = length;
-    }
-}
-
-export class Array20 extends ArrayVecType {
-    constructor(typeParameter: Type) {
-        super(20, typeParameter);
-    }
-}
-
-export class Array32 extends ArrayVecType {
-    constructor(typeParameter: Type) {
-        super(32, typeParameter);
-    }
-}
-
-export class Array64 extends ArrayVecType {
-    constructor(typeParameter: Type) {
-        super(64, typeParameter);
     }
 }
 

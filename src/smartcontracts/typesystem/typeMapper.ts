@@ -61,6 +61,7 @@ export class TypeMapper {
             ["tuple7", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
             ["tuple8", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
             // Known-length arrays.
+            // TODO: Handle these in typeExpressionParser, perhaps?
             ["array20", (...typeParameters: Type[]) => new ArrayVecType(20, typeParameters[0])],
             ["array32", (...typeParameters: Type[]) => new ArrayVecType(32, typeParameters[0])],
             ["array64", (...typeParameters: Type[]) => new ArrayVecType(64, typeParameters[0])],

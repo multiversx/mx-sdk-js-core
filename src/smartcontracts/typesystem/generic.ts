@@ -1,4 +1,5 @@
 import { guardValueIsSet } from "../../utils";
+import { CollectionOfTypedValues } from "./collections";
 import { Type, TypedValue, NullType, TypePlaceholder } from "./types";
 
 // TODO: Move to a new file, "genericOption.ts"
@@ -79,7 +80,7 @@ export class OptionValue extends TypedValue {
 // TODO: Rename to ListValue, for consistency (though the term is slighly unfortunate).
 // Question for review: or not?
 export class List extends TypedValue {
-    private readonly items: TypedValue[];
+    private readonly backingCollection: CollectionOfTypedValues;
 
     /**
      *
@@ -91,7 +92,7 @@ export class List extends TypedValue {
 
         // TODO: assert items are of type type.getFirstTypeParameter()
 
-        this.items = items;
+        this.backingCollection = new CollectionOfTypedValues(items);
     }
 
     static fromItems(items: TypedValue[]): List {
@@ -105,31 +106,18 @@ export class List extends TypedValue {
     }
 
     getLength(): number {
-        return this.items.length;
+        return this.backingCollection.getLength();
     }
 
     getItems(): ReadonlyArray<TypedValue> {
-        return this.items;
+        return this.backingCollection.getItems();
     }
 
     valueOf(): any[] {
-        return this.items.map((item) => item.valueOf());
+        return this.backingCollection.valueOf();
     }
 
     equals(other: List): boolean {
-        if (this.getLength() != other.getLength()) {
-            return false;
-        }
-
-        for (let i = 0; i < this.getLength(); i++) {
-            let selfItem = this.items[i];
-            let otherItem = other.items[i];
-
-            if (!selfItem.equals(otherItem)) {
-                return false;
-            }
-        }
-
-        return true;
+        return this.backingCollection.equals(other.backingCollection);
     }
 }

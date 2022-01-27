@@ -1,5 +1,6 @@
-import { guardLength, guardTrue, guardValueIsSet } from "../..";
-import { Type, TypedValue, TypePlaceholder } from "./types";
+import { guardLength, guardTrue } from "../..";
+import { CollectionOfTypedValues } from "./collections";
+import { Type, TypedValue } from "./types";
 
 // A type for known-length arrays. E.g. "array20", "array32", "array64" etc.
 export class ArrayVecType extends Type {
@@ -14,42 +15,27 @@ export class ArrayVecType extends Type {
 }
 
 export class ArrayVec extends TypedValue {
-    private readonly items: TypedValue[];
+    private readonly backingCollection: CollectionOfTypedValues;
 
     constructor(type: ArrayVecType, items: TypedValue[]) {
         super(type);
-
         guardLength(items, type.length);
-
-        this.items = items;
+        this.backingCollection = new CollectionOfTypedValues(items);
     }
 
     getLength(): number {
-        return this.items.length;
+        return this.backingCollection.getLength();
     }
 
     getItems(): ReadonlyArray<TypedValue> {
-        return this.items;
+        return this.backingCollection.getItems();
     }
 
     valueOf(): any[] {
-        return this.items.map((item) => item.valueOf());
+        return this.backingCollection.valueOf();
     }
 
     equals(other: ArrayVec): boolean {
-        if (this.getLength() != other.getLength()) {
-            return false;
-        }
-
-        for (let i = 0; i < this.getLength(); i++) {
-            let selfItem = this.items[i];
-            let otherItem = other.items[i];
-
-            if (!selfItem.equals(otherItem)) {
-                return false;
-            }
-        }
-
-        return true;
+        return this.backingCollection.equals(other.backingCollection);
     }
 }

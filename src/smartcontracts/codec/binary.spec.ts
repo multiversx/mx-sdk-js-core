@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { BinaryCodec, BinaryCodecConstraints } from "./binary";
-import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue } from "../typesystem";
+import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue, ArrayVec, ArrayVecType, U16Value } from "../typesystem";
 import { discardSuperfluousBytesInTwosComplement, discardSuperfluousZeroBytes, isMsbOne } from "./utils";
 import { Address } from "../../address";
 import { Balance } from "../../balance";
@@ -137,6 +137,33 @@ describe("test binary codec (advanced)", () => {
         console.timeEnd("decoding");
         assert.equal(decodedLength, buffer.length);
         assert.deepEqual(decodedList, list);
+    });
+
+    it("should encode / decode arrays", async () => {
+        let codec = new BinaryCodec();
+
+        let length = 20;
+        let sizeOfItem = 2; // u16
+        let arrayType = new ArrayVecType(length, new U16Type());
+        let array = new ArrayVec(
+            arrayType,
+            Array(length).fill(new U16Value(0xABBA))
+        );
+
+        let bufferNested = codec.encodeNested(array);
+        let bufferTopLevel = codec.encodeTopLevel(array);
+        assert.equal(bufferNested.length, length * sizeOfItem);
+        assert.equal(bufferTopLevel.length, length * sizeOfItem);
+        assert.deepEqual(bufferNested, Buffer.from("ABBA".repeat(length), "hex"));
+        assert.deepEqual(bufferTopLevel, Buffer.from("ABBA".repeat(length), "hex"));
+
+        let [decodedNested, decodedNestedLength] = codec.decodeNested<ArrayVec>(bufferNested, arrayType);
+        let decodedTopLevel = codec.decodeTopLevel<ArrayVec>(bufferTopLevel, arrayType);
+        assert.equal(decodedNestedLength, bufferNested.length);
+        assert.equal(decodedNested.getLength(), length);
+        assert.equal(decodedTopLevel.getLength(), length);
+        assert.deepEqual(decodedNested, array);
+        assert.deepEqual(decodedTopLevel, array);
     });
 
     it("should encode / decode structs", async () => {

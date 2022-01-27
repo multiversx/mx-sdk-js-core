@@ -1,6 +1,7 @@
 import { guardValueIsSet } from "../../utils";
 import { Type, TypedValue, NullType, TypePlaceholder } from "./types";
 
+// TODO: Move to a new file, "genericOption.ts"
 export class OptionType extends Type {
     constructor(typeParameter: Type) {
         super("Option", [typeParameter]);
@@ -17,12 +18,14 @@ export class OptionType extends Type {
     }
 }
 
+// TODO: Move to a new file, "genericList.ts"
 export class ListType extends Type {
     constructor(typeParameter: Type) {
         super("List", [typeParameter]);
     }
 }
 
+// TODO: Move to a new file, "genericOption.ts"
 export class OptionValue extends TypedValue {
     private readonly value: TypedValue | null;
 
@@ -72,6 +75,7 @@ export class OptionValue extends TypedValue {
     }
 }
 
+// TODO: Move to a new file, "genericList.ts"
 // TODO: Rename to ListValue, for consistency (though the term is slighly unfortunate).
 // Question for review: or not?
 export class List extends TypedValue {
@@ -96,7 +100,8 @@ export class List extends TypedValue {
         }
 
         let typeParameter = items[0].getType();
-        return new List(typeParameter, items);
+        let listType = new ListType(typeParameter);
+        return new List(listType, items);
     }
 
     getLength(): number {

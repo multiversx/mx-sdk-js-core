@@ -23,8 +23,6 @@ import { Hash } from "./hash";
 
 const createTransactionHasher = require("blake2b");
 
-const DEFAULT_TRANSACTION_VERSION = TransactionVersion.withDefaultVersion();
-const DEFAULT_TRANSACTION_OPTIONS = TransactionOptions.withDefaultOptions();
 const TRANSACTION_HASH_LENGTH = 32;
 
 /**
@@ -145,8 +143,8 @@ export class Transaction implements ISignable {
     this.gasLimit = gasLimit || NetworkConfig.getDefault().MinGasLimit;
     this.data = data || new TransactionPayload();
     this.chainID = chainID || NetworkConfig.getDefault().ChainID;
-    this.version = version || DEFAULT_TRANSACTION_VERSION;
-    this.options = options || DEFAULT_TRANSACTION_OPTIONS;
+    this.version = version || TransactionVersion.withDefaultVersion();
+    this.options = options || TransactionOptions.withDefaultOptions();
 
     this.signature = Signature.empty();
     this.hash = TransactionHash.empty();

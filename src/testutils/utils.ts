@@ -4,7 +4,7 @@ import { AbiRegistry } from "../smartcontracts/typesystem";
 import { TransactionWatcher } from "../transactionWatcher";
 
 export async function loadContractCode(path: PathLike): Promise<Code> {
-    if (isBrowser()) {
+    if (isOnBrowserTests()) {
         return Code.fromUrl(path.toString());
     }
 
@@ -14,7 +14,7 @@ export async function loadContractCode(path: PathLike): Promise<Code> {
 export async function loadAbiRegistry(paths: PathLike[]): Promise<AbiRegistry> {
     let sources = paths.map(e => e.toString());
 
-    if (isBrowser()) {
+    if (isOnBrowserTests()) {
         return AbiRegistry.load({ urls: sources });
     }
 
@@ -24,15 +24,23 @@ export async function loadAbiRegistry(paths: PathLike[]): Promise<AbiRegistry> {
 export async function extendAbiRegistry(registry: AbiRegistry, path: PathLike): Promise<AbiRegistry> {
     let source = path.toString();
 
-    if (isBrowser()) {
+    if (isOnBrowserTests()) {
         return registry.extendFromUrl(source);
     }
 
     return registry.extendFromFile(source);
 }
 
-function isBrowser() {
-    return typeof window !== "undefined";
+export function isOnBrowserTests() {
+    const BROWSER_TESTS_URL = "browser-tests";
+
+    let noWindow = typeof window === "undefined";
+    if (noWindow) {
+        return false;
+    }
+
+    let isOnTests = window.location.href.includes(BROWSER_TESTS_URL);
+    return isOnTests;
 }
 
 export function setupUnitTestWatcherTimeouts() {

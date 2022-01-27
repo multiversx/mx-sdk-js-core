@@ -1,5 +1,5 @@
 import { Address, ContractWrapper, createBalanceBuilder, Egld, Token, SystemWrapper, TokenType, setupInteractiveWithProvider } from "../..";
-import { MockProvider, setupUnitTestWatcherTimeouts, TestWallet } from "../../testutils";
+import { isOnBrowserTests, MockProvider, setupUnitTestWatcherTimeouts, TestWallet } from "../../testutils";
 import { assert } from "chai";
 
 describe("test ESDT transfers via the smart contract wrapper", async function () {
@@ -9,6 +9,10 @@ describe("test ESDT transfers via the smart contract wrapper", async function ()
     let alice: TestWallet;
     let market: ContractWrapper;
     before(async function () {
+        if (isOnBrowserTests()) {
+            this.skip();
+        }
+
         ({ erdSys, wallets: { alice } } = await setupInteractiveWithProvider(provider));
         market = await erdSys.loadWrapper("src/testdata", "esdt-nft-marketplace");
         market.address(dummyAddress).sender(alice).gas(500_000);

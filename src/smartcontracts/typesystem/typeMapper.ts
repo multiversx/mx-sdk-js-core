@@ -27,6 +27,7 @@ import { OptionalType } from "./algebraic";
 import { StringType, TupleType } from ".";
 import { CodeMetadataType } from "./codeMetadata";
 import { NothingType } from "./nothing";
+import { Array20, Array32, Array64 } from "./genericArray";
 
 type TypeConstructor = new (...typeParameters: Type[]) => Type;
 
@@ -58,6 +59,9 @@ export class TypeMapper {
             ["tuple6", TupleType],
             ["tuple7", TupleType],
             ["tuple8", TupleType],
+            ["array20", Array20],
+            ["array32", Array32],
+            ["array64", Array64],
         ]);
 
         // For closed types, we hold actual type instances instead of type constructors (no type parameters needed).

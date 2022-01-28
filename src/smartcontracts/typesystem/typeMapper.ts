@@ -24,43 +24,50 @@ import { TokenIdentifierType } from "./tokenIdentifier";
 import { Type, CustomType } from "./types";
 import { VariadicType } from "./variadic";
 import { OptionalType } from "./algebraic";
-import { StringType, TupleType } from ".";
+import { ArrayVecType } from "./genericArray";
+import { StringType } from "./string";
+import { TupleType } from "./tuple";
 import { CodeMetadataType } from "./codeMetadata";
 import { NothingType } from "./nothing";
 
-type TypeConstructor = new (...typeParameters: Type[]) => Type;
+type TypeFactory = (...typeParameters: Type[]) => Type;
 
 export class TypeMapper {
-    private readonly openTypesConstructors: Map<string, TypeConstructor>;
+    private readonly openTypesFactories: Map<string, TypeFactory>;
     private readonly closedTypesMap: Map<string, Type>;
 
     constructor(customTypes: CustomType[] = []) {
-        this.openTypesConstructors = new Map<string, TypeConstructor>([
-            ["Option", OptionType],
-            ["List", ListType],
+        this.openTypesFactories = new Map<string, TypeFactory>([
+            ["Option", (...typeParameters: Type[]) => new OptionType(typeParameters[0])],
+            ["List", (...typeParameters: Type[]) => new ListType(typeParameters[0])],
             // For the following open generics, we use a slightly different typing than the one defined by elrond-wasm-rs (temporary workaround).
-            ["VarArgs", VariadicType],
-            ["MultiResultVec", VariadicType],
-            ["variadic", VariadicType],
-            ["OptionalArg", OptionalType],
-            ["optional", OptionalType],
-            ["OptionalResult", OptionalType],
-            ["multi", CompositeType],
-            ["MultiArg", CompositeType],
-            ["MultiResult", CompositeType],
-            ["multi", CompositeType],
+            ["VarArgs", (...typeParameters: Type[]) => new VariadicType(typeParameters[0])],
+            ["MultiResultVec", (...typeParameters: Type[]) => new VariadicType(typeParameters[0])],
+            ["variadic", (...typeParameters: Type[]) => new VariadicType(typeParameters[0])],
+            ["OptionalArg", (...typeParameters: Type[]) => new OptionalType(typeParameters[0])],
+            ["optional", (...typeParameters: Type[]) => new OptionalType(typeParameters[0])],
+            ["OptionalResult", (...typeParameters: Type[]) => new OptionalType(typeParameters[0])],
+            ["multi", (...typeParameters: Type[]) => new CompositeType(...typeParameters)],
+            ["MultiArg", (...typeParameters: Type[]) => new CompositeType(...typeParameters)],
+            ["MultiResult", (...typeParameters: Type[]) => new CompositeType(...typeParameters)],
+            ["multi", (...typeParameters: Type[]) => new CompositeType(...typeParameters)],
             // Perhaps we can adjust the ABI generator to only output "tuple", instead of "tupleN"?
-            ["tuple", TupleType],
-            ["tuple2", TupleType],
-            ["tuple3", TupleType],
-            ["tuple4", TupleType],
-            ["tuple5", TupleType],
-            ["tuple6", TupleType],
-            ["tuple7", TupleType],
-            ["tuple8", TupleType],
+            ["tuple", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
+            ["tuple2", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
+            ["tuple3", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
+            ["tuple4", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
+            ["tuple5", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
+            ["tuple6", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
+            ["tuple7", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
+            ["tuple8", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
+            // Known-length arrays.
+            // TODO: Handle these in typeExpressionParser, perhaps?
+            ["array20", (...typeParameters: Type[]) => new ArrayVecType(20, typeParameters[0])],
+            ["array32", (...typeParameters: Type[]) => new ArrayVecType(32, typeParameters[0])],
+            ["array64", (...typeParameters: Type[]) => new ArrayVecType(64, typeParameters[0])],
         ]);
 
-        // For closed types, we hold actual type instances instead of type constructors (no type parameters needed).
+        // For closed types, we hold actual type instances instead of type constructors / factories (no type parameters needed).
         this.closedTypesMap = new Map<string, Type>([
             ["u8", new U8Type()],
             ["u16", new U16Type()],
@@ -150,11 +157,11 @@ export class TypeMapper {
         let typeParameters = type.getTypeParameters();
         let mappedTypeParameters = typeParameters.map((item) => this.mapType(item));
 
-        let constructor = this.openTypesConstructors.get(type.getName());
-        if (!constructor) {
+        let factory = this.openTypesFactories.get(type.getName());
+        if (!factory) {
             throw new errors.ErrTypingSystem(`Cannot map the generic type "${type.getName()}" to a known type`);
         }
 
-        return new constructor(...mappedTypeParameters);
+        return factory(...mappedTypeParameters);
     }
 }

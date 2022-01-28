@@ -86,9 +86,9 @@ describe("test abi registry", () => {
         assert.equal(performAction.output[0].type.getName(), "Action");
 
         let result = bc.decodeTopLevel(buff, performAction.output[0].type);
-        assert.equal(
-            JSON.stringify(result),
-            `{"type":{"name":"Action","typeParameters":[]},"fields":[{"value":{"type":{"name":"CallActionData","typeParameters":[]},"fields":[{"value":{"type":{"name":"Address","typeParameters":[]},"value":{"bech32":"erd13rrn3fwjds8r5260n6q3pd2qa6wqkudrhczh26d957c0edyzermshds0k8","pubkey":"88c738a5d26c0e3a2b4f9e8110b540ee9c0b71a3be057569a5a7b0fcb482c8f7"}},"name":"to"},{"value":{"type":{"name":"BigUint","typeParameters":[]},"value":"500000000000000000","sizeInBytes":0,"withSign":false},"name":"egld_amount"},{"value":{"type":{"name":"bytes","typeParameters":[]},"value":{"type":"Buffer","data":[104,101,108,108,111,32,119,111,114,108,100]}},"name":"endpoint_name"},{"value":{"type":{"name":"List","typeParameters":[{"name":"bytes","typeParameters":[]}]},"items":[]},"name":"arguments"}]},"name":"0"}],"name":"SendTransferExecute","discriminant":5}`
+        assert.deepEqual(
+            JSON.stringify(result.valueOf()),
+            `{"name":"SendTransferExecute","fields":[{"to":{"bech32":"erd13rrn3fwjds8r5260n6q3pd2qa6wqkudrhczh26d957c0edyzermshds0k8","pubkey":"88c738a5d26c0e3a2b4f9e8110b540ee9c0b71a3be057569a5a7b0fcb482c8f7"},"egld_amount":"500000000000000000","endpoint_name":{"type":"Buffer","data":[104,101,108,108,111,32,119,111,114,108,100]},"arguments":[]}]}`
         );
         assert.equal(result.valueOf().name, "SendTransferExecute");
     });

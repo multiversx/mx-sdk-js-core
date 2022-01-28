@@ -14,6 +14,7 @@ export * from "./endpoint";
 export * from "./enum";
 export * from "./fields";
 export * from "./generic";
+export * from "./genericArray";
 export * from "./h256";
 export * from "./matchers";
 export * from "./nothing";

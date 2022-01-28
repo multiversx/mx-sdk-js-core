@@ -11,6 +11,7 @@ import { Struct, StructType } from "./struct";
 import { TokenIdentifierType, TokenIdentifierValue } from "./tokenIdentifier";
 import { Tuple, TupleType } from "./tuple";
 import { Type, PrimitiveType, PrimitiveValue } from "./types";
+import { ArrayVec, ArrayVecType } from "./genericArray";
 
 // TODO: Extend functionality or rename wrt. restricted / reduced functionality (not all types are handled: composite, variadic).
 export function onTypeSelect<TResult>(
@@ -18,6 +19,7 @@ export function onTypeSelect<TResult>(
     selectors: {
         onOption: () => TResult;
         onList: () => TResult;
+        onArray: () => TResult;
         onPrimitive: () => TResult;
         onStruct: () => TResult;
         onTuple: () => TResult;
@@ -30,6 +32,9 @@ export function onTypeSelect<TResult>(
     }
     if (type instanceof ListType) {
         return selectors.onList();
+    }
+    if (type instanceof ArrayVecType) {
+        return selectors.onArray();
     }
     if (type instanceof PrimitiveType) {
         return selectors.onPrimitive();
@@ -57,6 +62,7 @@ export function onTypedValueSelect<TResult>(
         onPrimitive: () => TResult;
         onOption: () => TResult;
         onList: () => TResult;
+        onArray: () => TResult;
         onStruct: () => TResult;
         onTuple: () => TResult;
         onEnum: () => TResult;
@@ -71,6 +77,9 @@ export function onTypedValueSelect<TResult>(
     }
     if (value instanceof List) {
         return selectors.onList();
+    }
+    if (value instanceof ArrayVec) {
+        return selectors.onArray();
     }
     if (value instanceof Struct) {
         return selectors.onStruct();

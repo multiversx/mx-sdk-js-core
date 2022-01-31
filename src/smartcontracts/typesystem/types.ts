@@ -147,7 +147,7 @@ export class TypeCardinality {
     }
 
     isComposite(): boolean {
-        return !this.isSingular();
+        return this.upperBound != 1;
     }
 
     isFixed(): boolean {

@@ -18,6 +18,7 @@ import { H256Value } from "../typesystem/h256";
 import { BytesBinaryCodec } from "./bytes";
 import { TokenIdentifierCodec } from "./tokenIdentifier";
 import { TokenIdentifierValue } from "../typesystem/tokenIdentifier";
+import { NothingCodec } from "./nothing";
 
 export class PrimitiveBinaryCodec {
     private readonly binaryCodec: BinaryCodec;
@@ -28,6 +29,7 @@ export class PrimitiveBinaryCodec {
     private readonly h256Codec: H256BinaryCodec;
     private readonly bytesCodec: BytesBinaryCodec;
     private readonly tokenIdentifierCodec: TokenIdentifierCodec;
+    private readonly nothingCodec: NothingCodec;
 
     constructor(binaryCodec: BinaryCodec) {
         this.binaryCodec = binaryCodec;
@@ -38,6 +40,7 @@ export class PrimitiveBinaryCodec {
         this.h256Codec = new H256BinaryCodec();
         this.bytesCodec = new BytesBinaryCodec();
         this.tokenIdentifierCodec = new TokenIdentifierCodec();
+        this.nothingCodec = new NothingCodec();
     }
 
     decodeNested(buffer: Buffer, type: PrimitiveType): [PrimitiveValue, number] {
@@ -48,6 +51,7 @@ export class PrimitiveBinaryCodec {
             onBytes: () => this.bytesCodec.decodeNested(buffer),
             onH256: () => this.h256Codec.decodeNested(buffer),
             onTokenIndetifier: () => this.tokenIdentifierCodec.decodeNested(buffer),
+            onNothing: () => this.nothingCodec.decodeNested()
         });
     }
 
@@ -59,6 +63,7 @@ export class PrimitiveBinaryCodec {
             onBytes: () => this.bytesCodec.decodeTopLevel(buffer),
             onH256: () => this.h256Codec.decodeTopLevel(buffer),
             onTokenIndetifier: () => this.tokenIdentifierCodec.decodeTopLevel(buffer),
+            onNothing: () => this.nothingCodec.decodeTopLevel()
         });
     }
 
@@ -70,6 +75,7 @@ export class PrimitiveBinaryCodec {
             onBytes: () => this.bytesCodec.encodeNested(<BytesValue>value),
             onH256: () => this.h256Codec.encodeNested(<H256Value>value),
             onTypeIdentifier: () => this.tokenIdentifierCodec.encodeNested(<TokenIdentifierValue>value),
+            onNothing: () => this.nothingCodec.encodeNested()
         });
     }
 
@@ -81,6 +87,7 @@ export class PrimitiveBinaryCodec {
             onBytes: () => this.bytesCodec.encodeTopLevel(<BytesValue>value),
             onH256: () => this.h256Codec.encodeTopLevel(<H256Value>value),
             onTypeIdentifier: () => this.tokenIdentifierCodec.encodeTopLevel(<TokenIdentifierValue>value),
+            onNothing: () => this.nothingCodec.encodeTopLevel()
         });
     }
 }

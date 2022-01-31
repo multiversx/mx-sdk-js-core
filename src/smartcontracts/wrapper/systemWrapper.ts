@@ -8,7 +8,7 @@ import { ArgumentErrorContext } from "../argumentErrorContext";
 import { ChainSendContext } from "./chainSendContext";
 
 export namespace SystemConstants {
-    export let SYSTEM_ABI_PATH = path.join(__dirname, "../../../abi");
+    export let SYSTEM_ABI_PATH = path.join(path.dirname(__filename), "../../abi");
     export let ESDT_CONTRACT_ADDRESS = new Address("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
 
     export let MIN_TRANSACTION_GAS = 50_000;

@@ -5,10 +5,28 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
- - [Fix ExtensionProvider sign/send transaction response] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/72
+- [Fix smart contract results to align to the new API field namings]
+    - Breaking changes:
+        - `smartContractResults` property in `TransactionOnNetwork` was renamed to `results` as in the new API,
+        affecting `fromHttpResponse` method
+        - `ErrStructTyping` has been removed
+        - `EnumValue.valueOf()` does not return a string (the name of the variant) anymore. It returns a JS object such as `{"name": "name of variant", "fields": { ... }}`
+        - `StructFieldDefinition` has been replaced by `FieldDefinition`, while `StructField` has been replaced by `Field`.
+
+ - [Fix ExtensionProvider sign/send transaction response #72](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/72)
     - Provider's send/sign transaction methonds responded with plainObject transactions instead of Transaction
     - Added fromPlainObject method as a static method to transaction
-    - Fixed message signing with extension provider
+ 
+ - [Add signAuthToken method to HWProvider #73] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/73) 
+ - [Fix for ignored config options in proxyProvider and apiProvider #76](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/76)
+ - [Fix wallet logout/login redirect when using form submit] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/85)
+ - [Fix ExtensionProvider sign message #86](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/86)
+    - Add address to SignableMessage response
+
+- [Handle extension errors #87](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/87)
+    - Handle erros when sign/send transactions fails on extension side
+- [Handle heterogeneous enums with fields](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/98)
+-[Background communication channel with extension popup] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/103
 
 ## [8.0.0]
 - [ExtensionProvider] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/66

@@ -1,11 +1,12 @@
 import { assert } from "chai";
 import { extendAbiRegistry, loadAbiRegistry } from "../../testutils";
+import { BinaryCodec } from "../codec";
 import { AbiRegistry } from "./abiRegistry";
 import { AddressType } from "./address";
 import { BytesType } from "./bytes";
 import { EnumType } from "./enum";
 import { ListType, OptionType } from "./generic";
-import { BigUIntType, I64Type, U32Type } from "./numerical";
+import { BigUIntType, I64Type, U32Type, U8Type } from "./numerical";
 import { StructType } from "./struct";
 
 describe("test abi registry", () => {
@@ -27,7 +28,7 @@ describe("test abi registry", () => {
         assert.lengthOf(registry.customTypes, 2);
 
         assert.lengthOf(registry.getInterface("Lottery").endpoints, 6);
-        assert.lengthOf(registry.getStruct("LotteryInfo").fields, 8);
+        assert.lengthOf(registry.getStruct("LotteryInfo").getFieldsDefinitions(), 8);
         assert.lengthOf(registry.getEnum("Status").variants, 3);
     });
 
@@ -35,7 +36,7 @@ describe("test abi registry", () => {
         let registry = await loadAbiRegistry([
             "src/testdata/answer.abi.json",
             "src/testdata/counter.abi.json",
-            "src/testdata/lottery_egld.abi.json"
+            "src/testdata/lottery_egld.abi.json",
         ]);
 
         // Ultimate answer
@@ -65,8 +66,30 @@ describe("test abi registry", () => {
         assert.instanceOf(getLotteryInfo.input[0].type, BytesType);
         assert.instanceOf(getLotteryInfo.output[0].type, StructType);
         assert.equal(getLotteryInfo.output[0].type.getName(), "LotteryInfo");
-        assert.instanceOf((<StructType>getLotteryInfo.output[0].type).fields[0].type, BigUIntType);
-        assert.instanceOf((<StructType>getLotteryInfo.output[0].type).fields[5].type, ListType);
-        assert.instanceOf((<StructType>getLotteryInfo.output[0].type).fields[5].type.getFirstTypeParameter(), AddressType);
+
+        let fieldDefinitions = (<StructType>getLotteryInfo.output[0].type).getFieldsDefinitions();
+        assert.instanceOf(fieldDefinitions[0].type, BigUIntType);
+        assert.instanceOf(fieldDefinitions[5].type, ListType);
+        assert.instanceOf(fieldDefinitions[5].type.getFirstTypeParameter(), AddressType);
+    });
+
+    it("binary codec correctly decodes perform action result", async () => {
+        let bc = new BinaryCodec();
+        let buff = Buffer.from(
+            "0588c738a5d26c0e3a2b4f9e8110b540ee9c0b71a3be057569a5a7b0fcb482c8f70000000806f05b59d3b200000000000b68656c6c6f20776f726c6400000000",
+            "hex"
+        );
+
+        let registry = await loadAbiRegistry(["src/testdata/multisig.abi.json"]);
+        let multisig = registry.getInterface("Multisig");
+        let performAction = multisig.getEndpoint("getActionData");
+        assert.equal(performAction.output[0].type.getName(), "Action");
+
+        let result = bc.decodeTopLevel(buff, performAction.output[0].type);
+        assert.deepEqual(
+            JSON.stringify(result.valueOf()),
+            `{"name":"SendTransferExecute","fields":[{"to":{"bech32":"erd13rrn3fwjds8r5260n6q3pd2qa6wqkudrhczh26d957c0edyzermshds0k8","pubkey":"88c738a5d26c0e3a2b4f9e8110b540ee9c0b71a3be057569a5a7b0fcb482c8f7"},"egld_amount":"500000000000000000","endpoint_name":{"type":"Buffer","data":[104,101,108,108,111,32,119,111,114,108,100]},"arguments":[]}]}`
+        );
+        assert.equal(result.valueOf().name, "SendTransferExecute");
     });
 });

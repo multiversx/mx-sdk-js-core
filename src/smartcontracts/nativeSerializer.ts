@@ -4,7 +4,7 @@ import { ErrInvalidArgument, Address, BalanceBuilder } from "..";
 import { TestWallet } from "../testutils";
 import { ArgumentErrorContext } from "./argumentErrorContext";
 import { SmartContract } from "./smartContract";
-import { Struct, StructField, StructType, Tuple } from "./typesystem";
+import { Struct, Field, StructType, Tuple } from "./typesystem";
 import { ContractWrapper } from "./wrapper/contractWrapper";
 
 export namespace NativeTypes {
@@ -154,7 +154,7 @@ export namespace NativeSerializer {
 
     function toTupleValue(native: any, type: TupleType, errorContext: ArgumentErrorContext): TypedValue {
         let typedValues = [];
-        const fields = type.fields;
+        const fields = type.getFieldsDefinitions();
         errorContext.guardSameLength(native, fields);
         for (let i in fields) {
             typedValues.push(convertToTypedValue(native[i], fields[i].type, errorContext));
@@ -164,13 +164,13 @@ export namespace NativeSerializer {
 
     function toStructValue(native: any, type: StructType, errorContext: ArgumentErrorContext): TypedValue {
         let structFieldValues = [];
-        const fields = type.fields;
+        const fields = type.getFieldsDefinitions();
         for (let i in fields) {
             const fieldName = fields[i].name;
             errorContext.guardHasField(native, fieldName);
             const fieldNativeValue = native[fieldName];
             const fieldTypedValue = convertToTypedValue(fieldNativeValue, fields[i].type, errorContext);
-            structFieldValues.push(new StructField(fieldTypedValue, fieldName));
+            structFieldValues.push(new Field(fieldTypedValue, fieldName));
         }
         return new Struct(type, structFieldValues);
     }

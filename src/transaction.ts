@@ -22,7 +22,6 @@ import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Hash } from "./hash";
 
 const createTransactionHasher = require("blake2b");
-
 const TRANSACTION_HASH_LENGTH = 32;
 
 /**

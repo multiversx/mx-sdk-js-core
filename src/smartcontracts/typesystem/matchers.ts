@@ -6,10 +6,12 @@ import { EnumType, EnumValue } from "./enum";
 import { OptionType, OptionValue, List, ListType } from "./generic";
 import { H256Type, H256Value } from "./h256";
 import { NumericalType, NumericalValue } from "./numerical";
+import { NothingType, NothingValue } from "./nothing";
 import { Struct, StructType } from "./struct";
 import { TokenIdentifierType, TokenIdentifierValue } from "./tokenIdentifier";
 import { Tuple, TupleType } from "./tuple";
 import { Type, PrimitiveType, PrimitiveValue } from "./types";
+import { ArrayVec, ArrayVecType } from "./genericArray";
 
 // TODO: Extend functionality or rename wrt. restricted / reduced functionality (not all types are handled: composite, variadic).
 export function onTypeSelect<TResult>(
@@ -17,6 +19,7 @@ export function onTypeSelect<TResult>(
     selectors: {
         onOption: () => TResult;
         onList: () => TResult;
+        onArray: () => TResult;
         onPrimitive: () => TResult;
         onStruct: () => TResult;
         onTuple: () => TResult;
@@ -29,6 +32,9 @@ export function onTypeSelect<TResult>(
     }
     if (type instanceof ListType) {
         return selectors.onList();
+    }
+    if (type instanceof ArrayVecType) {
+        return selectors.onArray();
     }
     if (type instanceof PrimitiveType) {
         return selectors.onPrimitive();
@@ -56,6 +62,7 @@ export function onTypedValueSelect<TResult>(
         onPrimitive: () => TResult;
         onOption: () => TResult;
         onList: () => TResult;
+        onArray: () => TResult;
         onStruct: () => TResult;
         onTuple: () => TResult;
         onEnum: () => TResult;
@@ -71,6 +78,9 @@ export function onTypedValueSelect<TResult>(
     if (value instanceof List) {
         return selectors.onList();
     }
+    if (value instanceof ArrayVec) {
+        return selectors.onArray();
+    }
     if (value instanceof Struct) {
         return selectors.onStruct();
     }
@@ -80,6 +90,7 @@ export function onTypedValueSelect<TResult>(
     if (value instanceof EnumValue) {
         return selectors.onEnum();
     }
+
     if (selectors.onOther) {
         return selectors.onOther();
     }
@@ -96,6 +107,7 @@ export function onPrimitiveValueSelect<TResult>(
         onBytes: () => TResult;
         onH256: () => TResult;
         onTypeIdentifier: () => TResult;
+        onNothing: () => TResult;
         onOther?: () => TResult;
     }
 ): TResult {
@@ -117,6 +129,9 @@ export function onPrimitiveValueSelect<TResult>(
     if (value instanceof TokenIdentifierValue) {
         return selectors.onTypeIdentifier();
     }
+    if (value instanceof NothingValue) {
+        return selectors.onNothing();
+    }
     if (selectors.onOther) {
         return selectors.onOther();
     }
@@ -133,6 +148,7 @@ export function onPrimitiveTypeSelect<TResult>(
         onBytes: () => TResult;
         onH256: () => TResult;
         onTokenIndetifier: () => TResult;
+        onNothing: () => TResult;
         onOther?: () => TResult;
     }
 ): TResult {
@@ -153,6 +169,9 @@ export function onPrimitiveTypeSelect<TResult>(
     }
     if (type instanceof TokenIdentifierType) {
         return selectors.onTokenIndetifier();
+    }
+    if (type instanceof NothingType) {
+        return selectors.onNothing();
     }
     if (selectors.onOther) {
         return selectors.onOther();

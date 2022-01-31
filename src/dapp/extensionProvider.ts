@@ -16,11 +16,6 @@ interface IExtensionAccount {
 }
 
 export class ExtensionProvider implements IDappProvider {
-  private popupName = "connectPopup";
-
-  private extensionId: string = "";
-  private extensionURL: string = "";
-  private extensionPopupWindow: Window | null;
   public account: IExtensionAccount;
   private initialized: boolean = false;
   private static _instance: ExtensionProvider = new ExtensionProvider();
@@ -32,7 +27,6 @@ export class ExtensionProvider implements IDappProvider {
     }
     this.account = { address: "" };
     ExtensionProvider._instance = this;
-    this.extensionPopupWindow = null;
   }
 
   public static getInstance(): ExtensionProvider {
@@ -46,8 +40,6 @@ export class ExtensionProvider implements IDappProvider {
 
   async init(): Promise<boolean> {
     if (window && window.elrondWallet) {
-      this.extensionId = window.elrondWallet.extensionId;
-      this.extensionURL = `chrome-extension://${this.extensionId}/index.html`;
       this.initialized = true;
     }
     return this.initialized;
@@ -64,10 +56,9 @@ export class ExtensionProvider implements IDappProvider {
         "Extension provider is not initialised, call init() first"
       );
     }
-    this.openExtensionPopup();
     const { token } = options;
     const data = token ? token : "";
-    await this.startExtMsgChannel("connect", data);
+    await this.startBgrMsgChannel("connect", data);
     return this.account.address;
   }
 
@@ -104,8 +95,7 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   async sendTransaction(transaction: Transaction): Promise<Transaction> {
-    this.openExtensionPopup();
-    const txResponse = await this.startExtMsgChannel("sendTransactions", {
+    const txResponse = await this.startBgrMsgChannel("sendTransactions", {
       from: this.account.address,
       transactions: [transaction.toPlainObject()],
     });
@@ -114,8 +104,7 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   async signTransaction(transaction: Transaction): Promise<Transaction> {
-    this.openExtensionPopup();
-    const txResponse = await this.startExtMsgChannel("signTransactions", {
+    const txResponse = await this.startBgrMsgChannel("signTransactions", {
       from: this.account.address,
       transactions: [transaction.toPlainObject()],
     });
@@ -125,11 +114,10 @@ export class ExtensionProvider implements IDappProvider {
   async signTransactions(
     transactions: Array<Transaction>
   ): Promise<Array<Transaction>> {
-    this.openExtensionPopup();
     transactions = transactions.map((transaction) =>
       transaction.toPlainObject()
     );
-    let txResponse = await this.startExtMsgChannel("signTransactions", {
+    let txResponse = await this.startBgrMsgChannel("signTransactions", {
       from: this.account.address,
       transactions: transactions,
     });
@@ -140,13 +128,13 @@ export class ExtensionProvider implements IDappProvider {
   }
 
   async signMessage(message: SignableMessage): Promise<SignableMessage> {
-    this.openExtensionPopup();
     const data = {
       account: this.account.address,
       message: message.message.toString(),
     };
-    const signResponse = await this.startExtMsgChannel("signMessage", data);
+    const signResponse = await this.startBgrMsgChannel("signMessage", data);
     const signedMsg = new SignableMessage({
+      address: message.address,
       message: Buffer.from(signResponse.message),
       signature: new Signature(signResponse.signature),
     });
@@ -154,27 +142,15 @@ export class ExtensionProvider implements IDappProvider {
     return signedMsg;
   }
 
-  private openExtensionPopup() {
-    if (!this.initialized) {
-      throw new Error(
-        "Extension provider is not initialised, call init() first"
-      );
-    }
-    const popupOptions = `directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,left=${window.screenX +
-      window.outerWidth -
-      375},screenY=${window.screenY}resizable=no,width=375,height=569`;
-    this.extensionPopupWindow = window.open(
-      this.extensionURL,
-      this.popupName,
-      popupOptions
-    );
+  cancelAction() {
+    return this.startBgrMsgChannel("cancelAction", {});
   }
 
   private startBgrMsgChannel(
     operation: string,
     connectData: any
   ): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       window.postMessage(
         {
           target: "erdw-inpage",
@@ -185,91 +161,18 @@ export class ExtensionProvider implements IDappProvider {
       );
 
       const eventHandler = (event: any) => {
-        if (
-          event.isTrusted &&
-          event.data.type &&
-          event.data.target === "erdw-contentScript"
-        ) {
-          switch (event.data.type) {
-            case "logoutResponse":
-              window.removeEventListener("message", eventHandler);
-              resolve(true);
-              break;
-          }
-        }
-      };
-      setTimeout(() => {
-        reject(
-          "Extension logout response timeout. No response from extension."
-        );
-      }, 3000);
-      window.addEventListener("message", eventHandler, false);
-    });
-  }
-
-  private async startExtMsgChannel(
-    operation: string,
-    connectData: any
-  ): Promise<any> {
-    const response = await new Promise((resolve, reject) => {
-      let isResolved = false;
-      const eventHandler = (event: any) => {
-        if (
-          event.isTrusted &&
-          event.data.type &&
-          event.data.target === "erdw-extension"
-        ) {
-          switch (event.data.type) {
-            case "popupReady":
-              event.ports[0].postMessage({
-                target: "erdw-inpage",
-                type: operation,
-                data: connectData,
-              });
-              break;
-            case "connectResult":
-              this.account = event.data.data;
-              window.removeEventListener("message", eventHandler);
-              isResolved = true;
-              this.extensionPopupWindow?.close();
-              resolve(event.data.data);
-              break;
-
-            default:
-              this.handleExtResponseErr(event);
-              window.removeEventListener("message", eventHandler);
-              isResolved = true;
-              this.extensionPopupWindow?.close();
-              resolve(event.data.data);
-              break;
-          }
-        }
-      };
-      const windowCloseInterval = setInterval(() => {
-        if (this.extensionPopupWindow?.closed) {
-          clearInterval(windowCloseInterval);
-          if (!isResolved) {
+        if (event.isTrusted && event.data.target === "erdw-contentScript") {
+          if (event.data.type === "connectResponse") {
+            this.account = event.data.data;
             window.removeEventListener("message", eventHandler);
-            reject("Extension window was closed without response.");
+            resolve(event.data.data);
+          } else {
+            window.removeEventListener("message", eventHandler);
+            resolve(event.data.data);
           }
         }
-      }, 500);
+      };
       window.addEventListener("message", eventHandler, false);
     });
-
-    return response;
-  }
-
-  private handleExtResponseErr(event: any) {
-    if (!event.data && !event.data.data) {
-      throw new Error("Extension response is empty.");
-    }
-
-    if (
-      event.data.type === "transactionComplete" &&
-      event.data.data.length === 0
-    ) {
-      throw new Error("Transactions list response is empty.");
-    }
   }
 }

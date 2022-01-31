@@ -2,6 +2,7 @@ import { assert } from "chai";
 import {WalletProvider} from "./walletProvider";
 import {Transaction} from "../transaction";
 import {Address} from "../address";
+import { isOnBrowserTests } from "../testutils";
 
 declare global {
   namespace NodeJS {
@@ -16,15 +17,26 @@ declare global {
 }
 
 describe("test wallet provider", () => {
-  beforeEach(() => {
+  before(function() {
+    if (isOnBrowserTests()) {
+      this.skip();
+    }
+  });
+
+  beforeEach(function() {
     global.window = {
       location: {
         href: "http://return-to-wallet"
       }
     };
   });
-  after(() => {
-    delete global.window;
+
+  after(function() {
+    if (isOnBrowserTests()) {
+      // Do nothing.
+    } else {
+      delete global.window;
+    }
   });
 
   it('login redirects correctly', async () => {

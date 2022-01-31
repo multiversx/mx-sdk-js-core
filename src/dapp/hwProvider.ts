@@ -1,9 +1,11 @@
-import TransportU2f from "@ledgerhq/hw-transport-u2f";
 import TransportWebUSB from "@ledgerhq/hw-transport-webusb";
+import TransportWebHID from "@ledgerhq/hw-transport-webhid";
+import TransportU2f from "@ledgerhq/hw-transport-u2f";
 // @ts-ignore
 import AppElrond from "@elrondnetwork/hw-app-elrond";
 
 import platform from "platform";
+import Transport, { Descriptor } from "ledgerhq__hw-transport";
 
 import { IDappProvider, IHWElrondApp, IHWProvider } from "./interface";
 import { IProvider } from "../interface";
@@ -29,17 +31,31 @@ export class HWProvider implements IHWProvider {
      */
     async init(): Promise<boolean> {
         try {
-            let webUSBSupported = await TransportWebUSB.isSupported();
-            webUSBSupported =
-                webUSBSupported && !!platform.os && platform.os.family !== "Windows" && platform.name !== "Opera";
-
-            const transport = webUSBSupported ? await TransportWebUSB.create() : await TransportU2f.create();
+            const transport = await this.getTransport();
             this.hwApp = new AppElrond(transport);
 
             return true;
         } catch (error) {
             return false;
         }
+    }
+
+    async getTransport(): Promise<Transport<Descriptor>> {
+        let webUSBSupported = await TransportWebUSB.isSupported();
+        webUSBSupported =
+          webUSBSupported &&
+            platform.name !== "Opera";
+
+        if (webUSBSupported) {
+            return await TransportWebUSB.create();
+        }
+
+        let webHIDSupported = await TransportWebHID.isSupported();
+        if (webHIDSupported) {
+            return await TransportWebHID.open("");
+        }
+
+        return await TransportU2f.create();
     }
 
     /**

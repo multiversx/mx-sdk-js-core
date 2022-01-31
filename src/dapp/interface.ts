@@ -1,5 +1,6 @@
 import { Transaction } from "../transaction";
 import {SignableMessage} from "../signableMessage";
+import {Signature} from "../signature";
 
 export interface IDappProvider {
     init(): Promise<boolean>;
@@ -16,6 +17,7 @@ export interface IDappProvider {
 
 export interface IHWProvider extends IDappProvider {
     getAccounts(startIndex: number, length: number): Promise<string[]>;
+    tokenLogin(options: { token: Buffer, addressIndex?: number }): Promise<{signature: Signature; address: string}>;
 }
 
 export interface IDappMessageEvent extends MessageEvent {
@@ -48,5 +50,13 @@ export interface IHWElrondApp {
         contractData: number;
         accountIndex: number;
         addressIndex: number;
+    }>;
+    getAddressAndSignAuthToken(
+      account: number,
+      index: number,
+      token: Buffer,
+    ): Promise<{
+        address: string,
+        signature: string,
     }>;
 }

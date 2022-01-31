@@ -1,9 +1,10 @@
 import BigNumber from "bignumber.js";
-import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, Code, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, TokenIdentifierType, TokenIdentifierValue, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from ".";
+import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, Code, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, TokenIdentifierType, TokenIdentifierValue, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from ".";
 import { ErrInvalidArgument, Address, BalanceBuilder } from "..";
 import { TestWallet } from "../testutils";
 import { ArgumentErrorContext } from "./argumentErrorContext";
 import { SmartContract } from "./smartContract";
+import { Struct, Field, StructType, Tuple } from "./typesystem";
 import { ContractWrapper } from "./wrapper/contractWrapper";
 
 export namespace NativeTypes {
@@ -45,9 +46,7 @@ export namespace NativeSerializer {
         if (variadic) {
             let lastArgIndex = parameters.length - 1;
             let lastArg = args.slice(lastArgIndex);
-            if (lastArg.length > 0) {
-                args[lastArgIndex] = lastArg;
-            }
+            args[lastArgIndex] = lastArg;
         }
         return args;
     }
@@ -87,6 +86,12 @@ export namespace NativeSerializer {
         }
         if (type instanceof CompositeType) {
             return toCompositeValue(native, type, errorContext);
+        }
+        if (type instanceof TupleType) {
+            return toTupleValue(native, type, errorContext);
+        }
+        if (type instanceof StructType) {
+            return toStructValue(native, type, errorContext);
         }
         if (type instanceof ListType) {
             return toListValue(native, type, errorContext);
@@ -147,6 +152,29 @@ export namespace NativeSerializer {
         return new CompositeValue(type, typedValues);
     }
 
+    function toTupleValue(native: any, type: TupleType, errorContext: ArgumentErrorContext): TypedValue {
+        let typedValues = [];
+        const fields = type.getFieldsDefinitions();
+        errorContext.guardSameLength(native, fields);
+        for (let i in fields) {
+            typedValues.push(convertToTypedValue(native[i], fields[i].type, errorContext));
+        }
+        return Tuple.fromItems(typedValues);
+    }
+
+    function toStructValue(native: any, type: StructType, errorContext: ArgumentErrorContext): TypedValue {
+        let structFieldValues = [];
+        const fields = type.getFieldsDefinitions();
+        for (let i in fields) {
+            const fieldName = fields[i].name;
+            errorContext.guardHasField(native, fieldName);
+            const fieldNativeValue = native[fieldName];
+            const fieldTypedValue = convertToTypedValue(fieldNativeValue, fields[i].type, errorContext);
+            structFieldValues.push(new Field(fieldTypedValue, fieldName));
+        }
+        return new Struct(type, structFieldValues);
+    }
+
     function toPrimitive(native: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
         if (type instanceof NumericalType) {
             let number = new BigNumber(native);
@@ -168,6 +196,9 @@ export namespace NativeSerializer {
     }
 
     function convertNativeToBytesValue(native: NativeTypes.NativeBytes, errorContext: ArgumentErrorContext) {
+        if (native === undefined) {
+            errorContext.convertError(native, "BytesValue");
+        }
         if (native instanceof Code) {
             return BytesValue.fromHex(native.toString());
         }
@@ -184,6 +215,9 @@ export namespace NativeSerializer {
     }
 
     function convertNativeToBuffer(native: NativeTypes.NativeBuffer, errorContext: ArgumentErrorContext): Buffer {
+        if (native === undefined) {
+            errorContext.convertError(native, "Buffer");
+        }
         if (native instanceof Buffer) {
             return native;
         }

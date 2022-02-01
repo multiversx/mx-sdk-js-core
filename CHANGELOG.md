@@ -27,6 +27,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
     - Handle erros when sign/send transactions fails on extension side
 - [Handle heterogeneous enums with fields](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/98)
 -[Background communication channel with extension popup] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/103
+-[Extension Provider throw error if tx canceled] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/111
 
 ## [8.0.0]
 - [ExtensionProvider] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/66

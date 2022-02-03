@@ -1,6 +1,6 @@
 import { ErrInvariantFailed } from "../errors";
 import { loadAbiRegistry } from "../testutils";
-import { guardValueIsSet } from "../utils";
+import { guardValueIsSetWithMessage } from "../utils";
 import { ContractFunction } from "./function";
 import { AbiRegistry, EndpointDefinition } from "./typesystem";
 import { ContractInterface } from "./typesystem/contractInterface";
@@ -33,7 +33,7 @@ export class SmartContractAbi {
             name = name.name;
         }
         let result = this.getAllEndpoints().find(item => item.name === name);
-        guardValueIsSet("result", result);
+        guardValueIsSetWithMessage(`endpoint [${name}] not found`, result);
         return result!;
     }
 

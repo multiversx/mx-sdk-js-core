@@ -97,7 +97,7 @@ export class TypeMapper {
         }
     }
 
-    mapType(type: Type): Type {
+    mapRecursiveType(type: Type): Type | null {
         let isGeneric = type.isGenericType();
 
         if (type instanceof EnumType) {
@@ -114,13 +114,21 @@ export class TypeMapper {
             // This will call mapType() recursively, for all the type parameters.
             return this.mapGenericType(type);
         }
+        return null;
+    }
+
+    mapType(type: Type): Type {
+        let mappedType = this.mapRecursiveType(type);
+        if (mappedType !== null) {
+            return mappedType;
+        }
 
         let knownClosedType = this.closedTypesMap.get(type.getName());
         if (!knownClosedType) {
             throw new errors.ErrTypingSystem(`Cannot map the type "${type.getName()}" to a known type`);
         }
 
-        return knownClosedType;
+        return this.mapRecursiveType(knownClosedType) ?? knownClosedType;
     }
 
     feedCustomType(type: Type): void {

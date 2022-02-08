@@ -6,6 +6,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+## [9.0.2]
+ - Bump version, since previously published `8.0.2-alpha.1` version is picked as `latest` version by npmjs.
+
 ## [9.0.1]
 - [Add globals polyfill for Buffer](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/112)
 

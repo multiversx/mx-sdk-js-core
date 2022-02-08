@@ -7,6 +7,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 ## [9.0.2]
+ - [Fix recursivity issue when mapping types](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/114).
  - Bump version, since previously published `8.0.2-alpha.1` version is picked as `latest` version by npmjs.
 
 ## [9.0.1]

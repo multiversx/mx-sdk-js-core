@@ -12,7 +12,7 @@ export class Token {
     name: string = ''; // Token name (eg. MyTokenName123)
     type: TokenType = TokenType.Fungible;
     owner: Address = new Address();
-    supply: string = '0'; // Circulating supply = initial minted supply + local mints - local burns
+    supply: number = 0; // Circulating supply = initial minted supply + local mints - local burns
     decimals: number = 18;
     isPaused: boolean = false;
     canUpgrade: boolean = false;
@@ -36,7 +36,7 @@ export class Token {
         name: string,
         type: string,
         owner: string,
-        supply: string,
+        supply: number,
         decimals: number,
         isPaused: boolean,
         canUpgrade: boolean,

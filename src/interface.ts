@@ -12,10 +12,22 @@ import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Token } from "./token";
 import BigNumber from "bignumber.js";
 
+export interface ITransactionFetcher {
+    /**
+     * Fetches the state of a {@link Transaction}.
+     */
+     getTransaction(txHash: TransactionHash, hintSender?: Address, withResults?: boolean): Promise<TransactionOnNetwork>;
+
+    /**
+     * Queries the status of a {@link Transaction}.
+     */
+    getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus>;
+}
+
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
  */
-export interface IProvider {
+export interface IProvider extends ITransactionFetcher {
     /**
      * Fetches the Network configuration.
      */
@@ -62,16 +74,6 @@ export interface IProvider {
     simulateTransaction(tx: Transaction): Promise<TransactionHash>;
 
     /**
-     * Fetches the state of a {@link Transaction}.
-     */
-    getTransaction(txHash: TransactionHash, hintSender?: Address, withResults?: boolean): Promise<TransactionOnNetwork>;
-
-    /**
-     * Queries the status of a {@link Transaction}.
-     */
-    getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus>;
-
-    /**
      * Get method that receives the resource url and on callback the method used to map the response.
      */
     doGetGeneric(resourceUrl: string, callback: (response: any) => any): Promise<any>;
@@ -85,7 +87,7 @@ export interface IProvider {
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
  */
-export interface IApiProvider {
+export interface IApiProvider extends ITransactionFetcher {
     /**
      * Fetches the Network Stake.
      */
@@ -94,10 +96,6 @@ export interface IApiProvider {
      * Fetches the Network Stats.
      */
     getNetworkStats(): Promise<Stats>;
-    /**
-     * Fetches the state of a {@link Transaction}.
-     */
-    getTransaction(txHash: TransactionHash): Promise<TransactionOnNetwork>;
 
     getToken(tokenIdentifier: string): Promise<Token>;
 

@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IProvider, ISignable } from "./interface";
+import { IProvider, ISignable, ITransactionFetcher } from "./interface";
 import { Address } from "./address";
 import { Balance } from "./balance";
 import {
@@ -377,13 +377,13 @@ export class Transaction implements ISignable {
   /**
    * Fetches a representation of the transaction (whether pending, processed or finalized), as found on the Network.
    *
-   * @param provider The provider to use
+   * @param fetcher The transaction fetcher to use
    * @param cacheLocally Whether to cache the response locally, on the transaction object
    * @param awaitNotarized Whether to wait for the transaction to be notarized
    * @param withResults Whether to wait for the transaction results
    */
   async getAsOnNetwork(
-    provider: IProvider,
+    fetcher: ITransactionFetcher,
     cacheLocally = true,
     awaitNotarized = true,
     withResults = true
@@ -395,10 +395,10 @@ export class Transaction implements ISignable {
     // For Smart Contract transactions, wait for their full execution & notarization before returning.
     let isSmartContractTransaction = this.receiver.isContractAddress();
     if (isSmartContractTransaction && awaitNotarized) {
-      await this.awaitNotarized(provider);
+      await this.awaitNotarized(fetcher);
     }
 
-    let response = await provider.getTransaction(
+    let response = await fetcher.getTransaction(
       this.hash,
       this.sender,
       withResults
@@ -469,8 +469,8 @@ export class Transaction implements ISignable {
    * Awaits for a transaction to reach its "pending" state - that is, for the transaction to be accepted in the mempool.
    * Performs polling against the provider, via a {@link TransactionWatcher}.
    */
-  async awaitPending(provider: IProvider): Promise<void> {
-    let watcher = new TransactionWatcher(this.hash, provider);
+  async awaitPending(fetcher: ITransactionFetcher): Promise<void> {
+    let watcher = new TransactionWatcher(this.hash, fetcher);
     await watcher.awaitPending(this.notifyStatusUpdate.bind(this));
   }
 
@@ -478,8 +478,8 @@ export class Transaction implements ISignable {
    * Awaits for a transaction to reach its "executed" state - that is, for the transaction to be processed (whether with success or with errors).
    * Performs polling against the provider, via a {@link TransactionWatcher}.
    */
-  async awaitExecuted(provider: IProvider): Promise<void> {
-    let watcher = new TransactionWatcher(this.hash, provider);
+  async awaitExecuted(fetcher: ITransactionFetcher): Promise<void> {
+    let watcher = new TransactionWatcher(this.hash, fetcher);
     await watcher.awaitExecuted(this.notifyStatusUpdate.bind(this));
   }
 
@@ -494,8 +494,8 @@ export class Transaction implements ISignable {
     }
   }
 
-  async awaitNotarized(provider: IProvider): Promise<void> {
-    let watcher = new TransactionWatcher(this.hash, provider);
+  async awaitNotarized(fetcher: ITransactionFetcher): Promise<void> {
+    let watcher = new TransactionWatcher(this.hash, fetcher);
     await watcher.awaitNotarized();
   }
 }

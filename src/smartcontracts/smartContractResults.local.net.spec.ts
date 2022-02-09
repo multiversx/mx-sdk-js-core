@@ -6,8 +6,8 @@ import { GasLimit } from "../networkParams";
 import { assert } from "chai";
 import { chooseProvider } from "../interactive";
 
-describe("fetch transactions from devnet", function () {
-    let devnet = chooseProvider("local-testnet");;
+describe("fetch transactions from local testnet", function () {
+    let provider = chooseProvider("local-testnet");;
     let alice: TestWallet;
     before(async function () {
         ({ alice } = await loadTestWallets());
@@ -19,8 +19,8 @@ describe("fetch transactions from devnet", function () {
         TransactionWatcher.DefaultPollingInterval = 5000;
         TransactionWatcher.DefaultTimeout = 50000;
 
-        await NetworkConfig.getDefault().sync(devnet);
-        await alice.sync(devnet);
+        await NetworkConfig.getDefault().sync(provider);
+        await alice.sync(provider);
 
         // Deploy
         let contract = new SmartContract({});
@@ -46,14 +46,14 @@ describe("fetch transactions from devnet", function () {
         alice.account.incrementNonce();
 
         // Broadcast & execute
-        await transactionDeploy.send(devnet);
-        await transactionIncrement.send(devnet);
+        await transactionDeploy.send(provider);
+        await transactionIncrement.send(provider);
 
-        await transactionDeploy.awaitExecuted(devnet);
-        await transactionIncrement.awaitExecuted(devnet);
+        await transactionDeploy.awaitExecuted(provider);
+        await transactionIncrement.awaitExecuted(provider);
 
-        await transactionDeploy.getAsOnNetwork(devnet);
-        await transactionIncrement.getAsOnNetwork(devnet);
+        await transactionDeploy.getAsOnNetwork(provider);
+        await transactionIncrement.getAsOnNetwork(provider);
 
         let deployImmediateResult = transactionDeploy.getAsOnNetworkCached().getSmartContractResults().getImmediate();
         let deployResultingCalls = transactionDeploy.getAsOnNetworkCached().getSmartContractResults().getResultingCalls();
@@ -80,7 +80,7 @@ describe("fetch transactions from devnet", function () {
         TransactionWatcher.DefaultPollingInterval = 5000;
         TransactionWatcher.DefaultTimeout = 50000;
 
-        await NetworkConfig.getDefault().sync(devnet);
-        await alice.sync(devnet);
+        await NetworkConfig.getDefault().sync(provider);
+        await alice.sync(provider);
     });
 });

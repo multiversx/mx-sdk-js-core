@@ -17,12 +17,12 @@ describe("test transaction", function () {
     it("should send transactions", async function () {
         this.timeout(20000);
 
-        let devnet = chooseProvider("local-testnet");
+        let provider = chooseProvider("local-testnet");
 
-        await NetworkConfig.getDefault().sync(devnet);
-        await alice.sync(devnet);
+        await NetworkConfig.getDefault().sync(provider);
+        await alice.sync(provider);
 
-        await bob.sync(devnet);
+        await bob.sync(provider);
         let initialBalanceOfBob = bob.account.balance;
 
         let transactionOne = new Transaction({
@@ -42,13 +42,13 @@ describe("test transaction", function () {
         await alice.signer.sign(transactionOne);
         await alice.signer.sign(transactionTwo);
 
-        await transactionOne.send(devnet);
-        await transactionTwo.send(devnet);
+        await transactionOne.send(provider);
+        await transactionTwo.send(provider);
 
-        await transactionOne.awaitExecuted(devnet);
-        await transactionTwo.awaitExecuted(devnet);
+        await transactionOne.awaitExecuted(provider);
+        await transactionTwo.awaitExecuted(provider);
 
-        await bob.sync(devnet);
+        await bob.sync(provider);
         let newBalanceOfBob = bob.account.balance;
 
         assert.deepEqual(Balance.egld(85).valueOf(), newBalanceOfBob.valueOf().minus(initialBalanceOfBob.valueOf()));
@@ -57,10 +57,10 @@ describe("test transaction", function () {
     it("should simulate transactions", async function () {
         this.timeout(20000);
 
-        let devnet = chooseProvider("local-testnet");
+        let provider = chooseProvider("local-testnet");
 
-        await NetworkConfig.getDefault().sync(devnet);
-        await alice.sync(devnet);
+        await NetworkConfig.getDefault().sync(provider);
+        await alice.sync(provider);
 
         let transactionOne = new Transaction({
             data: new TransactionPayload("helloWorld"),
@@ -82,7 +82,7 @@ describe("test transaction", function () {
         await alice.signer.sign(transactionOne);
         await alice.signer.sign(transactionTwo);
 
-        Logger.trace(JSON.stringify(await transactionOne.simulate(devnet), null, 4));
-        Logger.trace(JSON.stringify(await transactionTwo.simulate(devnet), null, 4));
+        Logger.trace(JSON.stringify(await transactionOne.simulate(provider), null, 4));
+        Logger.trace(JSON.stringify(await transactionTwo.simulate(provider), null, 4));
     });
 });

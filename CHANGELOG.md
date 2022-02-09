@@ -5,7 +5,8 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
- - [Extension Provider throw error if tx canceled] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/111
+ - [Extension Provider throw error if tx canceled](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/111).
+ - [Add fromAbiUrl() - paired with fromAbiPath()](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/121).
 
 ## [9.0.2]
  - [Fix recursivity issue when mapping types](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/114).
@@ -28,16 +29,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
     - Provider's send/sign transaction methonds responded with plainObject transactions instead of Transaction
     - Added fromPlainObject method as a static method to transaction
  
-- [Add signAuthToken method to HWProvider #73] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/73) 
+- [Add signAuthToken method to HWProvider #73](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/73) 
 - [Fix for ignored config options in proxyProvider and apiProvider #76](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/76)
-- [Fix wallet logout/login redirect when using form submit] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/85)
+- [Fix wallet logout/login redirect when using form submit](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/85)
 - [Fix ExtensionProvider sign message #86](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/86)
     - Add address to SignableMessage response
 
 - [Handle extension errors #87](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/87)
     - Handle erros when sign/send transactions fails on extension side
 - [Handle heterogeneous enums with fields](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/98)
--[Background communication channel with extension popup] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/103)
+- [Background communication channel with extension popup](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/103)
 
 
 ## [8.0.0]

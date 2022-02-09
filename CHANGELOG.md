@@ -8,6 +8,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - [Extension Provider throw error if tx canceled](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/111).
  - [Add fromAbiUrl() - paired with fromAbiPath()](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/121).
  - [Redo](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/122) of PR [Better typing for ABI methods](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/61).
+ - [For integration tests, resolve ambiguity between devnet & local-testnet](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/124).
 
 ## [9.0.2]
  - [Fix recursivity issue when mapping types](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/114).

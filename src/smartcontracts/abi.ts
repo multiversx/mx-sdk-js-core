@@ -13,7 +13,13 @@ export class SmartContractAbi {
     }
 
     static async fromAbiPath(abiPath: string): Promise<SmartContractAbi> {
-        let abiRegistry = await loadAbiRegistry([abiPath]);
+        let abiRegistry = await AbiRegistry.load({ files: [abiPath] });
+        let interfaceNames = abiRegistry.interfaces.map(iface => iface.name);
+        return new SmartContractAbi(abiRegistry, interfaceNames);
+    }
+
+    static async fromAbiUrl(abiUrl: string): Promise<SmartContractAbi> {
+        let abiRegistry = await AbiRegistry.load({ urls: [abiUrl] });
         let interfaceNames = abiRegistry.interfaces.map(iface => iface.name);
         return new SmartContractAbi(abiRegistry, interfaceNames);
     }

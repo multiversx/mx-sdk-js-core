@@ -11,6 +11,7 @@
   "scripts": {
     "test": "npm run tests-unit",
     "tests-unit": "mocha $(find . -name '*.spec.ts' ! -name '*.net.spec.*')",
+    "tests-localnet": "mocha $(find . -name '*.local.net.spec.ts')",
     "tests-devnet": "mocha $(find . -name '*.dev.net.spec.ts')",
     "tests-testnet": "mocha $(find . -name '*.test.net.spec.ts')",
     "tests-mainnet": "mocha $(find . -name '*.main.net.spec.ts')",

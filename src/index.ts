@@ -1,3 +1,5 @@
+require('./globals');
+
 export * from "./interface";
 export * from "./errors";
 export * from "./account";

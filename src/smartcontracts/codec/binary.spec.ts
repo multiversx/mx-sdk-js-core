@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { BinaryCodec, BinaryCodecConstraints } from "./binary";
-import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue, ArrayVec, ArrayVecType, U16Value } from "../typesystem";
+import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue, ArrayVec, ArrayVecType, U16Value, TokenIdentifierType, TokenIdentifierValue } from "../typesystem";
 import { discardSuperfluousBytesInTwosComplement, discardSuperfluousZeroBytes, isMsbOne } from "./utils";
 import { Address } from "../../address";
 import { Balance } from "../../balance";
@@ -112,7 +112,7 @@ describe("test binary codec (advanced)", () => {
         assert.deepEqual(decodedTopLevel, list);
     });
 
-    it("benchmark: should work well with large lists", async function() {
+    it("benchmark: should work well with large lists", async function () {
         let numItems = 2 ** 12;
         let codec = new BinaryCodec(new BinaryCodecConstraints({
             maxListLength: numItems,
@@ -133,7 +133,7 @@ describe("test binary codec (advanced)", () => {
         assert.equal(buffer.length, 4 + numItems * 4);
 
         console.time("decoding");
-        let [decodedList, decodedLength] = codec.decodeNested<List>(buffer,  new ListType(new U32Type()));
+        let [decodedList, decodedLength] = codec.decodeNested<List>(buffer, new ListType(new U32Type()));
         console.timeEnd("decoding");
         assert.equal(decodedLength, buffer.length);
         assert.deepEqual(decodedList, list);
@@ -214,6 +214,39 @@ describe("test binary codec (advanced)", () => {
         });
     });
 
+    it("should encode / decode structs containing a TokenIdentifier", async () => {
+        let codec = new BinaryCodec();
+        let paymentType = new StructType(
+            "Payment",
+            [
+                new FieldDefinition("token_identifier", "", new TokenIdentifierType()),
+                new FieldDefinition("nonce", "", new U64Type()),
+                new FieldDefinition("amount", "", new BigUIntType()),
+            ]
+        );
+
+        let paymentStruct = new Struct(paymentType, [
+            new Field(new TokenIdentifierValue(Buffer.from("TEST-1234")), "token_identifier"),
+            new Field(new U64Value(new BigNumber(42)), "nonce"),
+            new Field(new BigUIntValue(new BigNumber("123450000000000000000")), "amount")
+        ]);
+
+        let encodedExpected = serialized("[00000009|544553542d31323334] [000000000000002a] [00000009|06b13680ef11f90000]");
+        let encoded = codec.encodeNested(paymentStruct);
+        assert.deepEqual(encoded, encodedExpected);
+
+        let [decoded, decodedLength] = codec.decodeNested(encodedExpected, paymentType);
+        assert.equal(decodedLength, encodedExpected.length);
+        assert.deepEqual(decoded, paymentStruct);
+
+        let decodedPayment = decoded.valueOf();
+        assert.deepEqual(decodedPayment, {
+            token_identifier: Buffer.from("TEST-1234"),
+            nonce: new BigNumber(42),
+            amount: new BigNumber("123450000000000000000"),
+        });
+    });
+
     it("should encode / decode enums", async () => {
         let codec = new BinaryCodec();
         let enumType = new EnumType("Colour", [
@@ -263,8 +296,8 @@ describe("test binary codec (advanced)", () => {
         ]);
 
         let enumType = new EnumType("Colour", [
-           orangeVariant,
-           blueVariant 
+            orangeVariant,
+            blueVariant
         ]);
 
         let orange = new EnumValue(enumType, orangeVariant, [

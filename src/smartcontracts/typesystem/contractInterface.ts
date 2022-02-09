@@ -1,4 +1,4 @@
-import { guardValueIsSet } from "../../utils";
+import { guardValueIsSetWithMessage } from "../../utils";
 import { EndpointDefinition } from "./endpoint";
 
 const NamePlaceholder = "?";
@@ -32,7 +32,7 @@ export class ContractInterface {
 
     getEndpoint(name: string): EndpointDefinition {
         let result = this.endpoints.find(e => e.name == name);
-        guardValueIsSet("result", result);
+        guardValueIsSetWithMessage(`endpoint [${name}] not found`, result);
         return result!;
     }
 }

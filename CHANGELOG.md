@@ -5,7 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
- - [Add fromAbiUrl() - paired with fromAbiPath()](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/121).
+ - [Extension Provider throw error if tx canceled] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/111
 
 ## [9.0.2]
  - [Fix recursivity issue when mapping types](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/114).
@@ -37,7 +37,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - [Handle extension errors #87](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/87)
     - Handle erros when sign/send transactions fails on extension side
 - [Handle heterogeneous enums with fields](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/98)
-- [Background communication channel with extension popup](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/103)
+-[Background communication channel with extension popup] (https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/103)
+
 
 ## [8.0.0]
 - [ExtensionProvider] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/66

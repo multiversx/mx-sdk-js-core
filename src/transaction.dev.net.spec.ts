@@ -1,88 +1,68 @@
-import { Transaction } from "./transaction";
-import { GasLimit } from "./networkParams";
-import { TransactionPayload } from "./transactionPayload";
-import { NetworkConfig } from "./networkConfig";
-import { Balance } from "./balance";
-import { loadTestWallets, TestWallet } from "./testutils";
-import { Logger } from "./logger";
 import { assert } from "chai";
-import { chooseProvider } from "./interactive";
+import { chooseProxyProvider } from "./interactive";
+import { Address, chooseApiProvider, Nonce, SmartContractResultItem, TransactionHash, TransactionStatus } from ".";
+import { Hash } from "./hash";
+import { TransactionOnNetwork, TransactionOnNetworkType } from "./transactionOnNetwork";
 
-describe("test transaction", function () {
-    let alice: TestWallet, bob: TestWallet;
-    before(async function () {
-        ({ alice, bob } = await loadTestWallets());
-    });
-
-    it("should send transactions", async function () {
+describe("test transactions on devnet", function () {
+    it("should get transaction from Proxy & from API", async function () {
         this.timeout(20000);
 
-        let devnet = chooseProvider("local-testnet");
+        let sender = new Address("erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7");
+        let proxyProvider = chooseProxyProvider("elrond-devnet");
+        let apiProvider = chooseApiProvider("elrond-devnet");
 
-        await NetworkConfig.getDefault().sync(devnet);
-        await alice.sync(devnet);
+        let hashes = [
+            new TransactionHash("b41f5fc39e96b1f194d07761c6efd6cb92278b95f5012ab12cbc910058ca8b54"),
+            new TransactionHash("7757397a59378e9d0f6d5f08cc934c260e33a50ae0d73fdf869f7c02b6b47b33"),
+            new TransactionHash("b87238089e81527158a6daee520280324bc7e5322ba54d1b3c9a5678abe953ea"),
+            new TransactionHash("b45dd5e598bc85ba71639f2cbce8c5dff2fbe93159e637852fddeb16c0e84a48"),
+            new TransactionHash("83db780e98d4d3c917668c47b33ba51445591efacb0df2a922f88e7dfbb5fc7d"),
+            new TransactionHash("c2eb62b28cc7320da2292d87944c5424a70e1f443323c138c1affada7f6e9705")
+        ]
 
-        await bob.sync(devnet);
-        let initialBalanceOfBob = bob.account.balance;
+        for (const hash of hashes) {
+            let transactionOnProxy = await proxyProvider.getTransaction(hash, sender, true);
+            let transactionOnAPI = await apiProvider.getTransaction(hash);
 
-        let transactionOne = new Transaction({
-            receiver: bob.address,
-            value: Balance.egld(42)
-        });
-
-        let transactionTwo = new Transaction({
-            receiver: bob.address,
-            value: Balance.egld(43)
-        });
-
-        transactionOne.setNonce(alice.account.nonce);
-        alice.account.incrementNonce();
-        transactionTwo.setNonce(alice.account.nonce);
-
-        await alice.signer.sign(transactionOne);
-        await alice.signer.sign(transactionTwo);
-
-        await transactionOne.send(devnet);
-        await transactionTwo.send(devnet);
-
-        await transactionOne.awaitExecuted(devnet);
-        await transactionTwo.awaitExecuted(devnet);
-
-        await bob.sync(devnet);
-        let newBalanceOfBob = bob.account.balance;
-
-        assert.deepEqual(Balance.egld(85).valueOf(), newBalanceOfBob.valueOf().minus(initialBalanceOfBob.valueOf()));
+            ignoreKnownDifferencesBetweenProviders(transactionOnProxy, transactionOnAPI);
+            assert.deepEqual(transactionOnProxy, transactionOnAPI);
+        }
     });
 
-    it("should simulate transactions", async function () {
-        this.timeout(20000);
+    // TODO: Strive to have as little differences as possible between Proxy and API.
+    // ... On client-side (erdjs), try to handle the differences in ProxyProvider & ApiProvider, or in TransactionOnNetwork.
+    // ... Merging the providers (in the future) should solve this as well.
+    function ignoreKnownDifferencesBetweenProviders(transactionOnProxy: TransactionOnNetwork, transactionOnAPI: TransactionOnNetwork) {
+        // Ignore status, since it differs between Proxy and API (for smart contract calls):
+        transactionOnProxy.status = new TransactionStatus("unknown");
+        transactionOnAPI.status = new TransactionStatus("unknown");
 
-        let devnet = chooseProvider("local-testnet");
+        // Ignore fields which are not present on API response:
+        transactionOnProxy.epoch = 0;
+        transactionOnProxy.type = new TransactionOnNetworkType();
+        transactionOnProxy.hyperblockNonce = new Nonce(0);
+        transactionOnProxy.hyperblockHash = new Hash("");
 
-        await NetworkConfig.getDefault().sync(devnet);
-        await alice.sync(devnet);
+        let immediateContractResultOnAPI: SmartContractResultItem = (<any>transactionOnAPI).results.immediate;
+        let contractResultsOnAPI: SmartContractResultItem[] = (<any>transactionOnAPI).results.items;
+        let resultingCallsOnAPI: SmartContractResultItem[] = (<any>transactionOnAPI).results.resultingCalls;
+        let allContractResults = [immediateContractResultOnAPI].concat(resultingCallsOnAPI).concat(contractResultsOnAPI);
 
-        let transactionOne = new Transaction({
-            data: new TransactionPayload("helloWorld"),
-            gasLimit: new GasLimit(70000),
-            receiver: alice.address,
-            value: Balance.egld(1000)
+        // Important issue (existing bug)! When working with TransactionOnNetwork objects, SCRs cannot be parsed correctly from API, only from Proxy.
+        // On API response, base64 decode "data" from smart contract results:
+        for (const item of allContractResults) {
+            item.data = Buffer.from(item.data, "base64").toString();
+        }
+
+        // On API response, convert "callType" of smart contract results to a number:
+        for (const item of allContractResults) {
+            item.callType = Number(item.callType);
+        }
+
+        // On API response, sort contract results by nonce:
+        contractResultsOnAPI.sort(function (a: SmartContractResultItem, b: SmartContractResultItem) {
+            return a.nonce.valueOf() - b.nonce.valueOf();
         });
-
-        let transactionTwo = new Transaction({
-            data: new TransactionPayload("helloWorld"),
-            gasLimit: new GasLimit(70000),
-            receiver: alice.address,
-            value: Balance.egld(1000000)
-        });
-
-        transactionOne.setNonce(alice.account.nonce);
-        transactionTwo.setNonce(alice.account.nonce);
-
-        await alice.signer.sign(transactionOne);
-        await alice.signer.sign(transactionTwo);
-
-        Logger.trace(JSON.stringify(await transactionOne.simulate(devnet), null, 4));
-        Logger.trace(JSON.stringify(await transactionTwo.simulate(devnet), null, 4));
-    });
+    }
 });

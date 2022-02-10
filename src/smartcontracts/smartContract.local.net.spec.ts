@@ -11,10 +11,10 @@ import { Balance } from "../balance";
 import { AddressValue, BigUIntValue, OptionValue, U32Value } from "./typesystem";
 import { decodeUnsignedNumber } from "./codec";
 import { BytesValue } from "./typesystem/bytes";
-import { chooseProvider } from "../interactive";
+import { chooseProxyProvider } from "../interactive";
 
-describe("test on devnet (local)", function () {
-    let devnet = chooseProvider("local-testnet");
+describe("test on local testnet", function () {
+    let provider = chooseProxyProvider("local-testnet");
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
     before(async function () {
         ({ alice, bob, carol } = await loadTestWallets());
@@ -26,8 +26,8 @@ describe("test on devnet (local)", function () {
         TransactionWatcher.DefaultPollingInterval = 5000;
         TransactionWatcher.DefaultTimeout = 50000;
 
-        await NetworkConfig.getDefault().sync(devnet);
-        await alice.sync(devnet);
+        await NetworkConfig.getDefault().sync(provider);
+        await alice.sync(provider);
 
         // Deploy
         let contract = new SmartContract({});
@@ -70,15 +70,15 @@ describe("test on devnet (local)", function () {
         await alice.signer.sign(simulateTwo);
 
         // Broadcast & execute
-        await transactionDeploy.send(devnet);
-        await transactionIncrement.send(devnet);
+        await transactionDeploy.send(provider);
+        await transactionIncrement.send(provider);
 
-        await transactionDeploy.awaitExecuted(devnet);
-        await transactionIncrement.awaitExecuted(devnet);
+        await transactionDeploy.awaitExecuted(provider);
+        await transactionIncrement.awaitExecuted(provider);
 
         // Simulate
-        Logger.trace(JSON.stringify(await simulateOne.simulate(devnet), null, 4));
-        Logger.trace(JSON.stringify(await simulateTwo.simulate(devnet), null, 4));
+        Logger.trace(JSON.stringify(await simulateOne.simulate(provider), null, 4));
+        Logger.trace(JSON.stringify(await simulateTwo.simulate(provider), null, 4));
     });
 
     it("counter: should deploy, call and query contract", async function () {
@@ -87,8 +87,8 @@ describe("test on devnet (local)", function () {
         TransactionWatcher.DefaultPollingInterval = 5000;
         TransactionWatcher.DefaultTimeout = 50000;
 
-        await NetworkConfig.getDefault().sync(devnet);
-        await alice.sync(devnet);
+        await NetworkConfig.getDefault().sync(provider);
+        await alice.sync(provider);
 
         // Deploy
         let contract = new SmartContract({});
@@ -125,16 +125,16 @@ describe("test on devnet (local)", function () {
         alice.account.incrementNonce();
 
         // Broadcast & execute
-        await transactionDeploy.send(devnet);
-        await transactionIncrementFirst.send(devnet);
-        await transactionIncrementSecond.send(devnet);
+        await transactionDeploy.send(provider);
+        await transactionIncrementFirst.send(provider);
+        await transactionIncrementSecond.send(provider);
 
-        await transactionDeploy.awaitExecuted(devnet);
-        await transactionIncrementFirst.awaitExecuted(devnet);
-        await transactionIncrementSecond.awaitExecuted(devnet);
+        await transactionDeploy.awaitExecuted(provider);
+        await transactionIncrementFirst.awaitExecuted(provider);
+        await transactionIncrementSecond.awaitExecuted(provider);
 
         // Check counter
-        let queryResponse = await contract.runQuery(devnet, { func: new ContractFunction("get") });
+        let queryResponse = await contract.runQuery(provider, { func: new ContractFunction("get") });
         assert.equal(3, decodeUnsignedNumber(queryResponse.outputUntyped()[0]));
     });
 
@@ -144,8 +144,8 @@ describe("test on devnet (local)", function () {
         TransactionWatcher.DefaultPollingInterval = 5000;
         TransactionWatcher.DefaultTimeout = 50000;
 
-        await NetworkConfig.getDefault().sync(devnet);
-        await alice.sync(devnet);
+        await NetworkConfig.getDefault().sync(provider);
+        await alice.sync(provider);
 
         // Deploy
         let contract = new SmartContract({});
@@ -184,33 +184,33 @@ describe("test on devnet (local)", function () {
         await alice.signer.sign(transactionMintCarol);
 
         // Broadcast & execute
-        await transactionDeploy.send(devnet);
-        await transactionMintBob.send(devnet);
-        await transactionMintCarol.send(devnet);
+        await transactionDeploy.send(provider);
+        await transactionMintBob.send(provider);
+        await transactionMintCarol.send(provider);
 
-        await transactionDeploy.awaitExecuted(devnet);
-        await transactionMintBob.awaitExecuted(devnet);
-        await transactionMintCarol.awaitExecuted(devnet);
+        await transactionDeploy.awaitExecuted(provider);
+        await transactionMintBob.awaitExecuted(provider);
+        await transactionMintCarol.awaitExecuted(provider);
 
         // Query state, do some assertions
-        let queryResponse = await contract.runQuery(devnet, {
+        let queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("totalSupply")
         });
         assert.equal(10000, decodeUnsignedNumber(queryResponse.outputUntyped()[0]));
 
-        queryResponse = await contract.runQuery(devnet, {
+        queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("balanceOf"),
             args: [new AddressValue(alice.address)]
         });
         assert.equal(7500, decodeUnsignedNumber(queryResponse.outputUntyped()[0]));
 
-        queryResponse = await contract.runQuery(devnet, {
+        queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("balanceOf"),
             args: [new AddressValue(bob.address)]
         });
         assert.equal(1000, decodeUnsignedNumber(queryResponse.outputUntyped()[0]));
 
-        queryResponse = await contract.runQuery(devnet, {
+        queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("balanceOf"),
             args: [new AddressValue(carol.address)]
         });
@@ -223,8 +223,8 @@ describe("test on devnet (local)", function () {
         TransactionWatcher.DefaultPollingInterval = 5000;
         TransactionWatcher.DefaultTimeout = 50000;
 
-        await NetworkConfig.getDefault().sync(devnet);
-        await alice.sync(devnet);
+        await NetworkConfig.getDefault().sync(provider);
+        await alice.sync(provider);
 
         // Deploy
         let contract = new SmartContract({});
@@ -261,21 +261,21 @@ describe("test on devnet (local)", function () {
         await alice.signer.sign(transactionStart);
 
         // Broadcast & execute
-        await transactionDeploy.send(devnet);
-        await transactionStart.send(devnet);
+        await transactionDeploy.send(provider);
+        await transactionStart.send(provider);
 
-        await transactionDeploy.awaitNotarized(devnet);
-        await transactionStart.awaitNotarized(devnet);
+        await transactionDeploy.awaitNotarized(provider);
+        await transactionStart.awaitNotarized(provider);
 
         // Let's check the SCRs
-        let deployResults = (await transactionDeploy.getAsOnNetwork(devnet)).getSmartContractResults();
+        let deployResults = (await transactionDeploy.getAsOnNetwork(provider)).getSmartContractResults();
         deployResults.getImmediate().assertSuccess();
 
-        let startResults = (await transactionStart.getAsOnNetwork(devnet)).getSmartContractResults();
+        let startResults = (await transactionStart.getAsOnNetwork(provider)).getSmartContractResults();
         startResults.getImmediate().assertSuccess();
 
         // Query state, do some assertions
-        let queryResponse = await contract.runQuery(devnet, {
+        let queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("status"),
             args: [
                 BytesValue.fromUTF8("foobar")
@@ -283,7 +283,7 @@ describe("test on devnet (local)", function () {
         });
         assert.equal(decodeUnsignedNumber(queryResponse.outputUntyped()[0]), 1);
 
-        queryResponse = await contract.runQuery(devnet, {
+        queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("status"),
             args: [
                 BytesValue.fromUTF8("missingLottery")

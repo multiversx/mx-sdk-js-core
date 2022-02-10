@@ -4,10 +4,10 @@ import { ContractFunction } from "./function";
 import { SmartContract } from "./smartContract";
 import * as errors from "../errors";
 import { AddressValue } from "./typesystem";
-import { chooseProvider } from "../interactive";
+import { chooseProxyProvider } from "../interactive";
 
 describe("test queries on mainnet", function () {
-    let provider = chooseProvider("elrond-mainnet");
+    let provider = chooseProxyProvider("elrond-mainnet");
     let delegationContract = new SmartContract({ address: new Address("erd1qqqqqqqqqqqqqpgqxwakt2g7u9atsnr03gqcgmhcv38pt7mkd94q6shuwt") });
 
     it("delegation: should getTotalStakeByType", async () => {

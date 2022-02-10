@@ -4,7 +4,7 @@ import * as errors from "./errors";
 import { Logger } from "./logger";
 import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
-import { TransactionHash } from "./transaction";
+import { TransactionHash, TransactionStatus } from "./transaction";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Token } from "./token";
 import { NFTToken } from "./nftToken";
@@ -47,6 +47,15 @@ export class ApiProvider implements IApiProvider {
     async getTransaction(txHash: TransactionHash): Promise<TransactionOnNetwork> {
         return this.doGetGeneric(`transactions/${txHash.toString()}`, (response) =>
             TransactionOnNetwork.fromHttpResponse(response)
+        );
+    }
+
+    /**
+     * Queries the status of a {@link Transaction}.
+     */
+    async getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus> {
+        return this.doGetGeneric(`transactions/${txHash.toString()}?fields=status`, (response) => 
+            new TransactionStatus(response.status)
         );
     }
 

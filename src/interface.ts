@@ -12,11 +12,14 @@ import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Token } from "./token";
 import BigNumber from "bignumber.js";
 
+/**
+ * @deprecated This interface will be removed in a future release, upon merging {@link IProvider} and {@link IApiProvider}.
+ */
 export interface ITransactionFetcher {
     /**
      * Fetches the state of a {@link Transaction}.
      */
-     getTransaction(txHash: TransactionHash, hintSender?: Address, withResults?: boolean): Promise<TransactionOnNetwork>;
+    getTransaction(txHash: TransactionHash, hintSender?: Address, withResults?: boolean): Promise<TransactionOnNetwork>;
 
     /**
      * Queries the status of a {@link Transaction}.

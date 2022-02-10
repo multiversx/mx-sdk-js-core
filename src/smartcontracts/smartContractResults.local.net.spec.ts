@@ -4,10 +4,10 @@ import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction, SmartContract } from ".";
 import { GasLimit } from "../networkParams";
 import { assert } from "chai";
-import { chooseProvider } from "../interactive";
+import { chooseProxyProvider } from "../interactive";
 
 describe("fetch transactions from local testnet", function () {
-    let provider = chooseProvider("local-testnet");;
+    let provider = chooseProxyProvider("local-testnet");;
     let alice: TestWallet;
     before(async function () {
         ({ alice } = await loadTestWallets());

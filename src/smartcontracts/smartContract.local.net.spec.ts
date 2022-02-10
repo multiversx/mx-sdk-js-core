@@ -11,10 +11,10 @@ import { Balance } from "../balance";
 import { AddressValue, BigUIntValue, OptionValue, U32Value } from "./typesystem";
 import { decodeUnsignedNumber } from "./codec";
 import { BytesValue } from "./typesystem/bytes";
-import { chooseProvider } from "../interactive";
+import { chooseProxyProvider } from "../interactive";
 
 describe("test on local testnet", function () {
-    let provider = chooseProvider("local-testnet");
+    let provider = chooseProxyProvider("local-testnet");
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
     before(async function () {
         ({ alice, bob, carol } = await loadTestWallets());

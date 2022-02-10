@@ -1,4 +1,4 @@
-import { IProvider } from "./interface";
+import { IProvider, ITransactionFetcher } from "./interface";
 import { AsyncTimer } from "./asyncTimer";
 import { TransactionHash, TransactionStatus } from "./transaction";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
@@ -18,25 +18,25 @@ export class TransactionWatcher {
     static NoopOnStatusReceived = (_: TransactionStatus) => { };
 
     private readonly hash: TransactionHash;
-    private readonly provider: IProvider;
+    private readonly fetcher: ITransactionFetcher;
     private readonly pollingInterval: number;
     private readonly timeout: number;
 
     /**
      * 
      * @param hash The hash of the transaction to watch
-     * @param provider The provider to query the status from
+     * @param fetcher The transaction fetcher
      * @param pollingInterval The polling interval, in milliseconds
      * @param timeout The timeout, in milliseconds
      */
     constructor(
         hash: TransactionHash,
-        provider: IProvider,
+        fetcher: ITransactionFetcher,
         pollingInterval: number = TransactionWatcher.DefaultPollingInterval,
         timeout: number = TransactionWatcher.DefaultTimeout
     ) {
         this.hash = hash;
-        this.provider = provider;
+        this.fetcher = fetcher;
         this.pollingInterval = pollingInterval;
         this.timeout = timeout;
     }
@@ -60,7 +60,7 @@ export class TransactionWatcher {
      * @param isAwaitedStatus A predicate over the status
      */
     public async awaitStatus(isAwaitedStatus: PredicateIsAwaitedStatus, onStatusReceived: ActionOnStatusReceived): Promise<void> {
-        let doFetch = async () => await this.provider.getTransactionStatus(this.hash);
+        let doFetch = async () => await this.fetcher.getTransactionStatus(this.hash);
         let errorProvider = () => new errors.ErrExpectedTransactionStatusNotReached();
 
         return this.awaitConditionally<TransactionStatus>(
@@ -73,7 +73,7 @@ export class TransactionWatcher {
 
     public async awaitNotarized(): Promise<void> {
         let isNotarized = (data: TransactionOnNetwork) => !data.hyperblockHash.isEmpty();
-        let doFetch = async () => await this.provider.getTransaction(this.hash);
+        let doFetch = async () => await this.fetcher.getTransaction(this.hash);
         let errorProvider = () => new errors.ErrTransactionWatcherTimeout();
 
         return this.awaitConditionally<TransactionOnNetwork>(

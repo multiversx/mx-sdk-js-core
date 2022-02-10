@@ -9,6 +9,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - [Add fromAbiUrl() - paired with fromAbiPath()](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/121).
  - [Redo](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/122) of PR [Better typing for ABI methods](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/61).
  - [For integration tests, resolve ambiguity between devnet & local-testnet](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/124).
+ - [Fix `transaction.getAsOnNetwork()` to work both with `ProxyProvider` and `ApiProvider` (PARTIAL FIX)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/123).
 
 ## [9.0.2]
  - [Fix recursivity issue when mapping types](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/114).

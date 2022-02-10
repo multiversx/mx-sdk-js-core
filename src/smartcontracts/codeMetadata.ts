@@ -77,6 +77,12 @@ export class CodeMetadata {
             payable: this.payable
         };
     }
+
+    equals(other: CodeMetadata): boolean {
+        return this.upgradeable == other.upgradeable &&
+            this.readable == other.readable &&
+            this.payable == other.payable;
+    }
 }
 
 enum ByteZero {

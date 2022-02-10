@@ -1,6 +1,6 @@
 import { ErrInvariantFailed } from "../errors";
 import { loadAbiRegistry } from "../testutils";
-import { guardValueIsSet } from "../utils";
+import { guardValueIsSetWithMessage } from "../utils";
 import { ContractFunction } from "./function";
 import { AbiRegistry, EndpointDefinition } from "./typesystem";
 import { ContractInterface } from "./typesystem/contractInterface";
@@ -13,7 +13,13 @@ export class SmartContractAbi {
     }
 
     static async fromAbiPath(abiPath: string): Promise<SmartContractAbi> {
-        let abiRegistry = await loadAbiRegistry([abiPath]);
+        let abiRegistry = await AbiRegistry.load({ files: [abiPath] });
+        let interfaceNames = abiRegistry.interfaces.map(iface => iface.name);
+        return new SmartContractAbi(abiRegistry, interfaceNames);
+    }
+
+    static async fromAbiUrl(abiUrl: string): Promise<SmartContractAbi> {
+        let abiRegistry = await AbiRegistry.load({ urls: [abiUrl] });
         let interfaceNames = abiRegistry.interfaces.map(iface => iface.name);
         return new SmartContractAbi(abiRegistry, interfaceNames);
     }
@@ -33,7 +39,7 @@ export class SmartContractAbi {
             name = name.name;
         }
         let result = this.getAllEndpoints().find(item => item.name === name);
-        guardValueIsSet("result", result);
+        guardValueIsSetWithMessage(`endpoint [${name}] not found`, result);
         return result!;
     }
 

@@ -182,6 +182,7 @@ In order to run the tests **on NodeJS**, do as follows:
 
 ```
 npm run tests-unit
+npm run tests-localnet
 npm run tests-devnet
 npm run tests-testnet
 npm run tests-mainnet
@@ -203,4 +204,4 @@ make clean && npm run browser-tests
 
 #### Notes
 
-For the `devnet` tests, make sure you have a *devnet* running locally. A local *devnet* can be started from the Elrond IDE or from [erdpy](https://docs.elrond.com/developers/setup-a-local-testnet-erdpy).
+For the `localnet` tests, make sure you have a *local testnet* up & running. A *local testnet* can be started from the Elrond IDE or from [erdpy](https://docs.elrond.com/developers/setup-local-testnet/).

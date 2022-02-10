@@ -12,7 +12,7 @@ export class BooleanBinaryCodec {
     decodeNested(buffer: Buffer): [BooleanValue, number] {
         // We don't check the size of the buffer, we just read the first byte.
 
-        let byte = buffer.readUInt8();
+        let byte = buffer.readUInt8(0);
         return [new BooleanValue(byte == BooleanBinaryCodec.TRUE), 1];
     }
 

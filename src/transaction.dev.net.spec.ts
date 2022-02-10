@@ -13,6 +13,7 @@ describe("test transactions on devnet", function () {
         let apiProvider = chooseApiProvider("elrond-devnet");
 
         let hashes = [
+            new TransactionHash("b41f5fc39e96b1f194d07761c6efd6cb92278b95f5012ab12cbc910058ca8b54"),
             new TransactionHash("7757397a59378e9d0f6d5f08cc934c260e33a50ae0d73fdf869f7c02b6b47b33"),
             new TransactionHash("b87238089e81527158a6daee520280324bc7e5322ba54d1b3c9a5678abe953ea"),
             new TransactionHash("b45dd5e598bc85ba71639f2cbce8c5dff2fbe93159e637852fddeb16c0e84a48"),
@@ -48,6 +49,7 @@ describe("test transactions on devnet", function () {
         let resultingCallsOnAPI: SmartContractResultItem[] = (<any>transactionOnAPI).results.resultingCalls;
         let allContractResults = [immediateContractResultOnAPI].concat(resultingCallsOnAPI).concat(contractResultsOnAPI);
 
+        // Important issue (existing bug)! When working with TransactionOnNetwork objects, SCRs cannot be parsed correctly from API, only from Proxy.
         // On API response, base64 decode "data" from smart contract results:
         for (const item of allContractResults) {
             item.data = Buffer.from(item.data, "base64").toString();

@@ -5,6 +5,9 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
+  - TBD
+
+## [9.0.3]
  - [Extension Provider throw error if tx canceled](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/111).
  - [Add fromAbiUrl() - paired with fromAbiPath()](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/121).
  - [Redo](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/122) of PR [Better typing for ABI methods](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/61).

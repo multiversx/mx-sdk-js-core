@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import { Balance } from "./balance";
-import { Egld } from "./balanceBuilder";
+import { createBalanceBuilder, Egld } from "./balanceBuilder";
+import { Token, TokenType } from "./token";
 
 describe("test balance", () => {
     it("should have desired precision", () => {
@@ -33,5 +34,11 @@ describe("test balance", () => {
         assert.equal(Egld(0.01).toDenominated(), "0.010000000000000000");
         assert.equal(Egld.raw('5000000000000000042').toDenominated(), "5.000000000000000042");
         assert.equal(Egld.raw('1000000000').toDenominated(), "0.000000001000000000");
+    });
+
+    it("test USDT builder", () => {
+        const USDTToken = createBalanceBuilder(new Token({ identifier: "USDT", name: "USDT", decimals: 6, type: TokenType.Fungible }));
+        assert.equal(USDTToken(10).toDenominated(), "10.000000");
+        assert.equal(USDTToken(10).toString(), "10000000");
     });
 });

@@ -5,10 +5,43 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
- - [Fix ExtensionProvider sign/send transaction response] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/72
+ - [Extension Provider throw error if tx canceled](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/111).
+ - [Add fromAbiUrl() - paired with fromAbiPath()](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/121).
+ - [Redo](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/122) of PR [Better typing for ABI methods](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/61).
+ - [For integration tests, resolve ambiguity between devnet & local-testnet](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/124).
+
+## [9.0.2]
+ - [Fix recursivity issue when mapping types](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/114).
+ - Bump version, since previously published `8.0.2-alpha.1` version is picked as `latest` version by npmjs.
+
+## [9.0.1]
+- [Add globals polyfill for Buffer](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/112)
+
+
+## [9.0.0]
+- [Fix smart contract results to align to the new API field namings]
+    - Breaking changes:
+        - `smartContractResults` property in `TransactionOnNetwork` was renamed to `results` as in the new API,
+        affecting `fromHttpResponse` method
+        - `ErrStructTyping` has been removed
+        - `EnumValue.valueOf()` does not return a string (the name of the variant) anymore. It returns a JS object such as `{"name": "name of variant", "fields": { ... }}`
+        - `StructFieldDefinition` has been replaced by `FieldDefinition`, while `StructField` has been replaced by `Field`.
+
+- [Fix ExtensionProvider sign/send transaction response #72](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/72)
     - Provider's send/sign transaction methonds responded with plainObject transactions instead of Transaction
     - Added fromPlainObject method as a static method to transaction
-    - Fixed message signing with extension provider
+ 
+- [Add signAuthToken method to HWProvider #73](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/73) 
+- [Fix for ignored config options in proxyProvider and apiProvider #76](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/76)
+- [Fix wallet logout/login redirect when using form submit](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/85)
+- [Fix ExtensionProvider sign message #86](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/86)
+    - Add address to SignableMessage response
+
+- [Handle extension errors #87](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/87)
+    - Handle erros when sign/send transactions fails on extension side
+- [Handle heterogeneous enums with fields](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/98)
+- [Background communication channel with extension popup](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/103)
+
 
 ## [8.0.0]
 - [ExtensionProvider] https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/66

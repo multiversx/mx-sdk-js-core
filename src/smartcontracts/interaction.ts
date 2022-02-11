@@ -7,10 +7,9 @@ import { QueryResponse } from "./queryResponse";
 import { ContractFunction } from "./function";
 import { Address } from "../address";
 import { SmartContract } from "./smartContract";
-import { EndpointDefinition, TypedValue } from "./typesystem";
+import { BigUIntValue, BytesValue, EndpointDefinition, TypedValue } from "./typesystem";
 import { Nonce } from "../nonce";
 import { ExecutionResultsBundle, QueryResponseBundle } from "./interface";
-import { ErrInvariantFailed } from "../errors";
 
 /**
  * Interactions can be seen as mutable transaction & query builders.
@@ -28,6 +27,11 @@ export class Interaction {
     private nonce: Nonce = new Nonce(0);
     private value: Balance = Balance.Zero();
     private gasLimit: GasLimit = GasLimit.min();
+
+    private isWithSingleESDTTransfer: boolean = false;
+    private singleESDTTransferAmount: Balance = Balance.Zero();
+    private isWithSingleESDTNFTTransfer: boolean = false;
+    private isWithMultiESDTNFTTransfer: boolean = false;
 
     constructor(
         contract: SmartContract,
@@ -68,17 +72,39 @@ export class Interaction {
     }
 
     buildTransaction(): Transaction {
+        let func: ContractFunction = this.executingFunction;
+        let args = this.args;
+
+        if (this.isWithSingleESDTTransfer) {
+            func = new ContractFunction("ESDTTransfer");
+            args = [
+                // The token identifier
+                BytesValue.fromUTF8(this.singleESDTTransferAmount.token.identifier),
+                // The transfered amount
+                new BigUIntValue(this.singleESDTTransferAmount.valueOf()),
+                ...args
+            ];
+        } else if (this.isWithSingleESDTNFTTransfer) {
+            func = new ContractFunction("ESDTNFTTransfer");
+
+            // TBD
+        } else if (this.isWithMultiESDTNFTTransfer) {
+            func = new ContractFunction("MultiESDTNFTTransfer");
+
+            // TBD
+        }
+
         // TODO: create as "deploy" transaction if the function is "init" (or find a better pattern for deployments).
         let transaction = this.contract.call({
-            func: this.executingFunction,
+            func: func,
             // GasLimit will be set using "withGasLimit()".
             gasLimit: this.gasLimit,
-            args: this.args,
+            args: args,
             // Value will be set using "withValue()".
             value: this.value,
             receiver: this.receiver,
         });
-
+        
         transaction.setNonce(this.nonce);
         return transaction;
     }
@@ -124,6 +150,24 @@ export class Interaction {
 
     withValue(value: Balance): Interaction {
         this.value = value;
+        return this;
+    }
+
+    withSingleESDTTransfer(amount: Balance): Interaction {
+        this.isWithSingleESDTTransfer = true;
+        this.singleESDTTransferAmount = amount;
+        return this;
+    }
+
+    withSingleESDTNFTTransfer() {
+        // TBD
+        this.isWithSingleESDTNFTTransfer = true;
+        return this;
+    }
+
+    withMultiESDTNFTTransfer() {
+        // TBD
+        this.isWithMultiESDTNFTTransfer = true;
         return this;
     }
 

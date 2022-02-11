@@ -7,6 +7,7 @@ import { TransactionPayload } from "./transactionPayload";
 import { Hash } from "./hash";
 import { TransactionHash, TransactionStatus } from "./transaction";
 import { SmartContractResults } from "./smartcontracts/smartContractResults";
+import { TransactionLogs } from "./transactionLogs";
 
 /**
  * A plain view of a transaction, as queried from the Network.
@@ -31,6 +32,7 @@ export class TransactionOnNetwork {
 
     private receipt: Receipt = new Receipt();
     private results: SmartContractResults = SmartContractResults.empty();
+    private logs: TransactionLogs = TransactionLogs.empty();
 
     constructor(init?: Partial<TransactionOnNetwork>) {
         Object.assign(this, init);
@@ -52,7 +54,8 @@ export class TransactionOnNetwork {
         hyperblockHash: string,
         receipt: any,
         results: any[],
-        smartContractResults: any[]
+        smartContractResults: any[],
+        logs: any[]
     }): TransactionOnNetwork {
         let transactionOnNetwork = new TransactionOnNetwork();
 
@@ -74,6 +77,7 @@ export class TransactionOnNetwork {
 
         transactionOnNetwork.receipt = Receipt.fromHttpResponse(response.receipt || {});
         transactionOnNetwork.results = SmartContractResults.fromHttpResponse(response.results || response.smartContractResults || []);
+        transactionOnNetwork.logs = TransactionLogs.fromHttpResponse(response.logs || {});
 
         return transactionOnNetwork;
     }
@@ -84,6 +88,10 @@ export class TransactionOnNetwork {
 
     getSmartContractResults(): SmartContractResults {
         return this.results;
+    }
+
+    getLogs(): TransactionLogs {
+        return this.logs;
     }
 }
 

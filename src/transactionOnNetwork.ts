@@ -12,6 +12,7 @@ import { SmartContractResults } from "./smartcontracts/smartContractResults";
  * A plain view of a transaction, as queried from the Network.
  */
 export class TransactionOnNetwork {
+    hash: TransactionHash = new TransactionHash("");
     type: TransactionOnNetworkType = new TransactionOnNetworkType();
     nonce: Nonce = new Nonce(0);
     round: number = 0;
@@ -35,7 +36,7 @@ export class TransactionOnNetwork {
         Object.assign(this, init);
     }
 
-    static fromHttpResponse(response: {
+    static fromHttpResponse(txHash: TransactionHash, response: {
         type: string,
         nonce: number,
         round: number,
@@ -55,6 +56,7 @@ export class TransactionOnNetwork {
     }): TransactionOnNetwork {
         let transactionOnNetwork = new TransactionOnNetwork();
 
+        transactionOnNetwork.hash = txHash;
         transactionOnNetwork.type = new TransactionOnNetworkType(response.type || "");
         transactionOnNetwork.nonce = new Nonce(response.nonce || 0);
         transactionOnNetwork.round = response.round;

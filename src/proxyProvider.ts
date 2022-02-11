@@ -105,7 +105,7 @@ export class ProxyProvider implements IProvider {
             withResults: withResults ? "true" : "",
         });
 
-        return this.doGetGeneric(url, (response) => TransactionOnNetwork.fromHttpResponse(response.transaction));
+        return this.doGetGeneric(url, (response) => TransactionOnNetwork.fromHttpResponse(txHash, response.transaction));
     }
 
     /**

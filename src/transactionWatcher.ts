@@ -104,6 +104,7 @@ export class TransactionWatcher {
         while (!stop) {
             try {
                 fetchedData = await doFetch();
+                Logger.debug("TransactionWatcher.awaitConditionally(): fetched data.")
 
                 if (onFetched) {
                     onFetched(fetchedData);
@@ -113,11 +114,11 @@ export class TransactionWatcher {
                     break;
                 }
             } catch (error) {
+                Logger.info("TransactionWatcher.awaitConditionally(): cannot (yet) fetch data.");
+
                 if (!(error instanceof errors.Err)) {
                     throw error;
                 }
-
-                Logger.info("cannot (yet) fetch data");
             }
 
             await periodicTimer.start(this.pollingInterval);

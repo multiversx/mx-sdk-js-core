@@ -182,6 +182,10 @@ export class Address {
      * Converts the address to a pretty, plain JavaScript object.
      */
     toJSON(): object {
+        if (this.isEmpty()) {
+            return {};
+        }
+
         return {
             bech32: this.bech32(),
             pubkey: this.hex()

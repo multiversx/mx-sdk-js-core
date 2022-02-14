@@ -92,4 +92,20 @@ describe("test abi registry", () => {
         );
         assert.equal(result.valueOf().name, "SendTransferExecute");
     });
+
+    it("binary codec correctly decodes result of farm-staking::stakeFarm()", async () => {
+        let codec = new BinaryCodec();
+        let buffer = Buffer.from("010000000b4641524d2d64653335386100000000000000090000000101", "hex");
+        let registry = await loadAbiRegistry(["src/testdata/farm-staking.abi.json"]);
+        let farm = registry.getInterface("Farm");
+        let stakeFarm = farm.getEndpoint("stakeFarm");
+        let esdtTokenPaymentType = stakeFarm.output[0].type;
+
+        let result = codec.decodeTopLevel(buffer, esdtTokenPaymentType);
+        let esdtTokenPayment = result.valueOf();
+        assert.equal(esdtTokenPayment.token_type.name, "NonFungible");
+        assert.equal(esdtTokenPayment.token_identifier.toString(), "FARM-de358a");
+        assert.equal(esdtTokenPayment.token_nonce, 9);
+        assert.equal(esdtTokenPayment.amount, 1);
+    });
 });

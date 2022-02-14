@@ -82,6 +82,8 @@ export class Interaction {
                 BytesValue.fromUTF8(this.singleESDTTransferAmount.token.identifier),
                 // The transfered amount
                 new BigUIntValue(this.singleESDTTransferAmount.valueOf()),
+                // The actual function to call
+                BytesValue.fromUTF8(this.executingFunction.valueOf()),
                 ...args
             ];
         } else if (this.isWithSingleESDTNFTTransfer) {

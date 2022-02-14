@@ -10,6 +10,7 @@ import { SmartContract } from "./smartContract";
 import { BigUIntValue, BytesValue, EndpointDefinition, TypedValue } from "./typesystem";
 import { Nonce } from "../nonce";
 import { ExecutionResultsBundle, QueryResponseBundle } from "./interface";
+import { ESDT_TRANSFER_FUNCTION_NAME } from "../constants";
 
 /**
  * Interactions can be seen as mutable transaction & query builders.
@@ -76,7 +77,7 @@ export class Interaction {
         let args = this.args;
 
         if (this.isWithSingleESDTTransfer) {
-            func = new ContractFunction("ESDTTransfer");
+            func = new ContractFunction(ESDT_TRANSFER_FUNCTION_NAME);
             args = [
                 // The token identifier
                 BytesValue.fromUTF8(this.singleESDTTransferAmount.token.identifier),

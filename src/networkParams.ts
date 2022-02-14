@@ -91,6 +91,10 @@ export class GasLimit {
         return new GasLimit(value);
     }
 
+    add(other: GasLimit): GasLimit {
+        return new GasLimit(this.value + other.value);
+    }
+
     valueOf(): number {
         return this.value;
     }

@@ -26,7 +26,9 @@ export class TransactionOnNetwork {
     data: TransactionPayload = new TransactionPayload();
     signature: Signature = Signature.empty();
     status: TransactionStatus = TransactionStatus.createUnknown();
+    timestamp: number = 0;
 
+    blockNonce: Nonce = new Nonce(0);
     hyperblockNonce: Nonce = new Nonce(0);
     hyperblockHash: Hash = Hash.empty();
 
@@ -50,6 +52,8 @@ export class TransactionOnNetwork {
         gasLimit: number,
         data: string,
         status: string,
+        timestamp: number,
+        blockNonce: number;
         hyperblockNonce: number,
         hyperblockHash: string,
         receipt: any,
@@ -71,7 +75,9 @@ export class TransactionOnNetwork {
         transactionOnNetwork.gasLimit = new GasLimit(response.gasLimit);
         transactionOnNetwork.data = TransactionPayload.fromEncoded(response.data);
         transactionOnNetwork.status = new TransactionStatus(response.status);
+        transactionOnNetwork.timestamp = response.timestamp || 0;
 
+        transactionOnNetwork.blockNonce = new Nonce(response.blockNonce || 0);
         transactionOnNetwork.hyperblockNonce = new Nonce(response.hyperblockNonce || 0);
         transactionOnNetwork.hyperblockHash = new Hash(response.hyperblockHash);
 

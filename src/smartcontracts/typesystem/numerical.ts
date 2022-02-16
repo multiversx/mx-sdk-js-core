@@ -180,7 +180,3 @@ export class BigIntValue extends NumericalValue {
         super(new BigIntType(), value);
     }
 }
-
-export function createBigNumber(value: string): BigNumber {
-    return new BigNumber(value);
-}

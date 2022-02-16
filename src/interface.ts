@@ -2,7 +2,7 @@ import { Transaction, TransactionHash, TransactionStatus } from "./transaction";
 import { NetworkConfig } from "./networkConfig";
 import { Signature } from "./signature";
 import { Address } from "./address";
-import { AccountOnNetwork } from "./account";
+import { AccountOnNetwork, TokenOfAccountOnNetwork } from "./account";
 import { Query } from "./smartcontracts";
 import { QueryResponse } from "./smartcontracts";
 import { NetworkStake } from "./networkStake";
@@ -49,7 +49,7 @@ export interface IProvider extends ITransactionFetcher {
     /**
      * Fetches the list of ESDT data for all the tokens of an address.
      */
-    getAddressEsdtList(address: Address): Promise<any>;
+    getAddressEsdtList(address: Address): Promise<TokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches the ESDT data for a token of an address.

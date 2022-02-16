@@ -6,7 +6,7 @@ import { Transaction, TransactionHash, TransactionStatus } from "./transaction";
 import { NetworkConfig } from "./networkConfig";
 import { Address } from "./address";
 import * as errors from "./errors";
-import { AccountOnNetwork } from "./account";
+import { AccountOnNetwork, TokenOfAccountOnNetwork } from "./account";
 import { Query } from "./smartcontracts/query";
 import { QueryResponse } from "./smartcontracts/queryResponse";
 import { Logger } from "./logger";
@@ -42,10 +42,11 @@ export class ProxyProvider implements IProvider {
         );
     }
 
-    async getAddressEsdtList(address: Address): Promise<any> {
-        return this.doGetGeneric(`address/${address.bech32()}/esdt`, (response) =>
-            response.esdts
-        );
+    async getAddressEsdtList(address: Address): Promise<TokenOfAccountOnNetwork[]> {
+        let url = `address/${address.bech32()}/esdt`;
+        let raw = await this.doGetGeneric(url, response => response.esdts);
+        let tokens = Object.values(raw).map(item => TokenOfAccountOnNetwork.fromHttpResponse(item));
+        return tokens;
     }
 
     async getAddressEsdt(address: Address, tokenIdentifier: string): Promise<any> {

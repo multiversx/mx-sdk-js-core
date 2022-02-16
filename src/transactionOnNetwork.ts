@@ -88,6 +88,10 @@ export class TransactionOnNetwork {
         return transactionOnNetwork;
     }
 
+    getDateTime(): Date {
+        return new Date(this.timestamp * 1000);
+    }
+
     getReceipt(): Receipt {
         return this.receipt;
     }

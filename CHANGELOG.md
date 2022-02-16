@@ -5,6 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
+  - [Fix constructor of `NumericalValue`](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/128).
   - TBD
 
 ## [9.0.3]

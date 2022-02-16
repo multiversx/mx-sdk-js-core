@@ -14,7 +14,7 @@ describe("test types", () => {
 
     it("for numeric values, should throw error when invalid input", () => {
         assert.throw(() => new U32Value(new BigNumber(-42)), errors.ErrInvalidArgument);
-        assert.throw(() => new NumericalValue(new U16Type(), <any>Number(42)), errors.ErrInvalidArgument);
+        assert.throw(() => new NumericalValue(new U16Type(), <any>{ foobar: 42 }), errors.ErrInvalidArgument);
     });
 
     it("should report type hierarchy", () => {

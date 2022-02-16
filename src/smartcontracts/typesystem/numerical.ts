@@ -90,19 +90,19 @@ export class NumericalValue extends PrimitiveValue {
     readonly sizeInBytes: number | undefined;
     readonly withSign: boolean;
 
-    constructor(type: NumericalType, value: BigNumber) {
+    constructor(type: NumericalType, value: BigNumber.Value) {
         super(type);
         guardType("type", NumericalType, type, false);
 
-        if (!(value instanceof BigNumber)) {
-            throw new errors.ErrInvalidArgument("value", value, "not a big number");
-        }
-
-        this.value = value;
+        this.value = new BigNumber(value);
         this.sizeInBytes = type.sizeInBytes;
         this.withSign = type.withSign;
 
-        if (!this.withSign && value.isNegative()) {
+        if (this.value.isNaN()) {
+            throw new errors.ErrInvalidArgument("value", value, "not a number");
+        }
+
+        if (!this.withSign && this.value.isNegative()) {
             throw new errors.ErrInvalidArgument("value", value.toString(10), "negative, but type is unsigned");
         }
     }
@@ -122,61 +122,61 @@ export class NumericalValue extends PrimitiveValue {
 }
 
 export class U8Value extends NumericalValue {
-    constructor(value: number | BigNumber) {
+    constructor(value: BigNumber.Value) {
         super(new U8Type(), new BigNumber(value));
     }
 }
 
 export class I8Value extends NumericalValue {
-    constructor(value: number | BigNumber) {
+    constructor(value: BigNumber.Value) {
         super(new I8Type(), new BigNumber(value));
     }
 }
 
 export class U16Value extends NumericalValue {
-    constructor(value: number | BigNumber) {
+    constructor(value: BigNumber.Value) {
         super(new U16Type(), new BigNumber(value));
     }
 }
 
 export class I16Value extends NumericalValue {
-    constructor(value: number | BigNumber) {
+    constructor(value: BigNumber.Value) {
         super(new I16Type(), new BigNumber(value));
     }
 }
 
 export class U32Value extends NumericalValue {
-    constructor(value: number | BigNumber) {
+    constructor(value: BigNumber.Value) {
         super(new U32Type(), new BigNumber(value));
     }
 }
 
 export class I32Value extends NumericalValue {
-    constructor(value: number | BigNumber) {
+    constructor(value: BigNumber.Value) {
         super(new I32Type(), new BigNumber(value));
     }
 }
 
 export class U64Value extends NumericalValue {
-    constructor(value: BigNumber) {
+    constructor(value: BigNumber.Value) {
         super(new U64Type(), value);
     }
 }
 
 export class I64Value extends NumericalValue {
-    constructor(value: BigNumber) {
+    constructor(value: BigNumber.Value) {
         super(new I64Type(), value);
     }
 }
 
 export class BigUIntValue extends NumericalValue {
-    constructor(value: BigNumber) {
+    constructor(value: BigNumber.Value) {
         super(new BigUIntType(), value);
     }
 }
 
 export class BigIntValue extends NumericalValue {
-    constructor(value: BigNumber) {
+    constructor(value: BigNumber.Value) {
         super(new BigIntType(), value);
     }
 }

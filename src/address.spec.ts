@@ -19,10 +19,10 @@ describe("test address", () => {
 
     it("should create empty address", async () => {
         let nobody = new Address();
-        
+
         assert.isEmpty(nobody.hex());
         assert.isEmpty(nobody.bech32());
-        assert.deepEqual(nobody.toJSON(), {});
+        assert.deepEqual(nobody.toJSON(), { bech32: "", pubkey: "" });
     });
 
     it("should check equality", () => {

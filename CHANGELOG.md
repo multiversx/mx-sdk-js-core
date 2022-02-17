@@ -6,7 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
   - [Fix constructor of `NumericalValue`](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/128).
-  - TBD
+  - [Sketch logs & events, add extra fields on TransactionOnNetwork, define TokenOfAccountOnNetwork](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/129).
 
 ## [9.0.3]
  - [Extension Provider throw error if tx canceled](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/111).

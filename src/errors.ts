@@ -480,3 +480,12 @@ export class ErrInvalidTxSignReturnValue extends Err {
     super("Invalid response in transaction sign return url");
   }
 }
+
+/**
+ * Signals that a specific transaction event was not found (i.e. in the transaction logs).
+ */
+export class ErrTransactionEventNotFound extends Err {
+  public constructor(identifier: string) {
+    super(`Transaction event with identifier [${identifier}] not found (in logs)`);
+  }
+}

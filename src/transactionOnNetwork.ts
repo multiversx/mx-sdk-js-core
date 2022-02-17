@@ -7,11 +7,13 @@ import { TransactionPayload } from "./transactionPayload";
 import { Hash } from "./hash";
 import { TransactionHash, TransactionStatus } from "./transaction";
 import { SmartContractResults } from "./smartcontracts/smartContractResults";
+import { TransactionLogs } from "./transactionLogs";
 
 /**
  * A plain view of a transaction, as queried from the Network.
  */
 export class TransactionOnNetwork {
+    hash: TransactionHash = new TransactionHash("");
     type: TransactionOnNetworkType = new TransactionOnNetworkType();
     nonce: Nonce = new Nonce(0);
     round: number = 0;
@@ -24,18 +26,21 @@ export class TransactionOnNetwork {
     data: TransactionPayload = new TransactionPayload();
     signature: Signature = Signature.empty();
     status: TransactionStatus = TransactionStatus.createUnknown();
+    timestamp: number = 0;
 
+    blockNonce: Nonce = new Nonce(0);
     hyperblockNonce: Nonce = new Nonce(0);
     hyperblockHash: Hash = Hash.empty();
 
     private receipt: Receipt = new Receipt();
     private results: SmartContractResults = SmartContractResults.empty();
+    private logs: TransactionLogs = TransactionLogs.empty();
 
     constructor(init?: Partial<TransactionOnNetwork>) {
         Object.assign(this, init);
     }
 
-    static fromHttpResponse(response: {
+    static fromHttpResponse(txHash: TransactionHash, response: {
         type: string,
         nonce: number,
         round: number,
@@ -47,14 +52,18 @@ export class TransactionOnNetwork {
         gasLimit: number,
         data: string,
         status: string,
+        timestamp: number,
+        blockNonce: number;
         hyperblockNonce: number,
         hyperblockHash: string,
         receipt: any,
         results: any[],
-        smartContractResults: any[]
+        smartContractResults: any[],
+        logs: any[]
     }): TransactionOnNetwork {
         let transactionOnNetwork = new TransactionOnNetwork();
 
+        transactionOnNetwork.hash = txHash;
         transactionOnNetwork.type = new TransactionOnNetworkType(response.type || "");
         transactionOnNetwork.nonce = new Nonce(response.nonce || 0);
         transactionOnNetwork.round = response.round;
@@ -66,14 +75,21 @@ export class TransactionOnNetwork {
         transactionOnNetwork.gasLimit = new GasLimit(response.gasLimit);
         transactionOnNetwork.data = TransactionPayload.fromEncoded(response.data);
         transactionOnNetwork.status = new TransactionStatus(response.status);
+        transactionOnNetwork.timestamp = response.timestamp || 0;
 
+        transactionOnNetwork.blockNonce = new Nonce(response.blockNonce || 0);
         transactionOnNetwork.hyperblockNonce = new Nonce(response.hyperblockNonce || 0);
         transactionOnNetwork.hyperblockHash = new Hash(response.hyperblockHash);
 
         transactionOnNetwork.receipt = Receipt.fromHttpResponse(response.receipt || {});
         transactionOnNetwork.results = SmartContractResults.fromHttpResponse(response.results || response.smartContractResults || []);
+        transactionOnNetwork.logs = TransactionLogs.fromHttpResponse(response.logs || {});
 
         return transactionOnNetwork;
+    }
+
+    getDateTime(): Date {
+        return new Date(this.timestamp * 1000);
     }
 
     getReceipt(): Receipt {
@@ -82,6 +98,10 @@ export class TransactionOnNetwork {
 
     getSmartContractResults(): SmartContractResults {
         return this.results;
+    }
+
+    getLogs(): TransactionLogs {
+        return this.logs;
     }
 }
 

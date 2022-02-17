@@ -46,7 +46,7 @@ export class ApiProvider implements IApiProvider {
      */
     async getTransaction(txHash: TransactionHash): Promise<TransactionOnNetwork> {
         return this.doGetGeneric(`transactions/${txHash.toString()}`, (response) =>
-            TransactionOnNetwork.fromHttpResponse(response)
+            TransactionOnNetwork.fromHttpResponse(txHash, response)
         );
     }
 

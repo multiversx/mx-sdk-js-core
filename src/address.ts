@@ -119,7 +119,9 @@ export class Address {
      * Returns the hex representation of the address (pubkey)
      */
     hex(): string {
-        this.assertNotEmpty();
+        if (this.isEmpty()) {
+            return "";
+        }
 
         return this.valueHex;
     }
@@ -128,7 +130,9 @@ export class Address {
      * Returns the bech32 representation of the address
      */
     bech32(): string {
-        this.assertNotEmpty();
+        if (this.isEmpty()) {
+            return "";
+        }
 
         let words = bech32.toWords(this.pubkey());
         let address = bech32.encode(HRP, words);
@@ -139,7 +143,9 @@ export class Address {
      * Returns the pubkey as raw bytes (buffer)
      */
     pubkey(): Buffer {
-        this.assertNotEmpty();
+        if (this.isEmpty()) {
+            return Buffer.from([]);
+        }
 
         return Buffer.from(this.valueHex, "hex");
     }
@@ -182,6 +188,10 @@ export class Address {
      * Converts the address to a pretty, plain JavaScript object.
      */
     toJSON(): object {
+        if (this.isEmpty()) {
+            return {};
+        }
+
         return {
             bech32: this.bech32(),
             pubkey: this.hex()

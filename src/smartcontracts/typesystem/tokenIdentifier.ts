@@ -33,4 +33,8 @@ export class TokenIdentifierValue extends PrimitiveValue {
     valueOf(): Buffer {
         return this.value;
     }
+
+    toString(): string {
+        return this.value.toString();
+    }
 }

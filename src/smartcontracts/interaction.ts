@@ -132,6 +132,15 @@ export class Interaction {
         return this;
     }
 
+    withGasLimitComponents(costPerByteOfMovementComponent: number, estimatedExecutionComponent: number): Interaction {
+        let transaction = this.buildTransaction();
+        let dataLength = transaction.getData().length();
+        let movementComponent = costPerByteOfMovementComponent * dataLength;
+        let gasLimit = new GasLimit(movementComponent + estimatedExecutionComponent);
+        
+        return this.withGasLimit(gasLimit);
+    }
+    
     withNonce(nonce: Nonce): Interaction {
         this.nonce = nonce;
         return this;

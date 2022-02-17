@@ -119,6 +119,10 @@ export class NumericalValue extends PrimitiveValue {
     valueOf(): BigNumber {
         return this.value;
     }
+
+    toString(): string {
+        return this.value.toString();
+    }
 }
 
 export class U8Value extends NumericalValue {

@@ -68,6 +68,10 @@ export class Interaction {
         return this.value;
     }
 
+    getSingleESDTTransfer(): Balance {
+        return this.singleESDTTransferAmount;
+    }
+
     getGasLimit(): GasLimit {
         return this.gasLimit;
     }

@@ -36,7 +36,28 @@ describe("test smart contract interactor", function() {
         runner = new DefaultInteractionRunner(checker, alice.signer, provider);
     });
 
-    it("should interact with 'answer'", async function() {
+    it("should set transaction fields", async function () {
+        let contract = new SmartContract({ address: dummyAddress });
+        let dummyFunction = new ContractFunction("dummy");
+        let interaction = new Interaction(contract, dummyFunction, dummyFunction, []);
+
+        let transaction = interaction
+            .withNonce(new Nonce(7))
+            .withValue(Balance.egld(1))
+            .withGasLimitComponents({ estimatedExecutionComponent: 20000000 })
+            .buildTransaction();
+
+        let expectedGasLimit = new GasLimit(50000)
+            .add(new GasLimit("dummy".length * 1500))
+            .add(new GasLimit(20000000));
+
+        assert.deepEqual(transaction.getReceiver(), dummyAddress);
+        assert.deepEqual(transaction.getValue(), Balance.egld(1));
+        assert.deepEqual(transaction.getNonce(), new Nonce(7));
+        assert.deepEqual(transaction.getGasLimit(), expectedGasLimit);
+    });
+
+    it("should interact with 'answer'", async function () {
         setupUnitTestWatcherTimeouts();
 
         let abiRegistry = await loadAbiRegistry(["src/testdata/answer.abi.json"]);

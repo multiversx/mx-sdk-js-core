@@ -10,7 +10,7 @@ import { SmartContract } from "./smartContract";
 import { EndpointDefinition, TypedValue } from "./typesystem";
 import { Nonce } from "../nonce";
 import { ExecutionResultsBundle, QueryResponseBundle } from "./interface";
-import { ErrInvariantFailed } from "../errors";
+import { NetworkConfig } from "../networkConfig";
 
 /**
  * Interactions can be seen as mutable transaction & query builders.
@@ -132,6 +132,19 @@ export class Interaction {
         return this;
     }
 
+    withGasLimitComponents(args: {minGasLimit?:number, gasPerDataByte?: number, estimatedExecutionComponent: number }): Interaction {
+        let minGasLimit = args.minGasLimit || NetworkConfig.getDefault().MinGasLimit.valueOf();
+        let gasPerDataByte = args.gasPerDataByte || NetworkConfig.getDefault().GasPerDataByte;
+
+        let transaction = this.buildTransaction();
+        let dataLength = transaction.getData().length();
+        let movementComponent = new GasLimit(minGasLimit + gasPerDataByte * dataLength);
+        let executionComponent = new GasLimit(args.estimatedExecutionComponent);
+        let gasLimit = movementComponent.add(executionComponent);
+        
+        return this.withGasLimit(gasLimit);
+    }
+    
     withNonce(nonce: Nonce): Interaction {
         this.nonce = nonce;
         return this;

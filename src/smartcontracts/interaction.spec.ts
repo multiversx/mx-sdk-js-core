@@ -24,6 +24,8 @@ import { ReturnCode } from "./returnCode";
 import { Balance } from "../balance";
 import BigNumber from "bignumber.js";
 import { BytesValue } from "./typesystem/bytes";
+import { Token, TokenType } from "../token";
+import { createBalanceBuilder } from "../balanceBuilder";
 
 describe("test smart contract interactor", function() {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");
@@ -55,6 +57,59 @@ describe("test smart contract interactor", function() {
         assert.deepEqual(transaction.getValue(), Balance.egld(1));
         assert.deepEqual(transaction.getNonce(), new Nonce(7));
         assert.deepEqual(transaction.getGasLimit(), expectedGasLimit);
+    });
+
+    it("should set transfers (payments) on contract calls (transfer and execute)", async function () {
+        let contract = new SmartContract({ address: dummyAddress });
+        let dummyFunction = new ContractFunction("dummy");
+        let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        
+        const TokenFoo = createBalanceBuilder(new Token({ identifier: "FOO-6ce17b", decimals: 0, type: TokenType.Fungible }));
+        const TokenBar = createBalanceBuilder(new Token({ identifier: "BAR-5bc08f", decimals: 3, type: TokenType.Fungible }));
+        const LKMEX = createBalanceBuilder(new Token({ identifier: "LKMEX-aab910", decimals: 18, type: TokenType.Semifungible }));
+        const Strămoși = createBalanceBuilder(new Token({ identifier: "MOS-b9b4b2", decimals: 0, type: TokenType.Nonfungible }));
+
+        const hexFoo = "464f4f2d366365313762";
+        const hexBar = "4241522d356263303866";
+        const hexLKMEX = "4c4b4d45582d616162393130";
+        const hexStrămoși = "4d4f532d623962346232";
+        const hexContractAddress = contract.getAddress().hex();
+        const hexDummyFunction = "64756d6d79";
+
+        // ESDT, single
+        let transaction = new Interaction(contract, dummyFunction, dummyFunction, [])
+            .withSingleESDTTransfer(TokenFoo("10"))
+            .buildTransaction();
+
+        assert.equal(transaction.getData().toString(), `ESDTTransfer@${hexFoo}@0a@${hexDummyFunction}`);
+
+        // Meta ESDT (special SFT), single
+        transaction = new Interaction(contract, dummyFunction, dummyFunction, [])
+            .withSingleESDTNFTTransfer(LKMEX.nonce(123456).value(123.456), alice)
+            .buildTransaction();
+
+        assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`);
+
+        // NFT, single
+        transaction = new Interaction(contract, dummyFunction, dummyFunction, [])
+            .withSingleESDTNFTTransfer(Strămoși.nonce(1).one(), alice)
+            .buildTransaction();
+
+        assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexStrămoși}@01@01@${hexContractAddress}@${hexDummyFunction}`);
+
+        // ESDT, multiple
+        transaction = new Interaction(contract, dummyFunction, dummyFunction, [])
+            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)], alice)
+            .buildTransaction();
+
+        assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexFoo}@@03@${hexBar}@@0c44@${hexDummyFunction}`);
+
+        // NFT, multiple
+        transaction = new Interaction(contract, dummyFunction, dummyFunction, [])
+            .withMultiESDTNFTTransfer([Strămoși.nonce(1).one(), Strămoși.nonce(42).one()], alice)
+            .buildTransaction();
+        
+        assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexStrămoși}@01@01@${hexStrămoși}@2a@01@${hexDummyFunction}`);
     });
 
     it("should interact with 'answer'", async function () {

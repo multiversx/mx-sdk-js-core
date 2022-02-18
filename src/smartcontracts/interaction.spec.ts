@@ -67,7 +67,7 @@ describe("test smart contract interactor", function() {
         const TokenFoo = createBalanceBuilder(new Token({ identifier: "FOO-6ce17b", decimals: 0, type: TokenType.Fungible }));
         const TokenBar = createBalanceBuilder(new Token({ identifier: "BAR-5bc08f", decimals: 3, type: TokenType.Fungible }));
         const LKMEX = createBalanceBuilder(new Token({ identifier: "LKMEX-aab910", decimals: 18, type: TokenType.Semifungible }));
-        const Strămoș = createBalanceBuilder(new Token({ identifier: "MOS-b9b4b2", decimals: 0, type: TokenType.Nonfungible }));
+        const Strămoși = createBalanceBuilder(new Token({ identifier: "MOS-b9b4b2", decimals: 0, type: TokenType.Nonfungible }));
 
         // ESDT, single
         let transaction = new Interaction(contract, dummyFunction, dummyFunction, [])
@@ -85,15 +85,24 @@ describe("test smart contract interactor", function() {
 
         // NFT, single
         transaction = new Interaction(contract, dummyFunction, dummyFunction, [])
-            .withSingleESDTNFTTransfer(Strămoș.nonce(1).one(), alice)
+            .withSingleESDTNFTTransfer(Strămoși.nonce(1).one(), alice)
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@4d4f532d623962346232@01@01@${contract.getAddress().hex()}@64756d6d79`);
 
         // ESDT, multiple
         transaction = new Interaction(contract, dummyFunction, dummyFunction, [])
-            .withMultiESDTNFTTransfer()
+            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)], alice)
             .buildTransaction();
+
+        assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${contract.getAddress().hex()}@02@464f4f2d366365313762@@03@4241522d356263303866@@0c44@64756d6d79`);
+
+        // NFT, multiple
+        transaction = new Interaction(contract, dummyFunction, dummyFunction, [])
+            .withMultiESDTNFTTransfer([Strămoși.nonce(1).one(), Strămoși.nonce(42).one()], alice)
+            .buildTransaction();
+        
+        assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${contract.getAddress().hex()}@02@4d4f532d623962346232@01@01@4d4f532d623962346232@2a@01@64756d6d79`);
     });
 
     it("should interact with 'answer'", async function () {

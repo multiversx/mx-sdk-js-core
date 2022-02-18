@@ -7,7 +7,7 @@ import { QueryResponse } from "./queryResponse";
 import { ContractFunction } from "./function";
 import { Address } from "../address";
 import { SmartContract } from "./smartContract";
-import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value } from "./typesystem";
+import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
 import { Nonce } from "../nonce";
 import { ExecutionResultsBundle, QueryResponseBundle } from "./interface";
 import { NetworkConfig } from "../networkConfig";
@@ -31,13 +31,11 @@ export class Interaction {
     private gasLimit: GasLimit = GasLimit.min();
 
     private isWithSingleESDTTransfer: boolean = false;
-    private singleESDTTransferAmount: Balance = Balance.Zero();
-
     private isWithSingleESDTNFTTransfer: boolean = false;
-    private singleESDTNFTTransferAmount: Balance = Balance.Zero();
-    private singleESDTNFTTransferSender: Address = new Address();
-
     private isWithMultiESDTNFTTransfer: boolean = false;
+
+    private tokenTransfers: Balance[] = []
+    private tokenTransfersSender: Address = new Address();
 
     constructor(
         contract: SmartContract,
@@ -73,8 +71,8 @@ export class Interaction {
         return this.value;
     }
 
-    getSingleESDTTransfer(): Balance {
-        return this.singleESDTTransferAmount;
+    getESDTNFTTransfers(): Balance[] {
+        return this.tokenTransfers;
     }
 
     getGasLimit(): GasLimit {
@@ -87,40 +85,66 @@ export class Interaction {
         let args = this.args;
 
         if (this.isWithSingleESDTTransfer) {
+            let singleTransfer = this.tokenTransfers[0];
+
             func = new ContractFunction(ESDT_TRANSFER_FUNCTION_NAME);
             args = [
                 // The token identifier
-                BytesValue.fromUTF8(this.singleESDTTransferAmount.token.identifier),
+                BytesValue.fromUTF8(singleTransfer.token.identifier),
                 // The transfered amount
-                new BigUIntValue(this.singleESDTTransferAmount.valueOf()),
+                new BigUIntValue(singleTransfer.valueOf()),
                 // The actual function to call
                 BytesValue.fromUTF8(this.executingFunction.valueOf()),
-                ...args
+                ...this.args
             ];
         } else if (this.isWithSingleESDTNFTTransfer) {
+            let singleTransfer = this.tokenTransfers[0];
+
             // For NFT, SFT and MetaESDT, transaction.sender == transaction.receiver.
-            receiver = this.singleESDTNFTTransferSender
+            receiver = this.tokenTransfersSender;
             func = new ContractFunction("ESDTNFTTransfer");
             args = [
                 // The token identifier
                 // Important: for NFTs, this has to be the "collection" name, actually.
                 // We will reconsider adding the field "collection" on "Token" upon merging "ApiProvider" and "ProxyProvider".
-                BytesValue.fromUTF8(this.singleESDTNFTTransferAmount.token.identifier),
+                BytesValue.fromUTF8(singleTransfer.token.identifier),
                 // The token nonce (creation nonce)
-                new U64Value(this.singleESDTNFTTransferAmount.getNonce()),
+                new U64Value(singleTransfer.getNonce()),
                 // The transfered amount (quantity)
                 // For NFTs, this will be 1.
-                new BigUIntValue(this.singleESDTNFTTransferAmount.valueOf()),
+                new BigUIntValue(singleTransfer.valueOf()),
                 // The actual receiver of the token(s): the contract
                 new AddressValue(this.contract.getAddress()),
                 // The actual function to call
                 BytesValue.fromUTF8(this.executingFunction.valueOf()),
-                ...args
+                ...this.args
             ];
         } else if (this.isWithMultiESDTNFTTransfer) {
+            // For NFT, SFT and MetaESDT, transaction.sender == transaction.receiver.
+            receiver = this.tokenTransfersSender;
             func = new ContractFunction("MultiESDTNFTTransfer");
+            args = [
+                // The actual receiver of the token(s): the contract
+                new AddressValue(this.contract.getAddress()),
+                // Number of transfers
+                new U8Value(this.tokenTransfers.length),
+            ];
 
-            // TBD
+            for (const transfer of this.tokenTransfers) {
+                // The token identifier
+                // Important: for NFTs, this has to be the "collection" name, actually.
+                // We will reconsider adding the field "collection" on "Token" upon merging "ApiProvider" and "ProxyProvider".
+                args.push(BytesValue.fromUTF8(transfer.token.identifier));
+                // The token nonce (creation nonce)
+                args.push(new U64Value(transfer.getNonce()));
+                // The transfered amount (quantity)
+                // For NFTs, this will be 1.
+                args.push(new BigUIntValue(transfer.valueOf()));
+            }
+
+            // The actual function to call
+            args.push(BytesValue.fromUTF8(this.executingFunction.valueOf()));
+            args.push(...this.args);
         }
 
         // TODO: create as "deploy" transaction if the function is "init" (or find a better pattern for deployments).
@@ -184,20 +208,21 @@ export class Interaction {
 
     withSingleESDTTransfer(amount: Balance): Interaction {
         this.isWithSingleESDTTransfer = true;
-        this.singleESDTTransferAmount = amount;
+        this.tokenTransfers = [amount];
         return this;
     }
 
     withSingleESDTNFTTransfer(amount: Balance, sender: Address) {
         this.isWithSingleESDTNFTTransfer = true;
-        this.singleESDTNFTTransferAmount = amount;
-        this.singleESDTNFTTransferSender = sender;
+        this.tokenTransfers = [amount];
+        this.tokenTransfersSender = sender;
         return this;
     }
 
-    withMultiESDTNFTTransfer() {
-        // TBD
+    withMultiESDTNFTTransfer(amounts: Balance[], sender: Address) {
         this.isWithMultiESDTNFTTransfer = true;
+        this.tokenTransfers = amounts;
+        this.tokenTransfersSender = sender;
         return this;
     }
 

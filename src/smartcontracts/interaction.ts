@@ -158,22 +158,22 @@ export class Interaction {
         return this;
     }
 
-    withSingleESDTTransfer(amount: Balance): Interaction {
+    withSingleESDTTransfer(transfer: Balance): Interaction {
         this.isWithSingleESDTTransfer = true;
-        this.tokenTransfers = new TokenTransfersWithinInteraction([amount], this);
+        this.tokenTransfers = new TokenTransfersWithinInteraction([transfer], this);
         return this;
     }
 
-    withSingleESDTNFTTransfer(amount: Balance, sender: Address) {
+    withSingleESDTNFTTransfer(transfer: Balance, sender: Address) {
         this.isWithSingleESDTNFTTransfer = true;
-        this.tokenTransfers = new TokenTransfersWithinInteraction([amount], this);
+        this.tokenTransfers = new TokenTransfersWithinInteraction([transfer], this);
         this.tokenTransfersSender = sender;
         return this;
     }
 
-    withMultiESDTNFTTransfer(amounts: Balance[], sender: Address) {
+    withMultiESDTNFTTransfer(transfers: Balance[], sender: Address) {
         this.isWithMultiESDTNFTTransfer = true;
-        this.tokenTransfers = new TokenTransfersWithinInteraction(amounts, this);
+        this.tokenTransfers = new TokenTransfersWithinInteraction(transfers, this);
         this.tokenTransfersSender = sender;
         return this;
     }
@@ -231,8 +231,8 @@ class TokenTransfersWithinInteraction {
     private readonly transfers: Balance[];
     private readonly interaction: Interaction;
 
-    constructor(amounts: Balance[], interaction: Interaction) {
-        this.transfers = amounts;
+    constructor(transfers: Balance[], interaction: Interaction) {
+        this.transfers = transfers;
         this.interaction = interaction;
     }
 
@@ -265,10 +265,10 @@ class TokenTransfersWithinInteraction {
     }
 
     buildArgsForMultiESDTNFTTransfer(): TypedValue[] {
-        let result: TypedValue[] = [
-            this.getTypedTokensReceiver(),
-            this.getTypedNumberOfTransfers()
-        ];
+        let result: TypedValue[] = [];
+
+        result.push(this.getTypedTokensReceiver());
+        result.push(this.getTypedNumberOfTransfers());
 
         for (const transfer of this.transfers) {
             result.push(this.getTypedTokenIdentifier(transfer));
@@ -311,7 +311,7 @@ class TokenTransfersWithinInteraction {
         return BytesValue.fromUTF8(this.interaction.getExecutingFunction().valueOf())
     }
 
-    private getInteractionArguments() {
+    private getInteractionArguments(): TypedValue[] {
         return this.interaction.getArguments();
     }
 }

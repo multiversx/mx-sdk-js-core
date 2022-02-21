@@ -44,12 +44,12 @@ export interface INetworkProvider {
     /**
      * Fetches data about the fungible tokens held by an account.
      */
-    getFungibleTokensOfAccount(address: Address): Promise<IFungibleTokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: Address, pagination?: Pagination): Promise<IFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
-    getNonFungibleTokensOfAccount(address: Address): Promise<INonFungibleTokenOfAccountOnNetwork[]>;
+    getNonFungibleTokensOfAccount(address: Address, pagination?: Pagination): Promise<INonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about a specific fungible token held by an account.
@@ -59,7 +59,7 @@ export interface INetworkProvider {
     /**
      * Fetches data about a specific non-fungible token (instance) held by an account.
      */
-    getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<IFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<INonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches the state of a {@link Transaction}.
@@ -133,4 +133,13 @@ export interface INonFungibleTokenOfAccountOnNetwork {
     nonce: Nonce;
     creator: Address;
     royalties: BigNumber;
+}
+
+export class Pagination {
+    from: number = 0;
+    size: number = 100;
+
+    static default(): Pagination {
+        return { from: 0, size: 100 };
+    }
 }

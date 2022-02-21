@@ -4,7 +4,7 @@ import { AccountOnNetwork } from "../account";
 import { Address } from "../address";
 import { defaultConfig } from "../constants";
 import { ErrApiProviderGet, ErrContractQuery } from "../errors";
-import { INetworkProvider } from "../interface.networkProvider";
+import { IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, Pagination } from "../interface.networkProvider";
 import { Logger } from "../logger";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";
@@ -19,9 +19,6 @@ import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 
-/**
- * This is a temporary change, this will be the only provider used, ProxyProvider will be deprecated
- */
 export class ApiNetworkProvider implements INetworkProvider {
     private url: string;
     private config: AxiosRequestConfig;
@@ -64,29 +61,37 @@ export class ApiNetworkProvider implements INetworkProvider {
         return account;
     }
 
-    async getFungibleTokensOfAccount(address: Address): Promise<FungibleTokenOfAccountOnNetwork[]> {
-        let url = `accounts/${address.bech32()}/tokens`;
+    async getFungibleTokensOfAccount(address: Address, pagination?: Pagination): Promise<IFungibleTokenOfAccountOnNetwork[]> {
+        pagination = pagination || Pagination.default();
+
+        let url = `accounts/${address.bech32()}/tokens?${this.buildPaginationParams(pagination)}`;
         let response: any[] = await this.doGetGeneric(url);
         let tokens = response.map(item => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
+
+        // TODO: Fix sorting
         tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(address: Address): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
-        let url = `accounts/${address.bech32()}/nfts`;
+    async getNonFungibleTokensOfAccount(address: Address, pagination?: Pagination): Promise<INonFungibleTokenOfAccountOnNetwork[]> {
+        pagination = pagination || Pagination.default();
+
+        let url = `accounts/${address.bech32()}/nfts?${this.buildPaginationParams(pagination)}`;
         let response: any[] = await this.doGetGeneric(url);
         let tokens = response.map(item => NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(item));
+        
+        // TODO: Fix sorting
         tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
         return tokens;
     }
 
-    async getFungibleTokenOfAccount(address: Address, tokenIdentifier: string): Promise<any> {
+    async getFungibleTokenOfAccount(address: Address, tokenIdentifier: string): Promise<IFungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`accounts/${address.bech32()}/tokens/${tokenIdentifier}`);
-        let tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response.tokenData);
+        let tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response);
         return tokenData;
     }
 
-    async getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<NonFungibleTokenOfAccountOnNetwork> {
+    async getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<INonFungibleTokenOfAccountOnNetwork> {
         let nonceHex = getHexMagnitudeOfBigInt(new BigNumber(nonce));
         let response = await this.doGetGeneric(`accounts/${address.bech32()}/nfts/${collection}-${nonceHex}`);
         let tokenData = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response.tokenData);
@@ -152,6 +157,10 @@ export class ApiNetworkProvider implements INetworkProvider {
     async doPostGeneric(resourceUrl: string, payload: any): Promise<any> {
         let response = await this.doPost(resourceUrl, payload);
         return response;
+    }
+
+    private buildPaginationParams(pagination: Pagination) {
+        return `from=${pagination.from}&size=${pagination.size}`;
     }
 
     private async doGet(resourceUrl: string): Promise<any> {

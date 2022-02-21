@@ -4,7 +4,7 @@ import { AccountOnNetwork } from "../account";
 import { Address } from "../address";
 import { defaultConfig } from "../constants";
 import { ErrApiProviderGet, ErrContractQuery } from "../errors";
-import { INetworkProvider } from "../interface.networkProvider";
+import { IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, Pagination } from "../interface.networkProvider";
 import { Logger } from "../logger";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";
@@ -16,7 +16,6 @@ import { Token } from "../token";
 import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
-
 
 export class ProxyNetworkProvider implements INetworkProvider {
     private url: string;
@@ -62,35 +61,39 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return account;
     }
 
-    async getFungibleTokensOfAccount(address: Address): Promise<FungibleTokenOfAccountOnNetwork[]> {
+    async getFungibleTokensOfAccount(address: Address, _pagination?: Pagination): Promise<IFungibleTokenOfAccountOnNetwork[]> {
         let url = `address/${address.bech32()}/esdt`;
         let response = await this.doGetGeneric(url);
         let responseItems: any[] = Object.values(response.esdts);
         // Skip NFTs / SFTs.
-        let responseItemsFiltered = responseItems.filter(item => !item.attributes); 
+        let responseItemsFiltered = responseItems.filter(item => !item.nonce);
         let tokens = responseItemsFiltered.map(item => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
+
+        // TODO: Fix sorting
         tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(address: Address): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+    async getNonFungibleTokensOfAccount(address: Address, _pagination?: Pagination): Promise<INonFungibleTokenOfAccountOnNetwork[]> {
         let url = `address/${address.bech32()}/esdt`;
         let response = await this.doGetGeneric(url);
         let responseItems: any[] = Object.values(response.esdts);
         // Skip fungible tokens.
         let responseItemsFiltered = responseItems.filter(item => item.nonce >= 0);
         let tokens = responseItemsFiltered.map(item => NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponse(item));
+
+        // TODO: Fix sorting
         tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
         return tokens;
     }
 
-    async getFungibleTokenOfAccount(address: Address, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
+    async getFungibleTokenOfAccount(address: Address, tokenIdentifier: string): Promise<IFungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`address/${address.bech32()}/esdt/${tokenIdentifier}`);
         let tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response.tokenData);
         return tokenData;
     }
 
-    async getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<NonFungibleTokenOfAccountOnNetwork> {
+    async getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<INonFungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`address/${address.bech32()}/nft/${collection}/nonce/${nonce}`);
         let tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponse(response.tokenData);
         return tokenData;

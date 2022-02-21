@@ -121,9 +121,14 @@ export class ExtensionProvider implements IDappProvider {
       from: this.account.address,
       transactions: transactions,
     });
-    txResponse = txResponse.map((transaction: any) =>
-      Transaction.fromPlainObject(transaction)
-    );
+    try {
+      txResponse = txResponse.map((transaction: any) =>
+        Transaction.fromPlainObject(transaction)
+      );
+    } catch (error) {
+      throw new Error("Transaction canceled.");
+    }
+
     return txResponse;
   }
 

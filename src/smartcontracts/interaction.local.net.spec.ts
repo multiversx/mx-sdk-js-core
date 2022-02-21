@@ -12,12 +12,12 @@ import { Balance } from "../balance";
 import BigNumber from "bignumber.js";
 import { NetworkConfig } from "../networkConfig";
 import { BytesValue } from "./typesystem/bytes";
-import { chooseProvider } from "../interactive";
+import { chooseProxyProvider } from "../interactive";
 
 
 describe("test smart contract interactor", function () {
     let checker = new StrictChecker();
-    let provider = chooseProvider("local-testnet");
+    let provider = chooseProxyProvider("local-testnet");
     let alice: TestWallet;
     let runner: DefaultInteractionRunner;
     before(async function () {

@@ -30,4 +30,5 @@ export * from "./nullSigner";
 
 export * from "./smartcontracts";
 
+export * from "./networkProvider";
 export * from "./dapp";

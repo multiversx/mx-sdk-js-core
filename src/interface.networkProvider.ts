@@ -1,5 +1,6 @@
 import { BigNumber } from "bignumber.js";
-import { AccountOnNetwork, TokenOfAccountOnNetwork } from "./account";
+import { Nonce } from ".";
+import { AccountOnNetwork } from "./account";
 import { Address } from "./address";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
@@ -26,18 +27,14 @@ export interface INetworkProvider {
     getNetworkStatus(): Promise<NetworkStatus>;
 
     /**
-     * Fetches the Network Stake.
-     * 
-     * TODO: Rename to "GetNetworkStakeStatistics" (not renamed yet in order to preserve interface compatibility).
+     * Fetches stake statistics.
      */
-    getNetworkStake(): Promise<NetworkStake>;
+    getNetworkStakeStatistics(): Promise<NetworkStake>;
 
     /**
-     * Fetches the Network Stats.
-     * 
-     * TODO: Rename to "GetNetworkGeneralStatistics" (not renamed yet in order to preserve interface compatibility).
+     * Fetches general statistics.
      */
-    getNetworkStats(): Promise<Stats>;
+    getNetworkGeneralStatistics(): Promise<Stats>;
 
     /**
      * Fetches the state of an {@link Account}.
@@ -45,28 +42,24 @@ export interface INetworkProvider {
     getAccount(address: Address): Promise<AccountOnNetwork>;
 
     /**
-     * Fetches all the tokens (fungible, SFT, NFT) of an account. It does NOT return the definition of tokens.
-     * It returns token balance and token instance properties.
-     * 
-     * TODO: Rename to "GetTokensOfAccount" (not renamed yet in order to preserve interface compatibility).
+     * Fetches data about the fungible tokens held by an account.
      */
-    getAddressEsdtList(address: Address): Promise<TokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: Address): Promise<IFungibleTokenOfAccountOnNetwork[]>;
 
     /**
-     * Fetches information about a fungible token of an account.
-     * 
-     * TODO: Return explicit type.
-     * TODO: Rename to "GetFungibleTokenOfAccount" (not renamed yet in order to preserve interface compatibility).
+     * Fetches data about the non-fungible tokens held by account.
      */
-    getAddressEsdt(address: Address, tokenIdentifier: string): Promise<any>;
+    getNonFungibleTokensOfAccount(address: Address): Promise<INonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
-     * Fetches information about a specific token (instance) of an account (works for SFT, Meta ESDT, NFT).
-     *
-     * TODO: Return explicit type.
-     * TODO: Rename to "GetTokenInstanceOfAccount" (not renamed yet in order to preserve interface compatibility).
+     * Fetches data about a specific fungible token held by an account.
      */
-    getAddressNft(address: Address, collection: string, nonce: BigNumber.Value): Promise<any>;
+    getFungibleTokenOfAccount(address: Address, tokenIdentifier: string): Promise<IFungibleTokenOfAccountOnNetwork>;
+
+    /**
+     * Fetches data about a specific non-fungible token (instance) held by an account.
+     */
+    getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<IFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches the state of a {@link Transaction}.
@@ -125,4 +118,19 @@ export interface INetworkProvider {
      * Performs a generic POST action against the provider (useful for new HTTP endpoints, not yet supported by erdjs).
      */
     doPostGeneric(resourceUrl: string, payload: any): Promise<any>;
+}
+
+
+export interface IFungibleTokenOfAccountOnNetwork {
+    tokenIdentifier: string;
+    balance: BigNumber;
+}
+
+export interface INonFungibleTokenOfAccountOnNetwork {
+    tokenIdentifier: string;
+    attributes: Buffer;
+    balance: BigNumber;
+    nonce: Nonce;
+    creator: Address;
+    royalties: BigNumber;
 }

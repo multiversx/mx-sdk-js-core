@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { BigNumber } from "bignumber.js";
-import { AccountOnNetwork, TokenOfAccountOnNetwork } from "../account";
+import { AccountOnNetwork } from "../account";
 import { Address } from "../address";
 import { defaultConfig } from "../constants";
 import { ErrApiProviderGet, ErrContractQuery } from "../errors";
@@ -15,6 +15,7 @@ import { Stats } from "../stats";
 import { Token } from "../token";
 import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 
 
 export class ProxyNetworkProvider implements INetworkProvider {
@@ -43,13 +44,13 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return networkStatus;
     }
 
-    async getNetworkStake(): Promise<NetworkStake> {
+    async getNetworkStakeStatistics(): Promise<NetworkStake> {
         // TODO: Implement wrt.:
         // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/stake/stake.service.ts
         throw new Error("Method not implemented.");
     }
 
-    async getNetworkStats(): Promise<Stats> {
+    async getNetworkGeneralStatistics(): Promise<Stats> {
         // TODO: Implement wrt. (full implementation may not be possible):
         // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/network/network.service.ts
         throw new Error("Method not implemented.");
@@ -61,22 +62,37 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return account;
     }
 
-    async getAddressEsdtList(address: Address): Promise<TokenOfAccountOnNetwork[]> {
+    async getFungibleTokensOfAccount(address: Address): Promise<FungibleTokenOfAccountOnNetwork[]> {
         let url = `address/${address.bech32()}/esdt`;
         let response = await this.doGetGeneric(url);
-        let tokens = Object.values(response.esdts).map(item => TokenOfAccountOnNetwork.fromHttpResponse(item));
+        let responseItems: any[] = Object.values(response.esdts);
+        // Skip NFTs / SFTs.
+        let responseItemsFiltered = responseItems.filter(item => !item.attributes); 
+        let tokens = responseItemsFiltered.map(item => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
+        tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
         return tokens;
     }
 
-    async getAddressEsdt(address: Address, tokenIdentifier: string): Promise<any> {
+    async getNonFungibleTokensOfAccount(address: Address): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+        let url = `address/${address.bech32()}/esdt`;
+        let response = await this.doGetGeneric(url);
+        let responseItems: any[] = Object.values(response.esdts);
+        // Skip fungible tokens.
+        let responseItemsFiltered = responseItems.filter(item => item.nonce >= 0);
+        let tokens = responseItemsFiltered.map(item => NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponse(item));
+        tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
+        return tokens;
+    }
+
+    async getFungibleTokenOfAccount(address: Address, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`address/${address.bech32()}/esdt/${tokenIdentifier}`);
-        let tokenData = response.tokenData;
+        let tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response.tokenData);
         return tokenData;
     }
 
-    async getAddressNft(address: Address, collection: string, nonce: BigNumber.Value): Promise<any> {
+    async getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<NonFungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`address/${address.bech32()}/nft/${collection}/nonce/${nonce}`);
-        let tokenData = response.tokenData;
+        let tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponse(response.tokenData);
         return tokenData;
     }
 

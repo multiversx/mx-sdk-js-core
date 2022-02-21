@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { BigNumber } from "bignumber.js";
-import { AccountOnNetwork, TokenOfAccountOnNetwork } from "../account";
+import { AccountOnNetwork } from "../account";
 import { Address } from "../address";
 import { defaultConfig } from "../constants";
 import { ErrApiProviderGet, ErrContractQuery } from "../errors";
@@ -17,6 +17,7 @@ import { Token } from "../token";
 import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
+import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 
 /**
  * This is a temporary change, this will be the only provider used, ProxyProvider will be deprecated
@@ -45,13 +46,13 @@ export class ApiNetworkProvider implements INetworkProvider {
         return await this.backingProxyNetworkProvider.getNetworkStatus();
     }
 
-    async getNetworkStake(): Promise<NetworkStake> {
+    async getNetworkStakeStatistics(): Promise<NetworkStake> {
         let response = await this.doGetGeneric("stake");
         let networkStake = NetworkStake.fromHttpResponse(response)
         return networkStake;
     }
 
-    async getNetworkStats(): Promise<Stats> {
+    async getNetworkGeneralStatistics(): Promise<Stats> {
         let response = await this.doGetGeneric("stats");
         let stats = Stats.fromHttpResponse(response)
         return stats;
@@ -63,23 +64,32 @@ export class ApiNetworkProvider implements INetworkProvider {
         return account;
     }
 
-    async getAddressEsdtList(address: Address): Promise<TokenOfAccountOnNetwork[]> {
+    async getFungibleTokensOfAccount(address: Address): Promise<FungibleTokenOfAccountOnNetwork[]> {
         let url = `accounts/${address.bech32()}/tokens`;
         let response: any[] = await this.doGetGeneric(url);
-        let tokens = response.map(item => TokenOfAccountOnNetwork.fromHttpResponse(item));
+        let tokens = response.map(item => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
+        tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
         return tokens;
     }
 
-    async getAddressEsdt(address: Address, tokenIdentifier: string): Promise<any> {
+    async getNonFungibleTokensOfAccount(address: Address): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+        let url = `accounts/${address.bech32()}/nfts`;
+        let response: any[] = await this.doGetGeneric(url);
+        let tokens = response.map(item => NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(item));
+        tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
+        return tokens;
+    }
+
+    async getFungibleTokenOfAccount(address: Address, tokenIdentifier: string): Promise<any> {
         let response = await this.doGetGeneric(`accounts/${address.bech32()}/tokens/${tokenIdentifier}`);
-        let tokenData = response.tokenData;
+        let tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response.tokenData);
         return tokenData;
     }
 
-    async getAddressNft(address: Address, collection: string, nonce: BigNumber.Value): Promise<any> {
+    async getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<NonFungibleTokenOfAccountOnNetwork> {
         let nonceHex = getHexMagnitudeOfBigInt(new BigNumber(nonce));
         let response = await this.doGetGeneric(`accounts/${address.bech32()}/nfts/${collection}-${nonceHex}`);
-        let tokenData = response.tokenData;
+        let tokenData = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response.tokenData);
         return tokenData;
     }
 

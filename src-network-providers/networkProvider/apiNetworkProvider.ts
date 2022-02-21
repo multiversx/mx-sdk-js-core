@@ -11,130 +11,127 @@ import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
 import { NFTToken } from "../nftToken";
 import { Query, QueryResponse } from "../smartcontracts";
+import { getHexMagnitudeOfBigInt } from "../smartcontracts/codec/utils";
 import { Stats } from "../stats";
 import { Token } from "../token";
 import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 
-
-export class ProxyNetworkProvider implements INetworkProvider {
+/**
+ * This is a temporary change, this will be the only provider used, ProxyProvider will be deprecated
+ */
+export class ApiNetworkProvider implements INetworkProvider {
     private url: string;
     private config: AxiosRequestConfig;
+    private backingProxyNetworkProvider;
 
     /**
-     * Creates a new {@link INetworkProvider} backed by an Elrond Proxy.
-     * @param url the URL of the Elrond Proxy
+     * Creates a new ApiProvider.
+     * @param url the URL of the Elrond Api
      * @param config axios request config options
      */
     constructor(url: string, config?: AxiosRequestConfig) {
         this.url = url;
         this.config = { ...defaultConfig, ...config };
+        this.backingProxyNetworkProvider = new ProxyNetworkProvider(url, config);
     }
 
     async getNetworkConfig(): Promise<NetworkConfig> {
-        let response = await this.doGetGeneric("network/config");
-        let networkConfig = NetworkConfig.fromHttpResponse(response.config);
-        return networkConfig;
+        return await this.backingProxyNetworkProvider.getNetworkConfig();
     }
 
     async getNetworkStatus(): Promise<NetworkStatus> {
-        let response = await this.doGetGeneric("network/status/4294967295");
-        let networkStatus = NetworkStatus.fromHttpResponse(response.status);
-        return networkStatus;
+        return await this.backingProxyNetworkProvider.getNetworkStatus();
     }
 
     async getNetworkStake(): Promise<NetworkStake> {
-        // TODO: Implement wrt.:
-        // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/stake/stake.service.ts
-        throw new Error("Method not implemented.");
+        let response = await this.doGetGeneric("stake");
+        let networkStake = NetworkStake.fromHttpResponse(response)
+        return networkStake;
     }
 
     async getNetworkStats(): Promise<Stats> {
-        // TODO: Implement wrt. (full implementation may not be possible):
-        // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/network/network.service.ts
-        throw new Error("Method not implemented.");
+        let response = await this.doGetGeneric("stats");
+        let stats = Stats.fromHttpResponse(response)
+        return stats;
     }
 
     async getAccount(address: Address): Promise<AccountOnNetwork> {
-        let response = await this.doGetGeneric(`address/${address.bech32()}`);
-        let account = AccountOnNetwork.fromHttpResponse(response.account);
+        let response = await this.doGetGeneric(`accounts/${address.bech32()}`);
+        let account = AccountOnNetwork.fromHttpResponse(response);
         return account;
     }
 
     async getAddressEsdtList(address: Address): Promise<TokenOfAccountOnNetwork[]> {
-        let url = `address/${address.bech32()}/esdt`;
-        let response = await this.doGetGeneric(url);
-        let tokens = Object.values(response.esdts).map(item => TokenOfAccountOnNetwork.fromHttpResponse(item));
+        let url = `accounts/${address.bech32()}/tokens`;
+        let response: any[] = await this.doGetGeneric(url);
+        let tokens = response.map(item => TokenOfAccountOnNetwork.fromHttpResponse(item));
         return tokens;
     }
 
     async getAddressEsdt(address: Address, tokenIdentifier: string): Promise<any> {
-        let response = await this.doGetGeneric(`address/${address.bech32()}/esdt/${tokenIdentifier}`);
+        let response = await this.doGetGeneric(`accounts/${address.bech32()}/tokens/${tokenIdentifier}`);
         let tokenData = response.tokenData;
         return tokenData;
     }
 
     async getAddressNft(address: Address, collection: string, nonce: BigNumber.Value): Promise<any> {
-        let response = await this.doGetGeneric(`address/${address.bech32()}/nft/${collection}/nonce/${nonce}`);
+        let nonceHex = getHexMagnitudeOfBigInt(new BigNumber(nonce));
+        let response = await this.doGetGeneric(`accounts/${address.bech32()}/nfts/${collection}-${nonceHex}`);
         let tokenData = response.tokenData;
         return tokenData;
     }
 
-    async getTransaction(txHash: TransactionHash, hintSender?: Address): Promise<TransactionOnNetwork> {
-        let url = this.buildUrlWithQueryParameters(`transaction/${txHash.toString()}`, {
-            withSender: hintSender ? hintSender.bech32() : "",
-            withResults: "true"
-        });
-
-        let response = await this.doGetGeneric(url);
+    async getTransaction(txHash: TransactionHash): Promise<TransactionOnNetwork> {
+        let response = await this.doGetGeneric(`transactions/${txHash.toString()}`);
         let transaction = TransactionOnNetwork.fromHttpResponse(txHash, response.transaction);
         return transaction;
     }
 
     async getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus> {
-        let response = await this.doGetGeneric(`transaction/${txHash.toString()}/status`);
+        let response = await this.doGetGeneric(`transactions/${txHash.toString()}?fields=status`);
         let status = new TransactionStatus(response.status);
         return status;
     }
 
     async sendTransaction(tx: Transaction): Promise<TransactionHash> {
-        let response = await this.doPostGeneric("transaction/send", tx.toSendable());
+        let response = await this.doPostGeneric("transactions", tx.toSendable());
+        // Also see: https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/transactions/entities/transaction.send.result.ts
         let hash = new TransactionHash(response.txHash);
         return hash;
     }
 
     async simulateTransaction(tx: Transaction): Promise<any> {
-        let response = await this.doPostGeneric("transaction/simulate", tx.toSendable());
-        return response;
+        return await this.backingProxyNetworkProvider.simulateTransaction(tx);
     }
 
     async queryContract(query: Query): Promise<QueryResponse> {
         try {
             let data = query.toHttpRequest();
-            let response = await this.doPostGeneric("vm-values/query", data);
-            let queryResponse = QueryResponse.fromHttpResponse(response.data)
+            let response = await this.doPostGeneric("query", data);
+            let queryResponse = QueryResponse.fromHttpResponse(response)
             return queryResponse;
         } catch (err: any) {
             throw ErrContractQuery.increaseSpecificity(err);
         }
     }
 
-    async getToken(_tokenIdentifier: string): Promise<Token> {
-        // TODO: Implement wrt.:
-        // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/esdt/esdt.service.ts#L221
-        throw new Error("Method not implemented.");
+    async getToken(tokenIdentifier: string): Promise<Token> {
+        let response = await this.doGetGeneric(`tokens/${tokenIdentifier}`);
+        let token = Token.fromHttpResponse(response);
+        return token;
     }
 
-    async getNFTToken(_tokenIdentifier: string): Promise<NFTToken> {
-        // TODO: Implement wrt.:
-        throw new Error("Method not implemented.");
+    async getNFTToken(tokenIdentifier: string): Promise<NFTToken> {
+        let response = await this.doGetGeneric(`nfts/${tokenIdentifier}`);
+        let token = NFTToken.fromHttpResponse(response);
+        return token;
     }
 
-    async getDefinitionOfTokenCollection(_collection: string): Promise<any> {
-        // TODO: Implement wrt.:
-        // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/collections/collection.service.ts
-        // https://docs.elrond.com/developers/esdt-tokens/#get-esdt-token-properties
-        throw new Error("Method not implemented.");
+    async getDefinitionOfTokenCollection(collection: string): Promise<any> {
+        let response = await this.doGetGeneric(`collections/${collection}`);
+        return response;
     }
 
     async doGetGeneric(resourceUrl: string): Promise<any> {
@@ -151,8 +148,8 @@ export class ProxyNetworkProvider implements INetworkProvider {
         try {
             let url = `${this.url}/${resourceUrl}`;
             let response = await axios.get(url, this.config);
-            let payload = response.data.data;
-            return payload;
+
+            return response.data;
         } catch (error) {
             this.handleApiError(error, resourceUrl);
         }
@@ -167,23 +164,11 @@ export class ProxyNetworkProvider implements INetworkProvider {
                     "Content-Type": "application/json",
                 },
             });
-            let responsePayload = response.data.data;
+            let responsePayload = response.data;
             return responsePayload;
         } catch (error) {
             this.handleApiError(error, resourceUrl);
         }
-    }
-
-    private buildUrlWithQueryParameters(endpoint: string, params: Record<string, string>): string {
-        let searchParams = new URLSearchParams();
-
-        for (let [key, value] of Object.entries(params)) {
-            if (value) {
-                searchParams.append(key, value);
-            }
-        }
-
-        return `${endpoint}?${searchParams.toString()}`;
     }
 
     private handleApiError(error: any, resourceUrl: string) {

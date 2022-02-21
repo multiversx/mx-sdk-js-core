@@ -10,6 +10,7 @@ export const ESDTNFT_TRANSFER_FUNCTION_NAME = "ESDTNFTTransfer";
 export const MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME = "MultiESDTNFTTransfer";
 export const ESDT_TRANSFER_VALUE = "0";
 
+// TODO: Rename fo "AxiosDefaultConfig" (less ambiguous).
 export const defaultConfig = {
     timeout: 1000,
     // See: https://github.com/axios/axios/issues/983 regarding transformResponse

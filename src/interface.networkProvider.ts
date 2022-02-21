@@ -4,6 +4,7 @@ import { Address } from "./address";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
+import { NFTToken } from "./nftToken";
 import { Query, QueryResponse } from "./smartcontracts";
 import { Stats } from "./stats";
 import { Token } from "./token";
@@ -23,6 +24,20 @@ export interface INetworkProvider {
      * Fetches the Network status.
      */
     getNetworkStatus(): Promise<NetworkStatus>;
+
+    /**
+     * Fetches the Network Stake.
+     * 
+     * TODO: Rename to "GetNetworkStakeStatistics" (not renamed yet in order to preserve interface compatibility).
+     */
+    getNetworkStake(): Promise<NetworkStake>;
+
+    /**
+     * Fetches the Network Stats.
+     * 
+     * TODO: Rename to "GetNetworkGeneralStatistics" (not renamed yet in order to preserve interface compatibility).
+     */
+    getNetworkStats(): Promise<Stats>;
 
     /**
      * Fetches the state of an {@link Account}.
@@ -51,7 +66,7 @@ export interface INetworkProvider {
      * TODO: Return explicit type.
      * TODO: Rename to "GetTokenInstanceOfAccount" (not renamed yet in order to preserve interface compatibility).
      */
-    getAddressNft(address: Address, tokenIdentifier: string, nonce: BigNumber.Value): Promise<any>;
+    getAddressNft(address: Address, collection: string, nonce: BigNumber.Value): Promise<any>;
 
     /**
      * Fetches the state of a {@link Transaction}.
@@ -81,20 +96,6 @@ export interface INetworkProvider {
     queryContract(query: Query): Promise<QueryResponse>;
 
     /**
-     * Fetches the Network Stake.
-     * 
-     * TODO: Rename to "GetNetworkStakeStatistics" (not renamed yet in order to preserve interface compatibility).
-     */
-    getNetworkStake(): Promise<NetworkStake>;
-
-    /**
-     * Fetches the Network Stats.
-     * 
-     * TODO: Rename to "GetNetworkGeneralStatistics" (not renamed yet in order to preserve interface compatibility).
-     */
-    getNetworkStats(): Promise<Stats>;
-
-    /**
      * Fetches the definition of a fungible token.
      * 
      * TODO: Rename to "GetDefinitionOfFungibleToken" or "GetFungibleTokenDefinition" (not renamed yet in order to preserve interface compatibility).
@@ -103,8 +104,17 @@ export interface INetworkProvider {
 
     /**
      * Fetches the definition of a SFT (including Meta ESDT) or NFT.
+     * 
+     * TODO: Return explicit type.
      */
-    getDefinitionOfTokenCollection(): Promise<any>;
+    getDefinitionOfTokenCollection(collection: string): Promise<any>;
+
+    /**
+     * Fetches an instance of a SFT (including Meta ESDT) or NFT.
+     * 
+     * TODO: Rename to "GetTokenInstance" (not renamed yet in order to preserve interface compatibility).
+     */
+    getNFTToken(tokenIdentifier: string): Promise<NFTToken>;
 
     /**
      * Performs a generic GET action against the provider (useful for new HTTP endpoints, not yet supported by erdjs).

@@ -40,6 +40,20 @@ export class NonFungibleTokenOfAccountOnNetwork implements INonFungibleTokenOfAc
         return result;
     }
 
+    static fromProxyHttpResponseByNonce(payload: any): NonFungibleTokenOfAccountOnNetwork {
+        let result = new NonFungibleTokenOfAccountOnNetwork();
+
+        result.attributes = Buffer.from(payload.attributes || "", "base64");
+        result.balance = new BigNumber(payload.balance || 0);
+        result.nonce = new Nonce(payload.nonce || 0);
+        result.creator = new Address(payload.creator || "");
+        result.royalties = new BigNumber(payload.royalties || 0).div(100);
+        result.tokenIdentifier = `${payload.tokenIdentifier}-${result.nonce.hex()}`;
+        result.collection = payload.tokenIdentifier || "";
+        
+        return result;
+    }
+
     private static parseCollectionFromIdentifier(identifier: string): string {
         let parts = identifier.split("-");
         let collection = parts.slice(0, 2).join("-");
@@ -57,6 +71,11 @@ export class NonFungibleTokenOfAccountOnNetwork implements INonFungibleTokenOfAc
         result.nonce = new Nonce(payload.nonce || 0);
         result.creator = new Address(payload.creator || "");
         result.royalties = new BigNumber(payload.royalties || 0);
+
+        if (!payload.creator) {
+            console.log(payload);
+            throw new Error("??? api");
+        }
 
         return result;
     }

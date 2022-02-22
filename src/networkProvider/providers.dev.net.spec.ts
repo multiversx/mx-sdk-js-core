@@ -8,8 +8,8 @@ import { TransactionHash, TransactionStatus } from "../transaction";
 import { Nonce } from "../nonce";
 
 describe("test network providers on devnet: Proxy and API", function () {
-    let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.elrond.com", { timeout: 5000 });
-    let proxyProvider: INetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.elrond.com", { timeout: 5000 });
+    let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.elrond.com", { timeout: 10000 });
+    let proxyProvider: INetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.elrond.com", { timeout: 10000 });
 
     let alice: TestWallet;
     let bob: TestWallet;
@@ -47,7 +47,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     });
 
     it("should have same response for getAccount()", async function () {
-        for (const user of [alice, bob, carol, dan]) {
+        for (const user of [bob, carol, dan]) {
             let apiResponse = await apiProvider.getAccount(user.address);
             let proxyResponse = await proxyProvider.getAccount(user.address);
             assert.deepEqual(apiResponse, proxyResponse);
@@ -55,23 +55,23 @@ describe("test network providers on devnet: Proxy and API", function () {
     });
 
     it("should have same response for getFungibleTokensOfAccount(), getFungibleTokenOfAccount()", async function () {
-        this.timeout(10000);
+        this.timeout(30000);
 
-        for (const user of [alice, bob, carol, dan]) {
+        for (const user of [carol, dan]) {
             let apiResponse = await apiProvider.getFungibleTokensOfAccount(user.address);
             let proxyResponse = await proxyProvider.getFungibleTokensOfAccount(user.address);
             assert.deepEqual(apiResponse.slice(0, 100), proxyResponse.slice(0, 100));
 
-            // for (const item of apiResponse.slice(0, 5)) {
-            //     let apiResponse = await apiProvider.getFungibleTokenOfAccount(user.address, item.tokenIdentifier);
-            //     let proxyResponse = await proxyProvider.getFungibleTokenOfAccount(user.address, item.tokenIdentifier);
-            //     //assert.deepEqual(apiResponse, proxyResponse, `user: ${user.address.bech32()}, token: ${item.tokenIdentifier}`);
-            // }
+            for (const item of apiResponse.slice(0, 5)) {
+                let apiResponse = await apiProvider.getFungibleTokenOfAccount(user.address, item.tokenIdentifier);
+                let proxyResponse = await proxyProvider.getFungibleTokenOfAccount(user.address, item.tokenIdentifier);
+                assert.deepEqual(apiResponse, proxyResponse, `user: ${user.address.bech32()}, token: ${item.tokenIdentifier}`);
+            }
         }
     });
 
-    it.only("should have same response for getNonFungibleTokensOfAccount(), getNonFungibleTokenOfAccount", async function () {
-        this.timeout(10000);
+    it("should have same response for getNonFungibleTokensOfAccount(), getNonFungibleTokenOfAccount", async function () {
+        this.timeout(30000);
 
         for (const user of [alice, bob, carol, dan]) {
             let apiResponse = await apiProvider.getNonFungibleTokensOfAccount(user.address);

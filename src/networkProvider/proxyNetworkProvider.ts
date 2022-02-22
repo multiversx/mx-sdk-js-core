@@ -94,8 +94,8 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: Nonce): Promise<INonFungibleTokenOfAccountOnNetwork> {
-        let response = await this.doGetGeneric(`address/${address.bech32()}/nft/${collection}/nonce/${nonce.hex()}`);
-        let tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponse(response.tokenData);
+        let response = await this.doGetGeneric(`address/${address.bech32()}/nft/${collection}/nonce/${nonce.valueOf()}`);
+        let tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponseByNonce(response.tokenData);
         return tokenData;
     }
 

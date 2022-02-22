@@ -3,16 +3,14 @@ import { AccountOnNetwork } from "../account";
 import { Address } from "../address";
 import { defaultConfig } from "../constants";
 import { ErrApiProviderGet, ErrContractQuery } from "../errors";
-import { IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, Pagination } from "../interface.networkProvider";
+import { IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, Pagination } from "../interface.networkProvider";
 import { Logger } from "../logger";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
-import { NFTToken } from "../nftToken";
 import { Nonce } from "../nonce";
 import { Query, QueryResponse } from "../smartcontracts";
 import { Stats } from "../stats";
-import { Token } from "../token";
 import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
@@ -70,7 +68,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         let tokens = responseItemsFiltered.map(item => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
 
         // TODO: Fix sorting
-        tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
+        tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
         return tokens;
     }
 
@@ -83,7 +81,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         let tokens = responseItemsFiltered.map(item => NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponse(item));
 
         // TODO: Fix sorting
-        tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
+        tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
         return tokens;
     }
 
@@ -134,21 +132,20 @@ export class ProxyNetworkProvider implements INetworkProvider {
         }
     }
 
-    async getToken(_tokenIdentifier: string): Promise<Token> {
+    async getDefinitionOfFungibleToken(_tokenIdentifier: string): Promise<IDefinitionOfFungibleTokenOnNetwork> {
         // TODO: Implement wrt.:
         // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/esdt/esdt.service.ts#L221
         throw new Error("Method not implemented.");
     }
 
-    async getNFTToken(_tokenIdentifier: string): Promise<NFTToken> {
-        // TODO: Implement wrt.:
-        throw new Error("Method not implemented.");
-    }
-
-    async getDefinitionOfTokenCollection(_collection: string): Promise<any> {
+    async getDefinitionOfTokenCollection(_collection: string): Promise<IDefinitionOfTokenCollectionOnNetwork> {
         // TODO: Implement wrt.:
         // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/collections/collection.service.ts
         // https://docs.elrond.com/developers/esdt-tokens/#get-esdt-token-properties
+        throw new Error("Method not implemented.");
+    }
+
+    async getNonFungibleToken(_collection: string, _nonce: Nonce): Promise<INonFungibleTokenOfAccountOnNetwork> {
         throw new Error("Method not implemented.");
     }
 

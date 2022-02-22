@@ -1,21 +1,19 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { BigNumber } from "bignumber.js";
 import { AccountOnNetwork } from "../account";
 import { Address } from "../address";
 import { defaultConfig } from "../constants";
 import { ErrApiProviderGet, ErrContractQuery } from "../errors";
-import { IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, Pagination } from "../interface.networkProvider";
+import { IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, Pagination } from "../interface.networkProvider";
 import { Logger } from "../logger";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
-import { NFTToken } from "../nftToken";
 import { Nonce } from "../nonce";
 import { Query, QueryResponse } from "../smartcontracts";
 import { Stats } from "../stats";
-import { Token } from "../token";
 import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
+import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
 
@@ -69,7 +67,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         let tokens = response.map(item => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
 
         // TODO: Fix sorting
-        tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
+        tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
         return tokens;
     }
 
@@ -81,7 +79,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         let tokens = response.map(item => NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(item));
         
         // TODO: Fix sorting
-        tokens.sort((a, b) => a.tokenIdentifier.localeCompare(b.tokenIdentifier));
+        tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
         return tokens;
     }
 
@@ -131,21 +129,22 @@ export class ApiNetworkProvider implements INetworkProvider {
         }
     }
 
-    async getToken(tokenIdentifier: string): Promise<Token> {
+    async getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<IDefinitionOfFungibleTokenOnNetwork> {
         let response = await this.doGetGeneric(`tokens/${tokenIdentifier}`);
-        let token = Token.fromHttpResponse(response);
-        return token;
+        let definition = DefinitionOfFungibleTokenOnNetwork.fromApiHttpResponse(response);
+        return definition;
     }
 
-    async getNFTToken(tokenIdentifier: string): Promise<NFTToken> {
-        let response = await this.doGetGeneric(`nfts/${tokenIdentifier}`);
-        let token = NFTToken.fromHttpResponse(response);
-        return token;
-    }
-
-    async getDefinitionOfTokenCollection(collection: string): Promise<any> {
+    async getDefinitionOfTokenCollection(collection: string): Promise<IDefinitionOfTokenCollectionOnNetwork> {
         let response = await this.doGetGeneric(`collections/${collection}`);
-        return response;
+        let definition = DefinitionOfTokenCollectionOnNetwork.fromApiHttpResponse(response);
+        return definition;
+    }
+
+    async getNonFungibleToken(collection: string, nonce: Nonce): Promise<INonFungibleTokenOfAccountOnNetwork> {
+        let response = await this.doGetGeneric(`nfts/${collection}-${nonce.hex()}`);
+        let token = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);
+        return token;
     }
 
     async doGetGeneric(resourceUrl: string): Promise<any> {

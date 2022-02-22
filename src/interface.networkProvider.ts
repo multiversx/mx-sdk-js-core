@@ -91,24 +91,20 @@ export interface INetworkProvider {
 
     /**
      * Fetches the definition of a fungible token.
-     * 
-     * TODO: Rename to "GetDefinitionOfFungibleToken" or "GetFungibleTokenDefinition" (not renamed yet in order to preserve interface compatibility).
+     *
      */
-    getToken(tokenIdentifier: string): Promise<Token>;
+    getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<IDefinitionOfFungibleTokenOnNetwork>;
 
     /**
      * Fetches the definition of a SFT (including Meta ESDT) or NFT.
      * 
-     * TODO: Return explicit type.
      */
-    getDefinitionOfTokenCollection(collection: string): Promise<any>;
+    getDefinitionOfTokenCollection(collection: string): Promise<IDefinitionOfTokenCollectionOnNetwork>;
 
     /**
-     * Fetches an instance of a SFT (including Meta ESDT) or NFT.
-     * 
-     * TODO: Rename to "GetTokenInstance" (not renamed yet in order to preserve interface compatibility).
+     * Fetches data about a specific non-fungible token (instance).
      */
-    getNFTToken(tokenIdentifier: string): Promise<NFTToken>;
+    getNonFungibleToken(collection: string, nonce: Nonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Performs a generic GET action against the provider (useful for new HTTP endpoints, not yet supported by erdjs).
@@ -122,12 +118,12 @@ export interface INetworkProvider {
 }
 
 export interface IFungibleTokenOfAccountOnNetwork {
-    tokenIdentifier: string;
+    identifier: string;
     balance: BigNumber;
 }
 
 export interface INonFungibleTokenOfAccountOnNetwork {
-    tokenIdentifier: string;
+    identifier: string;
     collection: string;
     attributes: Buffer;
     balance: BigNumber;
@@ -153,6 +149,38 @@ export interface ITransactionOnNetwork {
     blockNonce: Nonce;
     hyperblockNonce: Nonce;
     hyperblockHash: Hash;
+}
+
+export interface IDefinitionOfFungibleTokenOnNetwork {
+    identifier: string;
+    name: string;
+    ticker: string;
+    owner: Address;
+    decimals: number;
+    supply: BigNumber;
+    isPaused: boolean;
+    canUpgrade: boolean;
+    canMint: boolean;
+    canBurn: boolean;
+    canChangeOwner: boolean;
+    canPause: boolean;
+    canFreeze: boolean;
+    canWipe: boolean;
+    canAddSpecialRoles: boolean;
+}
+
+export interface IDefinitionOfTokenCollectionOnNetwork {
+    collection: string;
+    type: string;
+    name: string;
+    ticker: string;
+    owner: Address;
+    decimals: number;
+    canPause: boolean;
+    canFreeze: boolean;
+    canWipe: boolean;
+    canTransferRole: boolean;
+    // TODO: add "assets", "roles"
 }
 
 export class Pagination {

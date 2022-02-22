@@ -65,7 +65,7 @@ export interface INetworkProvider {
     /**
      * Fetches the state of a {@link Transaction}.
      */
-    getTransaction(txHash: TransactionHash, hintSender?: Address): Promise<ITransactionOnNetwork>;
+    getTransaction(txHash: TransactionHash): Promise<ITransactionOnNetwork>;
 
     /**
      * Queries the status of a {@link Transaction}.
@@ -136,18 +136,8 @@ export interface INonFungibleTokenOfAccountOnNetwork {
     royalties: BigNumber;
 }
 
-export class Pagination {
-    from: number = 0;
-    size: number = 100;
-
-    static default(): Pagination {
-        return { from: 0, size: 100 };
-    }
-}
-
 export interface ITransactionOnNetwork {
     hash: TransactionHash;
-    type: ITypeOfTransactionOnNetwork;
     nonce: Nonce;
     round: number;
     epoch: number;
@@ -165,6 +155,11 @@ export interface ITransactionOnNetwork {
     hyperblockHash: Hash;
 }
 
- export interface ITypeOfTransactionOnNetwork {
-    readonly value: string;
+export class Pagination {
+    from: number = 0;
+    size: number = 100;
+
+    static default(): Pagination {
+        return { from: 0, size: 100 };
+    }
 }

@@ -99,12 +99,8 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokenData;
     }
 
-    async getTransaction(txHash: TransactionHash, hintSender?: Address): Promise<ITransactionOnNetwork> {
-        let url = this.buildUrlWithQueryParameters(`transaction/${txHash.toString()}`, {
-            withSender: hintSender ? hintSender.bech32() : "",
-            withResults: "true"
-        });
-
+    async getTransaction(txHash: TransactionHash): Promise<ITransactionOnNetwork> {
+        let url = this.buildUrlWithQueryParameters(`transaction/${txHash.toString()}`, { withResults: "true" });
         let response = await this.doGetGeneric(url);
         let transaction = TransactionOnNetwork.fromProxyHttpResponse(txHash, response.transaction);
         return transaction;

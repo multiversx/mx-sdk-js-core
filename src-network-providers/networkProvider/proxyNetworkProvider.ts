@@ -1,21 +1,21 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { BigNumber } from "bignumber.js";
 import { AccountOnNetwork } from "../account";
 import { Address } from "../address";
 import { defaultConfig } from "../constants";
 import { ErrApiProviderGet, ErrContractQuery } from "../errors";
-import { IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, Pagination } from "../interface.networkProvider";
+import { IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, Pagination } from "../interface.networkProvider";
 import { Logger } from "../logger";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
 import { NFTToken } from "../nftToken";
+import { Nonce } from "../nonce";
 import { Query, QueryResponse } from "../smartcontracts";
 import { Stats } from "../stats";
 import { Token } from "../token";
 import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
+import { TransactionOnNetwork } from "./transactions";
 
 export class ProxyNetworkProvider implements INetworkProvider {
     private url: string;
@@ -93,20 +93,20 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokenData;
     }
 
-    async getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<INonFungibleTokenOfAccountOnNetwork> {
-        let response = await this.doGetGeneric(`address/${address.bech32()}/nft/${collection}/nonce/${nonce}`);
+    async getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: Nonce): Promise<INonFungibleTokenOfAccountOnNetwork> {
+        let response = await this.doGetGeneric(`address/${address.bech32()}/nft/${collection}/nonce/${nonce.hex()}`);
         let tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponse(response.tokenData);
         return tokenData;
     }
 
-    async getTransaction(txHash: TransactionHash, hintSender?: Address): Promise<TransactionOnNetwork> {
+    async getTransaction(txHash: TransactionHash, hintSender?: Address): Promise<ITransactionOnNetwork> {
         let url = this.buildUrlWithQueryParameters(`transaction/${txHash.toString()}`, {
             withSender: hintSender ? hintSender.bech32() : "",
             withResults: "true"
         });
 
         let response = await this.doGetGeneric(url);
-        let transaction = TransactionOnNetwork.fromHttpResponse(txHash, response.transaction);
+        let transaction = TransactionOnNetwork.fromProxyHttpResponse(txHash, response.transaction);
         return transaction;
     }
 

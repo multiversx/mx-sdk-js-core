@@ -19,6 +19,7 @@ export class FungibleTokenOfAccountOnNetwork implements IFungibleTokenOfAccountO
 
 export class NonFungibleTokenOfAccountOnNetwork implements INonFungibleTokenOfAccountOnNetwork {
     tokenIdentifier: string = "";
+    collection: string = "";
     attributes: Buffer = Buffer.from([]);
     balance: BigNumber = new BigNumber(0);
     nonce: Nonce = new Nonce(0);
@@ -28,7 +29,8 @@ export class NonFungibleTokenOfAccountOnNetwork implements INonFungibleTokenOfAc
     static fromProxyHttpResponse(payload: any): NonFungibleTokenOfAccountOnNetwork {
         let result = new NonFungibleTokenOfAccountOnNetwork();
 
-        result.tokenIdentifier = payload.tokenIdentifier || payload.identifier || "";
+        result.tokenIdentifier = payload.tokenIdentifier || "";
+        result.collection = NonFungibleTokenOfAccountOnNetwork.parseCollectionFromIdentifier(result.tokenIdentifier);
         result.attributes = Buffer.from(payload.attributes || "", "base64");
         result.balance = new BigNumber(payload.balance || 0);
         result.nonce = new Nonce(payload.nonce || 0);
@@ -38,10 +40,17 @@ export class NonFungibleTokenOfAccountOnNetwork implements INonFungibleTokenOfAc
         return result;
     }
 
+    private static parseCollectionFromIdentifier(identifier: string): string {
+        let parts = identifier.split("-");
+        let collection = parts.slice(0, 2).join("-");
+        return collection;
+    }
+
     static fromApiHttpResponse(payload: any): NonFungibleTokenOfAccountOnNetwork {
         let result = new NonFungibleTokenOfAccountOnNetwork();
 
-        result.tokenIdentifier = payload.tokenIdentifier || payload.identifier || "";
+        result.tokenIdentifier = payload.identifier || "";
+        result.collection = payload.collection || "";
         result.attributes = Buffer.from(payload.attributes || "", "base64");
         // On API, missing balance means NFT.
         result.balance = new BigNumber(payload.balance || 1);

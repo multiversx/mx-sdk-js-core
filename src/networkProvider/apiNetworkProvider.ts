@@ -4,20 +4,20 @@ import { AccountOnNetwork } from "../account";
 import { Address } from "../address";
 import { defaultConfig } from "../constants";
 import { ErrApiProviderGet, ErrContractQuery } from "../errors";
-import { IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, Pagination } from "../interface.networkProvider";
+import { IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, Pagination } from "../interface.networkProvider";
 import { Logger } from "../logger";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
 import { NFTToken } from "../nftToken";
+import { Nonce } from "../nonce";
 import { Query, QueryResponse } from "../smartcontracts";
-import { getHexMagnitudeOfBigInt } from "../smartcontracts/codec/utils";
 import { Stats } from "../stats";
 import { Token } from "../token";
 import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
+import { TransactionOnNetwork } from "./transactions";
 
 export class ApiNetworkProvider implements INetworkProvider {
     private url: string;
@@ -91,16 +91,15 @@ export class ApiNetworkProvider implements INetworkProvider {
         return tokenData;
     }
 
-    async getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<INonFungibleTokenOfAccountOnNetwork> {
-        let nonceHex = getHexMagnitudeOfBigInt(new BigNumber(nonce));
-        let response = await this.doGetGeneric(`accounts/${address.bech32()}/nfts/${collection}-${nonceHex}`);
-        let tokenData = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response.tokenData);
+    async getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: Nonce): Promise<INonFungibleTokenOfAccountOnNetwork> {
+        let response = await this.doGetGeneric(`accounts/${address.bech32()}/nfts/${collection}-${nonce.hex()}`);
+        let tokenData = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);
         return tokenData;
     }
 
-    async getTransaction(txHash: TransactionHash): Promise<TransactionOnNetwork> {
+    async getTransaction(txHash: TransactionHash): Promise<ITransactionOnNetwork> {
         let response = await this.doGetGeneric(`transactions/${txHash.toString()}`);
-        let transaction = TransactionOnNetwork.fromHttpResponse(txHash, response.transaction);
+        let transaction = TransactionOnNetwork.fromApiHttpResponse(txHash, response);
         return transaction;
     }
 

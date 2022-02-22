@@ -1,16 +1,17 @@
 import { BigNumber } from "bignumber.js";
-import { Nonce } from ".";
+import { Balance, GasLimit, GasPrice, Nonce, TransactionPayload } from ".";
 import { AccountOnNetwork } from "./account";
 import { Address } from "./address";
+import { Hash } from "./hash";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
 import { NFTToken } from "./nftToken";
+import { Signature } from "./signature";
 import { Query, QueryResponse } from "./smartcontracts";
 import { Stats } from "./stats";
 import { Token } from "./token";
 import { Transaction, TransactionHash, TransactionStatus } from "./transaction";
-import { TransactionOnNetwork } from "./transactionOnNetwork";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
@@ -59,12 +60,12 @@ export interface INetworkProvider {
     /**
      * Fetches data about a specific non-fungible token (instance) held by an account.
      */
-    getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: BigNumber.Value): Promise<INonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: Nonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches the state of a {@link Transaction}.
      */
-    getTransaction(txHash: TransactionHash, hintSender?: Address): Promise<TransactionOnNetwork>;
+    getTransaction(txHash: TransactionHash, hintSender?: Address): Promise<ITransactionOnNetwork>;
 
     /**
      * Queries the status of a {@link Transaction}.
@@ -120,7 +121,6 @@ export interface INetworkProvider {
     doPostGeneric(resourceUrl: string, payload: any): Promise<any>;
 }
 
-
 export interface IFungibleTokenOfAccountOnNetwork {
     tokenIdentifier: string;
     balance: BigNumber;
@@ -128,6 +128,7 @@ export interface IFungibleTokenOfAccountOnNetwork {
 
 export interface INonFungibleTokenOfAccountOnNetwork {
     tokenIdentifier: string;
+    collection: string;
     attributes: Buffer;
     balance: BigNumber;
     nonce: Nonce;
@@ -142,4 +143,28 @@ export class Pagination {
     static default(): Pagination {
         return { from: 0, size: 100 };
     }
+}
+
+export interface ITransactionOnNetwork {
+    hash: TransactionHash;
+    type: ITypeOfTransactionOnNetwork;
+    nonce: Nonce;
+    round: number;
+    epoch: number;
+    value: Balance;
+    receiver: Address;
+    sender: Address;
+    gasPrice: GasPrice;
+    gasLimit: GasLimit;
+    data: TransactionPayload;
+    signature: Signature;
+    status: TransactionStatus;
+    timestamp: number;
+    blockNonce: Nonce;
+    hyperblockNonce: Nonce;
+    hyperblockHash: Hash;
+}
+
+ export interface ITypeOfTransactionOnNetwork {
+    readonly value: string;
 }

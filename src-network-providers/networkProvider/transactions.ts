@@ -1,7 +1,7 @@
 import { Address } from "../address";
 import { Balance } from "../balance";
 import { Hash } from "../hash";
-import { ITransactionOnNetwork, ITypeOfTransactionOnNetwork } from "../interface.networkProvider";
+import { ITransactionOnNetwork } from "../interface.networkProvider";
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
 import { Signature } from "../signature";
@@ -10,7 +10,6 @@ import { TransactionPayload } from "../transactionPayload";
 
  export class TransactionOnNetwork implements ITransactionOnNetwork {
     hash: TransactionHash = new TransactionHash("");
-    type: ITypeOfTransactionOnNetwork = new TypeOfTransactionOnNetwork();
     nonce: Nonce = new Nonce(0);
     round: number = 0;
     epoch: number = 0;
@@ -32,7 +31,6 @@ import { TransactionPayload } from "../transactionPayload";
         let transactionOnNetwork = new TransactionOnNetwork();
 
         transactionOnNetwork.hash = txHash;
-        transactionOnNetwork.type = new TypeOfTransactionOnNetwork(response.type || "");
         transactionOnNetwork.nonce = new Nonce(response.nonce || 0);
         transactionOnNetwork.round = response.round;
         transactionOnNetwork.epoch = response.epoch || 0;
@@ -56,7 +54,6 @@ import { TransactionPayload } from "../transactionPayload";
         let transactionOnNetwork = new TransactionOnNetwork();
 
         transactionOnNetwork.hash = txHash;
-        transactionOnNetwork.type = new TypeOfTransactionOnNetwork(response.type || "");
         transactionOnNetwork.nonce = new Nonce(response.nonce || 0);
         transactionOnNetwork.round = response.round;
         transactionOnNetwork.epoch = response.epoch || 0;
@@ -81,10 +78,3 @@ import { TransactionPayload } from "../transactionPayload";
     }
 }
 
-class TypeOfTransactionOnNetwork implements ITypeOfTransactionOnNetwork {
-    readonly value: string;
-
-    constructor(value?: string) {
-        this.value = value || "unknown";
-    }
-}

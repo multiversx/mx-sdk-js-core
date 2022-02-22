@@ -102,17 +102,24 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         for (const hash of hashes) {
             let apiResponse = await apiProvider.getTransaction(hash);
-            let proxyResponse = await proxyProvider.getTransaction(hash, sender);
+            let proxyResponse = await proxyProvider.getTransaction(hash);
             
-            ignoreKnownTxDifferencesBetweenProviders(apiResponse, proxyResponse);
-            assert.deepEqual(apiResponse, proxyResponse);
+            ignoreKnownTransactionDifferencesBetweenProviders(apiResponse, proxyResponse);
+            assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
+        }
+
+        for (const hash of hashes) {
+            let apiResponse = await apiProvider.getTransactionStatus(hash);
+            let proxyResponse = await proxyProvider.getTransactionStatus(hash);
+            
+            // TODO: Fix differences of "tx.status".
+            // assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
         }
     });
 
     // TODO: Strive to have as little differences as possible between Proxy and API.
-    function ignoreKnownTxDifferencesBetweenProviders(apiResponse: ITransactionOnNetwork, proxyResponse: ITransactionOnNetwork) {
+    function ignoreKnownTransactionDifferencesBetweenProviders(apiResponse: ITransactionOnNetwork, proxyResponse: ITransactionOnNetwork) {
         apiResponse.status = proxyResponse.status = new TransactionStatus("ignore");
-        apiResponse.type = proxyResponse.type = { value: "ignore" };
 
         // Ignore fields which are not present on API response:
         proxyResponse.epoch = 0;

@@ -90,7 +90,46 @@ describe("test network providers on devnet: Proxy and API", function () {
         }
     });
 
-    it("should have same response for getTransaction(), getTransactionStatus()", async function () {
+    it("should have same response for getTransaction()", async function () {
+        this.timeout(20000);
+
+        let hashes = [
+            new TransactionHash("b41f5fc39e96b1f194d07761c6efd6cb92278b95f5012ab12cbc910058ca8b54"),
+            new TransactionHash("7757397a59378e9d0f6d5f08cc934c260e33a50ae0d73fdf869f7c02b6b47b33"),
+            new TransactionHash("b87238089e81527158a6daee520280324bc7e5322ba54d1b3c9a5678abe953ea"),
+            new TransactionHash("b45dd5e598bc85ba71639f2cbce8c5dff2fbe93159e637852fddeb16c0e84a48"),
+            new TransactionHash("83db780e98d4d3c917668c47b33ba51445591efacb0df2a922f88e7dfbb5fc7d"),
+            new TransactionHash("c2eb62b28cc7320da2292d87944c5424a70e1f443323c138c1affada7f6e9705"),
+            // TODO: Uncomment once the Gateway returns all SCRs in this case, as well.
+            // new TransactionHash("98e913c2a78cafdf4fa7f0113c1285fb29c2409bd7a746bb6f5506ad76841d54"),
+            new TransactionHash("5b05945be8ba2635e7c13d792ad727533494358308b5fcf36a816e52b5b272b8"),
+            new TransactionHash("47b089b5f0220299a017359003694a01fd75d075100166b8072c418d5143fe06"),
+            new TransactionHash("85021f20b06662240d8302d62f68031bbf7261bacb53b84e3dc9346c0f10a8e7")
+        ];
+
+        for (const hash of hashes) {
+            let apiResponse = await apiProvider.getTransaction(hash);
+            let proxyResponse = await proxyProvider.getTransaction(hash);
+
+            ignoreKnownTransactionDifferencesBetweenProviders(apiResponse, proxyResponse);
+            assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
+        }
+    });
+
+    // TODO: Strive to have as little differences as possible between Proxy and API.
+    function ignoreKnownTransactionDifferencesBetweenProviders(apiResponse: ITransactionOnNetwork, proxyResponse: ITransactionOnNetwork) {
+        // TODO: Remove this once "tx.status" is uniformized.
+        apiResponse.status = proxyResponse.status = new TransactionStatus("ignore");
+
+        // Ignore fields which are not present on API response:
+        proxyResponse.epoch = 0;
+        proxyResponse.blockNonce = new Nonce(0);
+        proxyResponse.hyperblockNonce = new Nonce(0);
+        proxyResponse.hyperblockHash = new Hash("");
+    }
+
+    // TODO: Fix differences of "tx.status", then enable this test.
+    it.skip("should have same response for getTransactionStatus()", async function () {
         this.timeout(20000);
 
         let hashes = [
@@ -107,32 +146,11 @@ describe("test network providers on devnet: Proxy and API", function () {
         ];
 
         for (const hash of hashes) {
-            let apiResponse = await apiProvider.getTransaction(hash);
-            let proxyResponse = await proxyProvider.getTransaction(hash);
-
-            ignoreKnownTransactionDifferencesBetweenProviders(apiResponse, proxyResponse);
-            assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
-        }
-
-        for (const hash of hashes) {
             let apiResponse = await apiProvider.getTransactionStatus(hash);
             let proxyResponse = await proxyProvider.getTransactionStatus(hash);
-
-            // TODO: Fix differences of "tx.status".
-            // assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
+            assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
         }
     });
-
-    // TODO: Strive to have as little differences as possible between Proxy and API.
-    function ignoreKnownTransactionDifferencesBetweenProviders(apiResponse: ITransactionOnNetwork, proxyResponse: ITransactionOnNetwork) {
-        apiResponse.status = proxyResponse.status = new TransactionStatus("ignore");
-
-        // Ignore fields which are not present on API response:
-        proxyResponse.epoch = 0;
-        proxyResponse.blockNonce = new Nonce(0);
-        proxyResponse.hyperblockNonce = new Nonce(0);
-        proxyResponse.hyperblockHash = new Hash("");
-    }
 
     it("should have same response for getDefinitionOfFungibleToken()", async function () {
         this.timeout(10000);

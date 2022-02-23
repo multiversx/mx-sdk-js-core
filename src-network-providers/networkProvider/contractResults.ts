@@ -6,16 +6,31 @@ import { IContractQueryResponse, IContractResultItem, IContractResults } from ".
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
 import { ArgSerializer, EndpointDefinition, MaxUint64, ReturnCode, TypedValue } from "../smartcontracts";
+import { TransactionHash } from "../transaction";
 
 export class ContractResults implements IContractResults {
     readonly items: IContractResultItem[];
 
     constructor(items: IContractResultItem[]) {
         this.items = items;
+
+        this.items.sort(function (a: IContractResultItem, b: IContractResultItem) {
+            return a.nonce.valueOf() - b.nonce.valueOf();
+        });
     }
 
     static empty(): ContractResults {
         return new ContractResults([]);
+    }
+
+    static fromProxyHttpResponse(results: any[]): ContractResults {
+        let items = results.map(item => ContractResultItem.fromProxyHttpResponse(item));
+        return new ContractResults(items);
+    }
+
+    static fromApiHttpResponse(results: any[]): ContractResults {
+        let items = results.map(item => ContractResultItem.fromApiHttpResponse(item));
+        return new ContractResults(items);
     }
 }
 
@@ -32,6 +47,39 @@ export class ContractResultItem implements IContractResultItem {
     gasPrice: GasPrice = new GasPrice(0);
     callType: number = 0;
     returnMessage: string = "";
+
+    static fromProxyHttpResponse(response: any): ContractResultItem {
+        let item = ContractResultItem.fromHttpResponse(response);
+        return item;
+    }
+
+    static fromApiHttpResponse(response: any): ContractResultItem {
+        let item = ContractResultItem.fromHttpResponse(response);
+
+        item.data = Buffer.from(item.data, "base64").toString();
+        item.callType = Number(item.callType);
+
+        return item;
+    }
+
+    private static fromHttpResponse(response: any): ContractResultItem {
+        let item = new ContractResultItem();
+
+        item.hash = new TransactionHash(response.hash);
+        item.nonce = new Nonce(response.nonce || 0);
+        item.value = Balance.fromString(response.value);
+        item.receiver = new Address(response.receiver);
+        item.sender = new Address(response.sender);
+        item.previousHash = new TransactionHash(response.prevTxHash);
+        item.originalHash = new TransactionHash(response.originalTxHash);
+        item.gasLimit = new GasLimit(response.gasLimit);
+        item.gasPrice = new GasPrice(response.gasPrice);
+        item.data = response.data || "";
+        item.callType = response.callType;
+        item.returnMessage = response.returnMessage;
+
+        return item;
+    }
 }
 
 export class ContractQueryResponse implements IContractQueryResponse {

@@ -10,6 +10,7 @@ import { Signature } from "./signature";
 import { EndpointDefinition, Query, ReturnCode, TypedValue } from "./smartcontracts";
 import { Stats } from "./stats";
 import { Transaction, TransactionHash, TransactionStatus } from "./transaction";
+import { TransactionLogs } from "./transactionLogs";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
@@ -147,6 +148,27 @@ export interface ITransactionOnNetwork {
     blockNonce: Nonce;
     hyperblockNonce: Nonce;
     hyperblockHash: Hash;
+    logs: TransactionLogs;
+    contractResults: IContractResults;
+}
+
+export interface IContractResults {
+    items: IContractResultItem[];
+}
+
+export interface IContractResultItem {
+    hash: Hash;
+    nonce: Nonce;
+    value: Balance;
+    receiver: Address;
+    sender: Address;
+    data: string;
+    previousHash: Hash;
+    originalHash: Hash;
+    gasLimit: GasLimit;
+    gasPrice: GasPrice;
+    callType: number;
+    returnMessage: string;
 }
 
 export interface IDefinitionOfFungibleTokenOnNetwork {

@@ -27,29 +27,42 @@ export class NonFungibleTokenOfAccountOnNetwork implements INonFungibleTokenOfAc
     royalties: BigNumber = new BigNumber(0);
 
     static fromProxyHttpResponse(payload: any): NonFungibleTokenOfAccountOnNetwork {
-        let result = new NonFungibleTokenOfAccountOnNetwork();
+        let result = NonFungibleTokenOfAccountOnNetwork.fromHttpResponse(payload);
 
         result.identifier = payload.tokenIdentifier || "";
         result.collection = NonFungibleTokenOfAccountOnNetwork.parseCollectionFromIdentifier(result.identifier);
-        result.attributes = Buffer.from(payload.attributes || "", "base64");
-        result.balance = new BigNumber(payload.balance || 0);
-        result.nonce = new Nonce(payload.nonce || 0);
-        result.creator = new Address(payload.creator || "");
         result.royalties = new BigNumber(payload.royalties || 0).div(100);
 
         return result;
     }
 
     static fromProxyHttpResponseByNonce(payload: any): NonFungibleTokenOfAccountOnNetwork {
+        let result = NonFungibleTokenOfAccountOnNetwork.fromHttpResponse(payload);
+
+        result.identifier = `${payload.tokenIdentifier}-${result.nonce.hex()}`;
+        result.collection = payload.tokenIdentifier || "";
+        result.royalties = new BigNumber(payload.royalties || 0).div(100);
+
+        return result;
+    }
+
+    static fromApiHttpResponse(payload: any): NonFungibleTokenOfAccountOnNetwork {
+        let result = NonFungibleTokenOfAccountOnNetwork.fromHttpResponse(payload);
+
+        result.identifier = payload.identifier || "";
+        result.collection = payload.collection || "";
+
+        return result;
+    }
+
+    private static fromHttpResponse(payload: any): NonFungibleTokenOfAccountOnNetwork {
         let result = new NonFungibleTokenOfAccountOnNetwork();
 
         result.attributes = Buffer.from(payload.attributes || "", "base64");
-        result.balance = new BigNumber(payload.balance || 0);
+        result.balance = new BigNumber(payload.balance || 1);
         result.nonce = new Nonce(payload.nonce || 0);
         result.creator = new Address(payload.creator || "");
-        result.royalties = new BigNumber(payload.royalties || 0).div(100);
-        result.identifier = `${payload.tokenIdentifier}-${result.nonce.hex()}`;
-        result.collection = payload.tokenIdentifier || "";
+        result.royalties = new BigNumber(payload.royalties || 0);
 
         return result;
     }
@@ -58,20 +71,5 @@ export class NonFungibleTokenOfAccountOnNetwork implements INonFungibleTokenOfAc
         let parts = identifier.split("-");
         let collection = parts.slice(0, 2).join("-");
         return collection;
-    }
-
-    static fromApiHttpResponse(payload: any): NonFungibleTokenOfAccountOnNetwork {
-        let result = new NonFungibleTokenOfAccountOnNetwork();
-
-        result.identifier = payload.identifier || "";
-        result.collection = payload.collection || "";
-        result.attributes = Buffer.from(payload.attributes || "", "base64");
-        // On API, missing balance means NFT.
-        result.balance = new BigNumber(payload.balance || 1);
-        result.nonce = new Nonce(payload.nonce || 0);
-        result.creator = new Address(payload.creator || "");
-        result.royalties = new BigNumber(payload.royalties || 0);
-        
-        return result;
     }
 }

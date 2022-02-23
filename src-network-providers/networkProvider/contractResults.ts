@@ -80,6 +80,16 @@ export class ContractResultItem implements IContractResultItem {
 
         return item;
     }
+
+    getOutputUntyped(): Buffer[] {
+        // TODO: Decide how to parse "data" (immediate results vs. other results).
+        throw new Error("Method not implemented.");
+    }
+
+    getOutputTyped(_endpointDefinition: EndpointDefinition): TypedValue[] {
+        // TODO: Decide how to parse "data" (immediate results vs. other results).
+        throw new Error("Method not implemented.");
+    }
 }
 
 export class ContractQueryResponse implements IContractQueryResponse {

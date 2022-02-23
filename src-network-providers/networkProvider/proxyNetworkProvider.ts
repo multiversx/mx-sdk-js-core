@@ -2,16 +2,17 @@ import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "../account";
 import { Address } from "../address";
 import { defaultConfig } from "../constants";
-import { ErrApiProviderGet, ErrContractQuery } from "../errors";
-import { IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, Pagination } from "../interface.networkProvider";
+import { ErrNetworkProvider } from "../errors";
+import { IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, Pagination } from "../interface.networkProvider";
 import { Logger } from "../logger";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
 import { Nonce } from "../nonce";
-import { Query, QueryResponse } from "../smartcontracts";
+import { Query } from "../smartcontracts";
 import { Stats } from "../stats";
 import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
+import { ContractQueryResponse } from "./contractResults";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
 
@@ -121,15 +122,11 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return response;
     }
 
-    async queryContract(query: Query): Promise<QueryResponse> {
-        try {
-            let data = query.toHttpRequest();
-            let response = await this.doPostGeneric("vm-values/query", data);
-            let queryResponse = QueryResponse.fromHttpResponse(response.data)
-            return queryResponse;
-        } catch (err: any) {
-            throw ErrContractQuery.increaseSpecificity(err);
-        }
+    async queryContract(query: Query): Promise<IContractQueryResponse> {
+        let data = query.toHttpRequest();
+        let response = await this.doPostGeneric("vm-values/query", data);
+        let queryResponse = ContractQueryResponse.fromHttpResponse(response.data);
+        return queryResponse;
     }
 
     async getDefinitionOfFungibleToken(_tokenIdentifier: string): Promise<IDefinitionOfFungibleTokenOnNetwork> {
@@ -201,11 +198,11 @@ export class ProxyNetworkProvider implements INetworkProvider {
     private handleApiError(error: any, resourceUrl: string) {
         if (!error.response) {
             Logger.warn(error);
-            throw new ErrApiProviderGet(resourceUrl, error.toString(), error);
+            throw new ErrNetworkProvider(resourceUrl, error.toString(), error);
         }
 
         let errorData = error.response.data;
         let originalErrorMessage = errorData.error || errorData.message || JSON.stringify(errorData);
-        throw new ErrApiProviderGet(resourceUrl, originalErrorMessage, error);
+        throw new ErrNetworkProvider(resourceUrl, originalErrorMessage, error);
     }
 }

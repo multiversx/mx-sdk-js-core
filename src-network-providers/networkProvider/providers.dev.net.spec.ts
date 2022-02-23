@@ -6,6 +6,10 @@ import { Address } from "../address";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { TransactionHash, TransactionStatus } from "../transaction";
 import { Nonce } from "../nonce";
+import { ContractFunction, Query } from "../smartcontracts";
+import { BigUIntValue, U32Value, BytesValue, VariadicValue, VariadicType, CompositeType, BytesType, BooleanType } from "../smartcontracts/typesystem";
+import { BigNumber } from "bignumber.js";
+import { Balance } from "../balance";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.elrond.com", { timeout: 10000 });
@@ -172,5 +176,54 @@ describe("test network providers on devnet: Proxy and API", function () {
             // let proxyResponse = await proxyProvider.getNonFungibleToken(token.id, token.nonce);
             // assert.deepEqual(apiResponse, proxyResponse);
         }
+    });
+
+    // TODO: enable when API fixes the imprecision around "gasRemaining".
+    // TODO: enable when API supports queries with "value".
+    it.skip("should have same response for queryContract()", async function () {
+        this.timeout(10000);
+
+        // Query: get ultimate answer
+        let query = new Query({
+            address: new Address("erd1qqqqqqqqqqqqqpgqggww7tjryk9saqzfpq09tw3vm06kl8h3396qqz277y"),
+            func: new ContractFunction("getUltimateAnswer"),
+            args: []
+        });
+
+        let apiResponse = await apiProvider.queryContract(query);
+        let proxyResponse = await proxyProvider.queryContract(query);
+        assert.deepEqual(apiResponse, proxyResponse);
+        assert.deepEqual(apiResponse.getOutputUntyped(), proxyResponse.getOutputUntyped());
+
+        // Query: increment counter
+        query = new Query({
+            address: new Address("erd1qqqqqqqqqqqqqpgqz045rw74nthgzw2te9lytgah775n3l08396q3wt4qq"),
+            func: new ContractFunction("increment"),
+            args: []
+        });
+
+        apiResponse = await apiProvider.queryContract(query);
+        proxyResponse = await proxyProvider.queryContract(query);
+        assert.deepEqual(apiResponse, proxyResponse);
+        assert.deepEqual(apiResponse.getOutputUntyped(), proxyResponse.getOutputUntyped());
+
+        // Query: issue ESDT
+        query = new Query({
+            address: new Address("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
+            func: new ContractFunction("issue"),
+            value: Balance.egld(0.05),
+            args: [
+                BytesValue.fromUTF8("FOO"),
+                BytesValue.fromUTF8("FOO"),
+                new BigUIntValue(new BigNumber("10000")),
+                new U32Value(18),
+                new VariadicValue(new VariadicType(new CompositeType(new BytesType(), new BooleanType())), [])
+            ]
+        });
+
+        apiResponse = await apiProvider.queryContract(query);
+        proxyResponse = await proxyProvider.queryContract(query);
+        assert.deepEqual(apiResponse, proxyResponse);
+        assert.deepEqual(apiResponse.getOutputUntyped(), proxyResponse.getOutputUntyped());
     });
 });

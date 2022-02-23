@@ -130,6 +130,39 @@ export interface INonFungibleTokenOfAccountOnNetwork {
     royalties: BigNumber;
 }
 
+
+export interface IDefinitionOfFungibleTokenOnNetwork {
+    identifier: string;
+    name: string;
+    ticker: string;
+    owner: Address;
+    decimals: number;
+    supply: BigNumber;
+    isPaused: boolean;
+    canUpgrade: boolean;
+    canMint: boolean;
+    canBurn: boolean;
+    canChangeOwner: boolean;
+    canPause: boolean;
+    canFreeze: boolean;
+    canWipe: boolean;
+    canAddSpecialRoles: boolean;
+}
+
+export interface IDefinitionOfTokenCollectionOnNetwork {
+    collection: string;
+    type: string;
+    name: string;
+    ticker: string;
+    owner: Address;
+    decimals: number;
+    canPause: boolean;
+    canFreeze: boolean;
+    canWipe: boolean;
+    canTransferRole: boolean;
+    // TODO: add "assets", "roles"
+}
+
 export interface ITransactionOnNetwork {
     hash: TransactionHash;
     nonce: Nonce;
@@ -168,38 +201,9 @@ export interface IContractResultItem {
     gasPrice: GasPrice;
     callType: number;
     returnMessage: string;
-}
 
-export interface IDefinitionOfFungibleTokenOnNetwork {
-    identifier: string;
-    name: string;
-    ticker: string;
-    owner: Address;
-    decimals: number;
-    supply: BigNumber;
-    isPaused: boolean;
-    canUpgrade: boolean;
-    canMint: boolean;
-    canBurn: boolean;
-    canChangeOwner: boolean;
-    canPause: boolean;
-    canFreeze: boolean;
-    canWipe: boolean;
-    canAddSpecialRoles: boolean;
-}
-
-export interface IDefinitionOfTokenCollectionOnNetwork {
-    collection: string;
-    type: string;
-    name: string;
-    ticker: string;
-    owner: Address;
-    decimals: number;
-    canPause: boolean;
-    canFreeze: boolean;
-    canWipe: boolean;
-    canTransferRole: boolean;
-    // TODO: add "assets", "roles"
+    getOutputUntyped(): Buffer[];
+    getOutputTyped(endpointDefinition: EndpointDefinition): TypedValue[];
 }
 
 export interface IContractQueryResponse {

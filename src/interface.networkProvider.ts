@@ -6,11 +6,9 @@ import { Hash } from "./hash";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
-import { NFTToken } from "./nftToken";
 import { Signature } from "./signature";
-import { Query, QueryResponse } from "./smartcontracts";
+import { EndpointDefinition, Query, ReturnCode, TypedValue } from "./smartcontracts";
 import { Stats } from "./stats";
-import { Token } from "./token";
 import { Transaction, TransactionHash, TransactionStatus } from "./transaction";
 
 /**
@@ -87,7 +85,7 @@ export interface INetworkProvider {
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
      */
-    queryContract(query: Query): Promise<QueryResponse>;
+    queryContract(query: Query): Promise<IContractQueryResponse>;
 
     /**
      * Fetches the definition of a fungible token.
@@ -181,6 +179,16 @@ export interface IDefinitionOfTokenCollectionOnNetwork {
     canWipe: boolean;
     canTransferRole: boolean;
     // TODO: add "assets", "roles"
+}
+
+export interface IContractQueryResponse {
+    returnData: string[];
+    returnCode: ReturnCode;
+    returnMessage: string;
+    gasUsed: GasLimit;
+
+    getOutputUntyped(): Buffer[];
+    getOutputTyped(endpointDefinition: EndpointDefinition): TypedValue[];
 }
 
 export class Pagination {

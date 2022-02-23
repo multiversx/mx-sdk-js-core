@@ -1,5 +1,5 @@
 export * from "./apiNetworkProvider";
 export * from "./proxyNetworkProvider";
 
-// do not export "./tokens" (encapsulation)
-// do not export "./transactions" (encapsulation)
+// we do not export "./tokens"
+// we do not export "./transactions"

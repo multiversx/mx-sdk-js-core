@@ -20,11 +20,6 @@ export class ProxyNetworkProvider implements INetworkProvider {
     private url: string;
     private config: AxiosRequestConfig;
 
-    /**
-     * Creates a new {@link INetworkProvider} backed by an Elrond Proxy.
-     * @param url the URL of the Elrond Proxy
-     * @param config axios request config options
-     */
     constructor(url: string, config?: AxiosRequestConfig) {
         this.url = url;
         this.config = { ...defaultConfig, ...config };

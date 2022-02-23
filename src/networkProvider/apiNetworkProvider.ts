@@ -23,11 +23,6 @@ export class ApiNetworkProvider implements INetworkProvider {
     private config: AxiosRequestConfig;
     private backingProxyNetworkProvider;
 
-    /**
-     * Creates a new ApiProvider.
-     * @param url the URL of the Elrond Api
-     * @param config axios request config options
-     */
     constructor(url: string, config?: AxiosRequestConfig) {
         this.url = url;
         this.config = { ...defaultConfig, ...config };
@@ -110,7 +105,6 @@ export class ApiNetworkProvider implements INetworkProvider {
 
     async sendTransaction(tx: Transaction): Promise<TransactionHash> {
         let response = await this.doPostGeneric("transactions", tx.toSendable());
-        // Also see: https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/transactions/entities/transaction.send.result.ts
         let hash = new TransactionHash(response.txHash);
         return hash;
     }
@@ -162,7 +156,6 @@ export class ApiNetworkProvider implements INetworkProvider {
         try {
             let url = `${this.url}/${resourceUrl}`;
             let response = await axios.get(url, this.config);
-
             return response.data;
         } catch (error) {
             this.handleApiError(error, resourceUrl);

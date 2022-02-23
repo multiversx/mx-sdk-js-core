@@ -79,9 +79,8 @@ export interface INetworkProvider {
     /**
      * Simulates the processing of an already-signed {@link Transaction}.
      * 
-     * TODO: Return explicit type.
      */
-    simulateTransaction(tx: Transaction): Promise<TransactionHash>;
+    simulateTransaction(tx: Transaction): Promise<IContractSimulation>;
 
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
@@ -211,6 +210,9 @@ export interface IContractQueryResponse {
 
     getOutputUntyped(): Buffer[];
     getOutputTyped(endpointDefinition: EndpointDefinition): TypedValue[];
+}
+
+export interface IContractSimulation {
 }
 
 export class Pagination {

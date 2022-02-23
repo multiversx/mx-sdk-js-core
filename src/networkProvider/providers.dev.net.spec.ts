@@ -27,12 +27,14 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getNetworkConfig()", async function () {
         let apiResponse = await apiProvider.getNetworkConfig();
         let proxyResponse = await proxyProvider.getNetworkConfig();
+
         assert.deepEqual(apiResponse, proxyResponse);
     });
 
     it("should have same response for getNetworkStatus()", async function () {
         let apiResponse = await apiProvider.getNetworkStatus();
         let proxyResponse = await proxyProvider.getNetworkStatus();
+
         assert.deepEqual(apiResponse, proxyResponse);
     });
 
@@ -40,6 +42,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     it.skip("should have same response for getNetworkStakeStatistics()", async function () {
         let apiResponse = await apiProvider.getNetworkStakeStatistics();
         let proxyResponse = await proxyProvider.getNetworkStakeStatistics();
+
         assert.deepEqual(apiResponse, proxyResponse);
     });
 
@@ -47,6 +50,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     it.skip("should have same response for getNetworkGeneralStatistics()", async function () {
         let apiResponse = await apiProvider.getNetworkGeneralStatistics();
         let proxyResponse = await proxyProvider.getNetworkGeneralStatistics();
+
         assert.deepEqual(apiResponse, proxyResponse);
     });
 
@@ -54,6 +58,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         for (const user of [bob, carol, dan]) {
             let apiResponse = await apiProvider.getAccount(user.address);
             let proxyResponse = await proxyProvider.getAccount(user.address);
+
             assert.deepEqual(apiResponse, proxyResponse);
         }
     });
@@ -64,11 +69,13 @@ describe("test network providers on devnet: Proxy and API", function () {
         for (const user of [carol, dan]) {
             let apiResponse = await apiProvider.getFungibleTokensOfAccount(user.address);
             let proxyResponse = await proxyProvider.getFungibleTokensOfAccount(user.address);
+
             assert.deepEqual(apiResponse.slice(0, 100), proxyResponse.slice(0, 100));
 
             for (const item of apiResponse.slice(0, 5)) {
                 let apiResponse = await apiProvider.getFungibleTokenOfAccount(user.address, item.identifier);
                 let proxyResponse = await proxyProvider.getFungibleTokenOfAccount(user.address, item.identifier);
+
                 assert.deepEqual(apiResponse, proxyResponse, `user: ${user.address.bech32()}, token: ${item.identifier}`);
             }
         }
@@ -80,11 +87,13 @@ describe("test network providers on devnet: Proxy and API", function () {
         for (const user of [alice, bob, carol, dan]) {
             let apiResponse = await apiProvider.getNonFungibleTokensOfAccount(user.address);
             let proxyResponse = await proxyProvider.getNonFungibleTokensOfAccount(user.address);
+
             assert.deepEqual(apiResponse.slice(0, 100), proxyResponse.slice(0, 100));
 
             for (const item of apiResponse.slice(0, 5)) {
                 let apiResponse = await apiProvider.getNonFungibleTokenOfAccount(user.address, item.collection, item.nonce);
                 let proxyResponse = await proxyProvider.getNonFungibleTokenOfAccount(user.address, item.collection, item.nonce);
+
                 assert.deepEqual(apiResponse, proxyResponse, `user: ${user.address.bech32()}, token: ${item.identifier}`);
             }
         }
@@ -148,6 +157,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         for (const hash of hashes) {
             let apiResponse = await apiProvider.getTransactionStatus(hash);
             let proxyResponse = await proxyProvider.getTransactionStatus(hash);
+
             assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
         }
     });
@@ -175,6 +185,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         for (const collection of collections) {
             let apiResponse = await apiProvider.getDefinitionOfTokenCollection(collection);
+
             assert.equal(apiResponse.collection, collection);
 
             // TODO: Uncomment after implementing the function in the proxy provider.
@@ -190,6 +201,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         for (const token of tokens) {
             let apiResponse = await apiProvider.getNonFungibleToken(token.id, token.nonce);
+
             assert.equal(apiResponse.collection, token.id);
 
             // TODO: Uncomment after implementing the function in the proxy provider.
@@ -212,6 +224,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         let apiResponse = await apiProvider.queryContract(query);
         let proxyResponse = await proxyProvider.queryContract(query);
+
         assert.deepEqual(apiResponse, proxyResponse);
         assert.deepEqual(apiResponse.getOutputUntyped(), proxyResponse.getOutputUntyped());
 
@@ -224,6 +237,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         apiResponse = await apiProvider.queryContract(query);
         proxyResponse = await proxyProvider.queryContract(query);
+
         assert.deepEqual(apiResponse, proxyResponse);
         assert.deepEqual(apiResponse.getOutputUntyped(), proxyResponse.getOutputUntyped());
 
@@ -243,6 +257,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         apiResponse = await apiProvider.queryContract(query);
         proxyResponse = await proxyProvider.queryContract(query);
+        
         assert.deepEqual(apiResponse, proxyResponse);
         assert.deepEqual(apiResponse.getOutputUntyped(), proxyResponse.getOutputUntyped());
     });

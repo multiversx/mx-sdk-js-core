@@ -1,4 +1,5 @@
 import * as errors from "./errors";
+import { numberToPaddedHex } from "./utils.codec";
 
 /**
  * The nonce, as an immutable object.
@@ -27,6 +28,10 @@ export class Nonce {
      */
     increment(): Nonce {
         return new Nonce(this.value + 1);
+    }
+
+    hex(): string {
+        return numberToPaddedHex(this.value);
     }
 
     valueOf(): number {

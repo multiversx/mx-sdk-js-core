@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "../address";
-import { IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork } from "../interface.networkProvider";
+import { IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork } from "./interface";
 
 export class DefinitionOfFungibleTokenOnNetwork implements IDefinitionOfFungibleTokenOnNetwork {
     identifier: string = "";

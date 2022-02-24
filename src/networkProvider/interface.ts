@@ -1,16 +1,16 @@
 import { BigNumber } from "bignumber.js";
-import { Balance, GasLimit, GasPrice, Nonce, TransactionPayload } from ".";
-import { AccountOnNetwork } from "./account";
-import { Address } from "./address";
-import { Hash } from "./hash";
-import { NetworkConfig } from "./networkConfig";
-import { NetworkStake } from "./networkStake";
-import { NetworkStatus } from "./networkStatus";
-import { Signature } from "./signature";
-import { EndpointDefinition, Query, ReturnCode, TypedValue } from "./smartcontracts";
-import { Stats } from "./stats";
-import { Transaction, TransactionHash, TransactionStatus } from "./transaction";
-import { TransactionLogs } from "./transactionLogs";
+import { Balance, GasLimit, GasPrice, Nonce, TransactionPayload } from "..";
+import { AccountOnNetwork } from "../account";
+import { Address } from "../address";
+import { Hash } from "../hash";
+import { NetworkConfig } from "../networkConfig";
+import { NetworkStake } from "../networkStake";
+import { NetworkStatus } from "../networkStatus";
+import { Signature } from "../signature";
+import { EndpointDefinition, Query, ReturnCode, TypedValue } from "../smartcontracts";
+import { Stats } from "../stats";
+import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
+import { TransactionLogs } from "../transactionLogs";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.

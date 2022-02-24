@@ -114,7 +114,7 @@ export class AccountOnNetwork {
 
         result.address = new Address(payload["address"] || 0);
         result.nonce = new Nonce(payload["nonce"] || 0);
-        result.balance = Balance.fromString(payload["balance"]);
+        result.balance = Balance.fromString(payload["balance"] || "0");
         result.code = payload["code"] || "";
         result.userName = payload["username"] || "";
 

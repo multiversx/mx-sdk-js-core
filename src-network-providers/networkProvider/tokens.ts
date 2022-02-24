@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "../address";
-import { IFungibleTokenOfAccountOnNetwork, INonFungibleTokenOfAccountOnNetwork } from "../interface.networkProvider";
+import { IFungibleTokenOfAccountOnNetwork, INonFungibleTokenOfAccountOnNetwork } from "./interface";
 import { Nonce } from "../nonce";
 
 export class FungibleTokenOfAccountOnNetwork implements IFungibleTokenOfAccountOnNetwork {

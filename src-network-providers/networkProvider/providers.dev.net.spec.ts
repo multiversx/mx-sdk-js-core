@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { ApiNetworkProvider, ProxyNetworkProvider } from ".";
 import { Hash } from "../hash";
-import { INetworkProvider, ITransactionOnNetwork } from "../interface.networkProvider";
+import { INetworkProvider, ITransactionOnNetwork } from "./interface";
 import { Address } from "../address";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { TransactionHash, TransactionStatus } from "../transaction";

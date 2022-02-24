@@ -2,7 +2,7 @@ import { BigNumber } from "bignumber.js";
 import { Address } from "../address";
 import { Balance } from "../balance";
 import { Hash } from "../hash";
-import { IContractQueryResponse, IContractResultItem, IContractResults } from "../interface.networkProvider";
+import { IContractQueryResponse, IContractResultItem, IContractResults } from "./interface";
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
 import { ArgSerializer, EndpointDefinition, MaxUint64, ReturnCode, TypedValue } from "../smartcontracts";

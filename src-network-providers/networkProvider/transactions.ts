@@ -1,7 +1,7 @@
 import { Address } from "../address";
 import { Balance } from "../balance";
 import { Hash } from "../hash";
-import { IContractResults, ITransactionOnNetwork } from "../interface.networkProvider";
+import { IContractResults, ITransactionOnNetwork } from "./interface";
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
 import { Signature } from "../signature";

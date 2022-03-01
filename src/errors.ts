@@ -273,6 +273,16 @@ export class ErrInvalidFunctionName extends Err {
 }
 
 /**
+ * Signals an error that happened during a request against the Network.
+ */
+ export class ErrNetworkProvider extends Err {
+  public constructor(url: string, error: string, inner?: Error) {
+    let message = `Request error on url [${url}]: [${error}]`;
+    super(message, inner);
+  }
+}
+
+/**
  * Signals an error that happened during a HTTP GET request.
  */
 export class ErrApiProviderGet extends Err {
@@ -478,5 +488,14 @@ export class ErrNotImplemented extends Err {
 export class ErrInvalidTxSignReturnValue extends Err {
   public constructor() {
     super("Invalid response in transaction sign return url");
+  }
+}
+
+/**
+ * Signals that a specific transaction event was not found (i.e. in the transaction logs).
+ */
+export class ErrTransactionEventNotFound extends Err {
+  public constructor(identifier: string) {
+    super(`Transaction event with identifier [${identifier}] not found (in logs)`);
   }
 }

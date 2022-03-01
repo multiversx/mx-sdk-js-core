@@ -17,6 +17,14 @@ describe("test address", () => {
         assert.equal(bob.hex(), bobHex);
     });
 
+    it("should create empty address", async () => {
+        let nobody = new Address();
+
+        assert.isEmpty(nobody.hex());
+        assert.isEmpty(nobody.bech32());
+        assert.deepEqual(nobody.toJSON(), { bech32: "", pubkey: "" });
+    });
+
     it("should check equality", () => {
         let aliceFoo = new Address(aliceBech32);
         let aliceBar = new Address(aliceHex);

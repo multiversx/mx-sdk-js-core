@@ -10,6 +10,7 @@ export enum TokenType {
 export class Token {
     identifier: string = ''; // Token identifier (ticker + random string, eg. MYTOKEN-12345)
     name: string = ''; // Token name (eg. MyTokenName123)
+    ticker: string = '';
     type: TokenType = TokenType.Fungible;
     owner: Address = new Address();
     supply: string = '0'; // Circulating supply = initial minted supply + local mints - local burns
@@ -34,6 +35,7 @@ export class Token {
     static fromHttpResponse(response: {
         identifier: string,
         name: string,
+        ticker: string,
         type: string,
         owner: string,
         supply: string,
@@ -50,6 +52,7 @@ export class Token {
         return new Token({
             identifier: response.identifier,
             name: response.name,
+            ticker: response.ticker,
             type: TokenType[response.type as keyof typeof TokenType],
             owner: new Address(response.owner),
             supply: response.supply,

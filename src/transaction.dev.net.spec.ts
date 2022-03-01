@@ -41,6 +41,7 @@ describe("test transactions on devnet", function () {
         // Ignore fields which are not present on API response:
         transactionOnProxy.epoch = 0;
         transactionOnProxy.type = new TransactionOnNetworkType();
+        transactionOnProxy.blockNonce = new Nonce(0);
         transactionOnProxy.hyperblockNonce = new Nonce(0);
         transactionOnProxy.hyperblockHash = new Hash("");
 

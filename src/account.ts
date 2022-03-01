@@ -3,6 +3,7 @@ import { Address } from "./address";
 import { Nonce } from "./nonce";
 import { Balance } from "./balance";
 import { Egld } from "./balanceBuilder";
+import BigNumber from "bignumber.js";
 
 /**
  * An abstraction representing an account (user or Smart Contract) on the Network.
@@ -113,9 +114,31 @@ export class AccountOnNetwork {
 
         result.address = new Address(payload["address"] || 0);
         result.nonce = new Nonce(payload["nonce"] || 0);
-        result.balance = Balance.fromString(payload["balance"]);
-        result.code = payload["code"];
-        result.userName = payload["username"];
+        result.balance = Balance.fromString(payload["balance"] || "0");
+        result.code = payload["code"] || "";
+        result.userName = payload["username"] || "";
+
+        return result;
+    }
+}
+
+export class TokenOfAccountOnNetwork {
+    tokenIdentifier: string = "";
+    attributes: Buffer = Buffer.from([]);
+    balance: BigNumber = new BigNumber(0);
+    nonce: Nonce = new Nonce(0);
+    creator: Address = new Address("");
+    royalties: BigNumber = new BigNumber(0);
+
+    static fromHttpResponse(payload: any): TokenOfAccountOnNetwork {
+        let result = new TokenOfAccountOnNetwork();
+
+        result.tokenIdentifier = payload.tokenIdentifier;
+        result.attributes = Buffer.from(payload.attributes || "", "base64");
+        result.balance = new BigNumber(payload.balance || 0);
+        result.nonce = new Nonce(payload.nonce || 0);
+        result.creator = new Address(payload.creator || "");
+        result.royalties = new BigNumber(payload.royalties || 0);
 
         return result;
     }

@@ -1,5 +1,3 @@
-import { EndpointDefinition } from "./typesystem";
-
 export class ReturnCode {
     static None = new ReturnCode("");
     static Ok = new ReturnCode("ok");

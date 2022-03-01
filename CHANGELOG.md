@@ -5,6 +5,10 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
+ - TBD
+
+## [9.1.0]
+  - [Interactions: enable token transfers ("transfer with execute")](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/131)
   - [Fix constructor of `NumericalValue`](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/128).
   - [Sketch logs & events, add extra fields on TransactionOnNetwork, define TokenOfAccountOnNetwork](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/129).
   - [Extra exports, better `toString()`, better handling of empty addresses, `gasLimit` helpers](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/130).

@@ -1,6 +1,6 @@
 {
   "name": "@elrondnetwork/erdjs",
-  "version": "9.0.3",
+  "version": "9.1.0",
   "description": "Smart Contracts interaction framework",
   "main": "out/index.js",
   "types": "out/index.d.js",
@@ -25,7 +25,7 @@
     "browser-tests": "make clean && make browser-tests && http-server --port=9876 -o browser-tests/index.html",
     "lint": "tslint --project .",
     "pretest": "npm run compile",
-    "prepare": "npm run compile && npm run compile-browser && npm run compile-browser-min && npm run compile-browser-nowallet && npm run compile-browser-nowallet-min"
+    "prepare": "npm run compile"
   },
   "author": "ElrondNetwork",
   "license": "GPL-3.0-or-later",

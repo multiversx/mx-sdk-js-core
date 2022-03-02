@@ -11,7 +11,17 @@ import {
 import { Transaction } from "../transaction";
 import { SignableMessage } from "../signableMessage";
 import {ErrInvalidTxSignReturnValue, ErrNotImplemented} from "../errors";
-import {Nonce, Balance, Address, GasPrice, GasLimit, TransactionPayload, ChainID, TransactionVersion} from "../";
+import {
+    Nonce,
+    Balance,
+    Address,
+    GasPrice,
+    GasLimit,
+    TransactionPayload,
+    ChainID,
+    TransactionVersion,
+    TransactionOptions
+} from "../";
 import {Signature} from "../signature";
 
 interface TransactionMessage {
@@ -21,6 +31,7 @@ interface TransactionMessage {
     gasLimit?: number;
     data?: string;
     nonce?: number;
+    options?: number;
 }
 
 export class WalletProvider implements IDappProvider {
@@ -77,7 +88,7 @@ export class WalletProvider implements IDappProvider {
               resolve(true);
             }, 10);
           });
-        
+
         return window.location.href;
     }
 
@@ -184,7 +195,7 @@ export class WalletProvider implements IDappProvider {
 
     static getTxSignReturnValue(urlParams: any): Transaction[] {
         const expectedProps = ["nonce", "value", "receiver", "sender", "gasPrice",
-            "gasLimit", "data", "chainID", "version", "signature"];
+            "gasLimit", "data", "chainID", "version", "signature", "options"];
 
         for (let txProp of expectedProps) {
             if (!urlParams[txProp] || !Array.isArray(urlParams[txProp])) {
@@ -210,7 +221,9 @@ export class WalletProvider implements IDappProvider {
                 data: new TransactionPayload(<string>urlParams["data"][i]),
                 chainID: new ChainID(<string>urlParams["chainID"][i]),
                 version: new TransactionVersion(parseInt(<string>urlParams["version"][i])),
-
+                ...(urlParams["options"][i] ? {
+                    options: new TransactionOptions(parseInt(<string>urlParams["options"][i]))
+                } : {})
             });
             tx.applySignature(new Signature(<string>urlParams["signature"][i]), Address.fromString(<string>urlParams["sender"][i]));
             transactions.push(tx);

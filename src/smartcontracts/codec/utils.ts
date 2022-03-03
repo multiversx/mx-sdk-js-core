@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { numberToPaddedHex } from "../../utils.codec";
 
 /**
  * Returns whether the most significant bit of a given byte (within a buffer) is 1.
@@ -48,14 +49,7 @@ export function getHexMagnitudeOfBigInt(value: BigNumber): string {
         value = value.multipliedBy(new BigNumber(-1));
     }
 
-    let hex = value.toString(16);
-    let padding = "0";
-
-    if (hex.length % 2 == 1) {
-        hex = padding + hex;
-    }
-
-    return hex;
+    return numberToPaddedHex(value);
 }
 
 export function flipBufferBitsInPlace(buffer: Buffer) {

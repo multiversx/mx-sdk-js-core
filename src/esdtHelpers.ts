@@ -1,7 +1,8 @@
-import {ScArgumentsParser} from "./scArgumentsParser";
-import {ErrInvalidEsdtTransferDataField} from "./errors";
+import { ScArgumentsParser } from "./scArgumentsParser";
+import { ErrInvalidEsdtTransferDataField } from "./errors";
 import BigNumber from "bignumber.js";
-import {ESDT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_GAS_LIMIT, ESDT_TRANSFER_VALUE} from "./constants";
+import { ESDT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_GAS_LIMIT, ESDT_TRANSFER_VALUE } from "./constants";
+import { numberToPaddedHex } from "./utils.codec";
 
 /**
  * This class exposes static methods that are useful for parsing ESDT transfer transactions
@@ -20,7 +21,7 @@ export class EsdtHelpers {
             throw new ErrInvalidEsdtTransferDataField();
         }
 
-        let {args} = ScArgumentsParser.parseSmartContractCallDataField(dataField);
+        let { args } = ScArgumentsParser.parseSmartContractCallDataField(dataField);
 
         if (args.length != 2) {
             throw new ErrInvalidEsdtTransferDataField();
@@ -62,7 +63,7 @@ export class EsdtHelpers {
      * @return {value, gasLimit, data} this function returns the value, the gas limit and the data field to use
      */
     public static getTxFieldsForEsdtTransfer(tokenIdentifier: string, amount: string): { value: string, gasLimit: number, data: string } {
-        const encodedAmount = new BigNumber(amount, 10).toString(16);
+        const encodedAmount = numberToPaddedHex(amount);
         const txDataField = [ESDT_TRANSFER_FUNCTION_NAME, tokenIdentifier, encodedAmount].join("@");
 
         return {

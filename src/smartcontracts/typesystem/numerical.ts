@@ -1,5 +1,4 @@
 import * as errors from "../../errors";
-import { guardType } from "../../utils";
 import { PrimitiveType, PrimitiveValue, Type } from "./types";
 import BigNumber from "bignumber.js";
 
@@ -92,7 +91,6 @@ export class NumericalValue extends PrimitiveValue {
 
     constructor(type: NumericalType, value: BigNumber.Value) {
         super(type);
-        guardType("type", NumericalType, type, false);
 
         this.value = new BigNumber(value);
         this.sizeInBytes = type.sizeInBytes;

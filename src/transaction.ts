@@ -12,7 +12,7 @@ import {
 import { NetworkConfig } from "./networkConfig";
 import { Nonce } from "./nonce";
 import { Signature } from "./signature";
-import { guardEmpty, guardNotEmpty, guardType } from "./utils";
+import { guardEmpty, guardNotEmpty } from "./utils";
 import { TransactionPayload } from "./transactionPayload";
 import * as errors from "./errors";
 import { TypedEvent } from "./events";

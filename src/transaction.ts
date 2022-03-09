@@ -153,12 +153,6 @@ export class Transaction implements ISignable {
     this.onSent = new TypedEvent();
     this.onStatusUpdated = new TypedEvent();
     this.onStatusChanged = new TypedEvent();
-
-    // We apply runtime type checks for these fields, since they are the most commonly misused when calling the Transaction constructor
-    // in JavaScript (which lacks type safety).
-    guardType("nonce", Nonce, this.nonce);
-    guardType("gasLimit", GasLimit, this.gasLimit);
-    guardType("gasPrice", GasPrice, this.gasPrice);
   }
 
   getNonce(): Nonce {

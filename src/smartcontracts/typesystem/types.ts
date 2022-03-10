@@ -1,4 +1,4 @@
-import { getJavascriptConstructorsNamesInHierarchy, getJavascriptPrototypesInHierarchy } from "../../reflection";
+import { getJavascriptConstructorsNamesInHierarchy, getJavascriptPrototypesInHierarchy, hasJavascriptConstructor } from "../../reflection";
 import { guardTrue, guardValueIsSet } from "../../utils";
 
 /**
@@ -34,7 +34,7 @@ export class Type {
     }
 
     hasJavascriptConstructor(javascriptConstructorName: string): boolean {
-        return this.constructor.name == javascriptConstructorName;
+        return hasJavascriptConstructor(this, javascriptConstructorName);
     }
 
     hasJavascriptConstructorInHierarchy(javascriptConstructorName: string): boolean {
@@ -228,7 +228,7 @@ export abstract class TypedValue {
     abstract valueOf(): any;
 
     hasJavascriptConstructor(javascriptConstructorName: string): boolean {
-        return this.constructor.name == javascriptConstructorName;
+        return hasJavascriptConstructor(this, javascriptConstructorName);
     }
 
     hasJavascriptConstructorInHierarchy(javascriptConstructorName: string): boolean {

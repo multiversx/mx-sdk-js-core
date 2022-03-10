@@ -38,8 +38,7 @@ export class Type {
     }
 
     hasJavascriptConstructorInHierarchy(javascriptConstructorName: string): boolean {
-        let constructorsNames = getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem);
-        return constructorsNames.includes(javascriptConstructorName);
+        return getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem).includes(javascriptConstructorName);
     }
 
     getTypeParameters(): Type[] {
@@ -232,8 +231,7 @@ export abstract class TypedValue {
     }
 
     hasJavascriptConstructorInHierarchy(javascriptConstructorName: string): boolean {
-        let constructorsNames = getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem);
-        return constructorsNames.includes(javascriptConstructorName);
+        return getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem).includes(javascriptConstructorName);
     }
 
     /**

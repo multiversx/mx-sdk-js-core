@@ -70,25 +70,25 @@ export function onTypedValueSelect<TResult>(
         onOther?: () => TResult;
     }
 ): TResult {
-    if (value instanceof PrimitiveValue) {
+    if (value.hasConstructorInHierarchy(PrimitiveValue.name)) {
         return selectors.onPrimitive();
     }
-    if (value instanceof OptionValue) {
+    if (value.hasConstructorInHierarchy(OptionValue.name)) {
         return selectors.onOption();
     }
-    if (value instanceof List) {
+    if (value.hasConstructorInHierarchy(List.name)) {
         return selectors.onList();
     }
-    if (value instanceof ArrayVec) {
+    if (value.hasConstructorInHierarchy(ArrayVec.name)) {
         return selectors.onArray();
     }
-    if (value instanceof Struct) {
+    if (value.hasConstructorInHierarchy(Struct.name)) {
         return selectors.onStruct();
     }
-    if (value instanceof Tuple) {
+    if (value.hasConstructorInHierarchy(Tuple.name)) {
         return selectors.onTuple();
     }
-    if (value instanceof EnumValue) {
+    if (value.hasConstructorInHierarchy(EnumValue.name)) {
         return selectors.onEnum();
     }
 
@@ -112,25 +112,25 @@ export function onPrimitiveValueSelect<TResult>(
         onOther?: () => TResult;
     }
 ): TResult {
-    if (value instanceof BooleanValue) {
+    if (value.hasConstructorInHierarchy(BooleanValue.name)) {
         return selectors.onBoolean();
     }
-    if (value instanceof NumericalValue) {
+    if (value.hasConstructorInHierarchy(NumericalValue.name)) {
         return selectors.onNumerical();
     }
-    if (value instanceof AddressValue) {
+    if (value.hasConstructorInHierarchy(AddressValue.name)) {
         return selectors.onAddress();
     }
-    if (value instanceof BytesValue) {
+    if (value.hasConstructorInHierarchy(BytesValue.name)) {
         return selectors.onBytes();
     }
-    if (value instanceof H256Value) {
+    if (value.hasConstructorInHierarchy(H256Value.name)) {
         return selectors.onH256();
     }
-    if (value instanceof TokenIdentifierValue) {
+    if (value.hasConstructorInHierarchy(TokenIdentifierValue.name)) {
         return selectors.onTypeIdentifier();
     }
-    if (value instanceof NothingValue) {
+    if (value.hasConstructorInHierarchy(NothingValue.name)) {
         return selectors.onNothing();
     }
     if (selectors.onOther) {

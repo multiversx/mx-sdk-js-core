@@ -1,3 +1,4 @@
+import { getJavascriptConstructorsNamesInHierarchy, getJavascriptPrototypesInHierarchy } from "../../reflection";
 import { guardTrue, guardValueIsSet } from "../../utils";
 
 /**
@@ -33,7 +34,7 @@ export class Type {
     }
 
     hasConstructorInHierarchy(javascriptConstructorName: string): boolean {
-        let constructorsNames = Type.getJavascriptConstructorsNamesInHierarchy(this);
+        let constructorsNames = getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem);
         return constructorsNames.includes(javascriptConstructorName);
     }
 
@@ -108,12 +109,18 @@ export class Type {
             }
 
         let javascriptConstructorNameOfThis = this.constructor.name;
-        let javascriptConstructorNamesInHierarchyOfOther = Type.getJavascriptConstructorsNamesInHierarchy(other);
+        let javascriptConstructorNamesInHierarchyOfOther = getJavascriptConstructorsNamesInHierarchy(other, prototype => prototype.belongsToTypesystem);
         if (javascriptConstructorNamesInHierarchyOfOther.includes(javascriptConstructorNameOfThis)) {
             return true;
         }
         
         return false;
+    }
+
+    private static getFullyQualifiedNamesInHierarchy(type: Type): string[] {
+        let prototypes: any[] = getJavascriptPrototypesInHierarchy(type, prototype => prototype.belongsToTypesystem);
+        let fullyQualifiedNames = prototypes.map(prototype => prototype.getFullyQualifiedName.call(type));
+        return fullyQualifiedNames;
     }
 
     /**
@@ -128,30 +135,6 @@ export class Type {
 
     getCardinality(): TypeCardinality {
         return this.cardinality;
-    }
-
-    private static getFullyQualifiedNamesInHierarchy(type: Type): string[] {
-        let prototypes: any[] = this.getJavascriptPrototypesInHierarchy(type);
-        let fullyQualifiedNames = prototypes.map(prototype => prototype.getFullyQualifiedName.call(type));
-        return fullyQualifiedNames;
-    }
-
-    private static getJavascriptConstructorsNamesInHierarchy(type: Type): string[] {
-        let prototypes = this.getJavascriptPrototypesInHierarchy(type);
-        let constructorNames = prototypes.map(prototype => prototype.constructor.name);
-        return constructorNames;
-    }
-
-    private static getJavascriptPrototypesInHierarchy(type: Type): Object[] {
-        let prototypes: Object[] = [];
-        let prototype: any = Object.getPrototypeOf(type);
-
-        while (prototype && prototype.belongsToTypesystem) {
-            prototypes.push(prototype);
-            prototype = Object.getPrototypeOf(prototype);
-        }
-
-        return prototypes;
     }
 
     /**
@@ -239,6 +222,16 @@ export abstract class TypedValue {
 
     abstract equals(other: any): boolean;
     abstract valueOf(): any;
+
+    hasConstructorInHierarchy(javascriptConstructorName: string): boolean {
+        let constructorsNames = getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem);
+        return constructorsNames.includes(javascriptConstructorName);
+    }
+
+    /**
+     * A special marker for values within erdjs' typesystem.
+     */
+     private belongsToTypesystem() {}
 }
 
 export abstract class PrimitiveValue extends TypedValue {

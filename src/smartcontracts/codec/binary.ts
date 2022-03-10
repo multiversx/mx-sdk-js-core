@@ -17,7 +17,7 @@ import {
     ArrayVecType,
     ArrayVec,
 } from "../typesystem";
-import { guardTrue, guardType } from "../../utils";
+import { guardTrue } from "../../utils";
 import { OptionValueBinaryCodec } from "./option";
 import { PrimitiveBinaryCodec } from "./primitive";
 import { ListBinaryCodec } from "./list";
@@ -100,7 +100,6 @@ export class BinaryCodec {
     }
 
     encodeTopLevel(typedValue: TypedValue): Buffer {
-        guardType("value", TypedValue, typedValue, false);
         guardTrue(
             typedValue
                 .getType()

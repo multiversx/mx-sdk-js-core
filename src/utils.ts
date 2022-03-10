@@ -8,17 +8,6 @@ export function guardTrue(value: boolean, what: string) {
     }
 }
 
-export function guardType(name: string, type: any, value?: any, allowUndefined: boolean = true) {
-    if (allowUndefined && value === undefined) {
-        return;
-    }
-    if (value instanceof type) {
-        return;
-    }
-
-    throw new errors.ErrBadType(name, type, value);
-}
-
 // TODO: merge with guardValueIsSetWithMessage
 export function guardValueIsSet(name: string, value?: any | null | undefined) {
     guardValueIsSetWithMessage(`${name} isn't set (null or undefined)`, value);

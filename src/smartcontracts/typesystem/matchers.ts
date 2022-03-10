@@ -12,6 +12,7 @@ import { TokenIdentifierType, TokenIdentifierValue } from "./tokenIdentifier";
 import { Tuple, TupleType } from "./tuple";
 import { Type, PrimitiveType, PrimitiveValue } from "./types";
 import { ArrayVec, ArrayVecType } from "./genericArray";
+import { TypedValue } from "./types";
 
 // TODO: Extend functionality or rename wrt. restricted / reduced functionality (not all types are handled: composite, variadic).
 export function onTypeSelect<TResult>(
@@ -27,25 +28,25 @@ export function onTypeSelect<TResult>(
         onOther?: () => TResult;
     }
 ): TResult {
-    if (type instanceof OptionType) {
+    if (type.hasConstructorInHierarchy(OptionType.name)) {
         return selectors.onOption();
     }
-    if (type instanceof ListType) {
+    if (type.hasConstructorInHierarchy(ListType.name)) {
         return selectors.onList();
     }
-    if (type instanceof ArrayVecType) {
+    if (type.hasConstructorInHierarchy(ArrayVecType.name)) {
         return selectors.onArray();
     }
-    if (type instanceof PrimitiveType) {
+    if (type.hasConstructorInHierarchy(PrimitiveType.name)) {
         return selectors.onPrimitive();
     }
-    if (type instanceof StructType) {
+    if (type.hasConstructorInHierarchy(StructType.name)) {
         return selectors.onStruct();
     }
-    if (type instanceof TupleType) {
+    if (type.hasConstructorInHierarchy(TupleType.name)) {
         return selectors.onTuple();
     }
-    if (type instanceof EnumType) {
+    if (type.hasConstructorInHierarchy(EnumType.name)) {
         return selectors.onEnum();
     }
 
@@ -57,7 +58,7 @@ export function onTypeSelect<TResult>(
 }
 
 export function onTypedValueSelect<TResult>(
-    value: any,
+    value: TypedValue,
     selectors: {
         onPrimitive: () => TResult;
         onOption: () => TResult;
@@ -152,25 +153,25 @@ export function onPrimitiveTypeSelect<TResult>(
         onOther?: () => TResult;
     }
 ): TResult {
-    if (type instanceof BooleanType) {
+    if (type.hasConstructorInHierarchy(BooleanType.name)) {
         return selectors.onBoolean();
     }
-    if (type instanceof NumericalType) {
+    if (type.hasConstructorInHierarchy(NumericalType.name)) {
         return selectors.onNumerical();
     }
-    if (type instanceof AddressType) {
+    if (type.hasConstructorInHierarchy(AddressType.name)) {
         return selectors.onAddress();
     }
-    if (type instanceof BytesType) {
+    if (type.hasConstructorInHierarchy(BytesType.name)) {
         return selectors.onBytes();
     }
-    if (type instanceof H256Type) {
+    if (type.hasConstructorInHierarchy(H256Type.name)) {
         return selectors.onH256();
     }
-    if (type instanceof TokenIdentifierType) {
+    if (type.hasConstructorInHierarchy(TokenIdentifierType.name)) {
         return selectors.onTokenIndetifier();
     }
-    if (type instanceof NothingType) {
+    if (type.hasConstructorInHierarchy(NothingType.name)) {
         return selectors.onNothing();
     }
     if (selectors.onOther) {

@@ -32,6 +32,11 @@ export class Type {
             `erdjs:types:${this.getName()}`;
     }
 
+    hasConstructorInHierarchy(javascriptConstructorName: string): boolean {
+        let constructorsNames = Type.getJavascriptConstructorsNamesInHierarchy(this);
+        return constructorsNames.includes(javascriptConstructorName);
+    }
+
     getTypeParameters(): Type[] {
         return this.typeParameters;
     }
@@ -96,17 +101,16 @@ export class Type {
             return false;
         }
 
-        let otherPrototype: any = Object.getPrototypeOf(other);
-        
-        while (otherPrototype && otherPrototype.getFullyQualifiedName) {
-            let thisName = this.getFullyQualifiedName();
-            let otherName = otherPrototype.getFullyQualifiedName.call(other);
-
-            if (thisName == otherName) {
+        let fullyQualifiedNameOfThis = this.getFullyQualifiedName();
+        let fullyQualifiedNamesInHierarchyOfOther = Type.getFullyQualifiedNamesInHierarchy(other);
+        if (fullyQualifiedNamesInHierarchyOfOther.includes(fullyQualifiedNameOfThis)) {
                 return true;
             }
 
-            otherPrototype = Object.getPrototypeOf(otherPrototype);
+        let javascriptConstructorNameOfThis = this.constructor.name;
+        let javascriptConstructorNamesInHierarchyOfOther = Type.getJavascriptConstructorsNamesInHierarchy(other);
+        if (javascriptConstructorNamesInHierarchyOfOther.includes(javascriptConstructorNameOfThis)) {
+            return true;
         }
         
         return false;
@@ -125,6 +129,35 @@ export class Type {
     getCardinality(): TypeCardinality {
         return this.cardinality;
     }
+
+    private static getFullyQualifiedNamesInHierarchy(type: Type): string[] {
+        let prototypes: any[] = this.getJavascriptPrototypesInHierarchy(type);
+        let fullyQualifiedNames = prototypes.map(prototype => prototype.getFullyQualifiedName.call(type));
+        return fullyQualifiedNames;
+    }
+
+    private static getJavascriptConstructorsNamesInHierarchy(type: Type): string[] {
+        let prototypes = this.getJavascriptPrototypesInHierarchy(type);
+        let constructorNames = prototypes.map(prototype => prototype.constructor.name);
+        return constructorNames;
+    }
+
+    private static getJavascriptPrototypesInHierarchy(type: Type): Object[] {
+        let prototypes: Object[] = [];
+        let prototype: any = Object.getPrototypeOf(type);
+
+        while (prototype && prototype.belongsToTypesystem) {
+            prototypes.push(prototype);
+            prototype = Object.getPrototypeOf(prototype);
+        }
+
+        return prototypes;
+    }
+
+    /**
+     * A special marker for types within erdjs' typesystem.
+     */
+    private belongsToTypesystem() {}
 }
 
 /**

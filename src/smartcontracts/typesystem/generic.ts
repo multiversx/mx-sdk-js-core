@@ -9,12 +9,12 @@ export class OptionType extends Type {
     }
 
     isAssignableFrom(type: Type): boolean {
-        if (!(type instanceof OptionType)) {
+        if (!(type.hasJavascriptConstructor(OptionType.name))) {
             return false;
         }
 
         let invariantTypeParameters = this.getFirstTypeParameter().equals(type.getFirstTypeParameter());
-        let fakeCovarianceToNull = type.getFirstTypeParameter() instanceof NullType;
+        let fakeCovarianceToNull = type.getFirstTypeParameter().hasJavascriptConstructor(NullType.name);
         return invariantTypeParameters || fakeCovarianceToNull;
     }
 }

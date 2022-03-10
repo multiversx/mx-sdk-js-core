@@ -33,7 +33,11 @@ export class Type {
             `erdjs:types:${this.getName()}`;
     }
 
-    hasConstructorInHierarchy(javascriptConstructorName: string): boolean {
+    hasJavascriptConstructor(javascriptConstructorName: string): boolean {
+        return this.constructor.name == javascriptConstructorName;
+    }
+
+    hasJavascriptConstructorInHierarchy(javascriptConstructorName: string): boolean {
         let constructorsNames = getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem);
         return constructorsNames.includes(javascriptConstructorName);
     }
@@ -105,15 +109,15 @@ export class Type {
         let fullyQualifiedNameOfThis = this.getFullyQualifiedName();
         let fullyQualifiedNamesInHierarchyOfOther = Type.getFullyQualifiedNamesInHierarchy(other);
         if (fullyQualifiedNamesInHierarchyOfOther.includes(fullyQualifiedNameOfThis)) {
-                return true;
-            }
+            return true;
+        }
 
         let javascriptConstructorNameOfThis = this.constructor.name;
         let javascriptConstructorNamesInHierarchyOfOther = getJavascriptConstructorsNamesInHierarchy(other, prototype => prototype.belongsToTypesystem);
         if (javascriptConstructorNamesInHierarchyOfOther.includes(javascriptConstructorNameOfThis)) {
             return true;
         }
-        
+
         return false;
     }
 
@@ -223,7 +227,7 @@ export abstract class TypedValue {
     abstract equals(other: any): boolean;
     abstract valueOf(): any;
 
-    hasConstructorInHierarchy(javascriptConstructorName: string): boolean {
+    hasJavascriptConstructorInHierarchy(javascriptConstructorName: string): boolean {
         let constructorsNames = getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem);
         return constructorsNames.includes(javascriptConstructorName);
     }
@@ -241,7 +245,7 @@ export abstract class PrimitiveValue extends TypedValue {
 }
 
 export function isTyped(value: any) {
-    return value instanceof TypedValue;
+    return value.belongsToTypesystem;
 }
 
 export class TypePlaceholder extends Type {

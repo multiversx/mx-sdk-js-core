@@ -90,9 +90,26 @@ export class Type {
      *  - https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)
      *  - https://docs.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance
      */
-    isAssignableFrom(type: Type): boolean {
-        let invariantTypeParameters = Type.equalsMany(this.getTypeParameters(), type.getTypeParameters());
-        return type instanceof this.constructor && invariantTypeParameters;
+    isAssignableFrom(other: Type): boolean {
+        let invariantTypeParameters = Type.equalsMany(this.getTypeParameters(), other.getTypeParameters());
+        if (!invariantTypeParameters) {
+            return false;
+        }
+
+        let otherPrototype: any = Object.getPrototypeOf(other);
+        
+        while (otherPrototype && otherPrototype.getFullyQualifiedName) {
+            let thisName = this.getFullyQualifiedName();
+            let otherName = otherPrototype.getFullyQualifiedName.call(other);
+
+            if (thisName == otherName) {
+                return true;
+            }
+
+            otherPrototype = Object.getPrototypeOf(otherPrototype);
+        }
+        
+        return false;
     }
 
     /**

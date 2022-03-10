@@ -2,12 +2,13 @@ import * as errors from "../../errors";
 import { assert } from "chai";
 import { NumericalValue, StringType } from ".";
 import { I64Type, U16Type, U32Type, U32Value, U8Type } from "./numerical";
-import { PrimitiveType, Type } from "./types";
+import { PrimitiveType, Type, NullType } from "./types";
 import { BooleanType } from "./boolean";
 import { AddressType } from "./address";
 import { OptionType } from "./generic";
 import { TypeExpressionParser } from "./typeExpressionParser";
 import BigNumber from "bignumber.js";
+import { BytesType} from "./bytes";
 
 describe("test types", () => {
     let parser = new TypeExpressionParser();
@@ -31,6 +32,11 @@ describe("test types", () => {
         assert.isFalse((new AddressType()).isAssignableFrom(new BooleanType()));
         assert.isFalse((new U32Type()).isAssignableFrom(new BooleanType()));
         assert.isFalse((new U32Type()).isAssignableFrom(new PrimitiveType("PrimitiveType")));
+
+        assert.isTrue(new BytesType().isAssignableFrom(new BytesType()));
+        assert.isTrue(new U32Type().isAssignableFrom(parser.parse("u32")));
+        assert.isTrue(new Type("u32").isAssignableFrom(new U32Type()));
+        assert.isTrue(new OptionType(new U32Type()).isAssignableFrom(new OptionType(new NullType())));
     });
 
     it("should report equality", () => {

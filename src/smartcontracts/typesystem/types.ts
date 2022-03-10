@@ -227,6 +227,10 @@ export abstract class TypedValue {
     abstract equals(other: any): boolean;
     abstract valueOf(): any;
 
+    hasJavascriptConstructor(javascriptConstructorName: string): boolean {
+        return this.constructor.name == javascriptConstructorName;
+    }
+
     hasJavascriptConstructorInHierarchy(javascriptConstructorName: string): boolean {
         let constructorsNames = getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem);
         return constructorsNames.includes(javascriptConstructorName);

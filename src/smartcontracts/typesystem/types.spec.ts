@@ -44,4 +44,12 @@ describe("test types", () => {
         assert.isTrue(parser.parse("Option<u32>").equals(new OptionType(new U32Type())));
         assert.isTrue(parser.parse("utf-8 string").equals(new StringType()));
     });
+
+    it("should get fully qualified name", () => {
+        assert.equal(new Type("foo").getFullyQualifiedName(), "erdjs:types:foo");
+        assert.equal(new U32Type().getFullyQualifiedName(), "erdjs:types:u32");
+        assert.equal(parser.parse("MultiResultVec<u32>").getFullyQualifiedName(), "erdjs:types:MultiResultVec<erdjs:types:u32>");
+        assert.equal(parser.parse("utf-8 string").getFullyQualifiedName(), "erdjs:types:utf-8 string");
+        assert.equal(parser.parse("Option<u32>").getFullyQualifiedName(), "erdjs:types:Option<erdjs:types:u32>");
+    });
 });

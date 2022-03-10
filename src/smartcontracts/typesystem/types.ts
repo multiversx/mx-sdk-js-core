@@ -21,6 +21,17 @@ export class Type {
         return this.name;
     }
 
+    /**
+     * Gets the fully qualified name of the type, to allow for better (efficient and non-ambiguous) type comparison within erdjs' typesystem.
+     */
+    getFullyQualifiedName(): string {
+        let joinedTypeParameters = this.getTypeParameters().map(type => type.getFullyQualifiedName()).join(", ");
+
+        return this.isGenericType() ? 
+            `erdjs:types:${this.getName()}<${joinedTypeParameters}>` : 
+            `erdjs:types:${this.getName()}`;
+    }
+
     getTypeParameters(): Type[] {
         return this.typeParameters;
     }
@@ -33,7 +44,6 @@ export class Type {
         guardTrue(this.typeParameters.length > 0, "type parameters length > 0");
         return this.typeParameters[0];
     }
-
 
     /**
      * Generates type expressions similar to elrond-wasm-rs. 
@@ -49,13 +59,7 @@ export class Type {
     }
 
     static equals(a: Type, b: Type): boolean {
-        // Workaround that seems to always work properly. Most probable reasons: 
-        // - ES6 is quite strict about enumerating over the properties on an object.
-        // - toJSON() returns an object literal (most probably, this results in deterministic iteration in all browser implementations).
-        let aJson = JSON.stringify(a.toJSON());
-        let bJson = JSON.stringify(b.toJSON());
-
-        return aJson == bJson;
+        return a.getFullyQualifiedName() == b.getFullyQualifiedName();
     }
 
     static equalsMany(a: Type[], b: Type[]) {

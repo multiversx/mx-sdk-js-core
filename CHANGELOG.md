@@ -5,7 +5,10 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
- - TBD
+ - [Fix WalletProvider URL when nonce = 0](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/137)
+ - [Fix padding for getTxFieldsForEsdtTransfer](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/140)
+ - [Added payableBySc to CodeMetadata](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/141)
+ - [Remove usages of guardType()](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/143)
 
 ## [9.1.0]
   - [Interactions: enable token transfers ("transfer with execute")](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/131)

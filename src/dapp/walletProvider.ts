@@ -243,7 +243,7 @@ export class WalletProvider implements IDappProvider {
         if (transaction.data) {
             urlString += `&data=${transaction.data}`;
         }
-        if (transaction.nonce) {
+        if (transaction.nonce || transaction.nonce === 0) {
             urlString += `&nonce=${transaction.nonce}`;
         }
 

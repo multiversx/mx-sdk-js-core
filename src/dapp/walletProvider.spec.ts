@@ -69,10 +69,10 @@ describe("test wallet provider", () => {
     });
 
     await walletProvider.sendTransaction(mockTransaction);
-    assert.equal(window.location.href, "http://mocked-wallet.com/hook/transaction?receiver=erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu&value=0&gasLimit=50000&gasPrice=1000000000&callbackUrl=http://return-to-wallet");
+    assert.equal(window.location.href, "http://mocked-wallet.com/hook/transaction?receiver=erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu&value=0&gasLimit=50000&gasPrice=1000000000&nonce=0&callbackUrl=http://return-to-wallet");
 
     await walletProvider.sendTransaction(mockTransaction, {callbackUrl: "http://another-callback"});
-    assert.equal(window.location.href, "http://mocked-wallet.com/hook/transaction?receiver=erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu&value=0&gasLimit=50000&gasPrice=1000000000&callbackUrl=http://another-callback");
+    assert.equal(window.location.href, "http://mocked-wallet.com/hook/transaction?receiver=erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu&value=0&gasLimit=50000&gasPrice=1000000000&nonce=0&callbackUrl=http://another-callback");
   });
 
   it('sign transaction redirects correctly', async () => {
@@ -82,10 +82,10 @@ describe("test wallet provider", () => {
     });
 
     await walletProvider.signTransaction(mockTransaction);
-    assert.equal(window.location.href, "http://mocked-wallet.com/hook/sign?receiver=erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu&value=0&gasLimit=50000&gasPrice=1000000000&callbackUrl=http://return-to-wallet");
+    assert.equal(window.location.href, "http://mocked-wallet.com/hook/sign?receiver=erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu&value=0&gasLimit=50000&gasPrice=1000000000&nonce=0&callbackUrl=http://return-to-wallet");
 
     await walletProvider.signTransaction(mockTransaction, {callbackUrl: "http://another-callback"});
-    assert.equal(window.location.href, "http://mocked-wallet.com/hook/sign?receiver=erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu&value=0&gasLimit=50000&gasPrice=1000000000&callbackUrl=http://another-callback");
+    assert.equal(window.location.href, "http://mocked-wallet.com/hook/sign?receiver=erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu&value=0&gasLimit=50000&gasPrice=1000000000&nonce=0&callbackUrl=http://another-callback");
   });
 
   it('sign multiple transactions redirects correctly', async () => {

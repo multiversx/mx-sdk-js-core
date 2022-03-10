@@ -53,7 +53,7 @@ describe("test smart contract interactor", function () {
         await lottery.call.start("lucky", Balance.egld(1), null, null, 1, null, null);
 
         let status = await lottery.query.status("lucky");
-        assert.equal(status.valueOf(), "Running");
+        assert.equal(status.valueOf().name, "Running");
 
         let info = await lottery.query.lotteryInfo("lucky");
         // Ignore "deadline" field in our test

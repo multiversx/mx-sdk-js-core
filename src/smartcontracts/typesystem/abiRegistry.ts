@@ -76,7 +76,7 @@ export class AbiRegistry {
         return names.map((name) => this.getInterface(name));
     }
     getStruct(name: string): StructType {
-        let result = this.customTypes.find((e) => e.getName() == name && e instanceof StructType);
+        let result = this.customTypes.find((e) => e.getName() == name && e.hasJavascriptConstructor(StructType.name));
         guardValueIsSetWithMessage(`struct [${name}] not found`, result);
         return <StructType>result!;
     }
@@ -84,7 +84,7 @@ export class AbiRegistry {
         return names.map((name) => this.getStruct(name));
     }
     getEnum(name: string): EnumType {
-        let result = this.customTypes.find((e) => e.getName() == name && e instanceof EnumType);
+        let result = this.customTypes.find((e) => e.getName() == name && e.hasJavascriptConstructor(EnumType.name));
         guardValueIsSetWithMessage(`enum [${name}] not found`, result);
         return <EnumType>result!;
     }

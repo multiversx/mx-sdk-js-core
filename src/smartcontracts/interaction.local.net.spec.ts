@@ -127,7 +127,7 @@ describe("test smart contract interactor", function () {
         let { returnCode: statusReturnCode, values: statusReturnValues, firstValue: statusFirstValue } = await runner.runAwaitExecution(lotteryStatusInteraction.withNonce(alice.account.getNonceThenIncrement()))
         assert.isTrue(statusReturnCode.equals(ReturnCode.Ok));
         assert.lengthOf(statusReturnValues, 1);
-        assert.equal(statusFirstValue.valueOf(), "Running");
+        assert.equal(statusFirstValue.valueOf().name, "Running");
 
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
         let { returnCode: infoReturnCode, values: infoReturnValues, firstValue: infoFirstValue } = await runner.runAwaitExecution(getLotteryInfoInteraction.withNonce(alice.account.getNonceThenIncrement()))

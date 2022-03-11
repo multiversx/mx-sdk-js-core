@@ -247,7 +247,7 @@ export abstract class PrimitiveValue extends TypedValue {
 }
 
 export function isTyped(value: any) {
-    return value.belongsToTypesystem;
+    return value.belongsToTypesystem !== undefined;
 }
 
 export class TypePlaceholder extends Type {

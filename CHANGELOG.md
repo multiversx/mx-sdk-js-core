@@ -4,7 +4,10 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## Unreleased
+ - TBD
+
+## [9.2.0]
  - [Fix WalletProvider URL when nonce = 0](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/137)
  - [Fix padding for getTxFieldsForEsdtTransfer](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/140)
  - [Added payableBySc to CodeMetadata](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/141)

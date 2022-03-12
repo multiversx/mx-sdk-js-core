@@ -24,6 +24,7 @@ export * from "./scArgumentsParser";
 export * from "./esdtHelpers";
 export * from "./token";
 
+// TODO: Do not export "crypto" and "walletcore", by default (not needed by most dapps).
 export * from "./crypto";
 export * from "./walletcore";
 export * from "./nullSigner";

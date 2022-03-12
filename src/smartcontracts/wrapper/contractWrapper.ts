@@ -1,15 +1,27 @@
 import path from "path";
 import fs from "fs";
-import { SmartContract, SmartContractAbi, ExecutionResultsBundle, Code, EndpointDefinition, Interaction, NativeTypes, NativeSerializer, EndpointParameterDefinition, AddressType } from "..";
 import { ChainSendContext } from "./chainSendContext";
 import { generateMethods, Methods } from "./generateMethods";
 import { formatEndpoint, FormattedCall } from "./formattedCall";
 import { ArgumentErrorContext } from "../argumentErrorContext";
-import { Address, Balance, Egld, Err, ErrContract, ErrInvalidArgument, IProvider, Transaction } from "../..";
 import { PreparedCall } from "./preparedCall";
 import { TransactionOnNetwork } from "../../transactionOnNetwork";
-import { ContractLogger, SendContext } from ".";
+import { ContractLogger } from "./contractLogger";
+import { SendContext } from "./sendContext";
 import { loadContractCode } from "../../testutils";
+import { NativeSerializer, NativeTypes } from "../nativeSerializer";
+import { AddressType, EndpointDefinition, EndpointParameterDefinition } from "../typesystem";
+import { Address } from "../../address";
+import { SmartContractAbi } from "../abi";
+import { SmartContract } from "../smartContract";
+import { Code } from "../code";
+import { Transaction } from "../../transaction";
+import { IProvider } from "../../interface";
+import { ExecutionResultsBundle } from "../interface";
+import { Interaction } from "../interaction";
+import { Err, ErrContract, ErrInvalidArgument } from "../../errors";
+import { Egld } from "../../balanceBuilder";
+import { Balance } from "../../balance";
 
 /**
  * Provides a simple interface in order to easily call or query the smart contract's methods.

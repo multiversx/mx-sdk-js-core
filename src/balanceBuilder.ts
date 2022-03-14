@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
-import { Balance, ErrInvariantFailed } from ".";
-import { ErrInvalidArgument } from "./errors";
+import { Balance } from "./balance";
+import { ErrInvalidArgument, ErrInvariantFailed } from "./errors";
 import { Token, TokenType } from "./token";
 
 /**

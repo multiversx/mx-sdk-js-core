@@ -1,8 +1,11 @@
 import { assert } from "chai";
-import { chooseProxyProvider } from "./interactive";
-import { Address, chooseApiProvider, Nonce, SmartContractResultItem, TransactionHash, TransactionStatus } from ".";
+import { chooseApiProvider, chooseProxyProvider } from "./interactive";
 import { Hash } from "./hash";
 import { TransactionOnNetwork, TransactionOnNetworkType } from "./transactionOnNetwork";
+import { TransactionHash, TransactionStatus } from "./transaction";
+import { Address } from "./address";
+import { Nonce } from "./nonce";
+import { SmartContractResultItem } from "./smartcontracts";
 
 describe("test transactions on devnet", function () {
     it("should get transaction from Proxy & from API", async function () {

@@ -1,7 +1,15 @@
 import BigNumber from "bignumber.js";
 import path from "path";
-import { ContractWrapper, SendContext, ContractLogger, EndpointParameterDefinition, AddressType } from "..";
-import { Address, Balance, IProvider, BalanceBuilder, Token, createBalanceBuilder, Egld, EsdtHelpers } from "../..";
+import { ContractWrapper } from "./contractWrapper";
+import { ContractLogger } from "./contractLogger";
+import { SendContext  } from "./sendContext";
+import { AddressType, EndpointParameterDefinition } from "../typesystem";
+import { Address } from "../../address";
+import { Balance } from "../../balance";
+import { Egld, BalanceBuilder, createBalanceBuilder } from "../../balanceBuilder";
+import { IProvider } from "../../interface";
+import { Token } from "../../token";
+import { EsdtHelpers } from "../../esdtHelpers";
 import { MockProvider, TestWallet } from "../../testutils";
 import { NativeSerializer, NativeTypes } from "../nativeSerializer";
 import { ArgumentErrorContext } from "../argumentErrorContext";

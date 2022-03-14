@@ -1,7 +1,9 @@
-import { SystemWrapper, Balance, setupInteractive } from "../..";
 import { assert } from "chai";
 import { BigNumber } from "bignumber.js";
 import { TestWallet } from "../../testutils";
+import { SystemWrapper } from "./systemWrapper";
+import { setupInteractive } from "../../interactive";
+import { Balance } from "../../balance";
 
 
 describe("test smart contract interactor", function () {

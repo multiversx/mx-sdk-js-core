@@ -1,4 +1,4 @@
-import { Address } from ".";
+import { Address } from "./address";
 import { ErrTransactionEventNotFound } from "./errors";
 
 export class TransactionLogs {

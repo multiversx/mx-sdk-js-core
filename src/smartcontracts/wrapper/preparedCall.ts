@@ -1,4 +1,5 @@
-import { Address, Balance } from "../..";
+import { Address } from "../../address";
+import { Balance } from "../../balance";
 import { FormattedCall } from "./formattedCall";
 
 /**

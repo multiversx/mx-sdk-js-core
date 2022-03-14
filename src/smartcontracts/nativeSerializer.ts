@@ -1,11 +1,14 @@
 import BigNumber from "bignumber.js";
-import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, Code, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, TokenIdentifierType, TokenIdentifierValue, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from ".";
-import { ErrInvalidArgument, Address, BalanceBuilder } from "..";
+import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, TokenIdentifierType, TokenIdentifierValue, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
 import { TestWallet } from "../testutils";
 import { ArgumentErrorContext } from "./argumentErrorContext";
 import { SmartContract } from "./smartContract";
 import { Struct, Field, StructType, Tuple } from "./typesystem";
 import { ContractWrapper } from "./wrapper/contractWrapper";
+import { BalanceBuilder } from "../balanceBuilder";
+import { Address } from "../address";
+import { Code } from "./code";
+import { ErrInvalidArgument } from "../errors";
 
 export namespace NativeTypes {
     export type NativeBuffer = Buffer | string | BalanceBuilder;

@@ -5,7 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## Unreleased
- - TBD
+ - [Fix / simplify some imports](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/148)
 
 ## [9.2.0]
  - [Fix WalletProvider URL when nonce = 0](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/137)

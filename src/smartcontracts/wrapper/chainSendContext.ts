@@ -1,5 +1,8 @@
-import { Balance, ContractLogger, IProvider, SendContext } from "../..";
+import { Balance } from "../../balance";
+import { IProvider } from "../../interface";
 import { TestWallet } from "../../testutils";
+import { ContractLogger } from "./contractLogger";
+import { SendContext } from "./sendContext";
 
 export class ChainSendContext {
     readonly context: SendContext;

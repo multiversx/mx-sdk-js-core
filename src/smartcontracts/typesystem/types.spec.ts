@@ -1,7 +1,6 @@
 import * as errors from "../../errors";
 import { assert } from "chai";
-import { NumericalValue, StringType } from ".";
-import { I64Type, U16Type, U32Type, U32Value, U8Type } from "./numerical";
+import { I64Type, NumericalValue, U16Type, U32Type, U32Value, U8Type } from "./numerical";
 import { PrimitiveType, Type, NullType } from "./types";
 import { BooleanType } from "./boolean";
 import { AddressType } from "./address";
@@ -9,6 +8,7 @@ import { OptionType } from "./generic";
 import { TypeExpressionParser } from "./typeExpressionParser";
 import BigNumber from "bignumber.js";
 import { BytesType} from "./bytes";
+import { StringType } from "./string";
 
 describe("test types", () => {
     let parser = new TypeExpressionParser();

@@ -1,10 +1,11 @@
 import { NetworkConfig } from "../networkConfig";
 import { loadContractCode, loadTestWallets, TestWallet } from "../testutils";
 import { TransactionWatcher } from "../transactionWatcher";
-import { ContractFunction, SmartContract } from ".";
 import { GasLimit } from "../networkParams";
 import { assert } from "chai";
 import { chooseProxyProvider } from "../interactive";
+import { SmartContract } from "./smartContract";
+import { ContractFunction } from "./function";
 
 describe("fetch transactions from local testnet", function () {
     let provider = chooseProxyProvider("local-testnet");;

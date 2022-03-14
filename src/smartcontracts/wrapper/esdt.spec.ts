@@ -1,8 +1,13 @@
-import { Address, ContractWrapper, createBalanceBuilder, Egld, Token, SystemWrapper, TokenType, setupInteractiveWithProvider } from "../..";
 import { isOnBrowserTests, MockProvider, setupUnitTestWatcherTimeouts, TestWallet } from "../../testutils";
 import { assert } from "chai";
-import { ArgSerializer } from "..";
 import BigNumber from "bignumber.js";
+import { SystemWrapper } from "./systemWrapper";
+import { Address } from "../../address";
+import { ContractWrapper } from "./contractWrapper";
+import { setupInteractiveWithProvider } from "../../interactive";
+import { createBalanceBuilder, Egld } from "../../balanceBuilder";
+import { Token, TokenType } from "../../token";
+import { ArgSerializer } from "../argSerializer";
 
 describe("test ESDT transfers via the smart contract wrapper", async function () {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");

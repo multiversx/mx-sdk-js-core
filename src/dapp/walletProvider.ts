@@ -11,8 +11,12 @@ import {
 import { Transaction } from "../transaction";
 import { SignableMessage } from "../signableMessage";
 import {ErrInvalidTxSignReturnValue, ErrNotImplemented} from "../errors";
-import {Nonce, Balance, Address, GasPrice, GasLimit, TransactionPayload, ChainID, TransactionVersion} from "../";
 import {Signature} from "../signature";
+import { Nonce } from "../nonce";
+import { Balance } from "../balance";
+import { Address } from "../address";
+import { ChainID, GasLimit, GasPrice, TransactionVersion } from "../networkParams";
+import { TransactionPayload } from "../transactionPayload";
 
 interface TransactionMessage {
     receiver: string;

@@ -2,8 +2,8 @@ import * as errors from "../errors";
 import { assert } from "chai";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { parse, parseUserKey, parseValidatorKey } from "./pem";
-import { BLS } from ".";
 import { Buffer } from "buffer";
+import { BLS } from "./validatorKeys";
 
 describe("test PEMs", () => {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;

@@ -1,4 +1,4 @@
-import { CodeMetadata } from "..";
+import { CodeMetadata } from "../codeMetadata";
 import { PrimitiveType, PrimitiveValue } from "./types";
 
 export class CodeMetadataType extends PrimitiveType {

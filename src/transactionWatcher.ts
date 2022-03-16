@@ -102,6 +102,8 @@ export class TransactionWatcher {
         });
 
         while (!stop) {
+            await periodicTimer.start(this.pollingInterval);
+
             try {
                 fetchedData = await doFetch();
                 Logger.debug("TransactionWatcher.awaitConditionally(): fetched data.", this.hash.toString())
@@ -120,8 +122,6 @@ export class TransactionWatcher {
                     throw error;
                 }
             }
-
-            await periodicTimer.start(this.pollingInterval);
         }
 
         if (!timeoutTimer.isStopped()) {

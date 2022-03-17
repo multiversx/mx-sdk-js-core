@@ -15,7 +15,7 @@ import {Signature} from "../signature";
 import { Nonce } from "../nonce";
 import { Balance } from "../balance";
 import { Address } from "../address";
-import { ChainID, GasLimit, GasPrice, TransactionVersion } from "../networkParams";
+import { ChainID, GasLimit, GasPrice, TransactionOptions, TransactionVersion } from "../networkParams";
 import { TransactionPayload } from "../transactionPayload";
 
 interface TransactionMessage {
@@ -187,6 +187,7 @@ export class WalletProvider implements IDappProvider {
     }
 
     static getTxSignReturnValue(urlParams: any): Transaction[] {
+        // "options" property is optional (it isn't always received from the Web Wallet).
         const expectedProps = ["nonce", "value", "receiver", "sender", "gasPrice",
             "gasLimit", "data", "chainID", "version", "signature"];
 
@@ -214,8 +215,13 @@ export class WalletProvider implements IDappProvider {
                 data: new TransactionPayload(<string>urlParams["data"][i]),
                 chainID: new ChainID(<string>urlParams["chainID"][i]),
                 version: new TransactionVersion(parseInt(<string>urlParams["version"][i])),
-
             });
+
+            // Handle the optional "options" property.
+            if (urlParams["options"]) {
+                tx.options = new TransactionOptions(parseInt(urlParams["options"][i]));
+            }
+
             tx.applySignature(new Signature(<string>urlParams["signature"][i]), Address.fromString(<string>urlParams["sender"][i]));
             transactions.push(tx);
         }

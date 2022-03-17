@@ -13,6 +13,7 @@ import { Tuple, TupleType } from "./tuple";
 import { Type, PrimitiveType, PrimitiveValue } from "./types";
 import { ArrayVec, ArrayVecType } from "./genericArray";
 import { TypedValue } from "./types";
+import { StringType, StringValue } from "./string";
 
 // TODO: Extend functionality or rename wrt. restricted / reduced functionality (not all types are handled: composite, variadic).
 export function onTypeSelect<TResult>(
@@ -106,6 +107,7 @@ export function onPrimitiveValueSelect<TResult>(
         onNumerical: () => TResult;
         onAddress: () => TResult;
         onBytes: () => TResult;
+        onString: () => TResult;
         onH256: () => TResult;
         onTypeIdentifier: () => TResult;
         onNothing: () => TResult;
@@ -123,6 +125,9 @@ export function onPrimitiveValueSelect<TResult>(
     }
     if (value.hasJavascriptConstructorInHierarchy(BytesValue.name)) {
         return selectors.onBytes();
+    }
+    if (value.hasJavascriptConstructorInHierarchy(StringValue.name)) {
+        return selectors.onString();
     }
     if (value.hasJavascriptConstructorInHierarchy(H256Value.name)) {
         return selectors.onH256();
@@ -147,6 +152,7 @@ export function onPrimitiveTypeSelect<TResult>(
         onNumerical: () => TResult;
         onAddress: () => TResult;
         onBytes: () => TResult;
+        onString: () => TResult;
         onH256: () => TResult;
         onTokenIndetifier: () => TResult;
         onNothing: () => TResult;
@@ -164,6 +170,9 @@ export function onPrimitiveTypeSelect<TResult>(
     }
     if (type.hasJavascriptConstructorInHierarchy(BytesType.name)) {
         return selectors.onBytes();
+    }
+    if (type.hasJavascriptConstructorInHierarchy(StringType.name)) {
+        return selectors.onString();
     }
     if (type.hasJavascriptConstructorInHierarchy(H256Type.name)) {
         return selectors.onH256();

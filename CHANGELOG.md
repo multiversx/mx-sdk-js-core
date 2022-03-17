@@ -6,6 +6,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Unreleased
  - [Fix / simplify some imports](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/148)
+ - [Handle strings in binary codec](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/153)
+ - [Fix data fetching from the blockchain - wait before polling for the first time](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/152)
 
 ## [9.2.0]
  - [Fix WalletProvider URL when nonce = 0](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/137)

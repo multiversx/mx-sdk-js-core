@@ -22,12 +22,12 @@ jobs:
           echo "" >> notes.txt
 
           RELEASE_TAG=v$(node -p "require('./package.json').version")
-          gh release create $RELEASE_TAG --prerelease --title="$RELEASE_TAG" --generate-notes --notes-file=notes.txt
+          gh release create $RELEASE_TAG --title="$RELEASE_TAG" --generate-notes --notes-file=notes.txt
       
       - run: npm ci
       - run: npm test
       
-      # - name: Publish to npmjs
-      #   env:
-      #     NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-      #   run: npm publish --access=public
+      - name: Publish to npmjs
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: npm publish --access=public

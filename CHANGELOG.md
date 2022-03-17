@@ -5,6 +5,9 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## Unreleased
+ - TBD
+
+## [9.2.1]
  - [Fix / simplify some imports](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/148)
  - [Handle strings in binary codec](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/153)
  - [Fix data fetching from the blockchain - wait before polling for the first time](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/152)

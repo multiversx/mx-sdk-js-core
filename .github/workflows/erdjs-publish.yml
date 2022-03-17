@@ -1,24 +1,10 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
 name: Publish erdjs
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - run: npm ci
-      - run: npm test
-
   publish-npm:
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -26,22 +12,22 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish --access=public
+      
+      - name: Create release
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo " - [npmjs](https://www.npmjs.com/package/@elrondnetwork/erdjs)" >> notes.txt
+          echo " - [CHANGELOG](https://github.com/ElrondNetwork/elrond-sdk-erdjs/blob/main/CHANGELOG.md)" >> notes.txt
+          echo "" >> notes.txt
 
-  # TODO: Enable when we make the repository "hw-app-elrond" public.
-  # publish-gpr:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: 12
-  #         registry-url: https://npm.pkg.github.com/
-  #     - run: npm ci
-  #     - run: cd erdjs && npm publish --access=public
-  #       env:
-  #         NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          RELEASE_TAG=v$(node -p "require('./package.json').version")
+          gh release create $RELEASE_TAG --prerelease --title="$RELEASE_TAG" --generate-notes --notes-file=notes.txt
+      
+      - run: npm ci
+      - run: npm test
+      
+      # - name: Publish to npmjs
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      #   run: npm publish --access=public

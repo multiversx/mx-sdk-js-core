@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - TBD
 
+## [9.2.2]
+ - [Wallet Provider: add "options" on tx sign return value](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/157)
+
 ## [9.2.1]
  - [Fix / simplify some imports](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/148)
  - [Handle strings in binary codec](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/153)

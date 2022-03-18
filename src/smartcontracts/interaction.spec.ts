@@ -119,7 +119,11 @@ describe("test smart contract interactor", function() {
         let abi = new SmartContractAbi(abiRegistry, ["answer"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
 
-        let interaction = <Interaction>contract.methods.getUltimateAnswer().withGasLimit(new GasLimit(543210));
+        let interaction = <Interaction>contract.methods
+            .getUltimateAnswer()
+            .withGasLimit(new GasLimit(543210))
+            .check();
+
         assert.equal(interaction.getContract().getAddress(), dummyAddress);
         assert.deepEqual(interaction.getInterpretingFunction(), new ContractFunction("getUltimateAnswer"));
         assert.deepEqual(interaction.getExecutingFunction(), new ContractFunction("getUltimateAnswer"));
@@ -181,8 +185,12 @@ describe("test smart contract interactor", function() {
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
 
         let getInteraction = <Interaction>contract.methods.get();
-        let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(new GasLimit(543210));
-        let decrementInteraction = (<Interaction>contract.methods.decrement()).withGasLimit(new GasLimit(987654));
+        let incrementInteraction = (<Interaction>contract.methods.increment())
+            .withGasLimit(new GasLimit(543210))
+            .check();
+        let decrementInteraction = (<Interaction>contract.methods.decrement())
+            .withGasLimit(new GasLimit(987654))
+            .check();
 
         // For "get()", return fake 7
         provider.mockQueryResponseOnFunction(
@@ -242,6 +250,7 @@ describe("test smart contract interactor", function() {
                     OptionValue.newMissing(),
                 ])
                 .withGasLimit(new GasLimit(5000000))
+                .check()
         );
 
         let lotteryStatusInteraction = <Interaction>(

@@ -12,6 +12,7 @@ import { Nonce } from "../nonce";
 import { ExecutionResultsBundle, QueryResponseBundle } from "./interface";
 import { NetworkConfig } from "../networkConfig";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
+import { IInteractionChecker, StrictChecker } from ".";
 
 /**
  * Interactions can be seen as mutable transaction & query builders.
@@ -20,6 +21,7 @@ import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDT
  * the execution outcome for the objects they've built.
  */
 export class Interaction {
+    private readonly checker: IInteractionChecker;
     private readonly contract: SmartContract;
     private readonly executingFunction: ContractFunction;
     private readonly interpretingFunction: ContractFunction;
@@ -43,6 +45,7 @@ export class Interaction {
         args: TypedValue[],
         receiver?: Address,
     ) {
+        this.checker = new StrictChecker();
         this.contract = contract;
         this.executingFunction = executingFunction;
         this.interpretingFunction = interpretingFunction;
@@ -198,6 +201,18 @@ export class Interaction {
 
     withNonce(nonce: Nonce): Interaction {
         this.nonce = nonce;
+        return this;
+    }
+
+    /**
+     * Checks the prepared interaction against the ABI endpoint definition.
+     * This function throws if type mismatches (provided vs. ABI) are encountered.
+     * 
+     * When the ABI is available, it is always recommended to call {@link check} before
+     * {@link buildTransaction}.
+     */
+    check(): Interaction {
+        this.checker.checkInteraction(this);
         return this;
     }
 

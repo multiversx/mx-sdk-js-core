@@ -10,7 +10,7 @@ import { OptionalType } from "./algebraic";
 import { CompositeType } from "./composite";
 import { ListType, OptionType } from "./generic";
 import { TupleType } from "./tuple";
-import { TokenIdentifierType } from "..";
+import { TokenIdentifierType } from "./tokenIdentifier";
 
 type TypeConstructor = new (...typeParameters: Type[]) => Type;
 

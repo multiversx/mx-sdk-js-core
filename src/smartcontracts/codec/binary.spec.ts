@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { BinaryCodec, BinaryCodecConstraints } from "./binary";
-import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue, ArrayVec, ArrayVecType, U16Value, TokenIdentifierType, TokenIdentifierValue } from "../typesystem";
+import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue, ArrayVec, ArrayVecType, U16Value, TokenIdentifierType, TokenIdentifierValue, StringValue, StringType } from "../typesystem";
 import { discardSuperfluousBytesInTwosComplement, discardSuperfluousZeroBytes, isMsbOne } from "./utils";
 import { Address } from "../../address";
 import { Balance } from "../../balance";
@@ -83,6 +83,24 @@ describe("test binary codec (basic)", () => {
             assert.instanceOf(decodedTop, NumericalValue);
             assert.isTrue(decodedTop.equals(value));
         }
+    });
+
+    it("should create bytes and strings, encode and decode", async () => {
+        let bytesValue = BytesValue.fromHex("74657374");
+        let stringValue = StringValue.fromHex("74657374");
+
+        let length = [0x00, 0x00, 0x00, 0x04];
+        let payload = [0x74, 0x65, 0x73, 0x74];
+        
+        assert.deepEqual(codec.encodeNested(bytesValue), Buffer.from([...length, ...payload]));
+        assert.deepEqual(codec.encodeTopLevel(bytesValue), Buffer.from(payload));
+        assert.deepEqual(codec.decodeNested<BytesValue>(Buffer.from([...length, ...payload]), new BytesType()), [bytesValue, 8]);
+        assert.deepEqual(codec.decodeTopLevel<BytesValue>(Buffer.from(payload), new BytesType()), bytesValue);
+
+        assert.deepEqual(codec.encodeNested(stringValue), Buffer.from([...length, ...payload]));
+        assert.deepEqual(codec.encodeTopLevel(stringValue), Buffer.from(payload));
+        assert.deepEqual(codec.decodeNested<StringValue>(Buffer.from([...length, ...payload]), new StringType()), [stringValue, 8]);
+        assert.deepEqual(codec.decodeTopLevel<StringValue>(Buffer.from(payload), new StringType()), stringValue);
     });
 });
 

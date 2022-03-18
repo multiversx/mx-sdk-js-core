@@ -1,4 +1,3 @@
-import * as errors from "../../errors";
 import { Address } from "../../address";
 import { PrimitiveType, PrimitiveValue } from "./types";
 

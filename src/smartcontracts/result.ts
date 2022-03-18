@@ -1,4 +1,8 @@
-import { ArgSerializer, EndpointDefinition, ErrContract, guardValueIsSet, ReturnCode, TypedValue } from "..";
+import { ErrContract } from "../errors";
+import { guardValueIsSet } from "../utils";
+import { ArgSerializer } from "./argSerializer";
+import { ReturnCode } from "./returnCode";
+import { EndpointDefinition, TypedValue } from "./typesystem";
 
 export namespace Result {
 

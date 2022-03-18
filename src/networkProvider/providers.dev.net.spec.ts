@@ -1,5 +1,4 @@
 import { assert } from "chai";
-import { ApiNetworkProvider, ProxyNetworkProvider } from ".";
 import { Hash } from "../hash";
 import { INetworkProvider, ITransactionOnNetwork } from "./interface";
 import { Address } from "../address";
@@ -10,6 +9,8 @@ import { ContractFunction, Query } from "../smartcontracts";
 import { BigUIntValue, U32Value, BytesValue, VariadicValue, VariadicType, CompositeType, BytesType, BooleanType } from "../smartcontracts/typesystem";
 import { BigNumber } from "bignumber.js";
 import { Balance } from "../balance";
+import { ApiNetworkProvider } from "./apiNetworkProvider";
+import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.elrond.com", { timeout: 10000 });

@@ -1,4 +1,9 @@
-import { Address, NetworkConfig, Query, QueryResponse, SmartContractResults, Transaction, TypedResult } from "../..";
+import { Address } from "../../address";
+import { NetworkConfig } from "../../networkConfig";
+import { Transaction } from "../../transaction";
+import { Query } from "../query";
+import { QueryResponse } from "../queryResponse";
+import { SmartContractResults, TypedResult } from "../smartContractResults";
 
 /**
  * Provides a simple interface in order to easily call or query the smart contract's methods.

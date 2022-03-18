@@ -12,7 +12,7 @@ import {
 import { NetworkConfig } from "./networkConfig";
 import { Nonce } from "./nonce";
 import { Signature } from "./signature";
-import { guardEmpty, guardNotEmpty, guardType } from "./utils";
+import { guardEmpty, guardNotEmpty } from "./utils";
 import { TransactionPayload } from "./transactionPayload";
 import * as errors from "./errors";
 import { TypedEvent } from "./events";
@@ -153,12 +153,6 @@ export class Transaction implements ISignable {
     this.onSent = new TypedEvent();
     this.onStatusUpdated = new TypedEvent();
     this.onStatusChanged = new TypedEvent();
-
-    // We apply runtime type checks for these fields, since they are the most commonly misused when calling the Transaction constructor
-    // in JavaScript (which lacks type safety).
-    guardType("nonce", Nonce, this.nonce);
-    guardType("gasLimit", GasLimit, this.gasLimit);
-    guardType("gasPrice", GasPrice, this.gasPrice);
   }
 
   getNonce(): Nonce {

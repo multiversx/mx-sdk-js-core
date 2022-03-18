@@ -1,4 +1,4 @@
-import { Balance } from "../..";
+import { Balance } from "../../balance";
 
 export function print(balance: Balance) {
     let nonceString = balance.token.isFungible() ? '' : ` nonce: ${balance.getNonce()}`;

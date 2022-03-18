@@ -1,34 +1,12 @@
 import { assert } from "chai";
 import { Transaction } from "./transaction";
-import * as errors from "./errors";
 import { Nonce } from "./nonce";
 import { ChainID, GasLimit, GasPrice, GasPriceModifier, TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
 import { Balance } from "./balance";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { NetworkConfig } from "./networkConfig";
-import { Address } from "./address";
 
-describe("test transaction", () => {
-    it("should throw error when bad types", () => {
-        assert.throw(() => new Transaction({ nonce: <any>42, receiver: new Address() }), errors.ErrBadType);
-        assert.throw(() => new Transaction({ receiver: new Address(), gasLimit: <any>42 }), errors.ErrBadType);
-        assert.throw(() => new Transaction({ receiver: new Address(), gasPrice: <any>42 }), errors.ErrBadType);
-
-        assert.throw(() => new Transaction({ nonce: <any>7, receiver: new Address() }), errors.ErrBadType);
-        assert.throw(() => new Transaction({ gasLimit: <any>8, receiver: new Address() }), errors.ErrBadType);
-        assert.throw(() => new Transaction({ gasPrice: <any>9, receiver: new Address() }), errors.ErrBadType);
-
-        assert.doesNotThrow(() => new Transaction({ receiver: new Address() }));
-        assert.doesNotThrow(() => new Transaction({
-            nonce: new Nonce(42),
-            gasLimit: new GasLimit(42),
-            gasPrice: new GasPrice(42),
-            receiver: new Address()
-        }));
-        assert.doesNotThrow(() => new Transaction({ nonce: undefined, gasLimit: undefined, gasPrice: undefined, receiver: new Address() }));
-    });
-});
 
 describe("test transaction construction", async () => {
     let wallets: Record<string, TestWallet>;

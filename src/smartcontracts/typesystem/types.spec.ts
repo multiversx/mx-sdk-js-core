@@ -1,13 +1,14 @@
 import * as errors from "../../errors";
 import { assert } from "chai";
-import { NumericalValue, StringType } from ".";
-import { I64Type, U16Type, U32Type, U32Value, U8Type } from "./numerical";
-import { PrimitiveType, Type } from "./types";
+import { I64Type, NumericalValue, U16Type, U32Type, U32Value, U8Type } from "./numerical";
+import { PrimitiveType, Type, NullType } from "./types";
 import { BooleanType } from "./boolean";
 import { AddressType } from "./address";
 import { OptionType } from "./generic";
 import { TypeExpressionParser } from "./typeExpressionParser";
 import BigNumber from "bignumber.js";
+import { BytesType} from "./bytes";
+import { StringType } from "./string";
 
 describe("test types", () => {
     let parser = new TypeExpressionParser();
@@ -31,6 +32,11 @@ describe("test types", () => {
         assert.isFalse((new AddressType()).isAssignableFrom(new BooleanType()));
         assert.isFalse((new U32Type()).isAssignableFrom(new BooleanType()));
         assert.isFalse((new U32Type()).isAssignableFrom(new PrimitiveType("PrimitiveType")));
+
+        assert.isTrue(new BytesType().isAssignableFrom(new BytesType()));
+        assert.isTrue(new U32Type().isAssignableFrom(parser.parse("u32")));
+        assert.isTrue(new Type("u32").isAssignableFrom(new U32Type()));
+        assert.isTrue(new OptionType(new U32Type()).isAssignableFrom(new OptionType(new NullType())));
     });
 
     it("should report equality", () => {
@@ -43,5 +49,13 @@ describe("test types", () => {
         assert.isFalse(parser.parse("MultiResultVec<u32>").equals(parser.parse("MultiResultVec<u33>")));
         assert.isTrue(parser.parse("Option<u32>").equals(new OptionType(new U32Type())));
         assert.isTrue(parser.parse("utf-8 string").equals(new StringType()));
+    });
+
+    it("should get fully qualified name", () => {
+        assert.equal(new Type("foo").getFullyQualifiedName(), "erdjs:types:foo");
+        assert.equal(new U32Type().getFullyQualifiedName(), "erdjs:types:u32");
+        assert.equal(parser.parse("MultiResultVec<u32>").getFullyQualifiedName(), "erdjs:types:MultiResultVec<erdjs:types:u32>");
+        assert.equal(parser.parse("utf-8 string").getFullyQualifiedName(), "erdjs:types:utf-8 string");
+        assert.equal(parser.parse("Option<u32>").getFullyQualifiedName(), "erdjs:types:Option<erdjs:types:u32>");
     });
 });

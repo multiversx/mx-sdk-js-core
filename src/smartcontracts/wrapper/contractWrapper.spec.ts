@@ -12,7 +12,8 @@ import { TransactionStatus } from "../../transaction";
 import { ReturnCode } from "../returnCode";
 import BigNumber from "bignumber.js";
 import { SystemWrapper } from "./systemWrapper";
-import { Egld, setupInteractiveWithProvider } from "../..";
+import { setupInteractiveWithProvider } from "../../interactive";
+import { Egld } from "../../balanceBuilder";
 
 describe("test smart contract wrapper", async function() {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");

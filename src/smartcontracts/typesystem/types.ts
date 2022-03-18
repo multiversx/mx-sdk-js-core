@@ -1,3 +1,4 @@
+import { getJavascriptConstructorsNamesInHierarchy, getJavascriptPrototypesInHierarchy, hasJavascriptConstructor } from "../../reflection";
 import { guardTrue, guardValueIsSet } from "../../utils";
 
 /**
@@ -21,6 +22,25 @@ export class Type {
         return this.name;
     }
 
+    /**
+     * Gets the fully qualified name of the type, to allow for better (efficient and non-ambiguous) type comparison within erdjs' typesystem.
+     */
+    getFullyQualifiedName(): string {
+        let joinedTypeParameters = this.getTypeParameters().map(type => type.getFullyQualifiedName()).join(", ");
+
+        return this.isGenericType() ? 
+            `erdjs:types:${this.getName()}<${joinedTypeParameters}>` : 
+            `erdjs:types:${this.getName()}`;
+    }
+
+    hasJavascriptConstructor(javascriptConstructorName: string): boolean {
+        return hasJavascriptConstructor(this, javascriptConstructorName);
+    }
+
+    hasJavascriptConstructorInHierarchy(javascriptConstructorName: string): boolean {
+        return getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem).includes(javascriptConstructorName);
+    }
+
     getTypeParameters(): Type[] {
         return this.typeParameters;
     }
@@ -33,7 +53,6 @@ export class Type {
         guardTrue(this.typeParameters.length > 0, "type parameters length > 0");
         return this.typeParameters[0];
     }
-
 
     /**
      * Generates type expressions similar to elrond-wasm-rs. 
@@ -49,13 +68,7 @@ export class Type {
     }
 
     static equals(a: Type, b: Type): boolean {
-        // Workaround that seems to always work properly. Most probable reasons: 
-        // - ES6 is quite strict about enumerating over the properties on an object.
-        // - toJSON() returns an object literal (most probably, this results in deterministic iteration in all browser implementations).
-        let aJson = JSON.stringify(a.toJSON());
-        let bJson = JSON.stringify(b.toJSON());
-
-        return aJson == bJson;
+        return a.getFullyQualifiedName() == b.getFullyQualifiedName();
     }
 
     static equalsMany(a: Type[], b: Type[]) {
@@ -86,9 +99,31 @@ export class Type {
      *  - https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)
      *  - https://docs.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance
      */
-    isAssignableFrom(type: Type): boolean {
-        let invariantTypeParameters = Type.equalsMany(this.getTypeParameters(), type.getTypeParameters());
-        return type instanceof this.constructor && invariantTypeParameters;
+    isAssignableFrom(other: Type): boolean {
+        let invariantTypeParameters = Type.equalsMany(this.getTypeParameters(), other.getTypeParameters());
+        if (!invariantTypeParameters) {
+            return false;
+        }
+
+        let fullyQualifiedNameOfThis = this.getFullyQualifiedName();
+        let fullyQualifiedNamesInHierarchyOfOther = Type.getFullyQualifiedNamesInHierarchy(other);
+        if (fullyQualifiedNamesInHierarchyOfOther.includes(fullyQualifiedNameOfThis)) {
+            return true;
+        }
+
+        let javascriptConstructorNameOfThis = this.constructor.name;
+        let javascriptConstructorNamesInHierarchyOfOther = getJavascriptConstructorsNamesInHierarchy(other, prototype => prototype.belongsToTypesystem);
+        if (javascriptConstructorNamesInHierarchyOfOther.includes(javascriptConstructorNameOfThis)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static getFullyQualifiedNamesInHierarchy(type: Type): string[] {
+        let prototypes: any[] = getJavascriptPrototypesInHierarchy(type, prototype => prototype.belongsToTypesystem);
+        let fullyQualifiedNames = prototypes.map(prototype => prototype.getFullyQualifiedName.call(type));
+        return fullyQualifiedNames;
     }
 
     /**
@@ -104,6 +139,11 @@ export class Type {
     getCardinality(): TypeCardinality {
         return this.cardinality;
     }
+
+    /**
+     * A special marker for types within erdjs' typesystem.
+     */
+    private belongsToTypesystem() {}
 }
 
 /**
@@ -185,6 +225,19 @@ export abstract class TypedValue {
 
     abstract equals(other: any): boolean;
     abstract valueOf(): any;
+
+    hasJavascriptConstructor(javascriptConstructorName: string): boolean {
+        return hasJavascriptConstructor(this, javascriptConstructorName);
+    }
+
+    hasJavascriptConstructorInHierarchy(javascriptConstructorName: string): boolean {
+        return getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem).includes(javascriptConstructorName);
+    }
+
+    /**
+     * A special marker for values within erdjs' typesystem.
+     */
+     private belongsToTypesystem() {}
 }
 
 export abstract class PrimitiveValue extends TypedValue {
@@ -194,7 +247,7 @@ export abstract class PrimitiveValue extends TypedValue {
 }
 
 export function isTyped(value: any) {
-    return value instanceof TypedValue;
+    return value.belongsToTypesystem !== undefined;
 }
 
 export class TypePlaceholder extends Type {

@@ -100,20 +100,21 @@ export class TypeMapper {
     mapRecursiveType(type: Type): Type | null {
         let isGeneric = type.isGenericType();
 
-        if (type instanceof EnumType) {
+        if (type.hasJavascriptConstructor(EnumType.name)) {
             // This will call mapType() recursively, for all the enum variant fields.
-            return this.mapEnumType(type);
+            return this.mapEnumType(<EnumType>type);
         }
 
-        if (type instanceof StructType) {
+        if (type.hasJavascriptConstructor(StructType.name)) {
             // This will call mapType() recursively, for all the struct's fields.
-            return this.mapStructType(type);
+            return this.mapStructType(<StructType>type);
         }
 
         if (isGeneric) {
             // This will call mapType() recursively, for all the type parameters.
             return this.mapGenericType(type);
         }
+        
         return null;
     }
 

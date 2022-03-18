@@ -52,10 +52,10 @@ export class ArgSerializer {
         function readValue(type: Type): TypedValue {
             // TODO: Use matchers.
 
-            if (type instanceof OptionalType) {
+            if (type.hasJavascriptConstructor(OptionalType.name)) {
                 let typedValue = readValue(type.getFirstTypeParameter());
                 return new OptionalValue(type, typedValue);
-            } else if (type instanceof VariadicType) {
+            } else if (type.hasJavascriptConstructor(VariadicType.name)) {
                 let typedValues = [];
 
                 while (!hasReachedTheEnd()) {
@@ -63,7 +63,7 @@ export class ArgSerializer {
                 }
 
                 return new VariadicValue(type, typedValues);
-            } else if (type instanceof CompositeType) {
+            } else if (type.hasJavascriptConstructor(CompositeType.name)) {
                 let typedValues = [];
 
                 for (const typeParameter of type.getTypeParameters()) {
@@ -132,16 +132,19 @@ export class ArgSerializer {
         function handleValue(value: TypedValue): void {
             // TODO: Use matchers.
 
-            if (value instanceof OptionalValue) {
-                if (value.isSet()) {
-                    handleValue(value.getTypedValue());
+            if (value.hasJavascriptConstructor(OptionalValue.name)) {
+                let valueAsOptional = <OptionalValue>value;
+                if (valueAsOptional.isSet()) {
+                    handleValue(valueAsOptional.getTypedValue());
                 }
-            } else if (value instanceof VariadicValue) {
-                for (const item of value.getItems()) {
+            } else if (value.hasJavascriptConstructor(VariadicValue.name)) {
+                let valueAsVariadic = <VariadicValue>value;
+                for (const item of valueAsVariadic.getItems()) {
                     handleValue(item);
                 }
-            } else if (value instanceof CompositeValue) {
-                for (const item of value.getItems()) {
+            } else if (value.hasJavascriptConstructor(CompositeValue.name)) {
+                let valueAsComposite = <CompositeValue>value;
+                for (const item of valueAsComposite.getItems()) {
                     handleValue(item);
                 }
             } else {

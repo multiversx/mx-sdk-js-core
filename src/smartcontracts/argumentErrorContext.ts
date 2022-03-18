@@ -1,5 +1,5 @@
-import { EndpointParameterDefinition, Type } from ".";
-import { ErrInvalidArgument } from "..";
+import { ErrInvalidArgument } from "../errors";
+import { EndpointParameterDefinition, Type } from "./typesystem";
 
 export class ArgumentErrorContext {
     endpointName: string;

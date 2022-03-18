@@ -4,8 +4,20 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## Unreleased
  - TBD
+
+## [9.2.1]
+ - [Fix / simplify some imports](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/148)
+ - [Handle strings in binary codec](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/153)
+ - [Fix data fetching from the blockchain - wait before polling for the first time](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/152)
+
+## [9.2.0]
+ - [Fix WalletProvider URL when nonce = 0](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/137)
+ - [Fix padding for getTxFieldsForEsdtTransfer](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/140)
+ - [Added payableBySc to CodeMetadata](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/141)
+ - [Remove usages of guardType()](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/143)
+ - [Remove JavaScript's native instanceof, where possible](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/145)
 
 ## [9.1.0]
   - [Interactions: enable token transfers ("transfer with execute")](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/131)

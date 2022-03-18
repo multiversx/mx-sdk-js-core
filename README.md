@@ -18,26 +18,19 @@ Elrond SDK for JavaScript and TypeScript (written in TypeScript).
 
 The most comprehensive usage examples are captured within the unit and the integration tests. Specifically, in the `*.spec.ts` files of the source code. For example:
 
- - [transaction.dev.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk/tree/development/erdjs/src/transaction.dev.net.spec.ts)
- - [address.spec.ts](https://github.com/ElrondNetwork/elrond-sdk/tree/development/erdjs/src/address.spec.ts)
- - [transactionPayloadBuilders.spec.ts](https://github.com/ElrondNetwork/elrond-sdk/tree/development/erdjs/src/smartcontracts/transactionPayloadBuilders.spec.ts)
- - [smartContract.spec.ts](https://github.com/ElrondNetwork/elrond-sdk/tree/development/erdjs/src/smartcontracts/smartContract.spec.ts)
- - [smartContract.dev.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk/tree/development/erdjs/src/smartcontracts/smartContract.dev.net.spec.ts)
- - [query.spec.ts](https://github.com/ElrondNetwork/elrond-sdk/tree/development/erdjs/src/smartcontracts/query.spec.ts)
- - [query.main.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk/tree/development/erdjs/src/smartcontracts/query.main.net.spec.ts)
+ - [transaction.dev.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/transaction.dev.net.spec.ts)
+ - [address.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/address.spec.ts)
+ - [transactionPayloadBuilders.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/transactionPayloadBuilders.spec.ts)
+ - [smartContract.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/smartContract.spec.ts)
+ - [smartContract.dev.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/smartContract.dev.net.spec.ts)
+ - [query.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/query.spec.ts)
+ - [query.main.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/query.main.net.spec.ts)
 
 For advanced smart contract interaction, using ABIs, please see the following test files:
 
- - [interaction.dev.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk/tree/development/erdjs/src/smartcontracts/interaction.dev.net.spec.ts) 
- - [abiRegistry.spec.ts](https://github.com/ElrondNetwork/elrond-sdk/tree/development/erdjs/src/smartcontracts/typesystem/abiRegistry.spec.ts)
- - [argSerializer.spec.ts](https://github.com/ElrondNetwork/elrond-sdk/tree/development/erdjs/src/smartcontracts/argSerializer.spec.ts) 
-
-**More examples and documentation on writing ABI-aware custom interactors for smart contracts is coming soon!**
-
-Additional examples (please note that they are slighly _out-of-date_ though) can be found here:
-
- - [Basic Example](https://github.com/ElrondNetwork/elrond-sdk/tree/development/docs/erdjs/examples/basic)
- - [Backend Dispatcher](https://github.com/ElrondNetwork/elrond-sdk/tree/development/docs/erdjs/examples/backend-dispatcher)
+ - [interaction.dev.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/interaction.dev.net.spec.ts) 
+ - [abiRegistry.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/typesystem/abiRegistry.spec.ts)
+ - [argSerializer.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/argSerializer.spec.ts) 
 
 ### Synchronizing network parameters
 

@@ -1,4 +1,7 @@
-import { ArgSerializer, ContractFunction, EndpointDefinition, NativeSerializer, TypedValue } from "..";
+import { ArgSerializer } from "../argSerializer";
+import { ContractFunction } from "../function";
+import { NativeSerializer } from "../nativeSerializer";
+import { EndpointDefinition, TypedValue } from "../typesystem";
 
 /**
  * Creates a FormattedCall from the given endpoint and args.

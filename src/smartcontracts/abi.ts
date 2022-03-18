@@ -1,5 +1,4 @@
 import { ErrInvariantFailed } from "../errors";
-import { loadAbiRegistry } from "../testutils";
 import { guardValueIsSetWithMessage } from "../utils";
 import { ContractFunction } from "./function";
 import { AbiRegistry, EndpointDefinition } from "./typesystem";

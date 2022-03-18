@@ -1,4 +1,3 @@
-import { StrictChecker } from "./strictChecker";
 import { DefaultInteractionRunner } from "./defaultRunner";
 import { SmartContract } from "./smartContract";
 import { BigUIntValue, OptionValue, U32Value } from "./typesystem";
@@ -29,13 +28,13 @@ import { createBalanceBuilder } from "../balanceBuilder";
 
 describe("test smart contract interactor", function() {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");
-    let checker = new StrictChecker();
     let provider = new MockProvider();
     let alice: TestWallet;
     let runner: DefaultInteractionRunner;
+
     before(async function() {
         ({ alice } = await loadTestWallets());
-        runner = new DefaultInteractionRunner(checker, alice.signer, provider);
+        runner = new DefaultInteractionRunner(provider);
     });
 
     it("should set transaction fields", async function () {
@@ -144,7 +143,9 @@ describe("test smart contract interactor", function() {
         assert.isTrue(queryCode.equals(ReturnCode.Ok));
 
         // Execute, do not wait for execution
-        let transaction = await runner.run(interaction.withNonce(new Nonce(0)));
+        let transaction = interaction.withNonce(new Nonce(0)).buildTransaction();
+        await alice.signer.sign(transaction);
+        transaction.send(provider);
         assert.equal(transaction.getNonce().valueOf(), 0);
         assert.equal(transaction.getData().toString(), "getUltimateAnswer");
         assert.equal(
@@ -152,7 +153,9 @@ describe("test smart contract interactor", function() {
             "60d0956a8902c1179dce92d91bd9670e31b9a9cd07c1d620edb7754a315b4818"
         );
 
-        transaction = await runner.run(interaction.withNonce(new Nonce(1)));
+        transaction = interaction.withNonce(new Nonce(1)).buildTransaction();
+        await alice.signer.sign(transaction);
+        await transaction.send(provider);
         assert.equal(transaction.getNonce().valueOf(), 1);
         assert.equal(
             transaction.getHash().toString(),
@@ -169,7 +172,11 @@ describe("test smart contract interactor", function() {
                 new AddImmediateResult("@6f6b@2b"),
                 new MarkNotarized(),
             ]),
-            runner.runAwaitExecution(interaction.withNonce(new Nonce(2))),
+            (async () => {
+                let transaction = interaction.withNonce(new Nonce(2)).buildTransaction();
+                await alice.signer.sign(transaction);
+                return await runner.run(transaction, interaction);
+            })()
         ]);
 
         assert.lengthOf(executionValues, 1);
@@ -210,22 +217,36 @@ describe("test smart contract interactor", function() {
                 new AddImmediateResult("@6f6b@08"),
                 new MarkNotarized(),
             ]),
-            runner.runAwaitExecution(incrementInteraction.withNonce(new Nonce(14))),
+            (async () => {
+                let transaction = incrementInteraction.withNonce(new Nonce(14)).buildTransaction();
+                await alice.signer.sign(transaction);
+                return await runner.run(transaction, incrementInteraction);
+            })()
         ]);
 
         assert.deepEqual(valueAfterIncrement.valueOf(), new BigNumber(8));
 
         // Decrement three times (simulate three parallel broadcasts). Wait for execution of the latter (third transaction). Return fake "5".
-        await runner.run(decrementInteraction.withNonce(new Nonce(15)));
-        await runner.run(decrementInteraction.withNonce(new Nonce(16)));
-
+        // Decrement #1
+        let decrementTransaction = decrementInteraction.withNonce(new Nonce(15)).buildTransaction();
+        await alice.signer.sign(decrementTransaction);
+        decrementTransaction.send(provider);
+        // Decrement #2
+        decrementTransaction = decrementInteraction.withNonce(new Nonce(16)).buildTransaction();
+        await alice.signer.sign(decrementTransaction);
+        decrementTransaction.send(provider);
+        // Decrement #3
         let [, { firstValue: valueAfterDecrement }] = await Promise.all([
             provider.mockNextTransactionTimeline([
                 new TransactionStatus("executed"),
                 new AddImmediateResult("@6f6b@05"),
                 new MarkNotarized(),
             ]),
-            runner.runAwaitExecution(decrementInteraction.withNonce(new Nonce(17))),
+            (async () => {
+                let decrementTransaction = decrementInteraction.withNonce(new Nonce(17)).buildTransaction();
+                await alice.signer.sign(decrementTransaction);
+                return await runner.run(decrementTransaction, decrementInteraction);
+            })()
         ]);
 
         assert.deepEqual(valueAfterDecrement.valueOf(), new BigNumber(5));
@@ -268,7 +289,11 @@ describe("test smart contract interactor", function() {
                 new AddImmediateResult("@6f6b"),
                 new MarkNotarized(),
             ]),
-            runner.runAwaitExecution(startInteraction.withNonce(new Nonce(14))),
+            (async () => {
+                let transaction = startInteraction.withNonce(new Nonce(14)).buildTransaction();
+                await alice.signer.sign(transaction);
+                return await runner.run(transaction, startInteraction);
+            })()
         ]);
 
         assert.equal(
@@ -291,7 +316,11 @@ describe("test smart contract interactor", function() {
                 new AddImmediateResult("@6f6b@01"),
                 new MarkNotarized(),
             ]),
-            runner.runAwaitExecution(lotteryStatusInteraction.withNonce(new Nonce(15))),
+            (async () => {
+                let transaction = startInteraction.withNonce(new Nonce(15)).buildTransaction();
+                await alice.signer.sign(transaction);
+                return await runner.run(transaction, lotteryStatusInteraction);
+            })()
         ]);
 
         assert.equal(
@@ -317,7 +346,11 @@ describe("test smart contract interactor", function() {
                 ),
                 new MarkNotarized(),
             ]),
-            runner.runAwaitExecution(getLotteryInfoInteraction.withNonce(new Nonce(16))),
+            (async () => {
+                let transaction = getLotteryInfoInteraction.withNonce(new Nonce(15)).buildTransaction();
+                await alice.signer.sign(transaction);
+                return await runner.run(transaction, getLotteryInfoInteraction);
+            })()
         ]);
 
         assert.equal(

@@ -1,69 +1,40 @@
 import { IProvider, ISigner } from "../interface";
-import { ExecutionResultsBundle, IInteractionChecker, IInteractionRunner, QueryResponseBundle } from "./interface";
+import { ExecutionResultsBundle, QueryResponseBundle } from "./interface";
 import { Interaction } from "./interaction";
 import { Transaction } from "../transaction";
-import { Address } from "../address";
 
 /**
- * An interaction runner suitable for backends or wallets.
- * Not suitable for dapps, which depend on external signers (wallets, ledger etc.).
+ * An interaction runner, suitable for frontends and dApp, 
+ * where signing is performed by means of an external wallet provider.
  */
-export class DefaultInteractionRunner implements IInteractionRunner {
-    private readonly checker: IInteractionChecker;
-    private readonly signer: ISigner;
+export class DefaultInteractionRunner {
     private readonly provider: IProvider;
 
-    constructor(checker: IInteractionChecker, signer: ISigner, provider: IProvider) {
-        this.checker = checker;
-        this.signer = signer;
+    constructor(provider: IProvider) {
         this.provider = provider;
     }
 
     /**
-     * Given an interaction, broadcasts its compiled transaction.
+     * Broadcasts an alredy-signed interaction transaction, and also waits for its execution on the Network.
+     * 
+     * @param signedInteractionTransaction The interaction transaction, which must be signed beforehand
+     * @param sourceInteraction The interaction used to build the {@link signedInteractionTransaction}
      */
-    async run(interaction: Interaction): Promise<Transaction> {
-        this.checkInteraction(interaction);
-
-        let transaction = interaction.buildTransaction();
-        await this.signer.sign(transaction);
-        await transaction.send(this.provider);
-        return transaction;
-    }
-
-    /**
-     * Given an interaction, broadcasts its compiled transaction (and also waits for its execution on the Network).
-     */
-    async runAwaitExecution(interaction: Interaction): Promise<ExecutionResultsBundle> {
-        this.checkInteraction(interaction);
-
-        let transaction = await this.run(interaction);
-        await transaction.awaitExecuted(this.provider);
-        // This will wait until the transaction is notarized, as well (so that SCRs are returned by the API).
-        let transactionOnNetwork = await transaction.getAsOnNetwork(this.provider);
-        let bundle = interaction.interpretExecutionResults(transactionOnNetwork);
+     async run(signedInteractionTransaction: Transaction, sourceInteraction: Interaction): Promise<ExecutionResultsBundle> {
+        await signedInteractionTransaction.send(this.provider);
+        await signedInteractionTransaction.awaitExecuted(this.provider);
+        
+        let transactionOnNetwork = await signedInteractionTransaction.getAsOnNetwork(this.provider);
+        // TODO: do not rely on interpretExecutionResults, as it may throw unexpectedly.
+        let bundle = sourceInteraction.interpretExecutionResults(transactionOnNetwork);
         return bundle;
     }
 
-    async runQuery(interaction: Interaction, caller?: Address): Promise<QueryResponseBundle> {
-        this.checkInteraction(interaction);
-
+    async runQuery(interaction: Interaction): Promise<QueryResponseBundle> {
         let query = interaction.buildQuery();
-        query.caller = caller || this.signer.getAddress();
         let response = await this.provider.queryContract(query);
+        // TODO: do not rely on interpretQueryResponse, as it may throw unexpectedly.
         let bundle = interaction.interpretQueryResponse(response);
         return bundle;
-    }
-
-    async runSimulation(interaction: Interaction): Promise<any> {
-        this.checkInteraction(interaction);
-
-        let transaction = interaction.buildTransaction();
-        await this.signer.sign(transaction);
-        return await transaction.simulate(this.provider);
-    }
-
-    private checkInteraction(interaction: Interaction) {
-        this.checker.checkInteraction(interaction);
     }
 }

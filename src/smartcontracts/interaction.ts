@@ -9,10 +9,11 @@ import { Address } from "../address";
 import { SmartContract } from "./smartContract";
 import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
 import { Nonce } from "../nonce";
-import { ExecutionResultsBundle, QueryResponseBundle } from "./interface";
+import { ExecutionResultsBundle, IInteractionChecker, QueryResponseBundle } from "./interface";
 import { NetworkConfig } from "../networkConfig";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
-import { IInteractionChecker, StrictChecker } from ".";
+import { StrictChecker } from "./strictChecker";
+import { Account } from "../account";
 
 /**
  * Interactions can be seen as mutable transaction & query builders.
@@ -31,6 +32,7 @@ export class Interaction {
     private nonce: Nonce = new Nonce(0);
     private value: Balance = Balance.Zero();
     private gasLimit: GasLimit = GasLimit.min();
+    private querent: Address = new Address();
 
     private isWithSingleESDTTransfer: boolean = false;
     private isWithSingleESDTNFTTransfer: boolean = false;
@@ -124,8 +126,7 @@ export class Interaction {
             args: this.args,
             // Value will be set using "withValue()".
             value: this.value,
-            // Caller will be set by the InteractionRunner.
-            caller: new Address()
+            caller: this.querent
         });
     }
 
@@ -201,6 +202,18 @@ export class Interaction {
 
     withNonce(nonce: Nonce): Interaction {
         this.nonce = nonce;
+        return this;
+    }
+
+    useThenIncrementNonceOf(account: Account) : Interaction {
+        return this.withNonce(account.getNonceThenIncrement());
+    }
+
+    /**
+     * Sets the "caller" field on contract queries.
+     */
+    withQuerent(querent: Address): Interaction {
+        this.querent = querent;
         return this;
     }
 

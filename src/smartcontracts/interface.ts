@@ -37,14 +37,6 @@ export interface ISmartContract {
     call({ func, args, value, gasLimit }: CallArguments): Transaction;
 }
 
-export interface IInteractionRunner {
-    run(interaction: Interaction): Promise<Transaction>;
-    runAwaitExecution(interaction: Interaction): Promise<ExecutionResultsBundle>;
-    runQuery(interaction: Interaction, caller?: Address): Promise<QueryResponseBundle>;
-    // TODO: Fix method signature (underspecified at this moment).
-    runSimulation(interaction: Interaction): Promise<any>;
-}
-
 export interface IInteractionChecker {
     checkInteraction(interaction: Interaction): void;
 }

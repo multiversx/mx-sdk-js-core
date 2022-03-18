@@ -35,10 +35,6 @@ export interface ISmartContract {
     call({ func, args, value, gasLimit }: CallArguments): Transaction;
 }
 
-export interface IInteractionChecker {
-    checkInteraction(interaction: Interaction): void;
-}
-
 export interface DeployArguments {
     code: Code;
     codeMetadata?: CodeMetadata;

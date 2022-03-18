@@ -1,7 +1,5 @@
 import { GasLimit } from "../../networkParams";
-import { IInteractionChecker } from "../interface";
 import { IProvider } from "../../interface";
-import { StrictChecker } from "../strictChecker";
 import { ContractLogger } from "./contractLogger";
 import { TestWallet } from "../../testutils";
 import { Balance } from "../../balance";
@@ -17,7 +15,6 @@ export class SendContext {
     private gas_: GasLimit | null;
     private logger_: ContractLogger | null;
     private value_: Balance | null;
-    readonly checker: IInteractionChecker;
 
     constructor(provider: IProvider) {
         this.sender_ = null;
@@ -25,7 +22,6 @@ export class SendContext {
         this.gas_ = null;
         this.logger_ = null;
         this.value_ = null;
-        this.checker = new StrictChecker();
     }
 
     provider(provider: IProvider): this {

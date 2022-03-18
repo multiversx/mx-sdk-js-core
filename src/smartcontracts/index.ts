@@ -18,7 +18,7 @@ export * from "./queryResponse";
 export * from "./returnCode";
 export * from "./smartContract";
 export * from "./smartContractResults";
-export * from "./strictChecker";
+export * from "./interactionChecker";
 export * from "./transactionPayloadBuilders";
 export * from "./typesystem";
 export * from "./wrapper";

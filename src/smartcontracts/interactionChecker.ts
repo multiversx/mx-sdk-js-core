@@ -1,7 +1,6 @@
 import * as errors from "../errors";
 import { EndpointDefinition } from "./typesystem";
 import { Interaction } from "./interaction";
-import { IInteractionChecker } from "./interface";
 
 /**
  * An interaction checker that aims to be as strict as possible.
@@ -10,7 +9,7 @@ import { IInteractionChecker } from "./interface";
  *  - errors related to calling "non-payable" functions with some value provided
  *  - gas estimation errors (not yet implemented)
  */
-export class StrictChecker implements IInteractionChecker {
+export class InteractionChecker {
     checkInteraction(interaction: Interaction): void {
         let definition = interaction.getEndpoint();
 

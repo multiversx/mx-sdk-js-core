@@ -8,10 +8,10 @@ import { Address } from "../address";
 import { SmartContract } from "./smartContract";
 import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
 import { Nonce } from "../nonce";
-import { IInteractionChecker, QueryResponseBundle } from "./interface";
+import { QueryResponseBundle } from "./interface";
 import { NetworkConfig } from "../networkConfig";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
-import { StrictChecker } from "./strictChecker";
+import { InteractionChecker } from "./interactionChecker";
 import { Account } from "../account";
 
 /**
@@ -21,7 +21,7 @@ import { Account } from "../account";
  * the execution outcome for the objects they've built.
  */
 export class Interaction {
-    private readonly checker: IInteractionChecker;
+    private readonly checker: InteractionChecker;
     private readonly contract: SmartContract;
     private readonly function: ContractFunction;
     private readonly args: TypedValue[];
@@ -44,7 +44,7 @@ export class Interaction {
         args: TypedValue[],
         receiver?: Address,
     ) {
-        this.checker = new StrictChecker();
+        this.checker = new InteractionChecker();
         this.contract = contract;
         this.function = func;
         this.args = args;

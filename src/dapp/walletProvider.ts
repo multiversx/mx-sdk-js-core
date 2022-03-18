@@ -188,8 +188,9 @@ export class WalletProvider implements IDappProvider {
     }
 
     static getTxSignReturnValue(urlParams: any): Transaction[] {
+        // "options" property is optional (it isn't always received from the Web Wallet)
         const expectedProps = ["nonce", "value", "receiver", "sender", "gasPrice",
-            "gasLimit", "data", "chainID", "version", "signature", "options"];
+            "gasLimit", "data", "chainID", "version", "signature"];
 
         for (let txProp of expectedProps) {
             if (!urlParams[txProp] || !Array.isArray(urlParams[txProp])) {
@@ -215,7 +216,8 @@ export class WalletProvider implements IDappProvider {
                 data: new TransactionPayload(<string>urlParams["data"][i]),
                 chainID: new ChainID(<string>urlParams["chainID"][i]),
                 version: new TransactionVersion(parseInt(<string>urlParams["version"][i])),
-                ...(urlParams["options"][i] ? {
+                // Handle the optional "options" property.
+                ...(urlParams["options"] && urlParams["options"][i] ? {
                     options: new TransactionOptions(parseInt(<string>urlParams["options"][i]))
                 } : {})
             });

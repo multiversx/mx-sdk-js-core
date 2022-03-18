@@ -10,12 +10,12 @@ import {
 } from "./constants";
 import { Transaction } from "../transaction";
 import { SignableMessage } from "../signableMessage";
-import {ErrInvalidTxSignReturnValue, ErrNotImplemented} from "../errors";
-import {Signature} from "../signature";
+import { ErrInvalidTxSignReturnValue, ErrNotImplemented } from "../errors";
+import { Signature } from "../signature";
 import { Nonce } from "../nonce";
 import { Balance } from "../balance";
 import { Address } from "../address";
-import { ChainID, GasLimit, GasPrice, TransactionVersion } from "../networkParams";
+import { ChainID, GasLimit, GasPrice, TransactionOptions, TransactionVersion } from "../networkParams";
 import { TransactionPayload } from "../transactionPayload";
 
 interface TransactionMessage {
@@ -25,6 +25,7 @@ interface TransactionMessage {
     gasLimit?: number;
     data?: string;
     nonce?: number;
+    options?: number;
 }
 
 export class WalletProvider implements IDappProvider {
@@ -81,7 +82,7 @@ export class WalletProvider implements IDappProvider {
               resolve(true);
             }, 10);
           });
-        
+
         return window.location.href;
     }
 
@@ -187,6 +188,7 @@ export class WalletProvider implements IDappProvider {
     }
 
     static getTxSignReturnValue(urlParams: any): Transaction[] {
+        // "options" property is optional (it isn't always received from the Web Wallet)
         const expectedProps = ["nonce", "value", "receiver", "sender", "gasPrice",
             "gasLimit", "data", "chainID", "version", "signature"];
 
@@ -214,7 +216,10 @@ export class WalletProvider implements IDappProvider {
                 data: new TransactionPayload(<string>urlParams["data"][i]),
                 chainID: new ChainID(<string>urlParams["chainID"][i]),
                 version: new TransactionVersion(parseInt(<string>urlParams["version"][i])),
-
+                // Handle the optional "options" property.
+                ...(urlParams["options"] && urlParams["options"][i] ? {
+                    options: new TransactionOptions(parseInt(<string>urlParams["options"][i]))
+                } : {})
             });
             tx.applySignature(new Signature(<string>urlParams["signature"][i]), Address.fromString(<string>urlParams["sender"][i]));
             transactions.push(tx);

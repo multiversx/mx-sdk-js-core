@@ -1,8 +1,8 @@
-import { ErrContract } from "../errors";
-import { guardValueIsSet } from "../utils";
-import { ArgSerializer } from "./argSerializer";
-import { ReturnCode } from "./returnCode";
-import { EndpointDefinition, TypedValue } from "./typesystem";
+import { ErrContract } from "../../errors";
+import { guardValueIsSet } from "../../utils";
+import { ArgSerializer } from "../argSerializer";
+import { ReturnCode } from "../returnCode";
+import { EndpointDefinition, TypedValue } from "../typesystem";
 
 export namespace Result {
 
@@ -15,7 +15,6 @@ export namespace Result {
         assertSuccess(): void;
         outputUntyped(): Buffer[];
         outputTyped(): TypedValue[];
-        unpackOutput(): any;
     }
 
     export function isSuccess(result: IResult): boolean {

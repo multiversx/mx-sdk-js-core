@@ -1,5 +1,4 @@
 import {
-    AddImmediateResult,
     MarkNotarized,
     MockProvider,
     setupUnitTestWatcherTimeouts,
@@ -109,11 +108,11 @@ function mockQuery(provider: MockProvider, functionName: string, mockedResult: s
     );
 }
 
-async function mockCall(provider: MockProvider, mockedResult: string, promise: Promise<any>) {
+async function mockCall(provider: MockProvider, _mockedResult: string, promise: Promise<any>) {
     let [, value] = await Promise.all([
         provider.mockNextTransactionTimeline([
             new TransactionStatus("executed"),
-            new AddImmediateResult(mockedResult),
+            // TODO: Add SCRs (_mockedResult)
             new MarkNotarized(),
         ]),
         promise,

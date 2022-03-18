@@ -118,10 +118,6 @@ export class MockProvider implements IProvider {
                     transaction.hyperblockNonce = new Nonce(42);
                     transaction.hyperblockHash = new Hash("a".repeat(32));
                 });
-            } else if (point instanceof AddImmediateResult) {
-                this.mockUpdateTransaction(hash, (transaction) => {
-                    transaction.getSmartContractResults().getImmediate().data = point.data;
-                });
             } else if (point instanceof Wait) {
                 await timeline.start(point.milliseconds);
             }
@@ -220,14 +216,6 @@ export class Wait {
 }
 
 export class MarkNotarized { }
-
-export class AddImmediateResult {
-    readonly data: string;
-
-    constructor(data: string) {
-        this.data = data;
-    }
-}
 
 class QueryResponder {
     readonly matches: (query: Query) => boolean;

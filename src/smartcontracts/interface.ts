@@ -2,14 +2,12 @@ import { Address } from "../address";
 import { Balance } from "../balance";
 import { GasLimit } from "../networkParams";
 import { Transaction } from "../transaction";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { QueryResponse } from "./queryResponse";
 import { ReturnCode } from "./returnCode";
-import { SmartContractResults, TypedResult } from "./smartContractResults";
 import { TypedValue } from "./typesystem";
 
 /**
@@ -70,16 +68,6 @@ export interface QueryArguments {
     args?: TypedValue[];
     value?: Balance;
     caller?: Address
-}
-
-export interface ExecutionResultsBundle {
-    transactionOnNetwork: TransactionOnNetwork;
-    smartContractResults: SmartContractResults;
-    immediateResult: TypedResult;
-    resultingCalls: TypedResult[];
-    values: TypedValue[];
-    firstValue: TypedValue;
-    returnCode: ReturnCode;
 }
 
 export interface QueryResponseBundle {

@@ -3,7 +3,8 @@ import { NetworkConfig } from "../../networkConfig";
 import { Transaction } from "../../transaction";
 import { Query } from "../query";
 import { QueryResponse } from "../queryResponse";
-import { SmartContractResults, TypedResult } from "../smartContractResults";
+import { SmartContractResults } from "../smartContractResults";
+import { findImmediateResult, findResultingCalls, TypedResult } from "./deprecatedSCRs";
 
 /**
  * Provides a simple interface in order to easily call or query the smart contract's methods.
@@ -42,17 +43,17 @@ export class ContractLogger {
 }
 
 function logReturnMessages(transaction: Transaction, smartContractResults: SmartContractResults) {
-    let immediate = smartContractResults.getImmediate();
+    let immediate = findImmediateResult(smartContractResults)!;
     logSmartContractResultIfMessage("(immediate)", transaction, immediate);
 
-    let resultingCalls = smartContractResults.getResultingCalls();
+    let resultingCalls = findResultingCalls(smartContractResults);
     for (let i in resultingCalls) {
         logSmartContractResultIfMessage("(resulting call)", transaction, resultingCalls[i]);
     }
 }
 
 function logSmartContractResultIfMessage(info: string, _transaction: Transaction, smartContractResult: TypedResult) {
-    if (smartContractResult.returnMessage) {
-        console.log(`Return message ${info} message: ${smartContractResult.returnMessage}`);
+    if (smartContractResult.getReturnMessage()) {
+        console.log(`Return message ${info} message: ${smartContractResult.getReturnMessage()}`);
     }
 }

@@ -1,7 +1,8 @@
-import { IProvider, ISigner } from "../interface";
-import { ExecutionResultsBundle, QueryResponseBundle } from "./interface";
+import { IProvider } from "../interface";
+import { QueryResponseBundle } from "./interface";
 import { Interaction } from "./interaction";
 import { Transaction } from "../transaction";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 
 /**
  * An interaction runner, suitable for frontends and dApp, 
@@ -18,16 +19,11 @@ export class DefaultInteractionRunner {
      * Broadcasts an alredy-signed interaction transaction, and also waits for its execution on the Network.
      * 
      * @param signedInteractionTransaction The interaction transaction, which must be signed beforehand
-     * @param sourceInteraction The interaction used to build the {@link signedInteractionTransaction}
      */
-     async run(signedInteractionTransaction: Transaction, sourceInteraction: Interaction): Promise<ExecutionResultsBundle> {
+     async run(signedInteractionTransaction: Transaction): Promise<TransactionOnNetwork> {
         await signedInteractionTransaction.send(this.provider);
         await signedInteractionTransaction.awaitExecuted(this.provider);
-        
-        let transactionOnNetwork = await signedInteractionTransaction.getAsOnNetwork(this.provider);
-        // TODO: do not rely on interpretExecutionResults, as it may throw unexpectedly.
-        let bundle = sourceInteraction.interpretExecutionResults(transactionOnNetwork);
-        return bundle;
+        return await signedInteractionTransaction.getAsOnNetwork(this.provider);
     }
 
     async runQuery(interaction: Interaction): Promise<QueryResponseBundle> {

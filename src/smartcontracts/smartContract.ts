@@ -61,7 +61,7 @@ export class SmartContract implements ISmartContract {
             // and returns a prepared contract interaction.
             this.methods[functionName] = function (args?: TypedValue[]) {
                 let func = new ContractFunction(functionName);
-                let interaction = new Interaction(contract, func, func, args || []);
+                let interaction = new Interaction(contract, func, args || []);
                 return interaction;
             };
         }

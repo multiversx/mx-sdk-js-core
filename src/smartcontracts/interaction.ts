@@ -1,7 +1,6 @@
 import { Balance } from "../balance";
 import { GasLimit } from "../networkParams";
 import { Transaction } from "../transaction";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { Query } from "./query";
 import { QueryResponse } from "./queryResponse";
 import { ContractFunction } from "./function";
@@ -9,7 +8,7 @@ import { Address } from "../address";
 import { SmartContract } from "./smartContract";
 import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
 import { Nonce } from "../nonce";
-import { ExecutionResultsBundle, IInteractionChecker, QueryResponseBundle } from "./interface";
+import { IInteractionChecker, QueryResponseBundle } from "./interface";
 import { NetworkConfig } from "../networkConfig";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
 import { StrictChecker } from "./strictChecker";
@@ -24,8 +23,7 @@ import { Account } from "../account";
 export class Interaction {
     private readonly checker: IInteractionChecker;
     private readonly contract: SmartContract;
-    private readonly executingFunction: ContractFunction;
-    private readonly interpretingFunction: ContractFunction;
+    private readonly function: ContractFunction;
     private readonly args: TypedValue[];
     private readonly receiver?: Address;
 
@@ -42,15 +40,13 @@ export class Interaction {
 
     constructor(
         contract: SmartContract,
-        executingFunction: ContractFunction,
-        interpretingFunction: ContractFunction,
+        func: ContractFunction,
         args: TypedValue[],
         receiver?: Address,
     ) {
         this.checker = new StrictChecker();
         this.contract = contract;
-        this.executingFunction = executingFunction;
-        this.interpretingFunction = interpretingFunction;
+        this.function = func;
         this.args = args;
         this.receiver = receiver;
         this.tokenTransfers = new TokenTransfersWithinInteraction([], this);
@@ -60,12 +56,8 @@ export class Interaction {
         return this.contract;
     }
 
-    getInterpretingFunction(): ContractFunction {
-        return this.interpretingFunction;
-    }
-
-    getExecutingFunction(): ContractFunction {
-        return this.executingFunction;
+    getFunction(): ContractFunction {
+        return this.function;
     }
 
     getArguments(): TypedValue[] {
@@ -86,7 +78,7 @@ export class Interaction {
 
     buildTransaction(): Transaction {
         let receiver = this.receiver;
-        let func: ContractFunction = this.executingFunction;
+        let func: ContractFunction = this.function;
         let args = this.args;
 
         if (this.isWithSingleESDTTransfer) {
@@ -122,20 +114,12 @@ export class Interaction {
     buildQuery(): Query {
         return new Query({
             address: this.contract.getAddress(),
-            func: this.executingFunction,
+            func: this.function,
             args: this.args,
             // Value will be set using "withValue()".
             value: this.value,
             caller: this.querent
         });
-    }
-
-    /**
-     * Interprets the results of a previously broadcasted (and fully executed) smart contract transaction.
-     * The outcome is structured such that it allows quick access to each level of detail.
-     */
-    interpretExecutionResults(transactionOnNetwork: TransactionOnNetwork): ExecutionResultsBundle {
-        return interpretExecutionResults(this.getEndpoint(), transactionOnNetwork);
     }
 
     /**
@@ -230,29 +214,8 @@ export class Interaction {
     }
 
     getEndpoint(): EndpointDefinition {
-        return this.getContract().getAbi().getEndpoint(this.getInterpretingFunction());
+        return this.getContract().getAbi().getEndpoint(this.getFunction());
     }
-}
-
-function interpretExecutionResults(endpoint: EndpointDefinition, transactionOnNetwork: TransactionOnNetwork): ExecutionResultsBundle {
-    let smartContractResults = transactionOnNetwork.getSmartContractResults();
-    let immediateResult = smartContractResults.getImmediate();
-    let resultingCalls = smartContractResults.getResultingCalls();
-
-    immediateResult.setEndpointDefinition(endpoint);
-
-    let values = immediateResult.outputTyped();
-    let returnCode = immediateResult.getReturnCode();
-
-    return {
-        transactionOnNetwork: transactionOnNetwork,
-        smartContractResults: smartContractResults,
-        immediateResult,
-        resultingCalls,
-        values,
-        firstValue: values[0],
-        returnCode: returnCode
-    };
 }
 
 class TokenTransfersWithinInteraction {
@@ -336,7 +299,7 @@ class TokenTransfersWithinInteraction {
     }
 
     private getTypedInteractionFunction(): TypedValue {
-        return BytesValue.fromUTF8(this.interaction.getExecutingFunction().valueOf())
+        return BytesValue.fromUTF8(this.interaction.getFunction().valueOf())
     }
 
     private getInteractionArguments(): TypedValue[] {

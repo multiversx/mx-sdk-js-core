@@ -3,9 +3,11 @@ import { EndpointDefinition, TypedValue } from "./typesystem";
 import { MaxUint64 } from "./query";
 import { ReturnCode } from "./returnCode";
 import BigNumber from "bignumber.js";
-import { Result } from "./result";
+import { ErrContract } from "../errors";
+import { guardValueIsSet } from "../utils";
+import { ArgSerializer } from "./argSerializer";
 
-export class QueryResponse implements Result.IResult {
+export class QueryResponse {
     /**
      * If available, will provide typed output arguments (with typed values).
      */
@@ -50,12 +52,13 @@ export class QueryResponse implements Result.IResult {
     getReturnMessage(): string {
         return this.returnMessage;
     }
-    unpackOutput(): any {
-        return Result.unpackOutput(this);
-    }
 
     assertSuccess() {
-        Result.assertSuccess(this);
+        if (this.isSuccess()) {
+            return;
+        }
+
+        throw new ErrContract(`${this.getReturnCode()}: ${this.getReturnMessage()}`);
     }
 
     isSuccess(): boolean {
@@ -74,7 +77,14 @@ export class QueryResponse implements Result.IResult {
     }
 
     outputTyped(): TypedValue[] {
-        return Result.outputTyped(this);
+        this.assertSuccess();
+
+        let endpointDefinition = this.getEndpointDefinition();
+        guardValueIsSet("endpointDefinition", endpointDefinition);
+
+        let buffers = this.outputUntyped();
+        let values = new ArgSerializer().buffersToValues(buffers, endpointDefinition!.output);
+        return values;
     }
 
     /**

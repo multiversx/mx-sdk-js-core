@@ -1,4 +1,6 @@
 import { TransactionOnNetwork } from "../../transactionOnNetwork";
+import { ArgSerializer } from "../argSerializer";
+import { QueryResponse } from "../queryResponse";
 import { ReturnCode } from "../returnCode";
 import { SmartContractResultItem, SmartContractResults } from "../smartContractResults";
 import { EndpointDefinition, TypedValue } from "../typesystem";
@@ -9,7 +11,7 @@ import { Result } from "./result";
  * The SCRs are more alike a graph.
  */
 export function interpretExecutionResults(endpoint: EndpointDefinition, transactionOnNetwork: TransactionOnNetwork): ExecutionResultsBundle {
-    let smartContractResults = transactionOnNetwork.getSmartContractResults();
+    let smartContractResults = transactionOnNetwork.results;
     let immediateResult = findImmediateResult(smartContractResults)!;
     let resultingCalls = findResultingCalls(smartContractResults);
 
@@ -30,6 +32,22 @@ export function interpretExecutionResults(endpoint: EndpointDefinition, transact
 }
 
 /**
+ * @deprecated
+ */
+export function interpretQueryResponse(endpoint: EndpointDefinition, queryResponse: QueryResponse): QueryResponseBundle {
+    let buffers = queryResponse.getReturnDataParts();
+    let values = new ArgSerializer().buffersToValues(buffers, endpoint.output);
+    let returnCode = queryResponse.returnCode;
+
+    return {
+        queryResponse: queryResponse,
+        values: values,
+        firstValue: values[0],
+        returnCode: returnCode
+    };
+}
+
+/**
  * @deprecated The concept of immediate results / resulting calls does not exist in the Protocol / in the API.
  * The SCRs are more alike a graph.
  */
@@ -40,6 +58,13 @@ export interface ExecutionResultsBundle {
     resultingCalls: TypedResult[];
     values: TypedValue[];
     firstValue: TypedValue;
+    returnCode: ReturnCode;
+}
+
+export interface QueryResponseBundle {
+    queryResponse: QueryResponse;
+    firstValue: TypedValue;
+    values: TypedValue[];
     returnCode: ReturnCode;
 }
 
@@ -97,7 +122,7 @@ export class TypedResult extends SmartContractResultItem implements Result.IResu
     }
 
     getReturnCode(): ReturnCode {
-        let tokens = this.getDataTokens();
+        let tokens = this.getDataParts();
         if (tokens.length < 2) {
             return ReturnCode.None;
         }
@@ -109,7 +134,7 @@ export class TypedResult extends SmartContractResultItem implements Result.IResu
         this.assertSuccess();
 
         // Skip the first 2 SCRs (eg. the @6f6b from @6f6b@2b).
-        return this.getDataTokens().slice(2);
+        return this.getDataParts().slice(2);
     }
 
     setEndpointDefinition(endpointDefinition: EndpointDefinition) {

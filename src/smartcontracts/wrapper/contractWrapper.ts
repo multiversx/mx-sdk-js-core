@@ -21,7 +21,7 @@ import { Interaction } from "../interaction";
 import { Err, ErrContract, ErrInvalidArgument } from "../../errors";
 import { Egld } from "../../balanceBuilder";
 import { Balance } from "../../balance";
-import { ExecutionResultsBundle, findImmediateResult, interpretExecutionResults } from "./deprecatedSCRs";
+import { ExecutionResultsBundle, findImmediateResult, interpretExecutionResults, interpretQueryResponse } from "./deprecatedContractResults";
 import { Result } from "./result";
 
 /**
@@ -110,7 +110,7 @@ export class ContractWrapper extends ChainSendContext {
 
         let transactionOnNetwork = await this.processTransaction(transaction);
 
-        let smartContractResults = transactionOnNetwork.getSmartContractResults();
+        let smartContractResults = transactionOnNetwork.results;
         let immediateResult = findImmediateResult(smartContractResults)!;
         immediateResult.assertSuccess();
         let logger = this.context.getLogger();
@@ -140,7 +140,7 @@ export class ContractWrapper extends ChainSendContext {
         }
         let response = await provider.queryContract(query);
         console.log("got response...", response);
-        let queryResponseBundle = interaction.interpretQueryResponse(response);
+        let queryResponseBundle = interpretQueryResponse(endpoint, response);
         let result = Result.unpackOutput(queryResponseBundle.queryResponse);
         logger?.queryComplete(result, response);
 
@@ -149,22 +149,22 @@ export class ContractWrapper extends ChainSendContext {
 
     async handleCall(endpoint: EndpointDefinition, ...args: any[]): Promise<any> {
         let { transaction, interaction } = this.buildTransactionAndInteraction(endpoint, args);
-        let { result } = await this.processTransactionAndInterpretResults({ transaction, interaction });
+        let { result } = await this.processTransactionAndInterpretResults({ endpoint, transaction });
         return result;
     }
 
     async handleResults(endpoint: EndpointDefinition, ...args: any[]): Promise<ExecutionResultsBundle> {
         let { transaction, interaction } = this.buildTransactionAndInteraction(endpoint, args);
-        let { executionResultsBundle } = await this.processTransactionAndInterpretResults({ transaction, interaction });
+        let { executionResultsBundle } = await this.processTransactionAndInterpretResults({ endpoint, transaction });
         return executionResultsBundle;
     }
 
-    async processTransactionAndInterpretResults({ transaction, interaction }: {
-        transaction: Transaction,
-        interaction: Interaction
+    async processTransactionAndInterpretResults({ endpoint, transaction }: {
+        endpoint: EndpointDefinition,
+        transaction: Transaction
     }): Promise<{ executionResultsBundle: ExecutionResultsBundle, result: any }> {
         let transactionOnNetwork = await this.processTransaction(transaction);
-        let executionResultsBundle = interpretExecutionResults(interaction.getEndpoint(), transactionOnNetwork);
+        let executionResultsBundle = interpretExecutionResults(endpoint, transactionOnNetwork);
         let { smartContractResults, immediateResult } = executionResultsBundle;
         let result = immediateResult?.unpackOutput();
         let logger = this.context.getLogger();
@@ -192,7 +192,7 @@ export class ContractWrapper extends ChainSendContext {
         let transactionOnNetwork = await transaction.getAsOnNetwork(provider, true, false, true);
         if (transaction.getStatus().isFailed()) {
             // TODO: extract the error messages
-            //let results = transactionOnNetwork.getSmartContractResults().getAllResults();
+            //let results = transactionOnNetwork.results.getAllResults();
             //let messages = results.map((result) => console.log(result));
             throw new ErrContract(`Transaction status failed: [${transaction.getStatus().toString()}].`);// Return messages:\n${messages}`);
         }

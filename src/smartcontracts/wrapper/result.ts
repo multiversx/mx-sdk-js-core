@@ -1,5 +1,4 @@
 import { ErrContract } from "../../errors";
-import { guardValueIsSet } from "../../utils";
 import { ArgSerializer } from "../argSerializer";
 import { ReturnCode } from "../returnCode";
 import { EndpointDefinition, TypedValue } from "../typesystem";
@@ -7,8 +6,6 @@ import { EndpointDefinition, TypedValue } from "../typesystem";
 export namespace Result {
 
     export interface IResult {
-        setEndpointDefinition(endpointDefinition: EndpointDefinition): void;
-        getEndpointDefinition(): EndpointDefinition | undefined;
         getReturnCode(): ReturnCode;
         getReturnMessage(): string;
         isSuccess(): boolean;
@@ -29,14 +26,11 @@ export namespace Result {
         throw new ErrContract(`${result.getReturnCode()}: ${result.getReturnMessage()}`);
     }
 
-    export function outputTyped(result: IResult) {
+    export function outputTyped(endpointDefinition: EndpointDefinition, result: IResult) {
         result.assertSuccess();
 
-        let endpointDefinition = result.getEndpointDefinition();
-        guardValueIsSet("endpointDefinition", endpointDefinition);
-
         let buffers = result.outputUntyped();
-        let values = new ArgSerializer().buffersToValues(buffers, endpointDefinition!.output);
+        let values = new ArgSerializer().buffersToValues(buffers, endpointDefinition.output);
         return values;
     }
 

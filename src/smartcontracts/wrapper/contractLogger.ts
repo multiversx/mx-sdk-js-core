@@ -4,7 +4,7 @@ import { Transaction } from "../../transaction";
 import { Query } from "../query";
 import { QueryResponse } from "../queryResponse";
 import { SmartContractResults } from "../smartContractResults";
-import { findImmediateResult, findResultingCalls, TypedResult } from "./deprecatedSCRs";
+import { findImmediateResult, findResultingCalls, TypedResult } from "./deprecatedContractResults";
 
 /**
  * Provides a simple interface in order to easily call or query the smart contract's methods.

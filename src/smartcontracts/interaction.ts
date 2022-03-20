@@ -2,17 +2,22 @@ import { Balance } from "../balance";
 import { GasLimit } from "../networkParams";
 import { Transaction } from "../transaction";
 import { Query } from "./query";
-import { QueryResponse } from "./queryResponse";
 import { ContractFunction } from "./function";
 import { Address } from "../address";
-import { SmartContract } from "./smartContract";
-import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
+import { AddressValue, BigUIntValue, BytesValue, TypedValue, U64Value, U8Value } from "./typesystem";
 import { Nonce } from "../nonce";
-import { QueryResponseBundle } from "./interface";
 import { NetworkConfig } from "../networkConfig";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
-import { InteractionChecker } from "./interactionChecker";
 import { Account } from "../account";
+import { CallArguments } from "./interface";
+
+/**
+ * Internal interface: the smart contract, as seen from the perspective of an {@link Interaction}.
+ */
+interface ISmartContractWithinInteraction {
+    call({ func, args, value, gasLimit, receiver }: CallArguments): Transaction;
+    getAddress(): Address;
+}
 
 /**
  * Interactions can be seen as mutable transaction & query builders.
@@ -21,8 +26,7 @@ import { Account } from "../account";
  * the execution outcome for the objects they've built.
  */
 export class Interaction {
-    private readonly checker: InteractionChecker;
-    private readonly contract: SmartContract;
+    private readonly contract: ISmartContractWithinInteraction;
     private readonly function: ContractFunction;
     private readonly args: TypedValue[];
     private readonly receiver?: Address;
@@ -39,20 +43,19 @@ export class Interaction {
     private tokenTransfersSender: Address = new Address();
 
     constructor(
-        contract: SmartContract,
+        contract: ISmartContractWithinInteraction,
         func: ContractFunction,
         args: TypedValue[],
         receiver?: Address,
     ) {
-        this.checker = new InteractionChecker();
         this.contract = contract;
         this.function = func;
         this.args = args;
         this.receiver = receiver;
         this.tokenTransfers = new TokenTransfersWithinInteraction([], this);
     }
-
-    getContract(): SmartContract {
+    
+    getContract(): ISmartContractWithinInteraction {
         return this.contract;
     }
 
@@ -122,25 +125,6 @@ export class Interaction {
         });
     }
 
-    /**
-     * Interprets the raw outcome of a Smart Contract query.
-     * The outcome is structured such that it allows quick access to each level of detail.
-     */
-    interpretQueryResponse(queryResponse: QueryResponse): QueryResponseBundle {
-        let endpoint = this.getEndpoint();
-        queryResponse.setEndpointDefinition(endpoint);
-
-        let values = queryResponse.outputTyped();
-        let returnCode = queryResponse.returnCode;
-
-        return {
-            queryResponse: queryResponse,
-            values: values,
-            firstValue: values[0],
-            returnCode: returnCode
-        };
-    }
-
     withValue(value: Balance): Interaction {
         this.value = value;
         return this;
@@ -199,22 +183,6 @@ export class Interaction {
     withQuerent(querent: Address): Interaction {
         this.querent = querent;
         return this;
-    }
-
-    /**
-     * Checks the prepared interaction against the ABI endpoint definition.
-     * This function throws if type mismatches (provided vs. ABI) are encountered.
-     * 
-     * When the ABI is available, it is always recommended to call {@link check} before
-     * {@link buildTransaction}.
-     */
-    check(): Interaction {
-        this.checker.checkInteraction(this);
-        return this;
-    }
-
-    getEndpoint(): EndpointDefinition {
-        return this.getContract().getAbi().getEndpoint(this.getFunction());
     }
 }
 

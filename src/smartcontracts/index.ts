@@ -8,7 +8,7 @@ export * from "./argSerializer";
 export * from "./code";
 export * from "./codec";
 export * from "./codeMetadata";
-export * from "./defaultRunner";
+export * from "./interactionController";
 export * from "./function";
 export * from "./interaction";
 export * from "./interface";

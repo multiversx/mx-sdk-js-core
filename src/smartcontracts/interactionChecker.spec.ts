@@ -19,17 +19,18 @@ describe("integration tests: test checker within interactor", function () {
         let abiRegistry = await loadAbiRegistry(["src/testdata/answer.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["answer"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
+        let endpoint = abi.getEndpoint("getUltimateAnswer");
 
         // Send value to non-payable
         assert.throw(() => {
             let interaction = (<Interaction>contract.methods.getUltimateAnswer()).withValue(Balance.egld(1));
-            checker.checkInteraction(interaction);
+            checker.checkInteraction(interaction, endpoint);
         }, errors.ErrContractInteraction, "cannot send EGLD value to non-payable");
 
         // Bad arguments
         assert.throw(() => {
             let interaction = (<Interaction>contract.methods.getUltimateAnswer([BytesValue.fromHex("abba")]));
-            checker.checkInteraction(interaction);
+            checker.checkInteraction(interaction, endpoint);
         }, errors.ErrContractInteraction, "bad arguments, expected: 0, got: 1");
     });
 
@@ -37,6 +38,7 @@ describe("integration tests: test checker within interactor", function () {
         let abiRegistry = await loadAbiRegistry(["src/testdata/lottery_egld.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
+        let endpoint = abi.getEndpoint("start");
 
         // Bad number of arguments
         assert.throw(() => {
@@ -45,7 +47,7 @@ describe("integration tests: test checker within interactor", function () {
                 new BigUIntValue(Balance.egld(1).valueOf()),
                 OptionValue.newMissing()
             ]);
-            checker.checkInteraction(interaction);
+            checker.checkInteraction(interaction, endpoint);
         }, errors.ErrContractInteraction, "bad arguments, expected: 7, got: 3");
 
         // Bad types (U64 instead of U32)
@@ -59,7 +61,7 @@ describe("integration tests: test checker within interactor", function () {
                 OptionValue.newMissing(),
                 OptionValue.newMissing(),
             ]);
-            checker.checkInteraction(interaction);
+            checker.checkInteraction(interaction, endpoint);
         }, errors.ErrContractInteraction, "type mismatch at index 4, expected: Option<u32>, got: Option<u64>");
     });
 });

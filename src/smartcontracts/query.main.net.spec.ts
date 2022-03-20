@@ -26,7 +26,7 @@ describe("test queries on mainnet", function () {
 
         assert.isTrue(response.isSuccess());
         assert.lengthOf(response.returnData, 1);
-        assert.isAtLeast(response.gasUsed.valueOf(), 20000000);
+        assert.isAtLeast(response.gasUsed.valueOf(), 1000000);
         assert.isAtMost(response.gasUsed.valueOf(), 50000000);
     });
 
@@ -38,7 +38,7 @@ describe("test queries on mainnet", function () {
         });
 
         assert.isTrue(response.isSuccess());
-        assert.isAtLeast(response.returnData.length, 20000);
+        assert.isAtLeast(response.returnData.length, 42);
     });
 
     it("delegation: should getClaimableRewards", async function () {
@@ -46,12 +46,12 @@ describe("test queries on mainnet", function () {
 
         // First, expect an error (bad arguments):
         try {
-            await delegationContract.runQuery(provider, {
+            let kk = await delegationContract.runQuery(provider, {
                 func: new ContractFunction("getClaimableRewards")
             });
 
             throw new errors.ErrTest("unexpected");
-        } catch (err) {
+        } catch (err: any) {
             assert.instanceOf(err, errors.ErrContractQuery);
             assert.include(err.toString(), "wrong number of arguments");
         }

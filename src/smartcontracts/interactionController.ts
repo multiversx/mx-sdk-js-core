@@ -7,6 +7,7 @@ import { ContractFunction } from "./function";
 import { ResultsParser } from "./resultsParser";
 import { InteractionChecker, NullInteractionChecker } from "./interactionChecker";
 import { EndpointDefinition } from "./typesystem";
+import { Logger } from "../logger";
 
 /**
  * Internal interface: the smart contract ABI, as seen from the perspective of an {@link InteractionController}.
@@ -44,6 +45,8 @@ export class InteractionController {
      * @param signedInteractionTransaction The interaction transaction, which must be signed beforehand
      */
     async execute(interaction: Interaction, signedInteractionTransaction: Transaction): Promise<{ transaction: TransactionOnNetwork, bundle: ContractOutcomeBundle }> {
+        Logger.info(`InteractionController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${signedInteractionTransaction.getHash()}`)
+
         let endpoint = this.getEndpoint(interaction);
 
         this.checker.checkInteraction(interaction, endpoint);
@@ -52,6 +55,9 @@ export class InteractionController {
         await signedInteractionTransaction.awaitExecuted(this.provider);
         let transactionOnNetwork = await signedInteractionTransaction.getAsOnNetwork(this.provider);
         let outcomeBundle = this.parser.parseOutcome(transactionOnNetwork, endpoint);
+
+        Logger.info(`InteractionController.execute [end]: function = ${interaction.getFunction()}, transaction = ${signedInteractionTransaction.getHash()}, return code = ${outcomeBundle.returnCode}`)
+
         return { transaction: transactionOnNetwork, bundle: outcomeBundle };
     }
 

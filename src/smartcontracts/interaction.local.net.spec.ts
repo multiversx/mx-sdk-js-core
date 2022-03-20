@@ -1,13 +1,12 @@
 import { DefaultInteractionController } from "./interactionController";
 import { SmartContract } from "./smartContract";
-import { BigUIntValue, OptionValue, TypedValue, U32Value } from "./typesystem";
+import { BigUIntType, BigUIntValue, OptionalType, OptionalValue, OptionValue, TokenIdentifierValue, TypedValue, U32Value } from "./typesystem";
 import { loadAbiRegistry, loadContractCode, loadTestWallets, TestWallet } from "../testutils";
 import { SmartContractAbi } from "./abi";
 import { assert } from "chai";
 import { Interaction } from "./interaction";
 import { GasLimit } from "../networkParams";
 import { ReturnCode } from "./returnCode";
-import { Balance } from "../balance";
 import BigNumber from "bignumber.js";
 import { NetworkConfig } from "../networkConfig";
 import { BytesValue } from "./typesystem/bytes";
@@ -112,19 +111,21 @@ describe("test smart contract interactor", function () {
 
         let startInteraction = <Interaction>contract.methods.start([
             BytesValue.fromUTF8("lucky"),
-            new BigUIntValue(Balance.egld(1).valueOf()),
+            new TokenIdentifierValue(Buffer.from("EGLD")),
+            new BigUIntValue(1),
             OptionValue.newMissing(),
             OptionValue.newMissing(),
             OptionValue.newProvided(new U32Value(1)),
             OptionValue.newMissing(),
             OptionValue.newMissing(),
+            new OptionalValue(new OptionalType(new BigUIntType()))
         ]).withGasLimit(new GasLimit(30000000));
 
         let lotteryStatusInteraction = <Interaction>contract.methods.status([
             BytesValue.fromUTF8("lucky")
         ]).withGasLimit(new GasLimit(30000000));
 
-        let getLotteryInfoInteraction = <Interaction>contract.methods.lotteryInfo([
+        let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo([
             BytesValue.fromUTF8("lucky")
         ]).withGasLimit(new GasLimit(30000000));
 
@@ -155,12 +156,11 @@ describe("test smart contract interactor", function () {
         delete info.deadline;
 
         assert.deepEqual(info, {
-            ticket_price: new BigNumber("1000000000000000000"),
+            token_identifier: Buffer.from("EGLD"),
+            ticket_price: new BigNumber("1"),
             tickets_left: new BigNumber(800),
             max_entries_per_user: new BigNumber(1),
             prize_distribution: Buffer.from([0x64]),
-            whitelist: [],
-            current_ticket_number: new BigNumber(0),
             prize_pool: new BigNumber("0")
         });
     });

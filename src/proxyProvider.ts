@@ -70,7 +70,7 @@ export class ProxyProvider implements IProvider {
             return this.doPostGeneric("vm-values/query", data, (response) =>
                 QueryResponse.fromHttpResponse(response.data || response.vmOutput)
             );
-        } catch (err) {
+        } catch (err: any) {
             throw errors.ErrContractQuery.increaseSpecificity(err);
         }
     }

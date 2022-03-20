@@ -8,7 +8,7 @@ import { loadContractCode } from "../testutils";
 import { Logger } from "../logger";
 import { assert } from "chai";
 import { Balance } from "../balance";
-import { AddressValue, BigUIntValue, OptionValue, U32Value } from "./typesystem";
+import { AddressValue, BigUIntType, BigUIntValue, OptionalType, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 import { decodeUnsignedNumber } from "./codec";
 import { BytesValue } from "./typesystem/bytes";
 import { chooseProxyProvider } from "../interactive";
@@ -245,13 +245,15 @@ describe("test on local testnet", function () {
             func: new ContractFunction("start"),
             gasLimit: new GasLimit(50000000),
             args: [
-                BytesValue.fromUTF8("foobar"),
-                new BigUIntValue(Balance.egld(1).valueOf()),
+                BytesValue.fromUTF8("lucky"),
+                new TokenIdentifierValue(Buffer.from("EGLD")),
+                new BigUIntValue(1),
                 OptionValue.newMissing(),
                 OptionValue.newMissing(),
                 OptionValue.newProvided(new U32Value(1)),
                 OptionValue.newMissing(),
                 OptionValue.newMissing(),
+                new OptionalValue(new OptionalType(new BigUIntType()))
             ]
         });
 
@@ -278,7 +280,7 @@ describe("test on local testnet", function () {
         let queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("status"),
             args: [
-                BytesValue.fromUTF8("foobar")
+                BytesValue.fromUTF8("lucky")
             ]
         });
         assert.equal(decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]), 1);

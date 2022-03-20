@@ -3,10 +3,9 @@ import { BigNumber } from "bignumber.js";
 import { TestWallet } from "../../testutils";
 import { SystemWrapper } from "./systemWrapper";
 import { setupInteractive } from "../../interactive";
-import { Balance } from "../../balance";
 
 
-describe("test smart contract interactor", function () {
+describe("test smart contract wrapper", function () {
     let erdSys: SystemWrapper;
     let alice: TestWallet;
 
@@ -52,22 +51,21 @@ describe("test smart contract interactor", function () {
         await lottery.sender(alice).gas(100_000_000).call.deploy();
 
         lottery.gas(50_000_000);
-        await lottery.call.start("lucky", Balance.egld(1), null, null, 1, null, null);
+        await lottery.call.start("lucky", "EGLD", 1, null, null, 1, null, null);
 
         let status = await lottery.query.status("lucky");
         assert.equal(status.valueOf().name, "Running");
 
-        let info = await lottery.query.lotteryInfo("lucky");
+        let info = await lottery.query.getLotteryInfo("lucky");
         // Ignore "deadline" field in our test
         delete info.deadline;
 
         assert.deepEqual(info, {
-            ticket_price: new BigNumber("1000000000000000000"),
+            token_identifier: Buffer.from("EGLD"),
+            ticket_price: new BigNumber("1"),
             tickets_left: new BigNumber(800),
             max_entries_per_user: new BigNumber(1),
             prize_distribution: Buffer.from([0x64]),
-            whitelist: [],
-            current_ticket_number: new BigNumber(0),
             prize_pool: new BigNumber("0")
         });
     });

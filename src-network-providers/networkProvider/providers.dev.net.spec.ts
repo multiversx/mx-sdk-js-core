@@ -227,7 +227,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         let proxyResponse = await proxyProvider.queryContract(query);
 
         assert.deepEqual(apiResponse, proxyResponse);
-        assert.deepEqual(apiResponse.getOutputUntyped(), proxyResponse.getOutputUntyped());
+        assert.deepEqual(apiResponse.getReturnDataParts(), proxyResponse.getReturnDataParts());
 
         // Query: increment counter
         query = new Query({
@@ -240,7 +240,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         proxyResponse = await proxyProvider.queryContract(query);
 
         assert.deepEqual(apiResponse, proxyResponse);
-        assert.deepEqual(apiResponse.getOutputUntyped(), proxyResponse.getOutputUntyped());
+        assert.deepEqual(apiResponse.getReturnDataParts(), proxyResponse.getReturnDataParts());
 
         // Query: issue ESDT
         query = new Query({
@@ -260,6 +260,6 @@ describe("test network providers on devnet: Proxy and API", function () {
         proxyResponse = await proxyProvider.queryContract(query);
         
         assert.deepEqual(apiResponse, proxyResponse);
-        assert.deepEqual(apiResponse.getOutputUntyped(), proxyResponse.getOutputUntyped());
+        assert.deepEqual(apiResponse.getReturnDataParts(), proxyResponse.getReturnDataParts());
     });
 });

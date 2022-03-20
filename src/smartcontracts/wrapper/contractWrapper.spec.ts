@@ -102,7 +102,7 @@ describe("test smart contract wrapper", async function() {
 });
 
 function mockQuery(provider: MockProvider, functionName: string, mockedResult: string) {
-    provider.mockQueryResponseOnFunction(
+    provider.mockQueryContractOnFunction(
         functionName,
         new QueryResponse({ returnData: [mockedResult], returnCode: ReturnCode.Ok })
     );

@@ -9,7 +9,7 @@ import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
 import { Nonce } from "../nonce";
 import { Signature } from "../signature";
-import { EndpointDefinition, Query, ReturnCode, TypedValue } from "../smartcontracts";
+import { Query, ReturnCode } from "../smartcontracts";
 import { Stats } from "../stats";
 import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
 import { TransactionLogs } from "../transactionLogs";
@@ -204,9 +204,6 @@ export interface IContractResultItem {
     gasPrice: GasPrice;
     callType: number;
     returnMessage: string;
-
-    getOutputUntyped(): Buffer[];
-    getOutputTyped(endpointDefinition: EndpointDefinition): TypedValue[];
 }
 
 export interface IContractQueryResponse {
@@ -214,9 +211,8 @@ export interface IContractQueryResponse {
     returnCode: ReturnCode;
     returnMessage: string;
     gasUsed: GasLimit;
-
-    getOutputUntyped(): Buffer[];
-    getOutputTyped(endpointDefinition: EndpointDefinition): TypedValue[];
+    
+    getReturnDataParts(): Buffer[];
 }
 
 export interface IContractSimulation {

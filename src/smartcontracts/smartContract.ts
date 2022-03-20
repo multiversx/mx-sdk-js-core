@@ -28,6 +28,7 @@ export class SmartContract implements ISmartContract {
     private code: Code = Code.nothing();
     private codeMetadata: CodeMetadata = new CodeMetadata();
     private abi?: SmartContractAbi;
+    // TODO: Perhaps remove this?
     private readonly trackOfTransactions: Transaction[] = [];
 
     /**

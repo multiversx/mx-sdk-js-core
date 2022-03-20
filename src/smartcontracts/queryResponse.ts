@@ -1,18 +1,11 @@
 import { GasLimit } from "../networkParams";
-import { EndpointDefinition, TypedValue } from "./typesystem";
 import { MaxUint64 } from "./query";
 import { ReturnCode } from "./returnCode";
 import BigNumber from "bignumber.js";
 import { ErrContract } from "../errors";
-import { guardValueIsSet } from "../utils";
 import { ArgSerializer } from "./argSerializer";
 
 export class QueryResponse {
-    /**
-     * If available, will provide typed output arguments (with typed values).
-     */
-    private endpointDefinition?: EndpointDefinition;
-
     returnData: string[];
     returnCode: ReturnCode;
     returnMessage: string;
@@ -43,14 +36,16 @@ export class QueryResponse {
         });
     }
 
-    getEndpointDefinition(): EndpointDefinition | undefined {
-        return this.endpointDefinition;
-    }
     getReturnCode(): ReturnCode {
         return this.returnCode;
     }
+
     getReturnMessage(): string {
         return this.returnMessage;
+    }
+
+    getReturnDataParts(): Buffer[] {
+        return this.returnData.map((item) => Buffer.from(item || "", "base64"));
     }
 
     assertSuccess() {
@@ -63,28 +58,6 @@ export class QueryResponse {
 
     isSuccess(): boolean {
         return this.returnCode.isSuccess();
-    }
-
-    setEndpointDefinition(endpointDefinition: EndpointDefinition): void {
-        this.endpointDefinition = endpointDefinition;
-    }
-
-    outputUntyped(): Buffer[] {
-        this.assertSuccess();
-
-        let buffers = this.returnData.map((item) => Buffer.from(item || "", "base64"));
-        return buffers;
-    }
-
-    outputTyped(): TypedValue[] {
-        this.assertSuccess();
-
-        let endpointDefinition = this.getEndpointDefinition();
-        guardValueIsSet("endpointDefinition", endpointDefinition);
-
-        let buffers = this.outputUntyped();
-        let values = new ArgSerializer().buffersToValues(buffers, endpointDefinition!.output);
-        return values;
     }
 
     /**

@@ -5,7 +5,7 @@ import { Hash } from "../hash";
 import { IContractQueryResponse, IContractResultItem, IContractResults } from "./interface";
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
-import { ArgSerializer, EndpointDefinition, MaxUint64, ReturnCode, TypedValue } from "../smartcontracts";
+import { MaxUint64, ReturnCode } from "../smartcontracts";
 import { TransactionHash } from "../transaction";
 
 export class ContractResults implements IContractResults {
@@ -80,16 +80,6 @@ export class ContractResultItem implements IContractResultItem {
 
         return item;
     }
-
-    getOutputUntyped(): Buffer[] {
-        // TODO: Decide how to parse "data" (immediate results vs. other results).
-        throw new Error("Method not implemented.");
-    }
-
-    getOutputTyped(_endpointDefinition: EndpointDefinition): TypedValue[] {
-        // TODO: Decide how to parse "data" (immediate results vs. other results).
-        throw new Error("Method not implemented.");
-    }
 }
 
 export class ContractQueryResponse implements IContractQueryResponse {
@@ -110,14 +100,7 @@ export class ContractQueryResponse implements IContractQueryResponse {
         return response;
     }
 
-    getOutputUntyped(): Buffer[] {
-        let buffers = this.returnData.map((item) => Buffer.from(item || "", "base64"));
-        return buffers;
-    }
-
-    getOutputTyped(endpointDefinition: EndpointDefinition): TypedValue[] {
-        let buffers = this.getOutputUntyped();
-        let values = new ArgSerializer().buffersToValues(buffers, endpointDefinition!.output);
-        return values;
+    getReturnDataParts(): Buffer[] {
+        return this.returnData.map((item) => Buffer.from(item || ""));
     }
 }

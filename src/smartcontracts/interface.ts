@@ -2,13 +2,14 @@ import { Address } from "../address";
 import { Balance } from "../balance";
 import { GasLimit } from "../networkParams";
 import { Transaction } from "../transaction";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { QueryResponse } from "./queryResponse";
 import { ReturnCode } from "./returnCode";
-import { TypedValue } from "./typesystem";
+import { EndpointDefinition, TypedValue } from "./typesystem";
 
 /**
  * ISmartContract defines a general interface for operating with {@link SmartContract} objects.
@@ -66,9 +67,20 @@ export interface QueryArguments {
     caller?: Address
 }
 
-export interface QueryResponseBundle {
-    queryResponse: QueryResponse;
-    firstValue: TypedValue;
-    values: TypedValue[];
+export interface ContractOutcomeBundle {
     returnCode: ReturnCode;
+    returnMessage: string;
+    values: TypedValue[];
+    firstValue?: TypedValue;
+    secondValue?: TypedValue;
+    thirdValue?: TypedValue;
+}
+
+export interface IInteractionChecker {
+    checkInteraction(interaction: Interaction, definition: EndpointDefinition): void;
+}
+
+export interface IResultsParser {
+    parseQueryResponse(queryResponse: QueryResponse, endpoint: EndpointDefinition): ContractOutcomeBundle;
+    parseOutcome(transaction: TransactionOnNetwork, endpoint: EndpointDefinition): ContractOutcomeBundle
 }

@@ -135,7 +135,7 @@ describe("test on local testnet", function () {
 
         // Check counter
         let queryResponse = await contract.runQuery(provider, { func: new ContractFunction("get") });
-        assert.equal(3, decodeUnsignedNumber(queryResponse.outputUntyped()[0]));
+        assert.equal(3, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
     });
 
     it("erc20: should deploy, call and query contract", async function () {
@@ -196,25 +196,25 @@ describe("test on local testnet", function () {
         let queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("totalSupply")
         });
-        assert.equal(10000, decodeUnsignedNumber(queryResponse.outputUntyped()[0]));
+        assert.equal(10000, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
 
         queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("balanceOf"),
             args: [new AddressValue(alice.address)]
         });
-        assert.equal(7500, decodeUnsignedNumber(queryResponse.outputUntyped()[0]));
+        assert.equal(7500, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
 
         queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("balanceOf"),
             args: [new AddressValue(bob.address)]
         });
-        assert.equal(1000, decodeUnsignedNumber(queryResponse.outputUntyped()[0]));
+        assert.equal(1000, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
 
         queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("balanceOf"),
             args: [new AddressValue(carol.address)]
         });
-        assert.equal(1500, decodeUnsignedNumber(queryResponse.outputUntyped()[0]));
+        assert.equal(1500, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
     });
 
     it("lottery: should deploy, call and query contract", async function () {
@@ -268,10 +268,10 @@ describe("test on local testnet", function () {
         await transactionStart.awaitNotarized(provider);
 
         // Let's check the SCRs
-        let deployResults = (await transactionDeploy.getAsOnNetwork(provider)).getSmartContractResults();
+        let deployResults = (await transactionDeploy.getAsOnNetwork(provider)).results;
         // TODO: deployResults.getImmediate().assertSuccess();
 
-        let startResults = (await transactionStart.getAsOnNetwork(provider)).getSmartContractResults();
+        let startResults = (await transactionStart.getAsOnNetwork(provider)).results;
         // TODO: startResults.getImmediate().assertSuccess();
 
         // Query state, do some assertions
@@ -281,7 +281,7 @@ describe("test on local testnet", function () {
                 BytesValue.fromUTF8("foobar")
             ]
         });
-        assert.equal(decodeUnsignedNumber(queryResponse.outputUntyped()[0]), 1);
+        assert.equal(decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]), 1);
 
         queryResponse = await contract.runQuery(provider, {
             func: new ContractFunction("status"),
@@ -289,6 +289,6 @@ describe("test on local testnet", function () {
                 BytesValue.fromUTF8("missingLottery")
             ]
         });
-        assert.equal(decodeUnsignedNumber(queryResponse.outputUntyped()[0]), 0);
+        assert.equal(decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]), 0);
     });
 });

@@ -28,6 +28,10 @@ export class SmartContractResults {
 }
 
 export class SmartContractResultItem {
+    constructor(init?: Partial<SmartContractResultItem>) {
+        Object.assign(this, init);
+    }
+
     hash: Hash = Hash.empty();
     nonce: Nonce = new Nonce(0);
     value: Balance = Balance.Zero();
@@ -71,7 +75,7 @@ export class SmartContractResultItem {
         return item;
     }
 
-    getDataTokens(): Buffer[] {
+    getDataParts(): Buffer[] {
         return new ArgSerializer().stringToBuffers(this.data);
     }
 }

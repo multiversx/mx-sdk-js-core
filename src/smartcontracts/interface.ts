@@ -67,7 +67,7 @@ export interface QueryArguments {
     caller?: Address
 }
 
-export interface ContractOutcomeBundle {
+export interface TypedOutcomeBundle {
     returnCode: ReturnCode;
     returnMessage: string;
     values: TypedValue[];
@@ -76,11 +76,20 @@ export interface ContractOutcomeBundle {
     thirdValue?: TypedValue;
 }
 
+export interface UntypedOutcomeBundle {
+    returnCode: ReturnCode;
+    returnMessage: string;
+    values: Buffer[];
+}
+
 export interface IInteractionChecker {
     checkInteraction(interaction: Interaction, definition: EndpointDefinition): void;
 }
 
 export interface IResultsParser {
-    parseQueryResponse(queryResponse: QueryResponse, endpoint: EndpointDefinition): ContractOutcomeBundle;
-    parseOutcome(transaction: TransactionOnNetwork, endpoint: EndpointDefinition): ContractOutcomeBundle
+    parseQueryResponse(queryResponse: QueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle;
+    parseUntypedQueryResponse(queryResponse: QueryResponse): UntypedOutcomeBundle;
+
+    parseOutcome(transaction: TransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle;
+    parseUntypedOutcome(transaction: TransactionOnNetwork): UntypedOutcomeBundle;
 }

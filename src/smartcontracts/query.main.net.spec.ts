@@ -45,19 +45,15 @@ describe("test queries on mainnet", function () {
         this.timeout(5000);
 
         // First, expect an error (bad arguments):
-        try {
-            let kk = await delegationContract.runQuery(provider, {
-                func: new ContractFunction("getClaimableRewards")
-            });
+        let response = await delegationContract.runQuery(provider, {
+            func: new ContractFunction("getClaimableRewards")
+        });
 
-            throw new errors.ErrTest("unexpected");
-        } catch (err: any) {
-            assert.instanceOf(err, errors.ErrContractQuery);
-            assert.include(err.toString(), "wrong number of arguments");
-        }
+        assert.include(response.returnCode.toString(), "user error");
+        assert.include(response.returnMessage, "wrong number of arguments");
 
         // Then do a successful query:
-        let response = await delegationContract.runQuery(provider, {
+        response = await delegationContract.runQuery(provider, {
             func: new ContractFunction("getClaimableRewards"),
             args: [new AddressValue(new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"))]
         });

@@ -123,11 +123,11 @@ describe("test smart contract interactor", function () {
 
         let lotteryStatusInteraction = <Interaction>contract.methods.status([
             BytesValue.fromUTF8("lucky")
-        ]).withGasLimit(new GasLimit(30000000));
+        ]).withGasLimit(new GasLimit(5000000));
 
         let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo([
             BytesValue.fromUTF8("lucky")
-        ]).withGasLimit(new GasLimit(30000000));
+        ]).withGasLimit(new GasLimit(5000000));
 
         // start()
         let startTransaction = startInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();

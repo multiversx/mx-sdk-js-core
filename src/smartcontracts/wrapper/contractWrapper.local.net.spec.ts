@@ -48,9 +48,9 @@ describe("test smart contract wrapper", function () {
 
         let lottery = await erdSys.loadWrapper("src/testdata", "lottery-esdt");
 
-        await lottery.sender(alice).gas(100_000_000).call.deploy();
+        await lottery.sender(alice).gas(50_000_000).call.deploy();
 
-        lottery.gas(50_000_000);
+        lottery.gas(5_000_000);
         await lottery.call.start("lucky", "EGLD", 1, null, null, 1, null, null);
 
         let status = await lottery.query.status("lucky");

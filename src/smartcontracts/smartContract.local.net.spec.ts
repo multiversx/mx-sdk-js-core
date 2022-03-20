@@ -7,15 +7,17 @@ import { loadTestWallets, TestWallet } from "../testutils/wallets";
 import { loadContractCode } from "../testutils";
 import { Logger } from "../logger";
 import { assert } from "chai";
-import { Balance } from "../balance";
 import { AddressValue, BigUIntType, BigUIntValue, OptionalType, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 import { decodeUnsignedNumber } from "./codec";
 import { BytesValue } from "./typesystem/bytes";
 import { chooseProxyProvider } from "../interactive";
+import { ResultsParser } from "./resultsParser";
 
 describe("test on local testnet", function () {
     let provider = chooseProxyProvider("local-testnet");
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
+    let resultsParser = new ResultsParser();
+
     before(async function () {
         ({ alice, bob, carol } = await loadTestWallets());
     });
@@ -74,7 +76,14 @@ describe("test on local testnet", function () {
         await transactionIncrement.send(provider);
 
         await transactionDeploy.awaitExecuted(provider);
+        let transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);
+        let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        assert.isTrue(bundle.returnCode.isSuccess());
+
         await transactionIncrement.awaitExecuted(provider);
+        transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);
+        bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        assert.isTrue(bundle.returnCode.isSuccess());
 
         // Simulate
         Logger.trace(JSON.stringify(await simulateOne.simulate(provider), null, 4));
@@ -230,7 +239,7 @@ describe("test on local testnet", function () {
         let contract = new SmartContract({});
         let transactionDeploy = contract.deploy({
             code: await loadContractCode("src/testdata/lottery-esdt.wasm"),
-            gasLimit: new GasLimit(100000000),
+            gasLimit: new GasLimit(50000000),
             initArguments: []
         });
 
@@ -243,7 +252,7 @@ describe("test on local testnet", function () {
         // Start
         let transactionStart = contract.call({
             func: new ContractFunction("start"),
-            gasLimit: new GasLimit(50000000),
+            gasLimit: new GasLimit(10000000),
             args: [
                 BytesValue.fromUTF8("lucky"),
                 new TokenIdentifierValue(Buffer.from("EGLD")),
@@ -270,11 +279,13 @@ describe("test on local testnet", function () {
         await transactionStart.awaitNotarized(provider);
 
         // Let's check the SCRs
-        let deployResults = (await transactionDeploy.getAsOnNetwork(provider)).results;
-        // TODO: deployResults.getImmediate().assertSuccess();
+        let transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);
+        let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        assert.isTrue(bundle.returnCode.isSuccess());
 
-        let startResults = (await transactionStart.getAsOnNetwork(provider)).results;
-        // TODO: startResults.getImmediate().assertSuccess();
+        transactionOnNetwork = await transactionStart.getAsOnNetwork(provider);
+        bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        assert.isTrue(bundle.returnCode.isSuccess());
 
         // Query state, do some assertions
         let queryResponse = await contract.runQuery(provider, {

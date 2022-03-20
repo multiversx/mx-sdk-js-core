@@ -2,7 +2,7 @@ import { IProvider } from "../interface";
 import { Interaction } from "./interaction";
 import { Transaction } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
-import { ContractOutcomeBundle, IInteractionChecker, IResultsParser } from "./interface";
+import { TypedOutcomeBundle, IInteractionChecker, IResultsParser } from "./interface";
 import { ContractFunction } from "./function";
 import { ResultsParser } from "./resultsParser";
 import { InteractionChecker, NullInteractionChecker } from "./interactionChecker";
@@ -44,7 +44,7 @@ export class InteractionController {
      * @param interaction The interaction used to build the {@link signedInteractionTransaction}
      * @param signedInteractionTransaction The interaction transaction, which must be signed beforehand
      */
-    async execute(interaction: Interaction, signedInteractionTransaction: Transaction): Promise<{ transaction: TransactionOnNetwork, bundle: ContractOutcomeBundle }> {
+    async execute(interaction: Interaction, signedInteractionTransaction: Transaction): Promise<{ transaction: TransactionOnNetwork, bundle: TypedOutcomeBundle }> {
         Logger.info(`InteractionController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${signedInteractionTransaction.getHash()}`)
 
         let endpoint = this.getEndpoint(interaction);
@@ -61,7 +61,7 @@ export class InteractionController {
         return { transaction: transactionOnNetwork, bundle: outcomeBundle };
     }
 
-    async query(interaction: Interaction): Promise<ContractOutcomeBundle> {
+    async query(interaction: Interaction): Promise<TypedOutcomeBundle> {
         let endpoint = this.getEndpoint(interaction);
 
         this.checker.checkInteraction(interaction, endpoint);

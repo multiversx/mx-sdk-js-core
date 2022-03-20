@@ -1,4 +1,21 @@
 {
+    "buildInfo": {
+        "rustc": {
+            "version": "1.60.0-nightly",
+            "commitHash": "c5c610aad0a012a9228ecb83cc19e77111a52140",
+            "commitDate": "2022-02-14",
+            "channel": "Nightly",
+            "short": "rustc 1.60.0-nightly (c5c610aad 2022-02-14)"
+        },
+        "contractCrate": {
+            "name": "lottery-esdt",
+            "version": "0.0.0"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.30.0"
+        }
+    },
     "name": "Lottery",
     "constructor": {
         "inputs": [],
@@ -7,10 +24,15 @@
     "endpoints": [
         {
             "name": "start",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "lottery_name",
                     "type": "bytes"
+                },
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
                 },
                 {
                     "name": "ticket_price",
@@ -35,16 +57,26 @@
                 {
                     "name": "opt_whitelist",
                     "type": "Option<List<Address>>"
+                },
+                {
+                    "name": "opt_burn_percentage",
+                    "type": "optional<BigUint>",
+                    "multi_arg": true
                 }
             ],
             "outputs": []
         },
         {
             "name": "createLotteryPool",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "lottery_name",
                     "type": "bytes"
+                },
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
                 },
                 {
                     "name": "ticket_price",
@@ -69,14 +101,20 @@
                 {
                     "name": "opt_whitelist",
                     "type": "Option<List<Address>>"
+                },
+                {
+                    "name": "opt_burn_percentage",
+                    "type": "optional<BigUint>",
+                    "multi_arg": true
                 }
             ],
             "outputs": []
         },
         {
             "name": "buy_ticket",
+            "mutability": "mutable",
             "payableInTokens": [
-                "EGLD"
+                "*"
             ],
             "inputs": [
                 {
@@ -88,6 +126,7 @@
         },
         {
             "name": "determine_winner",
+            "mutability": "mutable",
             "inputs": [
                 {
                     "name": "lottery_name",
@@ -98,6 +137,7 @@
         },
         {
             "name": "status",
+            "mutability": "readonly",
             "inputs": [
                 {
                     "name": "lottery_name",
@@ -111,7 +151,8 @@
             ]
         },
         {
-            "name": "lotteryInfo",
+            "name": "getLotteryInfo",
+            "mutability": "readonly",
             "inputs": [
                 {
                     "name": "lottery_name",
@@ -123,12 +164,33 @@
                     "type": "LotteryInfo"
                 }
             ]
+        },
+        {
+            "name": "getLotteryWhitelist",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "lottery_name",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<Address>",
+                    "multi_result": true
+                }
+            ]
         }
     ],
+    "hasCallback": false,
     "types": {
         "LotteryInfo": {
             "type": "struct",
             "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
                 {
                     "name": "ticket_price",
                     "type": "BigUint"
@@ -148,14 +210,6 @@
                 {
                     "name": "prize_distribution",
                     "type": "bytes"
-                },
-                {
-                    "name": "whitelist",
-                    "type": "List<Address>"
-                },
-                {
-                    "name": "current_ticket_number",
-                    "type": "u32"
                 },
                 {
                     "name": "prize_pool",

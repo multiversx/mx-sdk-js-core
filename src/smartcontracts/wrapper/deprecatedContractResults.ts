@@ -120,7 +120,10 @@ export class TypedResult extends SmartContractResultItem implements Result.IResu
         return this.getDataParts().slice(2);
     }
 
+    /**
+     * @deprecated The return message isn't available on SmartContractResultItem (not provided by the API).
+     */
     getReturnMessage(): string {
-        return "TODO: the return message isn't available on SmartContractResultItem (not provided by the API)";
+        return this.getReturnCode().toString();
     }
 }

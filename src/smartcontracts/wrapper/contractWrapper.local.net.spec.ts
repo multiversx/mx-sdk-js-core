@@ -44,14 +44,14 @@ describe("test smart contract interactor", function () {
         assert.deepEqual(await counter.call.decrement(), new BigNumber(0));
     });
 
-    it("should interact with 'lottery_egld' (local testnet)", async function () {
+    it("should interact with 'lottery-esdt' (local testnet)", async function () {
         this.timeout(120000);
 
-        let lottery = await erdSys.loadWrapper("src/testdata", "lottery_egld");
+        let lottery = await erdSys.loadWrapper("src/testdata", "lottery-esdt");
 
         await lottery.sender(alice).gas(100_000_000).call.deploy();
 
-        lottery.gas(15_000_000);
+        lottery.gas(50_000_000);
         await lottery.call.start("lucky", Balance.egld(1), null, null, 1, null, null);
 
         let status = await lottery.query.status("lucky");

@@ -1,7 +1,7 @@
 import * as errors from "../errors";
 import { InteractionChecker } from "./interactionChecker";
 import { SmartContract } from "./smartContract";
-import { BigUIntValue, OptionValue, U64Value } from "./typesystem";
+import { BigUIntType, BigUIntValue, OptionalType, OptionalValue, OptionValue, TokenIdentifierValue, U32Value, U64Value } from "./typesystem";
 import { loadAbiRegistry } from "../testutils";
 import { SmartContractAbi } from "./abi";
 import { Address } from "../address";
@@ -35,7 +35,7 @@ describe("integration tests: test checker within interactor", function () {
     });
 
     it("should detect errors for 'lottery'", async function () {
-        let abiRegistry = await loadAbiRegistry(["src/testdata/lottery_egld.abi.json"]);
+        let abiRegistry = await loadAbiRegistry(["src/testdata/lottery-esdt.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
         let endpoint = abi.getEndpoint("start");
@@ -48,20 +48,22 @@ describe("integration tests: test checker within interactor", function () {
                 OptionValue.newMissing()
             ]);
             checker.checkInteraction(interaction, endpoint);
-        }, errors.ErrContractInteraction, "bad arguments, expected: 7, got: 3");
+        }, errors.ErrContractInteraction, "bad arguments, expected: 9, got: 3");
 
         // Bad types (U64 instead of U32)
         assert.throw(() => {
             let interaction = contract.methods.start([
                 BytesValue.fromUTF8("lucky"),
-                new BigUIntValue(Balance.egld(1).valueOf()),
+                new TokenIdentifierValue(Buffer.from("lucky-token")),
+                new BigUIntValue(1),
+                OptionValue.newMissing(),
+                OptionValue.newProvided(new U32Value(1)),
+                OptionValue.newProvided(new U32Value(1)),
                 OptionValue.newMissing(),
                 OptionValue.newMissing(),
-                OptionValue.newProvided(new U64Value(new BigNumber(1))),
-                OptionValue.newMissing(),
-                OptionValue.newMissing(),
+                new OptionalValue(new OptionalType(new BigUIntType()))
             ]);
             checker.checkInteraction(interaction, endpoint);
-        }, errors.ErrContractInteraction, "type mismatch at index 4, expected: Option<u32>, got: Option<u64>");
+        }, errors.ErrContractInteraction, "type mismatch at index 4, expected: Option<u64>, got: Option<u32>");
     });
 });

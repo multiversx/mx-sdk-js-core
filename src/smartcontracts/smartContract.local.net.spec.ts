@@ -229,7 +229,7 @@ describe("test on local testnet", function () {
         // Deploy
         let contract = new SmartContract({});
         let transactionDeploy = contract.deploy({
-            code: await loadContractCode("src/testdata/lottery_egld.wasm"),
+            code: await loadContractCode("src/testdata/lottery-esdt.wasm"),
             gasLimit: new GasLimit(100000000),
             initArguments: []
         });
@@ -243,7 +243,7 @@ describe("test on local testnet", function () {
         // Start
         let transactionStart = contract.call({
             func: new ContractFunction("start"),
-            gasLimit: new GasLimit(15000000),
+            gasLimit: new GasLimit(50000000),
             args: [
                 BytesValue.fromUTF8("foobar"),
                 new BigUIntValue(Balance.egld(1).valueOf()),

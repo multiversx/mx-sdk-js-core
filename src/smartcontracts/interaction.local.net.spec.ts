@@ -96,10 +96,10 @@ describe("test smart contract interactor", function () {
         assert.deepEqual(valueAfterDecrement!.valueOf(), new BigNumber(0));
     });
 
-    it("should interact with 'lottery_egld' (local testnet)", async function () {
+    it("should interact with 'lottery-esdt' (local testnet)", async function () {
         this.timeout(120000);
 
-        let abiRegistry = await loadAbiRegistry(["src/testdata/lottery_egld.abi.json"]);
+        let abiRegistry = await loadAbiRegistry(["src/testdata/lottery-esdt.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
         let contract = new SmartContract({ abi: abi });
         let controller = new DefaultInteractionController(abi, provider);
@@ -108,7 +108,7 @@ describe("test smart contract interactor", function () {
         // because the Transaction objects created under the hood point to the "default" NetworkConfig.
         await NetworkConfig.getDefault().sync(provider);
         await alice.sync(provider);
-        await deploy(contract, "src/testdata/lottery_egld.wasm", new GasLimit(100000000), []);
+        await deploy(contract, "src/testdata/lottery-esdt.wasm", new GasLimit(100000000), []);
 
         let startInteraction = <Interaction>contract.methods.start([
             BytesValue.fromUTF8("lucky"),
@@ -118,15 +118,15 @@ describe("test smart contract interactor", function () {
             OptionValue.newProvided(new U32Value(1)),
             OptionValue.newMissing(),
             OptionValue.newMissing(),
-        ]).withGasLimit(new GasLimit(15000000));
+        ]).withGasLimit(new GasLimit(30000000));
 
         let lotteryStatusInteraction = <Interaction>contract.methods.status([
             BytesValue.fromUTF8("lucky")
-        ]).withGasLimit(new GasLimit(15000000));
+        ]).withGasLimit(new GasLimit(30000000));
 
         let getLotteryInfoInteraction = <Interaction>contract.methods.lotteryInfo([
             BytesValue.fromUTF8("lucky")
-        ]).withGasLimit(new GasLimit(15000000));
+        ]).withGasLimit(new GasLimit(30000000));
 
         // start()
         let startTransaction = startInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();

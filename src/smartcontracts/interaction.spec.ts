@@ -1,6 +1,6 @@
 import { DefaultInteractionController } from "./interactionController";
 import { SmartContract } from "./smartContract";
-import { BigUIntValue, OptionValue, U32Value } from "./typesystem";
+import { BigUIntType, BigUIntValue, OptionalType, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 import {
     loadAbiRegistry,
     loadTestWallets,
@@ -22,7 +22,6 @@ import BigNumber from "bignumber.js";
 import { BytesValue } from "./typesystem/bytes";
 import { Token, TokenType } from "../token";
 import { createBalanceBuilder } from "../balanceBuilder";
-import { SmartContractResultItem } from "./smartContractResults";
 
 describe("test smart contract interactor", function() {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");
@@ -215,10 +214,10 @@ describe("test smart contract interactor", function() {
         assert.deepEqual(valueAfterDecrement!.valueOf(), new BigNumber(5));
     });
 
-    it("should interact with 'lottery_egld'", async function() {
+    it("should interact with 'lottery-esdt'", async function() {
         setupUnitTestWatcherTimeouts();
 
-        let abiRegistry = await loadAbiRegistry(["src/testdata/lottery_egld.abi.json"]);
+        let abiRegistry = await loadAbiRegistry(["src/testdata/lottery-esdt.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
         let controller = new DefaultInteractionController(abi, provider);
@@ -227,12 +226,14 @@ describe("test smart contract interactor", function() {
             contract.methods
                 .start([
                     BytesValue.fromUTF8("lucky"),
-                    new BigUIntValue(Balance.egld(1).valueOf()),
+                    new TokenIdentifierValue(Buffer.from("lucky-token")),
+                    new BigUIntValue(1),
                     OptionValue.newMissing(),
                     OptionValue.newMissing(),
                     OptionValue.newProvided(new U32Value(1)),
                     OptionValue.newMissing(),
                     OptionValue.newMissing(),
+                    new OptionalValue(new OptionalType(new BigUIntType()))
                 ])
                 .withGasLimit(new GasLimit(5000000))
         );
@@ -241,8 +242,8 @@ describe("test smart contract interactor", function() {
             contract.methods.status([BytesValue.fromUTF8("lucky")]).withGasLimit(new GasLimit(5000000))
         );
 
-        let lotteryInfoInteraction = <Interaction>(
-            contract.methods.lotteryInfo([BytesValue.fromUTF8("lucky")]).withGasLimit(new GasLimit(5000000))
+        let getLotteryInfoInteraction = <Interaction>(
+            contract.methods.getLotteryInfo([BytesValue.fromUTF8("lucky")]).withGasLimit(new GasLimit(5000000))
         );
 
         // start()
@@ -251,7 +252,7 @@ describe("test smart contract interactor", function() {
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b");
         let { bundle: { returnCode: startReturnCode, values: startReturnValues } } = await controller.execute(startInteraction, startTransaction);
 
-        assert.equal(startTransaction.getData().toString(), "start@6c75636b79@0de0b6b3a7640000@@@0100000001@@");
+        assert.equal(startTransaction.getData().toString(), "start@6c75636b79@6c75636b792d746f6b656e@01@@@0100000001@@");
         assert.isTrue(startReturnCode.equals(ReturnCode.Ok));
         assert.lengthOf(startReturnValues, 0);
 
@@ -267,24 +268,23 @@ describe("test smart contract interactor", function() {
         assert.deepEqual(statusFirstValue!.valueOf(), { name: "Running", fields: [] });
 
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
-        let lotteryInfoTransaction = lotteryInfoInteraction.withNonce(new Nonce(15)).buildTransaction();
-        await alice.signer.sign(lotteryInfoTransaction);
-        provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@000000080de0b6b3a764000000000320000000006012a806000000010000000164000000000000000000000000");
-        let { bundle: { returnCode: infoReturnCode, values: infoReturnValues, firstValue: infoFirstValue} } = await controller.execute(lotteryInfoInteraction, lotteryInfoTransaction);
+        let getLotteryInfoTransaction = getLotteryInfoInteraction.withNonce(new Nonce(15)).buildTransaction();
+        await alice.signer.sign(getLotteryInfoTransaction);
+        provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@0000000b6c75636b792d746f6b656e000000010100000000000000005fc2b9dbffffffff00000001640000000a140ec80fa7ee88000000");
+        let { bundle: { returnCode: infoReturnCode, values: infoReturnValues, firstValue: infoFirstValue} } = await controller.execute(getLotteryInfoInteraction, getLotteryInfoTransaction);
 
-        assert.equal(lotteryInfoTransaction.getData().toString(), "lotteryInfo@6c75636b79");
+        assert.equal(getLotteryInfoTransaction.getData().toString(), "getLotteryInfo@6c75636b79");
         assert.isTrue(infoReturnCode.equals(ReturnCode.Ok));
         assert.lengthOf(infoReturnValues, 1);
 
         assert.deepEqual(infoFirstValue!.valueOf(), {
-            ticket_price: new BigNumber("1000000000000000000"),
-            tickets_left: new BigNumber(800),
-            deadline: new BigNumber("1611835398"),
-            max_entries_per_user: new BigNumber(1),
+            token_identifier: Buffer.from("lucky-token"),
+            ticket_price: new BigNumber("1"),
+            tickets_left: new BigNumber(0),
+            deadline: new BigNumber("0x000000005fc2b9db", 16),
+            max_entries_per_user: new BigNumber(0xffffffff),
             prize_distribution: Buffer.from([0x64]),
-            whitelist: [],
-            current_ticket_number: new BigNumber(0),
-            prize_pool: new BigNumber("0"),
+            prize_pool: new BigNumber("94720000000000000000000")
         });
     });
 });

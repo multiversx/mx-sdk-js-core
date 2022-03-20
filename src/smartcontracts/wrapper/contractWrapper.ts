@@ -21,7 +21,7 @@ import { Interaction } from "../interaction";
 import { Err, ErrContract, ErrInvalidArgument } from "../../errors";
 import { Egld } from "../../balanceBuilder";
 import { Balance } from "../../balance";
-import { ExecutionResultsBundle, findImmediateResult, interpretExecutionResults, interpretQueryResponse } from "./deprecatedContractResults";
+import { ExecutionResultsBundle, findImmediateResult, interpretExecutionResults } from "./deprecatedContractResults";
 import { Result } from "./result";
 
 /**
@@ -140,8 +140,7 @@ export class ContractWrapper extends ChainSendContext {
         }
         let response = await provider.queryContract(query);
         console.log("got response...", response);
-        let queryResponseBundle = interpretQueryResponse(endpoint, response);
-        let result = Result.unpackOutput(queryResponseBundle.queryResponse);
+        let result = Result.unpackQueryOutput(endpoint, response);
         logger?.queryComplete(result, response);
 
         return result;
@@ -166,7 +165,7 @@ export class ContractWrapper extends ChainSendContext {
         let transactionOnNetwork = await this.processTransaction(transaction);
         let executionResultsBundle = interpretExecutionResults(endpoint, transactionOnNetwork);
         let { smartContractResults, immediateResult } = executionResultsBundle;
-        let result = immediateResult?.unpackOutput();
+        let result = Result.unpackExecutionOutput(endpoint, immediateResult);
         let logger = this.context.getLogger();
         logger?.transactionComplete(result, immediateResult?.data, transaction, smartContractResults);
         return { executionResultsBundle, result };

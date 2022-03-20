@@ -1,5 +1,4 @@
 import {
-    MarkNotarized,
     MockProvider,
     setupUnitTestWatcherTimeouts,
     TestWallet,
@@ -7,7 +6,6 @@ import {
 import { Address } from "../../address";
 import { assert } from "chai";
 import { QueryResponse } from "../queryResponse";
-import { TransactionStatus } from "../../transaction";
 import { ReturnCode } from "../returnCode";
 import BigNumber from "bignumber.js";
 import { SystemWrapper } from "./systemWrapper";
@@ -108,14 +106,7 @@ function mockQuery(provider: MockProvider, functionName: string, mockedResult: s
     );
 }
 
-async function mockCall(provider: MockProvider, _mockedResult: string, promise: Promise<any>) {
-    let [, value] = await Promise.all([
-        provider.mockNextTransactionTimeline([
-            new TransactionStatus("executed"),
-            // TODO: Add SCRs (_mockedResult)
-            new MarkNotarized(),
-        ]),
-        promise,
-    ]);
-    return value;
+async function mockCall(provider: MockProvider, mockedResult: string, promise: Promise<any>) {
+    provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult(mockedResult);
+    return await promise;
 }

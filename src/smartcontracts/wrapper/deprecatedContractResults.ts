@@ -15,9 +15,8 @@ export function interpretExecutionResults(endpoint: EndpointDefinition, transact
     let immediateResult = findImmediateResult(smartContractResults)!;
     let resultingCalls = findResultingCalls(smartContractResults);
 
-    immediateResult.setEndpointDefinition(endpoint);
-
-    let values = immediateResult.outputTyped();
+    let buffers = immediateResult.outputUntyped();
+    let values = new ArgSerializer().buffersToValues(buffers, endpoint.output);
     let returnCode = immediateResult.getReturnCode();
 
     return {
@@ -26,22 +25,6 @@ export function interpretExecutionResults(endpoint: EndpointDefinition, transact
         immediateResult,
         resultingCalls,
         values,
-        firstValue: values[0],
-        returnCode: returnCode
-    };
-}
-
-/**
- * @deprecated
- */
-export function interpretQueryResponse(endpoint: EndpointDefinition, queryResponse: QueryResponse): QueryResponseBundle {
-    let buffers = queryResponse.getReturnDataParts();
-    let values = new ArgSerializer().buffersToValues(buffers, endpoint.output);
-    let returnCode = queryResponse.returnCode;
-
-    return {
-        queryResponse: queryResponse,
-        values: values,
         firstValue: values[0],
         returnCode: returnCode
     };
@@ -137,23 +120,7 @@ export class TypedResult extends SmartContractResultItem implements Result.IResu
         return this.getDataParts().slice(2);
     }
 
-    setEndpointDefinition(endpointDefinition: EndpointDefinition) {
-        this.endpointDefinition = endpointDefinition;
-    }
-
-    getEndpointDefinition(): EndpointDefinition | undefined {
-        return this.endpointDefinition;
-    }
-
     getReturnMessage(): string {
         return "TODO: the return message isn't available on SmartContractResultItem (not provided by the API)";
-    }
-
-    outputTyped(): TypedValue[] {
-        return Result.outputTyped(this);
-    }
-
-    unpackOutput(): any {
-        return Result.unpackOutput(this);
     }
 }

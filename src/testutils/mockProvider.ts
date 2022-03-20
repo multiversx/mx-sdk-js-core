@@ -88,16 +88,18 @@ export class MockProvider implements IProvider {
         this.queryContractResponders.push(new QueryContractResponder(predicate, response));
     }
 
-    mockGetTransactionWithAnyHashAsNotarizedWithContractResults(contractResults: SmartContractResultItem[]) {
+    mockGetTransactionWithAnyHashAsNotarizedWithOneResult(returnCodeAndData: string) {
+        let contractResult = new SmartContractResultItem({ nonce: new Nonce(1), data: returnCodeAndData });
+
         let predicate = (_hash: TransactionHash) => true;
         let response = new TransactionOnNetwork({
             status: new TransactionStatus("executed"),
             hyperblockNonce: DummyHyperblockNonce,
             hyperblockHash: DummyHyperblockHash,
-            results: new SmartContractResults(contractResults)
+            results: new SmartContractResults([contractResult])
         });
 
-        this.getTransactionResponders.push(new GetTransactionResponder(predicate, response));
+        this.getTransactionResponders.unshift(new GetTransactionResponder(predicate, response));
     }
 
     async mockTransactionTimeline(transaction: Transaction, timelinePoints: any[]): Promise<void> {

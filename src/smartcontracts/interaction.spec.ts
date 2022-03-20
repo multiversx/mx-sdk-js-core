@@ -160,7 +160,7 @@ describe("test smart contract interactor", function() {
         // Execute, and wait for execution
         transaction = interaction.withNonce(new Nonce(2)).buildTransaction();
         await alice.signer.sign(transaction);
-        provider.mockGetTransactionWithAnyHashAsNotarizedWithContractResults([new SmartContractResultItem({ data: "@6f6b@2bs" })])
+        provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@2bs");
         let { bundle } = await controller.execute(interaction, transaction);
 
         assert.lengthOf(bundle.values, 1);
@@ -193,7 +193,7 @@ describe("test smart contract interactor", function() {
 
         let incrementTransaction = incrementInteraction.withNonce(new Nonce(14)).buildTransaction();
         await alice.signer.sign(incrementTransaction);
-        provider.mockGetTransactionWithAnyHashAsNotarizedWithContractResults([new SmartContractResultItem({ data: "@6f6b@08" })])
+        provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@08");
         let { bundle: { firstValue: valueAfterIncrement } } = await controller.execute(incrementInteraction, incrementTransaction);
         assert.deepEqual(valueAfterIncrement!.valueOf(), new BigNumber(8));
 
@@ -210,7 +210,7 @@ describe("test smart contract interactor", function() {
 
         decrementTransaction = decrementInteraction.withNonce(new Nonce(17)).buildTransaction();
         await alice.signer.sign(decrementTransaction);
-        provider.mockGetTransactionWithAnyHashAsNotarizedWithContractResults([new SmartContractResultItem({ data: "@6f6b@05" })])
+        provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@05");
         let { bundle: { firstValue: valueAfterDecrement } } = await controller.execute(decrementInteraction, decrementTransaction);
         assert.deepEqual(valueAfterDecrement!.valueOf(), new BigNumber(5));
     });
@@ -248,7 +248,7 @@ describe("test smart contract interactor", function() {
         // start()
         let startTransaction = startInteraction.withNonce(new Nonce(14)).buildTransaction();
         await alice.signer.sign(startTransaction);
-        provider.mockGetTransactionWithAnyHashAsNotarizedWithContractResults([new SmartContractResultItem({ data: "@6f6b" })])
+        provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b");
         let { bundle: { returnCode: startReturnCode, values: startReturnValues } } = await controller.execute(startInteraction, startTransaction);
 
         assert.equal(startTransaction.getData().toString(), "start@6c75636b79@0de0b6b3a7640000@@@0100000001@@");
@@ -258,7 +258,7 @@ describe("test smart contract interactor", function() {
         // status() (this is a view function, but for the sake of the test, we'll execute it)
         let statusTransaction = statusInteraction.withNonce(new Nonce(15)).buildTransaction();
         await alice.signer.sign(statusTransaction);
-        provider.mockGetTransactionWithAnyHashAsNotarizedWithContractResults([new SmartContractResultItem({ data: "@6f6b@01" })])
+        provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@01");
         let { bundle: { returnCode: statusReturnCode, values: statusReturnValues, firstValue: statusFirstValue } } = await controller.execute(statusInteraction, statusTransaction);
 
         assert.equal(statusTransaction.getData().toString(),"status@6c75636b79");
@@ -269,7 +269,7 @@ describe("test smart contract interactor", function() {
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
         let lotteryInfoTransaction = lotteryInfoInteraction.withNonce(new Nonce(15)).buildTransaction();
         await alice.signer.sign(lotteryInfoTransaction);
-        provider.mockGetTransactionWithAnyHashAsNotarizedWithContractResults([new SmartContractResultItem({ data: "@6f6b@000000080de0b6b3a764000000000320000000006012a806000000010000000164000000000000000000000000" })])
+        provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@000000080de0b6b3a764000000000320000000006012a806000000010000000164000000000000000000000000");
         let { bundle: { returnCode: infoReturnCode, values: infoReturnValues, firstValue: infoFirstValue} } = await controller.execute(lotteryInfoInteraction, lotteryInfoTransaction);
 
         assert.equal(lotteryInfoTransaction.getData().toString(), "lotteryInfo@6c75636b79");

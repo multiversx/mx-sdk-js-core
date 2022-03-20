@@ -1,4 +1,4 @@
-import { DefaultInteractionController } from "./interactionController";
+import { DefaultSmartContractController } from "./smartContractController";
 import { SmartContract } from "./smartContract";
 import { BigUIntType, BigUIntValue, OptionalType, OptionalValue, OptionValue, TokenIdentifierValue, TypedValue, U32Value } from "./typesystem";
 import { loadAbiRegistry, loadContractCode, loadTestWallets, TestWallet } from "../testutils";
@@ -26,7 +26,7 @@ describe("test smart contract interactor", function () {
         let abiRegistry = await loadAbiRegistry(["src/testdata/answer.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["answer"]);
         let contract = new SmartContract({ abi: abi });
-        let controller = new DefaultInteractionController(abi, provider);
+        let controller = new DefaultSmartContractController(abi, provider);
 
         // Currently, this has to be called before creating any Interaction objects, 
         // because the Transaction objects created under the hood point to the "default" NetworkConfig.
@@ -62,7 +62,7 @@ describe("test smart contract interactor", function () {
         let abiRegistry = await loadAbiRegistry(["src/testdata/counter.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["counter"]);
         let contract = new SmartContract({ abi: abi });
-        let controller = new DefaultInteractionController(abi, provider);
+        let controller = new DefaultSmartContractController(abi, provider);
 
         // Currently, this has to be called before creating any Interaction objects, 
         // because the Transaction objects created under the hood point to the "default" NetworkConfig.
@@ -101,7 +101,7 @@ describe("test smart contract interactor", function () {
         let abiRegistry = await loadAbiRegistry(["src/testdata/lottery-esdt.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
         let contract = new SmartContract({ abi: abi });
-        let controller = new DefaultInteractionController(abi, provider);
+        let controller = new DefaultSmartContractController(abi, provider);
 
         // Currently, this has to be called before creating any Interaction objects, 
         // because the Transaction objects created under the hood point to the "default" NetworkConfig.

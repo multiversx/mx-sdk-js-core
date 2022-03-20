@@ -1,4 +1,4 @@
-import { DefaultInteractionController } from "./interactionController";
+import { DefaultSmartContractController } from "./smartContractController";
 import { SmartContract } from "./smartContract";
 import { BigUIntType, BigUIntValue, OptionalType, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 import {
@@ -112,7 +112,7 @@ describe("test smart contract interactor", function() {
         let abiRegistry = await loadAbiRegistry(["src/testdata/answer.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["answer"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
-        let controller = new DefaultInteractionController(abi, provider);
+        let controller = new DefaultSmartContractController(abi, provider);
 
         let interaction = <Interaction>contract.methods
             .getUltimateAnswer()
@@ -173,7 +173,7 @@ describe("test smart contract interactor", function() {
         let abiRegistry = await loadAbiRegistry(["src/testdata/counter.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["counter"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
-        let controller = new DefaultInteractionController(abi, provider);
+        let controller = new DefaultSmartContractController(abi, provider);
 
         let getInteraction = <Interaction>contract.methods.get();
         let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(new GasLimit(543210));
@@ -220,7 +220,7 @@ describe("test smart contract interactor", function() {
         let abiRegistry = await loadAbiRegistry(["src/testdata/lottery-esdt.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
-        let controller = new DefaultInteractionController(abi, provider);
+        let controller = new DefaultSmartContractController(abi, provider);
 
         let startInteraction = <Interaction>(
             contract.methods

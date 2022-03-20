@@ -6,10 +6,13 @@ import { assert } from "chai";
 import { chooseProxyProvider } from "../interactive";
 import { SmartContract } from "./smartContract";
 import { ContractFunction } from "./function";
+import { ResultsParser } from "./resultsParser";
 
 describe("fetch transactions from local testnet", function () {
     let provider = chooseProxyProvider("local-testnet");;
     let alice: TestWallet;
+    let resultsParser = new ResultsParser();
+
     before(async function () {
         ({ alice } = await loadTestWallets());
     });
@@ -56,7 +59,13 @@ describe("fetch transactions from local testnet", function () {
         await transactionDeploy.getAsOnNetwork(provider);
         await transactionIncrement.getAsOnNetwork(provider);
 
-        // TODO: Assert success in SCRs.
+        let transactionOnNetwork = transactionDeploy.getAsOnNetworkCached();
+        let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        assert.isTrue(bundle.returnCode.isSuccess());
+
+        transactionOnNetwork = transactionIncrement.getAsOnNetworkCached();
+        bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        assert.isTrue(bundle.returnCode.isSuccess());
     });
 
     it("ESDT", async function () {

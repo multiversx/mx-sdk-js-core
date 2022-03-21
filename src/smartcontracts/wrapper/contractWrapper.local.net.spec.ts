@@ -61,7 +61,7 @@ describe("test smart contract wrapper", function () {
         delete info.deadline;
 
         assert.deepEqual(info, {
-            token_identifier: Buffer.from("EGLD"),
+            token_identifier: "EGLD",
             ticket_price: new BigNumber("1"),
             tickets_left: new BigNumber(800),
             max_entries_per_user: new BigNumber(1),

@@ -111,7 +111,7 @@ describe("test smart contract interactor", function () {
 
         let startInteraction = <Interaction>contract.methods.start([
             BytesValue.fromUTF8("lucky"),
-            new TokenIdentifierValue(Buffer.from("EGLD")),
+            new TokenIdentifierValue("EGLD"),
             new BigUIntValue(1),
             OptionValue.newMissing(),
             OptionValue.newMissing(),
@@ -156,7 +156,7 @@ describe("test smart contract interactor", function () {
         delete info.deadline;
 
         assert.deepEqual(info, {
-            token_identifier: Buffer.from("EGLD"),
+            token_identifier: "EGLD",
             ticket_price: new BigNumber("1"),
             tickets_left: new BigNumber(800),
             max_entries_per_user: new BigNumber(1),

@@ -7,20 +7,20 @@ export class TokenIdentifierCodec {
 
     decodeNested(buffer: Buffer): [TokenIdentifierValue, number] {
         let [bytesValue, length] = this.bytesCodec.decodeNested(buffer);
-        return [new TokenIdentifierValue(bytesValue.valueOf()), length];
+        return [new TokenIdentifierValue(bytesValue.toString()), length];
     }
 
     decodeTopLevel(buffer: Buffer): TokenIdentifierValue {
         let bytesValue = this.bytesCodec.decodeTopLevel(buffer);
-        return new TokenIdentifierValue(bytesValue.valueOf());
+        return new TokenIdentifierValue(bytesValue.toString());
     }
 
     encodeNested(tokenIdentifier: TokenIdentifierValue): Buffer {
-        let bytesValue = new BytesValue(tokenIdentifier.valueOf());
+        let bytesValue = BytesValue.fromUTF8(tokenIdentifier.valueOf());
         return this.bytesCodec.encodeNested(bytesValue);
     }
 
     encodeTopLevel(tokenIdentifier: TokenIdentifierValue): Buffer {
-        return tokenIdentifier.valueOf();
+        return Buffer.from(tokenIdentifier.valueOf());
     }
 }

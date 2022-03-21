@@ -54,7 +54,7 @@ describe("integration tests: test checker within interactor", function () {
         assert.throw(() => {
             let interaction = contract.methods.start([
                 BytesValue.fromUTF8("lucky"),
-                new TokenIdentifierValue(Buffer.from("lucky-token")),
+                new TokenIdentifierValue("lucky-token"),
                 new BigUIntValue(1),
                 OptionValue.newMissing(),
                 OptionValue.newProvided(new U32Value(1)),

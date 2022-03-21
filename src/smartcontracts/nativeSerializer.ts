@@ -193,7 +193,7 @@ export namespace NativeSerializer {
             return new BooleanValue(native);
         }
         if (type instanceof TokenIdentifierType) {
-            return new TokenIdentifierValue(convertNativeToBuffer(native, errorContext));
+            return new TokenIdentifierValue(convertNativeToString(native, errorContext));
         }
         errorContext.throwError(`(function: toPrimitive) unsupported type ${type}`);
     }
@@ -217,18 +217,18 @@ export namespace NativeSerializer {
         errorContext.convertError(native, "BytesValue");
     }
 
-    function convertNativeToBuffer(native: NativeTypes.NativeBuffer, errorContext: ArgumentErrorContext): Buffer {
+    function convertNativeToString(native: NativeTypes.NativeBuffer, errorContext: ArgumentErrorContext): string {
         if (native === undefined) {
             errorContext.convertError(native, "Buffer");
         }
         if (native instanceof Buffer) {
-            return native;
+            return native.toString();
         }
         if (typeof native === "string") {
-            return Buffer.from(native);
+            return native;
         }
         if (((<BalanceBuilder>native).getTokenIdentifier)) {
-            return Buffer.from(native.getTokenIdentifier());
+            return native.getTokenIdentifier();
         }
         errorContext.convertError(native, "Buffer");
     }

@@ -73,7 +73,7 @@ describe("test ESDT transfers via the smart contract wrapper", async function ()
                 },
                 auctioned_token: {
                     nonce: new BigNumber(1),
-                    token_type: Buffer.from("TEST-feed60"),
+                    token_type: "TEST-feed60",
                 },
                 creator_royalties_percentage: new BigNumber(2500),
                 current_bid: new BigNumber(0),
@@ -86,7 +86,7 @@ describe("test ESDT transfers via the smart contract wrapper", async function ()
                 original_owner: new Address("erd1wuq9x0w2yl7lc96653hw6pltc2ay0f098mxhztn64vh6322ccmussa83g9"),
                 payment_token: {
                     nonce: new BigNumber(0),
-                    token_type: Buffer.from("EGLD")
+                    token_type: "EGLD"
                 },
                 start_time: new BigNumber(1643744844)
             }

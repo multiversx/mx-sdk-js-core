@@ -255,7 +255,7 @@ describe("test on local testnet", function () {
             gasLimit: new GasLimit(10000000),
             args: [
                 BytesValue.fromUTF8("lucky"),
-                new TokenIdentifierValue(Buffer.from("EGLD")),
+                new TokenIdentifierValue("EGLD"),
                 new BigUIntValue(1),
                 OptionValue.newMissing(),
                 OptionValue.newMissing(),

@@ -87,7 +87,7 @@ describe("test smart contract wrapper", async function() {
         );
 
         assert.deepEqual(info, {
-            token_identifier: Buffer.from("lucky-token"),
+            token_identifier: "lucky-token",
             ticket_price: new BigNumber("1"),
             tickets_left: new BigNumber(0),
             deadline: new BigNumber("0x000000005fc2b9db", 16),

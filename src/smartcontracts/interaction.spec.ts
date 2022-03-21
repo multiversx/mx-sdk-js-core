@@ -226,7 +226,7 @@ describe("test smart contract interactor", function() {
             contract.methods
                 .start([
                     BytesValue.fromUTF8("lucky"),
-                    new TokenIdentifierValue(Buffer.from("lucky-token")),
+                    new TokenIdentifierValue("lucky-token"),
                     new BigUIntValue(1),
                     OptionValue.newMissing(),
                     OptionValue.newMissing(),
@@ -278,7 +278,7 @@ describe("test smart contract interactor", function() {
         assert.lengthOf(infoReturnValues, 1);
 
         assert.deepEqual(infoFirstValue!.valueOf(), {
-            token_identifier: Buffer.from("lucky-token"),
+            token_identifier: "lucky-token",
             ticket_price: new BigNumber("1"),
             tickets_left: new BigNumber(0),
             deadline: new BigNumber("0x000000005fc2b9db", 16),

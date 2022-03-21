@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { BinaryCodec, BinaryCodecConstraints } from "./binary";
 import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue, ArrayVec, ArrayVecType, U16Value, TokenIdentifierType, TokenIdentifierValue, StringValue, StringType } from "../typesystem";
-import { discardSuperfluousBytesInTwosComplement, discardSuperfluousZeroBytes, isMsbOne } from "./utils";
+import { isMsbOne } from "./utils";
 import { Address } from "../../address";
 import { Balance } from "../../balance";
 import { BytesType, BytesValue } from "../typesystem/bytes";
@@ -398,65 +398,5 @@ describe("test codec utilities", () => {
         assert.isTrue(isMsbOne(buffer));
         buffer.writeBigInt64BE(BigInt("9223372036854775807"));
         assert.isFalse(isMsbOne(buffer));
-    });
-
-    it("should discardSuperfluousZeroBytes", async () => {
-        let buffer: Buffer;
-
-        buffer = discardSuperfluousZeroBytes(Buffer.from([0, 0, 0, 1, 2, 3, 4, 5]));
-        assert.deepEqual(buffer, Buffer.from([1, 2, 3, 4, 5]));
-        assert.equal(buffer.toString("hex"), "0102030405");
-
-        buffer = discardSuperfluousZeroBytes(Buffer.from([0, 0]));
-        assert.deepEqual(buffer, Buffer.from([]));
-        assert.equal(buffer.toString("hex"), "");
-
-        buffer = discardSuperfluousZeroBytes(Buffer.from([5, 0, 0]));
-        assert.deepEqual(buffer, Buffer.from([5, 0, 0]));
-        assert.equal(buffer.toString("hex"), "050000");
-    });
-
-    it("should discardSuperfluousBytesInTwosComplement", async () => {
-        let buffer: Buffer;
-
-        // Negative, -1
-        buffer = Buffer.alloc(1);
-        buffer.writeInt8(-1);
-        assert.deepEqual(buffer, Buffer.from([0xFF]));
-        assert.deepEqual(discardSuperfluousBytesInTwosComplement(buffer), Buffer.from([0xFF]));
-
-        buffer = Buffer.alloc(2);
-        buffer.writeInt16BE(-1);
-        assert.deepEqual(buffer, Buffer.from([0xFF, 0xFF]));
-        assert.deepEqual(discardSuperfluousBytesInTwosComplement(buffer), Buffer.from([0xFF]));
-
-        buffer = Buffer.alloc(4);
-        buffer.writeInt32BE(-1);
-        assert.deepEqual(buffer, Buffer.from([0xFF, 0xFF, 0xFF, 0xFF]));
-        assert.deepEqual(discardSuperfluousBytesInTwosComplement(buffer), Buffer.from([0xFF]));
-
-        buffer = Buffer.alloc(8);
-        buffer.writeBigInt64BE(BigInt("-1"));
-        assert.deepEqual(buffer, Buffer.from([0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]));
-        assert.deepEqual(discardSuperfluousBytesInTwosComplement(buffer), Buffer.from([0xFF]));
-
-        // Negative, other
-        buffer = Buffer.from([0b10000000]);
-        assert.deepEqual(discardSuperfluousBytesInTwosComplement(buffer), Buffer.from([0b10000000]));
-
-        buffer = Buffer.from([0b11111111, 0b00000000]);
-        assert.deepEqual(discardSuperfluousBytesInTwosComplement(buffer), Buffer.from([0b11111111, 0b00000000]));
-
-        buffer = Buffer.from([0b11111111, 0b10000000]);
-        assert.deepEqual(discardSuperfluousBytesInTwosComplement(buffer), Buffer.from([0b10000000]));
-
-        // Positive
-        buffer = Buffer.alloc(1);
-        buffer.writeInt8(127);
-        assert.deepEqual(buffer, Buffer.from([0x7F]));
-        assert.deepEqual(discardSuperfluousBytesInTwosComplement(buffer), Buffer.from([0x7F]));
-
-        assert.deepEqual(discardSuperfluousBytesInTwosComplement(Buffer.from([0x00, 0x00, 0xFF])), Buffer.from([0x00, 0xFF]));
-        assert.deepEqual(discardSuperfluousBytesInTwosComplement(Buffer.from([0x00, 0x00, 0x7F])), Buffer.from([0x7F]));
     });
 });

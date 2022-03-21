@@ -60,6 +60,9 @@ export class ResultsParser implements IResultsParser {
 
             if (transaction.logs.findEventByIdentifier("completedTxEvent")) {
                 returnCode = ReturnCode.Ok;
+            } else if (transaction.logs.findEventByIdentifier("SCDeploy")) {
+                // TODO: Check if this logic is correct.
+                returnCode = ReturnCode.Ok;
             } else if (transaction.logs.findEventByIdentifier("signalError")) {
                 returnCode = ReturnCode.UserError;
             }

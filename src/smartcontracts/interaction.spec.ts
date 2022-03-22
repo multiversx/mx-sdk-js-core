@@ -233,7 +233,7 @@ describe("test smart contract interactor", function() {
                     OptionValue.newProvided(new U32Value(1)),
                     OptionValue.newMissing(),
                     OptionValue.newMissing(),
-                    new OptionalValue(new OptionalType(new BigUIntType()))
+                    OptionalValue.newMissing()
                 ])
                 .withGasLimit(new GasLimit(5000000))
         );

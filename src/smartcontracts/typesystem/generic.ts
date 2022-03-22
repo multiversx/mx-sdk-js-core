@@ -46,7 +46,7 @@ export class OptionValue extends TypedValue {
         return new OptionValue(type);
     }
 
-    static newMissingType(type: Type): OptionValue {
+    static newMissingTyped(type: Type): OptionValue {
         return new OptionValue(new OptionType(type));
     }
 

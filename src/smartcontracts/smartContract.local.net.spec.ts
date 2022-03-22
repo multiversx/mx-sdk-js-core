@@ -262,7 +262,7 @@ describe("test on local testnet", function () {
                 OptionValue.newProvided(new U32Value(1)),
                 OptionValue.newMissing(),
                 OptionValue.newMissing(),
-                new OptionalValue(new OptionalType(new BigUIntType()))
+                OptionalValue.newMissing()
             ]
         });
 

@@ -1,5 +1,5 @@
 import { guardValueIsSet } from "../../utils";
-import { Type, TypeCardinality, TypedValue } from "./types";
+import { NullType, Type, TypeCardinality, TypedValue } from "./types";
 
 /**
  * An optional is an algebraic type. It holds zero or one values.
@@ -7,6 +7,16 @@ import { Type, TypeCardinality, TypedValue } from "./types";
 export class OptionalType extends Type {
     constructor(typeParameter: Type) {
         super("Optional", [typeParameter], TypeCardinality.variable(1));
+    }
+
+    isAssignableFrom(type: Type): boolean {
+        if (!(type.hasJavascriptConstructor(OptionalType.name))) {
+            return false;
+        }
+
+        let invariantTypeParameters = this.getFirstTypeParameter().equals(type.getFirstTypeParameter());
+        let fakeCovarianceToNull = type.getFirstTypeParameter().hasJavascriptConstructor(NullType.name);
+        return invariantTypeParameters || fakeCovarianceToNull;
     }
 }
 
@@ -19,6 +29,14 @@ export class OptionalValue extends TypedValue {
         // TODO: assert value is of type type.getFirstTypeParameter()
 
         this.value = value;
+    }
+
+    /**
+     * Creates an OptionalValue, as not provided (missing).
+     */
+    static newMissing(): OptionalValue {
+        let type = new OptionalType(new NullType());
+        return new OptionalValue(type);
     }
 
     isSet(): boolean {

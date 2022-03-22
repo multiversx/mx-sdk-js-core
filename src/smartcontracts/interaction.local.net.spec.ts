@@ -118,7 +118,7 @@ describe("test smart contract interactor", function () {
             OptionValue.newProvided(new U32Value(1)),
             OptionValue.newMissing(),
             OptionValue.newMissing(),
-            OptionValue.newMissing()
+            OptionalValue.newMissing()
         ]).withGasLimit(new GasLimit(30000000));
 
         let lotteryStatusInteraction = <Interaction>contract.methods.status([

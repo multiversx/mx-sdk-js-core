@@ -82,6 +82,10 @@ export class TestWallet {
         this.account = new Account(this.address);
     }
 
+    getAddress(): Address {
+        return this.address;
+    }
+
     async sync(provider: IProvider) {
         await this.account.sync(provider);
         return this;

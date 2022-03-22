@@ -1,3 +1,12 @@
+// deprecatedContractResults.ts
+/**
+ * This file contains the old (before erdjs 10) logic dealing with SCRs. 
+ * The components / functions were moved here in order to change erdjs-repl / contract wrapper components as little as possible.
+ * When splitting the erdjs repository into multiple ones (for wallet providers, walletcore etc.), we should consider extracting erdjs-repl / contract wrappers
+ * to a separate repository, as well. Though excellent for CLI, these components are not suited for minimal web dApps - different use cases.
+ * @module
+ */
+
 import { TransactionOnNetwork } from "../../transactionOnNetwork";
 import { ArgSerializer } from "../argSerializer";
 import { QueryResponse } from "../queryResponse";

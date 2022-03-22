@@ -1,3 +1,4 @@
+import { ErrMissingFieldOnStruct, ErrTypingSystem } from "../../errors";
 import { FieldDefinition, Field, Fields } from "./fields";
 import { CustomType, TypedValue } from "./types";
 
@@ -19,17 +20,17 @@ export class StructType extends CustomType {
     }
 }
 
-// TODO: implement setField(), convenience method.
-// TODO: Hold fields in a map (by name), and use the order within "field definitions" to perform codec operations.
 export class Struct extends TypedValue {
-    private readonly fields: Field[] = [];
+    private readonly fields: Field[];
+    private readonly fieldsByName: Map<string, Field>;
 
     /**
-     * Currently, one can only set fields at initialization time. Construction will be improved at a later time.
+     * One can only set fields at initialization time.
      */
     constructor(type: StructType, fields: Field[]) {
         super(type);
         this.fields = fields;
+        this.fieldsByName = new Map(fields.map(field => [field.name, field]));
 
         this.checkTyping();
     }
@@ -42,6 +43,15 @@ export class Struct extends TypedValue {
 
     getFields(): ReadonlyArray<Field> {
         return this.fields;
+    }
+
+    getFieldValue(name: string): any {
+        let field = this.fieldsByName.get(name);
+        if (field) {
+            return field.value.valueOf();
+        }
+
+        throw new ErrMissingFieldOnStruct(name, this.getType().getName());
     }
 
     valueOf(): any {

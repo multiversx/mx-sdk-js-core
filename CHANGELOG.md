@@ -8,13 +8,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - TBD
 
 ## [10.0.0]
- - [Fix SCRs interpretation, improve SC interactions](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/159)
+ - [Breaking changes: improve contract interactions and interpretation of contract results](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/159)
  
  **Breaking changes**
 
-- `ExecutionResultsBundle` and `QueryResponseBundle` have been removed, and replaced by `TypedOutcomeBundle` (and its untyped counterpart, `UntypedOutcomeBundle`).
+ - `ExecutionResultsBundle` and `QueryResponseBundle` have been removed, and replaced by `TypedOutcomeBundle` (and its untyped counterpart, `UntypedOutcomeBundle`).
  - `SmartContractResults` has been changed to not use the concepts `immediate result` and `resulting calls` anymore. Instead, interpreting `SmartContractResults.items` is now the responsibility of the `ResultsParser` (on which the contract controllers depend).
  - `TokenIdentifierValue` is constructed using a `string`, not a `buffer`. It's `valueOf()` it now a string, as well.
+ - The `Interaction` constructor does not receive the `interpretingFunction` parameter anymore.
  - `DefaultInteractionRunner` has been removed, and replaced by **smart contract controllers**.
  - `StrictChecker` has been renamed to `InteractionChecker`. It's public interface - the function `checkInteraction()` - has changed as well (it also requires the endpoint definition now, as a second parameter).
  - The functions `getReceipt()`, `getSmartContractResults()` and `getLogs()` of `TransactionOnNetwork` have been removed. The underlying properties are now public.

@@ -20,7 +20,6 @@ export function interpretExecutionResults(endpoint: EndpointDefinition, transact
     let returnCode = immediateResult.getReturnCode();
 
     return {
-        transactionOnNetwork: transactionOnNetwork,
         smartContractResults: smartContractResults,
         immediateResult,
         resultingCalls,
@@ -35,9 +34,11 @@ export function interpretExecutionResults(endpoint: EndpointDefinition, transact
  * The SCRs are more alike a graph.
  */
 export interface ExecutionResultsBundle {
-    transactionOnNetwork: TransactionOnNetwork;
     smartContractResults: SmartContractResults;
     immediateResult: TypedResult;
+    /**
+     * @deprecated Most probably, we should use logs & events instead
+     */
     resultingCalls: TypedResult[];
     values: TypedValue[];
     firstValue: TypedValue;
@@ -53,7 +54,7 @@ export interface QueryResponseBundle {
 
 /**
  * @deprecated The concept of immediate results / resulting calls does not exist in the Protocol / in the API.
- * The SCRs are more alike a graph.
+ * The SCRs are more like a graph.
  */
 export function findImmediateResult(results: SmartContractResults): TypedResult | undefined {
     let immediateItem = results.getAll().filter(item => isImmediateResult(item))[0];
@@ -65,7 +66,7 @@ export function findImmediateResult(results: SmartContractResults): TypedResult 
 
 /**
  * @deprecated The concept of immediate results / resulting calls does not exist in the Protocol / in the API.
- * The SCRs are more alike a graph.
+ * The SCRs are more like a graph.
  */
 export function findResultingCalls(results: SmartContractResults): TypedResult[] {
     let otherItems = results.getAll().filter(item => !isImmediateResult(item));
@@ -75,7 +76,7 @@ export function findResultingCalls(results: SmartContractResults): TypedResult[]
 
 /**
  * @deprecated The concept of immediate results / resulting calls does not exist in the Protocol / in the API.
- * The SCRs are more alike a graph.
+ * The SCRs are more like a graph.
  */
 function isImmediateResult(item: SmartContractResultItem): boolean {
     return item.nonce.valueOf() != 0;

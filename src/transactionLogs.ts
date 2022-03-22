@@ -20,7 +20,7 @@ export class TransactionLogs {
         return new TransactionLogs(address, events);
     }
 
-    requireEventByIdentifier(identifier: string) {
+    requireEventByIdentifier(identifier: string): TransactionEvent {
         let event = this.findEventByIdentifier(identifier);
         if (event) {
             return event;
@@ -29,7 +29,7 @@ export class TransactionLogs {
         throw new ErrTransactionEventNotFound(identifier);
     }
 
-    findEventByIdentifier(identifier: string) {
+    findEventByIdentifier(identifier: string): TransactionEvent | undefined {
         let event = this.events.filter(event => event.identifier == identifier)[0];
         return event;
     }

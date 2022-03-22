@@ -428,6 +428,15 @@ export class ErrTypingSystem extends Err {
 }
 
 /**
+ * Signals an error when parsing the contract results.
+ */
+ export class ErrCannotParseContractResults extends Err {
+  public constructor(details: string) {
+    super(`cannot parse contract results: ${details}`);
+  }
+}
+
+/**
  * Signals a generic codec (encode / decode) error.
  */
 export class ErrCodec extends Err {

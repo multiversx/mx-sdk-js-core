@@ -1,14 +1,17 @@
 import { assert } from "chai";
-import { loadTestWallets, TestWallet } from "../testutils";
 import { parse, parseUserKey, parseValidatorKey } from "./pem";
 import { Buffer } from "buffer";
 import { BLS } from "./validatorKeys";
 import { ErrBadPEM } from "./errors";
+import { loadTestWallet, TestWallet } from "./testutils/wallets";
 
 describe("test PEMs", () => {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
+
     before(async function () {
-        ({ alice, bob, carol } = await loadTestWallets());
+        alice = await loadTestWallet("alice");
+        bob = await loadTestWallet("bob");
+        carol = await loadTestWallet("carol");
     });
 
     it("should parseUserKey", () => {

@@ -1,5 +1,4 @@
-import { IVerifiable, IVerifier } from "./interface";
-import { Address } from "./address";
+import { IAddress, IVerifiable, IVerifier } from "./interface";
 import { UserPublicKey } from "./userKeys";
 
 /**
@@ -12,7 +11,7 @@ export class UserVerifier implements IVerifier {
     this.publicKey = publicKey;
   }
 
-  static fromAddress(address: Address): IVerifier {
+  static fromAddress(address: IAddress): IVerifier {
     let publicKey = new UserPublicKey(address.pubkey());
     return new UserVerifier(publicKey);
   }

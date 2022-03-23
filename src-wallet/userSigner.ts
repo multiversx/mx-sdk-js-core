@@ -1,5 +1,4 @@
-import { Address } from "./address";
-import { ISignable, ISigner } from "./interface";
+import { IAddress, ISignable, ISigner } from "./interface";
 import { Signature } from "./signature";
 import { UserSecretKey } from "./userKeys";
 import { UserWallet } from "./userWallet";
@@ -49,7 +48,7 @@ export class UserSigner implements ISigner {
     /**
      * Gets the address of the signer.
      */
-    getAddress(): Address {
+    getAddress(): IAddress {
         return this.secretKey.generatePublicKey().toAddress();
     }
 }

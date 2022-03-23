@@ -1,4 +1,5 @@
 import * as bech32 from "bech32";
+import { ErrBadAddress } from "./errors";
 
 /**
  * The human-readable-part of the bech32 addresses.
@@ -6,13 +7,30 @@ import * as bech32 from "bech32";
 const HRP = "erd";
 
 /**
- * An Elrond Address, as an immutable object.
+ * A user Address, as an immutable object.
  */
-export class Address {
+export class UserAddress {
     private readonly buffer: Buffer;
 
     public constructor(buffer: Buffer) {
         this.buffer = buffer;
+    }
+
+    static fromBech32(value: string): UserAddress {
+        let decoded;
+
+        try {
+            decoded = bech32.decode(value);
+        } catch (err: any) {
+            throw new ErrBadAddress(value, err);
+        }
+
+        if (decoded.prefix != HRP) {
+            throw new ErrBadAddress(value);
+        }
+
+        let pubkey = Buffer.from(bech32.fromWords(decoded.words));
+        return new UserAddress(pubkey);
     }
 
     /**
@@ -48,7 +66,7 @@ export class Address {
     /**
      * Compares the address to another address
      */
-    equals(other: Address): boolean {
+    equals(other: UserAddress): boolean {
         return this.buffer.compare(other.buffer) == 0;
     }
 

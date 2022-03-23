@@ -54,3 +54,12 @@ export class ErrSignerCannotSign extends Err {
         super(`Cannot sign`, inner);
     }
 }
+
+/**
+ * Signals a bad user address.
+ */
+ export class ErrBadAddress extends Err {
+    public constructor(value: string, inner?: Error) {
+        super(`Bad address: ${value}`, inner);
+    }
+}

@@ -14,7 +14,7 @@ export class ValidatorSigner {
         try {
             let secretKey = ValidatorSecretKey.fromPem(pemText, pemIndex);
             secretKey.sign(signable);
-        } catch (err) {
+        } catch (err: any) {
             throw new ErrSignerCannotSign(err);
         }
     }

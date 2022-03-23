@@ -23,6 +23,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - `StrictChecker` has been renamed to `InteractionChecker`. It's public interface - the function `checkInteraction()` - has changed as well (it also requires the endpoint definition now, as a second parameter).
  - The functions `getReceipt()`, `getSmartContractResults()` and `getLogs()` of `TransactionOnNetwork` have been removed. The underlying properties are now public.
  - Renamed `OptionValue.newMissingType()` to `OptionValue.newMissingTyped()`
+ - Queries with a return code different than `Ok` do not automatically throw an exception anymore (`assertSuccess()` has to be called explicitly in order to throw).
  
 **Other changes**
 

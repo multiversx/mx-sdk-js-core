@@ -49,15 +49,15 @@ describe("test user wallets", () => {
 
         secretKey = new UserSecretKey(Buffer.from(alice.secretKeyHex, "hex"));
         assert.equal(secretKey.generatePublicKey().hex(), alice.address.hex());
-        assert.isTrue(secretKey.generatePublicKey().toAddress().equals(alice.address));
+        assert.deepEqual(secretKey.generatePublicKey().toAddress(), alice.address);
 
         secretKey = new UserSecretKey(Buffer.from(bob.secretKeyHex, "hex"));
         assert.equal(secretKey.generatePublicKey().hex(), bob.address.hex());
-        assert.isTrue(secretKey.generatePublicKey().toAddress().equals(bob.address));
+        assert.deepEqual(secretKey.generatePublicKey().toAddress(), bob.address);
 
         secretKey = new UserSecretKey(Buffer.from(carol.secretKeyHex, "hex"));
         assert.equal(secretKey.generatePublicKey().hex(), carol.address.hex());
-        assert.isTrue(secretKey.generatePublicKey().toAddress().equals(carol.address));
+        assert.deepEqual(secretKey.generatePublicKey().toAddress(), carol.address);
     });
 
     it("should throw error when invalid input", () => {

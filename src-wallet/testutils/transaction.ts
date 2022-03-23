@@ -1,5 +1,5 @@
 import { IAddress, ISignable, ISignature, IVerifiable } from "../interface";
-import { TestSignature } from "./signature";
+import { Signature } from "../signature";
 
 /**
  * A dummy transaction used in tests.
@@ -50,6 +50,6 @@ export class TestTransaction implements ISignable, IVerifiable {
     }
 
     getSignature(): ISignature {
-        return new TestSignature(this.signature);
+        return new Signature(Buffer.from(this.signature, "hex"));
     }
 }

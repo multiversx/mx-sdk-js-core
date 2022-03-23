@@ -52,8 +52,8 @@ export interface IVerifiable {
     /**
      * Returns the signature that should be verified
      */
-
     getSignature(): ISignature;
+
     /**
      * Returns the signable object in its raw form - a sequence of bytes to be verified.
      */

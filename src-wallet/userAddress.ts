@@ -57,20 +57,6 @@ export class UserAddress {
     }
 
     /**
-     * Returns whether the address is empty.
-     */
-    isEmpty() {
-        return !this.buffer;
-    }
-
-    /**
-     * Compares the address to another address
-     */
-    equals(other: UserAddress): boolean {
-        return this.buffer.compare(other.buffer) == 0;
-    }
-
-    /**
      * Returns the bech32 representation of the address
      */
     toString(): string {

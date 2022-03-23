@@ -1,5 +1,5 @@
 /**
- * The base class for `erdjs` exceptions (errors).
+ * The base class for exceptions (errors).
  */
 export class Err extends Error {
     inner: Error | undefined = undefined;
@@ -56,7 +56,7 @@ export class ErrSignerCannotSign extends Err {
 }
 
 /**
- * Signals a bad user address.
+ * Signals a bad address.
  */
  export class ErrBadAddress extends Err {
     public constructor(value: string, inner?: Error) {

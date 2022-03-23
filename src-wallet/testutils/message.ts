@@ -1,5 +1,5 @@
 import { IAddress, ISignable, ISignature, IVerifiable } from "../interface";
-import { TestSignature } from "./signature";
+import { Signature } from "../signature";
 
 /**
  * A dummy message used in tests.
@@ -28,6 +28,6 @@ export class TestMessage implements ISignable, IVerifiable {
     }
 
     getSignature(): ISignature {
-        return new TestSignature(this.signature);
+        return new Signature(Buffer.from(this.signature, "hex"));
     }
 }

@@ -1,6 +1,6 @@
-import {IVerifiable, IVerifier} from "../interface";
-import {Address} from "../address";
-import {UserPublicKey} from "./userKeys";
+import { IVerifiable, IVerifier } from "./interface";
+import { Address } from "./address";
+import { UserPublicKey } from "./userKeys";
 
 /**
  * ed25519 signature verification

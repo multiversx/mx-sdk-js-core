@@ -1,5 +1,5 @@
-import * as errors from "../errors";
-import { guardLength } from "../utils";
+import { guardLength } from "./utils";
+import { ErrInvariantFailed } from "./errors";
 import { parseValidatorKey } from "./pem";
 
 const bls = require('@elrondnetwork/bls-wasm');
@@ -22,7 +22,7 @@ export class BLS {
 
     static guardInitialized() {
         if (!BLS.isInitialized) {
-            throw new errors.ErrInvariantFailed("BLS modules are not initalized. Make sure that 'await BLS.initIfNecessary()' is called correctly.");
+            throw new ErrInvariantFailed("BLS modules are not initalized. Make sure that 'await BLS.initIfNecessary()' is called correctly.");
         }
     }
 }

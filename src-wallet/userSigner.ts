@@ -1,9 +1,9 @@
-import * as errors from "../errors";
-import { Address } from "../address";
-import { ISignable, ISigner } from "../interface";
-import { Signature } from "../signature";
+import { Address } from "./address";
+import { ISignable, ISigner } from "./interface";
+import { Signature } from "./signature";
 import { UserSecretKey } from "./userKeys";
 import { UserWallet } from "./userWallet";
+import { ErrSignerCannotSign } from "./errors";
 
 /**
  * ed25519 signer
@@ -32,8 +32,8 @@ export class UserSigner implements ISigner {
     async sign(signable: ISignable): Promise<void> {
         try {
             this.trySign(signable);
-        } catch (err) {
-            throw new errors.ErrSignerCannotSign(err);
+        } catch (err: any) {
+            throw new ErrSignerCannotSign(err);
         }
     }
 

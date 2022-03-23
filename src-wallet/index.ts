@@ -1,8 +1,3 @@
-/**
- * @packageDocumentation
- * @module wallet
- */
-
 export * from "./mnemonic";
 export * from "./pem";
 export * from "./userWallet";

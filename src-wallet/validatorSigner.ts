@@ -1,4 +1,4 @@
-import * as errors from "../errors";
+import { ErrSignerCannotSign } from "./errors";
 import { BLS, ValidatorSecretKey } from "./validatorKeys";
 
 /**
@@ -15,7 +15,7 @@ export class ValidatorSigner {
             let secretKey = ValidatorSecretKey.fromPem(pemText, pemIndex);
             secretKey.sign(signable);
         } catch (err) {
-            throw new errors.ErrSignerCannotSign(err);
+            throw new ErrSignerCannotSign(err);
         }
     }
 }

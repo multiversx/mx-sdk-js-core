@@ -1,4 +1,3 @@
-import * as errors from "../errors";
 import { assert } from "chai";
 import { loadMnemonic, loadPassword, loadTestWallets, TestWallet } from "../testutils";
 import { UserSecretKey } from "./userKeys";
@@ -14,6 +13,7 @@ import { ChainID, GasLimit, GasPrice } from "../networkParams";
 import { TransactionPayload } from "../transactionPayload";
 import { UserVerifier } from "./userVerifier";
 import { SignableMessage } from "../signableMessage";
+import { ErrInvariantFailed } from "./errors";
 
 describe("test user wallets", () => {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
@@ -63,8 +63,8 @@ describe("test user wallets", () => {
     });
 
     it("should throw error when invalid input", () => {
-        assert.throw(() => new UserSecretKey(Buffer.alloc(42)), errors.ErrInvariantFailed);
-        assert.throw(() => UserSecretKey.fromString("foobar"), errors.ErrInvariantFailed);
+        assert.throw(() => new UserSecretKey(Buffer.alloc(42)), ErrInvariantFailed);
+        assert.throw(() => UserSecretKey.fromString("foobar"), ErrInvariantFailed);
     });
 
     it("should handle PEM files", () => {

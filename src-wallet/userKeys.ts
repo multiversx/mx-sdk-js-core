@@ -1,9 +1,7 @@
 import * as tweetnacl from "tweetnacl";
-import { Address } from "../address";
-import { guardLength } from "../utils";
+import { Address } from "./address";
+import { guardLength } from "./utils";
 import { parseUserKey } from "./pem";
-import {SignableMessage} from "../signableMessage";
-import {Logger} from "../logger";
 
 export const USER_SEED_LENGTH = 32;
 export const USER_PUBKEY_LENGTH = 32;
@@ -68,7 +66,7 @@ export class UserPublicKey {
             const unsignedMessage = tweetnacl.sign.open(unopenedMessage, this.buffer);
             return unsignedMessage != null;
         } catch (err) {
-            Logger.error(err);
+            console.error(err);
             return false;
         }
     }

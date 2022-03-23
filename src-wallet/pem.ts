@@ -1,4 +1,4 @@
-import * as errors from "../errors";
+import { ErrBadPEM } from "./errors";
 import { UserSecretKey, USER_PUBKEY_LENGTH, USER_SEED_LENGTH } from "./userKeys";
 import { ValidatorSecretKey, VALIDATOR_SECRETKEY_LENGTH } from "./validatorKeys";
 
@@ -38,7 +38,7 @@ export function parse(text: string, expectedLength: number): Buffer[] {
             let asBytes = Buffer.from(asHex, "hex");
 
             if (asBytes.length != expectedLength) {
-                throw new errors.ErrBadPEM(`incorrect key length: expected ${expectedLength}, found ${asBytes.length}`);
+                throw new ErrBadPEM(`incorrect key length: expected ${expectedLength}, found ${asBytes.length}`);
             }
 
             buffers.push(asBytes);
@@ -49,7 +49,7 @@ export function parse(text: string, expectedLength: number): Buffer[] {
     }
 
     if (linesAccumulator.length != 0) {
-        throw new errors.ErrBadPEM("incorrect file structure");
+        throw new ErrBadPEM("incorrect file structure");
     }
 
     return buffers;

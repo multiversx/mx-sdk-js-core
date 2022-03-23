@@ -15,8 +15,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - `ExecutionResultsBundle` and `QueryResponseBundle` have been removed, and replaced by `TypedOutcomeBundle` (and its untyped counterpart, `UntypedOutcomeBundle`).
  - `SmartContractResults` has been changed to not use the concepts `immediate result` and `resulting calls` anymore. Instead, interpreting `SmartContractResults.items` is now the responsibility of the `ResultsParser` (on which the contract controllers depend).
  - Redesigned `QueryResponse`, changed most of its public interface. Results interpretation is now the responsibility of the results parser, called by the smart contract controllers.
- - `interpretExecutionResults()` and `interpretExecutionResults()` do not exist on the `Interaction` object anymore. Now, querying / executing an interaction against the controller will return the interpreted results.
- - `TokenIdentifierValue` is constructed using a `string`, not a `buffer`. It's `valueOf()` it now a string, as well.
+ - `interpretQueryResponse()` and `interpretExecutionResults()` do not exist on the `Interaction` object anymore. Now, querying / executing an interaction against the controller will return the interpreted results.
+ - `TokenIdentifierValue` is constructed using a `string`, not a `buffer`. Its `valueOf()` is now a string, as well.
  - The `Interaction` constructor does not receive the `interpretingFunction` parameter anymore.
  - `Interaction.getInterpretingFunction()` and `Interaction.getExecutingFunction()` have been removed, replaced by `Interaction.getFunction()`.
  - `DefaultInteractionRunner` has been removed, and replaced by **smart contract controllers**.

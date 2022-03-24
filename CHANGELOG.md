@@ -7,6 +7,36 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - TBD
 
+## [10.0.0]
+ - [Breaking changes: improve contract interactions and interpretation of contract results](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/159)
+ 
+**Breaking changes**
+
+ - `ExecutionResultsBundle` and `QueryResponseBundle` have been removed, and replaced by `TypedOutcomeBundle` (and its untyped counterpart, `UntypedOutcomeBundle`).
+ - `SmartContractResults` has been changed to not use the concepts `immediate result` and `resulting calls` anymore. Instead, interpreting `SmartContractResults.items` is now the responsibility of the `ResultsParser` (on which the contract controllers depend).
+ - Redesigned `QueryResponse`, changed most of its public interface. Results interpretation is now the responsibility of the results parser, called by the smart contract controllers.
+ - `interpretQueryResponse()` and `interpretExecutionResults()` do not exist on the `Interaction` object anymore. Now, querying / executing an interaction against the controller will return the interpreted results.
+ - `TokenIdentifierValue` is constructed using a `string`, not a `buffer`. Its `valueOf()` is now a string, as well.
+ - The `Interaction` constructor does not receive the `interpretingFunction` parameter anymore.
+ - `Interaction.getInterpretingFunction()` and `Interaction.getExecutingFunction()` have been removed, replaced by `Interaction.getFunction()`.
+ - `DefaultInteractionRunner` has been removed, and replaced by **smart contract controllers**.
+ - `StrictChecker` has been renamed to `InteractionChecker`. It's public interface - the function `checkInteraction()` - has changed as well (it also requires the endpoint definition now, as a second parameter).
+ - The functions `getReceipt()`, `getSmartContractResults()` and `getLogs()` of `TransactionOnNetwork` have been removed. The underlying properties are now public.
+ - Renamed `OptionValue.newMissingType()` to `OptionValue.newMissingTyped()`
+ - Queries with a return code different than `Ok` do not automatically throw an exception anymore (`assertSuccess()` has to be called explicitly in order to throw).
+ 
+**Other changes**
+
+ - `SmartContract`, in addition to `methods`, now also has a `methodAuto` object that allows one to create interactions without explicitly specifying the types of the arguments. Automatic type inference (within erdjs' typesystem) is leveraged. The type inference system was implemented in the past, in the `nativeSerializer` component - PR https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9 by @claudiu725.
+ - Added utility function `getFieldValue()` on `Struct` and `EnumValue`.
+ - Refactoring in the `networkProvider` package (under development, in order to merge the provider interfaces under a single one)
+ - Added utility function `Interaction.useThenIncrementNonceOf()`
+ - Fixed `nativeSerializer` to not depend on `SmartContract`, `ContractWrapper` and `TestWallet` anymore (gathered under an interface).
+ - Replaced the old `lottery-egld` with the new `lottery-esdt` in integration tests.
+ - Added missing tests for some components: `nativeSerializer`, `struct`, `enum`.
+ - Added utility function `OptionalValue.newMissing()`. Added "fake" covariance wrt. "null type parameter" (when value is missing) on `OptionalType`.
+ - Added utility functions (typed value factories): `createListOfAddresses`, `createListOfTokenIdentifiers`.
+
 ## [9.2.3]
  - [Fix log level in transaction watcher.](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/160)
 

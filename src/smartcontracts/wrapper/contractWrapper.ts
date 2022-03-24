@@ -17,11 +17,12 @@ import { SmartContract } from "../smartContract";
 import { Code } from "../code";
 import { Transaction } from "../../transaction";
 import { IProvider } from "../../interface";
-import { ExecutionResultsBundle } from "../interface";
 import { Interaction } from "../interaction";
 import { Err, ErrContract, ErrInvalidArgument } from "../../errors";
 import { Egld } from "../../balanceBuilder";
 import { Balance } from "../../balance";
+import { ExecutionResultsBundle, findImmediateResult, interpretExecutionResults } from "./deprecatedContractResults";
+import { Result } from "./result";
 
 /**
  * Provides a simple interface in order to easily call or query the smart contract's methods.
@@ -109,8 +110,8 @@ export class ContractWrapper extends ChainSendContext {
 
         let transactionOnNetwork = await this.processTransaction(transaction);
 
-        let smartContractResults = transactionOnNetwork.getSmartContractResults();
-        let immediateResult = smartContractResults.getImmediate();
+        let smartContractResults = transactionOnNetwork.results;
+        let immediateResult = findImmediateResult(smartContractResults)!;
         immediateResult.assertSuccess();
         let logger = this.context.getLogger();
         logger?.deployComplete(transaction, smartContractResults, this.smartContract.getAddress());
@@ -138,8 +139,7 @@ export class ContractWrapper extends ChainSendContext {
             query.caller = optionalSender.address;
         }
         let response = await provider.queryContract(query);
-        let queryResponseBundle = interaction.interpretQueryResponse(response);
-        let result = queryResponseBundle.queryResponse.unpackOutput();
+        let result = Result.unpackQueryOutput(endpoint, response);
         logger?.queryComplete(result, response);
 
         return result;
@@ -147,24 +147,24 @@ export class ContractWrapper extends ChainSendContext {
 
     async handleCall(endpoint: EndpointDefinition, ...args: any[]): Promise<any> {
         let { transaction, interaction } = this.buildTransactionAndInteraction(endpoint, args);
-        let { result } = await this.processTransactionAndInterpretResults({ transaction, interaction });
+        let { result } = await this.processTransactionAndInterpretResults({ endpoint, transaction });
         return result;
     }
 
     async handleResults(endpoint: EndpointDefinition, ...args: any[]): Promise<ExecutionResultsBundle> {
         let { transaction, interaction } = this.buildTransactionAndInteraction(endpoint, args);
-        let { executionResultsBundle } = await this.processTransactionAndInterpretResults({ transaction, interaction });
+        let { executionResultsBundle } = await this.processTransactionAndInterpretResults({ endpoint, transaction });
         return executionResultsBundle;
     }
 
-    async processTransactionAndInterpretResults({ transaction, interaction }: {
-        transaction: Transaction,
-        interaction: Interaction
+    async processTransactionAndInterpretResults({ endpoint, transaction }: {
+        endpoint: EndpointDefinition,
+        transaction: Transaction
     }): Promise<{ executionResultsBundle: ExecutionResultsBundle, result: any }> {
         let transactionOnNetwork = await this.processTransaction(transaction);
-        let executionResultsBundle = interaction.interpretExecutionResults(transactionOnNetwork);
+        let executionResultsBundle = interpretExecutionResults(endpoint, transactionOnNetwork);
         let { smartContractResults, immediateResult } = executionResultsBundle;
-        let result = immediateResult?.unpackOutput();
+        let result = Result.unpackExecutionOutput(endpoint, immediateResult);
         let logger = this.context.getLogger();
         logger?.transactionComplete(result, immediateResult?.data, transaction, smartContractResults);
         return { executionResultsBundle, result };
@@ -190,7 +190,7 @@ export class ContractWrapper extends ChainSendContext {
         let transactionOnNetwork = await transaction.getAsOnNetwork(provider, true, false, true);
         if (transaction.getStatus().isFailed()) {
             // TODO: extract the error messages
-            //let results = transactionOnNetwork.getSmartContractResults().getAllResults();
+            //let results = transactionOnNetwork.results.getAllResults();
             //let messages = results.map((result) => console.log(result));
             throw new ErrContract(`Transaction status failed: [${transaction.getStatus().toString()}].`);// Return messages:\n${messages}`);
         }
@@ -231,7 +231,8 @@ export class ContractWrapper extends ChainSendContext {
         let executingFunction = preparedCall.formattedCall.getExecutingFunction();
         let interpretingFunction = preparedCall.formattedCall.getInterpretingFunction();
         let typedValueArgs = preparedCall.formattedCall.toTypedValues();
-        let interaction = new Interaction(this.smartContract, executingFunction, interpretingFunction, typedValueArgs, preparedCall.receiver);
+        // TODO: Most probably, this need to be fixed. Perhaps two interactions have to be instantiated?
+        let interaction = new Interaction(this.smartContract, executingFunction, typedValueArgs, preparedCall.receiver);
         interaction.withValue(preparedCall.egldValue);
         return interaction;
     }

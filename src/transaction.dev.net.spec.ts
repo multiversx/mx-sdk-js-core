@@ -48,19 +48,16 @@ describe("test transactions on devnet", function () {
         transactionOnProxy.hyperblockNonce = new Nonce(0);
         transactionOnProxy.hyperblockHash = new Hash("");
 
-        let immediateContractResultOnAPI: SmartContractResultItem = (<any>transactionOnAPI).results.immediate;
-        let contractResultsOnAPI: SmartContractResultItem[] = (<any>transactionOnAPI).results.items;
-        let resultingCallsOnAPI: SmartContractResultItem[] = (<any>transactionOnAPI).results.resultingCalls;
-        let allContractResults = [immediateContractResultOnAPI].concat(resultingCallsOnAPI).concat(contractResultsOnAPI);
+        let contractResultsOnAPI: SmartContractResultItem[] = transactionOnAPI.results.getAll();
 
         // Important issue (existing bug)! When working with TransactionOnNetwork objects, SCRs cannot be parsed correctly from API, only from Proxy.
         // On API response, base64 decode "data" from smart contract results:
-        for (const item of allContractResults) {
+        for (const item of contractResultsOnAPI) {
             item.data = Buffer.from(item.data, "base64").toString();
         }
 
         // On API response, convert "callType" of smart contract results to a number:
-        for (const item of allContractResults) {
+        for (const item of contractResultsOnAPI) {
             item.callType = Number(item.callType);
         }
 

@@ -15,7 +15,7 @@ export class OptionValueBinaryCodec {
 
     decodeNested(buffer: Buffer, type: Type): [OptionValue, number] {
         if (buffer[0] == 0x00) {
-            return [OptionValue.newMissingType(type), 1];
+            return [OptionValue.newMissingTyped(type), 1];
         }
 
         if (buffer[0] != 0x01) {

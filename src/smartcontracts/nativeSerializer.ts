@@ -1,10 +1,7 @@
 import BigNumber from "bignumber.js";
 import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, TokenIdentifierType, TokenIdentifierValue, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
-import { TestWallet } from "../testutils";
 import { ArgumentErrorContext } from "./argumentErrorContext";
-import { SmartContract } from "./smartContract";
 import { Struct, Field, StructType, Tuple } from "./typesystem";
-import { ContractWrapper } from "./wrapper/contractWrapper";
 import { BalanceBuilder } from "../balanceBuilder";
 import { Address } from "../address";
 import { Code } from "./code";
@@ -13,7 +10,7 @@ import { ErrInvalidArgument } from "../errors";
 export namespace NativeTypes {
     export type NativeBuffer = Buffer | string | BalanceBuilder;
     export type NativeBytes = Code | Buffer | string | BalanceBuilder;
-    export type NativeAddress = Address | string | Buffer | ContractWrapper | SmartContract | TestWallet;
+    export type NativeAddress = Address | string | Buffer | { getAddress(): Address };
 }
 
 export namespace NativeSerializer {
@@ -193,7 +190,7 @@ export namespace NativeSerializer {
             return new BooleanValue(native);
         }
         if (type instanceof TokenIdentifierType) {
-            return new TokenIdentifierValue(convertNativeToBuffer(native, errorContext));
+            return new TokenIdentifierValue(convertNativeToString(native, errorContext));
         }
         errorContext.throwError(`(function: toPrimitive) unsupported type ${type}`);
     }
@@ -217,34 +214,32 @@ export namespace NativeSerializer {
         errorContext.convertError(native, "BytesValue");
     }
 
-    function convertNativeToBuffer(native: NativeTypes.NativeBuffer, errorContext: ArgumentErrorContext): Buffer {
+    function convertNativeToString(native: NativeTypes.NativeBuffer, errorContext: ArgumentErrorContext): string {
         if (native === undefined) {
             errorContext.convertError(native, "Buffer");
         }
         if (native instanceof Buffer) {
-            return native;
+            return native.toString();
         }
         if (typeof native === "string") {
-            return Buffer.from(native);
+            return native;
         }
         if (((<BalanceBuilder>native).getTokenIdentifier)) {
-            return Buffer.from(native.getTokenIdentifier());
+            return native.getTokenIdentifier();
         }
         errorContext.convertError(native, "Buffer");
     }
 
     export function convertNativeToAddress(native: NativeTypes.NativeAddress, errorContext: ArgumentErrorContext): Address {
+        if ((<any>native).getAddress) {
+            return (<any>native).getAddress();
+        }
+
         switch (native.constructor) {
             case Address:
             case Buffer:
             case String:
                 return new Address(<Address | Buffer | string>native);
-            case ContractWrapper:
-                return (<ContractWrapper>native).getAddress();
-            case SmartContract:
-                return (<SmartContract>native).getAddress();
-            case TestWallet:
-                return (<TestWallet>native).address;
             default:
                 errorContext.convertError(native, "Address");
         }

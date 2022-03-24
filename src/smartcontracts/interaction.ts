@@ -1,17 +1,23 @@
 import { Balance } from "../balance";
 import { GasLimit } from "../networkParams";
 import { Transaction } from "../transaction";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { Query } from "./query";
-import { QueryResponse } from "./queryResponse";
 import { ContractFunction } from "./function";
 import { Address } from "../address";
-import { SmartContract } from "./smartContract";
-import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
+import { AddressValue, BigUIntValue, BytesValue, TypedValue, U64Value, U8Value } from "./typesystem";
 import { Nonce } from "../nonce";
-import { ExecutionResultsBundle, QueryResponseBundle } from "./interface";
 import { NetworkConfig } from "../networkConfig";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
+import { Account } from "../account";
+import { CallArguments } from "./interface";
+
+/**
+ * Internal interface: the smart contract, as seen from the perspective of an {@link Interaction}.
+ */
+interface ISmartContractWithinInteraction {
+    call({ func, args, value, gasLimit, receiver }: CallArguments): Transaction;
+    getAddress(): Address;
+}
 
 /**
  * Interactions can be seen as mutable transaction & query builders.
@@ -20,15 +26,15 @@ import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDT
  * the execution outcome for the objects they've built.
  */
 export class Interaction {
-    private readonly contract: SmartContract;
-    private readonly executingFunction: ContractFunction;
-    private readonly interpretingFunction: ContractFunction;
+    private readonly contract: ISmartContractWithinInteraction;
+    private readonly function: ContractFunction;
     private readonly args: TypedValue[];
     private readonly receiver?: Address;
 
     private nonce: Nonce = new Nonce(0);
     private value: Balance = Balance.Zero();
     private gasLimit: GasLimit = GasLimit.min();
+    private querent: Address = new Address();
 
     private isWithSingleESDTTransfer: boolean = false;
     private isWithSingleESDTNFTTransfer: boolean = false;
@@ -37,30 +43,24 @@ export class Interaction {
     private tokenTransfersSender: Address = new Address();
 
     constructor(
-        contract: SmartContract,
-        executingFunction: ContractFunction,
-        interpretingFunction: ContractFunction,
+        contract: ISmartContractWithinInteraction,
+        func: ContractFunction,
         args: TypedValue[],
         receiver?: Address,
     ) {
         this.contract = contract;
-        this.executingFunction = executingFunction;
-        this.interpretingFunction = interpretingFunction;
+        this.function = func;
         this.args = args;
         this.receiver = receiver;
         this.tokenTransfers = new TokenTransfersWithinInteraction([], this);
     }
-
-    getContract(): SmartContract {
+    
+    getContract(): ISmartContractWithinInteraction {
         return this.contract;
     }
 
-    getInterpretingFunction(): ContractFunction {
-        return this.interpretingFunction;
-    }
-
-    getExecutingFunction(): ContractFunction {
-        return this.executingFunction;
+    getFunction(): ContractFunction {
+        return this.function;
     }
 
     getArguments(): TypedValue[] {
@@ -81,7 +81,7 @@ export class Interaction {
 
     buildTransaction(): Transaction {
         let receiver = this.receiver;
-        let func: ContractFunction = this.executingFunction;
+        let func: ContractFunction = this.function;
         let args = this.args;
 
         if (this.isWithSingleESDTTransfer) {
@@ -117,40 +117,12 @@ export class Interaction {
     buildQuery(): Query {
         return new Query({
             address: this.contract.getAddress(),
-            func: this.executingFunction,
+            func: this.function,
             args: this.args,
             // Value will be set using "withValue()".
             value: this.value,
-            // Caller will be set by the InteractionRunner.
-            caller: new Address()
+            caller: this.querent
         });
-    }
-
-    /**
-     * Interprets the results of a previously broadcasted (and fully executed) smart contract transaction.
-     * The outcome is structured such that it allows quick access to each level of detail.
-     */
-    interpretExecutionResults(transactionOnNetwork: TransactionOnNetwork): ExecutionResultsBundle {
-        return interpretExecutionResults(this.getEndpoint(), transactionOnNetwork);
-    }
-
-    /**
-     * Interprets the raw outcome of a Smart Contract query.
-     * The outcome is structured such that it allows quick access to each level of detail.
-     */
-    interpretQueryResponse(queryResponse: QueryResponse): QueryResponseBundle {
-        let endpoint = this.getEndpoint();
-        queryResponse.setEndpointDefinition(endpoint);
-
-        let values = queryResponse.outputTyped();
-        let returnCode = queryResponse.returnCode;
-
-        return {
-            queryResponse: queryResponse,
-            values: values,
-            firstValue: values[0],
-            returnCode: returnCode
-        };
     }
 
     withValue(value: Balance): Interaction {
@@ -201,30 +173,17 @@ export class Interaction {
         return this;
     }
 
-    getEndpoint(): EndpointDefinition {
-        return this.getContract().getAbi().getEndpoint(this.getInterpretingFunction());
+    useThenIncrementNonceOf(account: Account) : Interaction {
+        return this.withNonce(account.getNonceThenIncrement());
     }
-}
 
-function interpretExecutionResults(endpoint: EndpointDefinition, transactionOnNetwork: TransactionOnNetwork): ExecutionResultsBundle {
-    let smartContractResults = transactionOnNetwork.getSmartContractResults();
-    let immediateResult = smartContractResults.getImmediate();
-    let resultingCalls = smartContractResults.getResultingCalls();
-
-    immediateResult.setEndpointDefinition(endpoint);
-
-    let values = immediateResult.outputTyped();
-    let returnCode = immediateResult.getReturnCode();
-
-    return {
-        transactionOnNetwork: transactionOnNetwork,
-        smartContractResults: smartContractResults,
-        immediateResult,
-        resultingCalls,
-        values,
-        firstValue: values[0],
-        returnCode: returnCode
-    };
+    /**
+     * Sets the "caller" field on contract queries.
+     */
+    withQuerent(querent: Address): Interaction {
+        this.querent = querent;
+        return this;
+    }
 }
 
 class TokenTransfersWithinInteraction {
@@ -308,7 +267,7 @@ class TokenTransfersWithinInteraction {
     }
 
     private getTypedInteractionFunction(): TypedValue {
-        return BytesValue.fromUTF8(this.interaction.getExecutingFunction().valueOf())
+        return BytesValue.fromUTF8(this.interaction.getFunction().valueOf())
     }
 
     private getInteractionArguments(): TypedValue[] {

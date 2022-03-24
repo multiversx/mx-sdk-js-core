@@ -32,9 +32,10 @@ export class TransactionOnNetwork {
     hyperblockNonce: Nonce = new Nonce(0);
     hyperblockHash: Hash = Hash.empty();
 
-    private receipt: Receipt = new Receipt();
-    private results: SmartContractResults = SmartContractResults.empty();
-    private logs: TransactionLogs = TransactionLogs.empty();
+    // TODO: Check if "receipt" is still received from the API.
+    receipt: Receipt = new Receipt();
+    results: SmartContractResults = SmartContractResults.empty();
+    logs: TransactionLogs = TransactionLogs.empty();
 
     constructor(init?: Partial<TransactionOnNetwork>) {
         Object.assign(this, init);
@@ -91,18 +92,6 @@ export class TransactionOnNetwork {
     getDateTime(): Date {
         return new Date(this.timestamp * 1000);
     }
-
-    getReceipt(): Receipt {
-        return this.receipt;
-    }
-
-    getSmartContractResults(): SmartContractResults {
-        return this.results;
-    }
-
-    getLogs(): TransactionLogs {
-        return this.logs;
-    }
 }
 
 /**
@@ -116,6 +105,7 @@ export class TransactionOnNetworkType {
     }
 }
 
+// TODO: Check if we still need this.
 export class Receipt {
     value: Balance = Balance.Zero();
     sender: Address = new Address();

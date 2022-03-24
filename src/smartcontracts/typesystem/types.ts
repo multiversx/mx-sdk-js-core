@@ -93,7 +93,7 @@ export class Type {
      * 
      * One exception though: for {@link OptionType}, we simulate covariance for missing (not provided) values.
      * For example, Option<u32> is assignable from Option<?>.
-     * For more details, see the implementation of {@link OptionType}.
+     * For more details, see the implementation of {@link OptionType} and @{@link OptionalType}.
      * 
      * Also see:
      *  - https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)

@@ -3,11 +3,13 @@ import { extendAbiRegistry, loadAbiRegistry } from "../../testutils";
 import { BinaryCodec } from "../codec";
 import { AbiRegistry } from "./abiRegistry";
 import { AddressType } from "./address";
+import { OptionalType } from "./algebraic";
 import { BytesType } from "./bytes";
 import { EnumType } from "./enum";
 import { ListType, OptionType } from "./generic";
-import { BigUIntType, I64Type, U32Type, U8Type } from "./numerical";
+import { BigUIntType, I64Type, U32Type, U64Type, U8Type } from "./numerical";
 import { StructType } from "./struct";
+import { TokenIdentifierType } from "./tokenIdentifier";
 
 describe("test abi registry", () => {
     it("should extend", async () => {
@@ -23,12 +25,12 @@ describe("test abi registry", () => {
         assert.lengthOf(registry.customTypes, 0);
         assert.lengthOf(registry.getInterface("counter").endpoints, 3);
 
-        await extendAbiRegistry(registry, "src/testdata/lottery_egld.abi.json");
+        await extendAbiRegistry(registry, "src/testdata/lottery-esdt.abi.json");
         assert.lengthOf(registry.interfaces, 3);
         assert.lengthOf(registry.customTypes, 2);
 
-        assert.lengthOf(registry.getInterface("Lottery").endpoints, 6);
-        assert.lengthOf(registry.getStruct("LotteryInfo").getFieldsDefinitions(), 8);
+        assert.lengthOf(registry.getInterface("Lottery").endpoints, 7);
+        assert.lengthOf(registry.getStruct("LotteryInfo").getFieldsDefinitions(), 7);
         assert.lengthOf(registry.getEnum("Status").variants, 3);
     });
 
@@ -36,7 +38,7 @@ describe("test abi registry", () => {
         let registry = await loadAbiRegistry([
             "src/testdata/answer.abi.json",
             "src/testdata/counter.abi.json",
-            "src/testdata/lottery_egld.abi.json",
+            "src/testdata/lottery-esdt.abi.json",
         ]);
 
         // Ultimate answer
@@ -53,13 +55,22 @@ describe("test abi registry", () => {
         let lottery = registry.getInterface("Lottery");
         let start = lottery.getEndpoint("start");
         let getStatus = lottery.getEndpoint("status");
-        let getLotteryInfo = lottery.getEndpoint("lotteryInfo");
+        let getLotteryInfo = lottery.getEndpoint("getLotteryInfo");
         assert.instanceOf(start.input[0].type, BytesType);
-        assert.instanceOf(start.input[1].type, BigUIntType);
-        assert.instanceOf(start.input[2].type, OptionType);
-        assert.instanceOf(start.input[2].type.getFirstTypeParameter(), U32Type);
-        assert.instanceOf(start.input[6].type.getFirstTypeParameter(), ListType);
-        assert.instanceOf(start.input[6].type.getFirstTypeParameter().getFirstTypeParameter(), AddressType);
+        assert.instanceOf(start.input[1].type, TokenIdentifierType);
+        assert.instanceOf(start.input[2].type, BigUIntType);
+        assert.instanceOf(start.input[3].type, OptionType);
+        assert.instanceOf(start.input[3].type.getFirstTypeParameter(), U32Type);
+        assert.instanceOf(start.input[4].type, OptionType);
+        assert.instanceOf(start.input[4].type.getFirstTypeParameter(), U64Type);
+        assert.instanceOf(start.input[5].type, OptionType);
+        assert.instanceOf(start.input[5].type.getFirstTypeParameter(), U32Type);
+        assert.instanceOf(start.input[6].type, OptionType);
+        assert.instanceOf(start.input[6].type.getFirstTypeParameter(), BytesType);
+        assert.instanceOf(start.input[7].type.getFirstTypeParameter(), ListType);
+        assert.instanceOf(start.input[7].type.getFirstTypeParameter().getFirstTypeParameter(), AddressType);
+        assert.instanceOf(start.input[8].type, OptionalType);
+        assert.instanceOf(start.input[8].type.getFirstTypeParameter(), BigUIntType);
         assert.instanceOf(getStatus.input[0].type, BytesType);
         assert.instanceOf(getStatus.output[0].type, EnumType);
         assert.equal(getStatus.output[0].type.getName(), "Status");
@@ -68,9 +79,8 @@ describe("test abi registry", () => {
         assert.equal(getLotteryInfo.output[0].type.getName(), "LotteryInfo");
 
         let fieldDefinitions = (<StructType>getLotteryInfo.output[0].type).getFieldsDefinitions();
-        assert.instanceOf(fieldDefinitions[0].type, BigUIntType);
-        assert.instanceOf(fieldDefinitions[5].type, ListType);
-        assert.instanceOf(fieldDefinitions[5].type.getFirstTypeParameter(), AddressType);
+        assert.instanceOf(fieldDefinitions[0].type, TokenIdentifierType);
+        assert.instanceOf(fieldDefinitions[5].type, BytesType);
     });
 
     it("binary codec correctly decodes perform action result", async () => {

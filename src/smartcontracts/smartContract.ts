@@ -17,6 +17,7 @@ import { TypedValue } from "./typesystem";
 import { bigIntToBuffer } from "./codec/utils";
 import BigNumber from "bignumber.js";
 import { Interaction } from "./interaction";
+import { NativeSerializer } from "./nativeSerializer";
 const createKeccakHash = require("keccak");
 
 /**
@@ -28,6 +29,7 @@ export class SmartContract implements ISmartContract {
     private code: Code = Code.nothing();
     private codeMetadata: CodeMetadata = new CodeMetadata();
     private abi?: SmartContractAbi;
+    // TODO: Perhaps remove this?
     private readonly trackOfTransactions: Transaction[] = [];
 
     /**
@@ -35,6 +37,15 @@ export class SmartContract implements ISmartContract {
      * (a bit similar to web3js's "contract.methods").
      */
     public readonly methods: { [key: string]: (args?: TypedValue[]) => Interaction } = {};
+
+    /**
+     * This object contains a function for each endpoint defined by the contract.
+     * (a bit similar to web3js's "contract.methods").
+     * 
+     * This is an alternative to {@link methods}. 
+     * Unlike {@link methods}, automatic type inference (wrt. ABI) is applied when using {@link methodsAuto}.
+     */
+    public readonly methodsAuto: { [key: string]: (args?: any[]) => Interaction } = {};
 
     /**
      * Create a SmartContract object by providing its address on the Network.
@@ -56,12 +67,20 @@ export class SmartContract implements ISmartContract {
         for (const definition of abi.getAllEndpoints()) {
             let functionName = definition.name;
 
-            // For each endpoint defined by the ABI, we attach a function to the "methods" object,
+            // For each endpoint defined by the ABI, we attach a function to the "methods" and "methodsAuto" objects,
             // a function that receives typed values as arguments
             // and returns a prepared contract interaction.
             this.methods[functionName] = function (args?: TypedValue[]) {
                 let func = new ContractFunction(functionName);
-                let interaction = new Interaction(contract, func, func, args || []);
+                let interaction = new Interaction(contract, func, args || []);
+                return interaction;
+            };
+
+            this.methodsAuto[functionName] = function (args?: any[]) {
+                let func = new ContractFunction(functionName);
+                // Perform automatic type inference, wrt. the endpoint definition:
+                let typedArgs = NativeSerializer.nativeToTypedValues(args || [], definition);
+                let interaction = new Interaction(contract, func, typedArgs || []);
                 return interaction;
             };
         }

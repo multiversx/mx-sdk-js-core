@@ -410,6 +410,33 @@ export class ErrTypingSystem extends Err {
 }
 
 /**
+ * Signals a missing field on a struct.
+ */
+ export class ErrMissingFieldOnStruct extends Err {
+  public constructor(fieldName: string, structName: string) {
+    super(`field ${fieldName} does not exist on struct ${structName}`);
+  }
+}
+
+/**
+ * Signals a missing field on an enum.
+ */
+ export class ErrMissingFieldOnEnum extends Err {
+  public constructor(fieldName: string, enumName: string) {
+    super(`field ${fieldName} does not exist on enum ${enumName}`);
+  }
+}
+
+/**
+ * Signals an error when parsing the contract results.
+ */
+ export class ErrCannotParseContractResults extends Err {
+  public constructor(details: string) {
+    super(`cannot parse contract results: ${details}`);
+  }
+}
+
+/**
  * Signals a generic codec (encode / decode) error.
  */
 export class ErrCodec extends Err {

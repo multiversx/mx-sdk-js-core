@@ -9,8 +9,7 @@ import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { QueryResponse } from "./queryResponse";
 import { ReturnCode } from "./returnCode";
-import { SmartContractResults, TypedResult } from "./smartContractResults";
-import { TypedValue } from "./typesystem";
+import { EndpointDefinition, TypedValue } from "./typesystem";
 
 /**
  * ISmartContract defines a general interface for operating with {@link SmartContract} objects.
@@ -35,18 +34,6 @@ export interface ISmartContract {
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
     call({ func, args, value, gasLimit }: CallArguments): Transaction;
-}
-
-export interface IInteractionRunner {
-    run(interaction: Interaction): Promise<Transaction>;
-    runAwaitExecution(interaction: Interaction): Promise<ExecutionResultsBundle>;
-    runQuery(interaction: Interaction, caller?: Address): Promise<QueryResponseBundle>;
-    // TODO: Fix method signature (underspecified at this moment).
-    runSimulation(interaction: Interaction): Promise<any>;
-}
-
-export interface IInteractionChecker {
-    checkInteraction(interaction: Interaction): void;
 }
 
 export interface DeployArguments {
@@ -80,19 +67,35 @@ export interface QueryArguments {
     caller?: Address
 }
 
-export interface ExecutionResultsBundle {
-    transactionOnNetwork: TransactionOnNetwork;
-    smartContractResults: SmartContractResults;
-    immediateResult: TypedResult;
-    resultingCalls: TypedResult[];
-    values: TypedValue[];
-    firstValue: TypedValue;
+export interface TypedOutcomeBundle {
     returnCode: ReturnCode;
+    returnMessage: string;
+    values: TypedValue[];
+    firstValue?: TypedValue;
+    secondValue?: TypedValue;
+    thirdValue?: TypedValue;
 }
 
-export interface QueryResponseBundle {
-    queryResponse: QueryResponse;
-    firstValue: TypedValue;
-    values: TypedValue[];
+export interface UntypedOutcomeBundle {
     returnCode: ReturnCode;
+    returnMessage: string;
+    values: Buffer[];
+}
+
+export interface ISmartContractController {
+    deploy(transaction: Transaction): Promise<{ transactionOnNetwork: TransactionOnNetwork, bundle: UntypedOutcomeBundle }>;
+    execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: TransactionOnNetwork, bundle: TypedOutcomeBundle }>;
+    query(interaction: Interaction): Promise<TypedOutcomeBundle>;
+}
+
+export interface IInteractionChecker {
+    checkInteraction(interaction: Interaction, definition: EndpointDefinition): void;
+}
+
+export interface IResultsParser {
+    parseQueryResponse(queryResponse: QueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle;
+    parseUntypedQueryResponse(queryResponse: QueryResponse): UntypedOutcomeBundle;
+
+    parseOutcome(transaction: TransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle;
+    parseUntypedOutcome(transaction: TransactionOnNetwork): UntypedOutcomeBundle;
 }

@@ -6,10 +6,13 @@ import { assert } from "chai";
 import { chooseProxyProvider } from "../interactive";
 import { SmartContract } from "./smartContract";
 import { ContractFunction } from "./function";
+import { ResultsParser } from "./resultsParser";
 
 describe("fetch transactions from local testnet", function () {
     let provider = chooseProxyProvider("local-testnet");;
     let alice: TestWallet;
+    let resultsParser = new ResultsParser();
+
     before(async function () {
         ({ alice } = await loadTestWallets());
     });
@@ -56,23 +59,13 @@ describe("fetch transactions from local testnet", function () {
         await transactionDeploy.getAsOnNetwork(provider);
         await transactionIncrement.getAsOnNetwork(provider);
 
-        let deployImmediateResult = transactionDeploy.getAsOnNetworkCached().getSmartContractResults().getImmediate();
-        let deployResultingCalls = transactionDeploy.getAsOnNetworkCached().getSmartContractResults().getResultingCalls();
-        let incrementImmediateResult = transactionIncrement.getAsOnNetworkCached().getSmartContractResults().getImmediate();
-        let incrementResultingCalls = transactionIncrement.getAsOnNetworkCached().getSmartContractResults().getResultingCalls();
+        let transactionOnNetwork = transactionDeploy.getAsOnNetworkCached();
+        let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        assert.isTrue(bundle.returnCode.isSuccess());
 
-        deployImmediateResult.assertSuccess();
-        incrementImmediateResult.assertSuccess();
-
-        assert.lengthOf(deployImmediateResult.outputUntyped(), 0);
-        // There is some refund
-        assert.isTrue(deployImmediateResult.value.valueOf().gt(0));
-        assert.lengthOf(deployResultingCalls, 0);
-
-        assert.lengthOf(incrementImmediateResult.outputUntyped(), 1);
-        // There is some refund
-        assert.isTrue(incrementImmediateResult.value.valueOf().gt(0));
-        assert.lengthOf(incrementResultingCalls, 0);
+        transactionOnNetwork = transactionIncrement.getAsOnNetworkCached();
+        bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        assert.isTrue(bundle.returnCode.isSuccess());
     });
 
     it("ESDT", async function () {

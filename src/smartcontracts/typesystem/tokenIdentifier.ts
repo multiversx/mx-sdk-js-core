@@ -8,9 +8,9 @@ export class TokenIdentifierType extends PrimitiveType {
 }
 
 export class TokenIdentifierValue extends PrimitiveValue {
-    private readonly value: Buffer;
+    private readonly value: string;
 
-    constructor(value: Buffer) {
+    constructor(value: string) {
         super(new TokenIdentifierType());
         this.value = value;
     }
@@ -27,10 +27,10 @@ export class TokenIdentifierValue extends PrimitiveValue {
             return false;
         }
         
-        return this.value.equals(other.value);
+        return this.value == other.value;
     }
 
-    valueOf(): Buffer {
+    valueOf(): string {
         return this.value;
     }
 

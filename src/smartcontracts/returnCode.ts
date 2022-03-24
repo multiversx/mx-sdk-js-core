@@ -1,3 +1,6 @@
+/**
+ * Also see: https://github.com/ElrondNetwork/elrond-vm-common/blob/master/returnCodes.go
+ */
 export class ReturnCode {
     static None = new ReturnCode("");
     static Ok = new ReturnCode("ok");

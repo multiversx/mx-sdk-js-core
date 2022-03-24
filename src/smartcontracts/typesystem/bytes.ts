@@ -49,4 +49,8 @@ export class BytesValue extends PrimitiveValue {
     valueOf(): Buffer {
         return this.value;
     }
+
+    toString() {
+        return this.value.toString();
+    }
 }

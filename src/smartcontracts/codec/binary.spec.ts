@@ -3,7 +3,6 @@ import { BinaryCodec, BinaryCodecConstraints } from "./binary";
 import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue, ArrayVec, ArrayVecType, U16Value, TokenIdentifierType, TokenIdentifierValue, StringValue, StringType } from "../typesystem";
 import { isMsbOne } from "./utils";
 import { Address } from "../../address";
-import { Balance } from "../../balance";
 import { BytesType, BytesValue } from "../typesystem/bytes";
 import BigNumber from "bignumber.js";
 import { FieldDefinition } from "../typesystem/fields";
@@ -189,29 +188,27 @@ describe("test binary codec (advanced)", () => {
         let fooType = new StructType(
             "Foo",
             [
+                new FieldDefinition("token_identifier", "", new TokenIdentifierType()),
                 new FieldDefinition("ticket_price", "", new BigUIntType()),
                 new FieldDefinition("tickets_left", "", new U32Type()),
                 new FieldDefinition("deadline", "", new U64Type()),
                 new FieldDefinition("max_entries_per_user", "", new U32Type()),
                 new FieldDefinition("prize_distribution", "", new BytesType()),
-                new FieldDefinition("whitelist", "", new ListType(new AddressType())),
-                new FieldDefinition("current_ticket_number", "", new U32Type()),
                 new FieldDefinition("prize_pool", "", new BigUIntType())
             ]
         );
 
         let fooStruct = new Struct(fooType, [
-            new Field(new BigUIntValue(Balance.egld(10).valueOf()), "ticket_price"),
+            new Field(new TokenIdentifierValue("lucky-token"), "token_identifier"),
+            new Field(new BigUIntValue(1), "ticket_price"),
             new Field(new U32Value(0), "tickets_left"),
             new Field(new U64Value(new BigNumber("0x000000005fc2b9db")), "deadline"),
             new Field(new U32Value(0xffffffff), "max_entries_per_user"),
             new Field(new BytesValue(Buffer.from([0x64])), "prize_distribution"),
-            new Field(new List(new ListType(new AddressType()), []), "whitelist"),
-            new Field(new U32Value(9472), "current_ticket_number"),
             new Field(new BigUIntValue(new BigNumber("94720000000000000000000")), "prize_pool")
         ]);
 
-        let encodedExpected = serialized("[00000008|8ac7230489e80000] [00000000] [000000005fc2b9db] [ffffffff] [00000001|64] [00000000] [00002500] [0000000a|140ec80fa7ee88000000]");
+        let encodedExpected = serialized("[0000000b|6c75636b792d746f6b656e] [00000001|01] [00000000] [000000005fc2b9db] [ffffffff] [00000001|64] [0000000a|140ec80fa7ee88000000]");
         let encoded = codec.encodeNested(fooStruct);
         assert.deepEqual(encoded, encodedExpected);
 
@@ -221,13 +218,12 @@ describe("test binary codec (advanced)", () => {
 
         let plainFoo = decoded.valueOf();
         assert.deepEqual(plainFoo, {
-            ticket_price: new BigNumber("10000000000000000000"),
+            token_identifier: "lucky-token",
+            ticket_price: new BigNumber("1"),
             tickets_left: new BigNumber(0),
             deadline: new BigNumber("0x000000005fc2b9db", 16),
             max_entries_per_user: new BigNumber(0xffffffff),
             prize_distribution: Buffer.from([0x64]),
-            whitelist: [],
-            current_ticket_number: new BigNumber(9472),
             prize_pool: new BigNumber("94720000000000000000000")
         });
     });
@@ -244,7 +240,7 @@ describe("test binary codec (advanced)", () => {
         );
 
         let paymentStruct = new Struct(paymentType, [
-            new Field(new TokenIdentifierValue(Buffer.from("TEST-1234")), "token_identifier"),
+            new Field(new TokenIdentifierValue("TEST-1234"), "token_identifier"),
             new Field(new U64Value(new BigNumber(42)), "nonce"),
             new Field(new BigUIntValue(new BigNumber("123450000000000000000")), "amount")
         ]);
@@ -259,7 +255,7 @@ describe("test binary codec (advanced)", () => {
 
         let decodedPayment = decoded.valueOf();
         assert.deepEqual(decodedPayment, {
-            token_identifier: Buffer.from("TEST-1234"),
+            token_identifier: "TEST-1234",
             nonce: new BigNumber(42),
             amount: new BigNumber("123450000000000000000"),
         });

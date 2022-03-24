@@ -20,6 +20,17 @@ jobs:
           node-version: 12
           registry-url: https://registry.npmjs.org/
       
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo " - [npmjs](https://www.npmjs.com/package/@elrondnetwork/erdjs)" >> notes.txt
+          echo " - [CHANGELOG](https://github.com/ElrondNetwork/elrond-sdk-erdjs/blob/main/CHANGELOG.md)" >> notes.txt
+          echo "" >> notes.txt
+
+          RELEASE_TAG=v$(node -p "require('./package.json').version")
+          gh release create --prerelease $RELEASE_TAG --title="$RELEASE_TAG" --generate-notes --notes-file=notes.txt
+
       - run: npm ci
       - run: npm test
       

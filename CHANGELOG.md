@@ -37,6 +37,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Added utility function `OptionalValue.newMissing()`. Added "fake" covariance wrt. "null type parameter" (when value is missing) on `OptionalType`.
  - Added utility functions (typed value factories): `createListOfAddresses`, `createListOfTokensIdentifiers`.
 
+## [9.2.3]
+ - [Fix log level in transaction watcher.](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/160)
+
 ## [9.2.2]
  - [Wallet Provider: add "options" on tx sign return value](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/157)
 

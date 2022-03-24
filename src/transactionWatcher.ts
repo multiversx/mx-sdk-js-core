@@ -116,7 +116,7 @@ export class TransactionWatcher {
                     break;
                 }
             } catch (error) {
-                Logger.info("TransactionWatcher.awaitConditionally(): cannot (yet) fetch data.", this.hash.toString());
+                Logger.debug("TransactionWatcher.awaitConditionally(): cannot (yet) fetch data.", this.hash.toString());
 
                 if (!(error instanceof errors.Err)) {
                     throw error;

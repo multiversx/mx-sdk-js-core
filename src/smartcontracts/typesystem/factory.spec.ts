@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { TokenIdentifierType } from "./tokenIdentifier";
 import { Address } from "../../address";
-import { createListOfAddresses, createListOfTokensIdentifiers } from "./factory";
+import { createListOfAddresses, createListOfTokenIdentifiers } from "./factory";
 import { ListType } from "./generic";
 import { AddressType } from "./address";
 
@@ -20,7 +20,7 @@ describe("test factory", () => {
 
     it("should create lists of token identifiers", () => {
         let identifiers = ["RIDE-7d18e9", "MEX-455c57"];
-        let list = createListOfTokensIdentifiers(identifiers);
+        let list = createListOfTokenIdentifiers(identifiers);
         assert.deepEqual(list.getType(), new ListType(new TokenIdentifierType()));
         assert.deepEqual(list.valueOf(), identifiers);
     });

@@ -35,7 +35,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Replaced the old `lottery-egld` with the new `lottery-esdt` in integration tests.
  - Added missing tests for some components: `nativeSerializer`, `struct`, `enum`.
  - Added utility function `OptionalValue.newMissing()`. Added "fake" covariance wrt. "null type parameter" (when value is missing) on `OptionalType`.
- - Added utility functions (typed value factories): `createListOfAddresses`, `createListOfTokensIdentifiers`.
+ - Added utility functions (typed value factories): `createListOfAddresses`, `createListOfTokenIdentifiers`.
 
 ## [9.2.3]
  - [Fix log level in transaction watcher.](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/160)

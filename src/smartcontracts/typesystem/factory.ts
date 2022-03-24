@@ -9,7 +9,7 @@ export function createListOfAddresses(addresses: Address[]): List {
     return list;
 }
 
-export function createListOfTokensIdentifiers(identifiers: string[]): List {
+export function createListOfTokenIdentifiers(identifiers: string[]): List {
     let identifiersTyped = identifiers.map(identifier => new TokenIdentifierValue(identifier));
     let list = List.fromItems(identifiersTyped);
     return list;

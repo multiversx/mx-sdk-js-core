@@ -139,7 +139,6 @@ export class ContractWrapper extends ChainSendContext {
             query.caller = optionalSender.address;
         }
         let response = await provider.queryContract(query);
-        console.log("got response...", response);
         let result = Result.unpackQueryOutput(endpoint, response);
         logger?.queryComplete(result, response);
 

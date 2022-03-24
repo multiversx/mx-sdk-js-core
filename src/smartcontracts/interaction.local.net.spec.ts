@@ -1,6 +1,6 @@
 import { DefaultSmartContractController } from "./smartContractController";
 import { SmartContract } from "./smartContract";
-import { BigUIntType, BigUIntValue, OptionalType, OptionalValue, OptionValue, TokenIdentifierValue, TypedValue, U32Value } from "./typesystem";
+import { BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 import { loadAbiRegistry, loadContractCode, loadTestWallets, TestWallet } from "../testutils";
 import { SmartContractAbi } from "./abi";
 import { assert } from "chai";
@@ -21,7 +21,7 @@ describe("test smart contract interactor", function () {
     });
 
     it("should interact with 'answer' (local testnet)", async function () {
-        this.timeout(60000);
+        this.timeout(80000);
 
         let abiRegistry = await loadAbiRegistry(["src/testdata/answer.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["answer"]);
@@ -32,7 +32,18 @@ describe("test smart contract interactor", function () {
         // because the Transaction objects created under the hood point to the "default" NetworkConfig.
         await NetworkConfig.getDefault().sync(provider);
         await alice.sync(provider);
-        await deploy(contract, "src/testdata/answer.wasm", new GasLimit(3000000), []);
+
+        // Deploy the contract
+        let deployTransaction = contract.deploy({
+            code: await loadContractCode("src/testdata/answer.wasm"),
+            gasLimit: new GasLimit(3000000),
+            initArguments: []
+        });
+
+        deployTransaction.setNonce(alice.account.getNonceThenIncrement());
+        await alice.signer.sign(deployTransaction);
+        let { bundle: { returnCode } } = await controller.deploy(deployTransaction);
+        assert.isTrue(returnCode.isSuccess());
 
         let interaction = <Interaction>contract.methods.getUltimateAnswer().withGasLimit(new GasLimit(3000000));
 
@@ -68,7 +79,18 @@ describe("test smart contract interactor", function () {
         // because the Transaction objects created under the hood point to the "default" NetworkConfig.
         await NetworkConfig.getDefault().sync(provider);
         await alice.sync(provider);
-        await deploy(contract, "src/testdata/counter.wasm", new GasLimit(3000000), []);
+
+        // Deploy the contract
+        let deployTransaction = contract.deploy({
+            code: await loadContractCode("src/testdata/counter.wasm"),
+            gasLimit: new GasLimit(3000000),
+            initArguments: []
+        });
+
+        deployTransaction.setNonce(alice.account.getNonceThenIncrement());
+        await alice.signer.sign(deployTransaction);
+        let { bundle: { returnCode } } = await controller.deploy(deployTransaction);
+        assert.isTrue(returnCode.isSuccess());
 
         let getInteraction = <Interaction>contract.methods.get();
         let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(new GasLimit(3000000));
@@ -96,7 +118,7 @@ describe("test smart contract interactor", function () {
     });
 
     it("should interact with 'lottery-esdt' (local testnet)", async function () {
-        this.timeout(120000);
+        this.timeout(140000);
 
         let abiRegistry = await loadAbiRegistry(["src/testdata/lottery-esdt.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
@@ -107,7 +129,18 @@ describe("test smart contract interactor", function () {
         // because the Transaction objects created under the hood point to the "default" NetworkConfig.
         await NetworkConfig.getDefault().sync(provider);
         await alice.sync(provider);
-        await deploy(contract, "src/testdata/lottery-esdt.wasm", new GasLimit(100000000), []);
+
+        // Deploy the contract
+        let deployTransaction = contract.deploy({
+            code: await loadContractCode("src/testdata/lottery-esdt.wasm"),
+            gasLimit: new GasLimit(100000000),
+            initArguments: []
+        });
+
+        deployTransaction.setNonce(alice.account.getNonceThenIncrement());
+        await alice.signer.sign(deployTransaction);
+        let { bundle: { returnCode } } = await controller.deploy(deployTransaction);
+        assert.isTrue(returnCode.isSuccess());
 
         let startInteraction = <Interaction>contract.methods.start([
             BytesValue.fromUTF8("lucky"),
@@ -164,22 +197,4 @@ describe("test smart contract interactor", function () {
             prize_pool: new BigNumber("0")
         });
     });
-
-    /**
-     * Deploy is not currently supported by interactors yet.
-     * We will deploy the contracts using the existing approach.
-     */
-    async function deploy(contract: SmartContract, path: string, gasLimit: GasLimit, initArguments: TypedValue[]): Promise<void> {
-        let transactionDeploy = contract.deploy({
-            code: await loadContractCode(path),
-            gasLimit: gasLimit,
-            initArguments: initArguments
-        });
-
-        // In these tests, all contracts are deployed by Alice.
-        transactionDeploy.setNonce(alice.account.getNonceThenIncrement());
-        await alice.signer.sign(transactionDeploy);
-        await transactionDeploy.send(provider);
-        await transactionDeploy.awaitExecuted(provider);
-    }
 });

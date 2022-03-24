@@ -1,6 +1,6 @@
 import { DefaultSmartContractController } from "./smartContractController";
 import { SmartContract } from "./smartContract";
-import { BigUIntType, BigUIntValue, OptionalType, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
+import { BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 import {
     loadAbiRegistry,
     loadTestWallets,

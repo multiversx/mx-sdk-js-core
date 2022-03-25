@@ -5,12 +5,19 @@ import { Type, TypeCardinality, TypedValue } from "./types";
  * An optional is an algebraic type. It holds zero or one values.
  */
 export class OptionalType extends Type {
+    static ClassName = "OptionalType";
+
     constructor(typeParameter: Type) {
         super("Optional", [typeParameter], TypeCardinality.variable(1));
+    }
+
+    getClassName(): string {
+        return OptionalType.ClassName;
     }
 }
 
 export class OptionalValue extends TypedValue {
+    static ClassName = "OptionalValue";
     private readonly value: TypedValue | null;
 
     constructor(type: OptionalType, value: TypedValue | null = null) {
@@ -19,6 +26,10 @@ export class OptionalValue extends TypedValue {
         // TODO: assert value is of type type.getFirstTypeParameter()
 
         this.value = value;
+    }
+
+    getClassName(): string {
+        return OptionalValue.ClassName;
     }
 
     isSet(): boolean {

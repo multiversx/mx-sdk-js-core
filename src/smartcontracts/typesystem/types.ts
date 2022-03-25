@@ -1,4 +1,4 @@
-import { getJavascriptConstructorsNamesInHierarchy, getJavascriptPrototypesInHierarchy, hasJavascriptConstructor } from "../../reflection";
+import { getJavascriptPrototypesInHierarchy } from "../../reflection";
 import { guardTrue, guardValueIsSet } from "../../utils";
 
 /**
@@ -6,6 +6,8 @@ import { guardTrue, guardValueIsSet } from "../../utils";
  * Once instantiated as a Type, a generic type is "closed" (as opposed to "open").
  */
 export class Type {
+    static ClassName = "Type";
+
     private readonly name: string;
     private readonly typeParameters: Type[];
     protected readonly cardinality: TypeCardinality;
@@ -22,6 +24,16 @@ export class Type {
         return this.name;
     }
 
+    getClassName() {
+        return Type.ClassName;
+    }
+
+    getClassHierarchy(): string[] {
+        let prototypes = getJavascriptPrototypesInHierarchy(this, prototype => prototype.belongsToTypesystem);
+        let classNames = prototypes.map(prototype => (<Type>prototype).getClassName()).reverse();
+        return classNames;
+    }
+
     /**
      * Gets the fully qualified name of the type, to allow for better (efficient and non-ambiguous) type comparison within erdjs' typesystem.
      */
@@ -33,12 +45,13 @@ export class Type {
             `erdjs:types:${this.getName()}`;
     }
 
-    hasJavascriptConstructor(javascriptConstructorName: string): boolean {
-        return hasJavascriptConstructor(this, javascriptConstructorName);
+    hasExactClass(className: string): boolean {
+        return this.getClassName() == className;
     }
 
-    hasJavascriptConstructorInHierarchy(javascriptConstructorName: string): boolean {
-        return getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem).includes(javascriptConstructorName);
+    hasClassOrSuperclass(className: string): boolean {
+        let hierarchy = this.getClassHierarchy();
+        return hierarchy.includes(className);
     }
 
     getTypeParameters(): Type[] {
@@ -111,13 +124,7 @@ export class Type {
             return true;
         }
 
-        let javascriptConstructorNameOfThis = this.constructor.name;
-        let javascriptConstructorNamesInHierarchyOfOther = getJavascriptConstructorsNamesInHierarchy(other, prototype => prototype.belongsToTypesystem);
-        if (javascriptConstructorNamesInHierarchyOfOther.includes(javascriptConstructorNameOfThis)) {
-            return true;
-        }
-
-        return false;
+        return other.hasClassOrSuperclass(this.getClassName());
     }
 
     private static getFullyQualifiedNamesInHierarchy(type: Type): string[] {
@@ -143,7 +150,7 @@ export class Type {
     /**
      * A special marker for types within erdjs' typesystem.
      */
-    private belongsToTypesystem() {}
+    belongsToTypesystem() {}
 }
 
 /**
@@ -204,19 +211,41 @@ export class TypeCardinality {
 }
 
 export class PrimitiveType extends Type {
+    static ClassName = "PrimitiveType";
+
     constructor(name: string) {
         super(name);
+    }
+
+    getClassName(): string {
+        return PrimitiveType.ClassName;
     }
 }
 
 export abstract class CustomType extends Type {
+    static ClassName = "CustomType";
+
+    getClassName(): string {
+        return CustomType.ClassName;
+    }
 }
 
 export abstract class TypedValue {
+    static ClassName = "TypedValue";
     private readonly type: Type;
 
     constructor(type: Type) {
         this.type = type;
+    }
+
+    getClassName(): string {
+        return TypedValue.ClassName;
+    }
+
+    getClassHierarchy(): string[] {
+        let prototypes = getJavascriptPrototypesInHierarchy(this, prototype => prototype.belongsToTypesystem);
+        let classNames = prototypes.map(prototype => (<TypedValue>prototype).getClassName()).reverse();
+        return classNames;
     }
 
     getType(): Type {
@@ -226,23 +255,30 @@ export abstract class TypedValue {
     abstract equals(other: any): boolean;
     abstract valueOf(): any;
 
-    hasJavascriptConstructor(javascriptConstructorName: string): boolean {
-        return hasJavascriptConstructor(this, javascriptConstructorName);
+    hasExactClass(className: string): boolean {
+        return this.getClassName() == className;
     }
 
-    hasJavascriptConstructorInHierarchy(javascriptConstructorName: string): boolean {
-        return getJavascriptConstructorsNamesInHierarchy(this, prototype => prototype.belongsToTypesystem).includes(javascriptConstructorName);
+    hasClassOrSuperclass(className: string): boolean {
+        let hierarchy = this.getClassHierarchy();
+        return hierarchy.includes(className);
     }
 
     /**
      * A special marker for values within erdjs' typesystem.
      */
-     private belongsToTypesystem() {}
+    belongsToTypesystem() {}
 }
 
 export abstract class PrimitiveValue extends TypedValue {
+    static ClassName = "PrimitiveValue";
+
     constructor(type: Type) {
         super(type);
+    }
+
+    getClassName(): string {
+        return PrimitiveValue.ClassName;
     }
 }
 
@@ -251,14 +287,26 @@ export function isTyped(value: any) {
 }
 
 export class TypePlaceholder extends Type {
+    static ClassName = "TypePlaceholder";
+
     constructor() {
         super("...");
+    }
+
+    getClassName(): string {
+        return TypePlaceholder.ClassName;
     }
 }
 
 
 export class NullType extends Type {
+    static ClassName = "NullType";
+
     constructor() {
         super("?");
+    }
+
+    getClassName(): string {
+        return NullType.ClassName;
     }
 }

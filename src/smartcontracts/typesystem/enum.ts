@@ -5,11 +5,16 @@ import { CustomType, TypedValue } from "./types";
 const SimpleEnumMaxDiscriminant = 256;
 
 export class EnumType extends CustomType {
+    static ClassName = "EnumType";
     readonly variants: EnumVariantDefinition[] = [];
 
     constructor(name: string, variants: EnumVariantDefinition[]) {
         super(name);
         this.variants = variants;
+    }
+
+    getClassName(): string {
+        return EnumType.ClassName;
     }
 
     static fromJSON(json: { name: string; variants: any[] }): EnumType {
@@ -57,6 +62,7 @@ export class EnumVariantDefinition {
 }
 
 export class EnumValue extends TypedValue {
+    static ClassName = "EnumValue";
     readonly name: string;
     readonly discriminant: number;
     private readonly fields: Field[] = [];
@@ -69,6 +75,10 @@ export class EnumValue extends TypedValue {
 
         let definitions = variant.getFieldsDefinitions();
         Fields.checkTyping(this.fields, definitions);
+    }
+
+    getClassName(): string {
+        return EnumValue.ClassName;
     }
 
     /**

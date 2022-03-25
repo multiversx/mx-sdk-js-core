@@ -2,8 +2,14 @@ import { Address } from "../../address";
 import { PrimitiveType, PrimitiveValue } from "./types";
 
 export class AddressType extends PrimitiveType {
+    static ClassName = "AddressType";
+
     constructor() {
         super("Address");
+    }
+
+    getClassName(): string {
+        return AddressType.ClassName;
     }
 }
 
@@ -11,11 +17,16 @@ export class AddressType extends PrimitiveType {
  * An address fed to or fetched from a Smart Contract contract, as an immutable abstraction.
  */
 export class AddressValue extends PrimitiveValue {
+    static ClassName = "AddressValue";
     private readonly value: Address;
 
     constructor(value: Address) {
         super(new AddressType());
         this.value = value;
+    }
+
+    getClassName(): string {
+        return AddressValue.ClassName;
     }
 
     /**

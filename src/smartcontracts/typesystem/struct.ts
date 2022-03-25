@@ -2,11 +2,16 @@ import { FieldDefinition, Field, Fields } from "./fields";
 import { CustomType, TypedValue } from "./types";
 
 export class StructType extends CustomType {
+    static ClassName = "StructType";
     private readonly fieldsDefinitions: FieldDefinition[] = [];
 
     constructor(name: string, fieldsDefinitions: FieldDefinition[]) {
         super(name);
         this.fieldsDefinitions = fieldsDefinitions;
+    }
+
+    getClassName(): string {
+        return StructType.ClassName;
     }
 
     static fromJSON(json: { name: string, fields: any[] }): StructType {
@@ -22,6 +27,7 @@ export class StructType extends CustomType {
 // TODO: implement setField(), convenience method.
 // TODO: Hold fields in a map (by name), and use the order within "field definitions" to perform codec operations.
 export class Struct extends TypedValue {
+    static ClassName = "Struct";
     private readonly fields: Field[] = [];
 
     /**
@@ -32,6 +38,10 @@ export class Struct extends TypedValue {
         this.fields = fields;
 
         this.checkTyping();
+    }
+
+    getClassName(): string {
+        return Struct.ClassName;
     }
 
     private checkTyping() {

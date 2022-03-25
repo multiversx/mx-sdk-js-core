@@ -3,11 +3,16 @@ import { FieldDefinition, Field, Fields } from "./fields";
 import { CustomType, TypedValue } from "./types";
 
 export class StructType extends CustomType {
+    static ClassName = "StructType";
     private readonly fieldsDefinitions: FieldDefinition[] = [];
 
     constructor(name: string, fieldsDefinitions: FieldDefinition[]) {
         super(name);
         this.fieldsDefinitions = fieldsDefinitions;
+    }
+
+    getClassName(): string {
+        return StructType.ClassName;
     }
 
     static fromJSON(json: { name: string, fields: any[] }): StructType {
@@ -21,6 +26,7 @@ export class StructType extends CustomType {
 }
 
 export class Struct extends TypedValue {
+    static ClassName = "Struct";
     private readonly fields: Field[];
     private readonly fieldsByName: Map<string, Field>;
 
@@ -33,6 +39,10 @@ export class Struct extends TypedValue {
         this.fieldsByName = new Map(fields.map(field => [field.name, field]));
 
         this.checkTyping();
+    }
+
+    getClassName(): string {
+        return Struct.ClassName;
     }
 
     private checkTyping() {

@@ -5,8 +5,14 @@ import { Type, TypedValue } from "./types";
 import { StructType } from "./struct";
 
 export class TupleType extends StructType {
+    static ClassName = "TupleType";
+    
     constructor(...typeParameters: Type[]) {
         super(TupleType.prepareName(typeParameters), TupleType.prepareFieldDefinitions(typeParameters));
+    }
+
+    getClassName(): string {
+        return TupleType.ClassName;
     }
 
     private static prepareName(typeParameters: Type[]): string {
@@ -29,8 +35,14 @@ function prepareFieldName(fieldIndex: number) {
 // Or let Tuple be the base class, but have Struct as a specialization of it, "named tuple"?
 // Or leave as it is?
 export class Tuple extends Struct {
+    static ClassName = "Tuple";
+
     constructor(type: TupleType, fields: Field[]) {
         super(type, fields);
+    }
+
+    getClassName(): string {
+        return Tuple.ClassName;
     }
 
     static fromItems(items: TypedValue[]): Tuple {

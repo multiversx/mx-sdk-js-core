@@ -52,10 +52,10 @@ export class ArgSerializer {
         function readValue(type: Type): TypedValue {
             // TODO: Use matchers.
 
-            if (type.hasJavascriptConstructor(OptionalType.name)) {
+            if (type.hasExactClass(OptionalType.ClassName)) {
                 let typedValue = readValue(type.getFirstTypeParameter());
                 return new OptionalValue(type, typedValue);
-            } else if (type.hasJavascriptConstructor(VariadicType.name)) {
+            } else if (type.hasExactClass(VariadicType.ClassName)) {
                 let typedValues = [];
 
                 while (!hasReachedTheEnd()) {
@@ -63,7 +63,7 @@ export class ArgSerializer {
                 }
 
                 return new VariadicValue(type, typedValues);
-            } else if (type.hasJavascriptConstructor(CompositeType.name)) {
+            } else if (type.hasExactClass(CompositeType.ClassName)) {
                 let typedValues = [];
 
                 for (const typeParameter of type.getTypeParameters()) {
@@ -132,17 +132,17 @@ export class ArgSerializer {
         function handleValue(value: TypedValue): void {
             // TODO: Use matchers.
 
-            if (value.hasJavascriptConstructor(OptionalValue.name)) {
+            if (value.hasExactClass(OptionalValue.ClassName)) {
                 let valueAsOptional = <OptionalValue>value;
                 if (valueAsOptional.isSet()) {
                     handleValue(valueAsOptional.getTypedValue());
                 }
-            } else if (value.hasJavascriptConstructor(VariadicValue.name)) {
+            } else if (value.hasExactClass(VariadicValue.ClassName)) {
                 let valueAsVariadic = <VariadicValue>value;
                 for (const item of valueAsVariadic.getItems()) {
                     handleValue(item);
                 }
-            } else if (value.hasJavascriptConstructor(CompositeValue.name)) {
+            } else if (value.hasExactClass(CompositeValue.ClassName)) {
                 let valueAsComposite = <CompositeValue>value;
                 for (const item of valueAsComposite.getItems()) {
                     handleValue(item);

@@ -29,15 +29,6 @@ export class ErrWrongMnemonic extends Err {
 }
 
 /**
- * Signals a wrong password.
- */
- export class ErrWrongPassword extends Err {
-    public constructor(message: string) {
-        super(`Possibly wrong password: ${message}`);
-    }
-}
-
-/**
  * Signals a bad PEM file.
  */
 export class ErrBadPEM extends Err {

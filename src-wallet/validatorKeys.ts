@@ -1,4 +1,4 @@
-import { guardLength } from "./utils";
+import { guardLength } from "./assertions";
 import { ErrInvariantFailed } from "./errors";
 import { parseValidatorKey } from "./pem";
 

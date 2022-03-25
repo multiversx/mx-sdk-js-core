@@ -1,6 +1,6 @@
 import * as tweetnacl from "tweetnacl";
 import { UserAddress } from "./userAddress";
-import { guardLength } from "./utils";
+import { guardLength } from "./assertions";
 import { parseUserKey } from "./pem";
 import { IAddress } from "./interface";
 

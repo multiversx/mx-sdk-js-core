@@ -1,7 +1,7 @@
 import crypto from "crypto";
-import {EncryptedData} from "./encryptedData";
-import * as errors from "../errors";
+import { EncryptedData } from "./encryptedData";
 import { DigestAlgorithm } from "./constants";
+import { Err } from "../errors";
 
 export class Decryptor {
   public static decrypt(data: EncryptedData, password: string): Buffer {
@@ -17,7 +17,7 @@ export class Decryptor {
     const actualMAC = data.mac;
 
     if (computedMAC.toString("hex") !== actualMAC) {
-      throw new errors.ErrWallet("MAC mismatch, possibly wrong password");
+      throw new Err("MAC mismatch, possibly wrong password");
     }
 
     const decipher = crypto.createDecipheriv(data.cipher, derivedKeyFirstHalf, iv);

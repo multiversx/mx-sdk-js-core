@@ -1,9 +1,8 @@
 import * as tweetnacl from "tweetnacl";
-import { Address } from "../address";
-import { guardLength } from "../utils";
+import { UserAddress } from "./userAddress";
+import { guardLength } from "./assertions";
 import { parseUserKey } from "./pem";
-import {SignableMessage} from "../signableMessage";
-import {Logger} from "../logger";
+import { IAddress } from "./interface";
 
 export const USER_SEED_LENGTH = 32;
 export const USER_PUBKEY_LENGTH = 32;
@@ -68,7 +67,7 @@ export class UserPublicKey {
             const unsignedMessage = tweetnacl.sign.open(unopenedMessage, this.buffer);
             return unsignedMessage != null;
         } catch (err) {
-            Logger.error(err);
+            console.error(err);
             return false;
         }
     }
@@ -77,8 +76,8 @@ export class UserPublicKey {
         return this.buffer.toString("hex");
     }
 
-    toAddress(): Address {
-        return new Address(this.buffer);
+    toAddress(): IAddress {
+        return new UserAddress(this.buffer);
     }
 
     valueOf(): Buffer {

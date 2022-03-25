@@ -1,26 +1,24 @@
-import * as errors from "../errors";
 import { assert } from "chai";
-import { loadMnemonic, loadPassword, loadTestWallets, TestWallet } from "../testutils";
 import { UserSecretKey } from "./userKeys";
 import { Mnemonic } from "./mnemonic";
 import { UserWallet } from "./userWallet";
-import { Randomness } from "../crypto";
-import { Address } from "../address";
+import { Randomness } from "./crypto";
+import { UserAddress } from "./userAddress";
 import { UserSigner } from "./userSigner";
-import { Transaction } from "../transaction";
-import { Nonce } from "../nonce";
-import { Balance } from "../balance";
-import { ChainID, GasLimit, GasPrice } from "../networkParams";
-import { TransactionPayload } from "../transactionPayload";
 import { UserVerifier } from "./userVerifier";
-import { SignableMessage } from "../signableMessage";
+import { ErrInvariantFailed } from "./errors";
+import { TestMessage } from "./testutils/message";
+import { DummyMnemonic, DummyPassword, loadTestWallet, TestWallet } from "./testutils/wallets";
+import { TestTransaction } from "./testutils/transaction";
 
 describe("test user wallets", () => {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
-    let password: string;
+    let password: string = DummyPassword;
+
     before(async function () {
-        ({ alice, bob, carol } = await loadTestWallets());
-        password = await loadPassword();
+        alice = await loadTestWallet("alice");
+        bob = await loadTestWallet("bob");
+        carol = await loadTestWallet("carol");
     });
 
     it("should generate mnemonic", () => {
@@ -30,7 +28,7 @@ describe("test user wallets", () => {
     });
 
     it("should derive keys", async () => {
-        let mnemonic = Mnemonic.fromString(await loadMnemonic());
+        let mnemonic = Mnemonic.fromString(DummyMnemonic);
 
         assert.equal(mnemonic.deriveKey(0).hex(), alice.secretKeyHex);
         assert.equal(mnemonic.deriveKey(1).hex(), bob.secretKeyHex);
@@ -51,20 +49,20 @@ describe("test user wallets", () => {
 
         secretKey = new UserSecretKey(Buffer.from(alice.secretKeyHex, "hex"));
         assert.equal(secretKey.generatePublicKey().hex(), alice.address.hex());
-        assert.isTrue(secretKey.generatePublicKey().toAddress().equals(alice.address));
+        assert.deepEqual(secretKey.generatePublicKey().toAddress(), alice.address);
 
         secretKey = new UserSecretKey(Buffer.from(bob.secretKeyHex, "hex"));
         assert.equal(secretKey.generatePublicKey().hex(), bob.address.hex());
-        assert.isTrue(secretKey.generatePublicKey().toAddress().equals(bob.address));
+        assert.deepEqual(secretKey.generatePublicKey().toAddress(), bob.address);
 
         secretKey = new UserSecretKey(Buffer.from(carol.secretKeyHex, "hex"));
         assert.equal(secretKey.generatePublicKey().hex(), carol.address.hex());
-        assert.isTrue(secretKey.generatePublicKey().toAddress().equals(carol.address));
+        assert.deepEqual(secretKey.generatePublicKey().toAddress(), carol.address);
     });
 
     it("should throw error when invalid input", () => {
-        assert.throw(() => new UserSecretKey(Buffer.alloc(42)), errors.ErrInvariantFailed);
-        assert.throw(() => UserSecretKey.fromString("foobar"), errors.ErrInvariantFailed);
+        assert.throw(() => new UserSecretKey(Buffer.alloc(42)), ErrInvariantFailed);
+        assert.throw(() => UserSecretKey.fromString("foobar"), ErrInvariantFailed);
     });
 
     it("should handle PEM files", () => {
@@ -124,18 +122,17 @@ describe("test user wallets", () => {
     it("should sign transactions", async () => {
         let signer = new UserSigner(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf"));
         let verifier = new UserVerifier(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf").generatePublicKey());
-        let sender = new Address("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz");
-        let receiver = new Address("erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r");
-
+        let sender = UserAddress.fromBech32("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz");
+        
         // With data field
-        let transaction = new Transaction({
-            nonce: new Nonce(0),
-            value: Balance.Zero(),
-            receiver: receiver,
-            gasPrice: new GasPrice(1000000000),
-            gasLimit: new GasLimit(50000),
-            data: new TransactionPayload("foo"),
-            chainID: new ChainID("1")
+        let transaction = new TestTransaction({
+            nonce: 0,
+            value: "0",
+            receiver: "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r",
+            gasPrice: 1000000000,
+            gasLimit: 50000,
+            data: "foo",
+            chainID: "1"
         });
 
         let serialized = transaction.serializeForSigning(sender).toString();
@@ -145,13 +142,13 @@ describe("test user wallets", () => {
         assert.equal(transaction.getSignature().hex(), "b5fddb8c16fa7f6123cb32edc854f1e760a3eb62c6dc420b5a4c0473c58befd45b621b31a448c5b59e21428f2bc128c80d0ee1caa4f2bf05a12be857ad451b00");
         assert.isTrue(verifier.verify(transaction));
         // Without data field
-        transaction = new Transaction({
-            nonce: new Nonce(8),
-            value: Balance.fromString("10000000000000000000"),
-            receiver: receiver,
-            gasPrice: new GasPrice(1000000000),
-            gasLimit: new GasLimit(50000),
-            chainID: new ChainID("1")
+        transaction = new TestTransaction({
+            nonce: 8,
+            value: "10000000000000000000",
+            receiver: "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r",
+            gasPrice: 1000000000,
+            gasLimit: 50000,
+            chainID: "1"
         });
 
         serialized = transaction.serializeForSigning(sender).toString();
@@ -164,14 +161,14 @@ describe("test user wallets", () => {
     it("should sign transactions using PEM files", async () => {
         let signer = UserSigner.fromPem(alice.pemFileText);
 
-        let transaction = new Transaction({
-            nonce: new Nonce(0),
-            value: Balance.Zero(),
-            receiver: new Address("erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r"),
-            gasPrice: new GasPrice(1000000000),
-            gasLimit: new GasLimit(50000),
-            data: new TransactionPayload("foo"),
-            chainID: new ChainID("1")
+        let transaction = new TestTransaction({
+            nonce: 0,
+            value: "0",
+            receiver: "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r",
+            gasPrice: 1000000000,
+            gasLimit: 50000,
+            data: "foo",
+            chainID: "1"
         });
 
         await signer.sign(transaction);
@@ -181,8 +178,9 @@ describe("test user wallets", () => {
     it("signs a general message", function () {
         let signer = new UserSigner(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf"));
         let verifier = new UserVerifier(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf").generatePublicKey());
-        const message = new SignableMessage({
-            message: Buffer.from("hello world")
+        const message = new TestMessage({
+            foo: "hello",
+            bar: "world"
         });
 
         signer.sign(message);

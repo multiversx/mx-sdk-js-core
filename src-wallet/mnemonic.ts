@@ -1,7 +1,7 @@
-import * as errors from "../errors";
 import { generateMnemonic, validateMnemonic, mnemonicToSeedSync } from "bip39";
 import { UserSecretKey } from "./userKeys";
 import { derivePath } from "ed25519-hd-key";
+import { ErrWrongMnemonic } from "./errors";
 
 const MNEMONIC_STRENGTH = 256;
 const BIP44_DERIVATION_PREFIX = "m/44'/508'/0'/0'";
@@ -29,7 +29,7 @@ export class Mnemonic {
         let isValid = validateMnemonic(text);
 
         if (!isValid) {
-            throw new errors.ErrWrongMnemonic();
+            throw new ErrWrongMnemonic();
         }
     }
 

@@ -1,14 +1,17 @@
-import * as errors from "../errors";
 import { assert } from "chai";
-import { loadTestWallets, TestWallet } from "../testutils";
 import { parse, parseUserKey, parseValidatorKey } from "./pem";
 import { Buffer } from "buffer";
 import { BLS } from "./validatorKeys";
+import { ErrBadPEM } from "./errors";
+import { loadTestWallet, TestWallet } from "./testutils/wallets";
 
 describe("test PEMs", () => {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
+
     before(async function () {
-        ({ alice, bob, carol } = await loadTestWallets());
+        alice = await loadTestWallet("alice");
+        bob = await loadTestWallet("bob");
+        carol = await loadTestWallet("carol");
     });
 
     it("should parseUserKey", () => {
@@ -81,13 +84,13 @@ ${payloadCarol}
         YjU4YTRmMjVlMzQ0ZThmOTAxMzk0NzJlZmY2ODg2NzcxYTk4MmYzMDgzZGE1ZDQy
         MWYyNGMyOTE4MWU2Mzg4ODIyOGRjODFjYTYwZDY5ZTE=`;
 
-        assert.throw(() => parseUserKey(contentWithoutEnd), errors.ErrBadPEM);
+        assert.throw(() => parseUserKey(contentWithoutEnd), ErrBadPEM);
 
         let contentWithBadData = `-----BEGIN PRIVATE KEY for alice
         NDEzZjQyNTc1ZjdmMjZmYWQzMzE3YTc3ODc3MTIxMmZkYjgwMjQ1ODUwOTgxZTQ4
         YjU4YTRmMjVlMzQ0ZThmOTAxMzk0NzJlZmY2ODg2NzcxYTk4MmYzMDgzZGE1Zfoo
         -----END PRIVATE KEY for alice`;
 
-        assert.throw(() => parseUserKey(contentWithBadData), errors.ErrBadPEM);
+        assert.throw(() => parseUserKey(contentWithBadData), ErrBadPEM);
     });
 });

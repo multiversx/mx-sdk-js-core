@@ -1,17 +1,28 @@
 import { PrimitiveType, PrimitiveValue } from "./types";
 
 export class StringType extends PrimitiveType {
+    static ClassName = "StringType";
+
     constructor() {
         super("utf-8 string");
+    }
+
+    getClassName(): string {
+        return StringType.ClassName;
     }
 }
 
 export class StringValue extends PrimitiveValue {
+    static ClassName = "StringValue";
     private readonly value: string;
 
     constructor(value: string) {
         super(new StringType());
         this.value = value;
+    }
+
+    getClassName(): string {
+        return StringValue.ClassName;
     }
 
     /**

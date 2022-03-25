@@ -1,8 +1,14 @@
 import { Type, TypeCardinality, TypedValue, TypePlaceholder } from "./types";
 
 export class VariadicType extends Type {
+    static ClassName = "VariadicType";
+
     constructor(typeParameter: Type) {
         super("Variadic", [typeParameter], TypeCardinality.variable());
+    }
+
+    getClassName(): string {
+        return VariadicType.ClassName;
     }
 }
 
@@ -13,6 +19,7 @@ export class VariadicType extends Type {
  * this TypedValue behaves similar to a List.
  */
 export class VariadicValue extends TypedValue {
+    static ClassName = "VariadicValue";
     private readonly items: TypedValue[];
 
     /**
@@ -26,6 +33,10 @@ export class VariadicValue extends TypedValue {
         // TODO: assert items are of type type.getFirstTypeParameter()
 
         this.items = items;
+    }
+
+    getClassName(): string {
+        return VariadicValue.ClassName;
     }
 
     static fromItems(...items: TypedValue[]): VariadicValue {

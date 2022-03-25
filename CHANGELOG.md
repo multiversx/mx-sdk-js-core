@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - TBD
 
+## [9.2.4]
+ - [Hardcode class names for classes within erdjs' typesystem.](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/164)
+
 ## [9.2.3]
  - [Fix log level in transaction watcher.](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/160)
 

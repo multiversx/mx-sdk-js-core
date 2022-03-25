@@ -29,25 +29,25 @@ export function onTypeSelect<TResult>(
         onOther?: () => TResult;
     }
 ): TResult {
-    if (type.hasJavascriptConstructorInHierarchy(OptionType.name)) {
+    if (type.hasExactClass(OptionType.ClassName)) {
         return selectors.onOption();
     }
-    if (type.hasJavascriptConstructorInHierarchy(ListType.name)) {
+    if (type.hasExactClass(ListType.ClassName)) {
         return selectors.onList();
     }
-    if (type.hasJavascriptConstructorInHierarchy(ArrayVecType.name)) {
+    if (type.hasExactClass(ArrayVecType.ClassName)) {
         return selectors.onArray();
     }
-    if (type.hasJavascriptConstructorInHierarchy(PrimitiveType.name)) {
+    if (type.hasClassOrSuperclass(PrimitiveType.ClassName)) {
         return selectors.onPrimitive();
     }
-    if (type.hasJavascriptConstructorInHierarchy(StructType.name)) {
+    if (type.hasExactClass(StructType.ClassName)) {
         return selectors.onStruct();
     }
-    if (type.hasJavascriptConstructorInHierarchy(TupleType.name)) {
+    if (type.hasExactClass(TupleType.ClassName)) {
         return selectors.onTuple();
     }
-    if (type.hasJavascriptConstructorInHierarchy(EnumType.name)) {
+    if (type.hasExactClass(EnumType.ClassName)) {
         return selectors.onEnum();
     }
 
@@ -71,25 +71,25 @@ export function onTypedValueSelect<TResult>(
         onOther?: () => TResult;
     }
 ): TResult {
-    if (value.hasJavascriptConstructorInHierarchy(PrimitiveValue.name)) {
+    if (value.hasClassOrSuperclass(PrimitiveValue.ClassName)) {
         return selectors.onPrimitive();
     }
-    if (value.hasJavascriptConstructorInHierarchy(OptionValue.name)) {
+    if (value.hasExactClass(OptionValue.ClassName)) {
         return selectors.onOption();
     }
-    if (value.hasJavascriptConstructorInHierarchy(List.name)) {
+    if (value.hasExactClass(List.ClassName)) {
         return selectors.onList();
     }
-    if (value.hasJavascriptConstructorInHierarchy(ArrayVec.name)) {
+    if (value.hasExactClass(ArrayVec.ClassName)) {
         return selectors.onArray();
     }
-    if (value.hasJavascriptConstructorInHierarchy(Struct.name)) {
+    if (value.hasExactClass(Struct.ClassName)) {
         return selectors.onStruct();
     }
-    if (value.hasJavascriptConstructorInHierarchy(Tuple.name)) {
+    if (value.hasExactClass(Tuple.ClassName)) {
         return selectors.onTuple();
     }
-    if (value.hasJavascriptConstructorInHierarchy(EnumValue.name)) {
+    if (value.hasExactClass(EnumValue.ClassName)) {
         return selectors.onEnum();
     }
 
@@ -114,28 +114,28 @@ export function onPrimitiveValueSelect<TResult>(
         onOther?: () => TResult;
     }
 ): TResult {
-    if (value.hasJavascriptConstructorInHierarchy(BooleanValue.name)) {
+    if (value.hasExactClass(BooleanValue.ClassName)) {
         return selectors.onBoolean();
     }
-    if (value.hasJavascriptConstructorInHierarchy(NumericalValue.name)) {
+    if (value.hasClassOrSuperclass(NumericalValue.ClassName)) {
         return selectors.onNumerical();
     }
-    if (value.hasJavascriptConstructorInHierarchy(AddressValue.name)) {
+    if (value.hasExactClass(AddressValue.ClassName)) {
         return selectors.onAddress();
     }
-    if (value.hasJavascriptConstructorInHierarchy(BytesValue.name)) {
+    if (value.hasExactClass(BytesValue.ClassName)) {
         return selectors.onBytes();
     }
-    if (value.hasJavascriptConstructorInHierarchy(StringValue.name)) {
+    if (value.hasExactClass(StringValue.ClassName)) {
         return selectors.onString();
     }
-    if (value.hasJavascriptConstructorInHierarchy(H256Value.name)) {
+    if (value.hasExactClass(H256Value.ClassName)) {
         return selectors.onH256();
     }
-    if (value.hasJavascriptConstructorInHierarchy(TokenIdentifierValue.name)) {
+    if (value.hasExactClass(TokenIdentifierValue.ClassName)) {
         return selectors.onTypeIdentifier();
     }
-    if (value.hasJavascriptConstructorInHierarchy(NothingValue.name)) {
+    if (value.hasExactClass(NothingValue.ClassName)) {
         return selectors.onNothing();
     }
     if (selectors.onOther) {
@@ -159,28 +159,28 @@ export function onPrimitiveTypeSelect<TResult>(
         onOther?: () => TResult;
     }
 ): TResult {
-    if (type.hasJavascriptConstructorInHierarchy(BooleanType.name)) {
+    if (type.hasExactClass(BooleanType.ClassName)) {
         return selectors.onBoolean();
     }
-    if (type.hasJavascriptConstructorInHierarchy(NumericalType.name)) {
+    if (type.hasClassOrSuperclass(NumericalType.ClassName)) {
         return selectors.onNumerical();
     }
-    if (type.hasJavascriptConstructorInHierarchy(AddressType.name)) {
+    if (type.hasExactClass(AddressType.ClassName)) {
         return selectors.onAddress();
     }
-    if (type.hasJavascriptConstructorInHierarchy(BytesType.name)) {
+    if (type.hasExactClass(BytesType.ClassName)) {
         return selectors.onBytes();
     }
-    if (type.hasJavascriptConstructorInHierarchy(StringType.name)) {
+    if (type.hasExactClass(StringType.ClassName)) {
         return selectors.onString();
     }
-    if (type.hasJavascriptConstructorInHierarchy(H256Type.name)) {
+    if (type.hasExactClass(H256Type.ClassName)) {
         return selectors.onH256();
     }
-    if (type.hasJavascriptConstructorInHierarchy(TokenIdentifierType.name)) {
+    if (type.hasExactClass(TokenIdentifierType.ClassName)) {
         return selectors.onTokenIndetifier();
     }
-    if (type.hasJavascriptConstructorInHierarchy(NothingType.name)) {
+    if (type.hasExactClass(NothingType.ClassName)) {
         return selectors.onNothing();
     }
     if (selectors.onOther) {

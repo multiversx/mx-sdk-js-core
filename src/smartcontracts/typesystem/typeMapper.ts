@@ -100,12 +100,12 @@ export class TypeMapper {
     mapRecursiveType(type: Type): Type | null {
         let isGeneric = type.isGenericType();
 
-        if (type.hasJavascriptConstructor(EnumType.name)) {
+        if (type.hasExactClass(EnumType.ClassName)) {
             // This will call mapType() recursively, for all the enum variant fields.
             return this.mapEnumType(<EnumType>type);
         }
 
-        if (type.hasJavascriptConstructor(StructType.name)) {
+        if (type.hasExactClass(StructType.ClassName)) {
             // This will call mapType() recursively, for all the struct's fields.
             return this.mapStructType(<StructType>type);
         }

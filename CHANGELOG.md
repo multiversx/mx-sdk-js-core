@@ -7,7 +7,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - TBD
 
-## [10.0.0]
+## [10.0.0-beta.2]
+ - [Hardcode class names for classes within erdjs' typesystem.](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/165)
+
+## [10.0.0-beta.1]
  - [Breaking changes: improve contract interactions and interpretation of contract results](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/159)
  
 **Breaking changes**
@@ -36,6 +39,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Added missing tests for some components: `nativeSerializer`, `struct`, `enum`.
  - Added utility function `OptionalValue.newMissing()`. Added "fake" covariance wrt. "null type parameter" (when value is missing) on `OptionalType`.
  - Added utility functions (typed value factories): `createListOfAddresses`, `createListOfTokenIdentifiers`.
+
+## [9.2.4]
+ - [Hardcode class names for classes within erdjs' typesystem.](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/164)
 
 ## [9.2.3]
  - [Fix log level in transaction watcher.](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/160)

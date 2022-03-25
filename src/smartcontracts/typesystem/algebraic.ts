@@ -5,22 +5,29 @@ import { NullType, Type, TypeCardinality, TypedValue } from "./types";
  * An optional is an algebraic type. It holds zero or one values.
  */
 export class OptionalType extends Type {
+    static ClassName = "OptionalType";
+
     constructor(typeParameter: Type) {
         super("Optional", [typeParameter], TypeCardinality.variable(1));
     }
 
+    getClassName(): string {
+        return OptionalType.ClassName;
+    }
+
     isAssignableFrom(type: Type): boolean {
-        if (!(type.hasJavascriptConstructor(OptionalType.name))) {
+        if (!(type.hasExactClass(OptionalType.ClassName))) {
             return false;
         }
 
         let invariantTypeParameters = this.getFirstTypeParameter().equals(type.getFirstTypeParameter());
-        let fakeCovarianceToNull = type.getFirstTypeParameter().hasJavascriptConstructor(NullType.name);
+        let fakeCovarianceToNull = type.getFirstTypeParameter().hasExactClass(NullType.ClassName);
         return invariantTypeParameters || fakeCovarianceToNull;
     }
 }
 
 export class OptionalValue extends TypedValue {
+    static ClassName = "OptionalValue";
     private readonly value: TypedValue | null;
 
     constructor(type: OptionalType, value: TypedValue | null = null) {
@@ -29,6 +36,10 @@ export class OptionalValue extends TypedValue {
         // TODO: assert value is of type type.getFirstTypeParameter()
 
         this.value = value;
+    }
+
+    getClassName(): string {
+        return OptionalValue.ClassName;
     }
 
     /**

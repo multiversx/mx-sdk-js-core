@@ -4,30 +4,43 @@ import { Type, TypedValue, NullType, TypePlaceholder } from "./types";
 
 // TODO: Move to a new file, "genericOption.ts"
 export class OptionType extends Type {
+    static ClassName = "OptionType";
+
     constructor(typeParameter: Type) {
         super("Option", [typeParameter]);
     }
 
+    getClassName(): string {
+        return OptionType.ClassName;
+    }
+
     isAssignableFrom(type: Type): boolean {
-        if (!(type.hasJavascriptConstructor(OptionType.name))) {
+        if (!(type.hasExactClass(OptionType.ClassName))) {
             return false;
         }
 
         let invariantTypeParameters = this.getFirstTypeParameter().equals(type.getFirstTypeParameter());
-        let fakeCovarianceToNull = type.getFirstTypeParameter().hasJavascriptConstructor(NullType.name);
+        let fakeCovarianceToNull = type.getFirstTypeParameter().hasExactClass(NullType.ClassName);
         return invariantTypeParameters || fakeCovarianceToNull;
     }
 }
 
 // TODO: Move to a new file, "genericList.ts"
 export class ListType extends Type {
+    static ClassName = "ListType";
+
     constructor(typeParameter: Type) {
         super("List", [typeParameter]);
+    }
+
+    getClassName(): string {
+        return ListType.ClassName;
     }
 }
 
 // TODO: Move to a new file, "genericOption.ts"
 export class OptionValue extends TypedValue {
+    static ClassName = "OptionValue";
     private readonly value: TypedValue | null;
 
     constructor(type: OptionType, value: TypedValue | null = null) {
@@ -36,6 +49,10 @@ export class OptionValue extends TypedValue {
         // TODO: assert value is of type type.getFirstTypeParameter()
 
         this.value = value;
+    }
+
+    getClassName(): string {
+        return OptionValue.ClassName;
     }
 
     /**
@@ -80,6 +97,7 @@ export class OptionValue extends TypedValue {
 // TODO: Rename to ListValue, for consistency (though the term is slighly unfortunate).
 // Question for review: or not?
 export class List extends TypedValue {
+    static ClassName = "List";
     private readonly backingCollection: CollectionOfTypedValues;
 
     /**
@@ -93,6 +111,10 @@ export class List extends TypedValue {
         // TODO: assert items are of type type.getFirstTypeParameter()
 
         this.backingCollection = new CollectionOfTypedValues(items);
+    }
+
+    getClassName(): string {
+        return List.ClassName;
     }
 
     static fromItems(items: TypedValue[]): List {

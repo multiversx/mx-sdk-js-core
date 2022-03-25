@@ -1,8 +1,14 @@
 import { PrimitiveType, PrimitiveValue } from "./types";
 
 export class BooleanType extends PrimitiveType {
+    static ClassName = "BooleanType";
+
     constructor() {
         super("bool");
+    }
+
+    getClassName(): string {
+        return BooleanType.ClassName;
     }
 }
 
@@ -10,11 +16,16 @@ export class BooleanType extends PrimitiveType {
  * A boolean value fed to or fetched from a Smart Contract contract, as an immutable abstraction.
  */
 export class BooleanValue extends PrimitiveValue {
+    static ClassName = "BooleanValue";
     private readonly value: boolean;
 
     constructor(value: boolean) {
         super(new BooleanType());
         this.value = value;
+    }
+
+    getClassName(): string {
+        return BooleanValue.ClassName;
     }
 
     /**

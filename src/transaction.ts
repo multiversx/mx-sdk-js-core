@@ -318,7 +318,7 @@ export class Transaction implements ISignable {
   /**
    * Applies the signature on the transaction.
    *
-   * @param signature The signature, as computed by a {@link ISigner}.
+   * @param signature The signature, as computed by a signer.
    * @param signedBy The address of the signer.
    */
   applySignature(signature: Signature, signedBy: Address) {

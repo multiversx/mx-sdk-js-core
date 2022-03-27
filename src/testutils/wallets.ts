@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Account } from "../account";
 import { Address } from "../address";
-import { IProvider, ISigner } from "../interface";
+import { IProvider } from "../interface";
 import { isOnBrowserTests } from "./utils";
 import { UserSecretKey, UserSigner } from "@elrondnetwork/erdjs-walletcore"
 

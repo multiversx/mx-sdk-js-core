@@ -1,7 +1,6 @@
 import {ISignable} from "./interface";
 import {Signature} from "./signature";
 import {Address} from "./address";
-import {sign} from "crypto";
 const createKeccakHash = require("keccak");
 
 export const MESSAGE_PREFIX = "\x17Elrond Signed Message:\n";

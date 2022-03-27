@@ -121,9 +121,9 @@ export interface ISignable {
      * Applies the computed signature on the object itself.
      *
      * @param signature The computed signature
-     * @param signedBy The address of the {@link Signer}
+     * @param signedBy The address of the signer
      */
-    applySignature(signature: Signature, signedBy: Address): void;
+    applySignature(signature: any, signedBy: any): void;
 }
 
 /**

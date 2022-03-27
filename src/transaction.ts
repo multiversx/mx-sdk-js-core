@@ -20,6 +20,7 @@ import { TransactionWatcher } from "./transactionWatcher";
 import { ProtoSerializer } from "./proto";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Hash } from "./hash";
+import { adaptToAddress, adaptToSignature } from "./boundaryAdapters";
 
 const createTransactionHasher = require("blake2b");
 const TRANSACTION_HASH_LENGTH = 32;
@@ -255,7 +256,9 @@ export class Transaction implements ISignable {
    *
    * @param signedBy The address of the future signer
    */
-  serializeForSigning(signedBy: Address): Buffer {
+  serializeForSigning(signedBy: any): Buffer {
+    signedBy = adaptToAddress(signedBy);
+
     // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
     let plain = this.toPlainObject(signedBy);
     // Make sure we never sign the transaction with another signature set up (useful when using the same method for verification)
@@ -321,7 +324,10 @@ export class Transaction implements ISignable {
    * @param signature The signature, as computed by a signer.
    * @param signedBy The address of the signer.
    */
-  applySignature(signature: Signature, signedBy: Address) {
+  applySignature(signature: any, signedBy: any) {
+    signature = adaptToSignature(signature)
+    signedBy = adaptToAddress(signedBy);
+    
     guardEmpty(this.signature, "signature");
     guardEmpty(this.hash, "hash");
 

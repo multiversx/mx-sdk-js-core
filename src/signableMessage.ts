@@ -1,6 +1,7 @@
 import {ISignable} from "./interface";
-import {Signature} from "./signature";
-import {Address} from "./address";
+import { Signature } from "./signature";
+import { Address } from "./address";
+import { adaptToSignature } from "./boundaryAdapters";
 const createKeccakHash = require("keccak");
 
 export const MESSAGE_PREFIX = "\x17Elrond Signed Message:\n";
@@ -57,8 +58,8 @@ export class SignableMessage implements ISignable {
     return this.signature;
   }
 
-  applySignature(signature: Signature): void {
-    this.signature = signature;
+  applySignature(signature: any): void {
+    this.signature = adaptToSignature(signature);
   }
 
   getMessageSize(): Buffer {

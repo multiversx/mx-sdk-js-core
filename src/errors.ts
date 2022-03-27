@@ -104,7 +104,7 @@ export class ErrBadType extends Err {
  */
 export class ErrInvariantFailed extends Err {
   public constructor(message: string) {
-    super(`"Invariant failed: ${message}`);
+    super(`Invariant failed: [${message}]`);
   }
 }
 
@@ -133,15 +133,6 @@ export class ErrAddressBadHrp extends Err {
 export class ErrAddressEmpty extends Err {
   public constructor() {
     super(`Address is empty`);
-  }
-}
-
-/**
- * Signals an error related to signing a message (a transaction).
- */
-export class ErrSignerCannotSign extends Err {
-  public constructor(inner: Error) {
-    super(`Cannot sign`, inner);
   }
 }
 

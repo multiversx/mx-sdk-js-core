@@ -115,7 +115,7 @@ export interface ISignable {
     /**
      * Returns the signable object in its raw form - a sequence of bytes to be signed.
      */
-    serializeForSigning(signedBy: Address): Buffer;
+    serializeForSigning(signedBy: IAddressOfSigner): Buffer;
 
     /**
      * Applies the computed signature on the object itself.
@@ -123,7 +123,7 @@ export interface ISignable {
      * @param signature The computed signature
      * @param signedBy The address of the signer
      */
-    applySignature(signature: any, signedBy: any): void;
+    applySignature(signature: ISignatureOfSignable, signedBy: IAddressOfSigner): void;
 }
 
 /**
@@ -145,4 +145,12 @@ export interface IVerifiable {
  */
 export interface Disposable {
     dispose(): void;
+}
+
+export interface ISignatureOfSignable {
+    hex(): string;
+}
+
+export interface IAddressOfSigner {
+    bech32(): string;
 }

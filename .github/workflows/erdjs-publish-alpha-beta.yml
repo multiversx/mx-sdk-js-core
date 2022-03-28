@@ -29,7 +29,7 @@ jobs:
           echo "" >> notes.txt
 
           RELEASE_TAG=v$(node -p "require('./package.json').version")
-          gh release create --prerelease $RELEASE_TAG --title="$RELEASE_TAG" --generate-notes --notes-file=notes.txt
+          gh release create --prerelease $RELEASE_TAG --target=$GITHUB_SHA --title="$RELEASE_TAG" --generate-notes --notes-file=notes.txt
 
       - run: npm ci
       - run: npm test

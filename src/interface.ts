@@ -109,25 +109,6 @@ export interface IApiProvider extends ITransactionFetcher {
 }
 
 /**
- * An interface that defines a signing-capable object.
- */
-export interface ISigner {
-    /**
-     * Gets the {@link Address} of the signer.
-     */
-    getAddress(): Address;
-
-    /**
-     * Signs a message (e.g. a {@link Transaction}).
-     */
-    sign(signable: ISignable): Promise<void>;
-}
-
-export interface IVerifier {
-    verify(message: IVerifiable): boolean;
-}
-
-/**
  * An interface that defines a signable object (e.g. a {@link Transaction}).
  */
 export interface ISignable {
@@ -140,9 +121,9 @@ export interface ISignable {
      * Applies the computed signature on the object itself.
      *
      * @param signature The computed signature
-     * @param signedBy The address of the {@link Signer}
+     * @param signedBy The address of the signer
      */
-    applySignature(signature: Signature, signedBy: Address): void;
+    applySignature(signature: any, signedBy: any): void;
 }
 
 /**

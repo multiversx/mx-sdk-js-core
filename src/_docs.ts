@@ -11,4 +11,3 @@ export * from "./networkConfig";
 export * from "./networkStake";
 export * from "./networkParams";
 export * from "./utils";
-export * from "./nullSigner";

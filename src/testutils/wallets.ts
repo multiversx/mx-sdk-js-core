@@ -3,10 +3,9 @@ import * as fs from "fs";
 import * as path from "path";
 import { Account } from "../account";
 import { Address } from "../address";
-import { IProvider, ISigner } from "../interface";
-import { UserSecretKey } from "../walletcore";
-import { UserSigner } from "../walletcore/userSigner";
+import { IProvider } from "../interface";
 import { isOnBrowserTests } from "./utils";
+import { UserSecretKey, UserSigner } from "@elrondnetwork/erdjs-walletcore"
 
 export async function loadAndSyncTestWallets(provider: IProvider): Promise<Record<string, TestWallet>> {
     let wallets = await loadTestWallets();
@@ -67,7 +66,7 @@ export class TestWallet {
     readonly address: Address;
     readonly secretKeyHex: string;
     readonly secretKey: Buffer;
-    readonly signer: ISigner;
+    readonly signer: UserSigner;
     readonly keyFileObject: any;
     readonly pemFileText: any;
     readonly account: Account;

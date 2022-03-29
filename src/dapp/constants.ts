@@ -19,9 +19,5 @@ export const WALLET_PROVIDER_SIGN_TRANSACTION_URL = "/hook/sign";
 export const WALLET_PROVIDER_CALLBACK_PARAM = "walletProviderStatus";
 export const WALLET_PROVIDER_CALLBACK_PARAM_TX_SIGNED = "transactionsSigned";
 
-// This constant represents the minimum version in which the Elrond Ledger App doesn't support anymore regular
-// transactions' signing, and uses transaction's hash signing instead
-export const LEDGER_TX_HASH_SIGN_MIN_VERSION = "1.0.11";
-
 // Wallet Connect ChainId for Elrond blockchain
 export const WALLETCONNECT_ELROND_CHAIN_ID = 508;

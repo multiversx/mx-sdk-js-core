@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IProvider, ISignable, ITransactionFetcher } from "./interface";
+import { IAddressOfExternalSigner, IProvider, ISignable, ISignatureOfExternalSigner, ITransactionFetcher } from "./interface";
 import { Address } from "./address";
 import { Balance } from "./balance";
 import {
@@ -256,11 +256,11 @@ export class Transaction implements ISignable {
    *
    * @param signedBy The address of the future signer
    */
-  serializeForSigning(signedBy: any): Buffer {
-    signedBy = adaptToAddress(signedBy);
+  serializeForSigning(signedBy: IAddressOfExternalSigner): Buffer {
+    let adaptedSignedBy = adaptToAddress(signedBy);
 
     // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
-    let plain = this.toPlainObject(signedBy);
+    let plain = this.toPlainObject(adaptedSignedBy);
     // Make sure we never sign the transaction with another signature set up (useful when using the same method for verification)
     if (plain.signature) {
       delete plain.signature;
@@ -324,18 +324,18 @@ export class Transaction implements ISignable {
    * @param signature The signature, as computed by a signer.
    * @param signedBy The address of the signer.
    */
-  applySignature(signature: any, signedBy: any) {
-    signature = adaptToSignature(signature)
-    signedBy = adaptToAddress(signedBy);
+  applySignature(signature: ISignatureOfExternalSigner, signedBy: IAddressOfExternalSigner) {
+    let adaptedSignature = adaptToSignature(signature);
+    let adaptedSignedBy = adaptToAddress(signedBy);
     
     guardEmpty(this.signature, "signature");
     guardEmpty(this.hash, "hash");
 
-    this.signature = signature;
-    this.sender = signedBy;
+    this.signature = adaptedSignature;
+    this.sender = adaptedSignedBy;
 
     this.hash = TransactionHash.compute(this);
-    this.onSigned.emit({ transaction: this, signedBy: signedBy });
+    this.onSigned.emit({ transaction: this, signedBy: adaptedSignedBy });
   }
 
   /**

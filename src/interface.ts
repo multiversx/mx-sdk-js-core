@@ -115,7 +115,7 @@ export interface ISignable {
     /**
      * Returns the signable object in its raw form - a sequence of bytes to be signed.
      */
-    serializeForSigning(signedBy: Address): Buffer;
+    serializeForSigning(signedBy: IAddressOfExternalSigner): Buffer;
 
     /**
      * Applies the computed signature on the object itself.
@@ -123,7 +123,7 @@ export interface ISignable {
      * @param signature The computed signature
      * @param signedBy The address of the signer
      */
-    applySignature(signature: any, signedBy: any): void;
+    applySignature(signature: ISignatureOfExternalSigner, signedBy: IAddressOfExternalSigner): void;
 }
 
 /**
@@ -145,4 +145,20 @@ export interface IVerifiable {
  */
 export interface Disposable {
     dispose(): void;
+}
+
+/**
+ * An interface that defines the signature, as computed by an external (to erdjs) signer.
+ * Implementations are outside of erdjs.
+ */
+export interface ISignatureOfExternalSigner {
+    hex(): string;
+}
+
+/**
+ * An interface that defines the address of an external (to erdjs) signer.
+ * Implementations are outside of erdjs.
+ */
+export interface IAddressOfExternalSigner {
+    bech32(): string;
 }

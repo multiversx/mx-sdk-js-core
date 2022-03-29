@@ -28,8 +28,6 @@
   "author": "ElrondNetwork",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@babel/runtime": "7.11.2",
-    "@walletconnect/client": "1.6.5",
     "abort-controller": "3.0.0",
     "axios": "0.24.0",
     "bech32": "1.1.4",
@@ -42,8 +40,6 @@
     "qs": "6.10.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.0",
-    "@babel/preset-env": "^7.15.0",
     "@elrondnetwork/erdjs-walletcore": "1.0.0",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",

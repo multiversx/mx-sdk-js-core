@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IAddressOfSigner, IProvider, ISignable, ISignatureOfSignable, ITransactionFetcher } from "./interface";
+import { IAddressOfExternalSigner, IProvider, ISignable, ISignatureOfExternalSigner, ITransactionFetcher } from "./interface";
 import { Address } from "./address";
 import { Balance } from "./balance";
 import {
@@ -256,7 +256,7 @@ export class Transaction implements ISignable {
    *
    * @param signedBy The address of the future signer
    */
-  serializeForSigning(signedBy: IAddressOfSigner): Buffer {
+  serializeForSigning(signedBy: IAddressOfExternalSigner): Buffer {
     let adaptedSignedBy = adaptToAddress(signedBy);
 
     // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
@@ -324,7 +324,7 @@ export class Transaction implements ISignable {
    * @param signature The signature, as computed by a signer.
    * @param signedBy The address of the signer.
    */
-  applySignature(signature: ISignatureOfSignable, signedBy: IAddressOfSigner) {
+  applySignature(signature: ISignatureOfExternalSigner, signedBy: IAddressOfExternalSigner) {
     let adaptedSignature = adaptToSignature(signature);
     let adaptedSignedBy = adaptToAddress(signedBy);
     

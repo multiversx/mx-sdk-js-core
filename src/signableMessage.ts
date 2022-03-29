@@ -1,4 +1,4 @@
-import { ISignable, ISignatureOfSignable } from "./interface";
+import { ISignable, ISignatureOfExternalSigner } from "./interface";
 import { Signature } from "./signature";
 import { Address } from "./address";
 import { adaptToSignature } from "./boundaryAdapters";
@@ -58,7 +58,7 @@ export class SignableMessage implements ISignable {
     return this.signature;
   }
 
-  applySignature(signature: ISignatureOfSignable): void {
+  applySignature(signature: ISignatureOfExternalSigner): void {
     this.signature = adaptToSignature(signature);
   }
 

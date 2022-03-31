@@ -4,6 +4,7 @@ import { TransactionHash, TransactionStatus } from "./transaction";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Logger } from "./logger";
 import { Err, ErrExpectedTransactionStatusNotReached, ErrTransactionWatcherTimeout } from "./errors";
+import { Address } from "./address";
 
 export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
 export type ActionOnStatusReceived = (status: TransactionStatus) => void;
@@ -39,7 +40,7 @@ export class TransactionWatcher {
         pollingInterval: number = TransactionWatcher.DefaultPollingInterval,
         timeout: number = TransactionWatcher.DefaultTimeout
     ) {
-        this.fetcher = fetcher;
+        this.fetcher = new TransactionFetcherWithTracing(fetcher);
         this.pollingInterval = pollingInterval;
         this.timeout = timeout;
     }
@@ -136,5 +137,23 @@ export class TransactionWatcher {
             let error = createError();
             throw error;
         }
+    }
+}
+
+class TransactionFetcherWithTracing implements ITransactionFetcher {
+    private readonly fetcher: ITransactionFetcher;
+
+    constructor(fetcher: ITransactionFetcher) {
+        this.fetcher = fetcher;
+    }
+
+    async getTransaction(txHash: TransactionHash, hintSender?: Address, withResults?: boolean): Promise<TransactionOnNetwork> {
+        Logger.debug(`transactionWatcher, getTransaction(${txHash.toString()})`);
+        return await this.fetcher.getTransaction(txHash, hintSender, withResults);
+    }
+
+    async getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus> {
+        Logger.debug(`transactionWatcher, getTransactionStatus(${txHash.toString()})`);
+        return await this.fetcher.getTransactionStatus(txHash);
     }
 }

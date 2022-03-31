@@ -29,8 +29,6 @@ export class SmartContract implements ISmartContract {
     private code: Code = Code.nothing();
     private codeMetadata: CodeMetadata = new CodeMetadata();
     private abi?: SmartContractAbi;
-    // TODO: Perhaps remove this?
-    private readonly trackOfTransactions: Transaction[] = [];
 
     /**
      * This object contains a function for each endpoint defined by the contract.
@@ -167,8 +165,6 @@ export class SmartContract implements ISmartContract {
         let nonce = transaction.getNonce();
         let address = SmartContract.computeAddress(this.owner, nonce);
         this.setAddress(address);
-
-        this.trackOfTransactions.push(transaction);
     }
 
     /**
@@ -194,13 +190,8 @@ export class SmartContract implements ISmartContract {
 
         this.code = code;
         this.codeMetadata = codeMetadata;
-        transaction.onSigned.on(this.onUpgradeSigned.bind(this));
 
         return transaction;
-    }
-
-    private onUpgradeSigned({ transaction }: { transaction: Transaction, signedBy: Address }) {
-        this.trackOfTransactions.push(transaction);
     }
 
     /**
@@ -222,13 +213,7 @@ export class SmartContract implements ISmartContract {
             data: payload
         });
 
-        transaction.onSigned.on(this.onCallSigned.bind(this));
-
         return transaction;
-    }
-
-    private onCallSigned({ transaction }: { transaction: Transaction, signedBy: Address }) {
-        this.trackOfTransactions.push(transaction);
     }
 
     async runQuery(

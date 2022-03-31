@@ -23,6 +23,7 @@ import { Egld } from "../../balanceBuilder";
 import { Balance } from "../../balance";
 import { ExecutionResultsBundle, findImmediateResult, interpretExecutionResults } from "./deprecatedContractResults";
 import { Result } from "./result";
+import { TransactionWatcher } from "../../transactionWatcher";
 
 /**
  * Provides a simple interface in order to easily call or query the smart contract's methods.
@@ -186,8 +187,8 @@ export class ContractWrapper extends ChainSendContext {
         sender.account.incrementNonce();
 
         logger?.transactionSent(transaction);
-        await transaction.awaitExecuted(provider);
-        let transactionOnNetwork = await transaction.getAsOnNetwork(provider, true, false, true);
+        await new TransactionWatcher(provider).awaitExecuted(transaction);
+        let transactionOnNetwork = await transaction.getAsOnNetwork(provider, true, true);
         if (transaction.getStatus().isFailed()) {
             // TODO: extract the error messages
             //let results = transactionOnNetwork.results.getAllResults();

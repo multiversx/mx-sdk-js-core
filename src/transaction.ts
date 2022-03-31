@@ -34,8 +34,6 @@ export class Transaction implements ISignable {
     signedBy: Address;
   }>;
   readonly onSent: TypedEvent<{ transaction: Transaction }>;
-  readonly onStatusUpdated: TypedEvent<{ transaction: Transaction }>;
-  readonly onStatusChanged: TypedEvent<{ transaction: Transaction }>;
 
   /**
    * The nonce of the transaction (the account sequence number of the sender).
@@ -152,8 +150,6 @@ export class Transaction implements ISignable {
 
     this.onSigned = new TypedEvent();
     this.onSent = new TypedEvent();
-    this.onStatusUpdated = new TypedEvent();
-    this.onStatusChanged = new TypedEvent();
   }
 
   getNonce(): Nonce {
@@ -379,24 +375,18 @@ export class Transaction implements ISignable {
    *
    * @param fetcher The transaction fetcher to use
    * @param cacheLocally Whether to cache the response locally, on the transaction object
-   * @param awaitNotarized Whether to wait for the transaction to be notarized
    * @param withResults Whether to wait for the transaction results
    */
   async getAsOnNetwork(
     fetcher: ITransactionFetcher,
     cacheLocally = true,
-    awaitNotarized = true,
     withResults = true
   ): Promise<TransactionOnNetwork> {
     if (this.hash.isEmpty()) {
       throw new errors.ErrTransactionHashUnknown();
     }
 
-    // For Smart Contract transactions, wait for their full execution & notarization before returning.
-    let isSmartContractTransaction = this.receiver.isContractAddress();
-    if (isSmartContractTransaction && awaitNotarized) {
-      await this.awaitNotarized(fetcher);
-    }
+    await new TransactionWatcher(fetcher).awaitExecuted(this);
 
     let response = await fetcher.getTransaction(
       this.hash,
@@ -463,40 +453,6 @@ export class Transaction implements ISignable {
     let processingFee = diff.multipliedBy(modifiedGasPrice);
 
     return feeForMove.plus(processingFee);
-  }
-
-  /**
-   * Awaits for a transaction to reach its "pending" state - that is, for the transaction to be accepted in the mempool.
-   * Performs polling against the provider, via a {@link TransactionWatcher}.
-   */
-  async awaitPending(fetcher: ITransactionFetcher): Promise<void> {
-    let watcher = new TransactionWatcher(this.hash, fetcher);
-    await watcher.awaitPending(this.notifyStatusUpdate.bind(this));
-  }
-
-  /**
-   * Awaits for a transaction to reach its "executed" state - that is, for the transaction to be processed (whether with success or with errors).
-   * Performs polling against the provider, via a {@link TransactionWatcher}.
-   */
-  async awaitExecuted(fetcher: ITransactionFetcher): Promise<void> {
-    let watcher = new TransactionWatcher(this.hash, fetcher);
-    await watcher.awaitExecuted(this.notifyStatusUpdate.bind(this));
-  }
-
-  private notifyStatusUpdate(newStatus: TransactionStatus) {
-    let sameStatus = this.status.equals(newStatus);
-
-    this.onStatusUpdated.emit({ transaction: this });
-
-    if (!sameStatus) {
-      this.status = newStatus;
-      this.onStatusChanged.emit({ transaction: this });
-    }
-  }
-
-  async awaitNotarized(fetcher: ITransactionFetcher): Promise<void> {
-    let watcher = new TransactionWatcher(this.hash, fetcher);
-    await watcher.awaitNotarized();
   }
 }
 

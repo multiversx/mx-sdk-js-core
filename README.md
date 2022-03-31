@@ -109,11 +109,8 @@ await tx1.send(provider);
 await tx2.send(provider);
 await tx3.send(provider);
 
-await tx1.awaitExecuted(provider);
-await tx2.awaitPending(provider);
-
-let watcher = new TransactionWatcher(tx3.hash, provider);
-await watcher.awaitStatus(status => status.isExecuted());
+let watcher = new TransactionWatcher(provider);
+await Promise.all([watcher.awaitExecuted(tx1), watcher.awaitExecuted(tx2), watcher.awaitExecuted(tx3)]);
 ```
 
 ### Managing the sender nonce locally

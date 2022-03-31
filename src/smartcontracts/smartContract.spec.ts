@@ -9,11 +9,14 @@ import { TransactionStatus } from "../transaction";
 import { ContractFunction } from "./function";
 import { U32Value } from "./typesystem";
 import { BytesValue } from "./typesystem/bytes";
+import { TransactionWatcher } from "../transactionWatcher";
 
 
 describe("test contract", () => {
     let provider = new MockProvider();
     let alice: TestWallet;
+    let transactionWatcher = new TransactionWatcher(provider);
+
     before(async function () {
         ({ alice } = await loadTestWallets());
     });
@@ -60,7 +63,7 @@ describe("test contract", () => {
 
         await Promise.all([
             provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
-            deployTransaction.awaitExecuted(provider)
+            transactionWatcher.awaitExecuted(deployTransaction)
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hash)).isExecuted());
@@ -107,8 +110,8 @@ describe("test contract", () => {
         await Promise.all([
             provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
             provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
-            callTransactionOne.awaitExecuted(provider),
-            callTransactionTwo.awaitExecuted(provider)
+            transactionWatcher.awaitExecuted(callTransactionOne),
+            transactionWatcher.awaitExecuted(callTransactionTwo)
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hashOne)).isExecuted());

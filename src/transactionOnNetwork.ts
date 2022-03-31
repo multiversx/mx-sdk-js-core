@@ -53,6 +53,7 @@ export class TransactionOnNetwork {
         gasLimit: number,
         data: string,
         status: string,
+        pendingResults: boolean,
         timestamp: number,
         blockNonce: number;
         hyperblockNonce: number,
@@ -77,6 +78,12 @@ export class TransactionOnNetwork {
         transactionOnNetwork.data = TransactionPayload.fromEncoded(response.data);
         transactionOnNetwork.status = new TransactionStatus(response.status);
         transactionOnNetwork.timestamp = response.timestamp || 0;
+
+        // Only applicable to API responses (not applicable to Gateway responses).
+        // We override the status.
+        if (response.pendingResults) {
+            transactionOnNetwork.status = new TransactionStatus("pending");
+        }
 
         transactionOnNetwork.blockNonce = new Nonce(response.blockNonce || 0);
         transactionOnNetwork.hyperblockNonce = new Nonce(response.hyperblockNonce || 0);

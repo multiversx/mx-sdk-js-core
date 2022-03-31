@@ -3,11 +3,11 @@ import { AsyncTimer } from "./asyncTimer";
 import { TransactionHash, TransactionStatus } from "./transaction";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Logger } from "./logger";
-import { Err, ErrExpectedTransactionStatusNotReached, ErrTransactionWatcherTimeout } from "./errors";
+import { Err, ErrExpectedTransactionStatusNotReached } from "./errors";
 import { Address } from "./address";
+import { TransactionCompletionAlgorithm } from "./transactionCompletionAlgorithm";
 
 export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
-export type ActionOnStatusReceived = (status: TransactionStatus) => void;
 
 /**
  * Internal interface: a transaction, as seen from the perspective of an {@link TransactionWatcher}.
@@ -48,43 +48,31 @@ export class TransactionWatcher {
     /**
      * Waits until the transaction reaches the "pending" status.
      */
-    public async awaitPending(transaction: ITransaction, onStatusReceived?: ActionOnStatusReceived): Promise<void> {
+    public async awaitPending(transaction: ITransaction): Promise<void> {
         let isPending = (status: TransactionStatus) => status.isPending();
         let doFetch = async () => await this.fetcher.getTransactionStatus(transaction.getHash());
-        let onPending = onStatusReceived || TransactionWatcher.NoopOnStatusReceived;
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
         
         return this.awaitConditionally<TransactionStatus>(
             isPending,
             doFetch,
-            onPending,
             errorProvider
         );
     }
 
     /**
-      * Waits until the transaction reaches the "executed" status.
+      * Waits until the transaction is completely processed.
       */
-    public async awaitExecuted(transaction: ITransaction, onStatusReceived?: ActionOnStatusReceived): Promise<void> {
-        let isExecuted = (status: TransactionStatus) => status.isExecuted();
-        let doFetch = async () => await this.fetcher.getTransactionStatus(transaction.getHash());
-        let onExecuted = onStatusReceived || TransactionWatcher.NoopOnStatusReceived;
+    public async awaitCompletion(transaction: ITransaction): Promise<void> {
+        let algorithm = new TransactionCompletionAlgorithm();
+
+        let isCompleted = algorithm.isCompleted;
+        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash());
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
-                
-        // // For Smart Contract transactions, wait for their full execution & notarization before returning.
-        // let isSmartContractTransaction = this.receiver.isContractAddress();
-        // if (isSmartContractTransaction && awaitNotarized) {
-        //   await this.awaitNotarized(fetcher);
-        // }
 
-        // let isNotarized = (data: TransactionOnNetwork) => !data.hyperblockHash.isEmpty();
-        // let doFetch = async () => await this.fetcher.getTransaction(this.hash);
-        // let errorProvider = () => new ErrTransactionWatcherTimeout();
-
-        return this.awaitConditionally<TransactionStatus>(
-            isExecuted,
+        return this.awaitConditionally<TransactionOnNetwork>(
+            isCompleted,
             doFetch,
-            onExecuted,
             errorProvider
         );
     }
@@ -92,7 +80,6 @@ export class TransactionWatcher {
     private async awaitConditionally<TData>(
         isSatisfied: (data: TData) => boolean,
         doFetch: () => Promise<TData>,
-        onFetched: (data: TData) => void,
         createError: () => Err
     ): Promise<void> {
         let periodicTimer = new AsyncTimer("watcher:periodic");
@@ -112,10 +99,6 @@ export class TransactionWatcher {
             try {
                 fetchedData = await doFetch();
                 
-                if (onFetched) {
-                    onFetched(fetchedData);
-                }
-
                 if (isSatisfied(fetchedData) || stop) {
                     break;
                 }

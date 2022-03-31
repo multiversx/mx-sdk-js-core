@@ -63,7 +63,7 @@ describe("test contract", () => {
 
         await Promise.all([
             provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
-            transactionWatcher.awaitExecuted(deployTransaction)
+            transactionWatcher.awaitCompletion(deployTransaction)
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hash)).isExecuted());
@@ -110,8 +110,8 @@ describe("test contract", () => {
         await Promise.all([
             provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
             provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
-            transactionWatcher.awaitExecuted(callTransactionOne),
-            transactionWatcher.awaitExecuted(callTransactionTwo)
+            transactionWatcher.awaitCompletion(callTransactionOne),
+            transactionWatcher.awaitCompletion(callTransactionTwo)
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hashOne)).isExecuted());

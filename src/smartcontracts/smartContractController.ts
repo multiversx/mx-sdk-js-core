@@ -21,7 +21,7 @@ interface ISmartContractAbi {
  * Internal interface: a transaction watcher, as seen from the perspective of a {@link SmartContractController}.
  */
 interface ITransactionWatcher {
-    awaitExecuted(transaction: Transaction): Promise<void>;
+    awaitCompletion(transaction: Transaction): Promise<void>;
 }
 
 /**
@@ -53,7 +53,7 @@ export class SmartContractController implements ISmartContractController {
         Logger.info(`SmartContractController.deploy [begin]: transaction = ${transaction.getHash()}`);
 
         await transaction.send(this.provider);
-        await this.transactionWatcher.awaitExecuted(transaction);
+        await this.transactionWatcher.awaitCompletion(transaction);
         let transactionOnNetwork = await transaction.getAsOnNetwork(this.provider);
         let bundle = this.parser.parseUntypedOutcome(transactionOnNetwork);
 
@@ -75,7 +75,7 @@ export class SmartContractController implements ISmartContractController {
         this.checker.checkInteraction(interaction, endpoint);
 
         await transaction.send(this.provider);
-        await this.transactionWatcher.awaitExecuted(transaction);
+        await this.transactionWatcher.awaitCompletion(transaction);
         let transactionOnNetwork = await transaction.getAsOnNetwork(this.provider);
         let bundle = this.parser.parseOutcome(transactionOnNetwork, endpoint);
 

@@ -33,5 +33,9 @@ export class TransactionCompletionAlgorithm {
         // timeOf(block with execution at destination is notarized) < timeOf(the "completedTxEvent" occurs)
         // Also, extremely inefficient for simple move balances (useless long wait).
         return transaction.hyperblockNonce.valueOf() > 0;
+
+        // TODO: simple move balance - only use the status field? isPending vs. not.
+        // simple move balance = not relayed, not token transfers, not SC calls (receiver address needed).
+        // tryParseCall(tx.data)
     }
 }

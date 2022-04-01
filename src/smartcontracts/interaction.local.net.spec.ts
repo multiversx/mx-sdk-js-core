@@ -8,7 +8,6 @@ import { Interaction } from "./interaction";
 import { GasLimit } from "../networkParams";
 import { ReturnCode } from "./returnCode";
 import BigNumber from "bignumber.js";
-import { NetworkConfig } from "../networkConfig";
 import { BytesValue } from "./typesystem/bytes";
 import { chooseProxyProvider } from "../interactive";
 
@@ -44,7 +43,9 @@ describe("test smart contract interactor", function () {
         let { bundle: { returnCode } } = await controller.deploy(deployTransaction);
         assert.isTrue(returnCode.isSuccess());
 
-        let interaction = <Interaction>contract.methods.getUltimateAnswer().withGasLimit(new GasLimit(3000000));
+        let interaction = <Interaction>contract.methods.getUltimateAnswer()
+            .withGasLimit(new GasLimit(3000000))
+            .withChainID(network.ChainID);
 
         // Query
         let queryResponseBundle = await controller.query(interaction);

@@ -207,6 +207,7 @@ export class ContractWrapper extends ChainSendContext {
         let preparedCall = this.prepareCallWithPayment(endpoint, args);
         let interaction = this.convertPreparedCallToInteraction(preparedCall);
         interaction.withGasLimit(this.context.getGasLimit());
+        interaction.withChainID(this.context.getChainID());
         let transaction = interaction.buildTransaction();
         return { transaction, interaction };
     }

@@ -101,13 +101,6 @@ export class Transaction implements ISignable {
   private asOnNetwork: TransactionOnNetwork = new TransactionOnNetwork();
 
   /**
-   * The last known status of the transaction, as fetched from the API.
-   *
-   * This only gets updated if {@link Transaction.awaitPending}, {@link Transaction.awaitExecuted} are called.
-   */
-  private status: TransactionStatus;
-
-  /**
    * Creates a new Transaction object.
    */
   public constructor({
@@ -146,7 +139,6 @@ export class Transaction implements ISignable {
 
     this.signature = Signature.empty();
     this.hash = TransactionHash.empty();
-    this.status = TransactionStatus.createUnknown();
 
     this.onSigned = new TypedEvent();
     this.onSent = new TypedEvent();
@@ -240,10 +232,6 @@ export class Transaction implements ISignable {
   getHash(): TransactionHash {
     guardNotEmpty(this.hash, "hash");
     return this.hash;
-  }
-
-  getStatus(): TransactionStatus {
-    return this.status;
   }
 
   /**
@@ -386,7 +374,7 @@ export class Transaction implements ISignable {
       throw new errors.ErrTransactionHashUnknown();
     }
 
-    await new TransactionWatcher(fetcher).awaitCompletion(this);
+    await new TransactionWatcher(fetcher).awaitCompleted(this);
 
     let response = await fetcher.getTransaction(
       this.hash,

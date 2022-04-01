@@ -187,13 +187,13 @@ export class ContractWrapper extends ChainSendContext {
         sender.account.incrementNonce();
 
         logger?.transactionSent(transaction);
-        await new TransactionWatcher(provider).awaitCompletion(transaction);
+        await new TransactionWatcher(provider).awaitCompleted(transaction);
         let transactionOnNetwork = await transaction.getAsOnNetwork(provider, true, true);
-        if (transaction.getStatus().isFailed()) {
+        if (transactionOnNetwork.status.isFailed()) {
             // TODO: extract the error messages
             //let results = transactionOnNetwork.results.getAllResults();
             //let messages = results.map((result) => console.log(result));
-            throw new ErrContract(`Transaction status failed: [${transaction.getStatus().toString()}].`);// Return messages:\n${messages}`);
+            throw new ErrContract(`Transaction status failed: [${transactionOnNetwork.status.toString()}].`);// Return messages:\n${messages}`);
         }
         return transactionOnNetwork;
     }

@@ -341,7 +341,7 @@ export class Transaction implements ISignable {
    * let provider = new ProxyProvider("https://gateway.elrond.com");
    * // ... Prepare, sign the transaction, then:
    * await tx.send(provider);
-   * await tx.awaitExecuted(provider);
+   * await watcher.awaitCompleted(tx);
    * ```
    */
   async send(provider: IProvider): Promise<TransactionHash> {

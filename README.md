@@ -110,7 +110,7 @@ await tx2.send(provider);
 await tx3.send(provider);
 
 let watcher = new TransactionWatcher(provider);
-await Promise.all([watcher.awaitExecuted(tx1), watcher.awaitExecuted(tx2), watcher.awaitExecuted(tx3)]);
+await Promise.all([watcher.awaitCompleted(tx1), watcher.awaitCompleted(tx2), watcher.awaitCompleted(tx3)]);
 ```
 
 ### Managing the sender nonce locally
@@ -129,8 +129,10 @@ await signer.sign(txB);
 await txA.send(provider);
 await txB.send(provider);
 
-await txA.awaitExecuted(provider);
-await txB.awaitExecuted(provider);
+let watcher = new TransactionWatcher(provider);
+
+await watcher.awaitCompleted(txA);
+await watcher.awaitCompleted(txB);
 ```
 
 ## Installation

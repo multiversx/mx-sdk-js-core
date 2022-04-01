@@ -63,7 +63,7 @@ export class TransactionWatcher {
     /**
       * Waits until the transaction is completely processed.
       */
-    public async awaitCompletion(transaction: ITransaction): Promise<void> {
+    public async awaitCompleted(transaction: ITransaction): Promise<void> {
         let algorithm = new TransactionCompletionAlgorithm();
 
         let isCompleted = algorithm.isCompleted;

@@ -7,6 +7,7 @@ import { loadTestWallets, TestWallet } from "./testutils";
 import { Logger } from "./logger";
 import { assert } from "chai";
 import { chooseProxyProvider } from "./interactive";
+import { TransactionWatcher } from "./transactionWatcher";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;
@@ -18,6 +19,7 @@ describe("test transaction", function () {
         this.timeout(20000);
 
         let provider = chooseProxyProvider("local-testnet");
+        let watcher = new TransactionWatcher(provider);
 
         await NetworkConfig.getDefault().sync(provider);
         await alice.sync(provider);
@@ -45,8 +47,8 @@ describe("test transaction", function () {
         await transactionOne.send(provider);
         await transactionTwo.send(provider);
 
-        await transactionOne.awaitExecuted(provider);
-        await transactionTwo.awaitExecuted(provider);
+        await watcher.awaitCompleted(transactionOne);
+        await watcher.awaitCompleted(transactionTwo);
 
         await bob.sync(provider);
         let newBalanceOfBob = bob.account.balance;

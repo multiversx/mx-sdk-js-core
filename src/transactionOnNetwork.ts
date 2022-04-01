@@ -100,8 +100,7 @@ export class TransactionOnNetwork {
     isCompleted(): boolean {
         // TODO: When using separate constructors of TransactionOnNetwork (for API response vs. for Gateway response, see package "networkProvider"),
         // we will be able to use different transaction completion strategies.
-        let algorithm = new TransactionCompletionStrategy();
-        return algorithm.isCompleted(this);
+        return new TransactionCompletionStrategy().isCompleted(this);
     }
 }
 

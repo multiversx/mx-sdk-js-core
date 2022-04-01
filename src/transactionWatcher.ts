@@ -9,7 +9,7 @@ import { Address } from "./address";
 export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
 
 /**
- * Internal interface: a transaction, as seen from the perspective of an {@link TransactionWatcher}.
+ * Internal interface: a transaction, as seen from the perspective of a {@link TransactionWatcher}.
  */
 interface ITransaction {
     getHash(): TransactionHash;

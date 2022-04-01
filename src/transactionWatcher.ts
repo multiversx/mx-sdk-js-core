@@ -5,7 +5,6 @@ import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Logger } from "./logger";
 import { Err, ErrExpectedTransactionStatusNotReached } from "./errors";
 import { Address } from "./address";
-import { TransactionCompletionAlgorithm } from "./transactionCompletionAlgorithm";
 
 export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
 
@@ -64,9 +63,7 @@ export class TransactionWatcher {
       * Waits until the transaction is completely processed.
       */
     public async awaitCompleted(transaction: ITransaction): Promise<void> {
-        let algorithm = new TransactionCompletionAlgorithm();
-
-        let isCompleted = (transactionOnNetwork: TransactionOnNetwork) => algorithm.isCompleted(transactionOnNetwork);
+        let isCompleted = (transactionOnNetwork: TransactionOnNetwork) => transactionOnNetwork.isCompleted();
         let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 
@@ -87,6 +84,7 @@ export class TransactionWatcher {
 
         let stop = false;
         let fetchedData: TData | undefined = undefined;
+        let satisfied: boolean = false;
 
         let _ = timeoutTimer.start(this.timeout).finally(() => {
             timeoutTimer.stop();
@@ -98,8 +96,8 @@ export class TransactionWatcher {
 
             try {
                 fetchedData = await doFetch();
-                
-                if (isSatisfied(fetchedData) || stop) {
+                satisfied = isSatisfied(fetchedData);
+                if (satisfied || stop) {
                     break;
                 }
             } catch (error) {
@@ -115,8 +113,7 @@ export class TransactionWatcher {
             timeoutTimer.stop();
         }
 
-        let notSatisfied = !fetchedData || !isSatisfied(fetchedData);
-        if (notSatisfied) {
+        if (!fetchedData || !satisfied) {
             let error = createError();
             throw error;
         }

@@ -8,6 +8,7 @@ import { Hash } from "./hash";
 import { TransactionHash, TransactionStatus } from "./transaction";
 import { SmartContractResults } from "./smartcontracts/smartContractResults";
 import { TransactionLogs } from "./transactionLogs";
+import { TransactionCompletionStrategy } from "./transactionCompletionStrategy";
 
 /**
  * A plain view of a transaction, as queried from the Network.
@@ -31,6 +32,7 @@ export class TransactionOnNetwork {
     blockNonce: Nonce = new Nonce(0);
     hyperblockNonce: Nonce = new Nonce(0);
     hyperblockHash: Hash = Hash.empty();
+    pendingResults: boolean = false;
 
     // TODO: Check if "receipt" is still received from the API.
     receipt: Receipt = new Receipt();
@@ -79,15 +81,10 @@ export class TransactionOnNetwork {
         transactionOnNetwork.status = new TransactionStatus(response.status);
         transactionOnNetwork.timestamp = response.timestamp || 0;
 
-        // Only applicable to API responses (not applicable to Gateway responses).
-        // We override the status.
-        if (response.pendingResults) {
-            transactionOnNetwork.status = new TransactionStatus("pending");
-        }
-
         transactionOnNetwork.blockNonce = new Nonce(response.blockNonce || 0);
         transactionOnNetwork.hyperblockNonce = new Nonce(response.hyperblockNonce || 0);
         transactionOnNetwork.hyperblockHash = new Hash(response.hyperblockHash);
+        transactionOnNetwork.pendingResults = response.pendingResults || false;
 
         transactionOnNetwork.receipt = Receipt.fromHttpResponse(response.receipt || {});
         transactionOnNetwork.results = SmartContractResults.fromHttpResponse(response.results || response.smartContractResults || []);
@@ -98,6 +95,13 @@ export class TransactionOnNetwork {
 
     getDateTime(): Date {
         return new Date(this.timestamp * 1000);
+    }
+
+    isCompleted(): boolean {
+        // TODO: When using separate constructors of TransactionOnNetwork (for API response vs. for Gateway response, see package "networkProvider"),
+        // we will be able to use different transaction completion strategies.
+        let algorithm = new TransactionCompletionStrategy();
+        return algorithm.isCompleted(this);
     }
 }
 

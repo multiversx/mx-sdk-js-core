@@ -502,7 +502,7 @@ export class TransactionStatus {
    * Returns whether the transaction has been executed (not necessarily with success).
    */
   isExecuted(): boolean {
-    return this.isSuccessful() || this.isInvalid();
+    return this.isSuccessful() || this.isFailed() || this.isInvalid();
   }
 
   /**

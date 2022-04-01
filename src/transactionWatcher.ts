@@ -67,7 +67,7 @@ export class TransactionWatcher {
         let algorithm = new TransactionCompletionAlgorithm();
 
         let isCompleted = (transactionOnNetwork: TransactionOnNetwork) => algorithm.isCompleted(transactionOnNetwork);
-        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash());
+        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 
         return this.awaitConditionally<TransactionOnNetwork>(

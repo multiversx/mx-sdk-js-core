@@ -374,8 +374,6 @@ export class Transaction implements ISignable {
       throw new errors.ErrTransactionHashUnknown();
     }
 
-    await new TransactionWatcher(fetcher).awaitCompleted(this);
-
     let response = await fetcher.getTransaction(
       this.hash,
       this.sender,

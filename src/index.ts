@@ -27,4 +27,3 @@ export * from "./token";
 export * from "./smartcontracts";
 
 export * from "./networkProvider";
-export * from "./dapp";

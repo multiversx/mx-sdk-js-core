@@ -374,15 +374,6 @@ export class ErrMock extends Err {
 }
 
 /**
- * Signals an error thrown when setting up a test.
- */
-export class ErrTest extends Err {
-  public constructor(message: string) {
-    super(message);
-  }
-}
-
-/**
  * Signals a generic serialization error.
  */
 export class ErrSerialization extends Err {
@@ -437,39 +428,12 @@ export class ErrCodec extends Err {
 }
 
 /**
- * Signals a generic wallet error.
- */
-export class ErrWallet extends Err {
-  public constructor(message: string) {
-    super(message);
-  }
-}
-
-/**
- * Signals a wrong mnemonic format.
- */
-export class ErrWrongMnemonic extends ErrWallet {
-  public constructor() {
-    super("Wrong mnemonic format");
-  }
-}
-
-/**
  * Signals a generic contract interaction error.
  */
 export class ErrContractInteraction extends Err {
     public constructor(message: string) {
         super(message);
     }
-}
-
-/**
- * Signals a bad PEM file.
- */
-export class ErrBadPEM extends ErrWallet {
-  public constructor(message?: string) {
-    super(message ? `Bad PEM: ${message}` : `Bad PEM`);
-  }
 }
 
 /**
@@ -497,15 +461,6 @@ export class ErrInvalidEsdtTransferDataField extends Err {
 export class ErrNotImplemented extends Err {
   public constructor() {
     super("Method not yet implemented");
-  }
-}
-
-/**
- * Signals that the data inside the url is not a valid one for a transaction sign response
- */
-export class ErrInvalidTxSignReturnValue extends Err {
-  public constructor() {
-    super("Invalid response in transaction sign return url");
   }
 }
 

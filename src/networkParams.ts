@@ -1,8 +1,6 @@
-import { TransactionPayload } from "./transactionPayload";
-import { NetworkConfig } from "./networkConfig";
 import * as errors from "./errors";
-import { Egld } from "./balanceBuilder";
 import {
+    TRANSACTION_MIN_GAS_PRICE,
     TRANSACTION_OPTIONS_DEFAULT,
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
     TRANSACTION_VERSION_DEFAULT, TRANSACTION_VERSION_TX_HASH_SIGN
@@ -30,17 +28,8 @@ export class GasPrice {
         this.value = value;
     }
 
-    toDenominated(): string {
-        let asBalance = Egld.raw(this.value.toString(10));
-        return asBalance.toDenominated();
-    }
-
-    /**
-     * Creates a GasPrice object using the minimum value.
-     */
-    static min(): GasPrice {
-        let value = NetworkConfig.getDefault().MinGasPrice.value;
-        return new GasPrice(value);
+    static default(): GasPrice {
+        return new GasPrice(TRANSACTION_MIN_GAS_PRICE);
     }
 
     valueOf(): number {
@@ -70,27 +59,6 @@ export class GasLimit {
         this.value = value;
     }
 
-    /**
-     * Creates a GasLimit object for a value-transfer {@link Transaction}.
-     */
-    static forTransfer(data: TransactionPayload): GasLimit {
-        let value = NetworkConfig.getDefault().MinGasLimit.value;
-
-        if (data) {
-            value += NetworkConfig.getDefault().GasPerDataByte * data.length();
-        }
-
-        return new GasLimit(value);
-    }
-
-    /**
-     * Creates a GasLimit object using the minimum value.
-     */
-    static min(): GasLimit {
-        let value = NetworkConfig.getDefault().MinGasLimit.value;
-        return new GasLimit(value);
-    }
-
     add(other: GasLimit): GasLimit {
         return new GasLimit(this.value + other.value);
     }
@@ -116,6 +84,10 @@ export class ChainID {
         }
 
         this.value = value;
+    }
+
+    static unspecified(): ChainID {
+        return new ChainID("?");
     }
 
     valueOf(): string {

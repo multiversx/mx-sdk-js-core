@@ -1,12 +1,11 @@
 import { Balance } from "../balance";
-import { GasLimit } from "../networkParams";
+import { ChainID, GasLimit, GasPrice } from "../networkParams";
 import { Transaction } from "../transaction";
 import { Query } from "./query";
 import { ContractFunction } from "./function";
 import { Address } from "../address";
 import { AddressValue, BigUIntValue, BytesValue, TypedValue, U64Value, U8Value } from "./typesystem";
 import { Nonce } from "../nonce";
-import { NetworkConfig } from "../networkConfig";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
 import { Account } from "../account";
 import { CallArguments } from "./interface";
@@ -33,7 +32,9 @@ export class Interaction {
 
     private nonce: Nonce = new Nonce(0);
     private value: Balance = Balance.Zero();
-    private gasLimit: GasLimit = GasLimit.min();
+    private gasLimit: GasLimit = new GasLimit(0);
+    private gasPrice: GasPrice | undefined = undefined;
+    private chainID: ChainID = ChainID.unspecified();
     private querent: Address = new Address();
 
     private isWithSingleESDTTransfer: boolean = false;
@@ -104,10 +105,12 @@ export class Interaction {
             func: func,
             // GasLimit will be set using "withGasLimit()".
             gasLimit: this.gasLimit,
+            gasPrice: this.gasPrice,
             args: args,
             // Value will be set using "withValue()".
             value: this.value,
             receiver: receiver,
+            chainID: this.chainID
         });
 
         transaction.setNonce(this.nonce);
@@ -155,9 +158,9 @@ export class Interaction {
         return this;
     }
 
-    withGasLimitComponents(args: { minGasLimit?: number, gasPerDataByte?: number, estimatedExecutionComponent: number }): Interaction {
-        let minGasLimit = args.minGasLimit || NetworkConfig.getDefault().MinGasLimit.valueOf();
-        let gasPerDataByte = args.gasPerDataByte || NetworkConfig.getDefault().GasPerDataByte;
+    withGasLimitComponents(args: { minGasLimit: number, gasPerDataByte: number, estimatedExecutionComponent: number }): Interaction {
+        let minGasLimit = args.minGasLimit;
+        let gasPerDataByte = args.gasPerDataByte;
 
         let transaction = this.buildTransaction();
         let dataLength = transaction.getData().length();
@@ -168,6 +171,11 @@ export class Interaction {
         return this.withGasLimit(gasLimit);
     }
 
+    withGasPrice(gasPrice: GasPrice): Interaction {
+        this.gasPrice = gasPrice;
+        return this;
+    }
+
     withNonce(nonce: Nonce): Interaction {
         this.nonce = nonce;
         return this;
@@ -175,6 +183,11 @@ export class Interaction {
 
     useThenIncrementNonceOf(account: Account) : Interaction {
         return this.withNonce(account.getNonceThenIncrement());
+    }
+
+    withChainID(chainID: ChainID): Interaction {
+        this.chainID = chainID;
+        return this;
     }
 
     /**

@@ -10,6 +10,9 @@ import { NetworkConfig } from "./networkConfig";
 
 describe("test transaction construction", async () => {
     let wallets: Record<string, TestWallet>;
+    let minGasLimit = new GasLimit(50000);
+    let minGasPrice = new GasPrice(1000000000);
+
     before(async function () {
         wallets = await loadTestWallets();
     });
@@ -19,8 +22,8 @@ describe("test transaction construction", async () => {
             nonce: new Nonce(89),
             value: Balance.Zero(),
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
-            gasLimit: GasLimit.min(),
+            gasPrice: minGasPrice,
+            gasLimit: minGasLimit,
             chainID: new ChainID("local-testnet")
         });
 
@@ -34,7 +37,7 @@ describe("test transaction construction", async () => {
             nonce: new Nonce(90),
             value: Balance.Zero(),
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
+            gasPrice: minGasPrice,
             gasLimit: new GasLimit(80000),
             data: new TransactionPayload("hello"),
             chainID: new ChainID("local-testnet")
@@ -50,8 +53,8 @@ describe("test transaction construction", async () => {
             nonce: new Nonce(89),
             value: Balance.Zero(),
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
-            gasLimit: GasLimit.min(),
+            gasPrice: minGasPrice,
+            gasLimit: minGasLimit,
             chainID: new ChainID("local-testnet"),
             version: new TransactionVersion(1),
             options: new TransactionOptions(1)
@@ -67,7 +70,7 @@ describe("test transaction construction", async () => {
             nonce: new Nonce(91),
             value: Balance.egld(10),
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
+            gasPrice: minGasPrice,
             gasLimit: new GasLimit(100000),
             data: new TransactionPayload("for the book"),
             chainID: new ChainID("local-testnet")
@@ -83,7 +86,7 @@ describe("test transaction construction", async () => {
             nonce: new Nonce(92),
             value: Balance.fromString("123456789000000000000000000000"),
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
+            gasPrice: minGasPrice,
             gasLimit: new GasLimit(100000),
             data: new TransactionPayload("for the spaceship"),
             chainID: new ChainID("local-testnet")
@@ -99,7 +102,7 @@ describe("test transaction construction", async () => {
             nonce: new Nonce(0),
             value: Balance.fromString("0"),
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
+            gasPrice: minGasPrice,
             gasLimit: new GasLimit(80000),
             data: new TransactionPayload("hello"),
             chainID: new ChainID("local-testnet"),
@@ -116,8 +119,8 @@ describe("test transaction construction", async () => {
             nonce: new Nonce(89),
             value: Balance.Zero(),
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
-            gasLimit: GasLimit.min(),
+            gasPrice: minGasPrice,
+            gasLimit: minGasLimit,
             chainID: new ChainID("local-testnet")
         });
 

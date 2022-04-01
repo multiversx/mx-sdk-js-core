@@ -75,7 +75,7 @@ export class Transaction implements ISignable {
   /**
    * The chain ID of the Network (e.g. "1" for Mainnet).
    */
-  private readonly chainID: ChainID;
+  private chainID: ChainID;
 
   /**
    * The version, required by the Network in order to correctly interpret the contents of the transaction.
@@ -129,9 +129,9 @@ export class Transaction implements ISignable {
     receiver: Address;
     sender?: Address;
     gasPrice?: GasPrice;
-    gasLimit?: GasLimit;
+    gasLimit: GasLimit;
     data?: TransactionPayload;
-    chainID?: ChainID;
+    chainID: ChainID;
     version?: TransactionVersion;
     options?: TransactionOptions;
   }) {
@@ -139,10 +139,10 @@ export class Transaction implements ISignable {
     this.value = value || Balance.Zero();
     this.sender = sender || Address.Zero();
     this.receiver = receiver;
-    this.gasPrice = gasPrice || NetworkConfig.getDefault().MinGasPrice;
-    this.gasLimit = gasLimit || NetworkConfig.getDefault().MinGasLimit;
+    this.gasPrice = gasPrice || GasPrice.default();
+    this.gasLimit = gasLimit;
     this.data = data || new TransactionPayload();
-    this.chainID = chainID || NetworkConfig.getDefault().ChainID;
+    this.chainID = chainID;
     this.version = version || TransactionVersion.withDefaultVersion();
     this.options = options || TransactionOptions.withDefaultOptions();
 
@@ -221,6 +221,11 @@ export class Transaction implements ISignable {
 
   getChainID(): ChainID {
     return this.chainID;
+  }
+
+  setChainID(chainID: ChainID) {
+    this.chainID = chainID;
+    this.doAfterPropertySetter();
   }
 
   getVersion(): TransactionVersion {

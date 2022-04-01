@@ -7,6 +7,17 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - TBD
 
+## [10.0.0-beta.3]
+ - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)
+ - [Remove trackOfTransactions (private field, not actually used)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/172)
+
+**Breaking changes**
+ - The dapp / signing providers have been extracted to separate repositories:
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-hw-provider
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-web-wallet-provider
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-wallet-connect-provider
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-extension-provider
+
 ## [10.0.0-beta.2]
  - [Hardcode class names for classes within erdjs' typesystem.](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/165)
 

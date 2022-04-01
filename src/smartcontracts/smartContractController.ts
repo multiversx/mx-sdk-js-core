@@ -39,14 +39,14 @@ export class SmartContractController implements ISmartContractController {
     }
 
     async deploy(transaction: Transaction): Promise<{ transactionOnNetwork: TransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
-        Logger.info(`SmartContractController.deploy [begin]: transaction = ${transaction.getHash()}`);
+        Logger.info(`SmartContractController.deploy [begin]: transaction = ${transaction.hash}`);
 
         await transaction.send(this.provider);
         await transaction.awaitExecuted(this.provider);
         let transactionOnNetwork = await transaction.getAsOnNetwork(this.provider);
         let bundle = this.parser.parseUntypedOutcome(transactionOnNetwork);
 
-        Logger.info(`SmartContractController.deploy [end]: transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);
+        Logger.info(`SmartContractController.deploy [end]: transaction = ${transaction.hash}, return code = ${bundle.returnCode}`);
         return { transactionOnNetwork, bundle };
     }
 
@@ -57,7 +57,7 @@ export class SmartContractController implements ISmartContractController {
      * @param transaction The interaction transaction, which must be signed beforehand
      */
     async execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: TransactionOnNetwork, bundle: TypedOutcomeBundle }> {
-        Logger.info(`SmartContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}`);
+        Logger.info(`SmartContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${transaction.hash}`);
 
         let endpoint = this.getEndpoint(interaction);
 
@@ -68,7 +68,7 @@ export class SmartContractController implements ISmartContractController {
         let transactionOnNetwork = await transaction.getAsOnNetwork(this.provider);
         let bundle = this.parser.parseOutcome(transactionOnNetwork, endpoint);
 
-        Logger.info(`SmartContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);
+        Logger.info(`SmartContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${transaction.hash}, return code = ${bundle.returnCode}`);
         return { transactionOnNetwork, bundle };
     }
 

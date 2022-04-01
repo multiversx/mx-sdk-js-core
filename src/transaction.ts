@@ -90,12 +90,12 @@ export class Transaction implements ISignable {
   /**
    * The signature.
    */
-  private signature: Signature;
+  signature: Signature;
 
   /**
    * The transaction hash, also used as a transaction identifier.
    */
-  private hash: TransactionHash;
+  hash: TransactionHash;
 
   /**
    * A (cached) representation of the transaction, as fetched from the API.
@@ -334,8 +334,12 @@ export class Transaction implements ISignable {
     this.signature = adaptedSignature;
     this.sender = adaptedSignedBy;
 
-    this.hash = TransactionHash.compute(this);
+    this.recomputeHash();
     this.onSigned.emit({ transaction: this, signedBy: adaptedSignedBy });
+  }
+
+  recomputeHash() {
+    this.hash = TransactionHash.compute(this);
   }
 
   /**

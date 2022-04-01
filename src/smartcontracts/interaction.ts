@@ -263,7 +263,9 @@ class TokenTransfersWithinInteraction {
 
     private getTypedTokensReceiver(): TypedValue {
         // The actual receiver of the token(s): the contract
-        return new AddressValue(this.interaction.getContract().getAddress());
+        let address = this.interaction.getContract().getAddress();
+        address.assertNotEmpty();
+        return new AddressValue(address);
     }
 
     private getTypedInteractionFunction(): TypedValue {

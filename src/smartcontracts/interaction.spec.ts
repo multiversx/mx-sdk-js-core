@@ -40,7 +40,7 @@ describe("test smart contract interactor", function() {
         let transaction = interaction
             .withNonce(new Nonce(7))
             .withValue(Balance.egld(1))
-            .withGasLimitComponents({ estimatedExecutionComponent: 20000000 })
+            .withGasLimitComponents({ minGasLimit: 50000, gasPerDataByte: 1500, estimatedExecutionComponent: 20000000 })
             .buildTransaction();
 
         let expectedGasLimit = new GasLimit(50000)

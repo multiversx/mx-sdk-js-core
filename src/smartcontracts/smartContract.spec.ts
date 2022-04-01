@@ -3,7 +3,7 @@ import { Address } from "../address";
 import { Code } from "./code";
 import { Nonce } from "../nonce";
 import { SmartContract } from "./smartContract";
-import { GasLimit } from "../networkParams";
+import { ChainID, GasLimit } from "../networkParams";
 import { loadTestWallets, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
 import { TransactionStatus } from "../transaction";
 import { ContractFunction } from "./function";
@@ -13,7 +13,9 @@ import { BytesValue } from "./typesystem/bytes";
 
 describe("test contract", () => {
     let provider = new MockProvider();
+    let chainID = new ChainID("test");
     let alice: TestWallet;
+
     before(async function () {
         ({ alice } = await loadTestWallets());
     });
@@ -36,7 +38,8 @@ describe("test contract", () => {
         let contract = new SmartContract({});
         let deployTransaction = contract.deploy({
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
-            gasLimit: new GasLimit(1000000)
+            gasLimit: new GasLimit(1000000),
+            chainID: chainID
         });
 
         provider.mockUpdateAccount(alice.address, account => {
@@ -76,13 +79,15 @@ describe("test contract", () => {
         let callTransactionOne = contract.call({
             func: new ContractFunction("helloEarth"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
-            gasLimit: new GasLimit(150000)
+            gasLimit: new GasLimit(150000),
+            chainID: chainID
         });
 
         let callTransactionTwo = contract.call({
             func: new ContractFunction("helloMars"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
-            gasLimit: new GasLimit(1500000)
+            gasLimit: new GasLimit(1500000),
+            chainID: chainID
         });
 
         await alice.sync(provider);

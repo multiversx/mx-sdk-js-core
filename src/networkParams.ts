@@ -28,7 +28,7 @@ export class GasPrice {
         this.value = value;
     }
 
-    static default(): GasPrice {
+    static min(): GasPrice {
         return new GasPrice(TRANSACTION_MIN_GAS_PRICE);
     }
 

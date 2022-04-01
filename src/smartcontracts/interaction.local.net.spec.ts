@@ -28,16 +28,15 @@ describe("test smart contract interactor", function () {
         let contract = new SmartContract({ abi: abi });
         let controller = new DefaultSmartContractController(abi, provider);
 
-        // Currently, this has to be called before creating any Interaction objects, 
-        // because the Transaction objects created under the hood point to the "default" NetworkConfig.
-        await NetworkConfig.getDefault().sync(provider);
+        let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
         // Deploy the contract
         let deployTransaction = contract.deploy({
             code: await loadContractCode("src/testdata/answer.wasm"),
             gasLimit: new GasLimit(3000000),
-            initArguments: []
+            initArguments: [],
+            chainID: network.ChainID
         });
 
         deployTransaction.setNonce(alice.account.getNonceThenIncrement());
@@ -75,16 +74,15 @@ describe("test smart contract interactor", function () {
         let contract = new SmartContract({ abi: abi });
         let controller = new DefaultSmartContractController(abi, provider);
 
-        // Currently, this has to be called before creating any Interaction objects, 
-        // because the Transaction objects created under the hood point to the "default" NetworkConfig.
-        await NetworkConfig.getDefault().sync(provider);
+        let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
         // Deploy the contract
         let deployTransaction = contract.deploy({
             code: await loadContractCode("src/testdata/counter.wasm"),
             gasLimit: new GasLimit(3000000),
-            initArguments: []
+            initArguments: [],
+            chainID: network.ChainID
         });
 
         deployTransaction.setNonce(alice.account.getNonceThenIncrement());
@@ -93,8 +91,12 @@ describe("test smart contract interactor", function () {
         assert.isTrue(returnCode.isSuccess());
 
         let getInteraction = <Interaction>contract.methods.get();
-        let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(new GasLimit(3000000));
-        let decrementInteraction = (<Interaction>contract.methods.decrement()).withGasLimit(new GasLimit(3000000));
+        let incrementInteraction = (<Interaction>contract.methods.increment())
+            .withGasLimit(new GasLimit(3000000))
+            .withChainID(network.ChainID);
+        let decrementInteraction = (<Interaction>contract.methods.decrement())
+            .withGasLimit(new GasLimit(3000000))
+            .withChainID(network.ChainID);
 
         // Query "get()"
         let { firstValue: counterValue } = await controller.query(getInteraction);
@@ -125,16 +127,15 @@ describe("test smart contract interactor", function () {
         let contract = new SmartContract({ abi: abi });
         let controller = new DefaultSmartContractController(abi, provider);
 
-        // Currently, this has to be called before creating any Interaction objects, 
-        // because the Transaction objects created under the hood point to the "default" NetworkConfig.
-        await NetworkConfig.getDefault().sync(provider);
+        let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
         // Deploy the contract
         let deployTransaction = contract.deploy({
             code: await loadContractCode("src/testdata/lottery-esdt.wasm"),
             gasLimit: new GasLimit(100000000),
-            initArguments: []
+            initArguments: [],
+            chainID: network.ChainID
         });
 
         deployTransaction.setNonce(alice.account.getNonceThenIncrement());
@@ -152,15 +153,21 @@ describe("test smart contract interactor", function () {
             OptionValue.newMissing(),
             OptionValue.newMissing(),
             OptionalValue.newMissing()
-        ]).withGasLimit(new GasLimit(30000000));
+        ])
+        .withGasLimit(new GasLimit(30000000))
+        .withChainID(network.ChainID);
 
         let lotteryStatusInteraction = <Interaction>contract.methods.status([
             BytesValue.fromUTF8("lucky")
-        ]).withGasLimit(new GasLimit(5000000));
+        ])
+        .withGasLimit(new GasLimit(5000000))
+        .withChainID(network.ChainID);
 
         let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo([
             BytesValue.fromUTF8("lucky")
-        ]).withGasLimit(new GasLimit(5000000));
+        ])
+        .withGasLimit(new GasLimit(5000000))
+        .withChainID(network.ChainID);
 
         // start()
         let startTransaction = startInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();

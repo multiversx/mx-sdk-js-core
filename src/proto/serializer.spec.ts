@@ -11,6 +11,7 @@ import { TransactionPayload } from "../transactionPayload";
 describe("serialize transactions", () => {
     let wallets: Record<string, TestWallet>;
     let serializer = new ProtoSerializer();
+
     before(async function () {
         wallets = await loadTestWallets();
     });
@@ -21,7 +22,7 @@ describe("serialize transactions", () => {
             value: Balance.Zero(),
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
-            gasLimit: GasLimit.min(),
+            gasLimit: new GasLimit(50000),
             chainID: new ChainID("local-testnet")
         });
 

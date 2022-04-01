@@ -23,14 +23,15 @@ describe("fetch transactions from local testnet", function () {
         TransactionWatcher.DefaultPollingInterval = 5000;
         TransactionWatcher.DefaultTimeout = 50000;
 
-        await NetworkConfig.getDefault().sync(provider);
+        let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
         // Deploy
         let contract = new SmartContract({});
         let transactionDeploy = contract.deploy({
             code: await loadContractCode("src/testdata/counter.wasm"),
-            gasLimit: new GasLimit(3000000)
+            gasLimit: new GasLimit(3000000),
+            chainID: network.ChainID
         });
 
         transactionDeploy.setNonce(alice.account.nonce);
@@ -41,7 +42,8 @@ describe("fetch transactions from local testnet", function () {
         // ++
         let transactionIncrement = contract.call({
             func: new ContractFunction("increment"),
-            gasLimit: new GasLimit(3000000)
+            gasLimit: new GasLimit(3000000),
+            chainID: network.ChainID
         });
 
         transactionIncrement.setNonce(alice.account.nonce);
@@ -66,15 +68,5 @@ describe("fetch transactions from local testnet", function () {
         transactionOnNetwork = transactionIncrement.getAsOnNetworkCached();
         bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
-    });
-
-    it("ESDT", async function () {
-        this.timeout(60000);
-
-        TransactionWatcher.DefaultPollingInterval = 5000;
-        TransactionWatcher.DefaultTimeout = 50000;
-
-        await NetworkConfig.getDefault().sync(provider);
-        await alice.sync(provider);
     });
 });

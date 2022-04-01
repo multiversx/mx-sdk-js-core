@@ -139,7 +139,7 @@ export class Transaction implements ISignable {
     this.value = value || Balance.Zero();
     this.sender = sender || Address.Zero();
     this.receiver = receiver;
-    this.gasPrice = gasPrice || GasPrice.default();
+    this.gasPrice = gasPrice || GasPrice.min();
     this.gasLimit = gasLimit;
     this.data = data || new TransactionPayload();
     this.chainID = chainID;

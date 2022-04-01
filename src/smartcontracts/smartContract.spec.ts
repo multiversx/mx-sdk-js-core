@@ -4,7 +4,7 @@ import { Code } from "./code";
 import { Nonce } from "../nonce";
 import { SmartContract } from "./smartContract";
 import { GasLimit } from "../networkParams";
-import { loadTestWallets, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
+import { InHyperblock, loadTestWallets, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
 import { TransactionStatus } from "../transaction";
 import { ContractFunction } from "./function";
 import { U32Value } from "./typesystem";
@@ -15,7 +15,6 @@ import { TransactionWatcher } from "../transactionWatcher";
 describe("test contract", () => {
     let provider = new MockProvider();
     let alice: TestWallet;
-    let transactionWatcher = new TransactionWatcher(provider);
 
     before(async function () {
         ({ alice } = await loadTestWallets());
@@ -35,6 +34,7 @@ describe("test contract", () => {
 
     it("should deploy", async () => {
         setupUnitTestWatcherTimeouts();
+        let watcher = new TransactionWatcher(provider);
 
         let contract = new SmartContract({});
         let deployTransaction = contract.deploy({
@@ -62,14 +62,17 @@ describe("test contract", () => {
         let hash = await deployTransaction.send(provider);
 
         await Promise.all([
-            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
-            transactionWatcher.awaitCompleted(deployTransaction)
+            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
+            watcher.awaitCompleted(deployTransaction)
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hash)).isExecuted());
     });
 
     it("should call", async () => {
+        setupUnitTestWatcherTimeouts();
+        let watcher = new TransactionWatcher(provider);
+        
         let contract = new SmartContract({ address: new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3") });
 
         provider.mockUpdateAccount(alice.address, account => {
@@ -108,10 +111,10 @@ describe("test contract", () => {
         let hashTwo = await callTransactionTwo.send(provider);
 
         await Promise.all([
-            provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
-            provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
-            transactionWatcher.awaitCompleted(callTransactionOne),
-            transactionWatcher.awaitCompleted(callTransactionTwo)
+            provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
+            provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
+            watcher.awaitCompleted(callTransactionOne),
+            watcher.awaitCompleted(callTransactionTwo)
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hashOne)).isExecuted());

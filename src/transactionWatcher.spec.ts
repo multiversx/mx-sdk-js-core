@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { TransactionWatcher } from "./transactionWatcher";
 import { TransactionHash, TransactionStatus } from "./transaction";
-import { MockProvider, Wait } from "./testutils";
+import { MockProvider, InHyperblock, Wait } from "./testutils";
 import { Nonce } from "./nonce";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 
@@ -21,7 +21,7 @@ describe("test transactionWatcher", () => {
         }));
 
         await Promise.all([
-            provider.mockTransactionTimelineByHash(hash, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
+            provider.mockTransactionTimelineByHash(hash, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
             watcher.awaitCompleted(dummyTransaction)
         ]);
 

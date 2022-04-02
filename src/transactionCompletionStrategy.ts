@@ -12,7 +12,6 @@ interface ITransactionOnNetwork {
     status: TransactionStatus;
     hyperblockNonce: Nonce;
     data: TransactionPayload;
-    pendingResults: boolean;
 }
 
 const WellKnownCompletionEvents = ["completedTxEvent", "SCDeploy", "signalError"];

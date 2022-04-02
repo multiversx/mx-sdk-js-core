@@ -84,6 +84,11 @@ export class TransactionOnNetwork {
         transactionOnNetwork.blockNonce = new Nonce(response.blockNonce || 0);
         transactionOnNetwork.hyperblockNonce = new Nonce(response.hyperblockNonce || 0);
         transactionOnNetwork.hyperblockHash = new Hash(response.hyperblockHash);
+        // TODO: Take this into consideration, as well.
+        // Currently, erdjs' transaction completion detection works only for ProxyProvider.
+        // When adding separate constructors "fromAPIHttpResponse" / "fromGatewayHttpResponse",
+        // we will also use different completion detection strategies.
+        // (not done right now, in order to avoid further code workarounds). 
         transactionOnNetwork.pendingResults = response.pendingResults || false;
 
         transactionOnNetwork.receipt = Receipt.fromHttpResponse(response.receipt || {});

@@ -1,3 +1,4 @@
+import { TransactionDecoder, TransactionMetadata } from "@elrondnetwork/transaction-decoder";
 import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
 import { TransactionLogs } from "../transactionLogs";
@@ -59,6 +60,8 @@ export class ResultsParser implements IResultsParser {
     parseUntypedOutcome(transaction: TransactionOnNetwork): UntypedOutcomeBundle {
         let bundle: UntypedOutcomeBundle | null;
 
+        let transactionMetadata = this.parseTransactionMetadata(transaction);
+
         bundle = this.createBundleOnSimpleMoveBalance(transaction)
         if (bundle) {
             return bundle;
@@ -89,7 +92,22 @@ export class ResultsParser implements IResultsParser {
             return bundle;
         }
 
+        bundle = this.createBundleCustom(transaction, transactionMetadata);
+        if (bundle) {
+            return bundle;
+        }
+
         throw new ErrCannotParseContractResults(`transaction ${transaction.hash.toString()}`);
+    }
+
+    private parseTransactionMetadata(transaction: TransactionOnNetwork): TransactionMetadata {
+        return new TransactionDecoder().getTransactionMetadata({
+            sender: transaction.sender.bech32(),
+            receiver: transaction.receiver.bech32(),
+            data: transaction.data.encoded(),
+            value: transaction.value.toString(),
+            type: transaction.type.value
+        })
     }
 
     private createBundleOnSimpleMoveBalance(transaction: TransactionOnNetwork): UntypedOutcomeBundle | null {
@@ -191,6 +209,13 @@ export class ResultsParser implements IResultsParser {
             returnMessage: returnMessage,
             values: returnDataParts
         };
+    }
+
+    /**
+     * Override this method (in a subclass of {@link ResultsParser}) if the basic heuristics of the parser are failing.
+     */
+    protected createBundleCustom(_transaction: TransactionOnNetwork, _transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
+        return null;
     }
 
     private sliceDataFieldInParts(data: string): { returnCode: ReturnCode, returnDataParts: Buffer[] } {

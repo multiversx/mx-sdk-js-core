@@ -1,15 +1,20 @@
-import { ErrCannotParseContractResults, ErrInvariantFailed } from "../errors";
+import { ErrCannotParseContractResults } from "../errors";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, IResultsParser, UntypedOutcomeBundle } from "./interface";
 import { QueryResponse } from "./queryResponse";
 import { ReturnCode } from "./returnCode";
+import { SmartContractResultItem } from "./smartContractResults";
 import { EndpointDefinition } from "./typesystem";
 
 enum WellKnownEvents {
     OnTransactionCompleted = "completedTxEvent",
-    OnContractDeployment = "SCDeploy",
-    OnUserError = "signalError"
+    OnSignalError = "signalError",
+    OnWriteLog = "writeLog"
+}
+
+enum WellKnownTopics {
+    TooMuchGas = "@too much gas provided for processing"
 }
 
 export class ResultsParser implements IResultsParser {
@@ -49,52 +54,104 @@ export class ResultsParser implements IResultsParser {
         };
     }
 
-    /**
-     * TODO: Upon further analysis, improve this function. Currently, the implementation makes some (possibly inaccurate) assumptions on the SCR & logs emission logic.
-     */
     parseUntypedOutcome(transaction: TransactionOnNetwork): UntypedOutcomeBundle {
         let resultItems = transaction.results.getAll();
-        // Let's search the result holding the returnData
-        // (possibly inaccurate logic at this moment)
-        let resultItemWithReturnData = resultItems.find(item => item.nonce.valueOf() != 0);
+        let logs = transaction.logs;
 
-        // If we didn't find it, then fallback to events & logs:
-        // (possibly inaccurate logic at this moment)
-        if (!resultItemWithReturnData) {
-            let returnCode = ReturnCode.Unknown;
-
-            if (transaction.logs.findEventByIdentifier(WellKnownEvents.OnTransactionCompleted)) {
-                // We do not extract any return data.
-                returnCode = ReturnCode.Ok;
-            } else if (transaction.logs.findEventByIdentifier(WellKnownEvents.OnContractDeployment)) {
-                // When encountering this event, we assume a successful deployment.
-                // We do not extract any return data.
-                // (possibly inaccurate logic at this moment, especially in case of deployments from other contracts)
-                returnCode = ReturnCode.Ok;
-            } else if (transaction.logs.findEventByIdentifier(WellKnownEvents.OnUserError)) {
-                returnCode = ReturnCode.UserError;
-            }
-
-            // TODO: Also handle "too much gas provided" (writeLog event) - in this case, the returnData is held in the event.data field.
-
+        // Handle simple move balances (or any other transactions without contract results / logs):
+        if (resultItems.length == 0 && logs.events.length == 0) {
             return {
-                returnCode: returnCode,
-                returnMessage: returnCode.toString(),
+                returnCode: ReturnCode.Unknown,
+                returnMessage: ReturnCode.Unknown.toString(),
                 values: []
             };
         }
 
-        let parts = resultItemWithReturnData.getDataParts();
-        let { returnCode, returnDataParts } = this.sliceDataParts(parts);
+        // Handle invalid transactions:
+        if (transaction.status.isInvalid()) {
+            return {
+                returnCode: ReturnCode.Unknown,
+                returnMessage: transaction.receipt.message,
+                values: []
+            };
+        }
 
-        return {
-            returnCode: returnCode,
-            returnMessage: returnCode.toString(),
-            values: returnDataParts
-        };
+        // Let's search the result holding the returnData:
+        let resultItemWithReturnData = this.findResultItemWithReturnData(resultItems);
+
+        if (resultItemWithReturnData) {
+            let { returnCode, returnDataParts } = this.sliceDataFieldInParts(resultItemWithReturnData.data);
+            let returnMessage = resultItemWithReturnData.returnMessage || returnCode.toString();
+
+            return {
+                returnCode: returnCode,
+                returnMessage: returnMessage,
+                values: returnDataParts
+            };
+        }
+
+        // If we didn't find it, then fallback to events & logs.
+        
+        // On "signalError":
+        let eventSignalError = logs.findSingleOrNoneEvent(WellKnownEvents.OnSignalError);
+
+        if (eventSignalError) {
+            let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventSignalError.data);
+            let lastTopic = eventSignalError.getLastTopic();
+            let returnMessage = lastTopic?.toString() || returnCode.toString();
+
+            return {
+                returnCode: returnCode,
+                returnMessage: returnMessage,
+                values: returnDataParts
+            };
+        }
+
+        // On "writeLog" with topic "@too much gas provided for processing"
+        let eventTooMuchGas = logs.findSingleOrNoneEvent(
+            WellKnownEvents.OnWriteLog, 
+            event => event.findFirstOrNoneTopic(topic => topic.toString().startsWith(WellKnownTopics.TooMuchGas)) != undefined
+        );
+
+        if (eventTooMuchGas) {
+            let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventTooMuchGas.data);
+            let lastTopic = eventTooMuchGas.getLastTopic();
+            let returnMessage = lastTopic?.toString() || returnCode.toString();
+
+            return {
+                returnCode: returnCode,
+                returnMessage: returnMessage,
+                values: returnDataParts
+            };
+        }
+
+        // On "writeLog" with first topic == sender
+        let eventWriteLogWhereTopicIsSender = logs.findSingleOrNoneEvent(
+            WellKnownEvents.OnWriteLog,
+            event => event.findFirstOrNoneTopic(topic => topic.hex() == transaction.sender.hex()) != undefined
+        );
+
+        if (eventWriteLogWhereTopicIsSender) {
+            let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventWriteLogWhereTopicIsSender.data);
+            let returnMessage = returnCode.toString();
+
+            return {
+                returnCode: returnCode,
+                returnMessage: returnMessage,
+                values: returnDataParts
+            };
+        }
+
+        throw new ErrCannotParseContractResults(`transaction ${transaction.hash.toString()}`);
     }
 
-    private sliceDataParts(parts: Buffer[]): { returnCode: ReturnCode, returnDataParts: Buffer[] } {
+    private findResultItemWithReturnData(items: SmartContractResultItem[]) {
+        let result = items.find(item => item.nonce.valueOf() != 0 && item.data.startsWith("@"));
+        return result;
+    }
+
+    private sliceDataFieldInParts(data: string): { returnCode: ReturnCode, returnDataParts: Buffer[] } {
+        let parts = new ArgSerializer().stringToBuffers(data);
         let emptyReturnPart = parts[0] || Buffer.from([]);
         let returnCodePart = parts[1] || Buffer.from([]);
         let returnDataParts = parts.slice(2);

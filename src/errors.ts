@@ -109,6 +109,15 @@ export class ErrInvariantFailed extends Err {
 }
 
 /**
+ * Signals an unexpected condition.
+ */
+ export class ErrUnexpectedCondition extends Err {
+  public constructor(message: string) {
+    super(`Unexpected condition: [${message}]`);
+  }
+}
+
+/**
  * Signals issues with {@link Address} instantiation.
  */
 export class ErrAddressCannotCreate extends Err {

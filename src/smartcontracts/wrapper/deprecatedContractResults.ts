@@ -115,7 +115,7 @@ export class TypedResult extends SmartContractResultItem implements Result.IResu
     }
 
     getReturnCode(): ReturnCode {
-        let tokens = this.getDataParts();
+        let tokens = new ArgSerializer().stringToBuffers(this.data);
         if (tokens.length < 2) {
             return ReturnCode.None;
         }
@@ -127,7 +127,8 @@ export class TypedResult extends SmartContractResultItem implements Result.IResu
         this.assertSuccess();
 
         // Skip the first 2 SCRs (eg. the @6f6b from @6f6b@2b).
-        return this.getDataParts().slice(2);
+        let dataParts = new ArgSerializer().stringToBuffers(this.data);
+        return dataParts.slice(2);
     }
 
     /**

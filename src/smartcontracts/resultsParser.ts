@@ -1,10 +1,12 @@
+import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
+import { TransactionLogs } from "../transactionLogs";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, IResultsParser, UntypedOutcomeBundle } from "./interface";
 import { QueryResponse } from "./queryResponse";
 import { ReturnCode } from "./returnCode";
-import { SmartContractResultItem } from "./smartContractResults";
+import { SmartContractResults } from "./smartContractResults";
 import { EndpointDefinition } from "./typesystem";
 
 enum WellKnownEvents {
@@ -55,11 +57,46 @@ export class ResultsParser implements IResultsParser {
     }
 
     parseUntypedOutcome(transaction: TransactionOnNetwork): UntypedOutcomeBundle {
-        let resultItems = transaction.results.getAll();
-        let logs = transaction.logs;
+        let bundle: UntypedOutcomeBundle | null;
 
-        // Handle simple move balances (or any other transactions without contract results / logs):
-        if (resultItems.length == 0 && logs.events.length == 0) {
+        bundle = this.createBundleOnSimpleMoveBalance(transaction)
+        if (bundle) {
+            return bundle;
+        }
+
+        bundle = this.createBundleOnInvalidTransaction(transaction);
+        if (bundle) {
+            return bundle;
+        }
+
+        bundle = this.createBundleOnEasilyFoundResultWithReturnData(transaction.results);
+        if (bundle) {
+            return bundle;
+        }
+
+        bundle = this.createBundleOnSignalError(transaction.logs);
+        if (bundle) {
+            return bundle;
+        }
+
+        bundle = this.createBundleOnTooMuchGasWarning(transaction.logs);
+        if (bundle) {
+            return bundle;
+        }
+
+        bundle = this.createBundleOnWriteLogWhereFirstTopicEqualsAddress(transaction.logs, transaction.sender);
+        if (bundle) {
+            return bundle;
+        }
+
+        throw new ErrCannotParseContractResults(`transaction ${transaction.hash.toString()}`);
+    }
+
+    private createBundleOnSimpleMoveBalance(transaction: TransactionOnNetwork): UntypedOutcomeBundle | null {
+        let noResults = transaction.results.getAll().length == 0;
+        let noLogs = transaction.logs.events.length == 0;
+
+        if (noResults && noLogs) {
             return {
                 returnCode: ReturnCode.Unknown,
                 returnMessage: ReturnCode.Unknown.toString(),
@@ -67,7 +104,10 @@ export class ResultsParser implements IResultsParser {
             };
         }
 
-        // Handle invalid transactions:
+        return null;
+    }
+
+    private createBundleOnInvalidTransaction(transaction: TransactionOnNetwork): UntypedOutcomeBundle | null {
         if (transaction.status.isInvalid()) {
             return {
                 returnCode: ReturnCode.Unknown,
@@ -76,78 +116,81 @@ export class ResultsParser implements IResultsParser {
             };
         }
 
-        // Let's search the contract result holding the returnData:
-        let resultItemWithReturnData = this.findResultItemWithReturnData(resultItems);
+        return null;
+    }
 
-        if (resultItemWithReturnData) {
-            let { returnCode, returnDataParts } = this.sliceDataFieldInParts(resultItemWithReturnData.data);
-            let returnMessage = resultItemWithReturnData.returnMessage || returnCode.toString();
-
-            return {
-                returnCode: returnCode,
-                returnMessage: returnMessage,
-                values: returnDataParts
-            };
+    private createBundleOnEasilyFoundResultWithReturnData(results: SmartContractResults): UntypedOutcomeBundle | null {
+        let resultItemWithReturnData = results.getAll().find(item => item.nonce.valueOf() != 0 && item.data.startsWith("@"));
+        if (!resultItemWithReturnData) {
+            return null;
         }
 
-        // If we didn't find it, then fallback to events & logs.
-        
-        // On "signalError":
+        let { returnCode, returnDataParts } = this.sliceDataFieldInParts(resultItemWithReturnData.data);
+        let returnMessage = resultItemWithReturnData.returnMessage || returnCode.toString();
+
+        return {
+            returnCode: returnCode,
+            returnMessage: returnMessage,
+            values: returnDataParts
+        };
+    }
+
+    private createBundleOnSignalError(logs: TransactionLogs): UntypedOutcomeBundle | null {
         let eventSignalError = logs.findSingleOrNoneEvent(WellKnownEvents.OnSignalError);
-
-        if (eventSignalError) {
-            let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventSignalError.data);
-            let lastTopic = eventSignalError.getLastTopic();
-            let returnMessage = lastTopic?.toString() || returnCode.toString();
-
-            return {
-                returnCode: returnCode,
-                returnMessage: returnMessage,
-                values: returnDataParts
-            };
+        if (!eventSignalError) {
+            return null;
         }
 
-        // On "writeLog" with topic "@too much gas provided for processing"
+        let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventSignalError.data);
+        let lastTopic = eventSignalError.getLastTopic();
+        let returnMessage = lastTopic?.toString() || returnCode.toString();
+
+        return {
+            returnCode: returnCode,
+            returnMessage: returnMessage,
+            values: returnDataParts
+        };
+    }
+
+    private createBundleOnTooMuchGasWarning(logs: TransactionLogs): UntypedOutcomeBundle | null {
         let eventTooMuchGas = logs.findSingleOrNoneEvent(
             WellKnownEvents.OnWriteLog,
             event => event.findFirstOrNoneTopic(topic => topic.toString().startsWith(WellKnownTopics.TooMuchGas)) != undefined
         );
 
-        if (eventTooMuchGas) {
-            let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventTooMuchGas.data);
-            let lastTopic = eventTooMuchGas.getLastTopic();
-            let returnMessage = lastTopic?.toString() || returnCode.toString();
-
-            return {
-                returnCode: returnCode,
-                returnMessage: returnMessage,
-                values: returnDataParts
-            };
+        if (!eventTooMuchGas) {
+            return null;
         }
 
-        // On "writeLog" with first topic == sender
-        let eventWriteLogWhereTopicIsSender = logs.findSingleOrNoneEvent(
-            WellKnownEvents.OnWriteLog,
-            event => event.findFirstOrNoneTopic(topic => topic.hex() == transaction.sender.hex()) != undefined
-        );
+        let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventTooMuchGas.data);
+        let lastTopic = eventTooMuchGas.getLastTopic();
+        let returnMessage = lastTopic?.toString() || returnCode.toString();
 
-        if (eventWriteLogWhereTopicIsSender) {
-            let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventWriteLogWhereTopicIsSender.data);
-            let returnMessage = returnCode.toString();
-
-            return {
-                returnCode: returnCode,
-                returnMessage: returnMessage,
-                values: returnDataParts
-            };
-        }
-
-        throw new ErrCannotParseContractResults(`transaction ${transaction.hash.toString()}`);
+        return {
+            returnCode: returnCode,
+            returnMessage: returnMessage,
+            values: returnDataParts
+        };
     }
 
-    private findResultItemWithReturnData(items: SmartContractResultItem[]) {
-        let result = items.find(item => item.nonce.valueOf() != 0 && item.data.startsWith("@"));
-        return result;
+    private createBundleOnWriteLogWhereFirstTopicEqualsAddress(logs: TransactionLogs, address: Address): UntypedOutcomeBundle | null {
+        let eventWriteLogWhereTopicIsSender = logs.findSingleOrNoneEvent(
+            WellKnownEvents.OnWriteLog,
+            event => event.findFirstOrNoneTopic(topic => topic.hex() == address.hex()) != undefined
+        );
+
+        if (!eventWriteLogWhereTopicIsSender) {
+            return null;
+        }
+
+        let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventWriteLogWhereTopicIsSender.data);
+        let returnMessage = returnCode.toString();
+
+        return {
+            returnCode: returnCode,
+            returnMessage: returnMessage,
+            values: returnDataParts
+        };
     }
 
     private sliceDataFieldInParts(data: string): { returnCode: ReturnCode, returnDataParts: Buffer[] } {

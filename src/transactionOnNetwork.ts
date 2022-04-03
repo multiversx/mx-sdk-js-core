@@ -109,7 +109,7 @@ export class TransactionOnNetworkType {
 export class Receipt {
     value: Balance = Balance.Zero();
     sender: Address = new Address();
-    message: string = "";
+    data: string = "";
     hash: TransactionHash = TransactionHash.empty();
 
     static fromHttpResponse(response: {
@@ -122,7 +122,7 @@ export class Receipt {
 
         receipt.value = Balance.fromString(response.value);
         receipt.sender = new Address(response.sender);
-        receipt.message = response.data;
+        receipt.data = response.data;
         receipt.hash = new TransactionHash(response.txHash);
 
         return receipt;

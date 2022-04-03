@@ -1,3 +1,5 @@
+import * as fs from "fs";
+import path from "path";
 import { assert } from "chai";
 import { BigUIntType, BigUIntValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition } from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
@@ -7,9 +9,24 @@ import { ResultsParser } from "./resultsParser";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractResultItem, SmartContractResults } from "./smartContractResults";
 import { Nonce } from "../nonce";
+import { TransactionHash } from "../transaction";
 import { TransactionEvent, TransactionEventTopic, TransactionLogs } from "../transactionLogs";
 import { Address } from "../address";
+import { Logger, LogLevel } from "../logger";
 
+const KnownReturnCodes: string[] = [
+    ReturnCode.None.valueOf(), 
+    ReturnCode.Ok.valueOf(), 
+    ReturnCode.FunctionNotFound.valueOf(),
+    ReturnCode.FunctionWrongSignature.valueOf(),
+    ReturnCode.ContractNotFound.valueOf(), 
+    ReturnCode.UserError.valueOf(), 
+    ReturnCode.OutOfGas.valueOf(),
+    ReturnCode.AccountCollision.valueOf(), 
+    ReturnCode.OutOfFunds.valueOf(),
+    ReturnCode.CallStackOverFlow.valueOf(), ReturnCode.ContractInvalid.valueOf(),
+    ReturnCode.ExecutionFailed.valueOf()
+];
 
 describe("test smart contract results parser", () => {
     let parser = new ResultsParser();
@@ -123,4 +140,45 @@ describe("test smart contract results parser", () => {
         assert.equal(bundle.returnMessage, "@too much gas provided for processing: gas provided = 596384500, gas used = 733010");
         assert.deepEqual(bundle.values, []);
     });
+
+    it.only("should parse real-world contract outcomes", async () => {
+        let oldLogLevel = Logger.logLevel;
+        Logger.setLevel(LogLevel.Trace);
+
+        let folder = path.resolve(process.env["SAMPLES"] || "SAMPLES")
+        let samples = loadRealWorldSamples(folder);
+
+        for (const [transaction, _] of samples) {
+            console.log("Transaction:", transaction.hash.toString());
+
+            let bundle = parser.parseUntypedOutcome(transaction);
+
+            console.log("Return code:", bundle.returnCode.toString());
+            console.log("Return message:", bundle.returnMessage);
+            console.log("Num values:", bundle.values.length);
+            console.log("=".repeat(80));
+
+            assert.include(KnownReturnCodes, bundle.returnCode.valueOf());
+        }
+
+        Logger.setLevel(oldLogLevel);
+    });
+
+    function loadRealWorldSamples(folder: string): [TransactionOnNetwork, string][] {
+        let transactionFiles = fs.readdirSync(folder);
+        let samples: [TransactionOnNetwork, string][] = [];
+
+        for (const file of transactionFiles) {
+            let txHash = new TransactionHash(path.basename(file, ".json"));
+            let filePath = path.resolve(folder, file);
+            let jsonContent: string = fs.readFileSync(filePath, { encoding: "utf8" });
+            let json = JSON.parse(jsonContent);
+            let payload = json["data"]["transaction"];
+            let transaction = TransactionOnNetwork.fromHttpResponse(txHash, payload);
+
+            samples.push([transaction, jsonContent]);
+        }
+
+        return samples;
+    }
 });

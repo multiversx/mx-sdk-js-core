@@ -1,6 +1,7 @@
 import { TransactionDecoder, TransactionMetadata } from "@elrondnetwork/transaction-decoder";
 import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
+import { Logger } from "../logger";
 import { TransactionLogs } from "../transactionLogs";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ArgSerializer } from "./argSerializer";
@@ -20,6 +21,10 @@ enum WellKnownTopics {
     TooMuchGas = "@too much gas provided for processing"
 }
 
+/**
+ * Parses contract query responses and smart contract results.
+ * The parsing involves some heuristics, in order to handle slight inconsistencies (e.g. some SCRs are present on API, but missing on Gateway).
+ */
 export class ResultsParser implements IResultsParser {
     parseQueryResponse(queryResponse: QueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle {
         let parts = queryResponse.getReturnDataParts();
@@ -64,36 +69,49 @@ export class ResultsParser implements IResultsParser {
 
         bundle = this.createBundleOnSimpleMoveBalance(transaction)
         if (bundle) {
+            Logger.trace("parseUntypedOutcome(): on simple move balance");
             return bundle;
         }
 
         bundle = this.createBundleOnInvalidTransaction(transaction);
         if (bundle) {
+            Logger.trace("parseUntypedOutcome(): on invalid transaction");
             return bundle;
         }
 
         bundle = this.createBundleOnEasilyFoundResultWithReturnData(transaction.results);
         if (bundle) {
+            Logger.trace("parseUntypedOutcome(): on easily found result with return data");
             return bundle;
         }
 
         bundle = this.createBundleOnSignalError(transaction.logs);
         if (bundle) {
+            Logger.trace("parseUntypedOutcome(): on signal error");
             return bundle;
         }
 
         bundle = this.createBundleOnTooMuchGasWarning(transaction.logs);
         if (bundle) {
+            Logger.trace("parseUntypedOutcome(): on 'too much gas' warning");
             return bundle;
         }
 
         bundle = this.createBundleOnWriteLogWhereFirstTopicEqualsAddress(transaction.logs, transaction.sender);
         if (bundle) {
+            Logger.trace("parseUntypedOutcome(): on writelog with topics[0] == tx.sender");
             return bundle;
         }
 
-        bundle = this.createBundleCustom(transaction, transactionMetadata);
+        bundle = this.createBundleWithCustomHeuristics(transaction, transactionMetadata);
         if (bundle) {
+            Logger.trace("parseUntypedOutcome(): with custom heuristics");
+            return bundle;
+        }
+
+        bundle = this.createBundleWithFallbackHeuristics(transaction, transactionMetadata);
+        if (bundle) {
+            Logger.trace("parseUntypedOutcome(): with fallback heuristics");
             return bundle;
         }
 
@@ -127,11 +145,15 @@ export class ResultsParser implements IResultsParser {
 
     private createBundleOnInvalidTransaction(transaction: TransactionOnNetwork): UntypedOutcomeBundle | null {
         if (transaction.status.isInvalid()) {
-            return {
-                returnCode: ReturnCode.Unknown,
-                returnMessage: transaction.receipt.message,
-                values: []
-            };
+            if (transaction.receipt.data) {
+                return {
+                    returnCode: ReturnCode.OutOfFunds,
+                    returnMessage: transaction.receipt.data,
+                    values: []
+                };
+            }
+
+            // If there's no receipt message, let other heuristics to handle the outcome (most probably, a log with "signalError" is emitted).
         }
 
         return null;
@@ -214,7 +236,32 @@ export class ResultsParser implements IResultsParser {
     /**
      * Override this method (in a subclass of {@link ResultsParser}) if the basic heuristics of the parser are failing.
      */
-    protected createBundleCustom(_transaction: TransactionOnNetwork, _transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
+    protected createBundleWithCustomHeuristics(_transaction: TransactionOnNetwork, _transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
+        return null;
+    }
+
+    private createBundleWithFallbackHeuristics(transaction: TransactionOnNetwork, transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
+        let contractAddress = new Address(transactionMetadata.receiver);
+
+        for (const resultItem of transaction.results.getAll()) {
+            let writeLogWithReturnData = resultItem.logs.findSingleOrNoneEvent(WellKnownEvents.OnWriteLog, event => {
+                let addressIsSender = event.address.equals(transaction.sender);
+                let firstTopicIsContract = event.topics[0]?.hex() == contractAddress.hex();
+                return addressIsSender && firstTopicIsContract;
+            });
+
+            if (writeLogWithReturnData) {
+                let { returnCode, returnDataParts } = this.sliceDataFieldInParts(writeLogWithReturnData.data);
+                let returnMessage = returnCode.toString();
+
+                return {
+                    returnCode: returnCode,
+                    returnMessage: returnMessage,
+                    values: returnDataParts
+                };
+            }
+        }
+
         return null;
     }
 

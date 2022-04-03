@@ -134,8 +134,8 @@ export class ResultsParser implements IResultsParser {
 
         if (noResults && noLogs) {
             return {
-                returnCode: ReturnCode.Unknown,
-                returnMessage: ReturnCode.Unknown.toString(),
+                returnCode: ReturnCode.None,
+                returnMessage: ReturnCode.None.toString(),
                 values: []
             };
         }
@@ -243,6 +243,7 @@ export class ResultsParser implements IResultsParser {
     private createBundleWithFallbackHeuristics(transaction: TransactionOnNetwork, transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
         let contractAddress = new Address(transactionMetadata.receiver);
 
+        // Search the nested logs for matching events (writeLog):
         for (const resultItem of transaction.results.getAll()) {
             let writeLogWithReturnData = resultItem.logs.findSingleOrNoneEvent(WellKnownEvents.OnWriteLog, event => {
                 let addressIsSender = event.address.equals(transaction.sender);
@@ -266,14 +267,21 @@ export class ResultsParser implements IResultsParser {
     }
 
     private sliceDataFieldInParts(data: string): { returnCode: ReturnCode, returnDataParts: Buffer[] } {
-        let parts = new ArgSerializer().stringToBuffers(data);
-        let emptyReturnPart = parts[0] || Buffer.from([]);
-        let returnCodePart = parts[1] || Buffer.from([]);
-        let returnDataParts = parts.slice(2);
+        // By default, skip the first part, which is usually empty (e.g. "[empty]@6f6b")
+        let startingIndex = 1;
 
-        if (emptyReturnPart.length != 0) {
-            throw new ErrCannotParseContractResults("no leading empty part");
+        // Before trying to parse the hex strings, cut the unwanted parts of the data field, in case of token transfers:
+        if (data.startsWith("ESDTTransfer")) {
+            // Skip "ESDTTransfer" (1), token identifier (2), amount (3)
+            startingIndex = 3;
+        } else {
+            // TODO: Upon gathering more transaction samples, fix for other kinds of transfers, as well.
         }
+
+        let parts = new ArgSerializer().stringToBuffers(data);
+        let returnCodePart = parts[startingIndex] || Buffer.from([]);
+        let returnDataParts = parts.slice(startingIndex + 1);
+        
         if (returnCodePart.length == 0) {
             throw new ErrCannotParseContractResults("no return code");
         }

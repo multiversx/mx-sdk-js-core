@@ -25,7 +25,12 @@ const KnownReturnCodes: string[] = [
     ReturnCode.AccountCollision.valueOf(), 
     ReturnCode.OutOfFunds.valueOf(),
     ReturnCode.CallStackOverFlow.valueOf(), ReturnCode.ContractInvalid.valueOf(),
-    ReturnCode.ExecutionFailed.valueOf()
+    ReturnCode.ExecutionFailed.valueOf(),
+    // Provided by protocol, not by VM:
+    "insufficient funds",
+    "operation in account not permitted not the owner of the account",
+    "sending value to non payable contract",
+    "invalid receiver address"
 ];
 
 describe("test smart contract results parser", () => {
@@ -141,7 +146,7 @@ describe("test smart contract results parser", () => {
         assert.deepEqual(bundle.values, []);
     });
 
-    it.only("should parse real-world contract outcomes", async () => {
+    it.skip("should parse real-world contract outcomes", async () => {
         let oldLogLevel = Logger.logLevel;
         Logger.setLevel(LogLevel.Trace);
 

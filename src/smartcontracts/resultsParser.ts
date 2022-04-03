@@ -76,7 +76,7 @@ export class ResultsParser implements IResultsParser {
             };
         }
 
-        // Let's search the result holding the returnData:
+        // Let's search the contract result holding the returnData:
         let resultItemWithReturnData = this.findResultItemWithReturnData(resultItems);
 
         if (resultItemWithReturnData) {
@@ -109,7 +109,7 @@ export class ResultsParser implements IResultsParser {
 
         // On "writeLog" with topic "@too much gas provided for processing"
         let eventTooMuchGas = logs.findSingleOrNoneEvent(
-            WellKnownEvents.OnWriteLog, 
+            WellKnownEvents.OnWriteLog,
             event => event.findFirstOrNoneTopic(topic => topic.toString().startsWith(WellKnownTopics.TooMuchGas)) != undefined
         );
 

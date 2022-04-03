@@ -4,6 +4,7 @@ import { Hash } from "../hash";
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
 import { TransactionHash } from "../transaction";
+import { TransactionLogs } from "../transactionLogs";
 
 export class SmartContractResults {
     private readonly items: SmartContractResultItem[] = [];
@@ -43,6 +44,7 @@ export class SmartContractResultItem {
     gasLimit: GasLimit = new GasLimit(0);
     gasPrice: GasPrice = new GasPrice(0);
     callType: number = 0;
+    logs: TransactionLogs = TransactionLogs.empty();
 
     static fromHttpResponse(response: {
         hash: string,
@@ -57,6 +59,7 @@ export class SmartContractResultItem {
         gasPrice: number,
         callType: number,
         returnMessage: string
+        logs: any[]
     }): SmartContractResultItem {
         let item = new SmartContractResultItem();
 
@@ -72,6 +75,8 @@ export class SmartContractResultItem {
         item.gasLimit = new GasLimit(response.gasLimit);
         item.gasPrice = new GasPrice(response.gasPrice);
         item.callType = response.callType;
+
+        item.logs = TransactionLogs.fromHttpResponse(response.logs || {});
 
         return item;
     }

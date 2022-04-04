@@ -29,7 +29,7 @@ export class TransactionCompletionStrategy {
 
         // Handle gateway mechanics:
         for (const completionEvent of WellKnownCompletionEvents) {
-            if (transaction.logs.findEventByIdentifier(completionEvent)) {
+            if (transaction.logs.findFirstOrNoneEvent(completionEvent)) {
                 // Certainly completed.
                 console.debug("TransactionCompletionStrategy.isCompleted(), found event:", completionEvent);
                 return true;

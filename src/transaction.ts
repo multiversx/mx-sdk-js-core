@@ -12,7 +12,7 @@ import {
 import { NetworkConfig } from "./networkConfig";
 import { Nonce } from "./nonce";
 import { Signature } from "./signature";
-import { guardEmpty, guardNotEmpty } from "./utils";
+import { guardNotEmpty } from "./utils";
 import { TransactionPayload } from "./transactionPayload";
 import * as errors from "./errors";
 import { TypedEvent } from "./events";
@@ -32,8 +32,6 @@ export class Transaction implements ISignable {
     transaction: Transaction;
     signedBy: Address;
   }>;
-  readonly onSent: TypedEvent<{ transaction: Transaction }>;
-
   /**
    * The nonce of the transaction (the account sequence number of the sender).
    */
@@ -95,11 +93,6 @@ export class Transaction implements ISignable {
   private hash: TransactionHash;
 
   /**
-   * A (cached) representation of the transaction, as fetched from the API.
-   */
-  private asOnNetwork: TransactionOnNetwork = new TransactionOnNetwork();
-
-  /**
    * Creates a new Transaction object.
    */
   public constructor({
@@ -140,7 +133,6 @@ export class Transaction implements ISignable {
     this.hash = TransactionHash.empty();
 
     this.onSigned = new TypedEvent();
-    this.onSent = new TypedEvent();
   }
 
   getNonce(): Nonce {
@@ -326,8 +318,6 @@ export class Transaction implements ISignable {
    */
   async send(provider: IProvider): Promise<TransactionHash> {
     this.hash = await provider.sendTransaction(this);
-
-    this.onSent.emit({ transaction: this });
     return this.hash;
   }
 
@@ -354,36 +344,15 @@ export class Transaction implements ISignable {
    * Fetches a representation of the transaction (whether pending, processed or finalized), as found on the Network.
    *
    * @param fetcher The transaction fetcher to use
-   * @param cacheLocally Whether to cache the response locally, on the transaction object
-   * @param withResults Whether to wait for the transaction results
    */
-  async getAsOnNetwork(
-    fetcher: ITransactionFetcher,
-    cacheLocally = true,
-    withResults = true
-  ): Promise<TransactionOnNetwork> {
-    if (this.hash.isEmpty()) {
-      throw new errors.ErrTransactionHashUnknown();
-    }
-
+  async getAsOnNetwork(fetcher: ITransactionFetcher): Promise<TransactionOnNetwork> {
     let response = await fetcher.getTransaction(
       this.hash,
       this.sender,
-      withResults
+      true
     );
 
-    if (cacheLocally) {
-      this.asOnNetwork = response;
-    }
-
     return response;
-  }
-
-  /**
-   * Returns the cached representation of the transaction, as previously fetched using {@link Transaction.getAsOnNetwork}.
-   */
-  getAsOnNetworkCached(): TransactionOnNetwork {
-    return this.asOnNetwork;
   }
 
   async awaitSigned(): Promise<void> {

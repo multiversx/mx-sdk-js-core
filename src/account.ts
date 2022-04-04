@@ -1,4 +1,3 @@
-import { IProvider } from "./interface";
 import { Address } from "./address";
 import { Nonce } from "./nonce";
 import { Balance } from "./balance";
@@ -32,13 +31,11 @@ export class Account {
     }
 
     /**
-     * Synchronizes account properties (such as nonce, balance) with the ones queried from the Network
-     * @param provider the Network provider
+     * Updates account properties (such as nonce, balance).
      */
-    async sync(provider: IProvider) {
-        let response = await provider.getAccount(this.address);
-        this.nonce = response.nonce;
-        this.balance = response.balance;
+    async update(obj: { nonce: Nonce, balance: Balance}) {
+        this.nonce = obj.nonce;
+        this.balance = obj.balance;
     }
 
     /**

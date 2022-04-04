@@ -234,7 +234,7 @@ export class ResultsParser implements IResultsParser {
     }
 
     /**
-     * Override this method (in a subclass of {@link ResultsParser}) if the basic heuristics of the parser are failing.
+     * Override this method (in a subclass of {@link ResultsParser}) if the basic heuristics of the parser are not sufficient.
      */
     protected createBundleWithCustomHeuristics(_transaction: TransactionOnNetwork, _transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
         return null;
@@ -275,7 +275,7 @@ export class ResultsParser implements IResultsParser {
             // Skip "ESDTTransfer" (1), token identifier (2), amount (3)
             startingIndex = 3;
         } else {
-            // TODO: Upon gathering more transaction samples, fix for other kinds of transfers, as well.
+            // TODO: Upon gathering more transaction samples, fix for other kinds of transfers, as well (future PR, as needed).
         }
 
         let parts = new ArgSerializer().stringToBuffers(data);

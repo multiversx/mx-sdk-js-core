@@ -16,7 +16,6 @@ import { guardEmpty, guardNotEmpty } from "./utils";
 import { TransactionPayload } from "./transactionPayload";
 import * as errors from "./errors";
 import { TypedEvent } from "./events";
-import { TransactionWatcher } from "./transactionWatcher";
 import { ProtoSerializer } from "./proto";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Hash } from "./hash";
@@ -165,7 +164,6 @@ export class Transaction implements ISignable {
    */
   setNonce(nonce: Nonce) {
     this.nonce = nonce;
-    this.doAfterPropertySetter();
   }
 
   getValue(): Balance {
@@ -174,7 +172,6 @@ export class Transaction implements ISignable {
 
   setValue(value: Balance) {
     this.value = value;
-    this.doAfterPropertySetter();
   }
 
   getSender(): Address {
@@ -191,7 +188,6 @@ export class Transaction implements ISignable {
 
   setGasPrice(gasPrice: GasPrice) {
     this.gasPrice = gasPrice;
-    this.doAfterPropertySetter();
   }
 
   getGasLimit(): GasLimit {
@@ -200,7 +196,6 @@ export class Transaction implements ISignable {
 
   setGasLimit(gasLimit: GasLimit) {
     this.gasLimit = gasLimit;
-    this.doAfterPropertySetter();
   }
 
   getData(): TransactionPayload {
@@ -213,7 +208,6 @@ export class Transaction implements ISignable {
 
   setChainID(chainID: ChainID) {
     this.chainID = chainID;
-    this.doAfterPropertySetter();
   }
 
   getVersion(): TransactionVersion {
@@ -222,11 +216,6 @@ export class Transaction implements ISignable {
 
   getOptions(): TransactionOptions {
     return this.options;
-  }
-
-  doAfterPropertySetter() {
-    this.signature = Signature.empty();
-    this.hash = TransactionHash.empty();
   }
 
   getSignature(): Signature {
@@ -316,9 +305,6 @@ export class Transaction implements ISignable {
   applySignature(signature: ISignatureOfExternalSigner, signedBy: IAddressOfExternalSigner) {
     let adaptedSignature = adaptToSignature(signature);
     let adaptedSignedBy = adaptToAddress(signedBy);
-    
-    guardEmpty(this.signature, "signature");
-    guardEmpty(this.hash, "hash");
 
     this.signature = adaptedSignature;
     this.sender = adaptedSignedBy;

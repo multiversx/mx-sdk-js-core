@@ -4,7 +4,6 @@ import { Hash } from "../hash";
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
 import { TransactionHash } from "../transaction";
-import { ArgSerializer } from "./argSerializer";
 import { TransactionLogs } from "../transactionLogs";
 
 export class SmartContractResults {
@@ -39,6 +38,7 @@ export class SmartContractResultItem {
     receiver: Address = new Address();
     sender: Address = new Address();
     data: string = "";
+    returnMessage: string = "";
     previousHash: Hash = Hash.empty();
     originalHash: Hash = Hash.empty();
     gasLimit: GasLimit = new GasLimit(0);
@@ -69,6 +69,7 @@ export class SmartContractResultItem {
         item.receiver = new Address(response.receiver);
         item.sender = new Address(response.sender);
         item.data = response.data || "";
+        item.returnMessage = response.returnMessage || "";
         item.previousHash = new TransactionHash(response.prevTxHash);
         item.originalHash = new TransactionHash(response.originalTxHash);
         item.gasLimit = new GasLimit(response.gasLimit);
@@ -78,9 +79,5 @@ export class SmartContractResultItem {
         item.logs = TransactionLogs.fromHttpResponse(response.logs || {});
 
         return item;
-    }
-
-    getDataParts(): Buffer[] {
-        return new ArgSerializer().stringToBuffers(this.data);
     }
 }

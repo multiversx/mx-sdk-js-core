@@ -128,7 +128,7 @@ export class MockProvider implements IProvider {
                 this.mockUpdateTransaction(hash, (transaction) => {
                     transaction.status = point;
                 });
-            } else if (point instanceof MarkNotarized) {
+            } else if (point instanceof InHyperblock) {
                 this.mockUpdateTransaction(hash, (transaction) => {
                     transaction.hyperblockNonce = DummyHyperblockNonce;
                     transaction.hyperblockHash = DummyHyperblockHash;
@@ -234,7 +234,7 @@ export class Wait {
     }
 }
 
-export class MarkNotarized { }
+export class InHyperblock { }
 
 class QueryContractResponder {
     readonly matches: (query: Query) => boolean;

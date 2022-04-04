@@ -1,12 +1,19 @@
-import { IProvider, ITransactionFetcher } from "./interface";
+import { ITransactionFetcher } from "./interface";
 import { AsyncTimer } from "./asyncTimer";
 import { TransactionHash, TransactionStatus } from "./transaction";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
-import * as errors from "./errors";
 import { Logger } from "./logger";
+import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached } from "./errors";
+import { Address } from "./address";
 
 export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
-export type ActionOnStatusReceived = (status: TransactionStatus) => void;
+
+/**
+ * Internal interface: a transaction, as seen from the perspective of a {@link TransactionWatcher}.
+ */
+interface ITransaction {
+    getHash(): TransactionHash;
+}
 
 /**
  * TransactionWatcher allows one to continuously watch (monitor), by means of polling, the status of a given transaction.
@@ -17,26 +24,22 @@ export class TransactionWatcher {
 
     static NoopOnStatusReceived = (_: TransactionStatus) => { };
 
-    private readonly hash: TransactionHash;
     private readonly fetcher: ITransactionFetcher;
     private readonly pollingInterval: number;
     private readonly timeout: number;
 
     /**
      * 
-     * @param hash The hash of the transaction to watch
      * @param fetcher The transaction fetcher
      * @param pollingInterval The polling interval, in milliseconds
      * @param timeout The timeout, in milliseconds
      */
     constructor(
-        hash: TransactionHash,
         fetcher: ITransactionFetcher,
         pollingInterval: number = TransactionWatcher.DefaultPollingInterval,
         timeout: number = TransactionWatcher.DefaultTimeout
     ) {
-        this.hash = hash;
-        this.fetcher = fetcher;
+        this.fetcher = new TransactionFetcherWithTracing(fetcher);
         this.pollingInterval = pollingInterval;
         this.timeout = timeout;
     }
@@ -44,57 +47,89 @@ export class TransactionWatcher {
     /**
      * Waits until the transaction reaches the "pending" status.
      */
-    public async awaitPending(onStatusReceived?: ActionOnStatusReceived): Promise<void> {
-        await this.awaitStatus(status => status.isPending(), onStatusReceived || TransactionWatcher.NoopOnStatusReceived);
-    }
-
-    /**
-      * Waits until the transaction reaches the "executed" status.
-      */
-    public async awaitExecuted(onStatusReceived?: ActionOnStatusReceived): Promise<void> {
-        await this.awaitStatus(status => status.isExecuted(), onStatusReceived || TransactionWatcher.NoopOnStatusReceived);
-    }
-
-    /**
-     * Waits until the predicate over the transaction status evaluates to "true".
-     * @param isAwaitedStatus A predicate over the status
-     */
-    public async awaitStatus(isAwaitedStatus: PredicateIsAwaitedStatus, onStatusReceived: ActionOnStatusReceived): Promise<void> {
-        let doFetch = async () => await this.fetcher.getTransactionStatus(this.hash);
-        let errorProvider = () => new errors.ErrExpectedTransactionStatusNotReached();
-
+    public async awaitPending(transaction: ITransaction): Promise<void> {
+        let isPending = (status: TransactionStatus) => status.isPending();
+        let doFetch = async () => await this.fetcher.getTransactionStatus(transaction.getHash());
+        let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
+        
         return this.awaitConditionally<TransactionStatus>(
-            isAwaitedStatus,
+            isPending,
             doFetch,
-            onStatusReceived,
             errorProvider
         );
     }
 
-    public async awaitNotarized(): Promise<void> {
-        let isNotarized = (data: TransactionOnNetwork) => !data.hyperblockHash.isEmpty();
-        let doFetch = async () => await this.fetcher.getTransaction(this.hash);
-        let errorProvider = () => new errors.ErrTransactionWatcherTimeout();
+    /**
+      * Waits until the transaction is completely processed.
+      */
+    public async awaitCompleted(transaction: ITransaction): Promise<void> {
+        let isCompleted = (transactionOnNetwork: TransactionOnNetwork) => transactionOnNetwork.isCompleted();
+        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
+        let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 
         return this.awaitConditionally<TransactionOnNetwork>(
-            isNotarized,
+            isCompleted,
             doFetch,
-            (_) => { },
             errorProvider
         );
     }
 
-    public async awaitConditionally<TData>(
+    public async awaitAllEvents(transaction: ITransaction, events: string[]): Promise<void> {
+        let foundAllEvents = (transactionOnNetwork: TransactionOnNetwork) => {
+            let allEventIdentifiers = transactionOnNetwork.getAllEvents().map(event => event.identifier);
+            let allAreFound = events.every(event => allEventIdentifiers.includes(event));
+            return allAreFound;
+        };
+
+        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
+        let errorProvider = () => new ErrExpectedTransactionEventsNotFound();
+
+        return this.awaitConditionally<TransactionOnNetwork>(
+            foundAllEvents,
+            doFetch,
+            errorProvider
+        );
+    }
+
+    public async awaitAnyEvent(transaction: ITransaction, events: string[]): Promise<void> {
+        let foundAnyEvent = (transactionOnNetwork: TransactionOnNetwork) => {
+            let allEventIdentifiers = transactionOnNetwork.getAllEvents().map(event => event.identifier);
+            let anyIsFound = events.find(event => allEventIdentifiers.includes(event)) != undefined;
+            return anyIsFound;
+        };
+
+        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
+        let errorProvider = () => new ErrExpectedTransactionEventsNotFound();
+
+        return this.awaitConditionally<TransactionOnNetwork>(
+            foundAnyEvent,
+            doFetch,
+            errorProvider
+        );
+    }
+
+    public async awaitOnCondition(transaction: ITransaction, condition: (data: TransactionOnNetwork) => boolean): Promise<void> {
+        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
+        let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
+
+        return this.awaitConditionally<TransactionOnNetwork>(
+            condition,
+            doFetch,
+            errorProvider
+        );
+    }
+
+    private async awaitConditionally<TData>(
         isSatisfied: (data: TData) => boolean,
         doFetch: () => Promise<TData>,
-        onFetched: (data: TData) => void,
-        createError: () => errors.Err
+        createError: () => Err
     ): Promise<void> {
         let periodicTimer = new AsyncTimer("watcher:periodic");
         let timeoutTimer = new AsyncTimer("watcher:timeout");
 
         let stop = false;
         let fetchedData: TData | undefined = undefined;
+        let satisfied: boolean = false;
 
         let _ = timeoutTimer.start(this.timeout).finally(() => {
             timeoutTimer.stop();
@@ -106,19 +141,14 @@ export class TransactionWatcher {
 
             try {
                 fetchedData = await doFetch();
-                Logger.debug("TransactionWatcher.awaitConditionally(): fetched data.", this.hash.toString())
-
-                if (onFetched) {
-                    onFetched(fetchedData);
-                }
-
-                if (isSatisfied(fetchedData) || stop) {
+                satisfied = isSatisfied(fetchedData);
+                if (satisfied || stop) {
                     break;
                 }
             } catch (error) {
-                Logger.debug("TransactionWatcher.awaitConditionally(): cannot (yet) fetch data.", this.hash.toString());
+                Logger.debug("TransactionWatcher.awaitConditionally(): cannot (yet) fetch data.");
 
-                if (!(error instanceof errors.Err)) {
+                if (!(error instanceof Err)) {
                     throw error;
                 }
             }
@@ -128,10 +158,27 @@ export class TransactionWatcher {
             timeoutTimer.stop();
         }
 
-        let notSatisfied = !fetchedData || !isSatisfied(fetchedData);
-        if (notSatisfied) {
+        if (!fetchedData || !satisfied) {
             let error = createError();
             throw error;
         }
+    }
+}
+
+class TransactionFetcherWithTracing implements ITransactionFetcher {
+    private readonly fetcher: ITransactionFetcher;
+
+    constructor(fetcher: ITransactionFetcher) {
+        this.fetcher = fetcher;
+    }
+
+    async getTransaction(txHash: TransactionHash, hintSender?: Address, withResults?: boolean): Promise<TransactionOnNetwork> {
+        Logger.debug(`transactionWatcher, getTransaction(${txHash.toString()})`);
+        return await this.fetcher.getTransaction(txHash, hintSender, withResults);
+    }
+
+    async getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus> {
+        Logger.debug(`transactionWatcher, getTransactionStatus(${txHash.toString()})`);
+        return await this.fetcher.getTransactionStatus(txHash);
     }
 }

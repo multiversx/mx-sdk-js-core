@@ -9,7 +9,8 @@ import { ContractFunction } from "./function";
 import { ResultsParser } from "./resultsParser";
 
 describe("fetch transactions from local testnet", function () {
-    let provider = chooseProxyProvider("local-testnet");;
+    let provider = chooseProxyProvider("local-testnet");
+    let watcher = new TransactionWatcher(provider);
     let alice: TestWallet;
     let resultsParser = new ResultsParser();
 
@@ -53,8 +54,8 @@ describe("fetch transactions from local testnet", function () {
         await transactionDeploy.send(provider);
         await transactionIncrement.send(provider);
 
-        await transactionDeploy.awaitExecuted(provider);
-        await transactionIncrement.awaitExecuted(provider);
+        await watcher.awaitCompleted(transactionDeploy);
+        await watcher.awaitCompleted(transactionIncrement);
 
         await transactionDeploy.getAsOnNetwork(provider);
         await transactionIncrement.getAsOnNetwork(provider);

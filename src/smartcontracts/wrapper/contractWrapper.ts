@@ -189,7 +189,7 @@ export class ContractWrapper extends ChainSendContext {
 
         logger?.transactionSent(transaction);
         await new TransactionWatcher(provider).awaitCompleted(transaction);
-        let transactionOnNetwork = await transaction.getAsOnNetwork(provider);
+        let transactionOnNetwork = await provider.getTransaction(transaction.getHash());
         if (transactionOnNetwork.status.isFailed()) {
             // TODO: extract the error messages
             //let results = transactionOnNetwork.results.getAllResults();

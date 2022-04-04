@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IAddressOfExternalSigner, IProvider, ISignable, ISignatureOfExternalSigner, ITransactionFetcher } from "./interface";
+import { IAddressOfExternalSigner, IProvider, ISignable, ISignatureOfExternalSigner } from "./interface";
 import { Address } from "./address";
 import { Balance } from "./balance";
 import {
@@ -17,7 +17,6 @@ import { TransactionPayload } from "./transactionPayload";
 import * as errors from "./errors";
 import { TypedEvent } from "./events";
 import { ProtoSerializer } from "./proto";
-import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Hash } from "./hash";
 import { adaptToAddress, adaptToSignature } from "./boundaryAdapters";
 
@@ -338,21 +337,6 @@ export class Transaction implements ISignable {
     }
 
     return this.toPlainObject();
-  }
-
-  /**
-   * Fetches a representation of the transaction (whether pending, processed or finalized), as found on the Network.
-   *
-   * @param fetcher The transaction fetcher to use
-   */
-  async getAsOnNetwork(fetcher: ITransactionFetcher): Promise<TransactionOnNetwork> {
-    let response = await fetcher.getTransaction(
-      this.hash,
-      this.sender,
-      true
-    );
-
-    return response;
   }
 
   async awaitSigned(): Promise<void> {

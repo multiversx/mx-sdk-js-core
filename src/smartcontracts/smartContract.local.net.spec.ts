@@ -2,12 +2,11 @@ import { SmartContract } from "./smartContract";
 import { GasLimit } from "../networkParams";
 import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction } from "./function";
-import { NetworkConfig } from "../networkConfig";
 import { loadTestWallets, TestWallet } from "../testutils/wallets";
 import { loadContractCode } from "../testutils";
 import { Logger } from "../logger";
 import { assert } from "chai";
-import { AddressValue, BigUIntType, BigUIntValue, OptionalType, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
+import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 import { decodeUnsignedNumber } from "./codec";
 import { BytesValue } from "./typesystem/bytes";
 import { chooseProxyProvider } from "../interactive";
@@ -81,12 +80,12 @@ describe("test on local testnet", function () {
         await transactionIncrement.send(provider);
 
         await watcher.awaitCompleted(transactionDeploy);
-        let transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);
+        let transactionOnNetwork = await provider.getTransaction(transactionDeploy.getHash());
         let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
         await watcher.awaitCompleted(transactionIncrement);
-        transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);
+        transactionOnNetwork = await provider.getTransaction(transactionIncrement.getHash());
         bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
@@ -292,11 +291,11 @@ describe("test on local testnet", function () {
         await watcher.awaitAnyEvent(transactionStart, ["completedTxEvent"]);
 
         // Let's check the SCRs
-        let transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);
+        let transactionOnNetwork = await provider.getTransaction(transactionDeploy.getHash());
         let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
-        transactionOnNetwork = await transactionStart.getAsOnNetwork(provider);
+        transactionOnNetwork = await provider.getTransaction(transactionStart.getHash());
         bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 

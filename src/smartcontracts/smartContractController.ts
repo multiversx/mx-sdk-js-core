@@ -54,7 +54,7 @@ export class SmartContractController implements ISmartContractController {
 
         await transaction.send(this.provider);
         await this.transactionCompletionAwaiter.awaitCompleted(transaction);
-        let transactionOnNetwork = await transaction.getAsOnNetwork(this.provider);
+        let transactionOnNetwork = await this.provider.getTransaction(transaction.getHash());
         let bundle = this.parser.parseUntypedOutcome(transactionOnNetwork);
 
         Logger.info(`SmartContractController.deploy [end]: transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);
@@ -76,7 +76,7 @@ export class SmartContractController implements ISmartContractController {
 
         await transaction.send(this.provider);
         await this.transactionCompletionAwaiter.awaitCompleted(transaction);
-        let transactionOnNetwork = await transaction.getAsOnNetwork(this.provider);
+        let transactionOnNetwork = await this.provider.getTransaction(transaction.getHash());
         let bundle = this.parser.parseOutcome(transactionOnNetwork, endpoint);
 
         Logger.info(`SmartContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);

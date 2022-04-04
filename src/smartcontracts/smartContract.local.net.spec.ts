@@ -276,8 +276,8 @@ describe("test on local testnet", function () {
         await transactionDeploy.send(provider);
         await transactionStart.send(provider);
 
-        await watcher.awaitCompleted(transactionDeploy);
-        await watcher.awaitCompleted(transactionStart);
+        await watcher.awaitAllEvents(transactionDeploy, ["SCDeploy"]);
+        await watcher.awaitAnyEvent(transactionStart, ["completedTxEvent"]);
 
         // Let's check the SCRs
         let transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);

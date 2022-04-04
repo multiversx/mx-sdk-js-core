@@ -7,7 +7,7 @@ import { TransactionPayload } from "./transactionPayload";
 import { Hash } from "./hash";
 import { TransactionHash, TransactionStatus } from "./transaction";
 import { SmartContractResults } from "./smartcontracts/smartContractResults";
-import { TransactionLogs } from "./transactionLogs";
+import { TransactionEvent, TransactionLogs } from "./transactionLogs";
 import { TransactionCompletionStrategy } from "./transactionCompletionStrategy";
 
 /**
@@ -106,6 +106,16 @@ export class TransactionOnNetwork {
         // TODO: When using separate constructors of TransactionOnNetwork (for API response vs. for Gateway response, see package "networkProvider"),
         // we will be able to use different transaction completion strategies.
         return new TransactionCompletionStrategy().isCompleted(this);
+    }
+
+    getAllEvents(): TransactionEvent[] {
+        let result = [...this.logs.events];
+
+        for (const resultItem of this.results.getAll()) {
+            result.push(...resultItem.logs.events);
+        }
+
+        return result;
     }
 }
 

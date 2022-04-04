@@ -18,9 +18,9 @@ interface ISmartContractAbi {
 }
 
 /**
- * Internal interface: a transaction watcher, as seen from the perspective of a {@link SmartContractController}.
+ * Internal interface: a transaction completion awaiter, as seen from the perspective of a {@link SmartContractController}.
  */
-interface ITransactionWatcher {
+interface ITransactionCompletionAwaiter {
     awaitCompleted(transaction: Transaction): Promise<void>;
 }
 
@@ -33,27 +33,27 @@ export class SmartContractController implements ISmartContractController {
     private readonly checker: IInteractionChecker;
     private readonly parser: IResultsParser;
     private readonly provider: IProvider;
-    private readonly transactionWatcher: ITransactionWatcher;
+    private readonly transactionCompletionAwaiter: ITransactionCompletionAwaiter;
 
     constructor(
         abi: ISmartContractAbi,
         checker: IInteractionChecker,
         parser: IResultsParser,
         provider: IProvider,
-        transactionWatcher: ITransactionWatcher
+        transactionWatcher: ITransactionCompletionAwaiter
     ) {
         this.abi = abi;
         this.checker = checker;
         this.parser = parser;
         this.provider = provider;
-        this.transactionWatcher = transactionWatcher;
+        this.transactionCompletionAwaiter = transactionWatcher;
     }
 
     async deploy(transaction: Transaction): Promise<{ transactionOnNetwork: TransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
         Logger.info(`SmartContractController.deploy [begin]: transaction = ${transaction.getHash()}`);
 
         await transaction.send(this.provider);
-        await this.transactionWatcher.awaitCompleted(transaction);
+        await this.transactionCompletionAwaiter.awaitCompleted(transaction);
         let transactionOnNetwork = await transaction.getAsOnNetwork(this.provider);
         let bundle = this.parser.parseUntypedOutcome(transactionOnNetwork);
 
@@ -75,7 +75,7 @@ export class SmartContractController implements ISmartContractController {
         this.checker.checkInteraction(interaction, endpoint);
 
         await transaction.send(this.provider);
-        await this.transactionWatcher.awaitCompleted(transaction);
+        await this.transactionCompletionAwaiter.awaitCompleted(transaction);
         let transactionOnNetwork = await transaction.getAsOnNetwork(this.provider);
         let bundle = this.parser.parseOutcome(transactionOnNetwork, endpoint);
 

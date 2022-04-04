@@ -52,7 +52,8 @@ export class SystemWrapper extends ChainSendContext {
     }
 
     static async load(provider: IProvider): Promise<SystemWrapper> {
-        let context = new SendContext(provider).logger(new ContractLogger());
+        let networkConfig = await provider.getNetworkConfig();
+        let context = new SendContext(provider, networkConfig).logger(new ContractLogger());
         let builtinFunctions = await ContractWrapper.loadProject(provider, null, SystemConstants.SYSTEM_ABI_PATH, "builtinFunctions", context);
         let sendWrapper = await ContractWrapper.loadProject(provider, builtinFunctions, SystemConstants.SYSTEM_ABI_PATH, "sendWrapper", context);
         let esdtSystemContract = await ContractWrapper.loadProject(provider, builtinFunctions, SystemConstants.SYSTEM_ABI_PATH, "esdtSystemContract", context);

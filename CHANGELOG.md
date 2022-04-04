@@ -5,7 +5,18 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## Unreleased
- - TBD
+ - [Breaking change: adjustements to transaction awaitening and completion, transaction watcher](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/173)
+ - [Breaking change: simplify network config / improve design - not a singleton anymore](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/176)
+
+ **Breaking changes**
+ - Removed utility functions: `transaction.awaitExecuted()`, `transaction.awaitPending()`. `TransactionWatcher` should be used directly, instead.
+ - Changed interface of `TransactionWatcher`. The constructor does not expect a transaction hash anymore, but the functions `await*` do.
+ - Introduced new functions on `TransactionWatcher`: `awaitCompleted()`, `awaitAllEvents()`, `awaitAnyEvent()` etc.
+ - Removed `Transaction.status` (the one on `TransactionOnNetwork` should be read instead).
+ - `Transaction.getAsOnNetwork()` does not wait for notarization / completion anymore. One should explicitly use the transaction watcher, when needed.
+ - Removed `NetworkConfig.getDefault()` and `NetworkConfig.sync()`. Instead, one should use `let networkConfig = await provider.getNetworkConfig()`.
+ - Constructor of `Transaction` now requires `chainID`, as well.
+ - Added `Interaction.withChainID()` - must be used before calling `buildTransaction()`.
 
 ## [10.0.0-beta.3]
  - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)

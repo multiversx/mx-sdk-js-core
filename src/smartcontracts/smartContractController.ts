@@ -8,12 +8,20 @@ import { ResultsParser } from "./resultsParser";
 import { InteractionChecker, NullInteractionChecker } from "./interactionChecker";
 import { EndpointDefinition } from "./typesystem";
 import { Logger } from "../logger";
+import { TransactionWatcher } from "../transactionWatcher";
 
 /**
- * Internal interface: the smart contract ABI, as seen from the perspective of an {@link SmartContractController}.
+ * Internal interface: the smart contract ABI, as seen from the perspective of a {@link SmartContractController}.
  */
 interface ISmartContractAbi {
     getEndpoint(func: ContractFunction): EndpointDefinition;
+}
+
+/**
+ * Internal interface: a transaction completion awaiter, as seen from the perspective of a {@link SmartContractController}.
+ */
+interface ITransactionCompletionAwaiter {
+    awaitCompleted(transaction: Transaction): Promise<void>;
 }
 
 /**
@@ -25,24 +33,27 @@ export class SmartContractController implements ISmartContractController {
     private readonly checker: IInteractionChecker;
     private readonly parser: IResultsParser;
     private readonly provider: IProvider;
+    private readonly transactionCompletionAwaiter: ITransactionCompletionAwaiter;
 
     constructor(
         abi: ISmartContractAbi,
         checker: IInteractionChecker,
         parser: IResultsParser,
         provider: IProvider,
+        transactionWatcher: ITransactionCompletionAwaiter
     ) {
         this.abi = abi;
         this.checker = checker;
         this.parser = parser;
         this.provider = provider;
+        this.transactionCompletionAwaiter = transactionWatcher;
     }
 
     async deploy(transaction: Transaction): Promise<{ transactionOnNetwork: TransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
         Logger.info(`SmartContractController.deploy [begin]: transaction = ${transaction.getHash()}`);
 
         await transaction.send(this.provider);
-        await transaction.awaitExecuted(this.provider);
+        await this.transactionCompletionAwaiter.awaitCompleted(transaction);
         let transactionOnNetwork = await transaction.getAsOnNetwork(this.provider);
         let bundle = this.parser.parseUntypedOutcome(transactionOnNetwork);
 
@@ -64,7 +75,7 @@ export class SmartContractController implements ISmartContractController {
         this.checker.checkInteraction(interaction, endpoint);
 
         await transaction.send(this.provider);
-        await transaction.awaitExecuted(this.provider);
+        await this.transactionCompletionAwaiter.awaitCompleted(transaction);
         let transactionOnNetwork = await transaction.getAsOnNetwork(this.provider);
         let bundle = this.parser.parseOutcome(transactionOnNetwork, endpoint);
 
@@ -95,12 +106,12 @@ export class SmartContractController implements ISmartContractController {
 
 export class DefaultSmartContractController extends SmartContractController {
     constructor(abi: ISmartContractAbi, provider: IProvider) {
-        super(abi, new InteractionChecker(), new ResultsParser(), provider);
+        super(abi, new InteractionChecker(), new ResultsParser(), provider, new TransactionWatcher(provider));
     }
 }
 
 export class NoCheckSmartContractController extends SmartContractController {
     constructor(abi: ISmartContractAbi, provider: IProvider) {
-        super(abi, new NullInteractionChecker(), new ResultsParser(), provider);
+        super(abi, new NullInteractionChecker(), new ResultsParser(), provider, new TransactionWatcher(provider));
     }
 }

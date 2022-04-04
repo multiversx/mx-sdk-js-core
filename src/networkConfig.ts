@@ -1,13 +1,10 @@
 import BigNumber from "bignumber.js";
-import { IProvider } from "./interface";
 import { GasPrice, GasLimit, TransactionVersion, ChainID, GasPriceModifier } from "./networkParams";
 
 /**
  * An object holding Network configuration parameters.
  */
 export class NetworkConfig {
-    private static default: NetworkConfig;
-
     /**
      * The chain ID. E.g. "1" for the Mainnet.
      */
@@ -67,26 +64,6 @@ export class NetworkConfig {
         this.MinGasPrice = new GasPrice(1000000000);
         this.GasPriceModifier = new GasPriceModifier(1);
         this.MinTransactionVersion = new TransactionVersion(1);
-    }
-
-    /**
-     * Gets the default configuration object (think of the Singleton pattern).
-     */
-    static getDefault(): NetworkConfig {
-        if (!NetworkConfig.default) {
-            NetworkConfig.default = new NetworkConfig();
-        }
-
-        return NetworkConfig.default;
-    }
-
-    /**
-     * Synchronizes a configuration object by querying the Network, through a {@link IProvider}.
-     * @param provider The provider to use
-     */
-    async sync(provider: IProvider): Promise<void> {
-        let fresh: NetworkConfig = await provider.getNetworkConfig();
-        Object.assign(this, fresh);
     }
 
     /**

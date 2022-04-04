@@ -23,6 +23,7 @@ import { Egld } from "../../balanceBuilder";
 import { Balance } from "../../balance";
 import { ExecutionResultsBundle, findImmediateResult, interpretExecutionResults } from "./deprecatedContractResults";
 import { Result } from "./result";
+import { TransactionWatcher } from "../../transactionWatcher";
 
 /**
  * Provides a simple interface in order to easily call or query the smart contract's methods.
@@ -100,7 +101,8 @@ export class ContractWrapper extends ChainSendContext {
         let transaction = this.smartContract.deploy({
             code: contractCode,
             gasLimit: this.context.getGasLimit(),
-            initArguments: convertedArgs
+            initArguments: convertedArgs,
+            chainID: this.context.getChainID()
         });
         return transaction;
     }
@@ -121,8 +123,8 @@ export class ContractWrapper extends ChainSendContext {
         let { abiPath, wasmPath } = await expandProjectPath(projectPath, filenameHint);
         let abi = await SmartContractAbi.fromAbiPath(abiPath);
         let smartContract = new SmartContract({ abi: abi });
-
-        sendContext = sendContext || new SendContext(provider).logger(new ContractLogger());
+        let networkConfig = await provider.getNetworkConfig();
+        sendContext = sendContext || new SendContext(provider, networkConfig).logger(new ContractLogger());
         return new ContractWrapper(smartContract, abi, wasmPath, sendContext, builtinFunctions);
     }
 
@@ -186,13 +188,13 @@ export class ContractWrapper extends ChainSendContext {
         sender.account.incrementNonce();
 
         logger?.transactionSent(transaction);
-        await transaction.awaitExecuted(provider);
-        let transactionOnNetwork = await transaction.getAsOnNetwork(provider, true, false, true);
-        if (transaction.getStatus().isFailed()) {
+        await new TransactionWatcher(provider).awaitCompleted(transaction);
+        let transactionOnNetwork = await transaction.getAsOnNetwork(provider, true, true);
+        if (transactionOnNetwork.status.isFailed()) {
             // TODO: extract the error messages
             //let results = transactionOnNetwork.results.getAllResults();
             //let messages = results.map((result) => console.log(result));
-            throw new ErrContract(`Transaction status failed: [${transaction.getStatus().toString()}].`);// Return messages:\n${messages}`);
+            throw new ErrContract(`Transaction status failed: [${transactionOnNetwork.status.toString()}].`);// Return messages:\n${messages}`);
         }
         return transactionOnNetwork;
     }
@@ -206,6 +208,7 @@ export class ContractWrapper extends ChainSendContext {
         let preparedCall = this.prepareCallWithPayment(endpoint, args);
         let interaction = this.convertPreparedCallToInteraction(preparedCall);
         interaction.withGasLimit(this.context.getGasLimit());
+        interaction.withChainID(this.context.getChainID());
         let transaction = interaction.buildTransaction();
         return { transaction, interaction };
     }

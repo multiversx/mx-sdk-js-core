@@ -1,10 +1,11 @@
-import { GasLimit } from "../../networkParams";
+import { ChainID, GasLimit } from "../../networkParams";
 import { IProvider } from "../../interface";
 import { ContractLogger } from "./contractLogger";
 import { TestWallet } from "../../testutils";
 import { Balance } from "../../balance";
 import { Err } from "../../errors";
 import { getGasFromValue } from "./systemWrapper";
+import { NetworkConfig } from "../../networkConfig";
 
 /**
  * Stores contextual information which is needed when preparing a transaction.
@@ -15,13 +16,15 @@ export class SendContext {
     private gas_: GasLimit | null;
     private logger_: ContractLogger | null;
     private value_: Balance | null;
+    private networkConfig: NetworkConfig;
 
-    constructor(provider: IProvider) {
+    constructor(provider: IProvider, networkConfig: NetworkConfig) {
         this.sender_ = null;
         this.provider_ = provider;
         this.gas_ = null;
         this.logger_ = null;
         this.value_ = null;
+        this.networkConfig = networkConfig;
     }
 
     provider(provider: IProvider): this {
@@ -79,6 +82,10 @@ export class SendContext {
             return this.gas_;
         }
         throw new Err("gas limit not set");
+    }
+
+    getChainID(): ChainID {
+        return this.networkConfig.ChainID;
     }
 
     getLogger(): ContractLogger | null {

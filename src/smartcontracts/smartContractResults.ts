@@ -58,7 +58,7 @@ export class SmartContractResultItem {
         gasLimit: number,
         gasPrice: number,
         callType: number,
-        returnMessage: string
+        returnMessage: string,
         logs: any[]
     }): SmartContractResultItem {
         let item = new SmartContractResultItem();

@@ -1,6 +1,6 @@
 import { Address } from "../address";
 import { Balance } from "../balance";
-import { GasLimit } from "../networkParams";
+import { ChainID, GasLimit, GasPrice } from "../networkParams";
 import { Transaction } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { Code } from "./code";
@@ -42,6 +42,8 @@ export interface DeployArguments {
     initArguments?: TypedValue[];
     value?: Balance;
     gasLimit: GasLimit;
+    gasPrice?: GasPrice;
+    chainID: ChainID;
 }
 
 export interface UpgradeArguments {
@@ -50,6 +52,8 @@ export interface UpgradeArguments {
     initArguments?: TypedValue[];
     value?: Balance;
     gasLimit: GasLimit;
+    gasPrice?: GasPrice;
+    chainID: ChainID;
 }
 
 export interface CallArguments {
@@ -58,6 +62,8 @@ export interface CallArguments {
     value?: Balance;
     gasLimit: GasLimit;
     receiver?: Address;
+    gasPrice?: GasPrice;
+    chainID: ChainID;
 }
 
 export interface QueryArguments {

@@ -3,17 +3,20 @@ import { Address } from "../address";
 import { Code } from "./code";
 import { Nonce } from "../nonce";
 import { SmartContract } from "./smartContract";
-import { GasLimit } from "../networkParams";
-import { loadTestWallets, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
+import { ChainID, GasLimit } from "../networkParams";
+import { InHyperblock, loadTestWallets, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
 import { TransactionStatus } from "../transaction";
 import { ContractFunction } from "./function";
 import { U32Value } from "./typesystem";
 import { BytesValue } from "./typesystem/bytes";
+import { TransactionWatcher } from "../transactionWatcher";
 
 
 describe("test contract", () => {
     let provider = new MockProvider();
+    let chainID = new ChainID("test");
     let alice: TestWallet;
+
     before(async function () {
         ({ alice } = await loadTestWallets());
     });
@@ -32,11 +35,13 @@ describe("test contract", () => {
 
     it("should deploy", async () => {
         setupUnitTestWatcherTimeouts();
+        let watcher = new TransactionWatcher(provider);
 
         let contract = new SmartContract({});
         let deployTransaction = contract.deploy({
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
-            gasLimit: new GasLimit(1000000)
+            gasLimit: new GasLimit(1000000),
+            chainID: chainID
         });
 
         provider.mockUpdateAccount(alice.address, account => {
@@ -59,14 +64,17 @@ describe("test contract", () => {
         let hash = await deployTransaction.send(provider);
 
         await Promise.all([
-            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
-            deployTransaction.awaitExecuted(provider)
+            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
+            watcher.awaitCompleted(deployTransaction)
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hash)).isExecuted());
     });
 
     it("should call", async () => {
+        setupUnitTestWatcherTimeouts();
+        let watcher = new TransactionWatcher(provider);
+        
         let contract = new SmartContract({ address: new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3") });
 
         provider.mockUpdateAccount(alice.address, account => {
@@ -76,13 +84,15 @@ describe("test contract", () => {
         let callTransactionOne = contract.call({
             func: new ContractFunction("helloEarth"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
-            gasLimit: new GasLimit(150000)
+            gasLimit: new GasLimit(150000),
+            chainID: chainID
         });
 
         let callTransactionTwo = contract.call({
             func: new ContractFunction("helloMars"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
-            gasLimit: new GasLimit(1500000)
+            gasLimit: new GasLimit(1500000),
+            chainID: chainID
         });
 
         await alice.sync(provider);
@@ -105,10 +115,10 @@ describe("test contract", () => {
         let hashTwo = await callTransactionTwo.send(provider);
 
         await Promise.all([
-            provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
-            provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed")]),
-            callTransactionOne.awaitExecuted(provider),
-            callTransactionTwo.awaitExecuted(provider)
+            provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
+            provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
+            watcher.awaitCompleted(callTransactionOne),
+            watcher.awaitCompleted(callTransactionTwo)
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hashOne)).isExecuted());

@@ -16,7 +16,6 @@ import { guardEmpty, guardNotEmpty } from "./utils";
 import { TransactionPayload } from "./transactionPayload";
 import * as errors from "./errors";
 import { TypedEvent } from "./events";
-import { TransactionWatcher } from "./transactionWatcher";
 import { ProtoSerializer } from "./proto";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Hash } from "./hash";
@@ -34,8 +33,6 @@ export class Transaction implements ISignable {
     signedBy: Address;
   }>;
   readonly onSent: TypedEvent<{ transaction: Transaction }>;
-  readonly onStatusUpdated: TypedEvent<{ transaction: Transaction }>;
-  readonly onStatusChanged: TypedEvent<{ transaction: Transaction }>;
 
   /**
    * The nonce of the transaction (the account sequence number of the sender).
@@ -75,7 +72,7 @@ export class Transaction implements ISignable {
   /**
    * The chain ID of the Network (e.g. "1" for Mainnet).
    */
-  private readonly chainID: ChainID;
+  private chainID: ChainID;
 
   /**
    * The version, required by the Network in order to correctly interpret the contents of the transaction.
@@ -103,13 +100,6 @@ export class Transaction implements ISignable {
   private asOnNetwork: TransactionOnNetwork = new TransactionOnNetwork();
 
   /**
-   * The last known status of the transaction, as fetched from the API.
-   *
-   * This only gets updated if {@link Transaction.awaitPending}, {@link Transaction.awaitExecuted} are called.
-   */
-  private status: TransactionStatus;
-
-  /**
    * Creates a new Transaction object.
    */
   public constructor({
@@ -129,9 +119,9 @@ export class Transaction implements ISignable {
     receiver: Address;
     sender?: Address;
     gasPrice?: GasPrice;
-    gasLimit?: GasLimit;
+    gasLimit: GasLimit;
     data?: TransactionPayload;
-    chainID?: ChainID;
+    chainID: ChainID;
     version?: TransactionVersion;
     options?: TransactionOptions;
   }) {
@@ -139,21 +129,18 @@ export class Transaction implements ISignable {
     this.value = value || Balance.Zero();
     this.sender = sender || Address.Zero();
     this.receiver = receiver;
-    this.gasPrice = gasPrice || NetworkConfig.getDefault().MinGasPrice;
-    this.gasLimit = gasLimit || NetworkConfig.getDefault().MinGasLimit;
+    this.gasPrice = gasPrice || GasPrice.min();
+    this.gasLimit = gasLimit;
     this.data = data || new TransactionPayload();
-    this.chainID = chainID || NetworkConfig.getDefault().ChainID;
+    this.chainID = chainID;
     this.version = version || TransactionVersion.withDefaultVersion();
     this.options = options || TransactionOptions.withDefaultOptions();
 
     this.signature = Signature.empty();
     this.hash = TransactionHash.empty();
-    this.status = TransactionStatus.createUnknown();
 
     this.onSigned = new TypedEvent();
     this.onSent = new TypedEvent();
-    this.onStatusUpdated = new TypedEvent();
-    this.onStatusChanged = new TypedEvent();
   }
 
   getNonce(): Nonce {
@@ -177,7 +164,6 @@ export class Transaction implements ISignable {
    */
   setNonce(nonce: Nonce) {
     this.nonce = nonce;
-    this.doAfterPropertySetter();
   }
 
   getValue(): Balance {
@@ -186,7 +172,6 @@ export class Transaction implements ISignable {
 
   setValue(value: Balance) {
     this.value = value;
-    this.doAfterPropertySetter();
   }
 
   getSender(): Address {
@@ -203,7 +188,6 @@ export class Transaction implements ISignable {
 
   setGasPrice(gasPrice: GasPrice) {
     this.gasPrice = gasPrice;
-    this.doAfterPropertySetter();
   }
 
   getGasLimit(): GasLimit {
@@ -212,7 +196,6 @@ export class Transaction implements ISignable {
 
   setGasLimit(gasLimit: GasLimit) {
     this.gasLimit = gasLimit;
-    this.doAfterPropertySetter();
   }
 
   getData(): TransactionPayload {
@@ -223,17 +206,16 @@ export class Transaction implements ISignable {
     return this.chainID;
   }
 
+  setChainID(chainID: ChainID) {
+    this.chainID = chainID;
+  }
+
   getVersion(): TransactionVersion {
     return this.version;
   }
 
   getOptions(): TransactionOptions {
     return this.options;
-  }
-
-  doAfterPropertySetter() {
-    this.signature = Signature.empty();
-    this.hash = TransactionHash.empty();
   }
 
   getSignature(): Signature {
@@ -244,10 +226,6 @@ export class Transaction implements ISignable {
   getHash(): TransactionHash {
     guardNotEmpty(this.hash, "hash");
     return this.hash;
-  }
-
-  getStatus(): TransactionStatus {
-    return this.status;
   }
 
   /**
@@ -327,9 +305,6 @@ export class Transaction implements ISignable {
   applySignature(signature: ISignatureOfExternalSigner, signedBy: IAddressOfExternalSigner) {
     let adaptedSignature = adaptToSignature(signature);
     let adaptedSignedBy = adaptToAddress(signedBy);
-    
-    guardEmpty(this.signature, "signature");
-    guardEmpty(this.hash, "hash");
 
     this.signature = adaptedSignature;
     this.sender = adaptedSignedBy;
@@ -343,9 +318,10 @@ export class Transaction implements ISignable {
    *
    * ```
    * let provider = new ProxyProvider("https://gateway.elrond.com");
+   * let watcher = new TransactionWatcher(provider);
    * // ... Prepare, sign the transaction, then:
    * await tx.send(provider);
-   * await tx.awaitExecuted(provider);
+   * await watcher.awaitCompleted(tx);
    * ```
    */
   async send(provider: IProvider): Promise<TransactionHash> {
@@ -379,23 +355,15 @@ export class Transaction implements ISignable {
    *
    * @param fetcher The transaction fetcher to use
    * @param cacheLocally Whether to cache the response locally, on the transaction object
-   * @param awaitNotarized Whether to wait for the transaction to be notarized
    * @param withResults Whether to wait for the transaction results
    */
   async getAsOnNetwork(
     fetcher: ITransactionFetcher,
     cacheLocally = true,
-    awaitNotarized = true,
     withResults = true
   ): Promise<TransactionOnNetwork> {
     if (this.hash.isEmpty()) {
       throw new errors.ErrTransactionHashUnknown();
-    }
-
-    // For Smart Contract transactions, wait for their full execution & notarization before returning.
-    let isSmartContractTransaction = this.receiver.isContractAddress();
-    if (isSmartContractTransaction && awaitNotarized) {
-      await this.awaitNotarized(fetcher);
     }
 
     let response = await fetcher.getTransaction(
@@ -464,40 +432,6 @@ export class Transaction implements ISignable {
 
     return feeForMove.plus(processingFee);
   }
-
-  /**
-   * Awaits for a transaction to reach its "pending" state - that is, for the transaction to be accepted in the mempool.
-   * Performs polling against the provider, via a {@link TransactionWatcher}.
-   */
-  async awaitPending(fetcher: ITransactionFetcher): Promise<void> {
-    let watcher = new TransactionWatcher(this.hash, fetcher);
-    await watcher.awaitPending(this.notifyStatusUpdate.bind(this));
-  }
-
-  /**
-   * Awaits for a transaction to reach its "executed" state - that is, for the transaction to be processed (whether with success or with errors).
-   * Performs polling against the provider, via a {@link TransactionWatcher}.
-   */
-  async awaitExecuted(fetcher: ITransactionFetcher): Promise<void> {
-    let watcher = new TransactionWatcher(this.hash, fetcher);
-    await watcher.awaitExecuted(this.notifyStatusUpdate.bind(this));
-  }
-
-  private notifyStatusUpdate(newStatus: TransactionStatus) {
-    let sameStatus = this.status.equals(newStatus);
-
-    this.onStatusUpdated.emit({ transaction: this });
-
-    if (!sameStatus) {
-      this.status = newStatus;
-      this.onStatusChanged.emit({ transaction: this });
-    }
-  }
-
-  async awaitNotarized(fetcher: ITransactionFetcher): Promise<void> {
-    let watcher = new TransactionWatcher(this.hash, fetcher);
-    await watcher.awaitNotarized();
-  }
 }
 
 /**
@@ -560,7 +494,7 @@ export class TransactionStatus {
    * Returns whether the transaction has been executed (not necessarily with success).
    */
   isExecuted(): boolean {
-    return this.isSuccessful() || this.isInvalid();
+    return this.isSuccessful() || this.isFailed() || this.isInvalid();
   }
 
   /**

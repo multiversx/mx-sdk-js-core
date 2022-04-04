@@ -1,15 +1,16 @@
 import { Transaction } from "./transaction";
 import { GasLimit } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
-import { NetworkConfig } from "./networkConfig";
 import { Balance } from "./balance";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { Logger } from "./logger";
 import { assert } from "chai";
 import { chooseProxyProvider } from "./interactive";
+import { TransactionWatcher } from "./transactionWatcher";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;
+
     before(async function () {
         ({ alice, bob } = await loadTestWallets());
     });
@@ -18,8 +19,9 @@ describe("test transaction", function () {
         this.timeout(20000);
 
         let provider = chooseProxyProvider("local-testnet");
-
-        await NetworkConfig.getDefault().sync(provider);
+        let watcher = new TransactionWatcher(provider);
+        let network = await provider.getNetworkConfig();
+        
         await alice.sync(provider);
 
         await bob.sync(provider);
@@ -27,12 +29,16 @@ describe("test transaction", function () {
 
         let transactionOne = new Transaction({
             receiver: bob.address,
-            value: Balance.egld(42)
+            value: Balance.egld(42),
+            gasLimit: network.MinGasLimit,
+            chainID: network.ChainID
         });
 
         let transactionTwo = new Transaction({
             receiver: bob.address,
-            value: Balance.egld(43)
+            value: Balance.egld(43),
+            gasLimit: network.MinGasLimit,
+            chainID: network.ChainID
         });
 
         transactionOne.setNonce(alice.account.nonce);
@@ -45,8 +51,8 @@ describe("test transaction", function () {
         await transactionOne.send(provider);
         await transactionTwo.send(provider);
 
-        await transactionOne.awaitExecuted(provider);
-        await transactionTwo.awaitExecuted(provider);
+        await watcher.awaitCompleted(transactionOne);
+        await watcher.awaitCompleted(transactionTwo);
 
         await bob.sync(provider);
         let newBalanceOfBob = bob.account.balance;
@@ -58,22 +64,23 @@ describe("test transaction", function () {
         this.timeout(20000);
 
         let provider = chooseProxyProvider("local-testnet");
-
-        await NetworkConfig.getDefault().sync(provider);
+        let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
         let transactionOne = new Transaction({
             data: new TransactionPayload("helloWorld"),
             gasLimit: new GasLimit(70000),
             receiver: alice.address,
-            value: Balance.egld(1000)
+            value: Balance.egld(1000),
+            chainID: network.ChainID
         });
 
         let transactionTwo = new Transaction({
             data: new TransactionPayload("helloWorld"),
             gasLimit: new GasLimit(70000),
             receiver: alice.address,
-            value: Balance.egld(1000000)
+            value: Balance.egld(1000000),
+            chainID: network.ChainID
         });
 
         transactionOne.setNonce(alice.account.nonce);

@@ -7,7 +7,8 @@ import { TransactionPayload } from "./transactionPayload";
 import { Hash } from "./hash";
 import { TransactionHash, TransactionStatus } from "./transaction";
 import { SmartContractResults } from "./smartcontracts/smartContractResults";
-import { TransactionLogs } from "./transactionLogs";
+import { TransactionEvent, TransactionLogs } from "./transactionLogs";
+import { TransactionCompletionStrategy } from "./transactionCompletionStrategy";
 
 /**
  * A plain view of a transaction, as queried from the Network.
@@ -31,6 +32,7 @@ export class TransactionOnNetwork {
     blockNonce: Nonce = new Nonce(0);
     hyperblockNonce: Nonce = new Nonce(0);
     hyperblockHash: Hash = Hash.empty();
+    pendingResults: boolean = false;
 
     // TODO: Check if "receipt" is still received from the API.
     receipt: Receipt = new Receipt();
@@ -53,6 +55,7 @@ export class TransactionOnNetwork {
         gasLimit: number,
         data: string,
         status: string,
+        pendingResults: boolean,
         timestamp: number,
         blockNonce: number;
         hyperblockNonce: number,
@@ -81,6 +84,12 @@ export class TransactionOnNetwork {
         transactionOnNetwork.blockNonce = new Nonce(response.blockNonce || 0);
         transactionOnNetwork.hyperblockNonce = new Nonce(response.hyperblockNonce || 0);
         transactionOnNetwork.hyperblockHash = new Hash(response.hyperblockHash);
+        // TODO: Take this into consideration, as well.
+        // Currently, erdjs' transaction completion detection works only for ProxyProvider.
+        // When adding separate constructors "fromAPIHttpResponse" / "fromGatewayHttpResponse",
+        // we will also use different completion detection strategies.
+        // (not done right now, in order to avoid further code workarounds). 
+        transactionOnNetwork.pendingResults = response.pendingResults || false;
 
         transactionOnNetwork.receipt = Receipt.fromHttpResponse(response.receipt || {});
         transactionOnNetwork.results = SmartContractResults.fromHttpResponse(response.results || response.smartContractResults || []);
@@ -91,6 +100,22 @@ export class TransactionOnNetwork {
 
     getDateTime(): Date {
         return new Date(this.timestamp * 1000);
+    }
+
+    isCompleted(): boolean {
+        // TODO: When using separate constructors of TransactionOnNetwork (for API response vs. for Gateway response, see package "networkProvider"),
+        // we will be able to use different transaction completion strategies.
+        return new TransactionCompletionStrategy().isCompleted(this);
+    }
+
+    getAllEvents(): TransactionEvent[] {
+        let result = [...this.logs.events];
+
+        for (const resultItem of this.results.getAll()) {
+            result.push(...resultItem.logs.events);
+        }
+
+        return result;
     }
 }
 

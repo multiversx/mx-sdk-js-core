@@ -4,7 +4,7 @@ import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
-import { CallArguments, DeployArguments, ISmartContract as ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
+import { CallArguments, DeployArguments, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
 import { Nonce } from "../nonce";
 import { ContractFunction } from "./function";
@@ -135,7 +135,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
      */
-    deploy({ code, codeMetadata, initArguments, value, gasLimit }: DeployArguments): Transaction {
+    deploy({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
         value = value || Balance.Zero();
@@ -150,7 +150,9 @@ export class SmartContract implements ISmartContract {
             receiver: Address.Zero(),
             value: value,
             gasLimit: gasLimit,
-            data: payload
+            gasPrice: gasPrice,
+            data: payload,
+            chainID: chainID
         });
 
         this.code = code;
@@ -170,7 +172,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
-    upgrade({ code, codeMetadata, initArguments, value, gasLimit }: UpgradeArguments): Transaction {
+    upgrade({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
         value = value || Balance.Zero();
@@ -185,7 +187,9 @@ export class SmartContract implements ISmartContract {
             receiver: this.getAddress(),
             value: value,
             gasLimit: gasLimit,
-            data: payload
+            gasPrice: gasPrice,
+            data: payload,
+            chainID: chainID
         });
 
         this.code = code;
@@ -197,7 +201,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
-    call({ func, args, value, gasLimit, receiver }: CallArguments): Transaction {
+    call({ func, args, value, gasLimit, receiver, gasPrice, chainID }: CallArguments): Transaction {
         args = args || [];
         value = value || Balance.Zero();
 
@@ -210,7 +214,9 @@ export class SmartContract implements ISmartContract {
             receiver: receiver ? receiver : this.getAddress(),
             value: value,
             gasLimit: gasLimit,
-            data: payload
+            gasPrice: gasPrice,
+            data: payload,
+            chainID: chainID
         });
 
         return transaction;

@@ -16,7 +16,6 @@ export async function setupInteractive(providerChoice: string): Promise<Interact
 }
 
 export async function setupInteractiveWithProvider(provider: IProvider): Promise<InteractivePackage> {
-    await NetworkConfig.getDefault().sync(provider);
     let wallets = await loadAndSyncTestWallets(provider);
     let erdSys = await SystemWrapper.load(provider);
     return { erdSys, Egld, wallets };

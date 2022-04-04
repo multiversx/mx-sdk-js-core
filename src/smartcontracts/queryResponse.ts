@@ -15,7 +15,7 @@ export class QueryResponse {
         this.returnData = init?.returnData || [];
         this.returnCode = init?.returnCode || ReturnCode.Unknown;
         this.returnMessage = init?.returnMessage || "";
-        this.gasUsed = init?.gasUsed || GasLimit.min();
+        this.gasUsed = init?.gasUsed || new GasLimit(0);
     }
 
     /**

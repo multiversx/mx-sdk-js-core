@@ -16,7 +16,6 @@ import { guardEmpty, guardNotEmpty } from "./utils";
 import { TransactionPayload } from "./transactionPayload";
 import * as errors from "./errors";
 import { TypedEvent } from "./events";
-import { TransactionWatcher } from "./transactionWatcher";
 import { ProtoSerializer } from "./proto";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Hash } from "./hash";
@@ -73,7 +72,7 @@ export class Transaction implements ISignable {
   /**
    * The chain ID of the Network (e.g. "1" for Mainnet).
    */
-  private readonly chainID: ChainID;
+  private chainID: ChainID;
 
   /**
    * The version, required by the Network in order to correctly interpret the contents of the transaction.
@@ -120,9 +119,9 @@ export class Transaction implements ISignable {
     receiver: Address;
     sender?: Address;
     gasPrice?: GasPrice;
-    gasLimit?: GasLimit;
+    gasLimit: GasLimit;
     data?: TransactionPayload;
-    chainID?: ChainID;
+    chainID: ChainID;
     version?: TransactionVersion;
     options?: TransactionOptions;
   }) {
@@ -130,10 +129,10 @@ export class Transaction implements ISignable {
     this.value = value || Balance.Zero();
     this.sender = sender || Address.Zero();
     this.receiver = receiver;
-    this.gasPrice = gasPrice || NetworkConfig.getDefault().MinGasPrice;
-    this.gasLimit = gasLimit || NetworkConfig.getDefault().MinGasLimit;
+    this.gasPrice = gasPrice || GasPrice.min();
+    this.gasLimit = gasLimit;
     this.data = data || new TransactionPayload();
-    this.chainID = chainID || NetworkConfig.getDefault().ChainID;
+    this.chainID = chainID;
     this.version = version || TransactionVersion.withDefaultVersion();
     this.options = options || TransactionOptions.withDefaultOptions();
 
@@ -165,7 +164,6 @@ export class Transaction implements ISignable {
    */
   setNonce(nonce: Nonce) {
     this.nonce = nonce;
-    this.doAfterPropertySetter();
   }
 
   getValue(): Balance {
@@ -174,7 +172,6 @@ export class Transaction implements ISignable {
 
   setValue(value: Balance) {
     this.value = value;
-    this.doAfterPropertySetter();
   }
 
   getSender(): Address {
@@ -191,7 +188,6 @@ export class Transaction implements ISignable {
 
   setGasPrice(gasPrice: GasPrice) {
     this.gasPrice = gasPrice;
-    this.doAfterPropertySetter();
   }
 
   getGasLimit(): GasLimit {
@@ -200,7 +196,6 @@ export class Transaction implements ISignable {
 
   setGasLimit(gasLimit: GasLimit) {
     this.gasLimit = gasLimit;
-    this.doAfterPropertySetter();
   }
 
   getData(): TransactionPayload {
@@ -211,17 +206,16 @@ export class Transaction implements ISignable {
     return this.chainID;
   }
 
+  setChainID(chainID: ChainID) {
+    this.chainID = chainID;
+  }
+
   getVersion(): TransactionVersion {
     return this.version;
   }
 
   getOptions(): TransactionOptions {
     return this.options;
-  }
-
-  doAfterPropertySetter() {
-    this.signature = Signature.empty();
-    this.hash = TransactionHash.empty();
   }
 
   getSignature(): Signature {
@@ -311,9 +305,6 @@ export class Transaction implements ISignable {
   applySignature(signature: ISignatureOfExternalSigner, signedBy: IAddressOfExternalSigner) {
     let adaptedSignature = adaptToSignature(signature);
     let adaptedSignedBy = adaptToAddress(signedBy);
-    
-    guardEmpty(this.signature, "signature");
-    guardEmpty(this.hash, "hash");
 
     this.signature = adaptedSignature;
     this.sender = adaptedSignedBy;

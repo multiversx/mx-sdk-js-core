@@ -101,7 +101,8 @@ export class ContractWrapper extends ChainSendContext {
         let transaction = this.smartContract.deploy({
             code: contractCode,
             gasLimit: this.context.getGasLimit(),
-            initArguments: convertedArgs
+            initArguments: convertedArgs,
+            chainID: this.context.getChainID()
         });
         return transaction;
     }
@@ -122,8 +123,8 @@ export class ContractWrapper extends ChainSendContext {
         let { abiPath, wasmPath } = await expandProjectPath(projectPath, filenameHint);
         let abi = await SmartContractAbi.fromAbiPath(abiPath);
         let smartContract = new SmartContract({ abi: abi });
-
-        sendContext = sendContext || new SendContext(provider).logger(new ContractLogger());
+        let networkConfig = await provider.getNetworkConfig();
+        sendContext = sendContext || new SendContext(provider, networkConfig).logger(new ContractLogger());
         return new ContractWrapper(smartContract, abi, wasmPath, sendContext, builtinFunctions);
     }
 
@@ -207,6 +208,7 @@ export class ContractWrapper extends ChainSendContext {
         let preparedCall = this.prepareCallWithPayment(endpoint, args);
         let interaction = this.convertPreparedCallToInteraction(preparedCall);
         interaction.withGasLimit(this.context.getGasLimit());
+        interaction.withChainID(this.context.getChainID());
         let transaction = interaction.buildTransaction();
         return { transaction, interaction };
     }

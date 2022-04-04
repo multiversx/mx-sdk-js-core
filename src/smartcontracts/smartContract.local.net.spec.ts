@@ -29,14 +29,15 @@ describe("test on local testnet", function () {
         TransactionWatcher.DefaultPollingInterval = 5000;
         TransactionWatcher.DefaultTimeout = 50000;
 
-        await NetworkConfig.getDefault().sync(provider);
+        let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
         // Deploy
         let contract = new SmartContract({});
         let transactionDeploy = contract.deploy({
             code: await loadContractCode("src/testdata/counter.wasm"),
-            gasLimit: new GasLimit(3000000)
+            gasLimit: new GasLimit(3000000),
+            chainID: network.ChainID
         });
 
         transactionDeploy.setNonce(alice.account.nonce);
@@ -47,7 +48,8 @@ describe("test on local testnet", function () {
         // ++
         let transactionIncrement = contract.call({
             func: new ContractFunction("increment"),
-            gasLimit: new GasLimit(3000000)
+            gasLimit: new GasLimit(3000000),
+            chainID: network.ChainID
         });
 
         transactionIncrement.setNonce(alice.account.nonce);
@@ -58,12 +60,14 @@ describe("test on local testnet", function () {
         // Now, let's build a few transactions, to be simulated
         let simulateOne = contract.call({
             func: new ContractFunction("increment"),
-            gasLimit: new GasLimit(100000)
+            gasLimit: new GasLimit(100000),
+            chainID: network.ChainID
         });
 
         let simulateTwo = contract.call({
             func: new ContractFunction("foobar"),
-            gasLimit: new GasLimit(500000)
+            gasLimit: new GasLimit(500000),
+            chainID: network.ChainID
         });
 
         simulateOne.setNonce(alice.account.nonce);
@@ -97,14 +101,15 @@ describe("test on local testnet", function () {
         TransactionWatcher.DefaultPollingInterval = 5000;
         TransactionWatcher.DefaultTimeout = 50000;
 
-        await NetworkConfig.getDefault().sync(provider);
+        let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
         // Deploy
         let contract = new SmartContract({});
         let transactionDeploy = contract.deploy({
             code: await loadContractCode("src/testdata/counter.wasm"),
-            gasLimit: new GasLimit(3000000)
+            gasLimit: new GasLimit(3000000),
+            chainID: network.ChainID
         });
 
         transactionDeploy.setNonce(alice.account.nonce);
@@ -115,7 +120,8 @@ describe("test on local testnet", function () {
         // ++
         let transactionIncrementFirst = contract.call({
             func: new ContractFunction("increment"),
-            gasLimit: new GasLimit(2000000)
+            gasLimit: new GasLimit(2000000),
+            chainID: network.ChainID
         });
 
         transactionIncrementFirst.setNonce(alice.account.nonce);
@@ -126,7 +132,8 @@ describe("test on local testnet", function () {
         // ++
         let transactionIncrementSecond = contract.call({
             func: new ContractFunction("increment"),
-            gasLimit: new GasLimit(2000000)
+            gasLimit: new GasLimit(2000000),
+            chainID: network.ChainID
         });
 
         transactionIncrementSecond.setNonce(alice.account.nonce);
@@ -154,7 +161,7 @@ describe("test on local testnet", function () {
         TransactionWatcher.DefaultPollingInterval = 5000;
         TransactionWatcher.DefaultTimeout = 50000;
 
-        await NetworkConfig.getDefault().sync(provider);
+        let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
         // Deploy
@@ -162,7 +169,8 @@ describe("test on local testnet", function () {
         let transactionDeploy = contract.deploy({
             code: await loadContractCode("src/testdata/erc20.wasm"),
             gasLimit: new GasLimit(50000000),
-            initArguments: [new U32Value(10000)]
+            initArguments: [new U32Value(10000)],
+            chainID: network.ChainID
         });
 
         // The deploy transaction should be signed, so that the address of the contract
@@ -175,13 +183,15 @@ describe("test on local testnet", function () {
         let transactionMintBob = contract.call({
             func: new ContractFunction("transferToken"),
             gasLimit: new GasLimit(9000000),
-            args: [new AddressValue(bob.address), new U32Value(1000)]
+            args: [new AddressValue(bob.address), new U32Value(1000)],
+            chainID: network.ChainID
         });
 
         let transactionMintCarol = contract.call({
             func: new ContractFunction("transferToken"),
             gasLimit: new GasLimit(9000000),
-            args: [new AddressValue(carol.address), new U32Value(1500)]
+            args: [new AddressValue(carol.address), new U32Value(1500)],
+            chainID: network.ChainID
         });
 
         // Apply nonces and sign the remaining transactions
@@ -233,7 +243,7 @@ describe("test on local testnet", function () {
         TransactionWatcher.DefaultPollingInterval = 5000;
         TransactionWatcher.DefaultTimeout = 50000;
 
-        await NetworkConfig.getDefault().sync(provider);
+        let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
         // Deploy
@@ -241,7 +251,8 @@ describe("test on local testnet", function () {
         let transactionDeploy = contract.deploy({
             code: await loadContractCode("src/testdata/lottery-esdt.wasm"),
             gasLimit: new GasLimit(50000000),
-            initArguments: []
+            initArguments: [],
+            chainID: network.ChainID
         });
 
         // The deploy transaction should be signed, so that the address of the contract
@@ -264,7 +275,8 @@ describe("test on local testnet", function () {
                 OptionValue.newMissing(),
                 OptionValue.newMissing(),
                 OptionalValue.newMissing()
-            ]
+            ],
+            chainID: network.ChainID
         });
 
         // Apply nonces and sign the remaining transactions

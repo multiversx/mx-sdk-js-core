@@ -12,7 +12,7 @@ import { SmartContractAbi } from "./abi";
 import { Address } from "../address";
 import { assert } from "chai";
 import { Interaction } from "./interaction";
-import { GasLimit } from "../networkParams";
+import { ChainID, GasLimit } from "../networkParams";
 import { ContractFunction } from "./function";
 import { QueryResponse } from "./queryResponse";
 import { Nonce } from "../nonce";
@@ -40,7 +40,7 @@ describe("test smart contract interactor", function() {
         let transaction = interaction
             .withNonce(new Nonce(7))
             .withValue(Balance.egld(1))
-            .withGasLimitComponents({ estimatedExecutionComponent: 20000000 })
+            .withGasLimitComponents({ minGasLimit: 50000, gasPerDataByte: 1500, estimatedExecutionComponent: 20000000 })
             .buildTransaction();
 
         let expectedGasLimit = new GasLimit(50000)
@@ -116,7 +116,8 @@ describe("test smart contract interactor", function() {
 
         let interaction = <Interaction>contract.methods
             .getUltimateAnswer()
-            .withGasLimit(new GasLimit(543210));
+            .withGasLimit(new GasLimit(543210))
+            .withChainID(new ChainID("T"));
 
         assert.equal(contract.getAddress(), dummyAddress);
         assert.deepEqual(interaction.getFunction(), new ContractFunction("getUltimateAnswer"));

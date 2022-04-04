@@ -32,14 +32,13 @@ For advanced smart contract interaction, using ABIs, please see the following te
  - [abiRegistry.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/typesystem/abiRegistry.spec.ts)
  - [argSerializer.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/argSerializer.spec.ts) 
 
-### Synchronizing network parameters
+### Fetching network parameters
 
 ```
 let provider = new ProxyProvider("https://localhost:7950");
-await NetworkConfig.getDefault().sync(provider);
-
-console.log(NetworkConfig.getDefault().MinGasPrice);
-console.log(NetworkConfig.getDefault().ChainID);
+let network = await provider.getNetworkConfig();
+console.log(network.MinGasPrice);
+console.log(network.ChainID);
 ```
 
 ### Synchronizing an account object

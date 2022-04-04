@@ -10,7 +10,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  **Breaking changes**
  - Removed utility functions: `transaction.awaitExecuted()`, `transaction.awaitPending()`. `TransactionWatcher` should be used directly, instead.
  - Changed interface of `TransactionWatcher`. The constructor does not expect a transaction hash anymore, but the functions `await*` do.
- - Introduced `TransactionWatcher.awaitCompleted(transaction)`.
+ - Introduced new functions on `TransactionWatcher`: `awaitCompleted()`, `awaitAllEvents()`, `awaitAnyEvent()` etc.
  - Removed `Transaction.status` (the one on `TransactionOnNetwork` should be read instead).
  - `Transaction.getAsOnNetwork()` does not wait for notarization / completion anymore. One should explicitly use the transaction watcher, when needed.
 

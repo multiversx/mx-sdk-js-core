@@ -15,6 +15,7 @@ import { ResultsParser } from "./resultsParser";
 
 describe("test on local testnet", function () {
     let provider = chooseProxyProvider("local-testnet");
+    let watcher = new TransactionWatcher(provider);
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
     let resultsParser = new ResultsParser();
 
@@ -79,12 +80,12 @@ describe("test on local testnet", function () {
         await transactionDeploy.send(provider);
         await transactionIncrement.send(provider);
 
-        await transactionDeploy.awaitExecuted(provider);
+        await watcher.awaitCompleted(transactionDeploy);
         let transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);
         let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
-        await transactionIncrement.awaitExecuted(provider);
+        await watcher.awaitCompleted(transactionIncrement);
         transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);
         bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
@@ -145,9 +146,9 @@ describe("test on local testnet", function () {
         await transactionIncrementFirst.send(provider);
         await transactionIncrementSecond.send(provider);
 
-        await transactionDeploy.awaitExecuted(provider);
-        await transactionIncrementFirst.awaitExecuted(provider);
-        await transactionIncrementSecond.awaitExecuted(provider);
+        await watcher.awaitCompleted(transactionDeploy);
+        await watcher.awaitCompleted(transactionIncrementFirst);
+        await watcher.awaitCompleted(transactionIncrementSecond);
 
         // Check counter
         let queryResponse = await contract.runQuery(provider, { func: new ContractFunction("get") });
@@ -207,9 +208,9 @@ describe("test on local testnet", function () {
         await transactionMintBob.send(provider);
         await transactionMintCarol.send(provider);
 
-        await transactionDeploy.awaitExecuted(provider);
-        await transactionMintBob.awaitExecuted(provider);
-        await transactionMintCarol.awaitExecuted(provider);
+        await watcher.awaitCompleted(transactionDeploy);
+        await watcher.awaitCompleted(transactionMintBob);
+        await watcher.awaitCompleted(transactionMintCarol);
 
         // Query state, do some assertions
         let queryResponse = await contract.runQuery(provider, {
@@ -287,8 +288,8 @@ describe("test on local testnet", function () {
         await transactionDeploy.send(provider);
         await transactionStart.send(provider);
 
-        await transactionDeploy.awaitNotarized(provider);
-        await transactionStart.awaitNotarized(provider);
+        await watcher.awaitAllEvents(transactionDeploy, ["SCDeploy"]);
+        await watcher.awaitAnyEvent(transactionStart, ["completedTxEvent"]);
 
         // Let's check the SCRs
         let transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);

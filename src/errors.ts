@@ -334,6 +334,15 @@ export class ErrExpectedTransactionStatusNotReached extends Err {
 }
 
 /**
+ * Signals an issue related to waiting for specific transaction events.
+ */
+ export class ErrExpectedTransactionEventsNotFound extends Err {
+  public constructor() {
+    super(`Expected transaction events not found`);
+  }
+}
+
+/**
  * Signals a generic error in the context of Smart Contracts.
  */
 export class ErrContract extends Err {

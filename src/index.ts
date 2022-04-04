@@ -11,6 +11,7 @@ export * from "./transactionPayload";
 export * from "./transactionWatcher";
 export * from "./balance";
 export * from "./balanceBuilder";
+export * from "./boundaryAdapters";
 export * from "./interactive";
 export * from "./logger";
 export * from "./networkConfig";

@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { INetworkProvider } from "./interface";
 import { Address } from "../address";
 import { loadTestWallets, TestWallet } from "../testutils";
-import { TransactionHash, TransactionStatus } from "../transaction";
+import { TransactionHash } from "../transaction";
 import { Nonce } from "../nonce";
 import { ContractFunction, Query } from "../smartcontracts";
 import { BigUIntValue, U32Value, BytesValue, VariadicValue, VariadicType, CompositeType, BytesType, BooleanType } from "../smartcontracts/typesystem";
@@ -11,6 +11,7 @@ import { Balance } from "../balance";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { TransactionOnNetwork } from "./transactions";
+import { TransactionStatus } from "./transactionStatus";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.elrond.com", { timeout: 10000 });

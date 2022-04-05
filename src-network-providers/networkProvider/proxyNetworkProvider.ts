@@ -3,7 +3,7 @@ import { AccountOnNetwork } from "../account";
 import { Address } from "../address";
 import { defaultConfig } from "../constants";
 import { ErrNetworkProvider } from "../errors";
-import { IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, Pagination } from "./interface";
+import { IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, IHash, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, Pagination } from "./interface";
 import { Logger } from "../logger";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";
@@ -11,10 +11,12 @@ import { NetworkStatus } from "../networkStatus";
 import { Nonce } from "../nonce";
 import { Query } from "../smartcontracts";
 import { Stats } from "../stats";
-import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
+import { Transaction } from "../transaction";
 import { ContractQueryResponse } from "./contractResults";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
+import { TransactionStatus } from "./transactionStatus";
+import { Hash } from "./primitives";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ProxyNetworkProvider implements INetworkProvider {
@@ -94,22 +96,22 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokenData;
     }
 
-    async getTransaction(txHash: TransactionHash): Promise<TransactionOnNetwork> {
+    async getTransaction(txHash: IHash): Promise<TransactionOnNetwork> {
         let url = this.buildUrlWithQueryParameters(`transaction/${txHash.toString()}`, { withResults: "true" });
         let response = await this.doGetGeneric(url);
         let transaction = TransactionOnNetwork.fromProxyHttpResponse(txHash, response.transaction);
         return transaction;
     }
 
-    async getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus> {
+    async getTransactionStatus(txHash: IHash): Promise<TransactionStatus> {
         let response = await this.doGetGeneric(`transaction/${txHash.toString()}/status`);
         let status = new TransactionStatus(response.status);
         return status;
     }
 
-    async sendTransaction(tx: Transaction): Promise<TransactionHash> {
+    async sendTransaction(tx: Transaction): Promise<IHash> {
         let response = await this.doPostGeneric("transaction/send", tx.toSendable());
-        let hash = new TransactionHash(response.txHash);
+        let hash = new Hash(response.txHash);
         return hash;
     }
 

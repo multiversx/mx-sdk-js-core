@@ -1,4 +1,3 @@
-import { NetworkConfig } from "../networkConfig";
 import { loadContractCode, loadTestWallets, TestWallet } from "../testutils";
 import { TransactionWatcher } from "../transactionWatcher";
 import { GasLimit } from "../networkParams";
@@ -53,21 +52,19 @@ describe("fetch transactions from local testnet", function () {
         alice.account.incrementNonce();
 
         // Broadcast & execute
-        await transactionDeploy.send(provider);
-        await transactionIncrement.send(provider);
+        await provider.sendTransaction(transactionDeploy);
+        await provider.sendTransaction(transactionIncrement);
 
         await watcher.awaitCompleted(transactionDeploy);
         await watcher.awaitCompleted(transactionIncrement);
 
-        await transactionDeploy.getAsOnNetwork(provider);
-        await transactionIncrement.getAsOnNetwork(provider);
+        let transactionOnNetworkDeploy = await provider.getTransaction(transactionDeploy.getHash());
+        let transactionOnNetworkIncrement = await provider.getTransaction(transactionIncrement.getHash());
 
-        let transactionOnNetwork = transactionDeploy.getAsOnNetworkCached();
-        let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        let bundle = resultsParser.parseUntypedOutcome(transactionOnNetworkDeploy);
         assert.isTrue(bundle.returnCode.isSuccess());
 
-        transactionOnNetwork = transactionIncrement.getAsOnNetworkCached();
-        bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        bundle = resultsParser.parseUntypedOutcome(transactionOnNetworkIncrement);
         assert.isTrue(bundle.returnCode.isSuccess());
     });
 });

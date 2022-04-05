@@ -3,7 +3,6 @@ import { ApiProvider } from "./apiProvider";
 import { BalanceBuilder, Egld } from "./balanceBuilder";
 import { ErrInvalidArgument } from "./errors";
 import { IApiProvider, IProvider } from "./interface";
-import { NetworkConfig } from "./networkConfig";
 import { ProxyProvider } from "./proxyProvider";
 import { SystemWrapper } from "./smartcontracts/wrapper";
 import { loadAndSyncTestWallets, TestWallet } from "./testutils";

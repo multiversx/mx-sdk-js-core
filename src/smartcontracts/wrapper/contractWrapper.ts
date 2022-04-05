@@ -180,7 +180,7 @@ export class ContractWrapper extends ChainSendContext {
 
         let logger = this.context.getLogger();
         logger?.transactionCreated(transaction);
-        await transaction.send(provider);
+        await provider.sendTransaction(transaction);
 
         // increment the nonce only after the transaction is sent
         // since an exception thrown by the provider means we will have to re-use the same nonce
@@ -189,7 +189,7 @@ export class ContractWrapper extends ChainSendContext {
 
         logger?.transactionSent(transaction);
         await new TransactionWatcher(provider).awaitCompleted(transaction);
-        let transactionOnNetwork = await transaction.getAsOnNetwork(provider, true, true);
+        let transactionOnNetwork = await provider.getTransaction(transaction.getHash());
         if (transactionOnNetwork.status.isFailed()) {
             // TODO: extract the error messages
             //let results = transactionOnNetwork.results.getAllResults();

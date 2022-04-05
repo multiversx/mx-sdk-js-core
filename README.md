@@ -43,10 +43,13 @@ console.log(network.ChainID);
 
 ### Synchronizing an account object
 
+The following snippet fetches (from the Network) the nonce and the balance of an account, and updates the local representation of the account.
+
 ```
 let addressOfAlice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 let alice = new Account(addressOfAlice);
-await alice.sync(provider);
+let aliceOnNetwork = await provider.getAccount(addressOfAlice);
+alice.update(aliceOnNetwork);
 
 console.log(alice.nonce);
 console.log(alice.balance);
@@ -66,7 +69,7 @@ let tx = new Transaction({
 
 tx.setNonce(alice.nonce);
 await signer.sign(tx);
-await tx.send(provider);
+await provider.sendTransaction(tx);
 ```
 
 ### Creating Smart Contract transactions
@@ -83,7 +86,7 @@ let tx = contract.call({
 
 tx.setNonce(alice.nonce);
 await signer.sign(tx);
-await tx.send(provider);
+await provider.sendTransaction(tx);
 ```
 
 ### Querying Smart Contracts
@@ -104,9 +107,9 @@ console.log(response.returnData);
 ### Waiting for transactions to be processed
 
 ```
-await tx1.send(provider);
-await tx2.send(provider);
-await tx3.send(provider);
+await provider.sendTransaction(tx1);
+await provider.sendTransaction(tx2);
+await provider.sendTransaction(tx3);
 
 let watcher = new TransactionWatcher(provider);
 await Promise.all([watcher.awaitCompleted(tx1), watcher.awaitCompleted(tx2), watcher.awaitCompleted(tx3)]);
@@ -115,7 +118,8 @@ await Promise.all([watcher.awaitCompleted(tx1), watcher.awaitCompleted(tx2), wat
 ### Managing the sender nonce locally
 
 ```
-await alice.sync(provider);
+let aliceOnNetwork = await provider.getAccount(alice.address);
+alice.update(aliceOnNetwork);
 
 txA.setNonce(alice.nonce);
 alice.incrementNonce();
@@ -125,8 +129,8 @@ alice.incrementNonce();
 await signer.sign(txA);
 await signer.sign(txB);
 
-await txA.send(provider);
-await txB.send(provider);
+await provider.sendTransaction(txA);
+await provider.sendTransaction(txB);
 
 let watcher = new TransactionWatcher(provider);
 

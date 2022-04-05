@@ -2,12 +2,11 @@ import { SmartContract } from "./smartContract";
 import { GasLimit } from "../networkParams";
 import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction } from "./function";
-import { NetworkConfig } from "../networkConfig";
 import { loadTestWallets, TestWallet } from "../testutils/wallets";
 import { loadContractCode } from "../testutils";
 import { Logger } from "../logger";
 import { assert } from "chai";
-import { AddressValue, BigUIntType, BigUIntValue, OptionalType, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
+import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 import { decodeUnsignedNumber } from "./codec";
 import { BytesValue } from "./typesystem/bytes";
 import { chooseProxyProvider } from "../interactive";
@@ -77,22 +76,22 @@ describe("test on local testnet", function () {
         await alice.signer.sign(simulateTwo);
 
         // Broadcast & execute
-        await transactionDeploy.send(provider);
-        await transactionIncrement.send(provider);
+        await provider.sendTransaction(transactionDeploy);
+        await provider.sendTransaction(transactionIncrement);
 
         await watcher.awaitCompleted(transactionDeploy);
-        let transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);
+        let transactionOnNetwork = await provider.getTransaction(transactionDeploy.getHash());
         let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
         await watcher.awaitCompleted(transactionIncrement);
-        transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);
+        transactionOnNetwork = await provider.getTransaction(transactionIncrement.getHash());
         bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
         // Simulate
-        Logger.trace(JSON.stringify(await simulateOne.simulate(provider), null, 4));
-        Logger.trace(JSON.stringify(await simulateTwo.simulate(provider), null, 4));
+        Logger.trace(JSON.stringify(await provider.simulateTransaction(simulateOne), null, 4));
+        Logger.trace(JSON.stringify(await provider.simulateTransaction(simulateTwo), null, 4));
     });
 
     it("counter: should deploy, call and query contract", async function () {
@@ -142,9 +141,9 @@ describe("test on local testnet", function () {
         alice.account.incrementNonce();
 
         // Broadcast & execute
-        await transactionDeploy.send(provider);
-        await transactionIncrementFirst.send(provider);
-        await transactionIncrementSecond.send(provider);
+        await provider.sendTransaction(transactionDeploy);
+        await provider.sendTransaction(transactionIncrementFirst);
+        await provider.sendTransaction(transactionIncrementSecond);
 
         await watcher.awaitCompleted(transactionDeploy);
         await watcher.awaitCompleted(transactionIncrementFirst);
@@ -204,9 +203,9 @@ describe("test on local testnet", function () {
         await alice.signer.sign(transactionMintCarol);
 
         // Broadcast & execute
-        await transactionDeploy.send(provider);
-        await transactionMintBob.send(provider);
-        await transactionMintCarol.send(provider);
+        await provider.sendTransaction(transactionDeploy);
+        await provider.sendTransaction(transactionMintBob);
+        await provider.sendTransaction(transactionMintCarol);
 
         await watcher.awaitCompleted(transactionDeploy);
         await watcher.awaitCompleted(transactionMintBob);
@@ -285,18 +284,18 @@ describe("test on local testnet", function () {
         await alice.signer.sign(transactionStart);
 
         // Broadcast & execute
-        await transactionDeploy.send(provider);
-        await transactionStart.send(provider);
+        await provider.sendTransaction(transactionDeploy);
+        await provider.sendTransaction(transactionStart);
 
         await watcher.awaitAllEvents(transactionDeploy, ["SCDeploy"]);
         await watcher.awaitAnyEvent(transactionStart, ["completedTxEvent"]);
 
         // Let's check the SCRs
-        let transactionOnNetwork = await transactionDeploy.getAsOnNetwork(provider);
+        let transactionOnNetwork = await provider.getTransaction(transactionDeploy.getHash());
         let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
-        transactionOnNetwork = await transactionStart.getAsOnNetwork(provider);
+        transactionOnNetwork = await provider.getTransaction(transactionStart.getHash());
         bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 

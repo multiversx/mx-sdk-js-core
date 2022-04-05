@@ -86,7 +86,8 @@ export class TestWallet {
     }
 
     async sync(provider: IProvider) {
-        await this.account.sync(provider);
+        let accountOnNetwork = await provider.getAccount(this.address);
+        await this.account.update(accountOnNetwork);
         return this;
     }
 }

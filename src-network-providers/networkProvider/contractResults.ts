@@ -2,11 +2,12 @@ import { BigNumber } from "bignumber.js";
 import { Address } from "../address";
 import { Balance } from "../balance";
 import { Hash } from "../hash";
-import { IContractQueryResponse, IContractResultItem, IContractResults } from "./interface";
+import { IContractQueryResponse, IContractResultItem, IContractResults, ITransactionLogs } from "./interface";
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
 import { MaxUint64, ReturnCode } from "../smartcontracts";
 import { TransactionHash } from "../transaction";
+import { TransactionLogs } from "./transactionLogs";
 
 export class ContractResults implements IContractResults {
     readonly items: IContractResultItem[];
@@ -47,6 +48,12 @@ export class ContractResultItem implements IContractResultItem {
     gasPrice: GasPrice = new GasPrice(0);
     callType: number = 0;
     returnMessage: string = "";
+    logs: ITransactionLogs = TransactionLogs.empty();
+
+    constructor(init?: Partial<IContractResultItem>) {
+        Object.assign(this, init);
+    }
+
 
     static fromProxyHttpResponse(response: any): ContractResultItem {
         let item = ContractResultItem.fromHttpResponse(response);
@@ -77,6 +84,8 @@ export class ContractResultItem implements IContractResultItem {
         item.data = response.data || "";
         item.callType = response.callType;
         item.returnMessage = response.returnMessage;
+
+        item.logs = TransactionLogs.fromHttpResponse(response.logs || {});
 
         return item;
     }

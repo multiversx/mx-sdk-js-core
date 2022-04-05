@@ -1,4 +1,3 @@
-import { Nonce } from "../nonce";
 import { TransactionStatus } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { isPaddedHex } from "../utils.codec";
@@ -10,7 +9,7 @@ import { TransactionLogs } from "./transactionLogs";
 interface ITransactionOnNetwork {
     logs: TransactionLogs;
     status: TransactionStatus;
-    hyperblockNonce: Nonce;
+    hyperblockNonce: number;
     data: TransactionPayload;
 }
 
@@ -40,7 +39,7 @@ export class TransactionCompletionStrategy {
             return transaction.status.isExecuted();
         }
 
-        let hyperblockNonce = transaction.hyperblockNonce.valueOf();
+        let hyperblockNonce = transaction.hyperblockNonce;
 
         // Imprecise condition, uncertain completion (usually sufficient, though).
         // This is WRONG when (at least): timeOf(block with execution at destination is notarized) < timeOf(the "completedTxEvent" occurs).

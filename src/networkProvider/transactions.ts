@@ -1,9 +1,6 @@
 import { Address } from "../address";
 import { Balance } from "../balance";
-import { Hash } from "../hash";
-import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
-import { Signature } from "../signature";
 import { TransactionHash, TransactionStatus } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { ContractResults } from "./contractResults";
@@ -21,16 +18,16 @@ import { TransactionReceipt } from "./transactionReceipt";
     value: Balance = Balance.Zero();
     receiver: Address = new Address();
     sender: Address = new Address();
-    gasPrice: GasPrice = new GasPrice(0);
-    gasLimit: GasLimit = new GasLimit(0);
+    gasPrice: number = 0;
+    gasLimit: number = 0;
     data: TransactionPayload = new TransactionPayload();
-    signature: Signature = Signature.empty();
+    signature: string = "";
     status: TransactionStatus = TransactionStatus.createUnknown();
     timestamp: number = 0;
 
-    blockNonce: Nonce = new Nonce(0);
-    hyperblockNonce: Nonce = new Nonce(0);
-    hyperblockHash: Hash = Hash.empty();
+    blockNonce: number = 0;
+    hyperblockNonce: number = 0;
+    hyperblockHash: string = "";
     pendingResults: boolean = false;
 
     receipt: TransactionReceipt = new TransactionReceipt();
@@ -68,15 +65,15 @@ import { TransactionReceipt } from "./transactionReceipt";
         result.value = Balance.fromString(response.value);
         result.sender = Address.fromBech32(response.sender);
         result.receiver = Address.fromBech32(response.receiver);
-        result.gasPrice = new GasPrice(response.gasPrice);
-        result.gasLimit = new GasLimit(response.gasLimit);
+        result.gasPrice = response.gasPrice || 0;
+        result.gasLimit = response.gasLimit || 0;
         result.data = TransactionPayload.fromEncoded(response.data);
         result.status = new TransactionStatus(response.status);
         result.timestamp = response.timestamp || 0;
 
-        result.blockNonce = new Nonce(response.blockNonce || 0);
-        result.hyperblockNonce = new Nonce(response.hyperblockNonce || 0);
-        result.hyperblockHash = new Hash(response.hyperblockHash);
+        result.blockNonce = response.blockNonce || 0;
+        result.hyperblockNonce = response.hyperblockNonce || 0;
+        result.hyperblockHash = response.hyperblockHash;
         result.pendingResults = response.pendingResults || false;
 
         result.receipt = TransactionReceipt.fromHttpResponse(response.receipt || {});

@@ -9,7 +9,6 @@ import { Balance } from "../balance";
 import * as errors from "../errors";
 import { Query } from "../smartcontracts/query";
 import { QueryResponse } from "../smartcontracts/queryResponse";
-import { Hash } from "../hash";
 import { NetworkStatus } from "../networkStatus";
 import { TypedEvent } from "../events";
 import { BalanceBuilder } from "../balanceBuilder";
@@ -17,8 +16,8 @@ import BigNumber from "bignumber.js";
 import { ContractResultItem, ContractResults } from "../networkProvider/contractResults";
 import { TransactionOnNetwork } from "../networkProvider/transactions";
 
-const DummyHyperblockNonce = new Nonce(42);
-const DummyHyperblockHash = new Hash("a".repeat(32));
+const DummyHyperblockNonce = 42;
+const DummyHyperblockHash = "a".repeat(32);
 
 /**
  * A mock {@link IProvider}, used for tests only.

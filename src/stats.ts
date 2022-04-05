@@ -1,5 +1,3 @@
-import { IApiProvider } from "./interface";
-
 /**
  * An object holding Network stats parameters.
  */
@@ -49,15 +47,6 @@ export class Stats {
         this.Epoch = 0;
         this.RoundsPassed = 0;
         this.RoundsPerEpoch = 0;
-    }
-
-    /**
-     * Synchronizes a stats object by querying the Network, through a {@link IProvider}.
-     * @param provider The provider to use
-     */
-    async sync(provider: IApiProvider): Promise<void> {
-        let fresh: Stats = await provider.getNetworkStats();
-        Object.assign(this, fresh);
     }
 
     /**

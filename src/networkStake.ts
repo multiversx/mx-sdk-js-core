@@ -1,4 +1,3 @@
-import { IApiProvider } from "./interface";
 import BigNumber from "bignumber.js";
 
 /**
@@ -30,26 +29,6 @@ export class NetworkStake {
     this.ActiveValidators = 0;
     this.QueueSize = 0;
     this.TotalStaked = new BigNumber(0);
-  }
-
-  /**
-   * Gets the default configuration object (think of the Singleton pattern).
-   */
-  static getDefault(): NetworkStake {
-    if (!NetworkStake.default) {
-      NetworkStake.default = new NetworkStake();
-    }
-
-    return NetworkStake.default;
-  }
-
-  /**
-   * Synchronizes a configuration object by querying the Network, through a {@link IProvider}.
-   * @param provider The provider to use
-   */
-  async sync(provider: IApiProvider): Promise<void> {
-    let fresh: NetworkStake = await provider.getNetworkStake();
-    Object.assign(this, fresh);
   }
 
   /**

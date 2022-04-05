@@ -1,20 +1,18 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "../account";
-import { defaultConfig } from "../constants";
-import { IAddress, IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, IHash, INetworkProvider, INonce, INonFungibleTokenOfAccountOnNetwork, Pagination } from "./interface";
-import { Logger } from "../logger";
+import { IAddress, IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, IHash, INetworkProvider, INonce, INonFungibleTokenOfAccountOnNetwork, ITransaction, Pagination } from "./interface";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
 import { Query } from "../smartcontracts";
 import { Stats } from "../stats";
-import { Transaction } from "../transaction";
 import { ContractQueryResponse } from "./contractResults";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { Hash } from "./primitives";
 import { ErrNetworkProvider } from "./errors";
+import { defaultAxiosConfig } from "./config";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ProxyNetworkProvider implements INetworkProvider {
@@ -23,7 +21,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
 
     constructor(url: string, config?: AxiosRequestConfig) {
         this.url = url;
-        this.config = { ...defaultConfig, ...config };
+        this.config = { ...defaultAxiosConfig, ...config };
     }
 
     async getNetworkConfig(): Promise<NetworkConfig> {
@@ -107,13 +105,13 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return status;
     }
 
-    async sendTransaction(tx: Transaction): Promise<IHash> {
+    async sendTransaction(tx: ITransaction): Promise<IHash> {
         let response = await this.doPostGeneric("transaction/send", tx.toSendable());
         let hash = new Hash(response.txHash);
         return hash;
     }
 
-    async simulateTransaction(tx: Transaction): Promise<any> {
+    async simulateTransaction(tx: ITransaction): Promise<any> {
         let response = await this.doPostGeneric("transaction/simulate", tx.toSendable());
         return response;
     }
@@ -193,7 +191,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
 
     private handleApiError(error: any, resourceUrl: string) {
         if (!error.response) {
-            Logger.warn(error);
+            console.warn(error);
             throw new ErrNetworkProvider(resourceUrl, error.toString(), error);
         }
 

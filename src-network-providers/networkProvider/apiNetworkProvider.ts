@@ -1,14 +1,11 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "../account";
-import { defaultConfig } from "../constants";
-import { IAddress, IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, IHash, INetworkProvider, INonce, INonFungibleTokenOfAccountOnNetwork, Pagination } from "./interface";
-import { Logger } from "../logger";
+import { IAddress, IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, IHash, INetworkProvider, INonce, INonFungibleTokenOfAccountOnNetwork, ITransaction, Pagination } from "./interface";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
 import { Query } from "../smartcontracts";
 import { Stats } from "../stats";
-import { Transaction } from "../transaction";
 import { ContractQueryResponse } from "./contractResults";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
@@ -17,6 +14,7 @@ import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { Hash } from "./primitives";
 import { ErrNetworkProvider } from "./errors";
+import { defaultAxiosConfig } from "./config";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ApiNetworkProvider implements INetworkProvider {
@@ -26,7 +24,7 @@ export class ApiNetworkProvider implements INetworkProvider {
 
     constructor(url: string, config?: AxiosRequestConfig) {
         this.url = url;
-        this.config = { ...defaultConfig, ...config };
+        this.config = { ...defaultAxiosConfig, ...config };
         this.backingProxyNetworkProvider = new ProxyNetworkProvider(url, config);
     }
 
@@ -104,13 +102,13 @@ export class ApiNetworkProvider implements INetworkProvider {
         return status;
     }
 
-    async sendTransaction(tx: Transaction): Promise<IHash> {
+    async sendTransaction(tx: ITransaction): Promise<IHash> {
         let response = await this.doPostGeneric("transactions", tx.toSendable());
         let hash = new Hash(response.txHash);
         return hash;
     }
 
-    async simulateTransaction(tx: Transaction): Promise<any> {
+    async simulateTransaction(tx: ITransaction): Promise<any> {
         return await this.backingProxyNetworkProvider.simulateTransaction(tx);
     }
 
@@ -181,7 +179,7 @@ export class ApiNetworkProvider implements INetworkProvider {
 
     private handleApiError(error: any, resourceUrl: string) {
         if (!error.response) {
-            Logger.warn(error);
+            console.warn(error);
             throw new ErrNetworkProvider(resourceUrl, error.toString(), error);
         }
 

@@ -165,7 +165,7 @@ export interface IContractQueryResponse {
     returnData: string[];
     returnCode: ReturnCode;
     returnMessage: string;
-    gasUsed: GasLimit;
+    gasUsed: IGasLimit;
 
     getReturnDataParts(): Buffer[];
 }
@@ -182,8 +182,14 @@ export class Pagination {
     }
 }
 
+export interface ITransaction {
+    toSendable(): any;
+}
+
 export interface IHexable { hex(): string }
-export interface IHash extends IHexable { };
+export interface IHash extends IHexable { }
 export interface IAddress { bech32(): string; }
 export interface INonce extends IHexable { valueOf(): number; }
 export interface ITransactionPayload { encoded(): string; }
+export interface IGasLimit { valueOf(): number; }
+export interface IGasPrice { valueOf(): number; }

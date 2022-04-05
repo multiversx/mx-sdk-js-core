@@ -1,14 +1,9 @@
 import { BigNumber } from "bignumber.js";
-import { Address } from "../address";
-import { Balance } from "../balance";
-import { Hash } from "../hash";
-import { IContractQueryResponse } from "./interface";
-import { GasLimit, GasPrice } from "../networkParams";
-import { Nonce } from "../nonce";
-import { TransactionHash } from "../transaction";
+import { IAddress, IContractQueryResponse, IGasLimit, IGasPrice, IHash, INonce } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
 import { ReturnCode } from "../smartcontracts/returnCode";
 import { MaxUint64 } from "../smartcontracts/query";
+import { Address, Hash, Nonce, TransactionValue } from "./primitives";
 
 export class ContractResults {
     readonly items: ContractResultItem[];
@@ -37,16 +32,16 @@ export class ContractResults {
 }
 
 export class ContractResultItem {
-    hash: Hash = Hash.empty();
-    nonce: Nonce = new Nonce(0);
-    value: Balance = Balance.Zero();
-    receiver: Address = new Address();
-    sender: Address = new Address();
+    hash: IHash = new Hash("")
+    nonce: INonce = new Nonce(0);
+    value: TransactionValue = new TransactionValue("");
+    receiver: IAddress = new Address("");
+    sender: IAddress = new Address("");
     data: string = "";
-    previousHash: Hash = Hash.empty();
-    originalHash: Hash = Hash.empty();
-    gasLimit: GasLimit = new GasLimit(0);
-    gasPrice: GasPrice = new GasPrice(0);
+    previousHash: Hash = new Hash("");
+    originalHash: Hash = new Hash("");
+    gasLimit: IGasLimit = 0;
+    gasPrice: IGasPrice = 0;
     callType: number = 0;
     returnMessage: string = "";
     logs: TransactionLogs = TransactionLogs.empty();
@@ -72,15 +67,15 @@ export class ContractResultItem {
     private static fromHttpResponse(response: any): ContractResultItem {
         let item = new ContractResultItem();
 
-        item.hash = new TransactionHash(response.hash);
+        item.hash = new Hash(response.hash);
         item.nonce = new Nonce(response.nonce || 0);
-        item.value = Balance.fromString(response.value);
+        item.value = new TransactionValue(response.value || "");
         item.receiver = new Address(response.receiver);
         item.sender = new Address(response.sender);
-        item.previousHash = new TransactionHash(response.prevTxHash);
-        item.originalHash = new TransactionHash(response.originalTxHash);
-        item.gasLimit = new GasLimit(response.gasLimit);
-        item.gasPrice = new GasPrice(response.gasPrice);
+        item.previousHash = new Hash(response.prevTxHash);
+        item.originalHash = new Hash(response.originalTxHash);
+        item.gasLimit = response.gasLimit || 0;
+        item.gasPrice = response.gasPrice || 0;
         item.data = response.data || "";
         item.callType = response.callType;
         item.returnMessage = response.returnMessage;
@@ -95,7 +90,7 @@ export class ContractQueryResponse implements IContractQueryResponse {
     returnData: string[] = [];
     returnCode: ReturnCode = ReturnCode.None;
     returnMessage: string = "";
-    gasUsed: GasLimit = new GasLimit(0);
+    gasUsed: IGasLimit = 0;
 
     static fromHttpResponse(payload: any): ContractQueryResponse {
         let response = new ContractQueryResponse();
@@ -104,7 +99,7 @@ export class ContractQueryResponse implements IContractQueryResponse {
         response.returnData = payload["returnData"] || [];
         response.returnCode = payload["returnCode"] || "";
         response.returnMessage = payload["returnMessage"] || "";
-        response.gasUsed = new GasLimit(MaxUint64.minus(gasRemaining).toNumber());
+        response.gasUsed = MaxUint64.minus(gasRemaining).toNumber();
 
         return response;
     }

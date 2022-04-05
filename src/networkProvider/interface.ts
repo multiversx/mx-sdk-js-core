@@ -8,8 +8,9 @@ import { NetworkStatus } from "../networkStatus";
 import { Nonce } from "../nonce";
 import { Query, ReturnCode } from "../smartcontracts";
 import { Stats } from "../stats";
-import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
+import { Transaction } from "../transaction";
 import { TransactionOnNetwork } from "./transactions";
+import { TransactionStatus } from "./transactionStatus";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
@@ -63,17 +64,17 @@ export interface INetworkProvider {
     /**
      * Fetches the state of a {@link Transaction}.
      */
-    getTransaction(txHash: TransactionHash): Promise<TransactionOnNetwork>;
+    getTransaction(txHash: IHash): Promise<TransactionOnNetwork>;
 
     /**
      * Queries the status of a {@link Transaction}.
      */
-    getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus>;
+    getTransactionStatus(txHash: IHash): Promise<TransactionStatus>;
 
     /**
      * Broadcasts an already-signed {@link Transaction}.
      */
-    sendTransaction(tx: Transaction): Promise<TransactionHash>;
+    sendTransaction(tx: Transaction): Promise<IHash>;
 
     /**
      * Simulates the processing of an already-signed {@link Transaction}.
@@ -182,3 +183,9 @@ export class Pagination {
         return { from: 0, size: 100 };
     }
 }
+
+export interface IHash { hex(): string; }
+export interface IAddress { bech32(): string; }
+export interface INonce { valueOf(): number; }
+export interface IHexable { hex(): string }
+export interface ITransactionPayload { encoded(): string; }

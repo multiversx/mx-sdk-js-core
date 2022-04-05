@@ -1,7 +1,8 @@
-import { ISignable, ISignatureOfExternalSigner } from "./interface";
+import { ISignable } from "./interface";
 import { Signature } from "./signature";
 import { Address } from "./address";
 import { adaptToSignature } from "./boundaryAdapters";
+import { ISignature } from "@elrondnetwork/erdjs-walletcore/out/interface";
 const createKeccakHash = require("keccak");
 
 export const MESSAGE_PREFIX = "\x17Elrond Signed Message:\n";
@@ -58,7 +59,7 @@ export class SignableMessage implements ISignable {
     return this.signature;
   }
 
-  applySignature(signature: ISignatureOfExternalSigner): void {
+  applySignature(signature: ISignature): void {
     this.signature = adaptToSignature(signature);
   }
 

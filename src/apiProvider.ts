@@ -1,15 +1,14 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { IApiProvider } from "./interface";
+import { IApiProvider, IHash } from "./interface";
 import * as errors from "./errors";
 import { Logger } from "./logger";
 import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
-import { TransactionHash, TransactionStatus } from "./transaction";
 import { Token } from "./token";
 import { NFTToken } from "./nftToken";
 import { defaultConfig } from "./constants";
 import { ApiNetworkProvider } from "./networkProvider/apiNetworkProvider";
-import { ITransactionOnNetwork } from "./interfaceOfNetwork";
+import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 /**
  * This is a temporary change, this will be the only provider used, ProxyProvider will be deprecated
@@ -50,14 +49,14 @@ export class ApiProvider implements IApiProvider {
     /**
      * Fetches the state of a {@link Transaction}.
      */
-    async getTransaction(txHash: TransactionHash): Promise<ITransactionOnNetwork> {
+    async getTransaction(txHash: IHash): Promise<ITransactionOnNetwork> {
         return await this.backingProvider.getTransaction(txHash);
     }
 
     /**
      * Queries the status of a {@link Transaction}.
      */
-    async getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus> {
+    async getTransactionStatus(txHash: IHash): Promise<ITransactionStatus> {
         return await this.backingProvider.getTransactionStatus(txHash);
     }
 

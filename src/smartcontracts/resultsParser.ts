@@ -8,6 +8,8 @@ import { TypedOutcomeBundle, IResultsParser, UntypedOutcomeBundle } from "./inte
 import { QueryResponse } from "./queryResponse";
 import { ReturnCode } from "./returnCode";
 import { EndpointDefinition } from "./typesystem";
+import { adaptToAddress } from "../boundaryAdapters";
+import { IBech32Address } from "../interface";
 
 enum WellKnownEvents {
     OnTransactionCompleted = "completedTxEvent",
@@ -123,7 +125,7 @@ export class ResultsParser implements IResultsParser {
             data: transaction.data.encoded(),
             value: transaction.value.toString(),
             type: transaction.type
-        })
+        });
     }
 
     private createBundleOnSimpleMoveBalance(transaction: ITransactionOnNetwork): UntypedOutcomeBundle | null {
@@ -211,10 +213,12 @@ export class ResultsParser implements IResultsParser {
         };
     }
 
-    private createBundleOnWriteLogWhereFirstTopicEqualsAddress(logs: ITransactionLogs, address: Address): UntypedOutcomeBundle | null {
+    private createBundleOnWriteLogWhereFirstTopicEqualsAddress(logs: ITransactionLogs, address: IBech32Address): UntypedOutcomeBundle | null {
+        let hexAddress = adaptToAddress(address).hex();
+        
         let eventWriteLogWhereTopicIsSender = logs.findSingleOrNoneEvent(
             WellKnownEvents.OnWriteLog,
-            event => event.findFirstOrNoneTopic(topic => topic.hex() == address.hex()) != undefined
+            event => event.findFirstOrNoneTopic(topic => topic.hex() == hexAddress) != undefined
         );
 
         if (!eventWriteLogWhereTopicIsSender) {
@@ -244,7 +248,7 @@ export class ResultsParser implements IResultsParser {
         // Search the nested logs for matching events (writeLog):
         for (const resultItem of transaction.contractResults.items) {
             let writeLogWithReturnData = resultItem.logs.findSingleOrNoneEvent(WellKnownEvents.OnWriteLog, event => {
-                let addressIsSender = event.address.equals(transaction.sender);
+                let addressIsSender = event.address.bech32() == transaction.sender.bech32();
                 let firstTopicIsContract = event.topics[0]?.hex() == contractAddress.hex();
                 return addressIsSender && firstTopicIsContract;
             });

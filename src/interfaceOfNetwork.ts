@@ -1,24 +1,26 @@
-import { Address } from "./address";
-import { Balance } from "./balance";
-import { Hash } from "./hash";
-import { Nonce } from "./nonce";
-import { TransactionHash, TransactionStatus } from "./transaction";
-import { TransactionPayload } from "./transactionPayload";
+import { IBech32Address, IHash, INonce, ITransactionPayload, ITransactionValue } from "./interface";
 
 export interface ITransactionOnNetwork {
-    hash: TransactionHash;
+    hash: IHash;
     type: string;
-    value: Balance;
-    receiver: Address;
-    sender: Address;
-    data: TransactionPayload;
-    status: TransactionStatus;
+    value: ITransactionValue;
+    receiver: IBech32Address;
+    sender: IBech32Address;
+    data: ITransactionPayload;
+    status: ITransactionStatus;
     receipt: ITransactionReceipt;
     contractResults: IContractResults;
     logs: ITransactionLogs;
 
     isCompleted(): boolean;
     getAllEvents(): ITransactionEvent[];
+}
+
+export interface ITransactionStatus {
+    isPending(): boolean;
+    isFailed(): boolean;
+    isInvalid(): boolean;
+    isExecuted(): boolean;
 }
 
 export interface ITransactionReceipt {
@@ -30,10 +32,10 @@ export interface IContractResults {
 }
 
 export interface IContractResultItem {
-    hash: Hash;
-    nonce: Nonce;
-    receiver: Address;
-    sender: Address;
+    hash: IHash;
+    nonce: INonce;
+    receiver: IBech32Address;
+    sender: IBech32Address;
     data: string;
     returnMessage: string;
     logs: ITransactionLogs;
@@ -48,7 +50,7 @@ export interface ITransactionLogs {
 }
 
 export interface ITransactionEvent {
-    readonly address: Address;
+    readonly address: IBech32Address;
     readonly identifier: string;
     readonly topics: ITransactionEventTopic[];
     readonly data: string;

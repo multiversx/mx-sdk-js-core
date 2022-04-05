@@ -1,26 +1,24 @@
-import { Address } from "../address";
-import { Balance } from "../balance";
-import { Nonce } from "../nonce";
-import { TransactionHash, TransactionStatus } from "../transaction";
-import { TransactionPayload } from "../transactionPayload";
+import { TransactionStatus } from "./transactionStatus";
 import { ContractResults } from "./contractResults";
+import { Address, Hash, Nonce, TransactionValue, TransactionPayload } from "./primitives";
+import { IAddress, IHash, INonce, ITransactionPayload } from "./interface";
 import { TransactionCompletionStrategy } from "./transactionCompletionStrategy";
 import { TransactionEvent } from "./transactionEvents";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
 
  export class TransactionOnNetwork {
-    hash: TransactionHash = new TransactionHash("");
+    hash: IHash = new Hash("");
     type: string = "";
-    nonce: Nonce = new Nonce(0);
+    nonce: INonce = new Nonce(0);
     round: number = 0;
     epoch: number = 0;
-    value: Balance = Balance.Zero();
-    receiver: Address = new Address();
-    sender: Address = new Address();
+    value: TransactionValue = new TransactionValue("");
+    receiver: IAddress = new Address("");
+    sender: IAddress = new Address("");
     gasPrice: number = 0;
     gasLimit: number = 0;
-    data: TransactionPayload = new TransactionPayload();
+    data: ITransactionPayload = new TransactionPayload("");
     signature: string = "";
     status: TransactionStatus = TransactionStatus.createUnknown();
     timestamp: number = 0;
@@ -38,7 +36,7 @@ import { TransactionReceipt } from "./transactionReceipt";
         Object.assign(this, init);
     }
 
-    static fromProxyHttpResponse(txHash: TransactionHash, response: any): TransactionOnNetwork {
+    static fromProxyHttpResponse(txHash: IHash, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromProxyHttpResponse(response.smartContractResults || []);
         // TODO: uniformize transaction status.
@@ -46,7 +44,7 @@ import { TransactionReceipt } from "./transactionReceipt";
         return result;
     }
 
-    static fromApiHttpResponse(txHash: TransactionHash, response: any): TransactionOnNetwork {
+    static fromApiHttpResponse(txHash: IHash, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromApiHttpResponse(response.results || []);
         // TODO: uniformize transaction status.
@@ -54,7 +52,7 @@ import { TransactionReceipt } from "./transactionReceipt";
         return result;
     }
 
-    private static fromHttpResponse(txHash: TransactionHash, response: any): TransactionOnNetwork {
+    private static fromHttpResponse(txHash: IHash, response: any): TransactionOnNetwork {
         let result = new TransactionOnNetwork();
 
         result.hash = txHash;
@@ -62,12 +60,12 @@ import { TransactionReceipt } from "./transactionReceipt";
         result.nonce = new Nonce(response.nonce || 0);
         result.round = response.round;
         result.epoch = response.epoch || 0;
-        result.value = Balance.fromString(response.value);
-        result.sender = Address.fromBech32(response.sender);
-        result.receiver = Address.fromBech32(response.receiver);
+        result.value = new TransactionValue(response.value);
+        result.sender = new Address(response.sender);
+        result.receiver = new Address(response.receiver);
         result.gasPrice = response.gasPrice || 0;
         result.gasLimit = response.gasLimit || 0;
-        result.data = TransactionPayload.fromEncoded(response.data);
+        result.data = new TransactionPayload(response.data);
         result.status = new TransactionStatus(response.status);
         result.timestamp = response.timestamp || 0;
 

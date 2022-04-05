@@ -1,7 +1,6 @@
-import { Transaction, TransactionHash, TransactionStatus } from "./transaction";
+import { Transaction } from "./transaction";
 import { NetworkConfig } from "./networkConfig";
 import { Signature } from "./signature";
-import { Address } from "./address";
 import { AccountOnNetwork, TokenOfAccountOnNetwork } from "./account";
 import { Query } from "./smartcontracts";
 import { QueryResponse } from "./smartcontracts";
@@ -10,21 +9,18 @@ import { Stats } from "./stats";
 import { NetworkStatus } from "./networkStatus";
 import { Token } from "./token";
 import BigNumber from "bignumber.js";
-import { ITransactionOnNetwork } from "./interfaceOfNetwork";
+import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
-/**
- * @deprecated This interface will be removed in a future release, upon merging {@link IProvider} and {@link IApiProvider}.
- */
 export interface ITransactionFetcher {
     /**
      * Fetches the state of a {@link Transaction}.
      */
-    getTransaction(txHash: TransactionHash, hintSender?: Address, withResults?: boolean): Promise<ITransactionOnNetwork>;
+    getTransaction(txHash: IHash, hintSender?: IBech32Address, withResults?: boolean): Promise<ITransactionOnNetwork>;
 
     /**
      * Queries the status of a {@link Transaction}.
      */
-    getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus>;
+    getTransactionStatus(txHash: IHash): Promise<ITransactionStatus>;
 }
 
 /**
@@ -44,22 +40,22 @@ export interface IProvider extends ITransactionFetcher {
     /**
      * Fetches the state of an {@link Account}.
      */
-    getAccount(address: Address): Promise<AccountOnNetwork>;
+    getAccount(address: IBech32Address): Promise<AccountOnNetwork>;
 
     /**
      * Fetches the list of ESDT data for all the tokens of an address.
      */
-    getAddressEsdtList(address: Address): Promise<TokenOfAccountOnNetwork[]>;
+    getAddressEsdtList(address: IBech32Address): Promise<TokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches the ESDT data for a token of an address.
      */
-    getAddressEsdt(address: Address, tokenIdentifier: string): Promise<any>;
+    getAddressEsdt(address: IBech32Address, tokenIdentifier: string): Promise<any>;
 
     /**
      * Fetches the NFT data for a token with a given nonce of an address.
      */
-    getAddressNft(address: Address, tokenIdentifier: string, nonce: BigNumber): Promise<any>;
+    getAddressNft(address: IBech32Address, tokenIdentifier: string, nonce: BigNumber): Promise<any>;
 
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
@@ -69,12 +65,12 @@ export interface IProvider extends ITransactionFetcher {
     /**
      * Broadcasts an already-signed {@link Transaction}.
      */
-    sendTransaction(tx: Transaction): Promise<TransactionHash>;
+    sendTransaction(tx: Transaction): Promise<IHash>;
 
     /**
      * Simulates the processing of an already-signed {@link Transaction}.
      */
-    simulateTransaction(tx: Transaction): Promise<TransactionHash>;
+    simulateTransaction(tx: Transaction): Promise<IHash>;
 
     /**
      * Get method that receives the resource url and on callback the method used to map the response.
@@ -115,7 +111,7 @@ export interface ISignable {
     /**
      * Returns the signable object in its raw form - a sequence of bytes to be signed.
      */
-    serializeForSigning(signedBy: IAddressOfExternalSigner): Buffer;
+    serializeForSigning(signedBy: IBech32Address): Buffer;
 
     /**
      * Applies the computed signature on the object itself.
@@ -123,7 +119,7 @@ export interface ISignable {
      * @param signature The computed signature
      * @param signedBy The address of the signer
      */
-    applySignature(signature: ISignatureOfExternalSigner, signedBy: IAddressOfExternalSigner): void;
+    applySignature(signature: ISignature, signedBy: IBech32Address): void;
 }
 
 /**
@@ -137,7 +133,7 @@ export interface IVerifiable {
     /**
      * Returns the signable object in its raw form - a sequence of bytes to be verified.
      */
-    serializeForSigning(signedBy?: Address): Buffer;
+    serializeForSigning(signedBy?: IBech32Address): Buffer;
 }
 
 /**
@@ -147,18 +143,9 @@ export interface Disposable {
     dispose(): void;
 }
 
-/**
- * An interface that defines the signature, as computed by an external (to erdjs) signer.
- * Implementations are outside of erdjs.
- */
-export interface ISignatureOfExternalSigner {
-    hex(): string;
-}
-
-/**
- * An interface that defines the address of an external (to erdjs) signer.
- * Implementations are outside of erdjs.
- */
-export interface IAddressOfExternalSigner {
-    bech32(): string;
-}
+export interface ISignature { hex(): string; }
+export interface IHash { hex(): string; }
+export interface IBech32Address { bech32(): string; }
+export interface ITransactionValue { toString(): string; }
+export interface ITransactionPayload { encoded(): string; }
+export interface INonce { valueOf(): number; }

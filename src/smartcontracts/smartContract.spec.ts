@@ -5,11 +5,11 @@ import { Nonce } from "../nonce";
 import { SmartContract } from "./smartContract";
 import { ChainID, GasLimit } from "../networkParams";
 import { InHyperblock, loadTestWallets, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
-import { TransactionStatus } from "../transaction";
 import { ContractFunction } from "./function";
 import { U32Value } from "./typesystem";
 import { BytesValue } from "./typesystem/bytes";
 import { TransactionWatcher } from "../transactionWatcher";
+import { TransactionStatus } from "../networkProvider/transactionStatus";
 
 
 describe("test contract", () => {

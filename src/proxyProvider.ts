@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from "axios";
 import BigNumber from "bignumber.js";
 
 import { IProvider } from "./interface";
-import { Transaction, TransactionHash, TransactionStatus } from "./transaction";
+import { Transaction, TransactionHash } from "./transaction";
 import { NetworkConfig } from "./networkConfig";
 import { Address } from "./address";
 import * as errors from "./errors";
@@ -13,7 +13,7 @@ import { Logger } from "./logger";
 import { NetworkStatus } from "./networkStatus";
 import { defaultConfig } from "./constants";
 import { ProxyNetworkProvider } from "./networkProvider/proxyNetworkProvider";
-import { ITransactionOnNetwork } from "./interfaceOfNetwork";
+import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 /**
  * This will be deprecated once all the endpoints move to ApiProvider
@@ -111,7 +111,7 @@ export class ProxyProvider implements IProvider {
     /**
      * Queries the status of a {@link Transaction}.
      */
-    async getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus> {
+    async getTransactionStatus(txHash: TransactionHash): Promise<ITransactionStatus> {
         return await this.backingProvider.getTransactionStatus(txHash);
     }
 

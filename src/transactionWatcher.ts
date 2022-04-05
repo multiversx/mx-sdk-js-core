@@ -1,18 +1,17 @@
-import { ITransactionFetcher } from "./interface";
+import { ITransactionFetcher, IHash } from "./interface";
 import { AsyncTimer } from "./asyncTimer";
-import { TransactionHash, TransactionStatus } from "./transaction";
 import { Logger } from "./logger";
 import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached } from "./errors";
 import { Address } from "./address";
-import { ITransactionOnNetwork } from "./interfaceOfNetwork";
+import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
-export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
+export type PredicateIsAwaitedStatus = (status: ITransactionStatus) => boolean;
 
 /**
  * Internal interface: a transaction, as seen from the perspective of a {@link TransactionWatcher}.
  */
 interface ITransaction {
-    getHash(): TransactionHash;
+    getHash(): IHash;
 }
 
 /**
@@ -22,7 +21,7 @@ export class TransactionWatcher {
     static DefaultPollingInterval: number = 6000;
     static DefaultTimeout: number = TransactionWatcher.DefaultPollingInterval * 15;
 
-    static NoopOnStatusReceived = (_: TransactionStatus) => { };
+    static NoopOnStatusReceived = (_: ITransactionStatus) => { };
 
     private readonly fetcher: ITransactionFetcher;
     private readonly pollingInterval: number;
@@ -48,11 +47,11 @@ export class TransactionWatcher {
      * Waits until the transaction reaches the "pending" status.
      */
     public async awaitPending(transaction: ITransaction): Promise<void> {
-        let isPending = (status: TransactionStatus) => status.isPending();
+        let isPending = (status: ITransactionStatus) => status.isPending();
         let doFetch = async () => await this.fetcher.getTransactionStatus(transaction.getHash());
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
         
-        return this.awaitConditionally<TransactionStatus>(
+        return this.awaitConditionally<ITransactionStatus>(
             isPending,
             doFetch,
             errorProvider
@@ -172,12 +171,12 @@ class TransactionFetcherWithTracing implements ITransactionFetcher {
         this.fetcher = fetcher;
     }
 
-    async getTransaction(txHash: TransactionHash, hintSender?: Address, withResults?: boolean): Promise<ITransactionOnNetwork> {
+    async getTransaction(txHash: IHash, hintSender?: Address, withResults?: boolean): Promise<ITransactionOnNetwork> {
         Logger.debug(`transactionWatcher, getTransaction(${txHash.toString()})`);
         return await this.fetcher.getTransaction(txHash, hintSender, withResults);
     }
 
-    async getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus> {
+    async getTransactionStatus(txHash: IHash): Promise<ITransactionStatus> {
         Logger.debug(`transactionWatcher, getTransactionStatus(${txHash.toString()})`);
         return await this.fetcher.getTransactionStatus(txHash);
     }

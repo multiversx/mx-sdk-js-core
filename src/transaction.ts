@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IAddressOfExternalSigner, ISignable, ISignatureOfExternalSigner } from "./interface";
+import { IBech32Address, ISignable, ISignature } from "./interface";
 import { Address } from "./address";
 import { Balance } from "./balance";
 import {
@@ -226,7 +226,7 @@ export class Transaction implements ISignable {
    *
    * @param signedBy The address of the future signer
    */
-  serializeForSigning(signedBy: IAddressOfExternalSigner): Buffer {
+  serializeForSigning(signedBy: IBech32Address): Buffer {
     let adaptedSignedBy = adaptToAddress(signedBy);
 
     // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
@@ -294,7 +294,7 @@ export class Transaction implements ISignable {
    * @param signature The signature, as computed by a signer.
    * @param signedBy The address of the signer.
    */
-  applySignature(signature: ISignatureOfExternalSigner, signedBy: IAddressOfExternalSigner) {
+  applySignature(signature: ISignature, signedBy: IBech32Address) {
     let adaptedSignature = adaptToSignature(signature);
     let adaptedSignedBy = adaptToAddress(signedBy);
 
@@ -387,90 +387,3 @@ export class TransactionHash extends Hash {
   }
 }
 
-/**
- * An abstraction for handling and interpreting the "status" field of a {@link Transaction}.
- */
-export class TransactionStatus {
-  /**
-   * The raw status, as fetched from the Network.
-   */
-  readonly status: string;
-
-  /**
-   * Creates a new TransactionStatus object.
-   */
-  constructor(status: string) {
-    this.status = (status || "").toLowerCase();
-  }
-
-  /**
-   * Creates an unknown status.
-   */
-  static createUnknown(): TransactionStatus {
-    return new TransactionStatus("unknown");
-  }
-
-  /**
-   * Returns whether the transaction is pending (e.g. in mempool).
-   */
-  isPending(): boolean {
-    return (
-      this.status == "received" ||
-      this.status == "pending" ||
-      this.status == "partially-executed"
-    );
-  }
-
-  /**
-   * Returns whether the transaction has been executed (not necessarily with success).
-   */
-  isExecuted(): boolean {
-    return this.isSuccessful() || this.isFailed() || this.isInvalid();
-  }
-
-  /**
-   * Returns whether the transaction has been executed successfully.
-   */
-  isSuccessful(): boolean {
-    return (
-      this.status == "executed" ||
-      this.status == "success" ||
-      this.status == "successful"
-    );
-  }
-
-  /**
-   * Returns whether the transaction has been executed, but with a failure.
-   */
-  isFailed(): boolean {
-    return (
-      this.status == "fail" ||
-      this.status == "failed" ||
-      this.status == "unsuccessful" ||
-      this.isInvalid()
-    );
-  }
-
-  /**
-   * Returns whether the transaction has been executed, but marked as invalid (e.g. due to "insufficient funds").
-   */
-  isInvalid(): boolean {
-    return this.status == "invalid";
-  }
-
-  toString(): string {
-    return this.status;
-  }
-
-  valueOf(): string {
-    return this.status;
-  }
-
-  equals(other: TransactionStatus) {
-    if (!other) {
-      return false;
-    }
-
-    return this.status == other.status;
-  }
-}

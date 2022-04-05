@@ -35,6 +35,10 @@ export class Hash {
     }
 
     toString(): string {
+        return this.hex();
+    }
+
+    hex(): string {
         return this.hash.toString("hex");
     }
 

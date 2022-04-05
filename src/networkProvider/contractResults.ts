@@ -2,7 +2,7 @@ import { BigNumber } from "bignumber.js";
 import { Address } from "../address";
 import { Balance } from "../balance";
 import { Hash } from "../hash";
-import { IContractQueryResponse, IContractResultItem, IContractResults, ITransactionLogs } from "./interface";
+import { IContractQueryResponse } from "./interface";
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
 import { TransactionHash } from "../transaction";
@@ -10,13 +10,13 @@ import { TransactionLogs } from "./transactionLogs";
 import { ReturnCode } from "../smartcontracts/returnCode";
 import { MaxUint64 } from "../smartcontracts/query";
 
-export class ContractResults implements IContractResults {
-    readonly items: IContractResultItem[];
+export class ContractResults {
+    readonly items: ContractResultItem[];
 
-    constructor(items: IContractResultItem[]) {
+    constructor(items: ContractResultItem[]) {
         this.items = items;
 
-        this.items.sort(function (a: IContractResultItem, b: IContractResultItem) {
+        this.items.sort(function (a: ContractResultItem, b: ContractResultItem) {
             return a.nonce.valueOf() - b.nonce.valueOf();
         });
     }
@@ -36,7 +36,7 @@ export class ContractResults implements IContractResults {
     }
 }
 
-export class ContractResultItem implements IContractResultItem {
+export class ContractResultItem {
     hash: Hash = Hash.empty();
     nonce: Nonce = new Nonce(0);
     value: Balance = Balance.Zero();
@@ -49,12 +49,11 @@ export class ContractResultItem implements IContractResultItem {
     gasPrice: GasPrice = new GasPrice(0);
     callType: number = 0;
     returnMessage: string = "";
-    logs: ITransactionLogs = TransactionLogs.empty();
+    logs: TransactionLogs = TransactionLogs.empty();
 
-    constructor(init?: Partial<IContractResultItem>) {
+    constructor(init?: Partial<ContractResultItem>) {
         Object.assign(this, init);
     }
-
 
     static fromProxyHttpResponse(response: any): ContractResultItem {
         let item = ContractResultItem.fromHttpResponse(response);

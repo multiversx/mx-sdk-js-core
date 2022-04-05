@@ -10,7 +10,7 @@ import { Stats } from "./stats";
 import { NetworkStatus } from "./networkStatus";
 import { Token } from "./token";
 import BigNumber from "bignumber.js";
-import { ITransactionOnNetwork } from "./networkProvider/interface";
+import { ITransactionOnNetwork } from "./interfaceOfNetwork";
 
 /**
  * @deprecated This interface will be removed in a future release, upon merging {@link IProvider} and {@link IApiProvider}.

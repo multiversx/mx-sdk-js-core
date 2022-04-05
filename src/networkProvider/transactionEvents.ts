@@ -1,13 +1,12 @@
 import { Address } from "../address";
-import { ITransactionEventTopic } from "./interface";
 
 export class TransactionEvent {
     readonly address: Address;
     readonly identifier: string;
-    readonly topics: ITransactionEventTopic[];
+    readonly topics: TransactionEventTopic[];
     readonly data: string;
 
-    constructor(address: Address, identifier: string, topics: ITransactionEventTopic[], data: string) {
+    constructor(address: Address, identifier: string, topics: TransactionEventTopic[], data: string) {
         this.address = address;
         this.identifier = identifier;
         this.topics = topics;
@@ -28,11 +27,11 @@ export class TransactionEvent {
         return event;
     }
 
-    findFirstOrNoneTopic(predicate: (topic: ITransactionEventTopic) => boolean): ITransactionEventTopic | undefined {
+    findFirstOrNoneTopic(predicate: (topic: TransactionEventTopic) => boolean): TransactionEventTopic | undefined {
         return this.topics.filter(topic => predicate(topic))[0];
     }
 
-    getLastTopic(): ITransactionEventTopic {
+    getLastTopic(): TransactionEventTopic {
         return this.topics[this.topics.length - 1];
     }
 }

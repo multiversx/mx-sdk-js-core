@@ -4,7 +4,7 @@ import { TransactionHash, TransactionStatus } from "./transaction";
 import { Logger } from "./logger";
 import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached } from "./errors";
 import { Address } from "./address";
-import { ITransactionOnNetwork } from "./networkProvider/interface";
+import { ITransactionOnNetwork } from "./interfaceOfNetwork";
 
 export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
 

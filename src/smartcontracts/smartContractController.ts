@@ -8,7 +8,7 @@ import { InteractionChecker, NullInteractionChecker } from "./interactionChecker
 import { EndpointDefinition } from "./typesystem";
 import { Logger } from "../logger";
 import { TransactionWatcher } from "../transactionWatcher";
-import { ITransactionOnNetwork } from "../networkProvider/interface";
+import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 
 /**
  * Internal interface: the smart contract ABI, as seen from the perspective of a {@link SmartContractController}.

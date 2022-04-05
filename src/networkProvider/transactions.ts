@@ -1,7 +1,6 @@
 import { Address } from "../address";
 import { Balance } from "../balance";
 import { Hash } from "../hash";
-import { IContractResults, ITransactionEvent, ITransactionLogs, ITransactionOnNetwork, ITransactionReceipt } from "./interface";
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
 import { Signature } from "../signature";
@@ -9,10 +8,11 @@ import { TransactionHash, TransactionStatus } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { ContractResults } from "./contractResults";
 import { TransactionCompletionStrategy } from "./transactionCompletionStrategy";
+import { TransactionEvent } from "./transactionEvents";
 import { TransactionLogs } from "./transactionLogs";
-import { Receipt } from "./receipt";
+import { TransactionReceipt } from "./transactionReceipt";
 
- export class TransactionOnNetwork implements ITransactionOnNetwork {
+ export class TransactionOnNetwork {
     hash: TransactionHash = new TransactionHash("");
     type: string = "";
     nonce: Nonce = new Nonce(0);
@@ -33,9 +33,9 @@ import { Receipt } from "./receipt";
     hyperblockHash: Hash = Hash.empty();
     pendingResults: boolean = false;
 
-    receipt: ITransactionReceipt = new Receipt();
-    contractResults: IContractResults = ContractResults.empty();
-    logs: ITransactionLogs = TransactionLogs.empty();
+    receipt: TransactionReceipt = new TransactionReceipt();
+    contractResults: ContractResults = ContractResults.empty();
+    logs: TransactionLogs = TransactionLogs.empty();
 
     constructor(init?: Partial<TransactionOnNetwork>) {
         Object.assign(this, init);
@@ -79,7 +79,7 @@ import { Receipt } from "./receipt";
         result.hyperblockHash = new Hash(response.hyperblockHash);
         result.pendingResults = response.pendingResults || false;
 
-        result.receipt = Receipt.fromHttpResponse(response.receipt || {});
+        result.receipt = TransactionReceipt.fromHttpResponse(response.receipt || {});
         result.logs = TransactionLogs.fromHttpResponse(response.logs || {});
 
         return result;
@@ -95,7 +95,7 @@ import { Receipt } from "./receipt";
         return new TransactionCompletionStrategy().isCompleted(this);
     }
 
-    getAllEvents(): ITransactionEvent[] {
+    getAllEvents(): TransactionEvent[] {
         let result = [...this.logs.events];
 
         for (const resultItem of this.contractResults.items) {

@@ -8,7 +8,7 @@
  */
 
 import { ContractResultItem } from "../../networkProvider/contractResults";
-import { IContractResultItem, IContractResults, ITransactionOnNetwork } from "../../networkProvider/interface";
+import { IContractResultItem, IContractResults, ITransactionOnNetwork } from "../../interfaceOfNetwork";
 import { ArgSerializer } from "../argSerializer";
 import { QueryResponse } from "../queryResponse";
 import { ReturnCode } from "../returnCode";
@@ -101,7 +101,7 @@ export class TypedResult extends ContractResultItem implements Result.IResult {
     */
     endpointDefinition?: EndpointDefinition;
 
-    constructor(init?: Partial<ContractResultItem>) {
+    constructor(init?: Partial<IContractResultItem>) {
         super();
         Object.assign(this, init);
     }

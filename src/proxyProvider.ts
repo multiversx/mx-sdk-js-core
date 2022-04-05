@@ -12,8 +12,8 @@ import { QueryResponse } from "./smartcontracts/queryResponse";
 import { Logger } from "./logger";
 import { NetworkStatus } from "./networkStatus";
 import { defaultConfig } from "./constants";
-import { INetworkProvider, ITransactionOnNetwork } from "./networkProvider/interface";
 import { ProxyNetworkProvider } from "./networkProvider/proxyNetworkProvider";
+import { ITransactionOnNetwork } from "./interfaceOfNetwork";
 
 /**
  * This will be deprecated once all the endpoints move to ApiProvider
@@ -26,7 +26,7 @@ export class ProxyProvider implements IProvider {
     /**
      * @deprecated used only for preparatory refactoring (unifying network providers)
      */
-    private readonly backingProvider: INetworkProvider;
+    private readonly backingProvider: ProxyNetworkProvider;
 
     /**
      * Creates a new ProxyProvider.

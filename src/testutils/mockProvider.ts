@@ -14,7 +14,7 @@ import { NetworkStatus } from "../networkStatus";
 import { TypedEvent } from "../events";
 import { BalanceBuilder } from "../balanceBuilder";
 import BigNumber from "bignumber.js";
-import { ITransactionOnNetwork } from "../networkProvider/interface";
+import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { ContractResultItem, ContractResults } from "../networkProvider/contractResults";
 import { TransactionOnNetwork } from "../networkProvider/transactions";
 

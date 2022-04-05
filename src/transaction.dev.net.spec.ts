@@ -4,7 +4,7 @@ import { Hash } from "./hash";
 import { TransactionHash, TransactionStatus } from "./transaction";
 import { Address } from "./address";
 import { Nonce } from "./nonce";
-import { IContractResultItem, ITransactionOnNetwork } from "./networkProvider/interface";
+import { IContractResultItem, ITransactionOnNetwork } from "./interfaceOfNetwork";
 
 describe("test transactions on devnet", function () {
     it("should get transaction from Proxy & from API", async function () {

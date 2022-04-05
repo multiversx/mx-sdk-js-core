@@ -23,7 +23,7 @@ import { Balance } from "../../balance";
 import { ExecutionResultsBundle, findImmediateResult, interpretExecutionResults } from "./deprecatedContractResults";
 import { Result } from "./result";
 import { TransactionWatcher } from "../../transactionWatcher";
-import { ITransactionOnNetwork } from "../../networkProvider/interface";
+import { ITransactionOnNetwork } from "../../interfaceOfNetwork";
 
 /**
  * Provides a simple interface in order to easily call or query the smart contract's methods.

@@ -1,7 +1,7 @@
 import { Address } from "../address";
 import { Balance } from "../balance";
+import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { ChainID, GasLimit, GasPrice } from "../networkParams";
-import { ITransactionOnNetwork } from "../networkProvider/interface";
 import { Transaction } from "../transaction";
 import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";

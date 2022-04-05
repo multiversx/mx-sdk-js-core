@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { Hash } from "../hash";
-import { INetworkProvider, ITransactionOnNetwork } from "./interface";
+import { INetworkProvider } from "./interface";
 import { Address } from "../address";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { TransactionHash, TransactionStatus } from "../transaction";
@@ -11,6 +11,7 @@ import { BigNumber } from "bignumber.js";
 import { Balance } from "../balance";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
+import { TransactionOnNetwork } from "./transactions";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.elrond.com", { timeout: 10000 });
@@ -127,7 +128,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     });
 
     // TODO: Strive to have as little differences as possible between Proxy and API.
-    function ignoreKnownTransactionDifferencesBetweenProviders(apiResponse: ITransactionOnNetwork, proxyResponse: ITransactionOnNetwork) {
+    function ignoreKnownTransactionDifferencesBetweenProviders(apiResponse: TransactionOnNetwork, proxyResponse: TransactionOnNetwork) {
         // TODO: Remove this once "tx.status" is uniformized.
         apiResponse.status = proxyResponse.status = new TransactionStatus("ignore");
 

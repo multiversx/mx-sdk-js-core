@@ -2,7 +2,7 @@ import { TransactionDecoder, TransactionMetadata } from "@elrondnetwork/transact
 import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
 import { Logger } from "../logger";
-import { IContractResults, ITransactionLogs, ITransactionOnNetwork } from "../networkProvider/interface";
+import { IContractResults, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, IResultsParser, UntypedOutcomeBundle } from "./interface";
 import { QueryResponse } from "./queryResponse";

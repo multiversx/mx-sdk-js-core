@@ -8,8 +8,8 @@ import { TransactionHash, TransactionStatus } from "./transaction";
 import { Token } from "./token";
 import { NFTToken } from "./nftToken";
 import { defaultConfig } from "./constants";
-import { INetworkProvider, ITransactionOnNetwork } from "./networkProvider/interface";
 import { ApiNetworkProvider } from "./networkProvider/apiNetworkProvider";
+import { ITransactionOnNetwork } from "./interfaceOfNetwork";
 
 /**
  * This is a temporary change, this will be the only provider used, ProxyProvider will be deprecated
@@ -20,7 +20,7 @@ export class ApiProvider implements IApiProvider {
     /**
      * @deprecated used only for preparatory refactoring (unifying network providers)
      */
-    private readonly backingProvider: INetworkProvider;
+    private readonly backingProvider: ApiNetworkProvider;
 
     /**
      * Creates a new ApiProvider.

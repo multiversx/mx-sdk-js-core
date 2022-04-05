@@ -56,7 +56,7 @@ describe("test smart contract interactor", function () {
         // Execute, do not wait for execution
         let transaction = interaction.useThenIncrementNonceOf(alice.account).buildTransaction();
         await alice.signer.sign(transaction);
-        await transaction.send(provider);
+        await provider.sendTransaction(transaction);
         // Execute, and wait for execution
         transaction = interaction.useThenIncrementNonceOf(alice.account).buildTransaction();
         await alice.signer.sign(transaction);
@@ -112,7 +112,7 @@ describe("test smart contract interactor", function () {
         // Decrement twice. Wait for execution of the second transaction.
         let decrementTransaction = decrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
         await alice.signer.sign(decrementTransaction);
-        await decrementTransaction.send(provider);
+        await provider.sendTransaction(decrementTransaction);
 
         decrementTransaction = decrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
         await alice.signer.sign(decrementTransaction);

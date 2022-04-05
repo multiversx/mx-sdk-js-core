@@ -61,7 +61,7 @@ describe("test contract", () => {
         assert.equal(contract.getAddress().bech32(), "erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q");
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
-        let hash = await deployTransaction.send(provider);
+        let hash = await provider.sendTransaction(deployTransaction);
 
         await Promise.all([
             provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
@@ -111,8 +111,8 @@ describe("test contract", () => {
         alice.signer.sign(callTransactionOne);
         alice.signer.sign(callTransactionTwo);
 
-        let hashOne = await callTransactionOne.send(provider);
-        let hashTwo = await callTransactionTwo.send(provider);
+        let hashOne = await provider.sendTransaction(callTransactionOne);
+        let hashTwo = await provider.sendTransaction(callTransactionTwo);
 
         await Promise.all([
             provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),

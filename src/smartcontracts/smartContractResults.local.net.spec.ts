@@ -52,8 +52,8 @@ describe("fetch transactions from local testnet", function () {
         alice.account.incrementNonce();
 
         // Broadcast & execute
-        await transactionDeploy.send(provider);
-        await transactionIncrement.send(provider);
+        await provider.sendTransaction(transactionDeploy);
+        await provider.sendTransaction(transactionIncrement);
 
         await watcher.awaitCompleted(transactionDeploy);
         await watcher.awaitCompleted(transactionIncrement);

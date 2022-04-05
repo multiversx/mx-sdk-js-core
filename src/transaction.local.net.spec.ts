@@ -48,8 +48,8 @@ describe("test transaction", function () {
         await alice.signer.sign(transactionOne);
         await alice.signer.sign(transactionTwo);
 
-        await transactionOne.send(provider);
-        await transactionTwo.send(provider);
+        await provider.sendTransaction(transactionOne);
+        await provider.sendTransaction(transactionTwo);
 
         await watcher.awaitCompleted(transactionOne);
         await watcher.awaitCompleted(transactionTwo);
@@ -89,7 +89,7 @@ describe("test transaction", function () {
         await alice.signer.sign(transactionOne);
         await alice.signer.sign(transactionTwo);
 
-        Logger.trace(JSON.stringify(await transactionOne.simulate(provider), null, 4));
-        Logger.trace(JSON.stringify(await transactionTwo.simulate(provider), null, 4));
+        Logger.trace(JSON.stringify(await provider.simulateTransaction(transactionOne), null, 4));
+        Logger.trace(JSON.stringify(await provider.simulateTransaction(transactionTwo), null, 4));
     });
 });

@@ -140,7 +140,7 @@ describe("test smart contract interactor", function() {
         // Execute, do not wait for execution
         let transaction = interaction.withNonce(new Nonce(0)).buildTransaction();
         await alice.signer.sign(transaction);
-        transaction.send(provider);
+        await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce().valueOf(), 0);
         assert.equal(transaction.getData().toString(), "getUltimateAnswer");
         assert.equal(
@@ -150,7 +150,7 @@ describe("test smart contract interactor", function() {
 
         transaction = interaction.withNonce(new Nonce(1)).buildTransaction();
         await alice.signer.sign(transaction);
-        await transaction.send(provider);
+        await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce().valueOf(), 1);
         assert.equal(
             transaction.getHash().toString(),
@@ -201,11 +201,11 @@ describe("test smart contract interactor", function() {
         // Decrement #1
         let decrementTransaction = decrementInteraction.withNonce(new Nonce(15)).buildTransaction();
         await alice.signer.sign(decrementTransaction);
-        decrementTransaction.send(provider);
+        await provider.sendTransaction(decrementTransaction);
         // Decrement #2
         decrementTransaction = decrementInteraction.withNonce(new Nonce(16)).buildTransaction();
         await alice.signer.sign(decrementTransaction);
-        decrementTransaction.send(provider);
+        await provider.sendTransaction(decrementTransaction);
         // Decrement #3
 
         decrementTransaction = decrementInteraction.withNonce(new Nonce(17)).buildTransaction();

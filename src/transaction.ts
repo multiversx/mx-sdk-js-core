@@ -142,7 +142,8 @@ export class Transaction implements ISignable {
    * Sets the account sequence number of the sender. Must be done prior signing.
    *
    * ```
-   * await alice.sync(provider);
+   * let aliceOnNetwork = await provider.getAccount(alice.address);
+   * alice.update(aliceOnNetwork);
    *
    * let tx = new Transaction({
    *      value: Balance.egld(1),
@@ -305,31 +306,8 @@ export class Transaction implements ISignable {
   }
 
   /**
-   * Broadcasts a transaction to the Network, via a {@link IProvider}.
-   *
-   * ```
-   * let provider = new ProxyProvider("https://gateway.elrond.com");
-   * let watcher = new TransactionWatcher(provider);
-   * // ... Prepare, sign the transaction, then:
-   * await tx.send(provider);
-   * await watcher.awaitCompleted(tx);
-   * ```
-   */
-  async send(provider: IProvider): Promise<TransactionHash> {
-    this.hash = await provider.sendTransaction(this);
-    return this.hash;
-  }
-
-  /**
-   * Simulates a transaction on the Network, via a {@link IProvider}.
-   */
-  async simulate(provider: IProvider): Promise<any> {
-    return await provider.simulateTransaction(this);
-  }
-
-  /**
    * Converts a transaction to a ready-to-broadcast object.
-   * Called internally by the {@link IProvider}.
+   * Called internally by the network provider.
    */
   toSendable(): any {
     if (this.signature.isEmpty()) {

@@ -1,12 +1,11 @@
-import { Address } from "../address";
-import { Balance } from "../balance";
-import { TransactionHash } from "../transaction";
+import { IAddress, IHash } from "./interface";
+import { Address, Hash, TransactionValue } from "./primitives";
 
 export class TransactionReceipt {
-    value: Balance = Balance.Zero();
-    sender: Address = new Address();
+    value: TransactionValue = new TransactionValue("");
+    sender: IAddress = new Address("");
     data: string = "";
-    hash: TransactionHash = TransactionHash.empty();
+    hash: IHash = new Hash("");
 
     static fromHttpResponse(response: {
         value: string,
@@ -16,10 +15,10 @@ export class TransactionReceipt {
     }): TransactionReceipt {
         let receipt = new TransactionReceipt();
 
-        receipt.value = Balance.fromString(response.value);
+        receipt.value = new TransactionValue(response.value);
         receipt.sender = new Address(response.sender);
         receipt.data = response.data;
-        receipt.hash = new TransactionHash(response.txHash);
+        receipt.hash = new Hash(response.txHash);
 
         return receipt;
     }

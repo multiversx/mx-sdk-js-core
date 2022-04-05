@@ -1,12 +1,13 @@
-import { Address } from "../address";
+import { IAddress } from "./interface";
+import { Address } from "./primitives";
 
 export class TransactionEvent {
-    readonly address: Address;
+    readonly address: IAddress;
     readonly identifier: string;
     readonly topics: TransactionEventTopic[];
     readonly data: string;
 
-    constructor(address: Address, identifier: string, topics: TransactionEventTopic[], data: string) {
+    constructor(address: IAddress, identifier: string, topics: TransactionEventTopic[], data: string) {
         this.address = address;
         this.identifier = identifier;
         this.topics = topics;

@@ -1,18 +1,19 @@
-import { Address } from "../address";
-import { ErrUnexpectedCondition } from "../errors";
+import { ErrUnexpectedCondition } from "./errors";
+import { IAddress } from "./interface";
+import { Address } from "./primitives";
 import { TransactionEvent } from "./transactionEvents";
 
 export class TransactionLogs {
-    readonly address: Address;
+    readonly address: IAddress;
     readonly events: TransactionEvent[];
 
-    constructor(address: Address, events: TransactionEvent[]) {
+    constructor(address: IAddress, events: TransactionEvent[]) {
         this.address = address;
         this.events = events;
     }
 
     static empty(): TransactionLogs {
-        return new TransactionLogs(new Address(), []);
+        return new TransactionLogs(new Address(""), []);
     }
 
     static fromHttpResponse(logs: any): TransactionLogs {

@@ -1,7 +1,7 @@
 import { TransactionStatus } from "./transactionStatus";
-import { isPaddedHex } from "../utils.codec";
 import { ITransactionPayload } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
+import { isPaddedHex } from "./primitives";
 
 /**
  * Internal interface: a transaction, as seen from the perspective of a {@link TransactionCompletionStrategy}.
@@ -56,7 +56,7 @@ export class TransactionCompletionStrategy {
         let prefix = parts[0];
         let otherParts = parts.slice(1);
         let emptyPrefix = !prefix;
-        let somePartsAreNotValidArguments = !otherParts.every(this.looksLikeValidArgument);
+        let somePartsAreNotValidArguments = !otherParts.every(part => this.looksLikeValidArgument(part));
         
         return emptyPrefix || somePartsAreNotValidArguments;
     }

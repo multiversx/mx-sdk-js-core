@@ -273,16 +273,6 @@ export class ErrInvalidFunctionName extends Err {
 }
 
 /**
- * Signals an error that happened during a request against the Network.
- */
- export class ErrNetworkProvider extends Err {
-  public constructor(url: string, error: string, inner?: Error) {
-    let message = `Request error on url [${url}]: [${error}]`;
-    super(message, inner);
-  }
-}
-
-/**
  * Signals an error that happened during a HTTP GET request.
  */
 export class ErrApiProviderGet extends Err {

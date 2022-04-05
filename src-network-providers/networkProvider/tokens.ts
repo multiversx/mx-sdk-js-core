@@ -1,7 +1,6 @@
 import { BigNumber } from "bignumber.js";
-import { Address } from "../address";
-import { IFungibleTokenOfAccountOnNetwork, INonFungibleTokenOfAccountOnNetwork } from "./interface";
-import { Nonce } from "../nonce";
+import { Address, Nonce } from "./primitives";
+import { IAddress, IFungibleTokenOfAccountOnNetwork, INonce, INonFungibleTokenOfAccountOnNetwork } from "./interface";
 
 export class FungibleTokenOfAccountOnNetwork implements IFungibleTokenOfAccountOnNetwork {
     identifier: string = "";
@@ -22,8 +21,8 @@ export class NonFungibleTokenOfAccountOnNetwork implements INonFungibleTokenOfAc
     collection: string = "";
     attributes: Buffer = Buffer.from([]);
     balance: BigNumber = new BigNumber(0);
-    nonce: Nonce = new Nonce(0);
-    creator: Address = new Address("");
+    nonce: INonce = new Nonce(0);
+    creator: IAddress = new Address("");
     royalties: BigNumber = new BigNumber(0);
 
     static fromProxyHttpResponse(payload: any): NonFungibleTokenOfAccountOnNetwork {

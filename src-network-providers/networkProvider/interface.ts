@@ -1,11 +1,9 @@
 import { BigNumber } from "bignumber.js";
 import { AccountOnNetwork } from "../account";
-import { Address } from "../address";
 import { NetworkConfig } from "../networkConfig";
 import { GasLimit } from "../networkParams";
 import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
-import { Nonce } from "../nonce";
 import { Query, ReturnCode } from "../smartcontracts";
 import { Stats } from "../stats";
 import { Transaction } from "../transaction";
@@ -39,27 +37,27 @@ export interface INetworkProvider {
     /**
      * Fetches the state of an {@link Account}.
      */
-    getAccount(address: Address): Promise<AccountOnNetwork>;
+    getAccount(address: IAddress): Promise<AccountOnNetwork>;
 
     /**
      * Fetches data about the fungible tokens held by an account.
      */
-    getFungibleTokensOfAccount(address: Address, pagination?: Pagination): Promise<IFungibleTokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<IFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
-    getNonFungibleTokensOfAccount(address: Address, pagination?: Pagination): Promise<INonFungibleTokenOfAccountOnNetwork[]>;
+    getNonFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<INonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about a specific fungible token held by an account.
      */
-    getFungibleTokenOfAccount(address: Address, tokenIdentifier: string): Promise<IFungibleTokenOfAccountOnNetwork>;
+    getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<IFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches data about a specific non-fungible token (instance) held by an account.
      */
-    getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: Nonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: INonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches the state of a {@link Transaction}.
@@ -102,7 +100,7 @@ export interface INetworkProvider {
     /**
      * Fetches data about a specific non-fungible token (instance).
      */
-    getNonFungibleToken(collection: string, nonce: Nonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleToken(collection: string, nonce: INonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Performs a generic GET action against the provider (useful for new HTTP endpoints, not yet supported by erdjs).
@@ -125,8 +123,8 @@ export interface INonFungibleTokenOfAccountOnNetwork {
     collection: string;
     attributes: Buffer;
     balance: BigNumber;
-    nonce: Nonce;
-    creator: Address;
+    nonce: INonce;
+    creator: IAddress;
     royalties: BigNumber;
 }
 
@@ -135,7 +133,7 @@ export interface IDefinitionOfFungibleTokenOnNetwork {
     identifier: string;
     name: string;
     ticker: string;
-    owner: Address;
+    owner: IAddress;
     decimals: number;
     supply: BigNumber;
     isPaused: boolean;
@@ -154,7 +152,7 @@ export interface IDefinitionOfTokenCollectionOnNetwork {
     type: string;
     name: string;
     ticker: string;
-    owner: Address;
+    owner: IAddress;
     decimals: number;
     canPause: boolean;
     canFreeze: boolean;
@@ -168,7 +166,7 @@ export interface IContractQueryResponse {
     returnCode: ReturnCode;
     returnMessage: string;
     gasUsed: GasLimit;
-    
+
     getReturnDataParts(): Buffer[];
 }
 
@@ -184,8 +182,8 @@ export class Pagination {
     }
 }
 
-export interface IHash { hex(): string; }
-export interface IAddress { bech32(): string; }
-export interface INonce { valueOf(): number; }
 export interface IHexable { hex(): string }
+export interface IHash extends IHexable { };
+export interface IAddress { bech32(): string; }
+export interface INonce extends IHexable { valueOf(): number; }
 export interface ITransactionPayload { encoded(): string; }

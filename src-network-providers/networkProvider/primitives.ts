@@ -34,6 +34,10 @@ export class Nonce implements INonce {
     valueOf(): number {
         return this.value;
     }
+
+    hex(): string {
+        return numberToPaddedHex(this.value);
+    }
 }
 
 export class TransactionValue {
@@ -58,4 +62,25 @@ export class TransactionPayload implements ITransactionPayload {
     encoded(): string {
         return this.base64;
     }
+}
+
+export function numberToPaddedHex(value: number) {
+    let hex = value.toString(16);
+    return zeroPadStringIfOddLength(hex);
+}
+
+export function isPaddedHex(input: string) {
+    input = input || "";
+    let decodedThenEncoded = Buffer.from(input, "hex").toString("hex");
+    return input.toUpperCase() == decodedThenEncoded.toUpperCase();
+}
+
+export function zeroPadStringIfOddLength(input: string): string {
+    input = input || "";
+
+    if (input.length % 2 == 1) {
+        return "0" + input;
+    }
+
+    return input;
 }

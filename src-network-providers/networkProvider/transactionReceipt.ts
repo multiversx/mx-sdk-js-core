@@ -2,7 +2,7 @@ import { Address } from "../address";
 import { Balance } from "../balance";
 import { TransactionHash } from "../transaction";
 
-export class Receipt {
+export class TransactionReceipt {
     value: Balance = Balance.Zero();
     sender: Address = new Address();
     data: string = "";
@@ -13,8 +13,8 @@ export class Receipt {
         sender: string,
         data: string,
         txHash: string
-    }): Receipt {
-        let receipt = new Receipt();
+    }): TransactionReceipt {
+        let receipt = new TransactionReceipt();
 
         receipt.value = Balance.fromString(response.value);
         receipt.sender = new Address(response.sender);

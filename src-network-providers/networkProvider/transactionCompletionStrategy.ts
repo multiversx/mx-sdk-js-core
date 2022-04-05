@@ -1,14 +1,14 @@
-import { ITransactionLogs } from "./interface";
 import { Nonce } from "../nonce";
 import { TransactionStatus } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { isPaddedHex } from "../utils.codec";
+import { TransactionLogs } from "./transactionLogs";
 
 /**
  * Internal interface: a transaction, as seen from the perspective of a {@link TransactionCompletionStrategy}.
  */
 interface ITransactionOnNetwork {
-    logs: ITransactionLogs;
+    logs: TransactionLogs;
     status: TransactionStatus;
     hyperblockNonce: Nonce;
     data: TransactionPayload;

@@ -3,7 +3,7 @@ import { AccountOnNetwork } from "../account";
 import { Address } from "../address";
 import { defaultConfig } from "../constants";
 import { ErrNetworkProvider } from "../errors";
-import { IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, Pagination } from "./interface";
+import { IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkProvider, INonFungibleTokenOfAccountOnNetwork, Pagination } from "./interface";
 import { Logger } from "../logger";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";
@@ -92,7 +92,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         return tokenData;
     }
 
-    async getTransaction(txHash: TransactionHash): Promise<ITransactionOnNetwork> {
+    async getTransaction(txHash: TransactionHash): Promise<TransactionOnNetwork> {
         let response = await this.doGetGeneric(`transactions/${txHash.toString()}`);
         let transaction = TransactionOnNetwork.fromApiHttpResponse(txHash, response);
         return transaction;

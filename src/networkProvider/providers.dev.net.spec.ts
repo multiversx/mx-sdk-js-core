@@ -1,17 +1,15 @@
 import { assert } from "chai";
 import { INetworkProvider } from "./interface";
-import { Address } from "../address";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { TransactionHash } from "../transaction";
-import { Nonce } from "../nonce";
 import { ContractFunction, Query } from "../smartcontracts";
 import { BigUIntValue, U32Value, BytesValue, VariadicValue, VariadicType, CompositeType, BytesType, BooleanType } from "../smartcontracts/typesystem";
 import { BigNumber } from "bignumber.js";
-import { Balance } from "../balance";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
+import { Address, Nonce, TransactionValue } from "./primitives";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.elrond.com", { timeout: 10000 });
@@ -247,7 +245,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         query = new Query({
             address: new Address("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
             func: new ContractFunction("issue"),
-            value: Balance.egld(0.05),
+            value: new TransactionValue("42"),
             args: [
                 BytesValue.fromUTF8("FOO"),
                 BytesValue.fromUTF8("FOO"),

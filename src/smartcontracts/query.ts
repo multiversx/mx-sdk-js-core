@@ -5,15 +5,16 @@ import { guardValueIsSet } from "../utils";
 import { TypedValue } from "./typesystem";
 import { ArgSerializer } from "./argSerializer";
 import BigNumber from "bignumber.js";
+import { IBech32Address, ITransactionValue } from "../interface";
 
 export const MaxUint64 = new BigNumber("18446744073709551615");
 
 export class Query {
     caller: Address;
-    address: Address;
+    address: IBech32Address;
     func: ContractFunction;
     args: TypedValue[];
-    value: Balance;
+    value: ITransactionValue;
 
     constructor(init?: Partial<Query>) {
         this.caller = new Address();
@@ -27,7 +28,6 @@ export class Query {
         guardValueIsSet("address", this.address);
         guardValueIsSet("func", this.func);
 
-        this.address.assertNotEmpty();
         this.args = this.args || [];
         this.caller = this.caller || new Address();
         this.value = this.value || Balance.Zero();

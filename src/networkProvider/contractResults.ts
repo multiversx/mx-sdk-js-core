@@ -1,9 +1,8 @@
 import { BigNumber } from "bignumber.js";
-import { IAddress, IContractQueryResponse, IGasLimit, IGasPrice, IHash, INonce } from "./interface";
+import { IAddress, IContractQueryResponse, IContractReturnCode, IGasLimit, IGasPrice, IHash, INonce } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
-import { ReturnCode } from "../smartcontracts/returnCode";
 import { MaxUint64 } from "../smartcontracts/query";
-import { Address, Hash, Nonce, TransactionValue } from "./primitives";
+import { Address, ContractReturnCode, Hash, Nonce, TransactionValue } from "./primitives";
 
 export class ContractResults {
     readonly items: ContractResultItem[];
@@ -88,7 +87,7 @@ export class ContractResultItem {
 
 export class ContractQueryResponse implements IContractQueryResponse {
     returnData: string[] = [];
-    returnCode: ReturnCode = ReturnCode.None;
+    returnCode: IContractReturnCode = new ContractReturnCode("");
     returnMessage: string = "";
     gasUsed: IGasLimit = 0;
 
@@ -97,7 +96,7 @@ export class ContractQueryResponse implements IContractQueryResponse {
         let gasRemaining = new BigNumber(payload["gasRemaining"] || payload["GasRemaining"] || 0);
 
         response.returnData = payload["returnData"] || [];
-        response.returnCode = payload["returnCode"] || "";
+        response.returnCode = new ContractReturnCode(payload["returnCode"] || "");
         response.returnMessage = payload["returnMessage"] || "";
         response.gasUsed = MaxUint64.minus(gasRemaining).toNumber();
 

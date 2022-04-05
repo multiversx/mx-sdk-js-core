@@ -1,12 +1,10 @@
 import { BigNumber } from "bignumber.js";
 import { AccountOnNetwork } from "../account";
 import { NetworkConfig } from "../networkConfig";
-import { GasLimit } from "../networkParams";
 import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
-import { Query, ReturnCode } from "../smartcontracts";
+import { Query } from "../smartcontracts";
 import { Stats } from "../stats";
-import { Transaction } from "../transaction";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 
@@ -72,13 +70,13 @@ export interface INetworkProvider {
     /**
      * Broadcasts an already-signed {@link Transaction}.
      */
-    sendTransaction(tx: Transaction): Promise<IHash>;
+    sendTransaction(tx: ITransaction): Promise<IHash>;
 
     /**
      * Simulates the processing of an already-signed {@link Transaction}.
      * 
      */
-    simulateTransaction(tx: Transaction): Promise<IContractSimulation>;
+    simulateTransaction(tx: ITransaction): Promise<IContractSimulation>;
 
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
@@ -163,11 +161,15 @@ export interface IDefinitionOfTokenCollectionOnNetwork {
 
 export interface IContractQueryResponse {
     returnData: string[];
-    returnCode: ReturnCode;
+    returnCode: IContractReturnCode;
     returnMessage: string;
     gasUsed: IGasLimit;
 
     getReturnDataParts(): Buffer[];
+}
+
+export interface IContractReturnCode {
+    toString(): string;
 }
 
 export interface IContractSimulation {

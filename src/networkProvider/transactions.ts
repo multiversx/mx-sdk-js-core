@@ -85,8 +85,7 @@ import { TransactionReceipt } from "./transactionReceipt";
     }
 
     isCompleted(): boolean {
-        // TODO: When using separate constructors of TransactionOnNetwork (for API response vs. for Gateway response, see package "networkProvider"),
-        // we will be able to use different transaction completion strategies.
+        // TODO: use different transaction completion strategies - API / Proxy.
         return new TransactionCompletionStrategy().isCompleted(this);
     }
 

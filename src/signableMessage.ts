@@ -1,8 +1,7 @@
-import { ISignable } from "./interface";
+import { ISignable, ISignature } from "./interface";
 import { Signature } from "./signature";
 import { Address } from "./address";
 import { adaptToSignature } from "./boundaryAdapters";
-import { ISignature } from "@elrondnetwork/erdjs-walletcore/out/interface";
 const createKeccakHash = require("keccak");
 
 export const MESSAGE_PREFIX = "\x17Elrond Signed Message:\n";

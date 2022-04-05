@@ -14,7 +14,6 @@ import { NetworkStatus } from "../networkStatus";
 import { TypedEvent } from "../events";
 import { BalanceBuilder } from "../balanceBuilder";
 import BigNumber from "bignumber.js";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { ContractResultItem, ContractResults } from "../networkProvider/contractResults";
 import { TransactionOnNetwork } from "../networkProvider/transactions";
 
@@ -29,14 +28,14 @@ export class MockProvider implements IProvider {
     static AddressOfBob = new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
     static AddressOfCarol = new Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
 
-    private readonly transactions: Map<string, ITransactionOnNetwork>;
+    private readonly transactions: Map<string, TransactionOnNetwork>;
     private readonly onTransactionSent: TypedEvent<{ transaction: Transaction }>;
     private readonly accounts: Map<string, AccountOnNetwork>;
     private readonly queryContractResponders: QueryContractResponder[] = [];
     private readonly getTransactionResponders: GetTransactionResponder[] = [];
 
     constructor() {
-        this.transactions = new Map<string, ITransactionOnNetwork>();
+        this.transactions = new Map<string, TransactionOnNetwork>();
         this.onTransactionSent = new TypedEvent();
         this.accounts = new Map<string, AccountOnNetwork>();
 
@@ -73,14 +72,14 @@ export class MockProvider implements IProvider {
         }
     }
 
-    mockUpdateTransaction(hash: TransactionHash, mutate: (item: ITransactionOnNetwork) => void) {
+    mockUpdateTransaction(hash: TransactionHash, mutate: (item: TransactionOnNetwork) => void) {
         let transaction = this.transactions.get(hash.toString());
         if (transaction) {
             mutate(transaction);
         }
     }
 
-    mockPutTransaction(hash: TransactionHash, item: ITransactionOnNetwork) {
+    mockPutTransaction(hash: TransactionHash, item: TransactionOnNetwork) {
         this.transactions.set(hash.toString(), item);
     }
 
@@ -186,7 +185,7 @@ export class MockProvider implements IProvider {
         txHash: TransactionHash,
         _hintSender?: Address,
         _withResults?: boolean
-    ): Promise<ITransactionOnNetwork> {
+    ): Promise<TransactionOnNetwork> {
         // At first, try to use a mock responder
         for (const responder of this.getTransactionResponders) {
             if (responder.matches(txHash)) {

@@ -64,6 +64,18 @@ export class TransactionPayload implements ITransactionPayload {
     }
 }
 
+export class ContractReturnCode {
+    private readonly value: string;
+
+    constructor(value: string) {
+        this.value = value;
+    }
+
+    toString() {
+        return this.value;
+    }
+}
+
 export function numberToPaddedHex(value: number) {
     let hex = value.toString(16);
     return zeroPadStringIfOddLength(hex);

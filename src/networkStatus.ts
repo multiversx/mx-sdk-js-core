@@ -1,5 +1,3 @@
-import { IProvider } from "./interface";
-
 /**
  * An object holding network status configuration parameters.
  */
@@ -61,26 +59,6 @@ export class NetworkStatus {
         this.RoundAtEpochStart = 0;
         this.RoundsPassedInCurrentEpoch = 0;
         this.RoundsPerEpoch = 0;
-    }
-
-    /**
-     * Gets the default network status object (think of the Singleton pattern).
-     */
-    static getDefault(): NetworkStatus {
-        if (!NetworkStatus.default) {
-            NetworkStatus.default = new NetworkStatus();
-        }
-
-        return NetworkStatus.default;
-    }
-
-    /**
-     * Synchronizes a configuration object by querying the node, through a {@link IProvider}.
-     * @param provider The provider to use
-     */
-    async sync(provider: IProvider): Promise<void> {
-        let fresh: NetworkStatus = await provider.getNetworkStatus();
-        Object.assign(this, fresh);
     }
 
     /**

@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IAddressOfExternalSigner, IProvider, ISignable, ISignatureOfExternalSigner } from "./interface";
+import { IAddressOfExternalSigner, ISignable, ISignatureOfExternalSigner } from "./interface";
 import { Address } from "./address";
 import { Balance } from "./balance";
 import {

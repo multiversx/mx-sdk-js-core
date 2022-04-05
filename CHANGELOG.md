@@ -9,6 +9,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - [Breaking change: simplify network config / improve design - not a singleton anymore](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/176)
  - [Fix / improve results parser (better heuristics)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/177)
  - [Breaking change: preparatory refactoring for decoupling core objects from IProvider](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/178)
+ - [Breaking change: decouple networkStake, networkStatus and stats from IProvider & IApiProvider](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/179)
 
  **Breaking changes**
  - Removed utility functions: `transaction.awaitExecuted()`, `transaction.awaitPending()`. `TransactionWatcher` should be used directly, instead.
@@ -20,9 +21,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Constructor of `Transaction` now requires `chainID`, as well.
  - Added `Interaction.withChainID()` - must be used before calling `buildTransaction()`.
  - Altered a bit the public interface of `TransactionEvent`, `Receipt` (renamed fields, renamed methods).
- - Remove `transaction.getAsOnNetwork()`. One should use `provider.getTransaction()` instead.
- - Remove `acount.sync()`. Replaced by `account.update({ nonce, balance})`.
- - Remove `transaction.send()`. `Provider.sendTransaction()` has to be used instead.
+ - Removed `transaction.getAsOnNetwork()`. One should use `provider.getTransaction()` instead.
+ - Removed `acount.sync()`. Replaced by `account.update({ nonce, balance})`.
+ - Removed `transaction.send()`. `Provider.sendTransaction()` has to be used instead.
+ - Removed the static functions `getDefault()` and `sync()` from `networkStake`, `networkStatus` and `stats`.
 
 ## [10.0.0-beta.3]
  - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)

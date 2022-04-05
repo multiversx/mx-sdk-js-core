@@ -1,11 +1,10 @@
 import { assert } from "chai";
 import { chooseApiProvider, chooseProxyProvider } from "./interactive";
 import { Hash } from "./hash";
-import { TransactionOnNetwork, TransactionOnNetworkType } from "./transactionOnNetwork";
 import { TransactionHash, TransactionStatus } from "./transaction";
 import { Address } from "./address";
 import { Nonce } from "./nonce";
-import { SmartContractResultItem } from "./smartcontracts";
+import { IContractResultItem, ITransactionOnNetwork } from "./networkProvider/interface";
 
 describe("test transactions on devnet", function () {
     it("should get transaction from Proxy & from API", async function () {
@@ -36,19 +35,18 @@ describe("test transactions on devnet", function () {
     // TODO: Strive to have as little differences as possible between Proxy and API.
     // ... On client-side (erdjs), try to handle the differences in ProxyProvider & ApiProvider, or in TransactionOnNetwork.
     // ... Merging the providers (in the future) should solve this as well.
-    function ignoreKnownDifferencesBetweenProviders(transactionOnProxy: TransactionOnNetwork, transactionOnAPI: TransactionOnNetwork) {
+    function ignoreKnownDifferencesBetweenProviders(transactionOnProxy: ITransactionOnNetwork, transactionOnAPI: ITransactionOnNetwork) {
         // Ignore status, since it differs between Proxy and API (for smart contract calls):
         transactionOnProxy.status = new TransactionStatus("unknown");
         transactionOnAPI.status = new TransactionStatus("unknown");
 
         // Ignore fields which are not present on API response:
         transactionOnProxy.epoch = 0;
-        transactionOnProxy.type = new TransactionOnNetworkType();
         transactionOnProxy.blockNonce = new Nonce(0);
         transactionOnProxy.hyperblockNonce = new Nonce(0);
         transactionOnProxy.hyperblockHash = new Hash("");
 
-        let contractResultsOnAPI: SmartContractResultItem[] = transactionOnAPI.results.getAll();
+        let contractResultsOnAPI: IContractResultItem[] = transactionOnAPI.contractResults.items;
 
         // Important issue (existing bug)! When working with TransactionOnNetwork objects, SCRs cannot be parsed correctly from API, only from Proxy.
         // On API response, base64 decode "data" from smart contract results:
@@ -62,7 +60,7 @@ describe("test transactions on devnet", function () {
         }
 
         // On API response, sort contract results by nonce:
-        contractResultsOnAPI.sort(function (a: SmartContractResultItem, b: SmartContractResultItem) {
+        contractResultsOnAPI.sort(function (a: IContractResultItem, b: IContractResultItem) {
             return a.nonce.valueOf() - b.nonce.valueOf();
         });
     }

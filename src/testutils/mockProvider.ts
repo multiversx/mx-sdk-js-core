@@ -1,6 +1,5 @@
 import { IProvider } from "../interface";
 import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { NetworkConfig } from "../networkConfig";
 import { Address } from "../address";
 import { Nonce } from "../nonce";
@@ -15,7 +14,9 @@ import { NetworkStatus } from "../networkStatus";
 import { TypedEvent } from "../events";
 import { BalanceBuilder } from "../balanceBuilder";
 import BigNumber from "bignumber.js";
-import { SmartContractResultItem, SmartContractResults } from "../smartcontracts";
+import { ITransactionOnNetwork } from "../networkProvider/interface";
+import { ContractResultItem, ContractResults } from "../networkProvider/contractResults";
+import { TransactionOnNetwork } from "../networkProvider/transactions";
 
 const DummyHyperblockNonce = new Nonce(42);
 const DummyHyperblockHash = new Hash("a".repeat(32));
@@ -28,14 +29,14 @@ export class MockProvider implements IProvider {
     static AddressOfBob = new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
     static AddressOfCarol = new Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
 
-    private readonly transactions: Map<string, TransactionOnNetwork>;
+    private readonly transactions: Map<string, ITransactionOnNetwork>;
     private readonly onTransactionSent: TypedEvent<{ transaction: Transaction }>;
     private readonly accounts: Map<string, AccountOnNetwork>;
     private readonly queryContractResponders: QueryContractResponder[] = [];
     private readonly getTransactionResponders: GetTransactionResponder[] = [];
 
     constructor() {
-        this.transactions = new Map<string, TransactionOnNetwork>();
+        this.transactions = new Map<string, ITransactionOnNetwork>();
         this.onTransactionSent = new TypedEvent();
         this.accounts = new Map<string, AccountOnNetwork>();
 
@@ -72,14 +73,14 @@ export class MockProvider implements IProvider {
         }
     }
 
-    mockUpdateTransaction(hash: TransactionHash, mutate: (item: TransactionOnNetwork) => void) {
+    mockUpdateTransaction(hash: TransactionHash, mutate: (item: ITransactionOnNetwork) => void) {
         let transaction = this.transactions.get(hash.toString());
         if (transaction) {
             mutate(transaction);
         }
     }
 
-    mockPutTransaction(hash: TransactionHash, item: TransactionOnNetwork) {
+    mockPutTransaction(hash: TransactionHash, item: ITransactionOnNetwork) {
         this.transactions.set(hash.toString(), item);
     }
 
@@ -89,14 +90,14 @@ export class MockProvider implements IProvider {
     }
 
     mockGetTransactionWithAnyHashAsNotarizedWithOneResult(returnCodeAndData: string) {
-        let contractResult = new SmartContractResultItem({ nonce: new Nonce(1), data: returnCodeAndData });
+        let contractResult = new ContractResultItem({ nonce: new Nonce(1), data: returnCodeAndData });
 
         let predicate = (_hash: TransactionHash) => true;
         let response = new TransactionOnNetwork({
             status: new TransactionStatus("executed"),
             hyperblockNonce: DummyHyperblockNonce,
             hyperblockHash: DummyHyperblockHash,
-            results: new SmartContractResults([contractResult])
+            contractResults: new ContractResults([contractResult])
         });
 
         this.getTransactionResponders.unshift(new GetTransactionResponder(predicate, response));
@@ -185,7 +186,7 @@ export class MockProvider implements IProvider {
         txHash: TransactionHash,
         _hintSender?: Address,
         _withResults?: boolean
-    ): Promise<TransactionOnNetwork> {
+    ): Promise<ITransactionOnNetwork> {
         // At first, try to use a mock responder
         for (const responder of this.getTransactionResponders) {
             if (responder.matches(txHash)) {

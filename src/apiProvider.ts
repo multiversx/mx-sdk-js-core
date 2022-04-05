@@ -5,10 +5,11 @@ import { Logger } from "./logger";
 import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
 import { TransactionHash, TransactionStatus } from "./transaction";
-import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Token } from "./token";
 import { NFTToken } from "./nftToken";
 import { defaultConfig } from "./constants";
+import { INetworkProvider, ITransactionOnNetwork } from "./networkProvider/interface";
+import { ApiNetworkProvider } from "./networkProvider/apiNetworkProvider";
 
 /**
  * This is a temporary change, this will be the only provider used, ProxyProvider will be deprecated
@@ -16,6 +17,10 @@ import { defaultConfig } from "./constants";
 export class ApiProvider implements IApiProvider {
     private url: string;
     private config: AxiosRequestConfig;
+    /**
+     * @deprecated used only for preparatory refactoring (unifying network providers)
+     */
+    private readonly backingProvider: INetworkProvider;
 
     /**
      * Creates a new ApiProvider.
@@ -25,6 +30,7 @@ export class ApiProvider implements IApiProvider {
     constructor(url: string, config?: AxiosRequestConfig) {
       this.url = url;
       this.config = {...defaultConfig, ...config};
+      this.backingProvider = new ApiNetworkProvider(url, config);
     }
 
     /**
@@ -44,19 +50,15 @@ export class ApiProvider implements IApiProvider {
     /**
      * Fetches the state of a {@link Transaction}.
      */
-    async getTransaction(txHash: TransactionHash): Promise<TransactionOnNetwork> {
-        return this.doGetGeneric(`transactions/${txHash.toString()}`, (response) =>
-            TransactionOnNetwork.fromHttpResponse(txHash, response)
-        );
+    async getTransaction(txHash: TransactionHash): Promise<ITransactionOnNetwork> {
+        return await this.backingProvider.getTransaction(txHash);
     }
 
     /**
      * Queries the status of a {@link Transaction}.
      */
     async getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus> {
-        return this.doGetGeneric(`transactions/${txHash.toString()}?fields=status`, (response) => 
-            new TransactionStatus(response.status)
-        );
+        return await this.backingProvider.getTransactionStatus(txHash);
     }
 
     async getToken(tokenIdentifier: string): Promise<Token> {

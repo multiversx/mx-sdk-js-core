@@ -7,11 +7,11 @@
  * @module
  */
 
-import { TransactionOnNetwork } from "../../transactionOnNetwork";
+import { ContractResultItem } from "../../networkProvider/contractResults";
+import { IContractResultItem, IContractResults, ITransactionOnNetwork } from "../../networkProvider/interface";
 import { ArgSerializer } from "../argSerializer";
 import { QueryResponse } from "../queryResponse";
 import { ReturnCode } from "../returnCode";
-import { SmartContractResultItem, SmartContractResults } from "../smartContractResults";
 import { EndpointDefinition, TypedValue } from "../typesystem";
 import { Result } from "./result";
 
@@ -19,8 +19,8 @@ import { Result } from "./result";
  * @deprecated The concept of immediate results / resulting calls does not exist in the Protocol / in the API.
  * The SCRs are more alike a graph.
  */
-export function interpretExecutionResults(endpoint: EndpointDefinition, transactionOnNetwork: TransactionOnNetwork): ExecutionResultsBundle {
-    let smartContractResults = transactionOnNetwork.results;
+export function interpretExecutionResults(endpoint: EndpointDefinition, transactionOnNetwork: ITransactionOnNetwork): ExecutionResultsBundle {
+    let smartContractResults = transactionOnNetwork.contractResults;
     let immediateResult = findImmediateResult(smartContractResults)!;
     let resultingCalls = findResultingCalls(smartContractResults);
 
@@ -43,7 +43,7 @@ export function interpretExecutionResults(endpoint: EndpointDefinition, transact
  * The SCRs are more alike a graph.
  */
 export interface ExecutionResultsBundle {
-    smartContractResults: SmartContractResults;
+    smartContractResults: IContractResults;
     immediateResult: TypedResult;
     /**
      * @deprecated Most probably, we should use logs & events instead
@@ -65,8 +65,8 @@ export interface QueryResponseBundle {
  * @deprecated The concept of immediate results / resulting calls does not exist in the Protocol / in the API.
  * The SCRs are more like a graph.
  */
-export function findImmediateResult(results: SmartContractResults): TypedResult | undefined {
-    let immediateItem = results.getAll().filter(item => isImmediateResult(item))[0];
+export function findImmediateResult(results: IContractResults): TypedResult | undefined {
+    let immediateItem = results.items.filter(item => isImmediateResult(item))[0];
     if (immediateItem) {
         return new TypedResult(immediateItem);
     }
@@ -77,8 +77,8 @@ export function findImmediateResult(results: SmartContractResults): TypedResult 
  * @deprecated The concept of immediate results / resulting calls does not exist in the Protocol / in the API.
  * The SCRs are more like a graph.
  */
-export function findResultingCalls(results: SmartContractResults): TypedResult[] {
-    let otherItems = results.getAll().filter(item => !isImmediateResult(item));
+export function findResultingCalls(results: IContractResults): TypedResult[] {
+    let otherItems = results.items.filter(item => !isImmediateResult(item));
     let resultingCalls = otherItems.map(item => new TypedResult(item));
     return resultingCalls;
 }
@@ -87,7 +87,7 @@ export function findResultingCalls(results: SmartContractResults): TypedResult[]
  * @deprecated The concept of immediate results / resulting calls does not exist in the Protocol / in the API.
  * The SCRs are more like a graph.
  */
-function isImmediateResult(item: SmartContractResultItem): boolean {
+function isImmediateResult(item: IContractResultItem): boolean {
     return item.nonce.valueOf() != 0;
 }
 
@@ -95,13 +95,13 @@ function isImmediateResult(item: SmartContractResultItem): boolean {
  * @deprecated getReturnCode(), outputUntyped are a bit fragile. 
  * They are not necessarily applicable to SCRs, in general (only in particular).
  */
-export class TypedResult extends SmartContractResultItem implements Result.IResult {
+export class TypedResult extends ContractResultItem implements Result.IResult {
     /**
     * If available, will provide typed output arguments (with typed values).
     */
     endpointDefinition?: EndpointDefinition;
 
-    constructor(init?: Partial<SmartContractResultItem>) {
+    constructor(init?: Partial<ContractResultItem>) {
         super();
         Object.assign(this, init);
     }

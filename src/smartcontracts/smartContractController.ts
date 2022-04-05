@@ -1,7 +1,6 @@
 import { IProvider } from "../interface";
 import { Interaction } from "./interaction";
 import { Transaction } from "../transaction";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TypedOutcomeBundle, IInteractionChecker, IResultsParser, ISmartContractController, UntypedOutcomeBundle } from "./interface";
 import { ContractFunction } from "./function";
 import { ResultsParser } from "./resultsParser";
@@ -9,6 +8,7 @@ import { InteractionChecker, NullInteractionChecker } from "./interactionChecker
 import { EndpointDefinition } from "./typesystem";
 import { Logger } from "../logger";
 import { TransactionWatcher } from "../transactionWatcher";
+import { ITransactionOnNetwork } from "../networkProvider/interface";
 
 /**
  * Internal interface: the smart contract ABI, as seen from the perspective of a {@link SmartContractController}.
@@ -49,7 +49,7 @@ export class SmartContractController implements ISmartContractController {
         this.transactionCompletionAwaiter = transactionWatcher;
     }
 
-    async deploy(transaction: Transaction): Promise<{ transactionOnNetwork: TransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
+    async deploy(transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
         Logger.info(`SmartContractController.deploy [begin]: transaction = ${transaction.getHash()}`);
 
         await this.provider.sendTransaction(transaction);
@@ -67,7 +67,7 @@ export class SmartContractController implements ISmartContractController {
      * @param interaction The interaction used to build the {@link transaction}
      * @param transaction The interaction transaction, which must be signed beforehand
      */
-    async execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: TransactionOnNetwork, bundle: TypedOutcomeBundle }> {
+    async execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }> {
         Logger.info(`SmartContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}`);
 
         let endpoint = this.getEndpoint(interaction);

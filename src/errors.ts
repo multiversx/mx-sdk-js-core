@@ -111,7 +111,7 @@ export class ErrInvariantFailed extends Err {
 /**
  * Signals an unexpected condition.
  */
- export class ErrUnexpectedCondition extends Err {
+export class ErrUnexpectedCondition extends Err {
   public constructor(message: string) {
     super(`Unexpected condition: [${message}]`);
   }

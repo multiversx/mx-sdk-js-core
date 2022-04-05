@@ -3,7 +3,7 @@ import { TransactionWatcher } from "./transactionWatcher";
 import { TransactionHash, TransactionStatus } from "./transaction";
 import { MockProvider, InHyperblock, Wait } from "./testutils";
 import { Nonce } from "./nonce";
-import { TransactionOnNetwork } from "./transactionOnNetwork";
+import { TransactionOnNetwork } from "./networkProvider/transactions";
 
 
 describe("test transactionWatcher", () => {

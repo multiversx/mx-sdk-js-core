@@ -6,13 +6,14 @@ import { BytesType, BytesValue } from "./typesystem/bytes";
 import { QueryResponse } from "./queryResponse";
 import { ReturnCode } from "./returnCode";
 import { ResultsParser } from "./resultsParser";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
-import { SmartContractResultItem, SmartContractResults } from "./smartContractResults";
 import { Nonce } from "../nonce";
 import { TransactionHash } from "../transaction";
-import { TransactionEvent, TransactionEventTopic, TransactionLogs } from "../transactionLogs";
 import { Address } from "../address";
 import { Logger, LogLevel } from "../logger";
+import { TransactionOnNetwork } from "../networkProvider/transactions";
+import { ContractResultItem, ContractResults } from "../networkProvider/contractResults";
+import { TransactionLogs } from "../networkProvider/transactionLogs";
+import { TransactionEvent, TransactionEventTopic } from "../networkProvider/transactionEvents";
 
 const KnownReturnCodes: string[] = [
     ReturnCode.None.valueOf(), 
@@ -70,8 +71,8 @@ describe("test smart contract results parser", () => {
         let endpoint = new EndpointDefinition("foo", [], outputParameters, endpointModifiers);
 
         let transactionOnNetwork = new TransactionOnNetwork({
-            results: new SmartContractResults([
-                new SmartContractResultItem({ nonce: new Nonce(7), data: "@6f6b@2a@abba" })
+            contractResults: new ContractResults([
+                new ContractResultItem({ nonce: new Nonce(7), data: "@6f6b@2a@abba" })
             ])
         });
 
@@ -85,8 +86,8 @@ describe("test smart contract results parser", () => {
 
     it("should parse contract outcome, on easily found result with return data", async () => {
         let transaction = new TransactionOnNetwork({
-            results: new SmartContractResults([
-                new SmartContractResultItem({
+            contractResults: new ContractResults([
+                new ContractResultItem({
                     nonce: new Nonce(42),
                     data: "@6f6b@03",
                     returnMessage: "foobar"
@@ -181,7 +182,7 @@ describe("test smart contract results parser", () => {
             let jsonContent: string = fs.readFileSync(filePath, { encoding: "utf8" });
             let json = JSON.parse(jsonContent);
             let payload = json["data"]["transaction"];
-            let transaction = TransactionOnNetwork.fromHttpResponse(txHash, payload);
+            let transaction = TransactionOnNetwork.fromProxyHttpResponse(txHash, payload);
 
             samples.push([transaction, jsonContent]);
         }

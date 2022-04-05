@@ -1,9 +1,9 @@
 import { Address } from "../../address";
 import { NetworkConfig } from "../../networkConfig";
+import { IContractResults } from "../../networkProvider/interface";
 import { Transaction } from "../../transaction";
 import { Query } from "../query";
 import { QueryResponse } from "../queryResponse";
-import { SmartContractResults } from "../smartContractResults";
 import { findImmediateResult, findResultingCalls, TypedResult } from "./deprecatedContractResults";
 
 /**
@@ -19,7 +19,7 @@ export class ContractLogger {
         console.log(`Tx ${transaction.getHash()} created. Sending...`);
     }
 
-    deployComplete(transaction: Transaction, smartContractResults: SmartContractResults, smartContractAddress: Address) {
+    deployComplete(transaction: Transaction, smartContractResults: IContractResults, smartContractAddress: Address) {
         logReturnMessages(transaction, smartContractResults);
         console.log(`done. (address: ${smartContractAddress.bech32()} )`);
     }
@@ -28,7 +28,7 @@ export class ContractLogger {
         console.log(`awaiting results...`);
     }
 
-    transactionComplete(_result: any, _resultData: string, transaction: Transaction, smartContractResults: SmartContractResults) {
+    transactionComplete(_result: any, _resultData: string, transaction: Transaction, smartContractResults: IContractResults) {
         logReturnMessages(transaction, smartContractResults);
         console.log(`done.`);
     }
@@ -42,7 +42,7 @@ export class ContractLogger {
     }
 }
 
-function logReturnMessages(transaction: Transaction, smartContractResults: SmartContractResults) {
+function logReturnMessages(transaction: Transaction, smartContractResults: IContractResults) {
     let immediate = findImmediateResult(smartContractResults)!;
     logSmartContractResultIfMessage("(immediate)", transaction, immediate);
 

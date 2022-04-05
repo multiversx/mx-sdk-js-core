@@ -1,8 +1,8 @@
 import { Address } from "../address";
 import { Balance } from "../balance";
 import { ChainID, GasLimit, GasPrice } from "../networkParams";
+import { ITransactionOnNetwork } from "../networkProvider/interface";
 import { Transaction } from "../transaction";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
@@ -89,8 +89,8 @@ export interface UntypedOutcomeBundle {
 }
 
 export interface ISmartContractController {
-    deploy(transaction: Transaction): Promise<{ transactionOnNetwork: TransactionOnNetwork, bundle: UntypedOutcomeBundle }>;
-    execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: TransactionOnNetwork, bundle: TypedOutcomeBundle }>;
+    deploy(transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }>;
+    execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }>;
     query(interaction: Interaction): Promise<TypedOutcomeBundle>;
 }
 
@@ -102,6 +102,6 @@ export interface IResultsParser {
     parseQueryResponse(queryResponse: QueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle;
     parseUntypedQueryResponse(queryResponse: QueryResponse): UntypedOutcomeBundle;
 
-    parseOutcome(transaction: TransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle;
-    parseUntypedOutcome(transaction: TransactionOnNetwork): UntypedOutcomeBundle;
+    parseOutcome(transaction: ITransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle;
+    parseUntypedOutcome(transaction: ITransactionOnNetwork): UntypedOutcomeBundle;
 }

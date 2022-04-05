@@ -1,17 +1,20 @@
 import { Address } from "../address";
 import { Balance } from "../balance";
 import { Hash } from "../hash";
-import { IContractResults, ITransactionOnNetwork } from "./interface";
+import { IContractResults, ITransactionEvent, ITransactionLogs, ITransactionOnNetwork, ITransactionReceipt } from "./interface";
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
 import { Signature } from "../signature";
 import { TransactionHash, TransactionStatus } from "../transaction";
-import { TransactionLogs } from "../transactionLogs";
 import { TransactionPayload } from "../transactionPayload";
 import { ContractResults } from "./contractResults";
+import { TransactionCompletionStrategy } from "./transactionCompletionStrategy";
+import { TransactionLogs } from "./transactionLogs";
+import { Receipt } from "./receipt";
 
  export class TransactionOnNetwork implements ITransactionOnNetwork {
     hash: TransactionHash = new TransactionHash("");
+    type: string = "";
     nonce: Nonce = new Nonce(0);
     round: number = 0;
     epoch: number = 0;
@@ -28,21 +31,29 @@ import { ContractResults } from "./contractResults";
     blockNonce: Nonce = new Nonce(0);
     hyperblockNonce: Nonce = new Nonce(0);
     hyperblockHash: Hash = Hash.empty();
+    pendingResults: boolean = false;
 
-    logs: TransactionLogs = TransactionLogs.empty();
+    receipt: ITransactionReceipt = new Receipt();
     contractResults: IContractResults = ContractResults.empty();
+    logs: ITransactionLogs = TransactionLogs.empty();
+
+    constructor(init?: Partial<TransactionOnNetwork>) {
+        Object.assign(this, init);
+    }
 
     static fromProxyHttpResponse(txHash: TransactionHash, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromProxyHttpResponse(response.smartContractResults || []);
-        // TODO: uniformize transaction status
+        // TODO: uniformize transaction status.
+        // TODO: Use specific completion detection strategy.
         return result;
     }
 
     static fromApiHttpResponse(txHash: TransactionHash, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromApiHttpResponse(response.results || []);
-        // TODO: uniformize transaction status
+        // TODO: uniformize transaction status.
+        // TODO: Use specific completion detection strategy.
         return result;
     }
 
@@ -50,6 +61,7 @@ import { ContractResults } from "./contractResults";
         let result = new TransactionOnNetwork();
 
         result.hash = txHash;
+        result.type = response.type || "";
         result.nonce = new Nonce(response.nonce || 0);
         result.round = response.round;
         result.epoch = response.epoch || 0;
@@ -65,7 +77,9 @@ import { ContractResults } from "./contractResults";
         result.blockNonce = new Nonce(response.blockNonce || 0);
         result.hyperblockNonce = new Nonce(response.hyperblockNonce || 0);
         result.hyperblockHash = new Hash(response.hyperblockHash);
+        result.pendingResults = response.pendingResults || false;
 
+        result.receipt = Receipt.fromHttpResponse(response.receipt || {});
         result.logs = TransactionLogs.fromHttpResponse(response.logs || {});
 
         return result;
@@ -73,6 +87,22 @@ import { ContractResults } from "./contractResults";
 
     getDateTime(): Date {
         return new Date(this.timestamp * 1000);
+    }
+
+    isCompleted(): boolean {
+        // TODO: When using separate constructors of TransactionOnNetwork (for API response vs. for Gateway response, see package "networkProvider"),
+        // we will be able to use different transaction completion strategies.
+        return new TransactionCompletionStrategy().isCompleted(this);
+    }
+
+    getAllEvents(): ITransactionEvent[] {
+        let result = [...this.logs.events];
+
+        for (const resultItem of this.contractResults.items) {
+            result.push(...resultItem.logs.events);
+        }
+
+        return result;
     }
 }
 

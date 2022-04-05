@@ -8,9 +8,9 @@ import { QueryResponse } from "./smartcontracts";
 import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
 import { NetworkStatus } from "./networkStatus";
-import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Token } from "./token";
 import BigNumber from "bignumber.js";
+import { ITransactionOnNetwork } from "./networkProvider/interface";
 
 /**
  * @deprecated This interface will be removed in a future release, upon merging {@link IProvider} and {@link IApiProvider}.
@@ -19,7 +19,7 @@ export interface ITransactionFetcher {
     /**
      * Fetches the state of a {@link Transaction}.
      */
-    getTransaction(txHash: TransactionHash, hintSender?: Address, withResults?: boolean): Promise<TransactionOnNetwork>;
+    getTransaction(txHash: TransactionHash, hintSender?: Address, withResults?: boolean): Promise<ITransactionOnNetwork>;
 
     /**
      * Queries the status of a {@link Transaction}.

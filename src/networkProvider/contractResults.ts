@@ -5,9 +5,10 @@ import { Hash } from "../hash";
 import { IContractQueryResponse, IContractResultItem, IContractResults, ITransactionLogs } from "./interface";
 import { GasLimit, GasPrice } from "../networkParams";
 import { Nonce } from "../nonce";
-import { MaxUint64, ReturnCode } from "../smartcontracts";
 import { TransactionHash } from "../transaction";
 import { TransactionLogs } from "./transactionLogs";
+import { ReturnCode } from "../smartcontracts/returnCode";
+import { MaxUint64 } from "../smartcontracts/query";
 
 export class ContractResults implements IContractResults {
     readonly items: IContractResultItem[];

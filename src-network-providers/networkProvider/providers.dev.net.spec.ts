@@ -1,5 +1,4 @@
 import { assert } from "chai";
-import { Hash } from "../hash";
 import { INetworkProvider } from "./interface";
 import { Address } from "../address";
 import { loadTestWallets, TestWallet } from "../testutils";
@@ -134,9 +133,9 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         // Ignore fields which are not present on API response:
         proxyResponse.epoch = 0;
-        proxyResponse.blockNonce = new Nonce(0);
-        proxyResponse.hyperblockNonce = new Nonce(0);
-        proxyResponse.hyperblockHash = new Hash("");
+        proxyResponse.blockNonce = 0;
+        proxyResponse.hyperblockNonce = 0;
+        proxyResponse.hyperblockHash = "";
     }
 
     // TODO: Fix differences of "tx.status", then enable this test.

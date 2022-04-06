@@ -68,13 +68,13 @@ export class ContractResultItem {
 
         item.hash = new Hash(response.hash);
         item.nonce = new Nonce(response.nonce || 0);
-        item.value = new TransactionValue(response.value || "");
+        item.value = new TransactionValue((response.value || 0).toString());
         item.receiver = new Address(response.receiver);
         item.sender = new Address(response.sender);
         item.previousHash = new Hash(response.prevTxHash);
         item.originalHash = new Hash(response.originalTxHash);
-        item.gasLimit = response.gasLimit || 0;
-        item.gasPrice = response.gasPrice || 0;
+        item.gasLimit = Number(response.gasLimit || 0);
+        item.gasPrice = Number(response.gasPrice || 0);
         item.data = response.data || "";
         item.callType = response.callType;
         item.returnMessage = response.returnMessage;

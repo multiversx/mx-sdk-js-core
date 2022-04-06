@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { MaxUint64 } from "./constants";
+import { MaxUint64AsBigNumber } from "./constants";
 import { IContractReturnCode, IGasLimit } from "./interface";
 import { ContractReturnCode } from "./primitives";
 
@@ -24,7 +24,7 @@ export class ContractQueryResponse {
         let returnCode = payload["returnCode"] || payload["ReturnCode"];
         let returnMessage = payload["returnMessage"] || payload["ReturnMessage"];
         let gasRemaining = new BigNumber(payload["gasRemaining"] || payload["GasRemaining"] || 0);
-        let gasUsed = new Number(MaxUint64.minus(gasRemaining).toNumber());
+        let gasUsed = new Number(MaxUint64AsBigNumber.minus(gasRemaining).toNumber());
 
         return new ContractQueryResponse({
             returnData: returnData,

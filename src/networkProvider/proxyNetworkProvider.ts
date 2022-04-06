@@ -4,7 +4,7 @@ import { IAddress, IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, 
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "./networkStake";
 import { Query } from "../smartcontracts";
-import { Stats } from "../stats";
+import { Stats } from "./stats";
 import { ContractQueryResponse } from "./contractResults";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";

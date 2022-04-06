@@ -24,7 +24,13 @@ export interface INetworkStatus {
 /**
  * @deprecated This interface will be removed upon the extraction of networkProvider package.
  */
- export interface INetworkStake {
+export interface INetworkStake {
+}
+
+/**
+ * @deprecated This interface will be removed upon the extraction of networkProvider package.
+ */
+export interface INetworkStats {
 }
 
 export interface ITransactionOnNetwork {

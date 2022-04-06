@@ -27,8 +27,7 @@ export class TransactionStatus {
     isPending(): boolean {
         return (
             this.status == "received" ||
-            this.status == "pending" ||
-            this.status == "partially-executed"
+            this.status == "pending"
         );
     }
 

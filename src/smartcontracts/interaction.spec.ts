@@ -14,7 +14,7 @@ import { assert } from "chai";
 import { Interaction } from "./interaction";
 import { ChainID, GasLimit } from "../networkParams";
 import { ContractFunction } from "./function";
-import { QueryResponse } from "./queryResponse";
+import { ContractQueryResponse } from "../networkProvider/contractQueryResponse";
 import { Nonce } from "../nonce";
 import { ReturnCode } from "./returnCode";
 import { Balance } from "../balance";
@@ -126,7 +126,7 @@ describe("test smart contract interactor", function() {
 
         provider.mockQueryContractOnFunction(
             "getUltimateAnswer",
-            new QueryResponse({ returnData: ["Kg=="], returnCode: ReturnCode.Ok })
+            new ContractQueryResponse({ returnData: ["Kg=="], returnCode: ReturnCode.Ok })
         );
 
         // Query
@@ -183,7 +183,7 @@ describe("test smart contract interactor", function() {
         // For "get()", return fake 7
         provider.mockQueryContractOnFunction(
             "get",
-            new QueryResponse({ returnData: ["Bw=="], returnCode: ReturnCode.Ok })
+            new ContractQueryResponse({ returnData: ["Bw=="], returnCode: ReturnCode.Ok })
         );
 
         // Query "get()"

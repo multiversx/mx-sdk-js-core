@@ -1,11 +1,9 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "./accounts";
-import { IAddress, IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, IHash, INetworkProvider, INonce, INonFungibleTokenOfAccountOnNetwork, ITransaction, Pagination } from "./interface";
+import { IAddress, IContractQuery, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, IHash, INetworkProvider, INonce, INonFungibleTokenOfAccountOnNetwork, ITransaction, Pagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
-import { Query } from "../smartcontracts";
 import { Stats } from "./stats";
-import { ContractQueryResponse } from "./contractResults";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
@@ -13,6 +11,7 @@ import { Hash } from "./primitives";
 import { ErrNetworkProvider } from "./errors";
 import { defaultAxiosConfig } from "./config";
 import { NetworkStatus } from "./networkStatus";
+import { ContractQueryResponse } from "./contractQueryResponse";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ProxyNetworkProvider implements INetworkProvider {
@@ -116,7 +115,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return response;
     }
 
-    async queryContract(query: Query): Promise<IContractQueryResponse> {
+    async queryContract(query: IContractQuery): Promise<ContractQueryResponse> {
         let data = query.toHttpRequest();
         let response = await this.doPostGeneric("vm-values/query", data);
         let queryResponse = ContractQueryResponse.fromHttpResponse(response.data);

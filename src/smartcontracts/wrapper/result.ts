@@ -1,6 +1,6 @@
 import { ErrContract } from "../../errors";
+import { IContractQueryResponse } from "../../interfaceOfNetwork";
 import { ArgSerializer } from "../argSerializer";
-import { QueryResponse } from "../queryResponse";
 import { ReturnCode } from "../returnCode";
 import { EndpointDefinition } from "../typesystem";
 import { TypedResult } from "./deprecatedContractResults";
@@ -26,7 +26,7 @@ export namespace Result {
         throw new ErrContract(`${result.getReturnCode()}: ${result.getReturnMessage()}`);
     }
 
-    export function unpackQueryOutput(endpoint: EndpointDefinition, queryResponse: QueryResponse) {
+    export function unpackQueryOutput(endpoint: EndpointDefinition, queryResponse: IContractQueryResponse) {
         if (!queryResponse.isSuccess()) {
             throw new ErrContract(`${queryResponse.returnCode}: ${queryResponse.returnMessage}`);
         }

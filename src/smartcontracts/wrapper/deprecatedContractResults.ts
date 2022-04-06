@@ -8,9 +8,8 @@
  */
 
 import { ContractResultItem } from "../../networkProvider/contractResults";
-import { IContractResultItem, IContractResults, ITransactionOnNetwork } from "../../interfaceOfNetwork";
+import { IContractQueryResponse, IContractResultItem, IContractResults, ITransactionOnNetwork } from "../../interfaceOfNetwork";
 import { ArgSerializer } from "../argSerializer";
-import { QueryResponse } from "../queryResponse";
 import { ReturnCode } from "../returnCode";
 import { EndpointDefinition, TypedValue } from "../typesystem";
 import { Result } from "./result";
@@ -55,7 +54,7 @@ export interface ExecutionResultsBundle {
 }
 
 export interface QueryResponseBundle {
-    queryResponse: QueryResponse;
+    queryResponse: IContractQueryResponse;
     firstValue: TypedValue;
     values: TypedValue[];
     returnCode: ReturnCode;

@@ -1,13 +1,12 @@
 import { Address } from "../address";
 import { Balance } from "../balance";
 import { IChainID, IGasLimit, IGasPrice } from "../interface";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { IContractQueryResponse, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { Transaction } from "../transaction";
 import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
-import { QueryResponse } from "./queryResponse";
 import { ReturnCode } from "./returnCode";
 import { EndpointDefinition, TypedValue } from "./typesystem";
 
@@ -99,8 +98,8 @@ export interface IInteractionChecker {
 }
 
 export interface IResultsParser {
-    parseQueryResponse(queryResponse: QueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle;
-    parseUntypedQueryResponse(queryResponse: QueryResponse): UntypedOutcomeBundle;
+    parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle;
+    parseUntypedQueryResponse(queryResponse: IContractQueryResponse): UntypedOutcomeBundle;
 
     parseOutcome(transaction: ITransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle;
     parseUntypedOutcome(transaction: ITransactionOnNetwork): UntypedOutcomeBundle;

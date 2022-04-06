@@ -1,10 +1,9 @@
 import { Transaction } from "./transaction";
 import { Signature } from "./signature";
 import { Query } from "./smartcontracts";
-import { QueryResponse } from "./smartcontracts";
 import { Token } from "./token";
 import BigNumber from "bignumber.js";
-import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStake, INetworkStats, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { IAccountOnNetwork, IContractQueryResponse, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStake, INetworkStats, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 export interface ITransactionFetcher {
     /**
@@ -55,7 +54,7 @@ export interface IProvider extends ITransactionFetcher {
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
      */
-    queryContract(query: Query): Promise<QueryResponse>;
+    queryContract(query: Query): Promise<IContractQueryResponse>;
 
     /**
      * Broadcasts an already-signed {@link Transaction}.

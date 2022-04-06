@@ -79,6 +79,18 @@ export interface IContractResultItem {
     logs: ITransactionLogs;
 }
 
+export interface IContractQueryResponse {
+    returnCode: IContractReturnCode;
+    returnMessage: string;
+    gasUsed: IGasLimit;
+    getReturnDataParts(): Buffer[];
+    isSuccess(): boolean;
+}
+
+export interface IContractReturnCode {
+    toString(): string;
+}
+
 export interface ITransactionLogs {
     events: ITransactionEvent[];
 

@@ -2,8 +2,6 @@ import { GasLimit } from "../networkParams";
 import { MaxUint64 } from "./query";
 import { ReturnCode } from "./returnCode";
 import BigNumber from "bignumber.js";
-import { ErrContract } from "../errors";
-import { ArgSerializer } from "./argSerializer";
 
 export class QueryResponse {
     returnData: string[];
@@ -36,24 +34,8 @@ export class QueryResponse {
         });
     }
 
-    getReturnCode(): ReturnCode {
-        return this.returnCode;
-    }
-
-    getReturnMessage(): string {
-        return this.returnMessage;
-    }
-
     getReturnDataParts(): Buffer[] {
         return this.returnData.map((item) => Buffer.from(item || "", "base64"));
-    }
-
-    assertSuccess() {
-        if (this.isSuccess()) {
-            return;
-        }
-
-        throw new ErrContract(`${this.getReturnCode()}: ${this.getReturnMessage()}`);
     }
 
     isSuccess(): boolean {

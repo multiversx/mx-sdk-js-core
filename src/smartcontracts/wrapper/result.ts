@@ -27,7 +27,10 @@ export namespace Result {
     }
 
     export function unpackQueryOutput(endpoint: EndpointDefinition, queryResponse: QueryResponse) {
-        queryResponse.assertSuccess();
+        if (!queryResponse.isSuccess()) {
+            throw new ErrContract(`${queryResponse.returnCode}: ${queryResponse.returnMessage}`);
+        }
+
         let buffers = queryResponse.getReturnDataParts();
         let typedValues = new ArgSerializer().buffersToValues(buffers, endpoint.output);
         let values = typedValues.map((value) => value?.valueOf());

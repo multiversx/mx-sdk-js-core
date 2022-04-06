@@ -9,15 +9,9 @@ import * as errors from "./errors";
 import { Query } from "./smartcontracts/query";
 import { QueryResponse } from "./smartcontracts/queryResponse";
 import { Logger } from "./logger";
-import { NetworkStatus } from "./networkStatus";
 import { defaultConfig } from "./constants";
 import { ProxyNetworkProvider } from "./networkProvider/proxyNetworkProvider";
-import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
-
-/**
- * This will be deprecated once all the endpoints move to ApiProvider
- */
-
+import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 export class ProxyProvider implements IProvider {
     private url: string;
@@ -119,10 +113,8 @@ export class ProxyProvider implements IProvider {
     /**
      * Fetches the network status configuration.
      */
-    async getNetworkStatus(): Promise<NetworkStatus> {
-        return this.doGetGeneric("network/status/4294967295", (response) =>
-            NetworkStatus.fromHttpResponse(response.status)
-        );
+    async getNetworkStatus(): Promise<INetworkStatus> {
+        return await this.backingProvider.getNetworkStatus();
     }
 
     /**

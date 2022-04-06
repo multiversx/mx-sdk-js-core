@@ -8,7 +8,6 @@ import { Balance } from "../balance";
 import * as errors from "../errors";
 import { Query } from "../smartcontracts/query";
 import { QueryResponse } from "../smartcontracts/queryResponse";
-import { NetworkStatus } from "../networkStatus";
 import { TypedEvent } from "../events";
 import { BalanceBuilder } from "../balanceBuilder";
 import BigNumber from "bignumber.js";
@@ -17,6 +16,7 @@ import { TransactionOnNetwork } from "../networkProvider/transactions";
 import { ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
 import { TransactionStatus } from "../networkProvider/transactionStatus";
 import { AccountOnNetwork } from "../networkProvider/accounts";
+import { NetworkStatus } from "../networkProvider/networkStatus";
 
 const DummyHyperblockNonce = 42;
 const DummyHyperblockHash = "a".repeat(32);

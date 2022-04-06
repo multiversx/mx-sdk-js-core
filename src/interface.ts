@@ -3,12 +3,10 @@ import { NetworkConfig } from "./networkConfig";
 import { Signature } from "./signature";
 import { Query } from "./smartcontracts";
 import { QueryResponse } from "./smartcontracts";
-import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
-import { NetworkStatus } from "./networkStatus";
 import { Token } from "./token";
 import BigNumber from "bignumber.js";
-import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkStake, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 export interface ITransactionFetcher {
     /**
@@ -34,7 +32,7 @@ export interface IProvider extends ITransactionFetcher {
     /**
      * Fetches the Network status.
      */
-    getNetworkStatus(): Promise<NetworkStatus>;
+    getNetworkStatus(): Promise<INetworkStatus>;
 
     /**
      * Fetches the state of an {@link Account}.
@@ -89,7 +87,7 @@ export interface IApiProvider extends ITransactionFetcher {
     /**
      * Fetches the Network Stake.
      */
-    getNetworkStake(): Promise<NetworkStake>;
+    getNetworkStake(): Promise<INetworkStake>;
     /**
      * Fetches the Network Stats.
      */

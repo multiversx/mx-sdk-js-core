@@ -14,6 +14,19 @@ export interface IAccountOnNetwork {
 export interface IFungibleTokenOfAccountOnNetwork {
 }
 
+/**
+ * @deprecated This interface will be removed upon the extraction of networkProvider package.
+ */
+export interface INetworkStatus {
+    Nonce: number;
+}
+
+/**
+ * @deprecated This interface will be removed upon the extraction of networkProvider package.
+ */
+ export interface INetworkStake {
+}
+
 export interface ITransactionOnNetwork {
     hash: IHash;
     type: string;

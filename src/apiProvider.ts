@@ -2,13 +2,12 @@ import axios, { AxiosRequestConfig } from "axios";
 import { IApiProvider, IHash } from "./interface";
 import * as errors from "./errors";
 import { Logger } from "./logger";
-import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
 import { Token } from "./token";
 import { NFTToken } from "./nftToken";
 import { defaultConfig } from "./constants";
 import { ApiNetworkProvider } from "./networkProvider/apiNetworkProvider";
-import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { INetworkStake, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 /**
  * This is a temporary change, this will be the only provider used, ProxyProvider will be deprecated
@@ -35,8 +34,8 @@ export class ApiProvider implements IApiProvider {
     /**
      * Fetches the Network Stake.
      */
-    async getNetworkStake(): Promise<NetworkStake> {
-        return this.doGetGeneric("stake", (response) => NetworkStake.fromHttpResponse(response));
+    async getNetworkStake(): Promise<INetworkStake> {
+        return await this.backingProvider.getNetworkStakeStatistics();
     }
 
     /**

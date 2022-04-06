@@ -80,6 +80,18 @@ export class ContractReturnCode {
     }
 }
 
+export class AccountBalance {
+    private readonly value: string;
+
+    constructor(value: string) {
+        this.value = value;
+    }
+
+    toString(): string {
+        return this.value;
+    }
+}
+
 export function numberToPaddedHex(value: number) {
     let hex = value.toString(16);
     return zeroPadStringIfOddLength(hex);

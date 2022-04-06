@@ -6,14 +6,13 @@ import { Transaction, TransactionHash } from "./transaction";
 import { NetworkConfig } from "./networkConfig";
 import { Address } from "./address";
 import * as errors from "./errors";
-import { AccountOnNetwork, TokenOfAccountOnNetwork } from "./account";
 import { Query } from "./smartcontracts/query";
 import { QueryResponse } from "./smartcontracts/queryResponse";
 import { Logger } from "./logger";
 import { NetworkStatus } from "./networkStatus";
 import { defaultConfig } from "./constants";
 import { ProxyNetworkProvider } from "./networkProvider/proxyNetworkProvider";
-import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 /**
  * This will be deprecated once all the endpoints move to ApiProvider
@@ -40,19 +39,14 @@ export class ProxyProvider implements IProvider {
     }
 
     /**
-     * Fetches the state of an {@link Account}.
+     * Fetches the state of an account.
      */
-    async getAccount(address: Address): Promise<AccountOnNetwork> {
-        return this.doGetGeneric(`address/${address.bech32()}`, (response) =>
-            AccountOnNetwork.fromHttpResponse(response.account)
-        );
+    async getAccount(address: Address): Promise<IAccountOnNetwork> {
+        return await this.backingProvider.getAccount(address);
     }
 
-    async getAddressEsdtList(address: Address): Promise<TokenOfAccountOnNetwork[]> {
-        let url = `address/${address.bech32()}/esdt`;
-        let raw = await this.doGetGeneric(url, response => response.esdts);
-        let tokens = Object.values(raw).map(item => TokenOfAccountOnNetwork.fromHttpResponse(item));
-        return tokens;
+    async getAddressEsdtList(address: Address): Promise<IFungibleTokenOfAccountOnNetwork[]> {
+        return await this.backingProvider.getFungibleTokensOfAccount(address);
     }
 
     async getAddressEsdt(address: Address, tokenIdentifier: string): Promise<any> {

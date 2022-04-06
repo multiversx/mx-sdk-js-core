@@ -119,7 +119,9 @@ export class SystemWrapper extends ChainSendContext {
     async getBalance(address: NativeTypes.NativeAddress, balanceBuilder: BalanceBuilder): Promise<Balance> {
         let typedAddress = NativeSerializer.convertNativeToAddress(address, new ArgumentErrorContext("getBalance", "0", new EndpointParameterDefinition("account", "", new AddressType())));
         if (balanceBuilder.getToken().isEgld()) {
-            return await this.provider.getAccount(typedAddress).then((account) => account.balance);
+            let account = await this.provider.getAccount(typedAddress);
+            let balance = Balance.fromString(account.balance.toString());
+            return balance;
         }
         let tokenData = await this.getTokenData(typedAddress, balanceBuilder);
         return balanceBuilder.raw(tokenData.balance);

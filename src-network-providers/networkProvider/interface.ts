@@ -3,7 +3,7 @@ import { AccountOnNetwork } from "./accounts";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "./networkStake";
 import { Query } from "../smartcontracts";
-import { Stats } from "../stats";
+import { Stats } from "./stats";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { NetworkStatus } from "./networkStatus";

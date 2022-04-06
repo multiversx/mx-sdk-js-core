@@ -10,6 +10,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - [Fix / improve results parser (better heuristics)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/177)
  - [Breaking change: preparatory refactoring for decoupling core objects from IProvider](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/178)
  - [Breaking change: decouple networkStake, networkStatus and stats from IProvider & IApiProvider](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/179)
+ - [Breaking change: unifying provider interfaces, preparing network providers for extraction - step 1](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/180)
+ - [Breaking change: unifying provider interfaces, preparing network providers for extraction - step 2](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/181)
+ - [Breaking change: unifying provider interfaces, preparing network providers for extraction - step 3](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/182)
+ - [Breaking change: SmartContract does not depend on IProvider anymore](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/183).
 
  **Breaking changes**
  - Removed utility functions: `transaction.awaitExecuted()`, `transaction.awaitPending()`. `TransactionWatcher` should be used directly, instead.
@@ -25,6 +29,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Removed `acount.sync()`. Replaced by `account.update({ nonce, balance})`.
  - Removed `transaction.send()`. `Provider.sendTransaction()` has to be used instead.
  - Removed the static functions `getDefault()` and `sync()` from `networkStake`, `networkStatus` and `stats`.
+ - Removed `smartContract.runQuery()` in order to decouple the contract class from the network provider. `smartContract.createQuery()` + `provider.queryContract()` have to be used, instead.
 
 ## [10.0.0-beta.3]
  - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)

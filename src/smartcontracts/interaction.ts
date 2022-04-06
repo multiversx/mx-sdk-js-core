@@ -9,6 +9,7 @@ import { Nonce } from "../nonce";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
 import { Account } from "../account";
 import { CallArguments } from "./interface";
+import { IChainID, IGasLimit, IGasPrice } from "../interface";
 
 /**
  * Internal interface: the smart contract, as seen from the perspective of an {@link Interaction}.
@@ -32,9 +33,9 @@ export class Interaction {
 
     private nonce: Nonce = new Nonce(0);
     private value: Balance = Balance.Zero();
-    private gasLimit: GasLimit = new GasLimit(0);
-    private gasPrice: GasPrice | undefined = undefined;
-    private chainID: ChainID = ChainID.unspecified();
+    private gasLimit: IGasLimit = new GasLimit(0);
+    private gasPrice: IGasPrice | undefined = undefined;
+    private chainID: IChainID = ChainID.unspecified();
     private querent: Address = new Address();
 
     private isWithSingleESDTTransfer: boolean = false;
@@ -76,7 +77,7 @@ export class Interaction {
         return this.tokenTransfers.getTransfers();
     }
 
-    getGasLimit(): GasLimit {
+    getGasLimit(): IGasLimit {
         return this.gasLimit;
     }
 
@@ -185,7 +186,7 @@ export class Interaction {
         return this.withNonce(account.getNonceThenIncrement());
     }
 
-    withChainID(chainID: ChainID): Interaction {
+    withChainID(chainID: IChainID): Interaction {
         this.chainID = chainID;
         return this;
     }

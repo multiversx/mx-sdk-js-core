@@ -3,7 +3,6 @@ import BigNumber from "bignumber.js";
 
 import { IProvider } from "./interface";
 import { Transaction, TransactionHash } from "./transaction";
-import { NetworkConfig } from "./networkConfig";
 import { Address } from "./address";
 import * as errors from "./errors";
 import { Query } from "./smartcontracts/query";
@@ -11,7 +10,7 @@ import { QueryResponse } from "./smartcontracts/queryResponse";
 import { Logger } from "./logger";
 import { defaultConfig } from "./constants";
 import { ProxyNetworkProvider } from "./networkProvider/proxyNetworkProvider";
-import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 export class ProxyProvider implements IProvider {
     private url: string;
@@ -106,8 +105,8 @@ export class ProxyProvider implements IProvider {
     /**
      * Fetches the Network configuration.
      */
-    async getNetworkConfig(): Promise<NetworkConfig> {
-        return this.doGetGeneric("network/config", (response) => NetworkConfig.fromHttpResponse(response.config));
+    async getNetworkConfig(): Promise<INetworkConfig> {
+        return await this.backingProvider.getNetworkConfig();
     }
 
     /**

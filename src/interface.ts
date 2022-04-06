@@ -1,11 +1,10 @@
 import { Transaction } from "./transaction";
-import { NetworkConfig } from "./networkConfig";
 import { Signature } from "./signature";
 import { Query } from "./smartcontracts";
 import { QueryResponse } from "./smartcontracts";
 import { Token } from "./token";
 import BigNumber from "bignumber.js";
-import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkStake, INetworkStats, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStake, INetworkStats, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 export interface ITransactionFetcher {
     /**
@@ -26,7 +25,7 @@ export interface IProvider extends ITransactionFetcher {
     /**
      * Fetches the Network configuration.
      */
-    getNetworkConfig(): Promise<NetworkConfig>;
+    getNetworkConfig(): Promise<INetworkConfig>;
 
     /**
      * Fetches the Network status.
@@ -146,3 +145,6 @@ export interface ITransactionValue { toString(): string; }
 export interface IAccountBalance { toString(): string; }
 export interface ITransactionPayload { encoded(): string; }
 export interface INonce { valueOf(): number; }
+export interface IChainID { valueOf(): string; }
+export interface IGasLimit { valueOf(): number; }
+export interface IGasPrice { valueOf(): number; }

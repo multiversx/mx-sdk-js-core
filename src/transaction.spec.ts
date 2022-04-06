@@ -5,7 +5,7 @@ import { ChainID, GasLimit, GasPrice, GasPriceModifier, TransactionOptions, Tran
 import { TransactionPayload } from "./transactionPayload";
 import { Balance } from "./balance";
 import { loadTestWallets, TestWallet } from "./testutils";
-import { NetworkConfig } from "./networkConfig";
+import { NetworkConfig } from "./networkProvider/networkConfig";
 
 
 describe("test transaction construction", async () => {

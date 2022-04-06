@@ -14,7 +14,6 @@ export * from "./balanceBuilder";
 export * from "./boundaryAdapters";
 export * from "./interactive";
 export * from "./logger";
-export * from "./networkConfig";
 export * from "./networkParams";
 export * from "./signableMessage";
 export * from "./utils";

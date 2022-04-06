@@ -1,5 +1,5 @@
 import { Address } from "../../address";
-import { NetworkConfig } from "../../networkConfig";
+import { NetworkConfig } from "../../networkProvider/networkConfig";
 import { IContractResults } from "../../interfaceOfNetwork";
 import { Transaction } from "../../transaction";
 import { Query } from "../query";

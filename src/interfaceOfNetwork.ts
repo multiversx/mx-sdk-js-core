@@ -1,4 +1,4 @@
-import { IAccountBalance, IBech32Address, IHash, INonce, ITransactionPayload, ITransactionValue } from "./interface";
+import { IAccountBalance, IBech32Address, IChainID, IGasLimit, IHash, INonce, ITransactionPayload, ITransactionValue } from "./interface";
 
 /**
  * @deprecated This interface will be removed upon the extraction of networkProvider package.
@@ -31,6 +31,11 @@ export interface INetworkStake {
  * @deprecated This interface will be removed upon the extraction of networkProvider package.
  */
 export interface INetworkStats {
+}
+
+export interface INetworkConfig {
+    MinGasLimit: IGasLimit;
+    ChainID: IChainID;
 }
 
 export interface ITransactionOnNetwork {

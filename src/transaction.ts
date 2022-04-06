@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IBech32Address, ISignable, ISignature } from "./interface";
+import { IBech32Address, IChainID, IGasLimit, IGasPrice, ISignable, ISignature } from "./interface";
 import { Address } from "./address";
 import { Balance } from "./balance";
 import {
@@ -9,7 +9,7 @@ import {
   TransactionOptions,
   TransactionVersion,
 } from "./networkParams";
-import { NetworkConfig } from "./networkConfig";
+import { NetworkConfig } from "./networkProvider/networkConfig";
 import { Nonce } from "./nonce";
 import { Signature } from "./signature";
 import { guardNotEmpty } from "./utils";
@@ -54,12 +54,12 @@ export class Transaction implements ISignable {
   /**
    * The gas price to be used.
    */
-  private gasPrice: GasPrice;
+  private gasPrice: IGasPrice;
 
   /**
    * The maximum amount of gas to be consumed when processing the transaction.
    */
-  private gasLimit: GasLimit;
+  private gasLimit: IGasLimit;
 
   /**
    * The payload of the transaction.
@@ -69,7 +69,7 @@ export class Transaction implements ISignable {
   /**
    * The chain ID of the Network (e.g. "1" for Mainnet).
    */
-  private chainID: ChainID;
+  private chainID: IChainID;
 
   /**
    * The version, required by the Network in order to correctly interpret the contents of the transaction.
@@ -110,10 +110,10 @@ export class Transaction implements ISignable {
     value?: Balance;
     receiver: Address;
     sender?: Address;
-    gasPrice?: GasPrice;
-    gasLimit: GasLimit;
+    gasPrice?: IGasPrice;
+    gasLimit: IGasLimit;
     data?: TransactionPayload;
-    chainID: ChainID;
+    chainID: IChainID;
     version?: TransactionVersion;
     options?: TransactionOptions;
   }) {
@@ -174,19 +174,19 @@ export class Transaction implements ISignable {
     return this.receiver;
   }
 
-  getGasPrice(): GasPrice {
+  getGasPrice(): IGasPrice {
     return this.gasPrice;
   }
 
-  setGasPrice(gasPrice: GasPrice) {
+  setGasPrice(gasPrice: IGasPrice) {
     this.gasPrice = gasPrice;
   }
 
-  getGasLimit(): GasLimit {
+  getGasLimit(): IGasLimit {
     return this.gasLimit;
   }
 
-  setGasLimit(gasLimit: GasLimit) {
+  setGasLimit(gasLimit: IGasLimit) {
     this.gasLimit = gasLimit;
   }
 
@@ -194,11 +194,11 @@ export class Transaction implements ISignable {
     return this.data;
   }
 
-  getChainID(): ChainID {
+  getChainID(): IChainID {
     return this.chainID;
   }
 
-  setChainID(chainID: ChainID) {
+  setChainID(chainID: IChainID) {
     this.chainID = chainID;
   }
 

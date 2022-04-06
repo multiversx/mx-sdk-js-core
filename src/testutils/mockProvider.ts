@@ -1,6 +1,6 @@
 import { IBech32Address, IHash, IProvider } from "../interface";
 import { Transaction, TransactionHash } from "../transaction";
-import { NetworkConfig } from "../networkConfig";
+import { NetworkConfig } from "../networkProvider/networkConfig";
 import { Address } from "../address";
 import { Nonce } from "../nonce";
 import { AsyncTimer } from "../asyncTimer";
@@ -13,7 +13,7 @@ import { BalanceBuilder } from "../balanceBuilder";
 import BigNumber from "bignumber.js";
 import { ContractResultItem, ContractResults } from "../networkProvider/contractResults";
 import { TransactionOnNetwork } from "../networkProvider/transactions";
-import { ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
+import { INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
 import { TransactionStatus } from "../networkProvider/transactionStatus";
 import { AccountOnNetwork } from "../networkProvider/accounts";
 import { NetworkStatus } from "../networkProvider/networkStatus";
@@ -208,7 +208,7 @@ export class MockProvider implements IProvider {
         return transaction.status;
     }
 
-    async getNetworkConfig(): Promise<NetworkConfig> {
+    async getNetworkConfig(): Promise<INetworkConfig> {
         return new NetworkConfig();
     }
 

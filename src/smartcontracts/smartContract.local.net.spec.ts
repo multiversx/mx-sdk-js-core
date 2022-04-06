@@ -150,7 +150,8 @@ describe("test on local testnet", function () {
         await watcher.awaitCompleted(transactionIncrementSecond);
 
         // Check counter
-        let queryResponse = await contract.runQuery(provider, { func: new ContractFunction("get") });
+        let query = contract.createQuery({ func: new ContractFunction("get") });
+        let queryResponse = await provider.queryContract(query);
         assert.equal(3, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
     });
 
@@ -212,27 +213,32 @@ describe("test on local testnet", function () {
         await watcher.awaitCompleted(transactionMintCarol);
 
         // Query state, do some assertions
-        let queryResponse = await contract.runQuery(provider, {
-            func: new ContractFunction("totalSupply")
-        });
+        let query = contract.createQuery({ func: new ContractFunction("totalSupply") });
+        let queryResponse = await provider.queryContract(query);
         assert.equal(10000, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
 
-        queryResponse = await contract.runQuery(provider, {
+        query = contract.createQuery({
             func: new ContractFunction("balanceOf"),
             args: [new AddressValue(alice.address)]
         });
+        queryResponse = await provider.queryContract(query);
+
         assert.equal(7500, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
 
-        queryResponse = await contract.runQuery(provider, {
+        query = contract.createQuery({
             func: new ContractFunction("balanceOf"),
             args: [new AddressValue(bob.address)]
         });
+        queryResponse = await provider.queryContract(query);
+
         assert.equal(1000, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
 
-        queryResponse = await contract.runQuery(provider, {
+        query = contract.createQuery({
             func: new ContractFunction("balanceOf"),
             args: [new AddressValue(carol.address)]
         });
+        queryResponse = await provider.queryContract(query);
+
         assert.equal(1500, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
     });
 
@@ -300,20 +306,22 @@ describe("test on local testnet", function () {
         assert.isTrue(bundle.returnCode.isSuccess());
 
         // Query state, do some assertions
-        let queryResponse = await contract.runQuery(provider, {
+        let query = contract.createQuery({
             func: new ContractFunction("status"),
             args: [
                 BytesValue.fromUTF8("lucky")
             ]
         });
+        let queryResponse = await provider.queryContract(query);
         assert.equal(decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]), 1);
 
-        queryResponse = await contract.runQuery(provider, {
+        query = contract.createQuery({
             func: new ContractFunction("status"),
             args: [
                 BytesValue.fromUTF8("missingLottery")
             ]
         });
+        queryResponse = await provider.queryContract(query);
         assert.equal(decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]), 0);
     });
 });

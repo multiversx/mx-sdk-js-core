@@ -9,8 +9,6 @@ import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
 import { Nonce } from "../nonce";
 import { ContractFunction } from "./function";
 import { Query } from "./query";
-import { QueryResponse } from "./queryResponse";
-import { IProvider } from "../interface";
 import { SmartContractAbi } from "./abi";
 import { guardValueIsSet } from "../utils";
 import { TypedValue } from "./typesystem";
@@ -222,20 +220,14 @@ export class SmartContract implements ISmartContract {
         return transaction;
     }
 
-    async runQuery(
-        provider: IProvider,
-        { func, args, value, caller }: QueryArguments)
-        : Promise<QueryResponse> {
-        let query = new Query({
+    createQuery({ func, args, value, caller }: QueryArguments): Query {
+        return new Query({
             address: this.address,
             func: func,
             args: args,
             value: value,
             caller: caller
         });
-
-        let response = await provider.queryContract(query);
-        return response;
     }
 
     /**

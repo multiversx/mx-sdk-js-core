@@ -1,12 +1,12 @@
 import { BigNumber } from "bignumber.js";
 import { AccountOnNetwork } from "./accounts";
-import { NetworkConfig } from "../networkConfig";
-import { NetworkStake } from "../networkStake";
-import { NetworkStatus } from "../networkStatus";
+import { NetworkConfig } from "./networkConfig";
+import { NetworkStake } from "./networkStake";
 import { Query } from "../smartcontracts";
-import { Stats } from "../stats";
+import { Stats } from "./stats";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
+import { NetworkStatus } from "./networkStatus";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
@@ -195,4 +195,7 @@ export interface INonce extends IHexable { valueOf(): number; }
 export interface ITransactionPayload { encoded(): string; }
 export interface IGasLimit { valueOf(): number; }
 export interface IGasPrice { valueOf(): number; }
+export interface IChainID { valueOf(): string; }
+export interface IGasPriceModifier { valueOf(): number; }
+export interface ITransactionVersion { valueOf(): number; }
 export interface IAccountBalance { toString(): string; }

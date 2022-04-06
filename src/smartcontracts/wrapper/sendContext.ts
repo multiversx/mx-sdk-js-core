@@ -1,11 +1,11 @@
-import { ChainID, GasLimit } from "../../networkParams";
-import { IProvider } from "../../interface";
+import { GasLimit } from "../../networkParams";
+import { IChainID, IProvider } from "../../interface";
 import { ContractLogger } from "./contractLogger";
 import { TestWallet } from "../../testutils";
 import { Balance } from "../../balance";
 import { Err } from "../../errors";
 import { getGasFromValue } from "./systemWrapper";
-import { NetworkConfig } from "../../networkConfig";
+import { INetworkConfig } from "../../interfaceOfNetwork";
 
 /**
  * Stores contextual information which is needed when preparing a transaction.
@@ -16,9 +16,9 @@ export class SendContext {
     private gas_: GasLimit | null;
     private logger_: ContractLogger | null;
     private value_: Balance | null;
-    private networkConfig: NetworkConfig;
+    private networkConfig: INetworkConfig;
 
-    constructor(provider: IProvider, networkConfig: NetworkConfig) {
+    constructor(provider: IProvider, networkConfig: INetworkConfig) {
         this.sender_ = null;
         this.provider_ = provider;
         this.gas_ = null;
@@ -84,7 +84,7 @@ export class SendContext {
         throw new Err("gas limit not set");
     }
 
-    getChainID(): ChainID {
+    getChainID(): IChainID {
         return this.networkConfig.ChainID;
     }
 

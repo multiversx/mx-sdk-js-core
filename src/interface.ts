@@ -1,14 +1,10 @@
 import { Transaction } from "./transaction";
-import { NetworkConfig } from "./networkConfig";
 import { Signature } from "./signature";
 import { Query } from "./smartcontracts";
 import { QueryResponse } from "./smartcontracts";
-import { NetworkStake } from "./networkStake";
-import { Stats } from "./stats";
-import { NetworkStatus } from "./networkStatus";
 import { Token } from "./token";
 import BigNumber from "bignumber.js";
-import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStake, INetworkStats, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 export interface ITransactionFetcher {
     /**
@@ -29,12 +25,12 @@ export interface IProvider extends ITransactionFetcher {
     /**
      * Fetches the Network configuration.
      */
-    getNetworkConfig(): Promise<NetworkConfig>;
+    getNetworkConfig(): Promise<INetworkConfig>;
 
     /**
      * Fetches the Network status.
      */
-    getNetworkStatus(): Promise<NetworkStatus>;
+    getNetworkStatus(): Promise<INetworkStatus>;
 
     /**
      * Fetches the state of an {@link Account}.
@@ -89,11 +85,11 @@ export interface IApiProvider extends ITransactionFetcher {
     /**
      * Fetches the Network Stake.
      */
-    getNetworkStake(): Promise<NetworkStake>;
+    getNetworkStake(): Promise<INetworkStake>;
     /**
      * Fetches the Network Stats.
      */
-    getNetworkStats(): Promise<Stats>;
+    getNetworkStats(): Promise<INetworkStats>;
 
     getToken(tokenIdentifier: string): Promise<Token>;
 
@@ -149,3 +145,6 @@ export interface ITransactionValue { toString(): string; }
 export interface IAccountBalance { toString(): string; }
 export interface ITransactionPayload { encoded(): string; }
 export interface INonce { valueOf(): number; }
+export interface IChainID { valueOf(): string; }
+export interface IGasLimit { valueOf(): number; }
+export interface IGasPrice { valueOf(): number; }

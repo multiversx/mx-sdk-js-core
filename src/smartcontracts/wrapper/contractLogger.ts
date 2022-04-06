@@ -1,6 +1,5 @@
 import { Address } from "../../address";
-import { NetworkConfig } from "../../networkConfig";
-import { IContractResults } from "../../interfaceOfNetwork";
+import { IContractResults, INetworkConfig } from "../../interfaceOfNetwork";
 import { Transaction } from "../../transaction";
 import { Query } from "../query";
 import { QueryResponse } from "../queryResponse";
@@ -11,7 +10,7 @@ import { findImmediateResult, findResultingCalls, TypedResult } from "./deprecat
  */
 export class ContractLogger {
 
-    synchronizedNetworkConfig(networkConfig: NetworkConfig) {
+    synchronizedNetworkConfig(networkConfig: INetworkConfig) {
         console.log(`Synchronized network config - chainID: ${networkConfig.ChainID.valueOf()}`);
     }
 

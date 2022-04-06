@@ -1,7 +1,7 @@
 import { Address } from "../address";
 import { Balance } from "../balance";
+import { IChainID, IGasLimit, IGasPrice } from "../interface";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { ChainID, GasLimit, GasPrice } from "../networkParams";
 import { Transaction } from "../transaction";
 import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
@@ -41,9 +41,9 @@ export interface DeployArguments {
     codeMetadata?: CodeMetadata;
     initArguments?: TypedValue[];
     value?: Balance;
-    gasLimit: GasLimit;
-    gasPrice?: GasPrice;
-    chainID: ChainID;
+    gasLimit: IGasLimit;
+    gasPrice?: IGasPrice;
+    chainID: IChainID;
 }
 
 export interface UpgradeArguments {
@@ -51,19 +51,19 @@ export interface UpgradeArguments {
     codeMetadata?: CodeMetadata;
     initArguments?: TypedValue[];
     value?: Balance;
-    gasLimit: GasLimit;
-    gasPrice?: GasPrice;
-    chainID: ChainID;
+    gasLimit: IGasLimit;
+    gasPrice?: IGasPrice;
+    chainID: IChainID;
 }
 
 export interface CallArguments {
     func: ContractFunction;
     args?: TypedValue[];
     value?: Balance;
-    gasLimit: GasLimit;
+    gasLimit: IGasLimit;
     receiver?: Address;
-    gasPrice?: GasPrice;
-    chainID: ChainID;
+    gasPrice?: IGasPrice;
+    chainID: IChainID;
 }
 
 export interface QueryArguments {

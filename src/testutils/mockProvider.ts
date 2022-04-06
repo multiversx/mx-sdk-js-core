@@ -4,7 +4,6 @@ import { NetworkConfig } from "../networkConfig";
 import { Address } from "../address";
 import { Nonce } from "../nonce";
 import { AsyncTimer } from "../asyncTimer";
-import { AccountOnNetwork } from "../account";
 import { Balance } from "../balance";
 import * as errors from "../errors";
 import { Query } from "../smartcontracts/query";
@@ -17,6 +16,7 @@ import { ContractResultItem, ContractResults } from "../networkProvider/contract
 import { TransactionOnNetwork } from "../networkProvider/transactions";
 import { ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
 import { TransactionStatus } from "../networkProvider/transactionStatus";
+import { AccountOnNetwork } from "../networkProvider/accounts";
 
 const DummyHyperblockNonce = 42;
 const DummyHyperblockHash = "a".repeat(32);

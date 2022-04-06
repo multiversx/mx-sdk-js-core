@@ -1,4 +1,18 @@
-import { IBech32Address, IHash, INonce, ITransactionPayload, ITransactionValue } from "./interface";
+import { IAccountBalance, IBech32Address, IHash, INonce, ITransactionPayload, ITransactionValue } from "./interface";
+
+/**
+ * @deprecated This interface will be removed upon the extraction of networkProvider package.
+ */
+export interface IAccountOnNetwork {
+    nonce: INonce;
+    balance: IAccountBalance;
+}
+
+/**
+ * @deprecated This interface will be removed upon the extraction of networkProvider package.
+ */
+export interface IFungibleTokenOfAccountOnNetwork {
+}
 
 export interface ITransactionOnNetwork {
     hash: IHash;

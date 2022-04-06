@@ -1,7 +1,6 @@
 import { Transaction } from "./transaction";
 import { NetworkConfig } from "./networkConfig";
 import { Signature } from "./signature";
-import { AccountOnNetwork, TokenOfAccountOnNetwork } from "./account";
 import { Query } from "./smartcontracts";
 import { QueryResponse } from "./smartcontracts";
 import { NetworkStake } from "./networkStake";
@@ -9,7 +8,7 @@ import { Stats } from "./stats";
 import { NetworkStatus } from "./networkStatus";
 import { Token } from "./token";
 import BigNumber from "bignumber.js";
-import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 export interface ITransactionFetcher {
     /**
@@ -40,12 +39,12 @@ export interface IProvider extends ITransactionFetcher {
     /**
      * Fetches the state of an {@link Account}.
      */
-    getAccount(address: IBech32Address): Promise<AccountOnNetwork>;
+    getAccount(address: IBech32Address): Promise<IAccountOnNetwork>;
 
     /**
      * Fetches the list of ESDT data for all the tokens of an address.
      */
-    getAddressEsdtList(address: IBech32Address): Promise<TokenOfAccountOnNetwork[]>;
+    getAddressEsdtList(address: IBech32Address): Promise<IFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches the ESDT data for a token of an address.
@@ -147,5 +146,6 @@ export interface ISignature { hex(): string; }
 export interface IHash { hex(): string; }
 export interface IBech32Address { bech32(): string; }
 export interface ITransactionValue { toString(): string; }
+export interface IAccountBalance { toString(): string; }
 export interface ITransactionPayload { encoded(): string; }
 export interface INonce { valueOf(): number; }

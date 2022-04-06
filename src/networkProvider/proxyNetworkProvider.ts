@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { AccountOnNetwork } from "../account";
+import { AccountOnNetwork } from "./accounts";
 import { IAddress, IContractQueryResponse, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, IHash, INetworkProvider, INonce, INonFungibleTokenOfAccountOnNetwork, ITransaction, Pagination } from "./interface";
 import { NetworkConfig } from "../networkConfig";
 import { NetworkStake } from "../networkStake";

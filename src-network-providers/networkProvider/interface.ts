@@ -2,11 +2,11 @@ import { BigNumber } from "bignumber.js";
 import { AccountOnNetwork } from "./accounts";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
-import { Query } from "../smartcontracts";
 import { Stats } from "./stats";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { NetworkStatus } from "./networkStatus";
+import { ContractQueryResponse } from "./contractQueryResponse";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
@@ -81,7 +81,7 @@ export interface INetworkProvider {
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
      */
-    queryContract(query: Query): Promise<IContractQueryResponse>;
+    queryContract(query: IContractQuery): Promise<ContractQueryResponse>;
 
     /**
      * Fetches the definition of a fungible token.
@@ -159,17 +159,13 @@ export interface IDefinitionOfTokenCollectionOnNetwork {
     // TODO: add "assets", "roles"
 }
 
-export interface IContractQueryResponse {
-    returnData: string[];
-    returnCode: IContractReturnCode;
-    returnMessage: string;
-    gasUsed: IGasLimit;
-
-    getReturnDataParts(): Buffer[];
+export interface IContractQuery {
+    toHttpRequest(): any;
 }
 
 export interface IContractReturnCode {
     toString(): string;
+    isSuccess(): boolean;
 }
 
 export interface IContractSimulation {

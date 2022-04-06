@@ -69,6 +69,8 @@ export class TransactionPayload implements ITransactionPayload {
 }
 
 export class ContractReturnCode {
+    private static OK: string = "ok";
+
     private readonly value: string;
 
     constructor(value: string) {
@@ -77,6 +79,10 @@ export class ContractReturnCode {
 
     toString() {
         return this.value;
+    }
+
+    isSuccess(): boolean {
+        return this.value == ContractReturnCode.OK;
     }
 }
 

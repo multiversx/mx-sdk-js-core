@@ -60,7 +60,7 @@ import { TransactionReceipt } from "./transactionReceipt";
         result.nonce = new Nonce(response.nonce || 0);
         result.round = response.round;
         result.epoch = response.epoch || 0;
-        result.value = new TransactionValue(response.value);
+        result.value = new TransactionValue((response.value || 0).toString());
         result.sender = new Address(response.sender);
         result.receiver = new Address(response.receiver);
         result.gasPrice = response.gasPrice || 0;
@@ -71,7 +71,7 @@ import { TransactionReceipt } from "./transactionReceipt";
 
         result.blockNonce = response.blockNonce || 0;
         result.hyperblockNonce = response.hyperblockNonce || 0;
-        result.hyperblockHash = response.hyperblockHash;
+        result.hyperblockHash = response.hyperblockHash || "";
         result.pendingResults = response.pendingResults || false;
 
         result.receipt = TransactionReceipt.fromHttpResponse(response.receipt || {});

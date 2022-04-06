@@ -103,17 +103,12 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(20000);
 
         let hashes = [
-            new TransactionHash("b41f5fc39e96b1f194d07761c6efd6cb92278b95f5012ab12cbc910058ca8b54"),
-            new TransactionHash("7757397a59378e9d0f6d5f08cc934c260e33a50ae0d73fdf869f7c02b6b47b33"),
-            new TransactionHash("b87238089e81527158a6daee520280324bc7e5322ba54d1b3c9a5678abe953ea"),
-            new TransactionHash("b45dd5e598bc85ba71639f2cbce8c5dff2fbe93159e637852fddeb16c0e84a48"),
-            new TransactionHash("83db780e98d4d3c917668c47b33ba51445591efacb0df2a922f88e7dfbb5fc7d"),
-            new TransactionHash("c2eb62b28cc7320da2292d87944c5424a70e1f443323c138c1affada7f6e9705"),
-            // TODO: Uncomment once the Gateway returns all SCRs in this case, as well.
-            // new TransactionHash("98e913c2a78cafdf4fa7f0113c1285fb29c2409bd7a746bb6f5506ad76841d54"),
-            new TransactionHash("5b05945be8ba2635e7c13d792ad727533494358308b5fcf36a816e52b5b272b8"),
-            new TransactionHash("47b089b5f0220299a017359003694a01fd75d075100166b8072c418d5143fe06"),
-            new TransactionHash("85021f20b06662240d8302d62f68031bbf7261bacb53b84e3dc9346c0f10a8e7")
+            new TransactionHash("a069c663831002651fd542479869cc61103465f3284dace772e7480f81429fa8"),
+            new TransactionHash("de3bc87f3e057e28ea6a625acd6d6d332e24f35ea73e820462b71256c8ecffb7"),
+            new TransactionHash("dbefa0299fe6b2336eb0bc3123fa623845c276e5c6e2a175adf1a562d5e77718"),
+            new TransactionHash("2a8ccbd91b7d9460a86174b5a8d4e6aa073b38674d1ee8107e728980a66f0676"),
+            // TODO: uncomment after fix (SCR missing on API)
+            // new TransactionHash("be7914b1eb4c6bd352ba1d86991959b443e446e0ad49fb796be3495c287b2472")
         ];
 
         for (const hash of hashes) {
@@ -131,6 +126,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         apiResponse.status = proxyResponse.status = new TransactionStatus("ignore");
 
         // Ignore fields which are not present on API response:
+        proxyResponse.type = "";
         proxyResponse.epoch = 0;
         proxyResponse.blockNonce = 0;
         proxyResponse.hyperblockNonce = 0;
@@ -142,16 +138,11 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(20000);
 
         let hashes = [
-            new TransactionHash("b41f5fc39e96b1f194d07761c6efd6cb92278b95f5012ab12cbc910058ca8b54"),
-            new TransactionHash("7757397a59378e9d0f6d5f08cc934c260e33a50ae0d73fdf869f7c02b6b47b33"),
-            new TransactionHash("b87238089e81527158a6daee520280324bc7e5322ba54d1b3c9a5678abe953ea"),
-            new TransactionHash("b45dd5e598bc85ba71639f2cbce8c5dff2fbe93159e637852fddeb16c0e84a48"),
-            new TransactionHash("83db780e98d4d3c917668c47b33ba51445591efacb0df2a922f88e7dfbb5fc7d"),
-            new TransactionHash("c2eb62b28cc7320da2292d87944c5424a70e1f443323c138c1affada7f6e9705"),
-            new TransactionHash("98e913c2a78cafdf4fa7f0113c1285fb29c2409bd7a746bb6f5506ad76841d54"),
-            new TransactionHash("5b05945be8ba2635e7c13d792ad727533494358308b5fcf36a816e52b5b272b8"),
-            new TransactionHash("47b089b5f0220299a017359003694a01fd75d075100166b8072c418d5143fe06"),
-            new TransactionHash("85021f20b06662240d8302d62f68031bbf7261bacb53b84e3dc9346c0f10a8e7")
+            new TransactionHash("a069c663831002651fd542479869cc61103465f3284dace772e7480f81429fa8"),
+            new TransactionHash("de3bc87f3e057e28ea6a625acd6d6d332e24f35ea73e820462b71256c8ecffb7"),
+            new TransactionHash("dbefa0299fe6b2336eb0bc3123fa623845c276e5c6e2a175adf1a562d5e77718"),
+            new TransactionHash("2a8ccbd91b7d9460a86174b5a8d4e6aa073b38674d1ee8107e728980a66f0676"),
+            new TransactionHash("be7914b1eb4c6bd352ba1d86991959b443e446e0ad49fb796be3495c287b2472")
         ];
 
         for (const hash of hashes) {
@@ -165,7 +156,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getDefinitionOfFungibleToken()", async function () {
         this.timeout(10000);
 
-        let identifiers = ["MEX-b6bb7d", "WEGLD-88600a", "RIDE-482531", "USDC-a32906"];
+        let identifiers = ["FOO-b6f543", "BAR-c80d29", "COUNTER-b7401d"];
 
         for (const identifier of identifiers) {
             let apiResponse = await apiProvider.getDefinitionOfFungibleToken(identifier);
@@ -181,7 +172,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getDefinitionOfTokenCollection()", async function () {
         this.timeout(10000);
 
-        let collections = ["LKMEX-9acade", "LKFARM-c20c1c", "MEXFARM-bab93a", "ART-264971", "MOS-ff0040"];
+        let collections = ["ERDJS-38f249"];
 
         for (const collection of collections) {
             let apiResponse = await apiProvider.getDefinitionOfTokenCollection(collection);
@@ -197,7 +188,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getNonFungibleToken()", async function () {
         this.timeout(10000);
 
-        let tokens = [{ id: "ERDJSNFT-4a5669", nonce: new Nonce(1) }];
+        let tokens = [{ id: "ERDJS-38f249", nonce: new Nonce(1) }];
 
         for (const token of tokens) {
             let apiResponse = await apiProvider.getNonFungibleToken(token.id, token.nonce);

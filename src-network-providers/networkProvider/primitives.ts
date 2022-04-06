@@ -53,14 +53,18 @@ export class TransactionValue {
 }
 
 export class TransactionPayload implements ITransactionPayload {
-    private readonly base64: string;
+    private readonly decoded: Buffer;
 
-    constructor(base64: string) {
-        this.base64 = base64;
+    constructor(encoded: string) {
+        this.decoded = Buffer.from(encoded || "", "base64");
     }
 
     encoded(): string {
-        return this.base64;
+        return this.decoded.toString("base64");
+    }
+
+    toString() {
+        return this.decoded.toString();
     }
 }
 

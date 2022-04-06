@@ -1,8 +1,6 @@
-import { BigNumber } from "bignumber.js";
-import { IAddress, IContractQueryResponse, IContractReturnCode, IGasLimit, IGasPrice, IHash, INonce } from "./interface";
+import { IAddress, IGasLimit, IGasPrice, IHash, INonce } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
-import { MaxUint64 } from "../smartcontracts/query";
-import { Address, ContractReturnCode, Hash, Nonce, TransactionValue } from "./primitives";
+import { Address, Hash, Nonce, TransactionValue } from "./primitives";
 
 export class ContractResults {
     readonly items: ContractResultItem[];
@@ -82,28 +80,5 @@ export class ContractResultItem {
         item.logs = TransactionLogs.fromHttpResponse(response.logs || {});
 
         return item;
-    }
-}
-
-export class ContractQueryResponse implements IContractQueryResponse {
-    returnData: string[] = [];
-    returnCode: IContractReturnCode = new ContractReturnCode("");
-    returnMessage: string = "";
-    gasUsed: IGasLimit = 0;
-
-    static fromHttpResponse(payload: any): ContractQueryResponse {
-        let response = new ContractQueryResponse();
-        let gasRemaining = new BigNumber(payload["gasRemaining"] || payload["GasRemaining"] || 0);
-
-        response.returnData = payload["returnData"] || [];
-        response.returnCode = new ContractReturnCode(payload["returnCode"] || "");
-        response.returnMessage = payload["returnMessage"] || "";
-        response.gasUsed = MaxUint64.minus(gasRemaining).toNumber();
-
-        return response;
-    }
-
-    getReturnDataParts(): Buffer[] {
-        return this.returnData.map((item) => Buffer.from(item || ""));
     }
 }

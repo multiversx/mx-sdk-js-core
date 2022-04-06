@@ -1,6 +1,5 @@
-import { IProvider } from "../interface";
-import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { IBech32Address, IHash, IProvider } from "../interface";
+import { Transaction, TransactionHash } from "../transaction";
 import { NetworkConfig } from "../networkConfig";
 import { Address } from "../address";
 import { Nonce } from "../nonce";
@@ -10,15 +9,17 @@ import { Balance } from "../balance";
 import * as errors from "../errors";
 import { Query } from "../smartcontracts/query";
 import { QueryResponse } from "../smartcontracts/queryResponse";
-import { Hash } from "../hash";
 import { NetworkStatus } from "../networkStatus";
 import { TypedEvent } from "../events";
 import { BalanceBuilder } from "../balanceBuilder";
 import BigNumber from "bignumber.js";
-import { SmartContractResultItem, SmartContractResults } from "../smartcontracts";
+import { ContractResultItem, ContractResults } from "../networkProvider/contractResults";
+import { TransactionOnNetwork } from "../networkProvider/transactions";
+import { ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
+import { TransactionStatus } from "../networkProvider/transactionStatus";
 
-const DummyHyperblockNonce = new Nonce(42);
-const DummyHyperblockHash = new Hash("a".repeat(32));
+const DummyHyperblockNonce = 42;
+const DummyHyperblockHash = "a".repeat(32);
 
 /**
  * A mock {@link IProvider}, used for tests only.
@@ -89,14 +90,14 @@ export class MockProvider implements IProvider {
     }
 
     mockGetTransactionWithAnyHashAsNotarizedWithOneResult(returnCodeAndData: string) {
-        let contractResult = new SmartContractResultItem({ nonce: new Nonce(1), data: returnCodeAndData });
+        let contractResult = new ContractResultItem({ nonce: new Nonce(1), data: returnCodeAndData });
 
-        let predicate = (_hash: TransactionHash) => true;
+        let predicate = (_hash: IHash) => true;
         let response = new TransactionOnNetwork({
             status: new TransactionStatus("executed"),
             hyperblockNonce: DummyHyperblockNonce,
             hyperblockHash: DummyHyperblockHash,
-            results: new SmartContractResults([contractResult])
+            contractResults: new ContractResults([contractResult])
         });
 
         this.getTransactionResponders.unshift(new GetTransactionResponder(predicate, response));
@@ -139,7 +140,7 @@ export class MockProvider implements IProvider {
         }
     }
 
-    async getAccount(address: Address): Promise<AccountOnNetwork> {
+    async getAccount(address: IBech32Address): Promise<AccountOnNetwork> {
         let account = this.accounts.get(address.bech32());
         if (account) {
             return account;
@@ -148,15 +149,15 @@ export class MockProvider implements IProvider {
         return new AccountOnNetwork();
     }
 
-    async getAddressEsdt(_address: Address, _tokenIdentifier: string): Promise<any> {
+    async getAddressEsdt(_address: IBech32Address, _tokenIdentifier: string): Promise<any> {
         return {};
     }
 
-    async getAddressEsdtList(_address: Address): Promise<any> {
+    async getAddressEsdtList(_address: IBech32Address): Promise<any> {
         return {};
     }
 
-    async getAddressNft(_address: Address, _tokenIdentifier: string, _nonce: BigNumber): Promise<any> {
+    async getAddressNft(_address: IBech32Address, _tokenIdentifier: string, _nonce: BigNumber): Promise<any> {
         return {};
     }
 
@@ -182,10 +183,10 @@ export class MockProvider implements IProvider {
     }
 
     async getTransaction(
-        txHash: TransactionHash,
-        _hintSender?: Address,
+        txHash: IHash,
+        _hintSender?: IBech32Address,
         _withResults?: boolean
-    ): Promise<TransactionOnNetwork> {
+    ): Promise<ITransactionOnNetwork> {
         // At first, try to use a mock responder
         for (const responder of this.getTransactionResponders) {
             if (responder.matches(txHash)) {
@@ -202,7 +203,7 @@ export class MockProvider implements IProvider {
         throw new errors.ErrMock("Transaction not found");
     }
 
-    async getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus> {
+    async getTransactionStatus(txHash: TransactionHash): Promise<ITransactionStatus> {
         let transaction = await this.getTransaction(txHash);
         return transaction.status;
     }
@@ -247,10 +248,10 @@ class QueryContractResponder {
 }
 
 class GetTransactionResponder {
-    readonly matches: (hash: TransactionHash) => boolean;
+    readonly matches: (hash: IHash) => boolean;
     readonly response: TransactionOnNetwork;
 
-    constructor(matches: (hash: TransactionHash) => boolean, response: TransactionOnNetwork) {
+    constructor(matches: (hash: IHash) => boolean, response: TransactionOnNetwork) {
         this.matches = matches;
         this.response = response;
     }

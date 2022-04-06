@@ -1,12 +1,12 @@
 import { BigNumber } from "bignumber.js";
-import { Address } from "../address";
-import { IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork } from "./interface";
+import { Address } from "./primitives";
+import { IAddress, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork } from "./interface";
 
 export class DefinitionOfFungibleTokenOnNetwork implements IDefinitionOfFungibleTokenOnNetwork {
     identifier: string = "";
     name: string = "";
     ticker: string = "";
-    owner: Address = new Address();
+    owner: IAddress = new Address("");
     decimals: number = 0;
     supply: BigNumber = new BigNumber(0);
     isPaused: boolean = false;
@@ -47,7 +47,7 @@ export class DefinitionOfTokenCollectionOnNetwork implements IDefinitionOfTokenC
     type: string = "";
     name: string = "";
     ticker: string = "";
-    owner: Address = new Address();
+    owner: IAddress = new Address("");
     decimals: number = 0;
     canPause: boolean = false;
     canFreeze: boolean = false;

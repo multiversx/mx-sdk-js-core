@@ -1,9 +1,10 @@
 import { assert } from "chai";
 import { TransactionWatcher } from "./transactionWatcher";
-import { TransactionHash, TransactionStatus } from "./transaction";
+import { TransactionHash } from "./transaction";
 import { MockProvider, InHyperblock, Wait } from "./testutils";
 import { Nonce } from "./nonce";
-import { TransactionOnNetwork } from "./transactionOnNetwork";
+import { TransactionOnNetwork } from "./networkProvider/transactions";
+import { TransactionStatus } from "./networkProvider/transactionStatus";
 
 
 describe("test transactionWatcher", () => {

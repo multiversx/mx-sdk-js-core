@@ -1,12 +1,12 @@
 import { Address } from "./address";
 import { ErrInvariantFailed } from "./errors";
-import { IAddressOfExternalSigner, ISignatureOfExternalSigner } from "./interface";
+import { IBech32Address, ISignature } from "./interface";
 import { Signature } from "./signature";
 
 /**
  * Adapts a signature created by other components (e.g. erdjs-walletcore, erdjs-hw-provider) to one understood by erdjs.
  */
-export function adaptToSignature(obj: ISignatureOfExternalSigner): Signature {
+export function adaptToSignature(obj: ISignature): Signature {
     if (!obj.hex || typeof obj.hex() !== "string") {
         throw new ErrInvariantFailed("adaptToSignature: bad or missing hex()")
     }
@@ -17,7 +17,7 @@ export function adaptToSignature(obj: ISignatureOfExternalSigner): Signature {
 /**
  * Adapts an address created by other components (e.g. erdjs-walletcore, erdjs-hw-provider) to one understood by erdjs.
  */
-export function adaptToAddress(obj: IAddressOfExternalSigner): Address {
+export function adaptToAddress(obj: IBech32Address): Address {
     if (!obj.bech32 || typeof obj.bech32() !== "string") {
         throw new ErrInvariantFailed("adaptToSignature: bad or missing bech32()")
     }

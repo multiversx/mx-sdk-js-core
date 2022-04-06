@@ -1,18 +1,17 @@
-import { ITransactionFetcher } from "./interface";
+import { ITransactionFetcher, IHash } from "./interface";
 import { AsyncTimer } from "./asyncTimer";
-import { TransactionHash, TransactionStatus } from "./transaction";
-import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { Logger } from "./logger";
 import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached } from "./errors";
 import { Address } from "./address";
+import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
-export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
+export type PredicateIsAwaitedStatus = (status: ITransactionStatus) => boolean;
 
 /**
  * Internal interface: a transaction, as seen from the perspective of a {@link TransactionWatcher}.
  */
 interface ITransaction {
-    getHash(): TransactionHash;
+    getHash(): IHash;
 }
 
 /**
@@ -22,7 +21,7 @@ export class TransactionWatcher {
     static DefaultPollingInterval: number = 6000;
     static DefaultTimeout: number = TransactionWatcher.DefaultPollingInterval * 15;
 
-    static NoopOnStatusReceived = (_: TransactionStatus) => { };
+    static NoopOnStatusReceived = (_: ITransactionStatus) => { };
 
     private readonly fetcher: ITransactionFetcher;
     private readonly pollingInterval: number;
@@ -48,11 +47,11 @@ export class TransactionWatcher {
      * Waits until the transaction reaches the "pending" status.
      */
     public async awaitPending(transaction: ITransaction): Promise<void> {
-        let isPending = (status: TransactionStatus) => status.isPending();
+        let isPending = (status: ITransactionStatus) => status.isPending();
         let doFetch = async () => await this.fetcher.getTransactionStatus(transaction.getHash());
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
         
-        return this.awaitConditionally<TransactionStatus>(
+        return this.awaitConditionally<ITransactionStatus>(
             isPending,
             doFetch,
             errorProvider
@@ -63,11 +62,11 @@ export class TransactionWatcher {
       * Waits until the transaction is completely processed.
       */
     public async awaitCompleted(transaction: ITransaction): Promise<void> {
-        let isCompleted = (transactionOnNetwork: TransactionOnNetwork) => transactionOnNetwork.isCompleted();
+        let isCompleted = (transactionOnNetwork: ITransactionOnNetwork) => transactionOnNetwork.isCompleted();
         let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 
-        return this.awaitConditionally<TransactionOnNetwork>(
+        return this.awaitConditionally<ITransactionOnNetwork>(
             isCompleted,
             doFetch,
             errorProvider
@@ -75,7 +74,7 @@ export class TransactionWatcher {
     }
 
     public async awaitAllEvents(transaction: ITransaction, events: string[]): Promise<void> {
-        let foundAllEvents = (transactionOnNetwork: TransactionOnNetwork) => {
+        let foundAllEvents = (transactionOnNetwork: ITransactionOnNetwork) => {
             let allEventIdentifiers = transactionOnNetwork.getAllEvents().map(event => event.identifier);
             let allAreFound = events.every(event => allEventIdentifiers.includes(event));
             return allAreFound;
@@ -84,7 +83,7 @@ export class TransactionWatcher {
         let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
         let errorProvider = () => new ErrExpectedTransactionEventsNotFound();
 
-        return this.awaitConditionally<TransactionOnNetwork>(
+        return this.awaitConditionally<ITransactionOnNetwork>(
             foundAllEvents,
             doFetch,
             errorProvider
@@ -92,7 +91,7 @@ export class TransactionWatcher {
     }
 
     public async awaitAnyEvent(transaction: ITransaction, events: string[]): Promise<void> {
-        let foundAnyEvent = (transactionOnNetwork: TransactionOnNetwork) => {
+        let foundAnyEvent = (transactionOnNetwork: ITransactionOnNetwork) => {
             let allEventIdentifiers = transactionOnNetwork.getAllEvents().map(event => event.identifier);
             let anyIsFound = events.find(event => allEventIdentifiers.includes(event)) != undefined;
             return anyIsFound;
@@ -101,18 +100,18 @@ export class TransactionWatcher {
         let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
         let errorProvider = () => new ErrExpectedTransactionEventsNotFound();
 
-        return this.awaitConditionally<TransactionOnNetwork>(
+        return this.awaitConditionally<ITransactionOnNetwork>(
             foundAnyEvent,
             doFetch,
             errorProvider
         );
     }
 
-    public async awaitOnCondition(transaction: ITransaction, condition: (data: TransactionOnNetwork) => boolean): Promise<void> {
+    public async awaitOnCondition(transaction: ITransaction, condition: (data: ITransactionOnNetwork) => boolean): Promise<void> {
         let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 
-        return this.awaitConditionally<TransactionOnNetwork>(
+        return this.awaitConditionally<ITransactionOnNetwork>(
             condition,
             doFetch,
             errorProvider
@@ -172,12 +171,12 @@ class TransactionFetcherWithTracing implements ITransactionFetcher {
         this.fetcher = fetcher;
     }
 
-    async getTransaction(txHash: TransactionHash, hintSender?: Address, withResults?: boolean): Promise<TransactionOnNetwork> {
+    async getTransaction(txHash: IHash, hintSender?: Address, withResults?: boolean): Promise<ITransactionOnNetwork> {
         Logger.debug(`transactionWatcher, getTransaction(${txHash.toString()})`);
         return await this.fetcher.getTransaction(txHash, hintSender, withResults);
     }
 
-    async getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus> {
+    async getTransactionStatus(txHash: IHash): Promise<ITransactionStatus> {
         Logger.debug(`transactionWatcher, getTransactionStatus(${txHash.toString()})`);
         return await this.fetcher.getTransactionStatus(txHash);
     }

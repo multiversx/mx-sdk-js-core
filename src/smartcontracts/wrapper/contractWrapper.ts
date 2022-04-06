@@ -5,7 +5,6 @@ import { generateMethods, Methods } from "./generateMethods";
 import { formatEndpoint, FormattedCall } from "./formattedCall";
 import { ArgumentErrorContext } from "../argumentErrorContext";
 import { PreparedCall } from "./preparedCall";
-import { TransactionOnNetwork } from "../../transactionOnNetwork";
 import { ContractLogger } from "./contractLogger";
 import { SendContext } from "./sendContext";
 import { loadContractCode } from "../../testutils";
@@ -24,6 +23,7 @@ import { Balance } from "../../balance";
 import { ExecutionResultsBundle, findImmediateResult, interpretExecutionResults } from "./deprecatedContractResults";
 import { Result } from "./result";
 import { TransactionWatcher } from "../../transactionWatcher";
+import { ITransactionOnNetwork } from "../../interfaceOfNetwork";
 
 /**
  * Provides a simple interface in order to easily call or query the smart contract's methods.
@@ -112,7 +112,7 @@ export class ContractWrapper extends ChainSendContext {
 
         let transactionOnNetwork = await this.processTransaction(transaction);
 
-        let smartContractResults = transactionOnNetwork.results;
+        let smartContractResults = transactionOnNetwork.contractResults;
         let immediateResult = findImmediateResult(smartContractResults)!;
         immediateResult.assertSuccess();
         let logger = this.context.getLogger();
@@ -172,7 +172,7 @@ export class ContractWrapper extends ChainSendContext {
         return { executionResultsBundle, result };
     }
 
-    async processTransaction(transaction: Transaction): Promise<TransactionOnNetwork> {
+    async processTransaction(transaction: Transaction): Promise<ITransactionOnNetwork> {
         let provider = this.context.getProvider();
         let sender = this.context.getSender();
         transaction.setNonce(sender.account.nonce);

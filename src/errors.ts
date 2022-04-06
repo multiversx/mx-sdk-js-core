@@ -111,7 +111,7 @@ export class ErrInvariantFailed extends Err {
 /**
  * Signals an unexpected condition.
  */
- export class ErrUnexpectedCondition extends Err {
+export class ErrUnexpectedCondition extends Err {
   public constructor(message: string) {
     super(`Unexpected condition: [${message}]`);
   }
@@ -269,16 +269,6 @@ export class ErrSignatureEmpty extends Err {
 export class ErrInvalidFunctionName extends Err {
   public constructor() {
     super(`Invalid function name`);
-  }
-}
-
-/**
- * Signals an error that happened during a request against the Network.
- */
- export class ErrNetworkProvider extends Err {
-  public constructor(url: string, error: string, inner?: Error) {
-    let message = `Request error on url [${url}]: [${error}]`;
-    super(message, inner);
   }
 }
 

@@ -42,12 +42,4 @@ describe("test smart contract queries", () => {
         assert.equal(request["args"][2], "abba");
         assert.equal(request["args"][3], "314dc6448d9338c15b0a00000000");
     });
-
-    it("should throw if missing required", async () => {
-        assert.throw(() => new Query(), errors.ErrAddressEmpty);
-        assert.throw(() => new Query({
-            address: new Address("erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q"),
-            func: undefined
-        }), errors.ErrInvariantFailed);
-    });
 });

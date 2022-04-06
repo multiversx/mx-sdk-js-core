@@ -1,8 +1,7 @@
-import { Nonce } from "./nonce";
-import { TransactionStatus } from "./transaction";
+import { TransactionStatus } from "./transactionStatus";
+import { ITransactionPayload } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
-import { TransactionPayload } from "./transactionPayload";
-import { isPaddedHex } from "./utils.codec";
+import { isPaddedHex } from "./primitives";
 
 /**
  * Internal interface: a transaction, as seen from the perspective of a {@link TransactionCompletionStrategy}.
@@ -10,8 +9,8 @@ import { isPaddedHex } from "./utils.codec";
 interface ITransactionOnNetwork {
     logs: TransactionLogs;
     status: TransactionStatus;
-    hyperblockNonce: Nonce;
-    data: TransactionPayload;
+    hyperblockNonce: number;
+    data: ITransactionPayload;
 }
 
 const WellKnownCompletionEvents = ["completedTxEvent", "SCDeploy", "signalError"];
@@ -40,7 +39,7 @@ export class TransactionCompletionStrategy {
             return transaction.status.isExecuted();
         }
 
-        let hyperblockNonce = transaction.hyperblockNonce.valueOf();
+        let hyperblockNonce = transaction.hyperblockNonce;
 
         // Imprecise condition, uncertain completion (usually sufficient, though).
         // This is WRONG when (at least): timeOf(block with execution at destination is notarized) < timeOf(the "completedTxEvent" occurs).
@@ -57,7 +56,7 @@ export class TransactionCompletionStrategy {
         let prefix = parts[0];
         let otherParts = parts.slice(1);
         let emptyPrefix = !prefix;
-        let somePartsAreNotValidArguments = !otherParts.every(this.looksLikeValidArgument);
+        let somePartsAreNotValidArguments = !otherParts.every(part => this.looksLikeValidArgument(part));
         
         return emptyPrefix || somePartsAreNotValidArguments;
     }

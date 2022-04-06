@@ -2,14 +2,14 @@ import { TransactionDecoder, TransactionMetadata } from "@elrondnetwork/transact
 import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
 import { Logger } from "../logger";
-import { TransactionLogs } from "../transactionLogs";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { IContractResults, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, IResultsParser, UntypedOutcomeBundle } from "./interface";
 import { QueryResponse } from "./queryResponse";
 import { ReturnCode } from "./returnCode";
-import { SmartContractResults } from "./smartContractResults";
 import { EndpointDefinition } from "./typesystem";
+import { adaptToAddress } from "../boundaryAdapters";
+import { IBech32Address } from "../interface";
 
 enum WellKnownEvents {
     OnTransactionCompleted = "completedTxEvent",
@@ -48,7 +48,7 @@ export class ResultsParser implements IResultsParser {
         };
     }
 
-    parseOutcome(transaction: TransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle {
+    parseOutcome(transaction: ITransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle {
         let untypedBundle = this.parseUntypedOutcome(transaction);
         let values = new ArgSerializer().buffersToValues(untypedBundle.values, endpoint.output);
 
@@ -62,7 +62,7 @@ export class ResultsParser implements IResultsParser {
         };
     }
 
-    parseUntypedOutcome(transaction: TransactionOnNetwork): UntypedOutcomeBundle {
+    parseUntypedOutcome(transaction: ITransactionOnNetwork): UntypedOutcomeBundle {
         let bundle: UntypedOutcomeBundle | null;
 
         let transactionMetadata = this.parseTransactionMetadata(transaction);
@@ -79,7 +79,7 @@ export class ResultsParser implements IResultsParser {
             return bundle;
         }
 
-        bundle = this.createBundleOnEasilyFoundResultWithReturnData(transaction.results);
+        bundle = this.createBundleOnEasilyFoundResultWithReturnData(transaction.contractResults);
         if (bundle) {
             Logger.trace("parseUntypedOutcome(): on easily found result with return data");
             return bundle;
@@ -118,18 +118,18 @@ export class ResultsParser implements IResultsParser {
         throw new ErrCannotParseContractResults(`transaction ${transaction.hash.toString()}`);
     }
 
-    private parseTransactionMetadata(transaction: TransactionOnNetwork): TransactionMetadata {
+    private parseTransactionMetadata(transaction: ITransactionOnNetwork): TransactionMetadata {
         return new TransactionDecoder().getTransactionMetadata({
             sender: transaction.sender.bech32(),
             receiver: transaction.receiver.bech32(),
             data: transaction.data.encoded(),
             value: transaction.value.toString(),
-            type: transaction.type.value
-        })
+            type: transaction.type
+        });
     }
 
-    private createBundleOnSimpleMoveBalance(transaction: TransactionOnNetwork): UntypedOutcomeBundle | null {
-        let noResults = transaction.results.getAll().length == 0;
+    private createBundleOnSimpleMoveBalance(transaction: ITransactionOnNetwork): UntypedOutcomeBundle | null {
+        let noResults = transaction.contractResults.items.length == 0;
         let noLogs = transaction.logs.events.length == 0;
 
         if (noResults && noLogs) {
@@ -143,7 +143,7 @@ export class ResultsParser implements IResultsParser {
         return null;
     }
 
-    private createBundleOnInvalidTransaction(transaction: TransactionOnNetwork): UntypedOutcomeBundle | null {
+    private createBundleOnInvalidTransaction(transaction: ITransactionOnNetwork): UntypedOutcomeBundle | null {
         if (transaction.status.isInvalid()) {
             if (transaction.receipt.data) {
                 return {
@@ -159,8 +159,8 @@ export class ResultsParser implements IResultsParser {
         return null;
     }
 
-    private createBundleOnEasilyFoundResultWithReturnData(results: SmartContractResults): UntypedOutcomeBundle | null {
-        let resultItemWithReturnData = results.getAll().find(item => item.nonce.valueOf() != 0 && item.data.startsWith("@"));
+    private createBundleOnEasilyFoundResultWithReturnData(results: IContractResults): UntypedOutcomeBundle | null {
+        let resultItemWithReturnData = results.items.find(item => item.nonce.valueOf() != 0 && item.data.startsWith("@"));
         if (!resultItemWithReturnData) {
             return null;
         }
@@ -175,7 +175,7 @@ export class ResultsParser implements IResultsParser {
         };
     }
 
-    private createBundleOnSignalError(logs: TransactionLogs): UntypedOutcomeBundle | null {
+    private createBundleOnSignalError(logs: ITransactionLogs): UntypedOutcomeBundle | null {
         let eventSignalError = logs.findSingleOrNoneEvent(WellKnownEvents.OnSignalError);
         if (!eventSignalError) {
             return null;
@@ -192,7 +192,7 @@ export class ResultsParser implements IResultsParser {
         };
     }
 
-    private createBundleOnTooMuchGasWarning(logs: TransactionLogs): UntypedOutcomeBundle | null {
+    private createBundleOnTooMuchGasWarning(logs: ITransactionLogs): UntypedOutcomeBundle | null {
         let eventTooMuchGas = logs.findSingleOrNoneEvent(
             WellKnownEvents.OnWriteLog,
             event => event.findFirstOrNoneTopic(topic => topic.toString().startsWith(WellKnownTopics.TooMuchGas)) != undefined
@@ -213,10 +213,12 @@ export class ResultsParser implements IResultsParser {
         };
     }
 
-    private createBundleOnWriteLogWhereFirstTopicEqualsAddress(logs: TransactionLogs, address: Address): UntypedOutcomeBundle | null {
+    private createBundleOnWriteLogWhereFirstTopicEqualsAddress(logs: ITransactionLogs, address: IBech32Address): UntypedOutcomeBundle | null {
+        let hexAddress = adaptToAddress(address).hex();
+        
         let eventWriteLogWhereTopicIsSender = logs.findSingleOrNoneEvent(
             WellKnownEvents.OnWriteLog,
-            event => event.findFirstOrNoneTopic(topic => topic.hex() == address.hex()) != undefined
+            event => event.findFirstOrNoneTopic(topic => topic.hex() == hexAddress) != undefined
         );
 
         if (!eventWriteLogWhereTopicIsSender) {
@@ -236,17 +238,17 @@ export class ResultsParser implements IResultsParser {
     /**
      * Override this method (in a subclass of {@link ResultsParser}) if the basic heuristics of the parser are not sufficient.
      */
-    protected createBundleWithCustomHeuristics(_transaction: TransactionOnNetwork, _transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
+    protected createBundleWithCustomHeuristics(_transaction: ITransactionOnNetwork, _transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
         return null;
     }
 
-    private createBundleWithFallbackHeuristics(transaction: TransactionOnNetwork, transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
+    private createBundleWithFallbackHeuristics(transaction: ITransactionOnNetwork, transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
         let contractAddress = new Address(transactionMetadata.receiver);
 
         // Search the nested logs for matching events (writeLog):
-        for (const resultItem of transaction.results.getAll()) {
+        for (const resultItem of transaction.contractResults.items) {
             let writeLogWithReturnData = resultItem.logs.findSingleOrNoneEvent(WellKnownEvents.OnWriteLog, event => {
-                let addressIsSender = event.address.equals(transaction.sender);
+                let addressIsSender = event.address.bech32() == transaction.sender.bech32();
                 let firstTopicIsContract = event.topics[0]?.hex() == contractAddress.hex();
                 return addressIsSender && firstTopicIsContract;
             });

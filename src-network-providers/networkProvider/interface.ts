@@ -1,19 +1,12 @@
 import { BigNumber } from "bignumber.js";
 import { AccountOnNetwork } from "../account";
-import { Address } from "../address";
-import { Balance } from "../balance";
-import { Hash } from "../hash";
 import { NetworkConfig } from "../networkConfig";
-import { GasLimit, GasPrice } from "../networkParams";
 import { NetworkStake } from "../networkStake";
 import { NetworkStatus } from "../networkStatus";
-import { Nonce } from "../nonce";
-import { Signature } from "../signature";
-import { Query, ReturnCode } from "../smartcontracts";
+import { Query } from "../smartcontracts";
 import { Stats } from "../stats";
-import { Transaction, TransactionHash, TransactionStatus } from "../transaction";
-import { TransactionLogs } from "../transactionLogs";
-import { TransactionPayload } from "../transactionPayload";
+import { TransactionOnNetwork } from "./transactions";
+import { TransactionStatus } from "./transactionStatus";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
@@ -42,48 +35,48 @@ export interface INetworkProvider {
     /**
      * Fetches the state of an {@link Account}.
      */
-    getAccount(address: Address): Promise<AccountOnNetwork>;
+    getAccount(address: IAddress): Promise<AccountOnNetwork>;
 
     /**
      * Fetches data about the fungible tokens held by an account.
      */
-    getFungibleTokensOfAccount(address: Address, pagination?: Pagination): Promise<IFungibleTokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<IFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
-    getNonFungibleTokensOfAccount(address: Address, pagination?: Pagination): Promise<INonFungibleTokenOfAccountOnNetwork[]>;
+    getNonFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<INonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about a specific fungible token held by an account.
      */
-    getFungibleTokenOfAccount(address: Address, tokenIdentifier: string): Promise<IFungibleTokenOfAccountOnNetwork>;
+    getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<IFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches data about a specific non-fungible token (instance) held by an account.
      */
-    getNonFungibleTokenOfAccount(address: Address, collection: string, nonce: Nonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: INonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches the state of a {@link Transaction}.
      */
-    getTransaction(txHash: TransactionHash): Promise<ITransactionOnNetwork>;
+    getTransaction(txHash: IHash): Promise<TransactionOnNetwork>;
 
     /**
      * Queries the status of a {@link Transaction}.
      */
-    getTransactionStatus(txHash: TransactionHash): Promise<TransactionStatus>;
+    getTransactionStatus(txHash: IHash): Promise<TransactionStatus>;
 
     /**
      * Broadcasts an already-signed {@link Transaction}.
      */
-    sendTransaction(tx: Transaction): Promise<TransactionHash>;
+    sendTransaction(tx: ITransaction): Promise<IHash>;
 
     /**
      * Simulates the processing of an already-signed {@link Transaction}.
      * 
      */
-    simulateTransaction(tx: Transaction): Promise<IContractSimulation>;
+    simulateTransaction(tx: ITransaction): Promise<IContractSimulation>;
 
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
@@ -105,7 +98,7 @@ export interface INetworkProvider {
     /**
      * Fetches data about a specific non-fungible token (instance).
      */
-    getNonFungibleToken(collection: string, nonce: Nonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleToken(collection: string, nonce: INonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Performs a generic GET action against the provider (useful for new HTTP endpoints, not yet supported by erdjs).
@@ -128,8 +121,8 @@ export interface INonFungibleTokenOfAccountOnNetwork {
     collection: string;
     attributes: Buffer;
     balance: BigNumber;
-    nonce: Nonce;
-    creator: Address;
+    nonce: INonce;
+    creator: IAddress;
     royalties: BigNumber;
 }
 
@@ -138,7 +131,7 @@ export interface IDefinitionOfFungibleTokenOnNetwork {
     identifier: string;
     name: string;
     ticker: string;
-    owner: Address;
+    owner: IAddress;
     decimals: number;
     supply: BigNumber;
     isPaused: boolean;
@@ -157,7 +150,7 @@ export interface IDefinitionOfTokenCollectionOnNetwork {
     type: string;
     name: string;
     ticker: string;
-    owner: Address;
+    owner: IAddress;
     decimals: number;
     canPause: boolean;
     canFreeze: boolean;
@@ -166,53 +159,17 @@ export interface IDefinitionOfTokenCollectionOnNetwork {
     // TODO: add "assets", "roles"
 }
 
-export interface ITransactionOnNetwork {
-    hash: TransactionHash;
-    nonce: Nonce;
-    round: number;
-    epoch: number;
-    value: Balance;
-    receiver: Address;
-    sender: Address;
-    gasPrice: GasPrice;
-    gasLimit: GasLimit;
-    data: TransactionPayload;
-    signature: Signature;
-    status: TransactionStatus;
-    timestamp: number;
-    blockNonce: Nonce;
-    hyperblockNonce: Nonce;
-    hyperblockHash: Hash;
-    logs: TransactionLogs;
-    contractResults: IContractResults;
-}
-
-export interface IContractResults {
-    items: IContractResultItem[];
-}
-
-export interface IContractResultItem {
-    hash: Hash;
-    nonce: Nonce;
-    value: Balance;
-    receiver: Address;
-    sender: Address;
-    data: string;
-    previousHash: Hash;
-    originalHash: Hash;
-    gasLimit: GasLimit;
-    gasPrice: GasPrice;
-    callType: number;
-    returnMessage: string;
-}
-
 export interface IContractQueryResponse {
     returnData: string[];
-    returnCode: ReturnCode;
+    returnCode: IContractReturnCode;
     returnMessage: string;
-    gasUsed: GasLimit;
-    
+    gasUsed: IGasLimit;
+
     getReturnDataParts(): Buffer[];
+}
+
+export interface IContractReturnCode {
+    toString(): string;
 }
 
 export interface IContractSimulation {
@@ -226,3 +183,15 @@ export class Pagination {
         return { from: 0, size: 100 };
     }
 }
+
+export interface ITransaction {
+    toSendable(): any;
+}
+
+export interface IHexable { hex(): string }
+export interface IHash extends IHexable { }
+export interface IAddress { bech32(): string; }
+export interface INonce extends IHexable { valueOf(): number; }
+export interface ITransactionPayload { encoded(): string; }
+export interface IGasLimit { valueOf(): number; }
+export interface IGasPrice { valueOf(): number; }

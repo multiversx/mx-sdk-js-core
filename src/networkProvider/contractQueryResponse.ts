@@ -1,59 +1,41 @@
-import { GasLimit } from "../networkParams";
-import { MaxUint64 } from "./query";
-import { ReturnCode } from "./returnCode";
 import BigNumber from "bignumber.js";
-import { ErrContract } from "../errors";
-import { ArgSerializer } from "./argSerializer";
+import { MaxUint64AsBigNumber } from "./constants";
+import { IContractReturnCode, IGasLimit } from "./interface";
+import { ContractReturnCode } from "./primitives";
 
-export class QueryResponse {
+export class ContractQueryResponse {
     returnData: string[];
-    returnCode: ReturnCode;
+    returnCode: IContractReturnCode;
     returnMessage: string;
-    gasUsed: GasLimit;
+    gasUsed: IGasLimit;
 
-    constructor(init?: Partial<QueryResponse>) {
+    constructor(init?: Partial<ContractQueryResponse>) {
         this.returnData = init?.returnData || [];
-        this.returnCode = init?.returnCode || ReturnCode.Unknown;
+        this.returnCode = init?.returnCode || new ContractReturnCode("");
         this.returnMessage = init?.returnMessage || "";
-        this.gasUsed = init?.gasUsed || new GasLimit(0);
+        this.gasUsed = init?.gasUsed || 0;
     }
 
     /**
      * Constructs a QueryResponse object from a HTTP response (as returned by the provider).
      */
-    static fromHttpResponse(payload: any): QueryResponse {
+    static fromHttpResponse(payload: any): ContractQueryResponse {
         let returnData = <string[]>payload["returnData"] || payload["ReturnData"];
         let returnCode = payload["returnCode"] || payload["ReturnCode"];
         let returnMessage = payload["returnMessage"] || payload["ReturnMessage"];
         let gasRemaining = new BigNumber(payload["gasRemaining"] || payload["GasRemaining"] || 0);
-        let gasUsed = new GasLimit(MaxUint64.minus(gasRemaining).toNumber());
+        let gasUsed = new Number(MaxUint64AsBigNumber.minus(gasRemaining).toNumber());
 
-        return new QueryResponse({
+        return new ContractQueryResponse({
             returnData: returnData,
-            returnCode: new ReturnCode(returnCode),
+            returnCode: new ContractReturnCode(returnCode),
             returnMessage: returnMessage,
             gasUsed: gasUsed,
         });
     }
 
-    getReturnCode(): ReturnCode {
-        return this.returnCode;
-    }
-
-    getReturnMessage(): string {
-        return this.returnMessage;
-    }
-
     getReturnDataParts(): Buffer[] {
         return this.returnData.map((item) => Buffer.from(item || "", "base64"));
-    }
-
-    assertSuccess() {
-        if (this.isSuccess()) {
-            return;
-        }
-
-        throw new ErrContract(`${this.getReturnCode()}: ${this.getReturnMessage()}`);
     }
 
     isSuccess(): boolean {

@@ -17,7 +17,7 @@ describe("test queries on mainnet", function () {
         let response = await provider.queryContract(query);
 
         assert.isTrue(response.isSuccess());
-        assert.lengthOf(response.returnData, 5);
+        assert.lengthOf(response.getReturnDataParts(), 5);
     });
 
     it("delegation: should getNumUsers", async () => {
@@ -28,7 +28,7 @@ describe("test queries on mainnet", function () {
         let response = await provider.queryContract(query);
 
         assert.isTrue(response.isSuccess());
-        assert.lengthOf(response.returnData, 1);
+        assert.lengthOf(response.getReturnDataParts(), 1);
         assert.isAtLeast(response.gasUsed.valueOf(), 1000000);
         assert.isAtMost(response.gasUsed.valueOf(), 50000000);
     });
@@ -43,7 +43,7 @@ describe("test queries on mainnet", function () {
         let response = await provider.queryContract(query);
 
         assert.isTrue(response.isSuccess());
-        assert.isAtLeast(response.returnData.length, 42);
+        assert.isAtLeast(response.getReturnDataParts().length, 42);
     });
 
     it("delegation: should getClaimableRewards", async function () {
@@ -68,6 +68,6 @@ describe("test queries on mainnet", function () {
         response = await provider.queryContract(query);
 
         assert.isTrue(response.isSuccess());
-        assert.isAtLeast(response.returnData.length, 1);
+        assert.isAtLeast(response.getReturnDataParts().length, 1);
     });
 });

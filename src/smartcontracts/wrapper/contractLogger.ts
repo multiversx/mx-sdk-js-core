@@ -1,8 +1,7 @@
 import { Address } from "../../address";
-import { IContractResults, INetworkConfig } from "../../interfaceOfNetwork";
+import { IContractQueryResponse, IContractResults, INetworkConfig } from "../../interfaceOfNetwork";
 import { Transaction } from "../../transaction";
 import { Query } from "../query";
-import { QueryResponse } from "../queryResponse";
 import { findImmediateResult, findResultingCalls, TypedResult } from "./deprecatedContractResults";
 
 /**
@@ -36,7 +35,7 @@ export class ContractLogger {
         console.log(`Query created. Sending...`);
     }
 
-    queryComplete(_result: any, _response: QueryResponse) {
+    queryComplete(_result: any, _response: IContractQueryResponse) {
         console.log(`done.`);
     }
 }

@@ -1,16 +1,15 @@
 import axios, { AxiosRequestConfig } from "axios";
 import BigNumber from "bignumber.js";
 
-import { IProvider } from "./interface";
+import { IHash, IProvider } from "./interface";
 import { Transaction, TransactionHash } from "./transaction";
 import { Address } from "./address";
 import * as errors from "./errors";
 import { Query } from "./smartcontracts/query";
-import { QueryResponse } from "./smartcontracts/queryResponse";
 import { Logger } from "./logger";
 import { defaultConfig } from "./constants";
 import { ProxyNetworkProvider } from "./networkProvider/proxyNetworkProvider";
-import { IAccountOnNetwork, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { IAccountOnNetwork, IContractQueryResponse, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 export class ProxyProvider implements IProvider {
     private url: string;
@@ -57,33 +56,22 @@ export class ProxyProvider implements IProvider {
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
      */
-    async queryContract(query: Query): Promise<QueryResponse> {
-        try {
-            let data = query.toHttpRequest();
-            return this.doPostGeneric("vm-values/query", data, (response) =>
-                QueryResponse.fromHttpResponse(response.data || response.vmOutput)
-            );
-        } catch (err: any) {
-            throw errors.ErrContractQuery.increaseSpecificity(err);
-        }
+    async queryContract(query: Query): Promise<IContractQueryResponse> {
+        return await this.backingProvider.queryContract(query);
     }
 
     /**
      * Broadcasts an already-signed {@link Transaction}.
      */
-    async sendTransaction(tx: Transaction): Promise<TransactionHash> {
-        return this.doPostGeneric(
-            "transaction/send",
-            tx.toSendable(),
-            (response) => new TransactionHash(response.txHash)
-        );
+    async sendTransaction(tx: Transaction): Promise<IHash> {
+        return await this.backingProvider.sendTransaction(tx);
     }
 
     /**
      * Simulates the processing of an already-signed {@link Transaction}.
      */
     async simulateTransaction(tx: Transaction): Promise<any> {
-        return this.doPostGeneric("transaction/simulate", tx.toSendable(), (response) => response);
+        return await this.backingProvider.simulateTransaction(tx);
     }
 
     /**

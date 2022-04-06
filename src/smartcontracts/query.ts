@@ -4,10 +4,7 @@ import { Address } from "../address";
 import { guardValueIsSet } from "../utils";
 import { TypedValue } from "./typesystem";
 import { ArgSerializer } from "./argSerializer";
-import BigNumber from "bignumber.js";
 import { IBech32Address, ITransactionValue } from "../interface";
-
-export const MaxUint64 = new BigNumber("18446744073709551615");
 
 export class Query {
     caller: Address;

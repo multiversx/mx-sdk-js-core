@@ -2,10 +2,9 @@ import { TransactionDecoder, TransactionMetadata } from "@elrondnetwork/transact
 import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
 import { Logger } from "../logger";
-import { IContractResults, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { IContractQueryResponse, IContractResults, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, IResultsParser, UntypedOutcomeBundle } from "./interface";
-import { QueryResponse } from "./queryResponse";
 import { ReturnCode } from "./returnCode";
 import { EndpointDefinition } from "./typesystem";
 import { adaptToAddress } from "../boundaryAdapters";
@@ -26,12 +25,13 @@ enum WellKnownTopics {
  * The parsing involves some heuristics, in order to handle slight inconsistencies (e.g. some SCRs are present on API, but missing on Gateway).
  */
 export class ResultsParser implements IResultsParser {
-    parseQueryResponse(queryResponse: QueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle {
+    parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle {
         let parts = queryResponse.getReturnDataParts();
         let values = new ArgSerializer().buffersToValues(parts, endpoint.output);
+        let returnCode = new ReturnCode(queryResponse.returnCode.toString());
 
         return {
-            returnCode: queryResponse.returnCode,
+            returnCode: returnCode,
             returnMessage: queryResponse.returnMessage,
             values: values,
             firstValue: values[0],
@@ -40,9 +40,11 @@ export class ResultsParser implements IResultsParser {
         };
     }
 
-    parseUntypedQueryResponse(queryResponse: QueryResponse): UntypedOutcomeBundle {
+    parseUntypedQueryResponse(queryResponse: IContractQueryResponse): UntypedOutcomeBundle {
+        let returnCode = new ReturnCode(queryResponse.returnCode.toString())
+
         return {
-            returnCode: queryResponse.returnCode,
+            returnCode: returnCode,
             returnMessage: queryResponse.returnMessage,
             values: queryResponse.getReturnDataParts()
         };

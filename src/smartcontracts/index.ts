@@ -15,7 +15,6 @@ export * from "./interactionChecker";
 export * from "./interface";
 export * from "./nativeSerializer";
 export * from "./query";
-export * from "./queryResponse";
 export * from "./resultsParser";
 export * from "./returnCode";
 export * from "./smartContract";

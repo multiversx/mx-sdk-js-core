@@ -5,7 +5,7 @@ import {
 } from "../../testutils";
 import { Address } from "../../address";
 import { assert } from "chai";
-import { QueryResponse } from "../queryResponse";
+import { ContractQueryResponse } from "../../networkProvider/contractQueryResponse";
 import { ReturnCode } from "../returnCode";
 import BigNumber from "bignumber.js";
 import { SystemWrapper } from "./systemWrapper";
@@ -101,7 +101,7 @@ describe("test smart contract wrapper", async function() {
 function mockQuery(provider: MockProvider, functionName: string, mockedResult: string) {
     provider.mockQueryContractOnFunction(
         functionName,
-        new QueryResponse({ returnData: [mockedResult], returnCode: ReturnCode.Ok })
+        new ContractQueryResponse({ returnData: [mockedResult], returnCode: ReturnCode.Ok })
     );
 }
 

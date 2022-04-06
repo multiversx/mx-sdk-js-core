@@ -7,7 +7,7 @@ import { AsyncTimer } from "../asyncTimer";
 import { Balance } from "../balance";
 import * as errors from "../errors";
 import { Query } from "../smartcontracts/query";
-import { QueryResponse } from "../smartcontracts/queryResponse";
+import { ContractQueryResponse } from "../networkProvider/contractQueryResponse";
 import { TypedEvent } from "../events";
 import { BalanceBuilder } from "../balanceBuilder";
 import BigNumber from "bignumber.js";
@@ -84,7 +84,7 @@ export class MockProvider implements IProvider {
         this.transactions.set(hash.toString(), item);
     }
 
-    mockQueryContractOnFunction(functionName: string, response: QueryResponse) {
+    mockQueryContractOnFunction(functionName: string, response: ContractQueryResponse) {
         let predicate = (query: Query) => query.func.name == functionName;
         this.queryContractResponders.push(new QueryContractResponder(predicate, response));
     }
@@ -216,14 +216,14 @@ export class MockProvider implements IProvider {
         return new NetworkStatus();
     }
 
-    async queryContract(query: Query): Promise<QueryResponse> {
+    async queryContract(query: Query): Promise<ContractQueryResponse> {
         for (const responder of this.queryContractResponders) {
             if (responder.matches(query)) {
                 return responder.response;
             }
         }
 
-        return new QueryResponse();
+        return new ContractQueryResponse();
     }
 }
 
@@ -239,9 +239,9 @@ export class InHyperblock { }
 
 class QueryContractResponder {
     readonly matches: (query: Query) => boolean;
-    readonly response: QueryResponse;
+    readonly response: ContractQueryResponse;
 
-    constructor(matches: (query: Query) => boolean, response: QueryResponse) {
+    constructor(matches: (query: Query) => boolean, response: ContractQueryResponse) {
         this.matches = matches;
         this.response = response;
     }

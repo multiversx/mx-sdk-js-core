@@ -14,6 +14,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - [Breaking change: unifying provider interfaces, preparing network providers for extraction - step 2](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/181)
  - [Breaking change: unifying provider interfaces, preparing network providers for extraction - step 3](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/182)
  - [Breaking change: SmartContract does not depend on IProvider anymore](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/183).
+ - [Breaking change: unifying provider interfaces, preparing network providers for extraction - step 4](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/184)
 
  **Breaking changes**
  - Removed utility functions: `transaction.awaitExecuted()`, `transaction.awaitPending()`. `TransactionWatcher` should be used directly, instead.

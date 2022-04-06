@@ -3,7 +3,7 @@ import path from "path";
 import { assert } from "chai";
 import { BigUIntType, BigUIntValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition } from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
-import { QueryResponse } from "./queryResponse";
+import { ContractQueryResponse } from "../networkProvider/contractQueryResponse";
 import { ReturnCode } from "./returnCode";
 import { ResultsParser } from "./resultsParser";
 import { Nonce } from "../nonce";
@@ -45,7 +45,7 @@ describe("test smart contract results parser", () => {
         ];
         let endpoint = new EndpointDefinition("foo", [], outputParameters, endpointModifiers);
 
-        let queryResponse = new QueryResponse({
+        let queryResponse = new ContractQueryResponse({
             returnData: [
                 Buffer.from([42]).toString("base64"),
                 Buffer.from("abba", "hex").toString("base64")

@@ -29,22 +29,12 @@ export class ErrNetworkProvider extends Err {
     }
 }
 
-/**
- * Signals an error that happened during a HTTP GET request.
- */
-export class ErrApiProviderGet extends Err {
-    public constructor(url: string, error: string, inner?: Error) {
-        let message = `Cannot GET ${url}: [${error}]`;
-        super(message, inner);
-    }
-}
 
 /**
- * Signals an error that happened during a HTTP POST request.
+ * Signals a generic error in the context of querying Smart Contracts.
  */
-export class ErrApiProviderPost extends Err {
-    public constructor(url: string, error: string, inner?: Error) {
-        let message = `Cannot POST ${url}: [${error}]`;
-        super(message, inner);
+export class ErrContractQuery extends Err {
+    public constructor(originalError: Error) {
+        super(originalError.message.replace("executeQuery:", ""));
     }
 }

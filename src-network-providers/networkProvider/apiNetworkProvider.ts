@@ -10,7 +10,7 @@ import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } f
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { Hash } from "./primitives";
-import { ErrNetworkProvider } from "./errors";
+import { ErrContractQuery, ErrNetworkProvider } from "./errors";
 import { defaultAxiosConfig } from "./config";
 import { NetworkStatus } from "./networkStatus";
 import { ContractQueryResponse } from "./contractQueryResponse";
@@ -112,10 +112,12 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     async queryContract(query: IContractQuery): Promise<ContractQueryResponse> {
-        let data = query.toHttpRequest();
-        let response = await this.doPostGeneric("query", data);
-        let queryResponse = ContractQueryResponse.fromHttpResponse(response);
-        return queryResponse;
+        try {
+            let response = await this.doPostGeneric("query", query.toHttpRequest());
+            return ContractQueryResponse.fromHttpResponse(response);
+        } catch (error: any) {
+            throw new ErrContractQuery(error);
+        }
     }
 
     async getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {

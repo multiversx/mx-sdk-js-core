@@ -1,19 +1,20 @@
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import BigNumber from "bignumber.js";
+import { IAddress, IContractQuery, IHash, ITransaction } from "./interface";
+import { ProxyNetworkProvider } from "./proxyNetworkProvider";
+import { ContractQueryResponse } from "./contractQueryResponse";
+import { AccountOnNetwork } from "./accounts";
+import { FungibleTokenOfAccountOnNetwork } from "./tokens";
+import { TransactionStatus } from "./transactionStatus";
+import { TransactionOnNetwork } from "./transactions";
+import { NetworkConfig } from "./networkConfig";
+import { NetworkStatus } from "./networkStatus";
+import { Nonce } from "./primitives";
 
-import { IHash, IProvider } from "./interface";
-import { Transaction, TransactionHash } from "./transaction";
-import { Address } from "./address";
-import * as errors from "./errors";
-import { Query } from "./smartcontracts/query";
-import { Logger } from "./logger";
-import { defaultConfig } from "./constants";
-import { ProxyNetworkProvider } from "./networkProvider/proxyNetworkProvider";
-import { IAccountOnNetwork, IContractQueryResponse, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
-
-export class ProxyProvider implements IProvider {
-    private url: string;
-    private config: AxiosRequestConfig;
+/**
+ * @deprecated
+ */
+export class ProxyProvider {
     /**
      * @deprecated used only for preparatory refactoring (unifying network providers)
      */
@@ -25,148 +26,88 @@ export class ProxyProvider implements IProvider {
      * @param config axios request config options
      */
     constructor(url: string, config?: AxiosRequestConfig) {
-        this.url = url;
-        this.config = {...defaultConfig, ...config};
         this.backingProvider = new ProxyNetworkProvider(url, config);
     }
 
     /**
      * Fetches the state of an account.
      */
-    async getAccount(address: Address): Promise<IAccountOnNetwork> {
+    async getAccount(address: IAddress): Promise<AccountOnNetwork> {
         return await this.backingProvider.getAccount(address);
     }
 
-    async getAddressEsdtList(address: Address): Promise<IFungibleTokenOfAccountOnNetwork[]> {
+    async getAddressEsdtList(address: IAddress): Promise<FungibleTokenOfAccountOnNetwork[]> {
         return await this.backingProvider.getFungibleTokensOfAccount(address);
     }
 
-    async getAddressEsdt(address: Address, tokenIdentifier: string): Promise<any> {
-        return this.doGetGeneric(`address/${address.bech32()}/esdt/${tokenIdentifier}`, (response) =>
-            response.tokenData
-        );
+    async getAddressEsdt(address: IAddress, tokenIdentifier: string): Promise<any> {
+        return await this.backingProvider.getFungibleTokenOfAccount(address, tokenIdentifier);
     }
 
-    async getAddressNft(address: Address, tokenIdentifier: string, nonce: BigNumber): Promise<any> {
-        return this.doGetGeneric(`address/${address.bech32()}/nft/${tokenIdentifier}/nonce/${nonce}`, (response) =>
-            response.tokenData
-        );
+    async getAddressNft(address: IAddress, tokenIdentifier: string, nonce: BigNumber): Promise<any> {
+        return await this.backingProvider.getNonFungibleTokenOfAccount(address, tokenIdentifier, new Nonce(nonce.toNumber()));
     }
 
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
      */
-    async queryContract(query: Query): Promise<IContractQueryResponse> {
+    async queryContract(query: IContractQuery): Promise<ContractQueryResponse> {
         return await this.backingProvider.queryContract(query);
     }
 
     /**
-     * Broadcasts an already-signed {@link Transaction}.
+     * Broadcasts an already-signed transaction.
      */
-    async sendTransaction(tx: Transaction): Promise<IHash> {
+    async sendTransaction(tx: ITransaction): Promise<IHash> {
         return await this.backingProvider.sendTransaction(tx);
     }
 
     /**
-     * Simulates the processing of an already-signed {@link Transaction}.
+     * Simulates the processing of an already-signed transaction.
      */
-    async simulateTransaction(tx: Transaction): Promise<any> {
+    async simulateTransaction(tx: ITransaction): Promise<any> {
         return await this.backingProvider.simulateTransaction(tx);
     }
 
     /**
-     * Fetches the state of a {@link Transaction}.
+     * Fetches the state of a transaction.
      */
-    async getTransaction(
-        txHash: TransactionHash
-    ): Promise<ITransactionOnNetwork> {
+    async getTransaction(txHash: IHash): Promise<TransactionOnNetwork> {
         return await this.backingProvider.getTransaction(txHash);
     }
 
     /**
-     * Queries the status of a {@link Transaction}.
+     * Queries the status of a transaction.
      */
-    async getTransactionStatus(txHash: TransactionHash): Promise<ITransactionStatus> {
+    async getTransactionStatus(txHash: IHash): Promise<TransactionStatus> {
         return await this.backingProvider.getTransactionStatus(txHash);
     }
 
     /**
      * Fetches the Network configuration.
      */
-    async getNetworkConfig(): Promise<INetworkConfig> {
+    async getNetworkConfig(): Promise<NetworkConfig> {
         return await this.backingProvider.getNetworkConfig();
     }
 
     /**
      * Fetches the network status configuration.
      */
-    async getNetworkStatus(): Promise<INetworkStatus> {
+    async getNetworkStatus(): Promise<NetworkStatus> {
         return await this.backingProvider.getNetworkStatus();
     }
 
     /**
      * Get method that receives the resource url and on callback the method used to map the response.
      */
-    async doGetGeneric(resourceUrl: string, callback: (response: any) => any): Promise<any> {
-        let response = await this.doGet(resourceUrl);
-        return callback(response);
+    async doGetGeneric(resourceUrl: string): Promise<any> {
+        return await this.backingProvider.doGetGeneric(resourceUrl);
     }
 
     /**
      * Post method that receives the resource url, the post payload and on callback the method used to map the response.
      */
-    async doPostGeneric(resourceUrl: string, payload: any, callback: (response: any) => any): Promise<any> {
-        let response = await this.doPost(resourceUrl, payload);
-        return callback(response);
-    }
-
-    private async doGet(resourceUrl: string): Promise<any> {
-        try {
-            let url = `${this.url}/${resourceUrl}`;
-            let response = await axios.get(url, this.config);
-            let payload = response.data.data;
-            return payload;
-        } catch (error) {
-            this.handleApiError(error, resourceUrl);
-        }
-    }
-
-    private async doPost(resourceUrl: string, payload: any): Promise<any> {
-        try {
-            let url = `${this.url}/${resourceUrl}`;
-            let response = await axios.post(url, payload, {
-                ...this.config,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            let responsePayload = response.data.data;
-            return responsePayload;
-        } catch (error) {
-            this.handleApiError(error, resourceUrl);
-        }
-    }
-
-    private buildUrlWithQueryParameters(endpoint: string, params: Record<string, string>): string {
-        let searchParams = new URLSearchParams();
-
-        for (let [key, value] of Object.entries(params)) {
-            if (value) {
-                searchParams.append(key, value);
-            }
-        }
-
-        return `${endpoint}?${searchParams.toString()}`;
-    }
-
-    private handleApiError(error: any, resourceUrl: string) {
-        if (!error.response) {
-            Logger.warn(error);
-            throw new errors.ErrApiProviderGet(resourceUrl, error.toString(), error);
-        }
-
-        let errorData = error.response.data;
-        let originalErrorMessage = errorData.error || errorData.message || JSON.stringify(errorData);
-        throw new errors.ErrApiProviderGet(resourceUrl, originalErrorMessage, error);
+    async doPostGeneric(resourceUrl: string, payload: any): Promise<any> {
+        return await this.backingProvider.doPostGeneric(resourceUrl, payload);
     }
 }

@@ -1,17 +1,19 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { IApiProvider, IHash } from "./interface";
+import { IHash } from "./interface";
 import * as errors from "./errors";
-import { Logger } from "./logger";
-import { Token } from "./token";
 import { NFTToken } from "./nftToken";
-import { defaultConfig } from "./constants";
-import { ApiNetworkProvider } from "./networkProvider/apiNetworkProvider";
-import { INetworkStake, INetworkStats, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { defaultAxiosConfig } from "./config";
+import { ApiNetworkProvider } from "./apiNetworkProvider";
+import { TransactionOnNetwork } from "./transactions";
+import { Stats } from "./stats";
+import { NetworkStake } from "./networkStake";
+import { TransactionStatus } from "./transactionStatus";
+import { DefinitionOfFungibleTokenOnNetwork } from "./tokenDefinitions";
 
 /**
- * This is a temporary change, this will be the only provider used, ProxyProvider will be deprecated
+ * @deprecated
  */
-export class ApiProvider implements IApiProvider {
+export class ApiProvider {
     private url: string;
     private config: AxiosRequestConfig;
     /**
@@ -26,40 +28,40 @@ export class ApiProvider implements IApiProvider {
      */
     constructor(url: string, config?: AxiosRequestConfig) {
       this.url = url;
-      this.config = {...defaultConfig, ...config};
+      this.config = {...defaultAxiosConfig, ...config};
       this.backingProvider = new ApiNetworkProvider(url, config);
     }
 
     /**
      * Fetches the Network Stake.
      */
-    async getNetworkStake(): Promise<INetworkStake> {
+    async getNetworkStake(): Promise<NetworkStake> {
         return await this.backingProvider.getNetworkStakeStatistics();
     }
 
     /**
      * Fetches the Network Stats.
      */
-    async getNetworkStats(): Promise<INetworkStats> {
+    async getNetworkStats(): Promise<Stats> {
         return await this.backingProvider.getNetworkGeneralStatistics();
     }
 
     /**
-     * Fetches the state of a {@link Transaction}.
+     * Fetches the state of a transaction.
      */
-    async getTransaction(txHash: IHash): Promise<ITransactionOnNetwork> {
+    async getTransaction(txHash: IHash): Promise<TransactionOnNetwork> {
         return await this.backingProvider.getTransaction(txHash);
     }
 
     /**
-     * Queries the status of a {@link Transaction}.
+     * Queries the status of a transaction.
      */
-    async getTransactionStatus(txHash: IHash): Promise<ITransactionStatus> {
+    async getTransactionStatus(txHash: IHash): Promise<TransactionStatus> {
         return await this.backingProvider.getTransactionStatus(txHash);
     }
 
-    async getToken(tokenIdentifier: string): Promise<Token> {
-        return this.doGetGeneric(`tokens/${tokenIdentifier}`, (response) => Token.fromHttpResponse(response));
+    async getToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
+        return await this.backingProvider.getDefinitionOfFungibleToken(tokenIdentifier);
     }
 
     async getNFTToken(tokenIdentifier: string): Promise<NFTToken> {
@@ -87,7 +89,7 @@ export class ApiProvider implements IApiProvider {
 
     private handleApiError(error: any, resourceUrl: string) {
         if (!error.response) {
-            Logger.warn(error);
+            console.warn(error);
             throw new errors.ErrApiProviderGet(resourceUrl, error.toString(), error);
         }
 

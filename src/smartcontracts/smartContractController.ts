@@ -1,4 +1,3 @@
-import { IProvider } from "../interface";
 import { Interaction } from "./interaction";
 import { Transaction } from "../transaction";
 import { TypedOutcomeBundle, IInteractionChecker, IResultsParser, ISmartContractController, UntypedOutcomeBundle } from "./interface";
@@ -8,7 +7,19 @@ import { InteractionChecker, NullInteractionChecker } from "./interactionChecker
 import { EndpointDefinition } from "./typesystem";
 import { Logger } from "../logger";
 import { TransactionWatcher } from "../transactionWatcher";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { IContractQueryResponse, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
+import { IHash } from "../interface";
+import { Query } from "./query";
+
+/**
+ * @deprecated (controller will be extracted, as well, or removed)
+ */
+interface IDeprecatedProvider {
+    sendTransaction(transaction: Transaction): Promise<IHash>;
+    getTransaction(hash: IHash): Promise<ITransactionOnNetwork>;
+    getTransactionStatus(hash: IHash): Promise<ITransactionStatus>;
+    queryContract(query: Query): Promise<IContractQueryResponse>;
+}
 
 /**
  * Internal interface: the smart contract ABI, as seen from the perspective of a {@link SmartContractController}.
@@ -32,14 +43,14 @@ export class SmartContractController implements ISmartContractController {
     private readonly abi: ISmartContractAbi;
     private readonly checker: IInteractionChecker;
     private readonly parser: IResultsParser;
-    private readonly provider: IProvider;
+    private readonly provider: IDeprecatedProvider;
     private readonly transactionCompletionAwaiter: ITransactionCompletionAwaiter;
 
     constructor(
         abi: ISmartContractAbi,
         checker: IInteractionChecker,
         parser: IResultsParser,
-        provider: IProvider,
+        provider: IDeprecatedProvider,
         transactionWatcher: ITransactionCompletionAwaiter
     ) {
         this.abi = abi;
@@ -105,13 +116,13 @@ export class SmartContractController implements ISmartContractController {
 }
 
 export class DefaultSmartContractController extends SmartContractController {
-    constructor(abi: ISmartContractAbi, provider: IProvider) {
+    constructor(abi: ISmartContractAbi, provider: IDeprecatedProvider) {
         super(abi, new InteractionChecker(), new ResultsParser(), provider, new TransactionWatcher(provider));
     }
 }
 
 export class NoCheckSmartContractController extends SmartContractController {
-    constructor(abi: ISmartContractAbi, provider: IProvider) {
+    constructor(abi: ISmartContractAbi, provider: IDeprecatedProvider) {
         super(abi, new NullInteractionChecker(), new ResultsParser(), provider, new TransactionWatcher(provider));
     }
 }

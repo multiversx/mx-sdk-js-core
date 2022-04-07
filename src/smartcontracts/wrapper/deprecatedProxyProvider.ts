@@ -1,15 +1,15 @@
 import { AxiosRequestConfig } from "axios";
 import BigNumber from "bignumber.js";
-import { IAddress, IContractQuery, IHash, ITransaction } from "./interface";
-import { ProxyNetworkProvider } from "./proxyNetworkProvider";
-import { ContractQueryResponse } from "./contractQueryResponse";
-import { AccountOnNetwork } from "./accounts";
-import { FungibleTokenOfAccountOnNetwork } from "./tokens";
-import { TransactionStatus } from "./transactionStatus";
-import { TransactionOnNetwork } from "./transactions";
-import { NetworkConfig } from "./networkConfig";
-import { NetworkStatus } from "./networkStatus";
-import { Nonce } from "./primitives";
+import { IAddress, IContractQuery, IHash, ITransaction } from "../../networkProvider/interface";
+import { ProxyNetworkProvider } from "../../networkProvider/proxyNetworkProvider";
+import { ContractQueryResponse } from "../../networkProvider/contractQueryResponse";
+import { AccountOnNetwork } from "../../networkProvider/accounts";
+import { FungibleTokenOfAccountOnNetwork } from "../../networkProvider/tokens";
+import { TransactionStatus } from "../../networkProvider/transactionStatus";
+import { TransactionOnNetwork } from "../../networkProvider/transactions";
+import { NetworkConfig } from "../../networkProvider/networkConfig";
+import { NetworkStatus } from "../../networkProvider/networkStatus";
+import { Nonce } from "../../networkProvider/primitives";
 
 /**
  * @deprecated

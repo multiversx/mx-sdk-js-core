@@ -7,13 +7,13 @@ import { AddressType, EndpointParameterDefinition } from "../typesystem";
 import { Address } from "../../address";
 import { Balance } from "../../balance";
 import { Egld, BalanceBuilder, createBalanceBuilder } from "../../balanceBuilder";
-import { IProvider } from "../../interface";
 import { Token } from "../../token";
 import { EsdtHelpers } from "../../esdtHelpers";
 import { MockProvider, TestWallet } from "../../testutils";
 import { NativeSerializer, NativeTypes } from "../nativeSerializer";
 import { ArgumentErrorContext } from "../argumentErrorContext";
 import { ChainSendContext } from "./chainSendContext";
+import { IDeprecatedProvider } from "./interface";
 
 export namespace SystemConstants {
     export let SYSTEM_ABI_PATH = path.join(path.dirname(__filename), "../../abi");
@@ -27,13 +27,13 @@ export namespace SystemConstants {
 }
 
 export class SystemWrapper extends ChainSendContext {
-    private readonly provider: IProvider;
+    private readonly provider: IDeprecatedProvider;
     private readonly builtinFunctions: ContractWrapper;
     readonly esdtSystemContract: ContractWrapper;
     readonly issueCost: Balance;
     private readonly sendWrapper: ContractWrapper;
 
-    private constructor(provider: IProvider, context: SendContext, sendContract: ContractWrapper, esdtSystemContract: ContractWrapper, issueCost: Balance, builtinFunctions: ContractWrapper) {
+    private constructor(provider: IDeprecatedProvider, context: SendContext, sendContract: ContractWrapper, esdtSystemContract: ContractWrapper, issueCost: Balance, builtinFunctions: ContractWrapper) {
         super(context);
         this.provider = provider;
         this.sendWrapper = sendContract;
@@ -51,7 +51,7 @@ export class SystemWrapper extends ChainSendContext {
         return { ownerAddress, baseIssuingCost: Egld.raw(baseIssuingCost), minTokenNameLength, maxTokenNameLength };
     }
 
-    static async load(provider: IProvider): Promise<SystemWrapper> {
+    static async load(provider: IDeprecatedProvider): Promise<SystemWrapper> {
         let networkConfig = await provider.getNetworkConfig();
         let context = new SendContext(provider, networkConfig).logger(new ContractLogger());
         let builtinFunctions = await ContractWrapper.loadProject(provider, null, SystemConstants.SYSTEM_ABI_PATH, "builtinFunctions", context);

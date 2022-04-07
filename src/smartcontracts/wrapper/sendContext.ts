@@ -1,24 +1,25 @@
 import { GasLimit } from "../../networkParams";
-import { IChainID, IProvider } from "../../interface";
+import { IChainID } from "../../interface";
 import { ContractLogger } from "./contractLogger";
 import { TestWallet } from "../../testutils";
 import { Balance } from "../../balance";
 import { Err } from "../../errors";
 import { getGasFromValue } from "./systemWrapper";
 import { INetworkConfig } from "../../interfaceOfNetwork";
+import { IDeprecatedProvider } from "./interface";
 
 /**
  * Stores contextual information which is needed when preparing a transaction.
  */
 export class SendContext {
     private sender_: TestWallet | null;
-    private provider_: IProvider;
+    private provider_: IDeprecatedProvider;
     private gas_: GasLimit | null;
     private logger_: ContractLogger | null;
     private value_: Balance | null;
     private networkConfig: INetworkConfig;
 
-    constructor(provider: IProvider, networkConfig: INetworkConfig) {
+    constructor(provider: IDeprecatedProvider, networkConfig: INetworkConfig) {
         this.sender_ = null;
         this.provider_ = provider;
         this.gas_ = null;
@@ -27,7 +28,7 @@ export class SendContext {
         this.networkConfig = networkConfig;
     }
 
-    provider(provider: IProvider): this {
+    provider(provider: IDeprecatedProvider): this {
         this.provider_ = provider;
         return this;
     }
@@ -73,7 +74,7 @@ export class SendContext {
         return this.sender_;
     }
 
-    getProvider(): IProvider {
+    getProvider(): IDeprecatedProvider {
         return this.provider_;
     }
 

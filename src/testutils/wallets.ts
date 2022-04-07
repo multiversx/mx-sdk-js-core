@@ -3,17 +3,22 @@ import * as fs from "fs";
 import * as path from "path";
 import { Account } from "../account";
 import { Address } from "../address";
-import { IProvider } from "../interface";
+import { IBech32Address } from "../interface";
 import { isOnBrowserTests } from "./utils";
 import { UserSecretKey, UserSigner } from "@elrondnetwork/erdjs-walletcore"
+import { IAccountOnNetwork } from "../interfaceOfNetwork";
 
-export async function loadAndSyncTestWallets(provider: IProvider): Promise<Record<string, TestWallet>> {
+interface IAccountFetcher {
+    getAccount(address: IBech32Address): Promise<IAccountOnNetwork>;
+}
+
+export async function loadAndSyncTestWallets(provider: IAccountFetcher): Promise<Record<string, TestWallet>> {
     let wallets = await loadTestWallets();
     await syncTestWallets(wallets, provider);
     return wallets;
 }
 
-export async function syncTestWallets(wallets: Record<string, TestWallet>, provider: IProvider) {
+export async function syncTestWallets(wallets: Record<string, TestWallet>, provider: IAccountFetcher) {
     await Promise.all(Object.values(wallets).map(async (wallet) => wallet.sync(provider)));
 }
 
@@ -85,7 +90,7 @@ export class TestWallet {
         return this.address;
     }
 
-    async sync(provider: IProvider) {
+    async sync(provider: IAccountFetcher) {
         let accountOnNetwork = await provider.getAccount(this.address);
         await this.account.update(accountOnNetwork);
         return this;

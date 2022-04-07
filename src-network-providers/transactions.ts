@@ -88,15 +88,5 @@ import { TransactionReceipt } from "./transactionReceipt";
         // TODO: use different transaction completion strategies - API / Proxy.
         return new TransactionCompletionStrategy().isCompleted(this);
     }
-
-    getAllEvents(): TransactionEvent[] {
-        let result = [...this.logs.events];
-
-        for (const resultItem of this.contractResults.items) {
-            result.push(...resultItem.logs.events);
-        }
-
-        return result;
-    }
 }
 

@@ -1,10 +1,9 @@
-import { Transaction } from "./transaction";
 import { Signature } from "./signature";
-import { Query } from "./smartcontracts";
-import { Token } from "./token";
-import BigNumber from "bignumber.js";
-import { IAccountOnNetwork, IContractQueryResponse, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStake, INetworkStats, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
+/**
+ * @deprecated
+ */
 export interface ITransactionFetcher {
     /**
      * Fetches the state of a {@link Transaction}.
@@ -15,87 +14,6 @@ export interface ITransactionFetcher {
      * Queries the status of a {@link Transaction}.
      */
     getTransactionStatus(txHash: IHash): Promise<ITransactionStatus>;
-}
-
-/**
- * An interface that defines the endpoints of an HTTP API Provider.
- */
-export interface IProvider extends ITransactionFetcher {
-    /**
-     * Fetches the Network configuration.
-     */
-    getNetworkConfig(): Promise<INetworkConfig>;
-
-    /**
-     * Fetches the Network status.
-     */
-    getNetworkStatus(): Promise<INetworkStatus>;
-
-    /**
-     * Fetches the state of an {@link Account}.
-     */
-    getAccount(address: IBech32Address): Promise<IAccountOnNetwork>;
-
-    /**
-     * Fetches the list of ESDT data for all the tokens of an address.
-     */
-    getAddressEsdtList(address: IBech32Address): Promise<IFungibleTokenOfAccountOnNetwork[]>;
-
-    /**
-     * Fetches the ESDT data for a token of an address.
-     */
-    getAddressEsdt(address: IBech32Address, tokenIdentifier: string): Promise<any>;
-
-    /**
-     * Fetches the NFT data for a token with a given nonce of an address.
-     */
-    getAddressNft(address: IBech32Address, tokenIdentifier: string, nonce: BigNumber): Promise<any>;
-
-    /**
-     * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
-     */
-    queryContract(query: Query): Promise<IContractQueryResponse>;
-
-    /**
-     * Broadcasts an already-signed {@link Transaction}.
-     */
-    sendTransaction(tx: Transaction): Promise<IHash>;
-
-    /**
-     * Simulates the processing of an already-signed {@link Transaction}.
-     */
-    simulateTransaction(tx: Transaction): Promise<IHash>;
-
-    /**
-     * Get method that receives the resource url and on callback the method used to map the response.
-     */
-    doGetGeneric(resourceUrl: string, callback: (response: any) => any): Promise<any>;
-
-    /**
-     * Post method that receives the resource url, the post payload and on callback the method used to map the response.
-     */
-    doPostGeneric(resourceUrl: string, payload: any, callback: (response: any) => any): Promise<any>;
-}
-
-/**
- * An interface that defines the endpoints of an HTTP API Provider.
- */
-export interface IApiProvider extends ITransactionFetcher {
-    /**
-     * Fetches the Network Stake.
-     */
-    getNetworkStake(): Promise<INetworkStake>;
-    /**
-     * Fetches the Network Stats.
-     */
-    getNetworkStats(): Promise<INetworkStats>;
-
-    getToken(tokenIdentifier: string): Promise<Token>;
-
-    /**
-     * Get method that receives the resource url and on callback the method used to map the response.
-     */
-    doGetGeneric(resourceUrl: string, callback: (response: any) => any): Promise<any>;
 }
 
 /**

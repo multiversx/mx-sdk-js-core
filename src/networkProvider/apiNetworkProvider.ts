@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "./accounts";
-import { IAddress, IContractQuery, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, IHash, INetworkProvider, INonce, INonFungibleTokenOfAccountOnNetwork, ITransaction, Pagination } from "./interface";
+import { IAddress, IContractQuery, IHash, INetworkProvider, INonce, ITransaction, Pagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
@@ -10,7 +10,7 @@ import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } f
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { Hash } from "./primitives";
-import { ErrNetworkProvider } from "./errors";
+import { ErrContractQuery, ErrNetworkProvider } from "./errors";
 import { defaultAxiosConfig } from "./config";
 import { NetworkStatus } from "./networkStatus";
 import { ContractQueryResponse } from "./contractQueryResponse";
@@ -53,7 +53,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         return account;
     }
 
-    async getFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<IFungibleTokenOfAccountOnNetwork[]> {
+    async getFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<FungibleTokenOfAccountOnNetwork[]> {
         pagination = pagination || Pagination.default();
 
         let url = `accounts/${address.bech32()}/tokens?${this.buildPaginationParams(pagination)}`;
@@ -65,7 +65,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<INonFungibleTokenOfAccountOnNetwork[]> {
+    async getNonFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
         pagination = pagination || Pagination.default();
 
         let url = `accounts/${address.bech32()}/nfts?${this.buildPaginationParams(pagination)}`;
@@ -77,13 +77,13 @@ export class ApiNetworkProvider implements INetworkProvider {
         return tokens;
     }
 
-    async getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<IFungibleTokenOfAccountOnNetwork> {
+    async getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`accounts/${address.bech32()}/tokens/${tokenIdentifier}`);
         let tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response);
         return tokenData;
     }
 
-    async getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: INonce): Promise<INonFungibleTokenOfAccountOnNetwork> {
+    async getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: INonce): Promise<NonFungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`accounts/${address.bech32()}/nfts/${collection}-${nonce.hex()}`);
         let tokenData = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);
         return tokenData;
@@ -112,25 +112,27 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     async queryContract(query: IContractQuery): Promise<ContractQueryResponse> {
-        let data = query.toHttpRequest();
-        let response = await this.doPostGeneric("query", data);
-        let queryResponse = ContractQueryResponse.fromHttpResponse(response);
-        return queryResponse;
+        try {
+            let response = await this.doPostGeneric("query", query.toHttpRequest());
+            return ContractQueryResponse.fromHttpResponse(response);
+        } catch (error: any) {
+            throw new ErrContractQuery(error);
+        }
     }
 
-    async getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<IDefinitionOfFungibleTokenOnNetwork> {
+    async getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
         let response = await this.doGetGeneric(`tokens/${tokenIdentifier}`);
         let definition = DefinitionOfFungibleTokenOnNetwork.fromApiHttpResponse(response);
         return definition;
     }
 
-    async getDefinitionOfTokenCollection(collection: string): Promise<IDefinitionOfTokenCollectionOnNetwork> {
+    async getDefinitionOfTokenCollection(collection: string): Promise<DefinitionOfTokenCollectionOnNetwork> {
         let response = await this.doGetGeneric(`collections/${collection}`);
         let definition = DefinitionOfTokenCollectionOnNetwork.fromApiHttpResponse(response);
         return definition;
     }
 
-    async getNonFungibleToken(collection: string, nonce: INonce): Promise<INonFungibleTokenOfAccountOnNetwork> {
+    async getNonFungibleToken(collection: string, nonce: INonce): Promise<NonFungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`nfts/${collection}-${nonce.hex()}`);
         let token = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);
         return token;

@@ -1,4 +1,4 @@
-import { IBech32Address, IHash, IProvider } from "../interface";
+import { IBech32Address, IHash } from "../interface";
 import { Transaction, TransactionHash } from "../transaction";
 import { NetworkConfig } from "../networkProvider/networkConfig";
 import { Address } from "../address";
@@ -21,10 +21,7 @@ import { NetworkStatus } from "../networkProvider/networkStatus";
 const DummyHyperblockNonce = 42;
 const DummyHyperblockHash = "a".repeat(32);
 
-/**
- * A mock {@link IProvider}, used for tests only.
- */
-export class MockProvider implements IProvider {
+export class MockProvider {
     static AddressOfAlice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
     static AddressOfBob = new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
     static AddressOfCarol = new Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");

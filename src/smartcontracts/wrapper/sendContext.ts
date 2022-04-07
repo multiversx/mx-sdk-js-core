@@ -1,11 +1,12 @@
 import { GasLimit } from "../../networkParams";
-import { IChainID, IProvider } from "../../interface";
+import { IChainID } from "../../interface";
 import { ContractLogger } from "./contractLogger";
 import { TestWallet } from "../../testutils";
 import { Balance } from "../../balance";
 import { Err } from "../../errors";
 import { getGasFromValue } from "./systemWrapper";
 import { INetworkConfig } from "../../interfaceOfNetwork";
+import { IProvider } from "./interface";
 
 /**
  * Stores contextual information which is needed when preparing a transaction.

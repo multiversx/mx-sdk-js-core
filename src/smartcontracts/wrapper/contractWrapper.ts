@@ -15,7 +15,6 @@ import { SmartContractAbi } from "../abi";
 import { SmartContract } from "../smartContract";
 import { Code } from "../code";
 import { Transaction } from "../../transaction";
-import { IProvider } from "../../interface";
 import { Interaction } from "../interaction";
 import { Err, ErrContract, ErrInvalidArgument } from "../../errors";
 import { Egld } from "../../balanceBuilder";
@@ -24,6 +23,7 @@ import { ExecutionResultsBundle, findImmediateResult, interpretExecutionResults 
 import { Result } from "./result";
 import { TransactionWatcher } from "../../transactionWatcher";
 import { ITransactionOnNetwork } from "../../interfaceOfNetwork";
+import { IProvider } from "./interface";
 
 /**
  * Provides a simple interface in order to easily call or query the smart contract's methods.

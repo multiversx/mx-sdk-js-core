@@ -1,7 +1,7 @@
 import { Balance } from "../../balance";
-import { IProvider } from "../../interface";
 import { TestWallet } from "../../testutils";
 import { ContractLogger } from "./contractLogger";
+import { IProvider } from "./interface";
 import { SendContext } from "./sendContext";
 
 export class ChainSendContext {

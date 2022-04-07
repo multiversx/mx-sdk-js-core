@@ -7,13 +7,13 @@ import { AddressType, EndpointParameterDefinition } from "../typesystem";
 import { Address } from "../../address";
 import { Balance } from "../../balance";
 import { Egld, BalanceBuilder, createBalanceBuilder } from "../../balanceBuilder";
-import { IProvider } from "../../interface";
 import { Token } from "../../token";
 import { EsdtHelpers } from "../../esdtHelpers";
 import { MockProvider, TestWallet } from "../../testutils";
 import { NativeSerializer, NativeTypes } from "../nativeSerializer";
 import { ArgumentErrorContext } from "../argumentErrorContext";
 import { ChainSendContext } from "./chainSendContext";
+import { IProvider } from "./interface";
 
 export namespace SystemConstants {
     export let SYSTEM_ABI_PATH = path.join(path.dirname(__filename), "../../abi");

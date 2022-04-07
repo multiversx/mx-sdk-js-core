@@ -1,4 +1,3 @@
-import { BigNumber } from "bignumber.js";
 import { AccountOnNetwork } from "./accounts";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
@@ -7,6 +6,8 @@ import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { NetworkStatus } from "./networkStatus";
 import { ContractQueryResponse } from "./contractQueryResponse";
+import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
+import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
@@ -40,22 +41,22 @@ export interface INetworkProvider {
     /**
      * Fetches data about the fungible tokens held by an account.
      */
-    getFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<IFungibleTokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
-    getNonFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<INonFungibleTokenOfAccountOnNetwork[]>;
+    getNonFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about a specific fungible token held by an account.
      */
-    getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<IFungibleTokenOfAccountOnNetwork>;
+    getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches data about a specific non-fungible token (instance) held by an account.
      */
-    getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: INonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: INonce): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches the state of a {@link Transaction}.
@@ -87,18 +88,18 @@ export interface INetworkProvider {
      * Fetches the definition of a fungible token.
      *
      */
-    getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<IDefinitionOfFungibleTokenOnNetwork>;
+    getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork>;
 
     /**
      * Fetches the definition of a SFT (including Meta ESDT) or NFT.
      * 
      */
-    getDefinitionOfTokenCollection(collection: string): Promise<IDefinitionOfTokenCollectionOnNetwork>;
+    getDefinitionOfTokenCollection(collection: string): Promise<DefinitionOfTokenCollectionOnNetwork>;
 
     /**
      * Fetches data about a specific non-fungible token (instance).
      */
-    getNonFungibleToken(collection: string, nonce: INonce): Promise<INonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleToken(collection: string, nonce: INonce): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Performs a generic GET action against the provider (useful for new HTTP endpoints, not yet supported by erdjs).
@@ -109,54 +110,6 @@ export interface INetworkProvider {
      * Performs a generic POST action against the provider (useful for new HTTP endpoints, not yet supported by erdjs).
      */
     doPostGeneric(resourceUrl: string, payload: any): Promise<any>;
-}
-
-export interface IFungibleTokenOfAccountOnNetwork {
-    identifier: string;
-    balance: BigNumber;
-}
-
-export interface INonFungibleTokenOfAccountOnNetwork {
-    identifier: string;
-    collection: string;
-    attributes: Buffer;
-    balance: BigNumber;
-    nonce: INonce;
-    creator: IAddress;
-    royalties: BigNumber;
-}
-
-
-export interface IDefinitionOfFungibleTokenOnNetwork {
-    identifier: string;
-    name: string;
-    ticker: string;
-    owner: IAddress;
-    decimals: number;
-    supply: BigNumber;
-    isPaused: boolean;
-    canUpgrade: boolean;
-    canMint: boolean;
-    canBurn: boolean;
-    canChangeOwner: boolean;
-    canPause: boolean;
-    canFreeze: boolean;
-    canWipe: boolean;
-    canAddSpecialRoles: boolean;
-}
-
-export interface IDefinitionOfTokenCollectionOnNetwork {
-    collection: string;
-    type: string;
-    name: string;
-    ticker: string;
-    owner: IAddress;
-    decimals: number;
-    canPause: boolean;
-    canFreeze: boolean;
-    canWipe: boolean;
-    canTransferRole: boolean;
-    // TODO: add "assets", "roles"
 }
 
 export interface IContractQuery {

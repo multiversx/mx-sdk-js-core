@@ -1,8 +1,8 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./primitives";
-import { IAddress, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork } from "./interface";
+import { IAddress } from "./interface";
 
-export class DefinitionOfFungibleTokenOnNetwork implements IDefinitionOfFungibleTokenOnNetwork {
+export class DefinitionOfFungibleTokenOnNetwork {
     identifier: string = "";
     name: string = "";
     ticker: string = "";
@@ -42,7 +42,7 @@ export class DefinitionOfFungibleTokenOnNetwork implements IDefinitionOfFungible
     }
 }
 
-export class DefinitionOfTokenCollectionOnNetwork implements IDefinitionOfTokenCollectionOnNetwork {
+export class DefinitionOfTokenCollectionOnNetwork {
     collection: string = "";
     type: string = "";
     name: string = "";

@@ -28,3 +28,13 @@ export class ErrNetworkProvider extends Err {
         super(message, inner);
     }
 }
+
+
+/**
+ * Signals a generic error in the context of querying Smart Contracts.
+ */
+export class ErrContractQuery extends Err {
+    public constructor(originalError: Error) {
+        super(originalError.message.replace("executeQuery:", ""));
+    }
+}

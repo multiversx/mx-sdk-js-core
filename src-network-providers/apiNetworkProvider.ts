@@ -90,13 +90,13 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     async getTransaction(txHash: IHash): Promise<TransactionOnNetwork> {
-        let response = await this.doGetGeneric(`transactions/${txHash.toString()}`);
+        let response = await this.doGetGeneric(`transactions/${txHash.hex()}`);
         let transaction = TransactionOnNetwork.fromApiHttpResponse(txHash, response);
         return transaction;
     }
 
     async getTransactionStatus(txHash: IHash): Promise<TransactionStatus> {
-        let response = await this.doGetGeneric(`transactions/${txHash.toString()}?fields=status`);
+        let response = await this.doGetGeneric(`transactions/${txHash.hex()}?fields=status`);
         let status = new TransactionStatus(response.status);
         return status;
     }
@@ -153,8 +153,10 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     private async doGet(resourceUrl: string): Promise<any> {
+        let url = `${this.url}/${resourceUrl}`;
+        console.debug(`ApiNetworkProvider.doGet(): ${url}`);
+
         try {
-            let url = `${this.url}/${resourceUrl}`;
             let response = await axios.get(url, this.config);
             return response.data;
         } catch (error) {
@@ -163,8 +165,10 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     private async doPost(resourceUrl: string, payload: any): Promise<any> {
+        let url = `${this.url}/${resourceUrl}`;
+        console.debug(`ApiNetworkProvider.doPost(): ${url}`);
+
         try {
-            let url = `${this.url}/${resourceUrl}`;
             let response = await axios.post(url, payload, {
                 ...this.config,
                 headers: {

@@ -93,14 +93,14 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getTransaction(txHash: IHash): Promise<TransactionOnNetwork> {
-        let url = this.buildUrlWithQueryParameters(`transaction/${txHash.toString()}`, { withResults: "true" });
+        let url = this.buildUrlWithQueryParameters(`transaction/${txHash.hex()}`, { withResults: "true" });
         let response = await this.doGetGeneric(url);
         let transaction = TransactionOnNetwork.fromProxyHttpResponse(txHash, response.transaction);
         return transaction;
     }
 
     async getTransactionStatus(txHash: IHash): Promise<TransactionStatus> {
-        let response = await this.doGetGeneric(`transaction/${txHash.toString()}/status`);
+        let response = await this.doGetGeneric(`transaction/${txHash.hex()}/status`);
         let status = new TransactionStatus(response.status);
         return status;
     }
@@ -153,8 +153,10 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     private async doGet(resourceUrl: string): Promise<any> {
+        let url = `${this.url}/${resourceUrl}`;
+        console.debug(`ProxyNetworkProvider.doGet(): ${url}`);
+
         try {
-            let url = `${this.url}/${resourceUrl}`;
             let response = await axios.get(url, this.config);
             let payload = response.data.data;
             return payload;
@@ -164,8 +166,10 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     private async doPost(resourceUrl: string, payload: any): Promise<any> {
+        let url = `${this.url}/${resourceUrl}`;
+        console.debug(`ProxyNetworkProvider.doPost(): ${url}`);
+
         try {
-            let url = `${this.url}/${resourceUrl}`;
             let response = await axios.post(url, payload, {
                 ...this.config,
                 headers: {

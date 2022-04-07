@@ -25,11 +25,9 @@ export class NonFungibleTokenOfAccountOnNetwork {
     type: string = "";
     name: string = "";
     creator: IAddress = new Address("");
-    isWhitelistedStorage: boolean = false;
     supply: BigNumber = new BigNumber(0);
     decimals: number = 0;
     royalties: BigNumber = new BigNumber(0);
-    ticker: string = "";
     assets: string[] = [];
 
     constructor(init?: Partial<NonFungibleTokenOfAccountOnNetwork>) {
@@ -75,11 +73,9 @@ export class NonFungibleTokenOfAccountOnNetwork {
         result.type = payload.type || "";
         result.name = payload.name || "";
         result.creator = new Address(payload.creator || "");
-        result.isWhitelistedStorage = payload.isWhitelistedStorage || false;
         result.decimals = Number(payload.decimals || 0);
         result.supply = new BigNumber(payload.balance || 1);
         result.royalties = new BigNumber(payload.royalties || 0);
-        result.ticker = payload.ticker || "";
         result.assets = payload.assets || [];
 
         return result;

@@ -1,8 +1,8 @@
 
 import { BalanceBuilder, Egld } from "./balanceBuilder";
 import { ErrInvalidArgument } from "./errors";
-import { IApiProvider, IProvider } from "./interface";
-import { DeprecatedApiProvider } from "./networkProvider/deprecatedApiProvider";
+import { IProvider } from "./interface";
+import { ApiNetworkProvider } from "./networkProvider";
 import { DeprecatedProxyProvider } from "./networkProvider/deprecatedProxyProvider";
 import { SystemWrapper } from "./smartcontracts/wrapper";
 import { loadAndSyncTestWallets, TestWallet } from "./testutils";
@@ -36,11 +36,11 @@ export function chooseProxyProvider(providerChoice: string): IProvider {
     throw new ErrInvalidArgument(`providerChoice is not recognized (must be one of: ${Object.keys(providers)})`);
 }
 
-export function chooseApiProvider(providerChoice: string): IApiProvider {
-    let providers: Record<string, IApiProvider> = {
-        "elrond-devnet": new DeprecatedApiProvider("https://devnet-api.elrond.com", { timeout: 5000 }),
-        "elrond-testnet": new DeprecatedApiProvider("https://testnet-api.elrond.com", { timeout: 5000 }),
-        "elrond-mainnet": new DeprecatedApiProvider("https://api.elrond.com", { timeout: 5000 })
+export function chooseApiProvider(providerChoice: string): ApiNetworkProvider {
+    let providers: Record<string, ApiNetworkProvider> = {
+        "elrond-devnet": new ApiNetworkProvider("https://devnet-api.elrond.com", { timeout: 5000 }),
+        "elrond-testnet": new ApiNetworkProvider("https://testnet-api.elrond.com", { timeout: 5000 }),
+        "elrond-mainnet": new ApiNetworkProvider("https://api.elrond.com", { timeout: 5000 })
     };
 
     let chosenProvider = providers[providerChoice];

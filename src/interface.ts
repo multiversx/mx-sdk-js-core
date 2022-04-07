@@ -3,7 +3,6 @@ import { Signature } from "./signature";
 import { Query } from "./smartcontracts";
 import BigNumber from "bignumber.js";
 import { IAccountOnNetwork, IContractQueryResponse, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStake, INetworkStats, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
-import { IDefinitionOfFungibleTokenOnNetwork } from "./networkProvider/interface";
 
 /**
  * @deprecated
@@ -78,22 +77,6 @@ export interface IProvider extends ITransactionFetcher {
      * Post method that receives the resource url, the post payload and on callback the method used to map the response.
      */
     doPostGeneric(resourceUrl: string, payload: any, callback: (response: any) => any): Promise<any>;
-}
-
-/**
- * @deprecated
- */
-export interface IApiProvider extends ITransactionFetcher {
-    /**
-     * Fetches the Network Stake.
-     */
-    getNetworkStake(): Promise<INetworkStake>;
-    /**
-     * Fetches the Network Stats.
-     */
-    getNetworkStats(): Promise<INetworkStats>;
-
-    getToken(tokenIdentifier: string): Promise<IDefinitionOfFungibleTokenOnNetwork>;
 }
 
 /**

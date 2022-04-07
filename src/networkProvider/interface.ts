@@ -119,11 +119,18 @@ export interface IFungibleTokenOfAccountOnNetwork {
 export interface INonFungibleTokenOfAccountOnNetwork {
     identifier: string;
     collection: string;
+    timestamp: number;
     attributes: Buffer;
-    balance: BigNumber;
     nonce: INonce;
+    type: string;
+    name: string;
     creator: IAddress;
+    isWhitelistedStorage: boolean;
+    supply: BigNumber;
+    decimals: number;
     royalties: BigNumber;
+    ticker: string;
+    assets: string[];
 }
 
 

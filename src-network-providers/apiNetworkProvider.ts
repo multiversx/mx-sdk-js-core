@@ -37,13 +37,13 @@ export class ApiNetworkProvider implements INetworkProvider {
 
     async getNetworkStakeStatistics(): Promise<NetworkStake> {
         let response = await this.doGetGeneric("stake");
-        let networkStake = NetworkStake.fromHttpResponse(response)
+        let networkStake = NetworkStake.fromHttpResponse(response);
         return networkStake;
     }
 
     async getNetworkGeneralStatistics(): Promise<Stats> {
         let response = await this.doGetGeneric("stats");
-        let stats = Stats.fromHttpResponse(response)
+        let stats = Stats.fromHttpResponse(response);
         return stats;
     }
 

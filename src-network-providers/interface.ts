@@ -138,7 +138,7 @@ export interface ITransaction {
     toSendable(): any;
 }
 
-export interface IHexable { hex(): string }
+export interface IHexable { hex(): string; }
 export interface IHash extends IHexable { }
 export interface IAddress { bech32(): string; }
 export interface INonce extends IHexable { valueOf(): number; }

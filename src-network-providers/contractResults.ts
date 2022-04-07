@@ -29,7 +29,7 @@ export class ContractResults {
 }
 
 export class ContractResultItem {
-    hash: IHash = new Hash("")
+    hash: IHash = new Hash("");
     nonce: INonce = new Nonce(0);
     value: TransactionValue = new TransactionValue("");
     receiver: IAddress = new Address("");

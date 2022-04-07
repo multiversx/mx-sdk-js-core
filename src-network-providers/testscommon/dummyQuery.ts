@@ -18,6 +18,6 @@ export class DummyQuery implements IContractQuery {
             "args": this.arguments,
             "value": this.value,
             "caller": this.caller
-        }
+        };
     }
 }

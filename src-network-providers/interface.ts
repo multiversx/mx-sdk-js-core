@@ -34,7 +34,7 @@ export interface INetworkProvider {
     getNetworkGeneralStatistics(): Promise<Stats>;
 
     /**
-     * Fetches the state of an {@link Account}.
+     * Fetches the state of an account.
      */
     getAccount(address: IAddress): Promise<AccountOnNetwork>;
 
@@ -59,22 +59,22 @@ export interface INetworkProvider {
     getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: INonce): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
-     * Fetches the state of a {@link Transaction}.
+     * Fetches the state of a transaction.
      */
     getTransaction(txHash: IHash): Promise<TransactionOnNetwork>;
 
     /**
-     * Queries the status of a {@link Transaction}.
+     * Queries the status of a transaction.
      */
     getTransactionStatus(txHash: IHash): Promise<TransactionStatus>;
 
     /**
-     * Broadcasts an already-signed {@link Transaction}.
+     * Broadcasts an already-signed transaction.
      */
     sendTransaction(tx: ITransaction): Promise<IHash>;
 
     /**
-     * Simulates the processing of an already-signed {@link Transaction}.
+     * Simulates the processing of an already-signed transaction.
      * 
      */
     simulateTransaction(tx: ITransaction): Promise<IContractSimulation>;

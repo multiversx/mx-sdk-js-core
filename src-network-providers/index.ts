@@ -1,5 +1,3 @@
-export * from "./apiNetworkProvider";
-export * from "./proxyNetworkProvider";
+export * from "./factory";
 
-// we do not export "./tokens"
-// we do not export "./transactions"
+// Important: we do not export any other components.

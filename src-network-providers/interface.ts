@@ -77,7 +77,7 @@ export interface INetworkProvider {
      * Simulates the processing of an already-signed transaction.
      * 
      */
-    simulateTransaction(tx: ITransaction): Promise<IContractSimulation>;
+    simulateTransaction(tx: ITransaction): Promise<ISimulationResults>;
 
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
@@ -122,7 +122,7 @@ export interface IContractReturnCode {
     isSuccess(): boolean;
 }
 
-export interface IContractSimulation {
+export interface ISimulationResults {
 }
 
 export interface IPagination {
@@ -142,6 +142,5 @@ export interface ITransactionPayload { encoded(): string; }
 export interface IGasLimit { valueOf(): number; }
 export interface IGasPrice { valueOf(): number; }
 export interface IChainID { valueOf(): string; }
-export interface IGasPriceModifier { valueOf(): number; }
 export interface ITransactionVersion { valueOf(): number; }
 export interface IAccountBalance { toString(): string; }

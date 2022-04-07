@@ -9,11 +9,11 @@ import { assert } from "chai";
 import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 import { decodeUnsignedNumber } from "./codec";
 import { BytesValue } from "./typesystem/bytes";
-import { chooseProxyProvider } from "../interactive";
 import { ResultsParser } from "./resultsParser";
+import { createLocalnetProvider } from "../testutils/networkProviders";
 
 describe("test on local testnet", function () {
-    let provider = chooseProxyProvider("local-testnet");
+    let provider = createLocalnetProvider();
     let watcher = new TransactionWatcher(provider);
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
     let resultsParser = new ResultsParser();

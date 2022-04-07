@@ -2,13 +2,13 @@ import { loadContractCode, loadTestWallets, TestWallet } from "../testutils";
 import { TransactionWatcher } from "../transactionWatcher";
 import { GasLimit } from "../networkParams";
 import { assert } from "chai";
-import { chooseProxyProvider } from "../interactive";
 import { SmartContract } from "./smartContract";
 import { ContractFunction } from "./function";
 import { ResultsParser } from "./resultsParser";
+import { createLocalnetProvider } from "../testutils/networkProviders";
 
 describe("fetch transactions from local testnet", function () {
-    let provider = chooseProxyProvider("local-testnet");
+    let provider = createLocalnetProvider();
     let watcher = new TransactionWatcher(provider);
     let alice: TestWallet;
     let resultsParser = new ResultsParser();

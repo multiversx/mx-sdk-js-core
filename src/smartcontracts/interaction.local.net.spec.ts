@@ -9,12 +9,13 @@ import { GasLimit } from "../networkParams";
 import { ReturnCode } from "./returnCode";
 import BigNumber from "bignumber.js";
 import { BytesValue } from "./typesystem/bytes";
-import { chooseProxyProvider } from "../interactive";
+import { createLocalnetProvider } from "../testutils/networkProviders";
 
 
 describe("test smart contract interactor", function () {
-    let provider = chooseProxyProvider("local-testnet");
+    let provider = createLocalnetProvider();
     let alice: TestWallet;
+    
     before(async function () {
         ({ alice } = await loadTestWallets());
     });

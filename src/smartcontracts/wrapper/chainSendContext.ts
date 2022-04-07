@@ -1,7 +1,7 @@
 import { Balance } from "../../balance";
 import { TestWallet } from "../../testutils";
 import { ContractLogger } from "./contractLogger";
-import { IDeprecatedProvider } from "./interface";
+import { IProvider } from "./interface";
 import { SendContext } from "./sendContext";
 
 export class ChainSendContext {
@@ -36,7 +36,7 @@ export class ChainSendContext {
         return this;
     }
 
-    getProvider(): IDeprecatedProvider {
+    getProvider(): IProvider {
         return this.context.getProvider();
     }
 }

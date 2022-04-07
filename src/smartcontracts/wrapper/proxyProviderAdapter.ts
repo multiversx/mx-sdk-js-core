@@ -10,11 +10,12 @@ import { TransactionOnNetwork } from "../../networkProvider/transactions";
 import { NetworkConfig } from "../../networkProvider/networkConfig";
 import { NetworkStatus } from "../../networkProvider/networkStatus";
 import { Nonce } from "../../networkProvider/primitives";
+import { IProvider } from "./interface";
 
 /**
- * @deprecated
+ * The contract wrappers require an adapted interface of the proxy provider.
  */
-export class DeprecatedProxyProvider {
+export class ProxyProviderAdapter implements IProvider {
     private readonly backingProvider: ProxyNetworkProvider;
 
     constructor(url: string, config?: AxiosRequestConfig) {
@@ -45,10 +46,6 @@ export class DeprecatedProxyProvider {
         return await this.backingProvider.sendTransaction(tx);
     }
 
-    async simulateTransaction(tx: ITransaction): Promise<any> {
-        return await this.backingProvider.simulateTransaction(tx);
-    }
-
     async getTransaction(txHash: IHash): Promise<TransactionOnNetwork> {
         return await this.backingProvider.getTransaction(txHash);
     }
@@ -63,13 +60,5 @@ export class DeprecatedProxyProvider {
 
     async getNetworkStatus(): Promise<NetworkStatus> {
         return await this.backingProvider.getNetworkStatus();
-    }
-
-    async doGetGeneric(resourceUrl: string): Promise<any> {
-        return await this.backingProvider.doGetGeneric(resourceUrl);
-    }
-
-    async doPostGeneric(resourceUrl: string, payload: any): Promise<any> {
-        return await this.backingProvider.doPostGeneric(resourceUrl, payload);
     }
 }

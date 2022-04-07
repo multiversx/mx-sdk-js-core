@@ -5,9 +5,9 @@ import { Transaction } from "../../transaction";
 import { Query } from "../query";
 
 /**
- * @deprecated
+ * The contract wrappers require this interface of a network provider.
  */
-export interface IDeprecatedProvider {
+export interface IProvider {
     getTransaction(txHash: IHash, hintSender?: IBech32Address, withResults?: boolean): Promise<ITransactionOnNetwork>;
     getTransactionStatus(txHash: IHash): Promise<ITransactionStatus>;
     getNetworkConfig(): Promise<INetworkConfig>;
@@ -18,7 +18,4 @@ export interface IDeprecatedProvider {
     getAddressNft(address: IBech32Address, tokenIdentifier: string, nonce: BigNumber): Promise<any>;
     queryContract(query: Query): Promise<IContractQueryResponse>;
     sendTransaction(tx: Transaction): Promise<IHash>;
-    simulateTransaction(tx: Transaction): Promise<IHash>;
-    doGetGeneric(resourceUrl: string, callback: (response: any) => any): Promise<any>;
-    doPostGeneric(resourceUrl: string, payload: any, callback: (response: any) => any): Promise<any>;
 }

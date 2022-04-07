@@ -6,20 +6,20 @@ import { Balance } from "../../balance";
 import { Err } from "../../errors";
 import { getGasFromValue } from "./systemWrapper";
 import { INetworkConfig } from "../../interfaceOfNetwork";
-import { IDeprecatedProvider } from "./interface";
+import { IProvider } from "./interface";
 
 /**
  * Stores contextual information which is needed when preparing a transaction.
  */
 export class SendContext {
     private sender_: TestWallet | null;
-    private provider_: IDeprecatedProvider;
+    private provider_: IProvider;
     private gas_: GasLimit | null;
     private logger_: ContractLogger | null;
     private value_: Balance | null;
     private networkConfig: INetworkConfig;
 
-    constructor(provider: IDeprecatedProvider, networkConfig: INetworkConfig) {
+    constructor(provider: IProvider, networkConfig: INetworkConfig) {
         this.sender_ = null;
         this.provider_ = provider;
         this.gas_ = null;
@@ -28,7 +28,7 @@ export class SendContext {
         this.networkConfig = networkConfig;
     }
 
-    provider(provider: IDeprecatedProvider): this {
+    provider(provider: IProvider): this {
         this.provider_ = provider;
         return this;
     }
@@ -74,7 +74,7 @@ export class SendContext {
         return this.sender_;
     }
 
-    getProvider(): IDeprecatedProvider {
+    getProvider(): IProvider {
         return this.provider_;
     }
 

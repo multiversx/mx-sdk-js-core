@@ -1,6 +1,5 @@
-import { Transaction } from "./transaction";
 import { Signature } from "./signature";
-import { IAccountOnNetwork, IContractQueryResponse, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStake, INetworkStats, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 /**
  * @deprecated

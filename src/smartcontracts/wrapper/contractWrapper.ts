@@ -23,7 +23,7 @@ import { ExecutionResultsBundle, findImmediateResult, interpretExecutionResults 
 import { Result } from "./result";
 import { TransactionWatcher } from "../../transactionWatcher";
 import { ITransactionOnNetwork } from "../../interfaceOfNetwork";
-import { IDeprecatedProvider } from "./interface";
+import { IProvider } from "./interface";
 
 /**
  * Provides a simple interface in order to easily call or query the smart contract's methods.
@@ -119,7 +119,7 @@ export class ContractWrapper extends ChainSendContext {
         logger?.deployComplete(transaction, smartContractResults, this.smartContract.getAddress());
     }
 
-    static async loadProject(provider: IDeprecatedProvider, builtinFunctions: ContractWrapper | null, projectPath: string, filenameHint?: string, sendContext?: SendContext): Promise<ContractWrapper> {
+    static async loadProject(provider: IProvider, builtinFunctions: ContractWrapper | null, projectPath: string, filenameHint?: string, sendContext?: SendContext): Promise<ContractWrapper> {
         let { abiPath, wasmPath } = await expandProjectPath(projectPath, filenameHint);
         let abi = await SmartContractAbi.fromAbiPath(abiPath);
         let smartContract = new SmartContract({ abi: abi });

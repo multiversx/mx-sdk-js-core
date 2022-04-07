@@ -3,8 +3,7 @@ import { TransactionWatcher } from "./transactionWatcher";
 import { TransactionHash } from "./transaction";
 import { MockProvider, InHyperblock, Wait } from "./testutils";
 import { Nonce } from "./nonce";
-import { TransactionOnNetwork } from "./networkProvider/transactions";
-import { TransactionStatus } from "./networkProvider/transactionStatus";
+import { MockTransactionStatus } from "./testutils/networkProviders";
 
 
 describe("test transactionWatcher", () => {
@@ -18,11 +17,11 @@ describe("test transactionWatcher", () => {
 
         provider.mockPutTransaction(hash, new TransactionOnNetwork({
             nonce: new Nonce(7),
-            status: TransactionStatus.createUnknown()
+            status: new MockTransactionStatus("unknown")
         }));
 
         await Promise.all([
-            provider.mockTransactionTimelineByHash(hash, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
+            provider.mockTransactionTimelineByHash(hash, [new Wait(40), new MockTransactionStatus("pending"), new Wait(40), new MockTransactionStatus("executed"), new InHyperblock()]),
             watcher.awaitCompleted(dummyTransaction)
         ]);
 

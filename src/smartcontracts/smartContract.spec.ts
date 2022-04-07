@@ -9,7 +9,7 @@ import { ContractFunction } from "./function";
 import { U32Value } from "./typesystem";
 import { BytesValue } from "./typesystem/bytes";
 import { TransactionWatcher } from "../transactionWatcher";
-import { TransactionStatus } from "../networkProvider/transactionStatus";
+import { MockTransactionStatus } from "../testutils/networkProviders";
 
 
 describe("test contract", () => {
@@ -64,7 +64,7 @@ describe("test contract", () => {
         let hash = await provider.sendTransaction(deployTransaction);
 
         await Promise.all([
-            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
+            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new MockTransactionStatus("pending"), new Wait(40), new MockTransactionStatus("executed"), new InHyperblock()]),
             watcher.awaitCompleted(deployTransaction)
         ]);
 
@@ -115,8 +115,8 @@ describe("test contract", () => {
         let hashTwo = await provider.sendTransaction(callTransactionTwo);
 
         await Promise.all([
-            provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
-            provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new InHyperblock()]),
+            provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new MockTransactionStatus("pending"), new Wait(40), new MockTransactionStatus("executed"), new InHyperblock()]),
+            provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new MockTransactionStatus("pending"), new Wait(40), new MockTransactionStatus("executed"), new InHyperblock()]),
             watcher.awaitCompleted(callTransactionOne),
             watcher.awaitCompleted(callTransactionTwo)
         ]);

@@ -10,6 +10,7 @@ import { TransactionHash } from "../transaction";
 import { Address } from "../address";
 import { Logger, LogLevel } from "../logger";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { MockTransactionEventTopic } from "../testutils/networkProviders";
 
 const KnownReturnCodes: string[] = [
     ReturnCode.None.valueOf(), 
@@ -106,7 +107,7 @@ describe("test smart contract results parser", () => {
                         new Address(), 
                         "signalError", 
                         [
-                            new TransactionEventTopic(Buffer.from("something happened").toString("base64"))
+                            new MockTransactionEventTopic(Buffer.from("something happened").toString("base64"))
                         ],
                         `@${Buffer.from("user error").toString("hex")}@07`
                     )    
@@ -129,7 +130,7 @@ describe("test smart contract results parser", () => {
                         new Address(), 
                         "writeLog", 
                         [
-                            new TransactionEventTopic("QHRvbyBtdWNoIGdhcyBwcm92aWRlZCBmb3IgcHJvY2Vzc2luZzogZ2FzIHByb3ZpZGVkID0gNTk2Mzg0NTAwLCBnYXMgdXNlZCA9IDczMzAxMA==")
+                            new MockTransactionEventTopic("QHRvbyBtdWNoIGdhcyBwcm92aWRlZCBmb3IgcHJvY2Vzc2luZzogZ2FzIHByb3ZpZGVkID0gNTk2Mzg0NTAwLCBnYXMgdXNlZCA9IDczMzAxMA==")
                         ],
                         Buffer.from("QDZmNmI=", "base64").toString()
                     )    

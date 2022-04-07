@@ -2,8 +2,8 @@
 import { BalanceBuilder, Egld } from "./balanceBuilder";
 import { ErrInvalidArgument } from "./errors";
 import { IApiProvider, IProvider } from "./interface";
-import { ApiProvider } from "./networkProvider/apiProvider";
-import { ProxyProvider } from "./networkProvider/proxyProvider";
+import { DeprecatedApiProvider } from "./networkProvider/deprecatedApiProvider";
+import { DeprecatedProxyProvider } from "./networkProvider/deprecatedProxyProvider";
 import { SystemWrapper } from "./smartcontracts/wrapper";
 import { loadAndSyncTestWallets, TestWallet } from "./testutils";
 
@@ -22,10 +22,10 @@ export async function setupInteractiveWithProvider(provider: IProvider): Promise
 
 export function chooseProxyProvider(providerChoice: string): IProvider {
     let providers: Record<string, IProvider> = {
-        "local-testnet": new ProxyProvider("http://localhost:7950", { timeout: 5000 }),
-        "elrond-testnet": new ProxyProvider("https://testnet-gateway.elrond.com", { timeout: 5000 }),
-        "elrond-devnet": new ProxyProvider("https://devnet-gateway.elrond.com", { timeout: 5000 }),
-        "elrond-mainnet": new ProxyProvider("https://gateway.elrond.com", { timeout: 20000 }),
+        "local-testnet": new DeprecatedProxyProvider("http://localhost:7950", { timeout: 5000 }),
+        "elrond-testnet": new DeprecatedProxyProvider("https://testnet-gateway.elrond.com", { timeout: 5000 }),
+        "elrond-devnet": new DeprecatedProxyProvider("https://devnet-gateway.elrond.com", { timeout: 5000 }),
+        "elrond-mainnet": new DeprecatedProxyProvider("https://gateway.elrond.com", { timeout: 20000 }),
     };
 
     let chosenProvider = providers[providerChoice];
@@ -38,9 +38,9 @@ export function chooseProxyProvider(providerChoice: string): IProvider {
 
 export function chooseApiProvider(providerChoice: string): IApiProvider {
     let providers: Record<string, IApiProvider> = {
-        "elrond-devnet": new ApiProvider("https://devnet-api.elrond.com", { timeout: 5000 }),
-        "elrond-testnet": new ApiProvider("https://testnet-api.elrond.com", { timeout: 5000 }),
-        "elrond-mainnet": new ApiProvider("https://api.elrond.com", { timeout: 5000 })
+        "elrond-devnet": new DeprecatedApiProvider("https://devnet-api.elrond.com", { timeout: 5000 }),
+        "elrond-testnet": new DeprecatedApiProvider("https://testnet-api.elrond.com", { timeout: 5000 }),
+        "elrond-mainnet": new DeprecatedApiProvider("https://api.elrond.com", { timeout: 5000 })
     };
 
     let chosenProvider = providers[providerChoice];

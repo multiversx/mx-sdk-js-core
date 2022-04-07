@@ -13,7 +13,7 @@ import { DefinitionOfFungibleTokenOnNetwork } from "./tokenDefinitions";
 /**
  * @deprecated
  */
-export class ApiProvider {
+export class DeprecatedApiProvider {
     private url: string;
     private config: AxiosRequestConfig;
     /**

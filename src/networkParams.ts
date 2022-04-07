@@ -171,26 +171,3 @@ export class TransactionOptions {
     }
 }
 
-export class GasPriceModifier {
-    /**
-     * The actual numeric value.
-     */
-    private readonly value: number;
-
-    /**
-     * Creates a GasPriceModifier object given a value.
-     */
-    constructor(value: number) {
-        value = Number(value);
-
-        if (value <= 0 || value > 1) {
-            throw new errors.ErrGasPriceModifierInvalid(value);
-        }
-
-        this.value = value;
-    }
-
-    valueOf(): number {
-        return this.value;
-    }
-}

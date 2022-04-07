@@ -14,7 +14,6 @@ import { assert } from "chai";
 import { Interaction } from "./interaction";
 import { ChainID, GasLimit } from "../networkParams";
 import { ContractFunction } from "./function";
-import { ContractQueryResponse } from "../networkProvider/contractQueryResponse";
 import { Nonce } from "../nonce";
 import { ReturnCode } from "./returnCode";
 import { Balance } from "../balance";

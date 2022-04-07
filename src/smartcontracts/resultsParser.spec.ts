@@ -3,17 +3,13 @@ import path from "path";
 import { assert } from "chai";
 import { BigUIntType, BigUIntValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition } from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
-import { ContractQueryResponse } from "../networkProvider/contractQueryResponse";
 import { ReturnCode } from "./returnCode";
 import { ResultsParser } from "./resultsParser";
 import { Nonce } from "../nonce";
 import { TransactionHash } from "../transaction";
 import { Address } from "../address";
 import { Logger, LogLevel } from "../logger";
-import { TransactionOnNetwork } from "../networkProvider/transactions";
-import { ContractResultItem, ContractResults } from "../networkProvider/contractResults";
-import { TransactionLogs } from "../networkProvider/transactionLogs";
-import { TransactionEvent, TransactionEventTopic } from "../networkProvider/transactionEvents";
+import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 
 const KnownReturnCodes: string[] = [
     ReturnCode.None.valueOf(), 
@@ -172,9 +168,9 @@ describe("test smart contract results parser", () => {
         Logger.setLevel(oldLogLevel);
     });
 
-    function loadRealWorldSamples(folder: string): [TransactionOnNetwork, string][] {
+    function loadRealWorldSamples(folder: string): [ITransactionOnNetwork, string][] {
         let transactionFiles = fs.readdirSync(folder);
-        let samples: [TransactionOnNetwork, string][] = [];
+        let samples: [ITransactionOnNetwork, string][] = [];
 
         for (const file of transactionFiles) {
             let txHash = new TransactionHash(path.basename(file, ".json"));

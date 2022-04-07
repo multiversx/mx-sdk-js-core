@@ -1,11 +1,10 @@
 import { assert } from "chai";
 import { Transaction } from "./transaction";
 import { Nonce } from "./nonce";
-import { ChainID, GasLimit, GasPrice, GasPriceModifier, TransactionOptions, TransactionVersion } from "./networkParams";
+import { ChainID, GasLimit, GasPrice, TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
 import { Balance } from "./balance";
 import { loadTestWallets, TestWallet } from "./testutils";
-import { NetworkConfig } from "./networkProvider/networkConfig";
 
 
 describe("test transaction construction", async () => {
@@ -142,9 +141,12 @@ describe("test transaction construction", async () => {
             chainID: new ChainID("local-testnet")
         });
 
-        let networkConfig = new NetworkConfig();
-        networkConfig.MinGasLimit = new GasLimit(10);
-        networkConfig.GasPriceModifier = new GasPriceModifier(0.01);
+        let networkConfig = {
+            MinGasLimit: new GasLimit(10),
+            GasPerDataByte: 1500,
+            GasPriceModifier: 0.01,
+            ChainID: "T"
+        };
 
         let fee = transaction.computeFee(networkConfig);
         assert.equal(fee.toString(), "5050");
@@ -161,9 +163,12 @@ describe("test transaction construction", async () => {
             chainID: new ChainID("local-testnet")
         });
 
-        let networkConfig = new NetworkConfig();
-        networkConfig.MinGasLimit = new GasLimit(10);
-        networkConfig.GasPriceModifier = new GasPriceModifier(0.01);
+        let networkConfig = {
+            MinGasLimit: new GasLimit(10),
+            GasPerDataByte: 1500,
+            GasPriceModifier: 0.01,
+            ChainID: "T"
+        };
 
         let fee = transaction.computeFee(networkConfig);
         assert.equal(fee.toString(), "6005000");

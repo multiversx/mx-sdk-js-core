@@ -20,4 +20,3 @@ export * from "./returnCode";
 export * from "./smartContract";
 export * from "./transactionPayloadBuilders";
 export * from "./typesystem";
-export * from "./wrapper";

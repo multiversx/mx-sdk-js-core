@@ -9,7 +9,6 @@ import {
   TransactionOptions,
   TransactionVersion,
 } from "./networkParams";
-import { NetworkConfig } from "./networkProvider/networkConfig";
 import { Nonce } from "./nonce";
 import { Signature } from "./signature";
 import { guardNotEmpty } from "./utils";
@@ -19,6 +18,7 @@ import { TypedEvent } from "./events";
 import { ProtoSerializer } from "./proto";
 import { Hash } from "./hash";
 import { adaptToAddress, adaptToSignature } from "./boundaryAdapters";
+import { INetworkConfig } from "./interfaceOfNetwork";
 
 const createTransactionHasher = require("blake2b");
 const TRANSACTION_HASH_LENGTH = 32;
@@ -341,7 +341,7 @@ export class Transaction implements ISignable {
    * Computes the current transaction fee based on the {@link NetworkConfig} and transaction properties
    * @param networkConfig {@link NetworkConfig}
    */
-  computeFee(networkConfig: NetworkConfig): BigNumber {
+  computeFee(networkConfig: INetworkConfig): BigNumber {
     let moveBalanceGas =
       networkConfig.MinGasLimit.valueOf() +
       this.data.length() * networkConfig.GasPerDataByte.valueOf();

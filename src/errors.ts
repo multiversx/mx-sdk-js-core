@@ -218,15 +218,6 @@ export class ErrTransactionOptionsInvalid extends Err {
 }
 
 /**
- * Signals an invalid value for {@link GasPriceModifier} objects.
- */
-export class ErrGasPriceModifierInvalid extends Err {
-  public constructor(value: number) {
-    super(`Invalid gas price modifier: ${value}`);
-  }
-}
-
-/**
  * Signals that the hash of the {@link Transaction} is not known (not set).
  */
 export class ErrTransactionHashUnknown extends Err {

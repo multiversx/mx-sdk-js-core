@@ -32,42 +32,6 @@ export class Token {
         Object.assign(this, init);
     }
 
-    static fromHttpResponse(response: {
-        identifier: string,
-        name: string,
-        ticker: string,
-        type: string,
-        owner: string,
-        supply: string,
-        decimals: number,
-        isPaused: boolean,
-        canUpgrade: boolean,
-        canMint: boolean,
-        canBurn: boolean,
-        canChangeOwner: boolean,
-        canPause: boolean,
-        canFreeze: boolean,
-        canWipe: boolean
-    }): Token {
-        return new Token({
-            identifier: response.identifier,
-            name: response.name,
-            ticker: response.ticker,
-            type: TokenType[response.type as keyof typeof TokenType],
-            owner: new Address(response.owner),
-            supply: response.supply,
-            decimals: response.decimals,
-            isPaused: response.isPaused,
-            canUpgrade: response.canUpgrade,
-            canMint: response.canMint,
-            canBurn: response.canBurn,
-            canChangeOwner: response.canChangeOwner,
-            canPause: response.canPause,
-            canFreeze: response.canFreeze,
-            canWipe: response.canWipe,
-        });
-    }
-
     static fromTokenProperties(tokenIdentifier: string, results: any[]): Token {
         let [tokenName, tokenType, owner, supply, ...propertiesBuffers] = results;
         let properties = parseTokenProperties(propertiesBuffers);

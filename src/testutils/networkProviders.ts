@@ -1,8 +1,11 @@
 import { createProxyNetworkProvider } from "@elrondnetwork/erdjs-network-providers";
-import { IAccountBalance, IBech32Address, IHash, INonce } from "../interface";
-import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionEventTopic, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
+import { Address } from "../address";
+import { Hash } from "../hash";
+import { IAccountBalance, IBech32Address, IHash, INonce, ITransactionPayload, ITransactionValue } from "../interface";
+import { IAccountOnNetwork, IContractQueryResponse, IContractResultItem, IContractResults, IContractReturnCode, INetworkConfig, ITransactionEvent, ITransactionEventTopic, ITransactionLogs, ITransactionOnNetwork, ITransactionReceipt, ITransactionStatus } from "../interfaceOfNetwork";
 import { Query } from "../smartcontracts/query";
 import { Transaction } from "../transaction";
+import { TransactionPayload } from "../transactionPayload";
 
 export function createLocalnetProvider(): INetworkProvider {
     return createProxyNetworkProvider("http://localhost:7950", { timeout: 5000 });
@@ -25,6 +28,27 @@ export class MockAccountOnNetwork implements IAccountOnNetwork {
     constructor(obj: {nonce: INonce, balance: IAccountBalance}) {
         this.nonce = obj.nonce;
         this.balance = obj.balance;
+    }
+}
+
+export class MockTransactionOnNetwork implements ITransactionOnNetwork {
+    hash: IHash = new Hash("");
+    type: string = "";
+    value: ITransactionValue = "";
+    receiver: IBech32Address = new Address();
+    sender: IBech32Address = new Address();
+    data: ITransactionPayload = new TransactionPayload();
+    status: ITransactionStatus = new MockTransactionStatus("");
+    receipt: ITransactionReceipt = new MockTransactionReceipt();
+    contractResults: IContractResults = new MockContractResults([]);
+    logs: ITransactionLogs = new MockTransactionLogs();
+    
+    constructor(init?: Partial<ITransactionOnNetwork>) {
+        Object.assign(this, init);
+    }
+
+    isCompleted(): boolean {
+        throw new Error("Method not implemented.");
     }
 }
 
@@ -52,6 +76,48 @@ export class MockTransactionStatus implements ITransactionStatus {
     }
 }
 
+export class MockTransactionReceipt implements ITransactionReceipt {
+    data: string = "";
+}
+
+export class MockContractResults implements IContractResults {
+    items: IContractResultItem[] = [];
+
+    constructor(items: IContractResultItem[]) {
+        this.items = items;
+    }
+}
+
+export class MockContractResultItem implements IContractResultItem {
+    hash: IHash = new Hash("");
+    nonce: INonce = 0;
+    receiver: IBech32Address = new Address();
+    sender: IBech32Address = new Address();
+    data: string = "";
+    returnMessage: string = "";
+    logs: ITransactionLogs = new MockTransactionLogs;
+
+    constructor(init?: Partial<IContractResultItem>) {
+        Object.assign(this, init);
+    }
+}
+
+export class MockTransactionLogs implements ITransactionLogs {
+    events: ITransactionEvent[] = [];
+
+    findSingleOrNoneEvent(_identifier: string, _predicate?: (event: ITransactionEvent) => boolean): ITransactionEvent | undefined {
+        throw new Error("Method not implemented.");
+    }
+    
+    findFirstOrNoneEvent(_identifier: string, _predicate?: (event: ITransactionEvent) => boolean): ITransactionEvent | undefined {
+        throw new Error("Method not implemented.");
+    }
+
+    findEvents(_identifier: string, _predicate?: (event: ITransactionEvent) => boolean): ITransactionEvent[] {
+        throw new Error("Method not implemented.");
+    }
+}
+
 export class MockTransactionEventTopic implements ITransactionEventTopic {
     value: Buffer;
 
@@ -65,5 +131,19 @@ export class MockTransactionEventTopic implements ITransactionEventTopic {
 
     hex(): string {
         return this.value.toString("hex");
+    }
+}
+
+export class MockContractQueryResponse implements IContractQueryResponse {
+    returnCode: IContractReturnCode = "";
+    returnMessage: string = "";
+    dataParts: Buffer[] = [];
+
+    constructor(init?: Partial<MockContractQueryResponse>) {
+        Object.assign(this, init);
+    }
+
+    getReturnDataParts(): Buffer[] {
+        return this.dataParts;
     }
 }

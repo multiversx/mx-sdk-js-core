@@ -25,7 +25,6 @@ export interface ITransactionOnNetwork {
     logs: ITransactionLogs;
 
     isCompleted(): boolean;
-    getAllEvents(): ITransactionEvent[];
 }
 
 export interface ITransactionStatus {

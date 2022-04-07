@@ -10,7 +10,7 @@ import { TransactionHash } from "../transaction";
 import { Address } from "../address";
 import { Logger, LogLevel } from "../logger";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { MockTransactionEventTopic } from "../testutils/networkProviders";
+import { MockContractQueryResponse, MockContractResultItem, MockContractResults, MockTransactionEventTopic, MockTransactionLogs, MockTransactionOnNetwork } from "../testutils/networkProviders";
 
 const KnownReturnCodes: string[] = [
     ReturnCode.None.valueOf(), 
@@ -42,10 +42,10 @@ describe("test smart contract results parser", () => {
         ];
         let endpoint = new EndpointDefinition("foo", [], outputParameters, endpointModifiers);
 
-        let queryResponse = new ContractQueryResponse({
-            returnData: [
-                Buffer.from([42]).toString("base64"),
-                Buffer.from("abba", "hex").toString("base64")
+        let queryResponse = new MockContractQueryResponse({
+            dataParts: [
+                Buffer.from([42]),
+                Buffer.from("abba", "hex")
             ],
             returnCode: ReturnCode.Ok,
             returnMessage: "foobar"
@@ -67,9 +67,9 @@ describe("test smart contract results parser", () => {
         ];
         let endpoint = new EndpointDefinition("foo", [], outputParameters, endpointModifiers);
 
-        let transactionOnNetwork = new TransactionOnNetwork({
-            contractResults: new ContractResults([
-                new ContractResultItem({ nonce: new Nonce(7), data: "@6f6b@2a@abba" })
+        let transactionOnNetwork = new MockTransactionOnNetwork({
+            contractResults: new MockContractResults([
+                new MockContractResultItem({ nonce: new Nonce(7), data: "@6f6b@2a@abba" })
             ])
         });
 
@@ -82,9 +82,9 @@ describe("test smart contract results parser", () => {
     });
 
     it("should parse contract outcome, on easily found result with return data", async () => {
-        let transaction = new TransactionOnNetwork({
-            contractResults: new ContractResults([
-                new ContractResultItem({
+        let transaction = new MockTransactionOnNetwork({
+            contractResults: new MockContractResults([
+                new MockContractResultItem({
                     nonce: new Nonce(42),
                     data: "@6f6b@03",
                     returnMessage: "foobar"
@@ -99,11 +99,11 @@ describe("test smart contract results parser", () => {
     });
 
     it("should parse contract outcome, on signal error", async () => {
-        let transaction = new TransactionOnNetwork({
-            logs: new TransactionLogs(
+        let transaction = new MockTransactionOnNetwork({
+            logs: new MockTransactionLogs(
                 new Address(), 
                 [
-                    new TransactionEvent(
+                    new MockTransactionEvent(
                         new Address(), 
                         "signalError", 
                         [
@@ -122,11 +122,11 @@ describe("test smart contract results parser", () => {
     });
 
     it("should parse contract outcome, on too much gas warning", async () => {
-        let transaction = new TransactionOnNetwork({
-            logs: new TransactionLogs(
+        let transaction = new MockTransactionOnNetwork({
+            logs: new MockTransactionLogs(
                 new Address(), 
                 [
-                    new TransactionEvent(
+                    new MockTransactionEvent(
                         new Address(), 
                         "writeLog", 
                         [

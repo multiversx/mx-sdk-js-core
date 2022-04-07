@@ -2,8 +2,7 @@ import { assert } from "chai";
 import { TransactionWatcher } from "./transactionWatcher";
 import { TransactionHash } from "./transaction";
 import { MockProvider, InHyperblock, Wait } from "./testutils";
-import { Nonce } from "./nonce";
-import { MockTransactionStatus } from "./testutils/networkProviders";
+import { MockTransactionOnNetwork, MockTransactionStatus } from "./testutils/networkProviders";
 
 
 describe("test transactionWatcher", () => {
@@ -15,8 +14,7 @@ describe("test transactionWatcher", () => {
             getHash: () => hash
         }
 
-        provider.mockPutTransaction(hash, new TransactionOnNetwork({
-            nonce: new Nonce(7),
+        provider.mockPutTransaction(hash, new MockTransactionOnNetwork({
             status: new MockTransactionStatus("unknown")
         }));
 

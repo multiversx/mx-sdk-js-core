@@ -7,10 +7,8 @@ import { Balance } from "../balance";
 import * as errors from "../errors";
 import { Query } from "../smartcontracts/query";
 import { TypedEvent } from "../events";
-import { BalanceBuilder } from "../balanceBuilder";
-import BigNumber from "bignumber.js";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
-import { MockAccountOnNetwork, MockTransactionStatus } from "./networkProviders";
+import { MockAccountOnNetwork, MockContractResultItem, MockContractResults, MockTransactionOnNetwork, MockTransactionStatus } from "./networkProviders";
 import { ErrMock } from "../errors";
 
 const DummyHyperblockNonce = 42;
@@ -126,14 +124,13 @@ export class MockProvider {
             return account;
         }
 
-        throw new ErrMock("account does not exist")
+        throw new ErrMock("Account not found")
     }
 
     async sendTransaction(transaction: Transaction): Promise<TransactionHash> {
         this.mockPutTransaction(
             transaction.getHash(),
-            new TransactionOnNetwork({
-                nonce: transaction.getNonce(),
+            new MockTransactionOnNetwork({
                 sender: transaction.getSender(),
                 receiver: transaction.getReceiver(),
                 data: transaction.getData(),
@@ -168,7 +165,7 @@ export class MockProvider {
             return transaction;
         }
 
-        throw new errors.ErrMock("Transaction not found");
+        throw new ErrMock("Transaction not found");
     }
 
     async getTransactionStatus(txHash: TransactionHash): Promise<ITransactionStatus> {
@@ -187,7 +184,7 @@ export class MockProvider {
             }
         }
 
-        return new ContractQueryResponse();
+        throw new ErrMock("No query response to return");
     }
 }
 

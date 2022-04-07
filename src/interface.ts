@@ -1,10 +1,13 @@
 import { Transaction } from "./transaction";
 import { Signature } from "./signature";
 import { Query } from "./smartcontracts";
-import { Token } from "./token";
 import BigNumber from "bignumber.js";
 import { IAccountOnNetwork, IContractQueryResponse, IFungibleTokenOfAccountOnNetwork, INetworkConfig, INetworkStake, INetworkStats, INetworkStatus, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { IDefinitionOfFungibleTokenOnNetwork } from "./networkProvider/interface";
 
+/**
+ * @deprecated
+ */
 export interface ITransactionFetcher {
     /**
      * Fetches the state of a {@link Transaction}.
@@ -18,7 +21,7 @@ export interface ITransactionFetcher {
 }
 
 /**
- * An interface that defines the endpoints of an HTTP API Provider.
+ * @deprecated
  */
 export interface IProvider extends ITransactionFetcher {
     /**
@@ -78,7 +81,7 @@ export interface IProvider extends ITransactionFetcher {
 }
 
 /**
- * An interface that defines the endpoints of an HTTP API Provider.
+ * @deprecated
  */
 export interface IApiProvider extends ITransactionFetcher {
     /**
@@ -90,12 +93,7 @@ export interface IApiProvider extends ITransactionFetcher {
      */
     getNetworkStats(): Promise<INetworkStats>;
 
-    getToken(tokenIdentifier: string): Promise<Token>;
-
-    /**
-     * Get method that receives the resource url and on callback the method used to map the response.
-     */
-    doGetGeneric(resourceUrl: string, callback: (response: any) => any): Promise<any>;
+    getToken(tokenIdentifier: string): Promise<IDefinitionOfFungibleTokenOnNetwork>;
 }
 
 /**

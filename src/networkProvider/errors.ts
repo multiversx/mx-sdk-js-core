@@ -28,3 +28,23 @@ export class ErrNetworkProvider extends Err {
         super(message, inner);
     }
 }
+
+/**
+ * Signals an error that happened during a HTTP GET request.
+ */
+export class ErrApiProviderGet extends Err {
+    public constructor(url: string, error: string, inner?: Error) {
+        let message = `Cannot GET ${url}: [${error}]`;
+        super(message, inner);
+    }
+}
+
+/**
+ * Signals an error that happened during a HTTP POST request.
+ */
+export class ErrApiProviderPost extends Err {
+    public constructor(url: string, error: string, inner?: Error) {
+        let message = `Cannot POST ${url}: [${error}]`;
+        super(message, inner);
+    }
+}

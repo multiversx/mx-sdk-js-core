@@ -273,30 +273,6 @@ export class ErrInvalidFunctionName extends Err {
 }
 
 /**
- * Signals an error that happened during a HTTP GET request.
- */
-export class ErrApiProviderGet extends Err {
-  public constructor(url: string, error: string, inner?: Error) {
-    let message = `Cannot GET ${url}: [${error}]`;
-    super(message, inner);
-  }
-}
-
-/**
- * Signals an error that happened during a HTTP POST request.
- */
-export class ErrApiProviderPost extends Err {
-  readonly originalErrorMessage: string;
-
-  public constructor(url: string, error: string, inner?: Error) {
-    let message = `Cannot POST ${url}: [${error}]`;
-    super(message, inner);
-
-    this.originalErrorMessage = error || "";
-  }
-}
-
-/**
  * Signals a failed operation, since the Timer is already running.
  */
 export class ErrAsyncTimerAlreadyRunning extends Err {
@@ -347,28 +323,6 @@ export class ErrExpectedTransactionStatusNotReached extends Err {
 export class ErrContract extends Err {
   public constructor(message: string) {
     super(message);
-  }
-}
-
-/**
- * Signals a generic error in the context of querying Smart Contracts.
- */
-export class ErrContractQuery extends Err {
-  public constructor(message: string) {
-    super(message);
-  }
-
-  static increaseSpecificity(err: Err): Err {
-    if (err instanceof ErrApiProviderPost) {
-      if (err.originalErrorMessage.indexOf("error running vm func")) {
-        let newErrorMessage = err.originalErrorMessage
-          .replace(new RegExp("executeQuery:", "g"), "")
-          .trim();
-        return new ErrContractQuery(newErrorMessage);
-      }
-    }
-
-    return err;
   }
 }
 

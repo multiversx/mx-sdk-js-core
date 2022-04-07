@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "./accounts";
-import { IAddress, IContractQuery, IHash, INetworkProvider, INonce, ITransaction, Pagination } from "./interface";
+import { IAddress, IContractQuery, IHash, INetworkProvider, INonce, ITransaction, IPagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
@@ -11,7 +11,7 @@ import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { Hash } from "./primitives";
 import { ErrContractQuery, ErrNetworkProvider } from "./errors";
-import { defaultAxiosConfig } from "./config";
+import { defaultAxiosConfig, defaultPagination } from "./config";
 import { NetworkStatus } from "./networkStatus";
 import { ContractQueryResponse } from "./contractQueryResponse";
 
@@ -53,8 +53,8 @@ export class ApiNetworkProvider implements INetworkProvider {
         return account;
     }
 
-    async getFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<FungibleTokenOfAccountOnNetwork[]> {
-        pagination = pagination || Pagination.default();
+    async getFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]> {
+        pagination = pagination || defaultPagination;
 
         let url = `accounts/${address.bech32()}/tokens?${this.buildPaginationParams(pagination)}`;
         let response: any[] = await this.doGetGeneric(url);
@@ -65,8 +65,8 @@ export class ApiNetworkProvider implements INetworkProvider {
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
-        pagination = pagination || Pagination.default();
+    async getNonFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+        pagination = pagination || defaultPagination;
 
         let url = `accounts/${address.bech32()}/nfts?${this.buildPaginationParams(pagination)}`;
         let response: any[] = await this.doGetGeneric(url);
@@ -148,7 +148,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         return response;
     }
 
-    private buildPaginationParams(pagination: Pagination) {
+    private buildPaginationParams(pagination: IPagination) {
         return `from=${pagination.from}&size=${pagination.size}`;
     }
 

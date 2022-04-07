@@ -41,12 +41,12 @@ export interface INetworkProvider {
     /**
      * Fetches data about the fungible tokens held by an account.
      */
-    getFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
-    getNonFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
+    getNonFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about a specific fungible token held by an account.
@@ -125,13 +125,9 @@ export interface IContractReturnCode {
 export interface IContractSimulation {
 }
 
-export class Pagination {
-    from: number = 0;
-    size: number = 100;
-
-    static default(): Pagination {
-        return { from: 0, size: 100 };
-    }
+export interface IPagination {
+    from: number;
+    size: number;
 }
 
 export interface ITransaction {

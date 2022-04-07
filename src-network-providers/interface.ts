@@ -112,6 +112,7 @@ export interface INetworkProvider {
     doPostGeneric(resourceUrl: string, payload: any): Promise<any>;
 }
 
+// TODO: network-providers package should be responsible with formatting the http request.
 export interface IContractQuery {
     toHttpRequest(): any;
 }
@@ -137,7 +138,7 @@ export interface ITransaction {
     toSendable(): any;
 }
 
-export interface IHexable { hex(): string }
+export interface IHexable { hex(): string; }
 export interface IHash extends IHexable { }
 export interface IAddress { bech32(): string; }
 export interface INonce extends IHexable { valueOf(): number; }

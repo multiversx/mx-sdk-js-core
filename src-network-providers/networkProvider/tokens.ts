@@ -1,8 +1,8 @@
 import { BigNumber } from "bignumber.js";
 import { Address, Nonce } from "./primitives";
-import { IAddress, IFungibleTokenOfAccountOnNetwork, INonce, INonFungibleTokenOfAccountOnNetwork } from "./interface";
+import { IAddress, INonce } from "./interface";
 
-export class FungibleTokenOfAccountOnNetwork implements IFungibleTokenOfAccountOnNetwork {
+export class FungibleTokenOfAccountOnNetwork {
     identifier: string = "";
     balance: BigNumber = new BigNumber(0);
 
@@ -16,7 +16,7 @@ export class FungibleTokenOfAccountOnNetwork implements IFungibleTokenOfAccountO
     }
 }
 
-export class NonFungibleTokenOfAccountOnNetwork implements INonFungibleTokenOfAccountOnNetwork {
+export class NonFungibleTokenOfAccountOnNetwork {
     identifier: string = "";
     collection: string = "";
     timestamp: number = 0;

@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "./accounts";
-import { IAddress, IContractQuery, IDefinitionOfFungibleTokenOnNetwork, IDefinitionOfTokenCollectionOnNetwork, IFungibleTokenOfAccountOnNetwork, IHash, INetworkProvider, INonce, INonFungibleTokenOfAccountOnNetwork, ITransaction, Pagination } from "./interface";
+import { IAddress, IContractQuery, IHash, INetworkProvider, INonce, ITransaction, Pagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
 import { Stats } from "./stats";
@@ -12,6 +12,7 @@ import { ErrNetworkProvider } from "./errors";
 import { defaultAxiosConfig } from "./config";
 import { NetworkStatus } from "./networkStatus";
 import { ContractQueryResponse } from "./contractQueryResponse";
+import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ProxyNetworkProvider implements INetworkProvider {
@@ -53,7 +54,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return account;
     }
 
-    async getFungibleTokensOfAccount(address: IAddress, _pagination?: Pagination): Promise<IFungibleTokenOfAccountOnNetwork[]> {
+    async getFungibleTokensOfAccount(address: IAddress, _pagination?: Pagination): Promise<FungibleTokenOfAccountOnNetwork[]> {
         let url = `address/${address.bech32()}/esdt`;
         let response = await this.doGetGeneric(url);
         let responseItems: any[] = Object.values(response.esdts);
@@ -66,7 +67,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(address: IAddress, _pagination?: Pagination): Promise<INonFungibleTokenOfAccountOnNetwork[]> {
+    async getNonFungibleTokensOfAccount(address: IAddress, _pagination?: Pagination): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
         let url = `address/${address.bech32()}/esdt`;
         let response = await this.doGetGeneric(url);
         let responseItems: any[] = Object.values(response.esdts);
@@ -79,13 +80,13 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokens;
     }
 
-    async getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<IFungibleTokenOfAccountOnNetwork> {
+    async getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`address/${address.bech32()}/esdt/${tokenIdentifier}`);
         let tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response.tokenData);
         return tokenData;
     }
 
-    async getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: INonce): Promise<INonFungibleTokenOfAccountOnNetwork> {
+    async getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: INonce): Promise<NonFungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`address/${address.bech32()}/nft/${collection}/nonce/${nonce.valueOf()}`);
         let tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponseByNonce(response.tokenData);
         return tokenData;
@@ -122,20 +123,20 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return queryResponse;
     }
 
-    async getDefinitionOfFungibleToken(_tokenIdentifier: string): Promise<IDefinitionOfFungibleTokenOnNetwork> {
+    async getDefinitionOfFungibleToken(_tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
         // TODO: Implement wrt.:
         // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/esdt/esdt.service.ts#L221
         throw new Error("Method not implemented.");
     }
 
-    async getDefinitionOfTokenCollection(_collection: string): Promise<IDefinitionOfTokenCollectionOnNetwork> {
+    async getDefinitionOfTokenCollection(_collection: string): Promise<DefinitionOfTokenCollectionOnNetwork> {
         // TODO: Implement wrt.:
         // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/collections/collection.service.ts
         // https://docs.elrond.com/developers/esdt-tokens/#get-esdt-token-properties
         throw new Error("Method not implemented.");
     }
 
-    async getNonFungibleToken(_collection: string, _nonce: INonce): Promise<INonFungibleTokenOfAccountOnNetwork> {
+    async getNonFungibleToken(_collection: string, _nonce: INonce): Promise<NonFungibleTokenOfAccountOnNetwork> {
         throw new Error("Method not implemented.");
     }
 

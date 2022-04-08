@@ -68,9 +68,3 @@ export class TransactionCompletionStrategyOnAPI {
         return !transaction.status.isPending();
     }
 }
-
-export class NullTransactionCompletionStrategy {
-    isCompleted(_transaction: ITransactionOnNetwork): boolean {
-        return false;
-    }
-}

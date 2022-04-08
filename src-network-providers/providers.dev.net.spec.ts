@@ -4,7 +4,7 @@ import { Hash } from "./primitives";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { Address, Nonce } from "./primitives";
-import { DummyQuery } from "./testscommon/dummyQuery";
+import { MockQuery } from "./testscommon/dummyQuery";
 import { createApiNetworkProvider, createProxyNetworkProvider } from "./factory";
 
 describe("test network providers on devnet: Proxy and API", function () {
@@ -205,7 +205,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(10000);
 
         // Query: get sum (of adder contract)
-        let query = new DummyQuery({
+        let query = new MockQuery({
             contract: "erd1qqqqqqqqqqqqqpgquykqja5c4v33zdmnwglj3jphqwrelzdn396qlc9g33",
             function: "getSum"
         });
@@ -221,7 +221,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.deepEqual(apiResponse.getReturnDataParts(), proxyResponse.getReturnDataParts());
 
         // Query: increment counter
-        query = new DummyQuery({
+        query = new MockQuery({
             contract: "erd1qqqqqqqqqqqqqpgqzeq07xvhs5g7cg4ama85upaqarrcgu49396q0gz4yf",
             function: "increment",
             arguments: []
@@ -242,7 +242,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(10000);
 
         // Query: issue ESDT
-        let query = new DummyQuery({
+        let query = new MockQuery({
             contract: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
             function: "issue",
             value: "50000000000000000",

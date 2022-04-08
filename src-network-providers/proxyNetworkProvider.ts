@@ -3,7 +3,7 @@ import { AccountOnNetwork } from "./accounts";
 import { IAddress, IContractQuery, IHash, INetworkProvider, INonce, IPagination, ITransaction } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
-import { Stats } from "./stats";
+import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
@@ -42,7 +42,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         throw new Error("Method not implemented.");
     }
 
-    async getNetworkGeneralStatistics(): Promise<Stats> {
+    async getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics> {
         // TODO: Implement wrt. (full implementation may not be possible):
         // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/network/network.service.ts
         throw new Error("Method not implemented.");

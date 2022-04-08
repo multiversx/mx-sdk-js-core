@@ -1,7 +1,7 @@
 import { AccountOnNetwork } from "./accounts";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
-import { Stats } from "./stats";
+import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { NetworkStatus } from "./networkStatus";
@@ -31,7 +31,7 @@ export interface INetworkProvider {
     /**
      * Fetches general statistics.
      */
-    getNetworkGeneralStatistics(): Promise<Stats>;
+    getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics>;
 
     /**
      * Fetches the state of an account.

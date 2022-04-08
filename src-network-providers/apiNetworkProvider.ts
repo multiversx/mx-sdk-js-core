@@ -3,7 +3,7 @@ import { AccountOnNetwork } from "./accounts";
 import { IAddress, IContractQuery, IHash, INetworkProvider, INonce, ITransaction, IPagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
-import { Stats } from "./stats";
+import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
@@ -41,9 +41,9 @@ export class ApiNetworkProvider implements INetworkProvider {
         return networkStake;
     }
 
-    async getNetworkGeneralStatistics(): Promise<Stats> {
+    async getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics> {
         let response = await this.doGetGeneric("stats");
-        let stats = Stats.fromHttpResponse(response);
+        let stats = NetworkGeneralStatistics.fromHttpResponse(response);
         return stats;
     }
 

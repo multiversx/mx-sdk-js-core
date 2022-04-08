@@ -6,7 +6,7 @@ import { TransactionCompletionStrategy } from "./transactionCompletionStrategy";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
 
- export class TransactionOnNetwork {
+export class TransactionOnNetwork {
     hash: IHash = new Hash("");
     type: string = "";
     nonce: INonce = new Nonce(0);

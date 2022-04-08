@@ -1,9 +1,7 @@
 /**
  * An object holding Network stats parameters.
  */
-export class Stats {
-    private static default: Stats;
-
+export class NetworkGeneralStatistics {
     /**
      * The number of Shards.
      */
@@ -52,8 +50,8 @@ export class Stats {
     /**
      * Constructs a stats object from a HTTP response (as returned by the provider).
      */
-    static fromHttpResponse(payload: any): Stats {
-        let stats = new Stats();
+    static fromHttpResponse(payload: any): NetworkGeneralStatistics {
+        let stats = new NetworkGeneralStatistics();
 
         stats.Shards = Number(payload["shards"]);
         stats.Blocks = Number(payload["blocks"]);

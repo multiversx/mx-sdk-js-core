@@ -28,8 +28,8 @@ export class TransactionOnNetwork {
     pendingResults: boolean = false;
 
     receipt: TransactionReceipt = new TransactionReceipt();
-    contractResults: ContractResults = ContractResults.empty();
-    logs: TransactionLogs = TransactionLogs.empty();
+    contractResults: ContractResults = new ContractResults([]);
+    logs: TransactionLogs = new TransactionLogs();
 
     constructor(init?: Partial<TransactionOnNetwork>) {
         Object.assign(this, init);

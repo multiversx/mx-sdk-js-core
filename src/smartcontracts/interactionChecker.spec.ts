@@ -28,7 +28,7 @@ describe("integration tests: test checker within interactor", function () {
 
         // Bad arguments
         assert.throw(() => {
-            contract.methods.getUltimateAnswer([BytesValue.fromHex("abba")]);
+            contract.methods.getUltimateAnswer(["abba"]);
         }, Error, "Wrong number of arguments for endpoint getUltimateAnswer: expected between 0 and 0 arguments, have 1");
     });
 

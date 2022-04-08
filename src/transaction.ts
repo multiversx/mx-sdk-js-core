@@ -306,16 +306,6 @@ export class Transaction implements ISignable {
     return this.toPlainObject();
   }
 
-  async awaitHashed(): Promise<void> {
-    if (!this.hash.isEmpty()) {
-      return;
-    }
-
-    return new Promise<void>((resolve, _reject) => {
-      this.onSigned.on(() => resolve());
-    });
-  }
-
   /**
    * Computes the current transaction fee based on the {@link NetworkConfig} and transaction properties
    * @param networkConfig {@link NetworkConfig}

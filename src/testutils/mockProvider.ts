@@ -78,7 +78,6 @@ export class MockProvider {
     }
 
     async mockTransactionTimeline(transaction: Transaction, timelinePoints: any[]): Promise<void> {
-        await transaction.awaitHashed();
         return this.mockTransactionTimelineByHash(transaction.getHash(), timelinePoints);
     }
 

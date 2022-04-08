@@ -2,17 +2,12 @@ import { TransactionStatus } from "./transactionStatus";
 import { ContractResults } from "./contractResults";
 import { Address, Hash, Nonce, TransactionValue, TransactionPayload } from "./primitives";
 import { IAddress, IGasLimit, IGasPrice, IHash, INonce, ITransactionPayload } from "./interface";
-import { NullTransactionCompletionStrategy, TransactionCompletionStrategyOnAPI, TransactionCompletionStrategyOnProxy } from "./transactionCompletionStrategy";
+import { TransactionCompletionStrategyOnAPI, TransactionCompletionStrategyOnProxy } from "./transactionCompletionStrategy";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
 
-interface ICompletionStrategy {
-    isCompleted(transaction: TransactionOnNetwork): boolean;
-}
-
 export class TransactionOnNetwork {
-    completionStrategy: ICompletionStrategy = new NullTransactionCompletionStrategy();
-
+    isCompleted: boolean = false;
     hash: IHash = new Hash("");
     type: string = "";
     nonce: INonce = new Nonce(0);
@@ -43,7 +38,7 @@ export class TransactionOnNetwork {
     static fromProxyHttpResponse(txHash: IHash, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromProxyHttpResponse(response.smartContractResults || []);
-        result.completionStrategy = new TransactionCompletionStrategyOnProxy();
+        result.isCompleted = new TransactionCompletionStrategyOnProxy().isCompleted(result);
         // TODO: uniformize transaction status.
         return result;
     }
@@ -51,7 +46,7 @@ export class TransactionOnNetwork {
     static fromApiHttpResponse(txHash: IHash, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromApiHttpResponse(response.results || []);
-        result.completionStrategy = new TransactionCompletionStrategyOnAPI();
+        result.isCompleted = new TransactionCompletionStrategyOnAPI().isCompleted(result);
         // TODO: uniformize transaction status.
         return result;
     }
@@ -85,10 +80,6 @@ export class TransactionOnNetwork {
 
     getDateTime(): Date {
         return new Date(this.timestamp * 1000);
-    }
-
-    isCompleted(): boolean {
-        return this.completionStrategy.isCompleted(this);
     }
 }
 

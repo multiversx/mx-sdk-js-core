@@ -119,8 +119,8 @@ describe("test network providers on devnet: Proxy and API", function () {
             assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
 
             // Also assert completion
-            assert.isTrue(apiResponse.isCompleted());
-            assert.isTrue(proxyResponse.isCompleted());
+            assert.isTrue(apiResponse.isCompleted);
+            assert.isTrue(proxyResponse.isCompleted);
         }
     });
 

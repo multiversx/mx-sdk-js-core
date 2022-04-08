@@ -79,6 +79,7 @@ export interface TypedOutcomeBundle {
     firstValue?: TypedValue;
     secondValue?: TypedValue;
     thirdValue?: TypedValue;
+    lastValue?: TypedValue;
 }
 
 export interface UntypedOutcomeBundle {

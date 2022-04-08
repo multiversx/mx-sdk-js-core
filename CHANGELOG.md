@@ -17,6 +17,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - [Breaking change: unifying provider interfaces, preparing network providers for extraction - step 4](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/184)
  - [Breaking change: unifying provider interfaces, preparing network providers for extraction - step 5](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/185)
  - [Breaking change: extractions (network providers and contract wrappers)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/186)
+ - [Breaking change: rename "methods" to "methodsExplicit". Rename "methodsAuto" to "methods" (default choice)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/187)
 
  **Breaking changes**
  - Removed utility functions: `transaction.awaitExecuted()`, `transaction.awaitPending()`. `TransactionWatcher` should be used directly, instead.
@@ -36,6 +37,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Moved network providers and contract wrappers to separate repositories:
    - https://github.com/ElrondNetwork/elrond-sdk-erdjs-network-providers
    - https://github.com/ElrondNetwork/elrond-sdk-erdjs-contract-wrappers
+ - Rename `methods` to `methodsExplicit`. Rename `methodsAuto` (only added in erdjs 10 beta) to `methods` (default choice). Therefore, by default, interactions are created without having to pass `TypedValue` objects as parameters. Automatic type inference is applied.
 
 ## [10.0.0-beta.3]
  - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)

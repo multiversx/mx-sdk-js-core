@@ -87,16 +87,6 @@ export interface UntypedOutcomeBundle {
     values: Buffer[];
 }
 
-export interface ISmartContractController {
-    deploy(transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }>;
-    execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }>;
-    query(interaction: Interaction): Promise<TypedOutcomeBundle>;
-}
-
-export interface IInteractionChecker {
-    checkInteraction(interaction: Interaction, definition: EndpointDefinition): void;
-}
-
 export interface IResultsParser {
     parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle;
     parseUntypedQueryResponse(queryResponse: IContractQueryResponse): UntypedOutcomeBundle;

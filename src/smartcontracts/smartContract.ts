@@ -6,7 +6,6 @@ import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
 import { CallArguments, DeployArguments, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
-import { Nonce } from "../nonce";
 import { ContractFunction } from "./function";
 import { Query } from "./query";
 import { SmartContractAbi } from "./abi";
@@ -16,14 +15,15 @@ import { bigIntToBuffer } from "./codec/utils";
 import BigNumber from "bignumber.js";
 import { Interaction } from "./interaction";
 import { NativeSerializer } from "./nativeSerializer";
-import { IBech32Address } from "../interface";
+import { IBech32Address, INonce } from "../interface";
+import { ErrContractHasNoAddress } from "../errors";
 const createKeccakHash = require("keccak");
 
 /**
  * An abstraction for deploying and interacting with Smart Contracts.
  */
 export class SmartContract implements ISmartContract {
-    private address: Address = new Address();
+    private address: IBech32Address = new Address();
     private code: Code = Code.nothing();
     private codeMetadata: CodeMetadata = new CodeMetadata();
     private abi?: SmartContractAbi;
@@ -46,7 +46,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Create a SmartContract object by providing its address on the Network.
      */
-    constructor({ address, abi }: { address?: Address, abi?: SmartContractAbi }) {
+    constructor({ address, abi }: { address?: IBech32Address, abi?: SmartContractAbi }) {
         this.address = address || new Address();
         this.abi = abi;
 
@@ -84,14 +84,14 @@ export class SmartContract implements ISmartContract {
     /**
      * Sets the address, as on Network.
      */
-    setAddress(address: Address) {
+    setAddress(address: IBech32Address) {
         this.address = address;
     }
 
     /**
      * Gets the address, as on Network.
      */
-    getAddress(): Address {
+    getAddress(): IBech32Address {
         return this.address;
     }
 
@@ -147,21 +147,15 @@ export class SmartContract implements ISmartContract {
 
         this.code = code;
         this.codeMetadata = codeMetadata;
-        transaction.onSigned.on(this.onDeploySigned.bind(this));
-
         return transaction;
-    }
-
-    private onDeploySigned({ transaction, signedBy }: { transaction: Transaction, signedBy: IBech32Address }) {
-        let nonce = transaction.getNonce();
-        let address = SmartContract.computeAddress(signedBy, nonce);
-        this.setAddress(address);
     }
 
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
     upgrade({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
+        this.ensureHasAddress();
+
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
         value = value || Balance.Zero();
@@ -191,6 +185,8 @@ export class SmartContract implements ISmartContract {
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
     call({ func, args, value, gasLimit, receiver, gasPrice, chainID }: CallArguments): Transaction {
+        this.ensureHasAddress();
+
         args = args || [];
         value = value || Balance.Zero();
 
@@ -212,13 +208,21 @@ export class SmartContract implements ISmartContract {
     }
 
     createQuery({ func, args, value, caller }: QueryArguments): Query {
+        this.ensureHasAddress();
+
         return new Query({
-            address: this.address,
+            address: this.getAddress(),
             func: func,
             args: args,
             value: value,
             caller: caller
         });
+    }
+
+    private ensureHasAddress() {
+        if (!this.getAddress().bech32()) {
+            throw new ErrContractHasNoAddress();
+        }
     }
 
     /**
@@ -228,7 +232,7 @@ export class SmartContract implements ISmartContract {
      * @param owner The owner of the Smart Contract
      * @param nonce The owner nonce used for the deployment transaction
      */
-    static computeAddress(owner: IBech32Address, nonce: Nonce): Address {
+    static computeAddress(owner: IBech32Address, nonce: INonce): IBech32Address {
         let initialPadding = Buffer.alloc(8, 0);
         let ownerPubkey = new Address(owner.bech32()).pubkey();
         let shardSelector = ownerPubkey.slice(30);

@@ -107,8 +107,8 @@ export class Transaction implements ISignable {
   }: {
     nonce?: Nonce;
     value?: Balance;
-    receiver: Address;
-    sender?: Address;
+    receiver: IBech32Address;
+    sender?: IBech32Address;
     gasPrice?: IGasPrice;
     gasLimit: IGasLimit;
     data?: TransactionPayload;

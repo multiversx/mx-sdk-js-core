@@ -67,7 +67,7 @@ describe("test smart contract interactor", function() {
         const hexBar = "4241522d356263303866";
         const hexLKMEX = "4c4b4d45582d616162393130";
         const hexStrămoși = "4d4f532d623962346232";
-        const hexContractAddress = contract.getAddress().hex();
+        const hexContractAddress = new Address(contract.getAddress().bech32()).hex();
         const hexDummyFunction = "64756d6d79";
 
         // ESDT, single

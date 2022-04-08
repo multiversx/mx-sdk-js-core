@@ -7,7 +7,7 @@ import { ArgSerializer } from "./argSerializer";
 import { IBech32Address, ITransactionValue } from "../interface";
 
 export class Query {
-    caller: Address;
+    caller: IBech32Address;
     address: IBech32Address;
     func: ContractFunction;
     args: TypedValue[];
@@ -38,7 +38,7 @@ export class Query {
             "value": this.value.toString()
         };
 
-        if (!this.caller.isEmpty()) {
+        if (this.caller.bech32()) {
             request["caller"] = this.caller.bech32();
         }
 

@@ -308,6 +308,15 @@ export class ErrContract extends Err {
   }
 }
 
+export class ErrContractHasNoAddress extends ErrContract {
+  public constructor() {
+    super(`
+The smart contract has no address set. Make sure you provide the address in the constructor, or call setAddress() appropriately.
+If you need to recompute the address of the contract, make use of SmartContract.computeAddress(). 
+`);
+  }
+}
+
 /**
  * Signals an error thrown by the mock-like test objects.
  */

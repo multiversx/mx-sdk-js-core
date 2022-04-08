@@ -1,6 +1,5 @@
 import { DefaultSmartContractController } from "./smartContractController";
 import { SmartContract } from "./smartContract";
-import { BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 import { loadAbiRegistry, loadContractCode, loadTestWallets, TestWallet } from "../testutils";
 import { SmartContractAbi } from "./abi";
 import { assert } from "chai";
@@ -8,7 +7,6 @@ import { Interaction } from "./interaction";
 import { GasLimit } from "../networkParams";
 import { ReturnCode } from "./returnCode";
 import BigNumber from "bignumber.js";
-import { BytesValue } from "./typesystem/bytes";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 
 
@@ -26,7 +24,7 @@ describe("test smart contract interactor", function () {
         let abiRegistry = await loadAbiRegistry(["src/testdata/answer.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["answer"]);
         let contract = new SmartContract({ abi: abi });
-        let controller = new DefaultSmartContractController(abi, provider);
+        let controller = new DefaultSmartContractController(provider);
 
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
@@ -74,7 +72,7 @@ describe("test smart contract interactor", function () {
         let abiRegistry = await loadAbiRegistry(["src/testdata/counter.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["counter"]);
         let contract = new SmartContract({ abi: abi });
-        let controller = new DefaultSmartContractController(abi, provider);
+        let controller = new DefaultSmartContractController(provider);
 
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
@@ -127,7 +125,7 @@ describe("test smart contract interactor", function () {
         let abiRegistry = await loadAbiRegistry(["src/testdata/lottery-esdt.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
         let contract = new SmartContract({ abi: abi });
-        let controller = new DefaultSmartContractController(abi, provider);
+        let controller = new DefaultSmartContractController(provider);
 
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);

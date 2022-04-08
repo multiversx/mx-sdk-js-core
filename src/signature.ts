@@ -55,18 +55,6 @@ export class Signature {
     }
 
     hex() {
-        this.assertNotEmpty();
-
         return this.valueHex;
-    }
-
-    isEmpty(): boolean {
-        return !this.valueHex;
-    }
-
-    private assertNotEmpty() {
-        if (this.isEmpty()) {
-            throw new errors.ErrSignatureEmpty();
-        }
     }
 }

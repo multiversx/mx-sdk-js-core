@@ -71,7 +71,7 @@ export class MockProvider {
         let response = new TransactionOnNetwork({
             status: new TransactionStatus("executed"),
             contractResults: new ContractResults([contractResult]),
-            isCompleted: () => true
+            isCompleted: true
         });
 
         this.getTransactionResponders.unshift(new GetTransactionResponder(predicate, response));
@@ -105,7 +105,7 @@ export class MockProvider {
                 });
             } else if (point instanceof MarkCompleted) {
                 this.mockUpdateTransaction(hash, (transaction) => {
-                    transaction.isCompleted = () => true;
+                    transaction.isCompleted = true;
                 });
             } else if (point instanceof Wait) {
                 await timeline.start(point.milliseconds);

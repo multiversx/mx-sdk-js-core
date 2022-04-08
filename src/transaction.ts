@@ -306,16 +306,6 @@ export class Transaction implements ISignable {
     return this.toPlainObject();
   }
 
-  async awaitSigned(): Promise<void> {
-    if (this.signature.hex()) {
-      return;
-    }
-
-    return new Promise<void>((resolve, _reject) => {
-      this.onSigned.on(() => resolve());
-    });
-  }
-
   async awaitHashed(): Promise<void> {
     if (!this.hash.isEmpty()) {
       return;

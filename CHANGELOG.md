@@ -16,6 +16,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - [Breaking change: SmartContract does not depend on IProvider anymore](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/183).
  - [Breaking change: unifying provider interfaces, preparing network providers for extraction - step 4](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/184)
  - [Breaking change: unifying provider interfaces, preparing network providers for extraction - step 5](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/185)
+ - [Breaking change: extractions (network providers and contract wrappers)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/186)
 
  **Breaking changes**
  - Removed utility functions: `transaction.awaitExecuted()`, `transaction.awaitPending()`. `TransactionWatcher` should be used directly, instead.
@@ -32,6 +33,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Removed `transaction.send()`. `Provider.sendTransaction()` has to be used instead.
  - Removed the static functions `getDefault()` and `sync()` from `networkStake`, `networkStatus` and `stats`.
  - Removed `smartContract.runQuery()` in order to decouple the contract class from the network provider. `smartContract.createQuery()` + `provider.queryContract()` have to be used, instead.
+ - Moved network providers and contract wrappers to separate repositories:
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-network-providers
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-contract-wrappers
 
 ## [10.0.0-beta.3]
  - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)

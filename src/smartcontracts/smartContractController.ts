@@ -63,13 +63,9 @@ export class SmartContractController implements ISmartContractController {
     async execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }> {
         Logger.info(`SmartContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}`);
 
-        let endpoint = interaction.getEndpoint();
-
-        interaction.check();
-
         await this.provider.sendTransaction(transaction);
         let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction);
-        let bundle = this.parser.parseOutcome(transactionOnNetwork, endpoint);
+        let bundle = this.parser.parseOutcome(transactionOnNetwork, interaction.getEndpoint());
 
         Logger.info(`SmartContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);
         return { transactionOnNetwork, bundle };
@@ -78,13 +74,8 @@ export class SmartContractController implements ISmartContractController {
     async query(interaction: Interaction): Promise<TypedOutcomeBundle> {
         Logger.debug(`SmartContractController.query [begin]: function = ${interaction.getFunction()}`);
 
-        let endpoint = interaction.getEndpoint();
-
-        interaction.check();
-
-        let query = interaction.buildQuery();
-        let queryResponse = await this.provider.queryContract(query);
-        let bundle = this.parser.parseQueryResponse(queryResponse, endpoint);
+        let queryResponse = await this.provider.queryContract(interaction.buildQuery());
+        let bundle = this.parser.parseQueryResponse(queryResponse, interaction.getEndpoint());
 
         Logger.debug(`SmartContractController.query [end]: function = ${interaction.getFunction()}, return code = ${bundle.returnCode}`);
         return bundle;

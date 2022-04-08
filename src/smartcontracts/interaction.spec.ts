@@ -176,7 +176,7 @@ describe("test smart contract interactor", function() {
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
         let controller = new DefaultSmartContractController(provider);
 
-        let getInteraction = <Interaction>contract.methodsExplicit.get();
+        let getInteraction = <Interaction>contract.methodsExplicit.get().check();
         let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(new GasLimit(543210));
         let decrementInteraction = (<Interaction>contract.methods.decrement()).withGasLimit(new GasLimit(987654));
 
@@ -237,6 +237,7 @@ describe("test smart contract interactor", function() {
                     OptionalValue.newMissing()
                 ])
                 .withGasLimit(new GasLimit(5000000))
+                .check()
         );
 
         let statusInteraction = <Interaction>(

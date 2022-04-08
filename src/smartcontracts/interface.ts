@@ -6,7 +6,6 @@ import { Transaction } from "../transaction";
 import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
-import { Interaction } from "./interaction";
 import { ReturnCode } from "./returnCode";
 import { EndpointDefinition, TypedValue } from "./typesystem";
 
@@ -79,22 +78,13 @@ export interface TypedOutcomeBundle {
     firstValue?: TypedValue;
     secondValue?: TypedValue;
     thirdValue?: TypedValue;
+    lastValue?: TypedValue;
 }
 
 export interface UntypedOutcomeBundle {
     returnCode: ReturnCode;
     returnMessage: string;
     values: Buffer[];
-}
-
-export interface ISmartContractController {
-    deploy(transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }>;
-    execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }>;
-    query(interaction: Interaction): Promise<TypedOutcomeBundle>;
-}
-
-export interface IInteractionChecker {
-    checkInteraction(interaction: Interaction, definition: EndpointDefinition): void;
 }
 
 export interface IResultsParser {

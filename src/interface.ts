@@ -1,16 +1,11 @@
 import { Signature } from "./signature";
-import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { ITransactionOnNetwork } from "./interfaceOfNetwork";
 
 export interface ITransactionFetcher {
     /**
      * Fetches the state of a {@link Transaction}.
      */
     getTransaction(txHash: IHash, hintSender?: IBech32Address, withResults?: boolean): Promise<ITransactionOnNetwork>;
-
-    /**
-     * Queries the status of a {@link Transaction}.
-     */
-    getTransactionStatus(txHash: IHash): Promise<ITransactionStatus>;
 }
 
 /**

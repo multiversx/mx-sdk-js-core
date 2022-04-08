@@ -4,12 +4,13 @@ import { Transaction } from "../transaction";
 import { Query } from "./query";
 import { ContractFunction } from "./function";
 import { Address } from "../address";
-import { AddressValue, BigUIntValue, BytesValue, TypedValue, U64Value, U8Value } from "./typesystem";
+import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
 import { Nonce } from "../nonce";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
 import { Account } from "../account";
 import { CallArguments } from "./interface";
 import { IChainID, IGasLimit, IGasPrice } from "../interface";
+import { InteractionChecker } from "./interactionChecker";
 
 /**
  * Internal interface: the smart contract, as seen from the perspective of an {@link Interaction}.
@@ -17,6 +18,7 @@ import { IChainID, IGasLimit, IGasPrice } from "../interface";
 interface ISmartContractWithinInteraction {
     call({ func, args, value, gasLimit, receiver }: CallArguments): Transaction;
     getAddress(): Address;
+    getEndpoint(name: ContractFunction): EndpointDefinition;
 }
 
 /**
@@ -63,6 +65,10 @@ export class Interaction {
 
     getFunction(): ContractFunction {
         return this.function;
+    }
+
+    getEndpoint(): EndpointDefinition {
+        return this.contract.getEndpoint(this.function);
     }
 
     getArguments(): TypedValue[] {
@@ -196,6 +202,14 @@ export class Interaction {
      */
     withQuerent(querent: Address): Interaction {
         this.querent = querent;
+        return this;
+    }
+
+    /**
+     * To perform custom checking, extend {@link Interaction} and override this method.
+     */
+    check(): Interaction {
+        new InteractionChecker().checkInteraction(this, this.getEndpoint());
         return this;
     }
 }

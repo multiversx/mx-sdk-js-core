@@ -5,6 +5,9 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## Unreleased
+ - TBD
+
+## 10.0.0-alpha.5
  - [Breaking change: adjustements to transaction awaitening and completion, transaction watcher](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/173)
  - [Breaking change: simplify network config / improve design - not a singleton anymore](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/176)
  - [Fix / improve results parser (better heuristics)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/177)

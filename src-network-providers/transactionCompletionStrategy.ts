@@ -3,9 +3,6 @@ import { ITransactionPayload } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
 import { isPaddedHex } from "./primitives";
 
-/**
- * Internal interface: a transaction, as seen from the perspective of a {@link TransactionCompletionStrategy}.
- */
 interface ITransactionOnNetwork {
     logs: TransactionLogs;
     status: TransactionStatus;
@@ -19,7 +16,7 @@ const WellKnownCompletionEvents = ["completedTxEvent", "SCDeploy", "signalError"
  * Algorithm for detecting transaction completion.
  * Based on some heuristics (a bit imprecise therefore, at this moment).
  */
-export class TransactionCompletionStrategy {
+export class TransactionCompletionStrategyOnProxy {
     isCompleted(transaction: ITransactionOnNetwork): boolean {
         if (transaction.status.isPending()) {
             // Certainly not completed.
@@ -63,5 +60,17 @@ export class TransactionCompletionStrategy {
 
     private looksLikeValidArgument(arg: string) {
         return isPaddedHex(arg);
+    }
+}
+
+export class TransactionCompletionStrategyOnAPI {
+    isCompleted(transaction: ITransactionOnNetwork): boolean {
+        return !transaction.status.isPending();
+    }
+}
+
+export class NullTransactionCompletionStrategy {
+    isCompleted(_transaction: ITransactionOnNetwork): boolean {
+        return false;
     }
 }

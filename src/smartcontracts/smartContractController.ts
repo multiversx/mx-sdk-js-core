@@ -7,7 +7,7 @@ import { InteractionChecker, NullInteractionChecker } from "./interactionChecker
 import { EndpointDefinition } from "./typesystem";
 import { Logger } from "../logger";
 import { TransactionWatcher } from "../transactionWatcher";
-import { IContractQueryResponse, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
+import { IContractQueryResponse, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { IHash } from "../interface";
 import { Query } from "./query";
 
@@ -17,7 +17,6 @@ import { Query } from "./query";
 interface IDeprecatedProvider {
     sendTransaction(transaction: Transaction): Promise<IHash>;
     getTransaction(hash: IHash): Promise<ITransactionOnNetwork>;
-    getTransactionStatus(hash: IHash): Promise<ITransactionStatus>;
     queryContract(query: Query): Promise<IContractQueryResponse>;
 }
 
@@ -32,7 +31,7 @@ interface ISmartContractAbi {
  * Internal interface: a transaction completion awaiter, as seen from the perspective of a {@link SmartContractController}.
  */
 interface ITransactionCompletionAwaiter {
-    awaitCompleted(transaction: Transaction): Promise<void>;
+    awaitCompleted(transaction: Transaction): Promise<ITransactionOnNetwork>;
 }
 
 /**
@@ -64,8 +63,7 @@ export class SmartContractController implements ISmartContractController {
         Logger.info(`SmartContractController.deploy [begin]: transaction = ${transaction.getHash()}`);
 
         await this.provider.sendTransaction(transaction);
-        await this.transactionCompletionAwaiter.awaitCompleted(transaction);
-        let transactionOnNetwork = await this.provider.getTransaction(transaction.getHash());
+        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction);
         let bundle = this.parser.parseUntypedOutcome(transactionOnNetwork);
 
         Logger.info(`SmartContractController.deploy [end]: transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);
@@ -86,8 +84,7 @@ export class SmartContractController implements ISmartContractController {
         this.checker.checkInteraction(interaction, endpoint);
 
         await this.provider.sendTransaction(transaction);
-        await this.transactionCompletionAwaiter.awaitCompleted(transaction);
-        let transactionOnNetwork = await this.provider.getTransaction(transaction.getHash());
+        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction);
         let bundle = this.parser.parseOutcome(transactionOnNetwork, endpoint);
 
         Logger.info(`SmartContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);

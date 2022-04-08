@@ -3,7 +3,6 @@ import { ContractResults } from "./contractResults";
 import { Address, Hash, Nonce, TransactionValue, TransactionPayload } from "./primitives";
 import { IAddress, IGasLimit, IGasPrice, IHash, INonce, ITransactionPayload } from "./interface";
 import { TransactionCompletionStrategy } from "./transactionCompletionStrategy";
-import { TransactionEvent } from "./transactionEvents";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
 

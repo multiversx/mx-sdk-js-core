@@ -2,16 +2,13 @@ import { IAddress } from "./interface";
 import { Address } from "./primitives";
 
 export class TransactionEvent {
-    readonly address: IAddress;
-    readonly identifier: string;
-    readonly topics: TransactionEventTopic[];
-    readonly data: string;
+    address: IAddress = new Address("");
+    identifier: string = "";
+    topics: TransactionEventTopic[] = [];
+    data: string = "";
 
-    constructor(address: IAddress, identifier: string, topics: TransactionEventTopic[], data: string) {
-        this.address = address;
-        this.identifier = identifier;
-        this.topics = topics;
-        this.data = data;
+    constructor(init?: Partial<TransactionEvent>) {
+        Object.assign(this, init);
     }
 
     static fromHttpResponse(responsePart: {
@@ -20,12 +17,13 @@ export class TransactionEvent {
         topics: string[],
         data: string
     }): TransactionEvent {
-        let topics = (responsePart.topics || []).map(topic => new TransactionEventTopic(topic));
-        let address = new Address(responsePart.address);
-        let identifier = responsePart.identifier || "";
-        let data = Buffer.from(responsePart.data || "", "base64").toString();
-        let event = new TransactionEvent(address, identifier, topics, data);
-        return event;
+        let result = new TransactionEvent();
+        result.address = new Address(responsePart.address);
+        result.identifier = responsePart.identifier || "";
+        result.topics = (responsePart.topics || []).map(topic => new TransactionEventTopic(topic));
+        result.data = Buffer.from(responsePart.data || "", "base64").toString();
+        
+        return result;
     }
 
     findFirstOrNoneTopic(predicate: (topic: TransactionEventTopic) => boolean): TransactionEventTopic | undefined {

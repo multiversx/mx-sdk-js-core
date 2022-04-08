@@ -1,10 +1,7 @@
 import { Interaction } from "./interaction";
 import { Transaction } from "../transaction";
-import { TypedOutcomeBundle, IInteractionChecker, IResultsParser, ISmartContractController, UntypedOutcomeBundle } from "./interface";
-import { ContractFunction } from "./function";
+import { TypedOutcomeBundle, IResultsParser, ISmartContractController, UntypedOutcomeBundle } from "./interface";
 import { ResultsParser } from "./resultsParser";
-import { InteractionChecker, NullInteractionChecker } from "./interactionChecker";
-import { EndpointDefinition } from "./typesystem";
 import { Logger } from "../logger";
 import { TransactionWatcher } from "../transactionWatcher";
 import { IContractQueryResponse, ITransactionOnNetwork } from "../interfaceOfNetwork";
@@ -21,13 +18,6 @@ interface IDeprecatedProvider {
 }
 
 /**
- * Internal interface: the smart contract ABI, as seen from the perspective of a {@link SmartContractController}.
- */
-interface ISmartContractAbi {
-    getEndpoint(func: ContractFunction): EndpointDefinition;
-}
-
-/**
  * Internal interface: a transaction completion awaiter, as seen from the perspective of a {@link SmartContractController}.
  */
 interface ITransactionCompletionAwaiter {
@@ -39,21 +29,15 @@ interface ITransactionCompletionAwaiter {
  * where signing is performed by means of an external wallet provider.
  */
 export class SmartContractController implements ISmartContractController {
-    private readonly abi: ISmartContractAbi;
-    private readonly checker: IInteractionChecker;
     private readonly parser: IResultsParser;
     private readonly provider: IDeprecatedProvider;
     private readonly transactionCompletionAwaiter: ITransactionCompletionAwaiter;
 
     constructor(
-        abi: ISmartContractAbi,
-        checker: IInteractionChecker,
         parser: IResultsParser,
         provider: IDeprecatedProvider,
         transactionWatcher: ITransactionCompletionAwaiter
     ) {
-        this.abi = abi;
-        this.checker = checker;
         this.parser = parser;
         this.provider = provider;
         this.transactionCompletionAwaiter = transactionWatcher;
@@ -79,9 +63,9 @@ export class SmartContractController implements ISmartContractController {
     async execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }> {
         Logger.info(`SmartContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}`);
 
-        let endpoint = this.getEndpoint(interaction);
+        let endpoint = interaction.getEndpoint();
 
-        this.checker.checkInteraction(interaction, endpoint);
+        interaction.check();
 
         await this.provider.sendTransaction(transaction);
         let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction);
@@ -94,9 +78,9 @@ export class SmartContractController implements ISmartContractController {
     async query(interaction: Interaction): Promise<TypedOutcomeBundle> {
         Logger.debug(`SmartContractController.query [begin]: function = ${interaction.getFunction()}`);
 
-        let endpoint = this.getEndpoint(interaction);
+        let endpoint = interaction.getEndpoint();
 
-        this.checker.checkInteraction(interaction, endpoint);
+        interaction.check();
 
         let query = interaction.buildQuery();
         let queryResponse = await this.provider.queryContract(query);
@@ -105,21 +89,10 @@ export class SmartContractController implements ISmartContractController {
         Logger.debug(`SmartContractController.query [end]: function = ${interaction.getFunction()}, return code = ${bundle.returnCode}`);
         return bundle;
     }
-
-    private getEndpoint(interaction: Interaction) {
-        let func = interaction.getFunction();
-        return this.abi.getEndpoint(func);
-    }
 }
 
 export class DefaultSmartContractController extends SmartContractController {
-    constructor(abi: ISmartContractAbi, provider: IDeprecatedProvider) {
-        super(abi, new InteractionChecker(), new ResultsParser(), provider, new TransactionWatcher(provider));
-    }
-}
-
-export class NoCheckSmartContractController extends SmartContractController {
-    constructor(abi: ISmartContractAbi, provider: IDeprecatedProvider) {
-        super(abi, new NullInteractionChecker(), new ResultsParser(), provider, new TransactionWatcher(provider));
+    constructor(provider: IDeprecatedProvider) {
+        super(new ResultsParser(), provider, new TransactionWatcher(provider));
     }
 }

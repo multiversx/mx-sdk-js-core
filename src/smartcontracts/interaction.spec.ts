@@ -112,7 +112,7 @@ describe("test smart contract interactor", function() {
         let abiRegistry = await loadAbiRegistry(["src/testdata/answer.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["answer"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
-        let controller = new DefaultSmartContractController(abi, provider);
+        let controller = new DefaultSmartContractController(provider);
 
         let interaction = <Interaction>contract.methods
             .getUltimateAnswer()
@@ -174,7 +174,7 @@ describe("test smart contract interactor", function() {
         let abiRegistry = await loadAbiRegistry(["src/testdata/counter.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["counter"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
-        let controller = new DefaultSmartContractController(abi, provider);
+        let controller = new DefaultSmartContractController(provider);
 
         let getInteraction = <Interaction>contract.methodsExplicit.get();
         let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(new GasLimit(543210));
@@ -221,7 +221,7 @@ describe("test smart contract interactor", function() {
         let abiRegistry = await loadAbiRegistry(["src/testdata/lottery-esdt.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
-        let controller = new DefaultSmartContractController(abi, provider);
+        let controller = new DefaultSmartContractController(provider);
 
         let startInteraction = <Interaction>(
             contract.methodsExplicit

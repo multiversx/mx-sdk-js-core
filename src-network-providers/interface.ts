@@ -1,7 +1,7 @@
 import { AccountOnNetwork } from "./accounts";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
-import { Stats } from "./stats";
+import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { NetworkStatus } from "./networkStatus";
@@ -31,7 +31,7 @@ export interface INetworkProvider {
     /**
      * Fetches general statistics.
      */
-    getNetworkGeneralStatistics(): Promise<Stats>;
+    getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics>;
 
     /**
      * Fetches the state of an account.
@@ -41,12 +41,12 @@ export interface INetworkProvider {
     /**
      * Fetches data about the fungible tokens held by an account.
      */
-    getFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
-    getNonFungibleTokensOfAccount(address: IAddress, pagination?: Pagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
+    getNonFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about a specific fungible token held by an account.
@@ -77,7 +77,7 @@ export interface INetworkProvider {
      * Simulates the processing of an already-signed transaction.
      * 
      */
-    simulateTransaction(tx: ITransaction): Promise<IContractSimulation>;
+    simulateTransaction(tx: ITransaction): Promise<ISimulationResults>;
 
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
@@ -122,16 +122,12 @@ export interface IContractReturnCode {
     isSuccess(): boolean;
 }
 
-export interface IContractSimulation {
+export interface ISimulationResults {
 }
 
-export class Pagination {
-    from: number = 0;
-    size: number = 100;
-
-    static default(): Pagination {
-        return { from: 0, size: 100 };
-    }
+export interface IPagination {
+    from: number;
+    size: number;
 }
 
 export interface ITransaction {
@@ -146,6 +142,5 @@ export interface ITransactionPayload { encoded(): string; }
 export interface IGasLimit { valueOf(): number; }
 export interface IGasPrice { valueOf(): number; }
 export interface IChainID { valueOf(): string; }
-export interface IGasPriceModifier { valueOf(): number; }
 export interface ITransactionVersion { valueOf(): number; }
 export interface IAccountBalance { toString(): string; }

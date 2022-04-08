@@ -1,3 +1,5 @@
+import { IPagination } from "./interface";
+
 const JSONbig = require("json-bigint");
 
 export const defaultAxiosConfig = {
@@ -8,4 +10,9 @@ export const defaultAxiosConfig = {
             return JSONbig.parse(data);
         }
     ]
+};
+
+export const defaultPagination: IPagination = {
+    from: 0,
+    size: 100
 };

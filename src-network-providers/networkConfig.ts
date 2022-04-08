@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { IChainID, IGasLimit, IGasPrice, IGasPriceModifier, ITransactionVersion } from "./interface";
+import { IChainID, IGasLimit, IGasPrice, ITransactionVersion } from "./interface";
 
 /**
  * An object holding Network configuration parameters.
@@ -36,7 +36,7 @@ export class NetworkConfig {
     /**
      *
      */
-    public GasPriceModifier: IGasPriceModifier;
+    public GasPriceModifier: number;
 
     /**
      * The minimum gas limit required to be set when broadcasting a {@link Transaction}.

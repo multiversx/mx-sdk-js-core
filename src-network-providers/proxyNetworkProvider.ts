@@ -1,9 +1,9 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "./accounts";
-import { IAddress, IContractQuery, IHash, INetworkProvider, INonce, ITransaction, Pagination } from "./interface";
+import { IAddress, IContractQuery, IHash, INetworkProvider, INonce, IPagination, ITransaction } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
-import { Stats } from "./stats";
+import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
@@ -42,7 +42,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         throw new Error("Method not implemented.");
     }
 
-    async getNetworkGeneralStatistics(): Promise<Stats> {
+    async getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics> {
         // TODO: Implement wrt. (full implementation may not be possible):
         // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/network/network.service.ts
         throw new Error("Method not implemented.");
@@ -54,7 +54,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return account;
     }
 
-    async getFungibleTokensOfAccount(address: IAddress, _pagination?: Pagination): Promise<FungibleTokenOfAccountOnNetwork[]> {
+    async getFungibleTokensOfAccount(address: IAddress, _pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]> {
         let url = `address/${address.bech32()}/esdt`;
         let response = await this.doGetGeneric(url);
         let responseItems: any[] = Object.values(response.esdts);
@@ -67,7 +67,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(address: IAddress, _pagination?: Pagination): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+    async getNonFungibleTokensOfAccount(address: IAddress, _pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
         let url = `address/${address.bech32()}/esdt`;
         let response = await this.doGetGeneric(url);
         let responseItems: any[] = Object.values(response.esdts);

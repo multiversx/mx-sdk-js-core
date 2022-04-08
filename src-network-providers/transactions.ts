@@ -3,11 +3,10 @@ import { ContractResults } from "./contractResults";
 import { Address, Hash, Nonce, TransactionValue, TransactionPayload } from "./primitives";
 import { IAddress, IGasLimit, IGasPrice, IHash, INonce, ITransactionPayload } from "./interface";
 import { TransactionCompletionStrategy } from "./transactionCompletionStrategy";
-import { TransactionEvent } from "./transactionEvents";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
 
- export class TransactionOnNetwork {
+export class TransactionOnNetwork {
     hash: IHash = new Hash("");
     type: string = "";
     nonce: INonce = new Nonce(0);
@@ -87,16 +86,6 @@ import { TransactionReceipt } from "./transactionReceipt";
     isCompleted(): boolean {
         // TODO: use different transaction completion strategies - API / Proxy.
         return new TransactionCompletionStrategy().isCompleted(this);
-    }
-
-    getAllEvents(): TransactionEvent[] {
-        let result = [...this.logs.events];
-
-        for (const resultItem of this.contractResults.items) {
-            result.push(...resultItem.logs.events);
-        }
-
-        return result;
     }
 }
 

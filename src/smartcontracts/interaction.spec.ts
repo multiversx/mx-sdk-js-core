@@ -1,4 +1,4 @@
-import { DefaultSmartContractController } from "./smartContractController";
+import { ContractController } from "../testutils/contractController";
 import { SmartContract } from "./smartContract";
 import { BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 import {
@@ -112,7 +112,7 @@ describe("test smart contract interactor", function() {
         let abiRegistry = await loadAbiRegistry(["src/testdata/answer.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["answer"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
-        let controller = new DefaultSmartContractController(abi, provider);
+        let controller = new ContractController(provider);
 
         let interaction = <Interaction>contract.methods
             .getUltimateAnswer()
@@ -174,9 +174,9 @@ describe("test smart contract interactor", function() {
         let abiRegistry = await loadAbiRegistry(["src/testdata/counter.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["counter"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
-        let controller = new DefaultSmartContractController(abi, provider);
+        let controller = new ContractController(provider);
 
-        let getInteraction = <Interaction>contract.methodsExplicit.get();
+        let getInteraction = <Interaction>contract.methodsExplicit.get().check();
         let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(new GasLimit(543210));
         let decrementInteraction = (<Interaction>contract.methods.decrement()).withGasLimit(new GasLimit(987654));
 
@@ -221,7 +221,7 @@ describe("test smart contract interactor", function() {
         let abiRegistry = await loadAbiRegistry(["src/testdata/lottery-esdt.abi.json"]);
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
-        let controller = new DefaultSmartContractController(abi, provider);
+        let controller = new ContractController(provider);
 
         let startInteraction = <Interaction>(
             contract.methodsExplicit
@@ -237,6 +237,7 @@ describe("test smart contract interactor", function() {
                     OptionalValue.newMissing()
                 ])
                 .withGasLimit(new GasLimit(5000000))
+                .check()
         );
 
         let statusInteraction = <Interaction>(

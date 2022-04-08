@@ -11,7 +11,7 @@ import { ContractFunction } from "./function";
 import { Query } from "./query";
 import { SmartContractAbi } from "./abi";
 import { guardValueIsSet } from "../utils";
-import { TypedValue } from "./typesystem";
+import { EndpointDefinition, TypedValue } from "./typesystem";
 import { bigIntToBuffer } from "./codec/utils";
 import BigNumber from "bignumber.js";
 import { Interaction } from "./interaction";
@@ -127,6 +127,10 @@ export class SmartContract implements ISmartContract {
     getAbi(): SmartContractAbi {
         guardValueIsSet("abi", this.abi);
         return this.abi!;
+    }
+
+    getEndpoint(name: string | ContractFunction): EndpointDefinition {
+        return this.getAbi().getEndpoint(name);
     }
 
     /**

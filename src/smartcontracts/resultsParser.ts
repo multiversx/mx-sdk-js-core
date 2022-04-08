@@ -36,7 +36,8 @@ export class ResultsParser implements IResultsParser {
             values: values,
             firstValue: values[0],
             secondValue: values[1],
-            thirdValue: values[2]
+            thirdValue: values[2],
+            lastValue: values[values.length - 1]
         };
     }
 
@@ -60,7 +61,8 @@ export class ResultsParser implements IResultsParser {
             values: values,
             firstValue: values[0],
             secondValue: values[1],
-            thirdValue: values[2]
+            thirdValue: values[2],
+            lastValue: values[values.length - 1]
         };
     }
 

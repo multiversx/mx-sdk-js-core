@@ -303,10 +303,6 @@ export class Transaction implements ISignable {
    * Called internally by the network provider.
    */
   toSendable(): any {
-    if (!this.signature.hex()) {
-      throw new errors.ErrTransactionNotSigned();
-    }
-
     return this.toPlainObject();
   }
 

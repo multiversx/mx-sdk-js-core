@@ -227,15 +227,6 @@ export class ErrTransactionHashUnknown extends Err {
 }
 
 /**
- * Signals that a {@link Transaction} cannot be used within an operation, since it isn't signed.
- */
-export class ErrTransactionNotSigned extends Err {
-  public constructor() {
-    super(`Transaction isn't signed`);
-  }
-}
-
-/**
  * Signals an error related to signing a message (a transaction).
  */
 export class ErrSignatureCannotCreate extends Err {

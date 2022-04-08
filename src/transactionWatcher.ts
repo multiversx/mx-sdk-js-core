@@ -62,7 +62,7 @@ export class TransactionWatcher {
       * Waits until the transaction is completely processed.
       */
     public async awaitCompleted(transaction: ITransaction): Promise<void> {
-        let isCompleted = (transactionOnNetwork: ITransactionOnNetwork) => transactionOnNetwork.isCompleted();
+        let isCompleted = (transactionOnNetwork: ITransactionOnNetwork) => transactionOnNetwork.isCompleted;
         let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 

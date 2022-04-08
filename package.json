@@ -40,7 +40,7 @@
     "protobufjs": "6.10.2"
   },
   "devDependencies": {
-    "@elrondnetwork/erdjs-network-providers": "0.1.1",
+    "@elrondnetwork/erdjs-network-providers": "0.1.2",
     "@elrondnetwork/erdjs-walletcore": "1.0.0",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",

@@ -13,6 +13,8 @@ export interface INetworkConfig {
 }
 
 export interface ITransactionOnNetwork {
+    isCompleted: boolean;
+    
     hash: IHash;
     type: string;
     value: ITransactionValue;
@@ -23,8 +25,6 @@ export interface ITransactionOnNetwork {
     receipt: ITransactionReceipt;
     contractResults: IContractResults;
     logs: ITransactionLogs;
-
-    isCompleted(): boolean;
 }
 
 export interface ITransactionStatus {

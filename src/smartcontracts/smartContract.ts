@@ -16,6 +16,7 @@ import { bigIntToBuffer } from "./codec/utils";
 import BigNumber from "bignumber.js";
 import { Interaction } from "./interaction";
 import { NativeSerializer } from "./nativeSerializer";
+import { IBech32Address } from "../interface";
 const createKeccakHash = require("keccak");
 
 /**
@@ -163,10 +164,9 @@ export class SmartContract implements ISmartContract {
         return transaction;
     }
 
-    private onDeploySigned({ transaction, signedBy }: { transaction: Transaction, signedBy: Address }) {
-        this.owner = signedBy;
+    private onDeploySigned({ transaction, signedBy }: { transaction: Transaction, signedBy: IBech32Address }) {
         let nonce = transaction.getNonce();
-        let address = SmartContract.computeAddress(this.owner, nonce);
+        let address = SmartContract.computeAddress(signedBy, nonce);
         this.setAddress(address);
     }
 
@@ -240,9 +240,9 @@ export class SmartContract implements ISmartContract {
      * @param owner The owner of the Smart Contract
      * @param nonce The owner nonce used for the deployment transaction
      */
-    static computeAddress(owner: Address, nonce: Nonce): Address {
+    static computeAddress(owner: IBech32Address, nonce: Nonce): Address {
         let initialPadding = Buffer.alloc(8, 0);
-        let ownerPubkey = owner.pubkey();
+        let ownerPubkey = new Address(owner.bech32()).pubkey();
         let shardSelector = ownerPubkey.slice(30);
         let ownerNonceBytes = Buffer.alloc(8);
 

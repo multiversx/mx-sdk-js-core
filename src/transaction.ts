@@ -17,7 +17,6 @@ import * as errors from "./errors";
 import { TypedEvent } from "./events";
 import { ProtoSerializer } from "./proto";
 import { Hash } from "./hash";
-import { adaptToAddress, adaptToSignature } from "./boundaryAdapters";
 import { INetworkConfig } from "./interfaceOfNetwork";
 
 const createTransactionHasher = require("blake2b");
@@ -29,7 +28,7 @@ const TRANSACTION_HASH_LENGTH = 32;
 export class Transaction implements ISignable {
   readonly onSigned: TypedEvent<{
     transaction: Transaction;
-    signedBy: Address;
+    signedBy: IBech32Address;
   }>;
   /**
    * The nonce of the transaction (the account sequence number of the sender).
@@ -44,12 +43,12 @@ export class Transaction implements ISignable {
   /**
    * The address of the sender.
    */
-  private sender: Address;
+  private sender: IBech32Address;
 
   /**
    * The address of the receiver.
    */
-  private readonly receiver: Address;
+  private readonly receiver: IBech32Address;
 
   /**
    * The gas price to be used.
@@ -84,7 +83,7 @@ export class Transaction implements ISignable {
   /**
    * The signature.
    */
-  private signature: Signature;
+  private signature: ISignature;
 
   /**
    * The transaction hash, also used as a transaction identifier.
@@ -166,11 +165,11 @@ export class Transaction implements ISignable {
     this.value = value;
   }
 
-  getSender(): Address {
+  getSender(): IBech32Address {
     return this.sender;
   }
 
-  getReceiver(): Address {
+  getReceiver(): IBech32Address {
     return this.receiver;
   }
 
@@ -210,8 +209,7 @@ export class Transaction implements ISignable {
     return this.options;
   }
 
-  getSignature(): Signature {
-    guardNotEmpty(this.signature, "signature");
+  getSignature(): ISignature {
     return this.signature;
   }
 
@@ -227,10 +225,8 @@ export class Transaction implements ISignable {
    * @param signedBy The address of the future signer
    */
   serializeForSigning(signedBy: IBech32Address): Buffer {
-    let adaptedSignedBy = adaptToAddress(signedBy);
-
     // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
-    let plain = this.toPlainObject(adaptedSignedBy);
+    let plain = this.toPlainObject(signedBy);
     // Make sure we never sign the transaction with another signature set up (useful when using the same method for verification)
     if (plain.signature) {
       delete plain.signature;
@@ -246,7 +242,7 @@ export class Transaction implements ISignable {
    *
    * @param sender The address of the sender (will be provided when called within the signing procedure)
    */
-  toPlainObject(sender?: Address): any {
+  toPlainObject(sender?: IBech32Address): any {
     return {
       nonce: this.nonce.valueOf(),
       value: this.value.toString(),
@@ -258,7 +254,7 @@ export class Transaction implements ISignable {
       chainID: this.chainID.valueOf(),
       version: this.version.valueOf(),
       options: this.options.valueOf() == 0 ? undefined : this.options.valueOf(),
-      signature: this.signature.isEmpty() ? undefined : this.signature.hex(),
+      signature: this.signature.hex() ? this.signature.hex() : undefined,
     };
   }
 
@@ -295,14 +291,11 @@ export class Transaction implements ISignable {
    * @param signedBy The address of the signer.
    */
   applySignature(signature: ISignature, signedBy: IBech32Address) {
-    let adaptedSignature = adaptToSignature(signature);
-    let adaptedSignedBy = adaptToAddress(signedBy);
-
-    this.signature = adaptedSignature;
-    this.sender = adaptedSignedBy;
+    this.signature = signature;
+    this.sender = signedBy;
 
     this.hash = TransactionHash.compute(this);
-    this.onSigned.emit({ transaction: this, signedBy: adaptedSignedBy });
+    this.onSigned.emit({ transaction: this, signedBy: signedBy });
   }
 
   /**
@@ -310,7 +303,7 @@ export class Transaction implements ISignable {
    * Called internally by the network provider.
    */
   toSendable(): any {
-    if (this.signature.isEmpty()) {
+    if (!this.signature.hex()) {
       throw new errors.ErrTransactionNotSigned();
     }
 
@@ -318,7 +311,7 @@ export class Transaction implements ISignable {
   }
 
   async awaitSigned(): Promise<void> {
-    if (!this.signature.isEmpty()) {
+    if (this.signature.hex()) {
       return;
     }
 

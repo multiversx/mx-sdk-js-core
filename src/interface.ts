@@ -1,4 +1,3 @@
-import { Signature } from "./signature";
 import { ITransactionOnNetwork } from "./interfaceOfNetwork";
 
 export interface ITransactionFetcher {
@@ -33,7 +32,7 @@ export interface IVerifiable {
     /**
      * Returns the signature that should be verified
      */
-    getSignature(): Signature;
+    getSignature(): ISignature;
     /**
      * Returns the signable object in its raw form - a sequence of bytes to be verified.
      */

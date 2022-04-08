@@ -1,9 +1,6 @@
 import { Signature } from "./signature";
 import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
-/**
- * @deprecated
- */
 export interface ITransactionFetcher {
     /**
      * Fetches the state of a {@link Transaction}.

@@ -14,7 +14,6 @@ import { assert } from "chai";
 import { Interaction } from "./interaction";
 import { ChainID, GasLimit } from "../networkParams";
 import { ContractFunction } from "./function";
-import { ContractQueryResponse } from "../networkProvider/contractQueryResponse";
 import { Nonce } from "../nonce";
 import { ReturnCode } from "./returnCode";
 import { Balance } from "../balance";
@@ -22,6 +21,7 @@ import BigNumber from "bignumber.js";
 import { BytesValue } from "./typesystem/bytes";
 import { Token, TokenType } from "../token";
 import { createBalanceBuilder } from "../balanceBuilder";
+import { ContractQueryResponse } from "@elrondnetwork/erdjs-network-providers";
 
 describe("test smart contract interactor", function() {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");
@@ -126,7 +126,7 @@ describe("test smart contract interactor", function() {
 
         provider.mockQueryContractOnFunction(
             "getUltimateAnswer",
-            new ContractQueryResponse({ returnData: ["Kg=="], returnCode: ReturnCode.Ok })
+            new ContractQueryResponse({ returnData: [Buffer.from([42]).toString("base64")], returnCode: ReturnCode.Ok })
         );
 
         // Query
@@ -183,7 +183,7 @@ describe("test smart contract interactor", function() {
         // For "get()", return fake 7
         provider.mockQueryContractOnFunction(
             "get",
-            new ContractQueryResponse({ returnData: ["Bw=="], returnCode: ReturnCode.Ok })
+            new ContractQueryResponse({ returnData: [Buffer.from([7]).toString("base64")], returnCode: ReturnCode.Ok })
         );
 
         // Query "get()"

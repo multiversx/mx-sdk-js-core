@@ -1,40 +1,14 @@
 import { IAccountBalance, IBech32Address, IChainID, IGasLimit, IHash, INonce, ITransactionPayload, ITransactionValue } from "./interface";
 
-/**
- * @deprecated This interface will be removed upon the extraction of networkProvider package.
- */
 export interface IAccountOnNetwork {
     nonce: INonce;
     balance: IAccountBalance;
 }
 
-/**
- * @deprecated This interface will be removed upon the extraction of networkProvider package.
- */
-export interface IFungibleTokenOfAccountOnNetwork {
-}
-
-/**
- * @deprecated This interface will be removed upon the extraction of networkProvider package.
- */
-export interface INetworkStatus {
-    Nonce: number;
-}
-
-/**
- * @deprecated This interface will be removed upon the extraction of networkProvider package.
- */
-export interface INetworkStake {
-}
-
-/**
- * @deprecated This interface will be removed upon the extraction of networkProvider package.
- */
-export interface INetworkStats {
-}
-
 export interface INetworkConfig {
     MinGasLimit: IGasLimit;
+    GasPerDataByte: number;
+    GasPriceModifier: number;
     ChainID: IChainID;
 }
 
@@ -51,7 +25,6 @@ export interface ITransactionOnNetwork {
     logs: ITransactionLogs;
 
     isCompleted(): boolean;
-    getAllEvents(): ITransactionEvent[];
 }
 
 export interface ITransactionStatus {
@@ -82,9 +55,7 @@ export interface IContractResultItem {
 export interface IContractQueryResponse {
     returnCode: IContractReturnCode;
     returnMessage: string;
-    gasUsed: IGasLimit;
     getReturnDataParts(): Buffer[];
-    isSuccess(): boolean;
 }
 
 export interface IContractReturnCode {

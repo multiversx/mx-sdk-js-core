@@ -36,10 +36,11 @@
     "buffer": "6.0.3",
     "json-bigint": "1.0.0",
     "json-duplicate-key-handle": "1.0.0",
-    "keccak": "^3.0.1",
+    "keccak": "3.0.1",
     "protobufjs": "6.10.2"
   },
   "devDependencies": {
+    "@elrondnetwork/erdjs-network-providers": "0.1.1",
     "@elrondnetwork/erdjs-walletcore": "1.0.0",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",

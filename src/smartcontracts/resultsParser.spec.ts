@@ -3,27 +3,24 @@ import path from "path";
 import { assert } from "chai";
 import { BigUIntType, BigUIntValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition } from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
-import { ContractQueryResponse } from "../networkProvider/contractQueryResponse";
 import { ReturnCode } from "./returnCode";
 import { ResultsParser } from "./resultsParser";
 import { Nonce } from "../nonce";
 import { TransactionHash } from "../transaction";
-import { Address } from "../address";
 import { Logger, LogLevel } from "../logger";
-import { TransactionOnNetwork } from "../networkProvider/transactions";
-import { ContractResultItem, ContractResults } from "../networkProvider/contractResults";
-import { TransactionLogs } from "../networkProvider/transactionLogs";
-import { TransactionEvent, TransactionEventTopic } from "../networkProvider/transactionEvents";
+import { ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { ContractQueryResponse, ContractResultItem, ContractResults, TransactionEvent, TransactionEventTopic, TransactionLogs, TransactionOnNetwork } from "@elrondnetwork/erdjs-network-providers";
+import { Address } from "../address";
 
 const KnownReturnCodes: string[] = [
-    ReturnCode.None.valueOf(), 
-    ReturnCode.Ok.valueOf(), 
+    ReturnCode.None.valueOf(),
+    ReturnCode.Ok.valueOf(),
     ReturnCode.FunctionNotFound.valueOf(),
     ReturnCode.FunctionWrongSignature.valueOf(),
-    ReturnCode.ContractNotFound.valueOf(), 
-    ReturnCode.UserError.valueOf(), 
+    ReturnCode.ContractNotFound.valueOf(),
+    ReturnCode.UserError.valueOf(),
     ReturnCode.OutOfGas.valueOf(),
-    ReturnCode.AccountCollision.valueOf(), 
+    ReturnCode.AccountCollision.valueOf(),
     ReturnCode.OutOfFunds.valueOf(),
     ReturnCode.CallStackOverFlow.valueOf(), ReturnCode.ContractInvalid.valueOf(),
     ReturnCode.ExecutionFailed.valueOf(),
@@ -48,7 +45,7 @@ describe("test smart contract results parser", () => {
         let queryResponse = new ContractQueryResponse({
             returnData: [
                 Buffer.from([42]).toString("base64"),
-                Buffer.from("abba", "hex").toString("base64")
+                Buffer.from("abba", "hex").toString("base64"),
             ],
             returnCode: ReturnCode.Ok,
             returnMessage: "foobar"
@@ -103,19 +100,15 @@ describe("test smart contract results parser", () => {
 
     it("should parse contract outcome, on signal error", async () => {
         let transaction = new TransactionOnNetwork({
-            logs: new TransactionLogs(
-                new Address(), 
-                [
-                    new TransactionEvent(
-                        new Address(), 
-                        "signalError", 
-                        [
-                            new TransactionEventTopic(Buffer.from("something happened").toString("base64"))
-                        ],
-                        `@${Buffer.from("user error").toString("hex")}@07`
-                    )    
-                ]
-            )
+            logs: new TransactionLogs(new Address(), [
+                new TransactionEvent({
+                    identifier: "signalError",
+                    topics: [
+                        new TransactionEventTopic(Buffer.from("something happened").toString("base64"))
+                    ],
+                    data: `@${Buffer.from("user error").toString("hex")}@07`
+                })
+            ])
         });
 
         let bundle = parser.parseUntypedOutcome(transaction);
@@ -126,19 +119,15 @@ describe("test smart contract results parser", () => {
 
     it("should parse contract outcome, on too much gas warning", async () => {
         let transaction = new TransactionOnNetwork({
-            logs: new TransactionLogs(
-                new Address(), 
-                [
-                    new TransactionEvent(
-                        new Address(), 
-                        "writeLog", 
-                        [
-                            new TransactionEventTopic("QHRvbyBtdWNoIGdhcyBwcm92aWRlZCBmb3IgcHJvY2Vzc2luZzogZ2FzIHByb3ZpZGVkID0gNTk2Mzg0NTAwLCBnYXMgdXNlZCA9IDczMzAxMA==")
-                        ],
-                        Buffer.from("QDZmNmI=", "base64").toString()
-                    )    
-                ]
-            )
+            logs: new TransactionLogs(new Address(), [
+                new TransactionEvent({
+                    identifier: "writeLog",
+                    topics: [
+                        new TransactionEventTopic("QHRvbyBtdWNoIGdhcyBwcm92aWRlZCBmb3IgcHJvY2Vzc2luZzogZ2FzIHByb3ZpZGVkID0gNTk2Mzg0NTAwLCBnYXMgdXNlZCA9IDczMzAxMA==")
+                    ],
+                    data: Buffer.from("QDZmNmI=", "base64").toString()
+                })
+            ])
         });
 
         let bundle = parser.parseUntypedOutcome(transaction);
@@ -172,9 +161,9 @@ describe("test smart contract results parser", () => {
         Logger.setLevel(oldLogLevel);
     });
 
-    function loadRealWorldSamples(folder: string): [TransactionOnNetwork, string][] {
+    function loadRealWorldSamples(folder: string): [ITransactionOnNetwork, string][] {
         let transactionFiles = fs.readdirSync(folder);
-        let samples: [TransactionOnNetwork, string][] = [];
+        let samples: [ITransactionOnNetwork, string][] = [];
 
         for (const file of transactionFiles) {
             let txHash = new TransactionHash(path.basename(file, ".json"));

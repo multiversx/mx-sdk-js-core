@@ -3,7 +3,7 @@ import { AsyncTimer } from "./asyncTimer";
 import { Logger } from "./logger";
 import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached } from "./errors";
 import { Address } from "./address";
-import { ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { ITransactionEvent, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 export type PredicateIsAwaitedStatus = (status: ITransactionStatus) => boolean;
 
@@ -75,7 +75,7 @@ export class TransactionWatcher {
 
     public async awaitAllEvents(transaction: ITransaction, events: string[]): Promise<void> {
         let foundAllEvents = (transactionOnNetwork: ITransactionOnNetwork) => {
-            let allEventIdentifiers = transactionOnNetwork.getAllEvents().map(event => event.identifier);
+            let allEventIdentifiers = this.getAllTransactionEvents(transactionOnNetwork).map(event => event.identifier);
             let allAreFound = events.every(event => allEventIdentifiers.includes(event));
             return allAreFound;
         };
@@ -92,7 +92,7 @@ export class TransactionWatcher {
 
     public async awaitAnyEvent(transaction: ITransaction, events: string[]): Promise<void> {
         let foundAnyEvent = (transactionOnNetwork: ITransactionOnNetwork) => {
-            let allEventIdentifiers = transactionOnNetwork.getAllEvents().map(event => event.identifier);
+            let allEventIdentifiers = this.getAllTransactionEvents(transactionOnNetwork).map(event => event.identifier);
             let anyIsFound = events.find(event => allEventIdentifiers.includes(event)) != undefined;
             return anyIsFound;
         };
@@ -161,6 +161,16 @@ export class TransactionWatcher {
             let error = createError();
             throw error;
         }
+    }
+
+    private getAllTransactionEvents(transaction: ITransactionOnNetwork): ITransactionEvent[] {
+        let result = [...transaction.logs.events];
+
+        for (const resultItem of transaction.contractResults.items) {
+            result.push(...resultItem.logs.events);
+        }
+
+        return result;
     }
 }
 

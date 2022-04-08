@@ -1,8 +1,9 @@
 import { assert } from "chai";
 import { Address } from "../address";
 import { AddressType, BigUIntType, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, ListType, NullType, OptionalType, OptionType, U32Type } from "./typesystem";
-import { BytesType } from "./typesystem/bytes";
+import { BytesType, BytesValue } from "./typesystem/bytes";
 import { NativeSerializer } from "./nativeSerializer";
+import { ErrTypeInferenceSystemRequiresRegularJavascriptObjects } from "../errors";
 
 describe("test native serializer", () => {
     it("should perform type inference", async () => {
@@ -37,5 +38,21 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[4].valueOf().toNumber(), e);
         assert.deepEqual(typedValues[5].getType(), new OptionalType(new BytesType()));
         assert.deepEqual(typedValues[5].valueOf(), null);
+    });
+
+    it("should not accept already typed values", async () => {
+        let endpointModifiers = new EndpointModifiers("", []);
+        let inputParameters = [
+            new EndpointParameterDefinition("a", "a", new BigUIntType()),
+            new EndpointParameterDefinition("b", "b", new ListType(new AddressType())),
+            new EndpointParameterDefinition("c", "c", new BytesType())
+        ];
+        let endpoint = new EndpointDefinition("foo", inputParameters, [], endpointModifiers);
+
+        let a = 42;
+        let b = [new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha")];
+        let c = BytesValue.fromUTF8("test");
+
+        assert.throw(() => NativeSerializer.nativeToTypedValues([a, b, c], endpoint), ErrTypeInferenceSystemRequiresRegularJavascriptObjects);
     });
 });

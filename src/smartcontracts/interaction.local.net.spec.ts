@@ -146,28 +146,23 @@ describe("test smart contract interactor", function () {
         assert.isTrue(returnCode.isSuccess());
 
         let startInteraction = <Interaction>contract.methods.start([
-            BytesValue.fromUTF8("lucky"),
-            new TokenIdentifierValue("EGLD"),
-            new BigUIntValue(1),
-            OptionValue.newMissing(),
-            OptionValue.newMissing(),
-            OptionValue.newProvided(new U32Value(1)),
-            OptionValue.newMissing(),
-            OptionValue.newMissing(),
-            OptionalValue.newMissing()
+            "lucky",
+            "EGLD",
+            1,
+            null,
+            null,
+            1,
+            null,
+            null
         ])
         .withGasLimit(new GasLimit(30000000))
         .withChainID(network.ChainID);
 
-        let lotteryStatusInteraction = <Interaction>contract.methods.status([
-            BytesValue.fromUTF8("lucky")
-        ])
+        let lotteryStatusInteraction = <Interaction>contract.methods.status(["lucky"])
         .withGasLimit(new GasLimit(5000000))
         .withChainID(network.ChainID);
 
-        let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo([
-            BytesValue.fromUTF8("lucky")
-        ])
+        let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo(["lucky"])
         .withGasLimit(new GasLimit(5000000))
         .withChainID(network.ChainID);
 

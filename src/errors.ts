@@ -345,6 +345,19 @@ export class ErrTypingSystem extends Err {
 }
 
 /**
+ * Signals a usage error related to "contract.methods" vs. "contract.methodsExplicit".
+ */
+ export class ErrTypeInferenceSystemRequiresRegularJavascriptObjects extends ErrTypingSystem {
+  public constructor(index: number) {
+    super(`
+argument at position ${index} seems to be a TypedValue. The automatic type inference system requires regular javascript objects as input.
+This error might occur when you pass a TypedValue to contract.methods.myFunction([...]). For passing TypedValues instead of regular javascript objects, and bypass the automatic type inference system, use contract.methodsExplicit.myFunction([...]) instead.
+Also see https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/187.
+`);
+  }
+}
+
+/**
  * Signals a missing field on a struct.
  */
  export class ErrMissingFieldOnStruct extends Err {

@@ -5,7 +5,7 @@ import { Struct, Field, StructType, Tuple } from "./typesystem";
 import { BalanceBuilder } from "../balanceBuilder";
 import { Address } from "../address";
 import { Code } from "./code";
-import { ErrInvalidArgument } from "../errors";
+import { ErrInvalidArgument, ErrTypeInferenceSystemRequiresRegularJavascriptObjects, ErrTypingSystem } from "../errors";
 
 export namespace NativeTypes {
     export type NativeBuffer = Buffer | string | BalanceBuilder;
@@ -19,6 +19,7 @@ export namespace NativeSerializer {
      */
     export function nativeToTypedValues(args: any[], endpoint: EndpointDefinition): TypedValue[] {
         args = args || [];
+        assertNotTypedValues(args);
         args = handleVariadicArgsAndRePack(args, endpoint);
 
         let parameters = endpoint.input;
@@ -32,6 +33,16 @@ export namespace NativeSerializer {
         }
 
         return values;
+    }
+
+    function assertNotTypedValues(args: any[]) {
+        for (let i = 0; i < args.length; i++) {
+            let arg = args[i];
+
+            if (arg && arg.belongsToTypesystem) {
+                throw new ErrTypeInferenceSystemRequiresRegularJavascriptObjects(i);
+            }
+        }
     }
 
     function handleVariadicArgsAndRePack(args: any[], endpoint: EndpointDefinition) {

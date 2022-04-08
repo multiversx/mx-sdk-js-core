@@ -8,7 +8,6 @@ import { Address } from "../address";
 import { assert } from "chai";
 import { Interaction } from "./interaction";
 import { Balance } from "../balance";
-import BigNumber from "bignumber.js";
 import { BytesValue } from "./typesystem/bytes";
 
 describe("integration tests: test checker within interactor", function () {
@@ -29,9 +28,8 @@ describe("integration tests: test checker within interactor", function () {
 
         // Bad arguments
         assert.throw(() => {
-            let interaction = (<Interaction>contract.methods.getUltimateAnswer([BytesValue.fromHex("abba")]));
-            checker.checkInteraction(interaction, endpoint);
-        }, errors.ErrContractInteraction, "bad arguments, expected: 0, got: 1");
+            contract.methods.getUltimateAnswer(["abba"]);
+        }, Error, "Wrong number of arguments for endpoint getUltimateAnswer: expected between 0 and 0 arguments, have 1");
     });
 
     it("should detect errors for 'lottery'", async function () {
@@ -42,17 +40,15 @@ describe("integration tests: test checker within interactor", function () {
 
         // Bad number of arguments
         assert.throw(() => {
-            let interaction = contract.methods.start([
-                BytesValue.fromUTF8("lucky"),
-                new BigUIntValue(Balance.egld(1).valueOf()),
-                OptionValue.newMissing()
+            contract.methods.start([
+                "lucky",
+                Balance.egld(1)
             ]);
-            checker.checkInteraction(interaction, endpoint);
-        }, errors.ErrContractInteraction, "bad arguments, expected: 9, got: 3");
+        }, Error, "Wrong number of arguments for endpoint start: expected between 8 and 9 arguments, have 2");
 
         // Bad types (U64 instead of U32)
         assert.throw(() => {
-            let interaction = contract.methods.start([
+            let interaction = contract.methodsExplicit.start([
                 BytesValue.fromUTF8("lucky"),
                 new TokenIdentifierValue("lucky-token"),
                 new BigUIntValue(1),

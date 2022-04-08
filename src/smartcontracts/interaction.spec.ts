@@ -176,7 +176,7 @@ describe("test smart contract interactor", function() {
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
         let controller = new DefaultSmartContractController(abi, provider);
 
-        let getInteraction = <Interaction>contract.methods.get();
+        let getInteraction = <Interaction>contract.methodsExplicit.get();
         let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(new GasLimit(543210));
         let decrementInteraction = (<Interaction>contract.methods.decrement()).withGasLimit(new GasLimit(987654));
 
@@ -224,7 +224,7 @@ describe("test smart contract interactor", function() {
         let controller = new DefaultSmartContractController(abi, provider);
 
         let startInteraction = <Interaction>(
-            contract.methods
+            contract.methodsExplicit
                 .start([
                     BytesValue.fromUTF8("lucky"),
                     new TokenIdentifierValue("lucky-token"),
@@ -240,11 +240,11 @@ describe("test smart contract interactor", function() {
         );
 
         let statusInteraction = <Interaction>(
-            contract.methods.status([BytesValue.fromUTF8("lucky")]).withGasLimit(new GasLimit(5000000))
+            contract.methods.status(["lucky"]).withGasLimit(new GasLimit(5000000))
         );
 
         let getLotteryInfoInteraction = <Interaction>(
-            contract.methods.getLotteryInfo([BytesValue.fromUTF8("lucky")]).withGasLimit(new GasLimit(5000000))
+            contract.methods.getLotteryInfo(["lucky"]).withGasLimit(new GasLimit(5000000))
         );
 
         // start()

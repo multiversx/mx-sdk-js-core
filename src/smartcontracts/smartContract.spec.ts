@@ -57,7 +57,6 @@ describe("test contract", () => {
 
         // Sign transaction, then check contract address (should be computed upon signing)
         alice.signer.sign(deployTransaction);
-        assert.equal(contract.getOwner().bech32(), alice.address.bech32());
         assert.equal(contract.getAddress().bech32(), "erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q");
 
         // Now let's broadcast the deploy transaction, and wait for its execution.

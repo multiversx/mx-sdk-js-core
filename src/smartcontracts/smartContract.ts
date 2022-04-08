@@ -23,7 +23,6 @@ const createKeccakHash = require("keccak");
  * An abstraction for deploying and interacting with Smart Contracts.
  */
 export class SmartContract implements ISmartContract {
-    private owner: Address = new Address();
     private address: Address = new Address();
     private code: Code = Code.nothing();
     private codeMetadata: CodeMetadata = new CodeMetadata();
@@ -94,17 +93,6 @@ export class SmartContract implements ISmartContract {
      */
     getAddress(): Address {
         return this.address;
-    }
-
-    /**
-     * Gets the owner address. 
-     * 
-     * Note that this function doesn't query the Network, but uses the information acquired when signing a deployment transaction.
-     * Therefore, currently, this function is useful only in the context of deploying Smart Contracts.
-     */
-    getOwner(): Address {
-        this.owner.assertNotEmpty();
-        return this.owner;
     }
 
     /**

@@ -6,7 +6,6 @@ import { Transaction } from "../transaction";
 import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
-import { Interaction } from "./interaction";
 import { ReturnCode } from "./returnCode";
 import { EndpointDefinition, TypedValue } from "./typesystem";
 

@@ -117,6 +117,10 @@ describe("test network providers on devnet: Proxy and API", function () {
 
             ignoreKnownTransactionDifferencesBetweenProviders(apiResponse, proxyResponse);
             assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
+
+            // Also assert completion
+            assert.isTrue(apiResponse.isCompleted);
+            assert.isTrue(proxyResponse.isCompleted);
         }
     });
 

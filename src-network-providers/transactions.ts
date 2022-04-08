@@ -2,11 +2,12 @@ import { TransactionStatus } from "./transactionStatus";
 import { ContractResults } from "./contractResults";
 import { Address, Hash, Nonce, TransactionValue, TransactionPayload } from "./primitives";
 import { IAddress, IGasLimit, IGasPrice, IHash, INonce, ITransactionPayload } from "./interface";
-import { TransactionCompletionStrategy } from "./transactionCompletionStrategy";
+import { TransactionCompletionStrategyOnAPI, TransactionCompletionStrategyOnProxy } from "./transactionCompletionStrategy";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
 
 export class TransactionOnNetwork {
+    isCompleted: boolean = false;
     hash: IHash = new Hash("");
     type: string = "";
     nonce: INonce = new Nonce(0);
@@ -25,7 +26,6 @@ export class TransactionOnNetwork {
     blockNonce: number = 0;
     hyperblockNonce: number = 0;
     hyperblockHash: string = "";
-    pendingResults: boolean = false;
 
     receipt: TransactionReceipt = new TransactionReceipt();
     contractResults: ContractResults = ContractResults.empty();
@@ -38,16 +38,16 @@ export class TransactionOnNetwork {
     static fromProxyHttpResponse(txHash: IHash, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromProxyHttpResponse(response.smartContractResults || []);
+        result.isCompleted = new TransactionCompletionStrategyOnProxy().isCompleted(result);
         // TODO: uniformize transaction status.
-        // TODO: Use specific completion detection strategy.
         return result;
     }
 
     static fromApiHttpResponse(txHash: IHash, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromApiHttpResponse(response.results || []);
+        result.isCompleted = new TransactionCompletionStrategyOnAPI().isCompleted(result);
         // TODO: uniformize transaction status.
-        // TODO: Use specific completion detection strategy.
         return result;
     }
 
@@ -71,7 +71,6 @@ export class TransactionOnNetwork {
         result.blockNonce = response.blockNonce || 0;
         result.hyperblockNonce = response.hyperblockNonce || 0;
         result.hyperblockHash = response.hyperblockHash || "";
-        result.pendingResults = response.pendingResults || false;
 
         result.receipt = TransactionReceipt.fromHttpResponse(response.receipt || {});
         result.logs = TransactionLogs.fromHttpResponse(response.logs || {});
@@ -81,11 +80,6 @@ export class TransactionOnNetwork {
 
     getDateTime(): Date {
         return new Date(this.timestamp * 1000);
-    }
-
-    isCompleted(): boolean {
-        // TODO: use different transaction completion strategies - API / Proxy.
-        return new TransactionCompletionStrategy().isCompleted(this);
     }
 }
 

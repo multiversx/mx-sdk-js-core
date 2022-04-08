@@ -1,8 +1,8 @@
 import { assert } from "chai";
 import { TransactionWatcher } from "./transactionWatcher";
 import { TransactionHash } from "./transaction";
-import { MockProvider, InHyperblock, Wait } from "./testutils";
-import { MockTransactionOnNetwork, MockTransactionStatus } from "./testutils/networkProviders";
+import { MockProvider, MarkCompleted, Wait } from "./testutils";
+import { TransactionOnNetwork, TransactionStatus } from "@elrondnetwork/erdjs-network-providers";
 
 
 describe("test transactionWatcher", () => {
@@ -14,12 +14,12 @@ describe("test transactionWatcher", () => {
             getHash: () => hash
         }
 
-        provider.mockPutTransaction(hash, new MockTransactionOnNetwork({
-            status: new MockTransactionStatus("unknown")
+        provider.mockPutTransaction(hash, new TransactionOnNetwork({
+            status: new TransactionStatus("unknown")
         }));
 
         await Promise.all([
-            provider.mockTransactionTimelineByHash(hash, [new Wait(40), new MockTransactionStatus("pending"), new Wait(40), new MockTransactionStatus("executed"), new InHyperblock()]),
+            provider.mockTransactionTimelineByHash(hash, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
             watcher.awaitCompleted(dummyTransaction)
         ]);
 

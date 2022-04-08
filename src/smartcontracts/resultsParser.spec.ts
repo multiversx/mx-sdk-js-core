@@ -7,20 +7,20 @@ import { ReturnCode } from "./returnCode";
 import { ResultsParser } from "./resultsParser";
 import { Nonce } from "../nonce";
 import { TransactionHash } from "../transaction";
-import { Address } from "../address";
 import { Logger, LogLevel } from "../logger";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { MockContractQueryResponse, MockContractResultItem, MockContractResults, MockTransactionEventTopic, MockTransactionLogs, MockTransactionOnNetwork } from "../testutils/networkProviders";
+import { ContractQueryResponse, ContractResultItem, ContractResults, TransactionEvent, TransactionEventTopic, TransactionLogs, TransactionOnNetwork } from "@elrondnetwork/erdjs-network-providers";
+import { Address } from "../address";
 
 const KnownReturnCodes: string[] = [
-    ReturnCode.None.valueOf(), 
-    ReturnCode.Ok.valueOf(), 
+    ReturnCode.None.valueOf(),
+    ReturnCode.Ok.valueOf(),
     ReturnCode.FunctionNotFound.valueOf(),
     ReturnCode.FunctionWrongSignature.valueOf(),
-    ReturnCode.ContractNotFound.valueOf(), 
-    ReturnCode.UserError.valueOf(), 
+    ReturnCode.ContractNotFound.valueOf(),
+    ReturnCode.UserError.valueOf(),
     ReturnCode.OutOfGas.valueOf(),
-    ReturnCode.AccountCollision.valueOf(), 
+    ReturnCode.AccountCollision.valueOf(),
     ReturnCode.OutOfFunds.valueOf(),
     ReturnCode.CallStackOverFlow.valueOf(), ReturnCode.ContractInvalid.valueOf(),
     ReturnCode.ExecutionFailed.valueOf(),
@@ -42,10 +42,10 @@ describe("test smart contract results parser", () => {
         ];
         let endpoint = new EndpointDefinition("foo", [], outputParameters, endpointModifiers);
 
-        let queryResponse = new MockContractQueryResponse({
-            dataParts: [
-                Buffer.from([42]),
-                Buffer.from("abba", "hex")
+        let queryResponse = new ContractQueryResponse({
+            returnData: [
+                Buffer.from([42]).toString("base64"),
+                Buffer.from("abba", "hex").toString("base64"),
             ],
             returnCode: ReturnCode.Ok,
             returnMessage: "foobar"
@@ -67,9 +67,9 @@ describe("test smart contract results parser", () => {
         ];
         let endpoint = new EndpointDefinition("foo", [], outputParameters, endpointModifiers);
 
-        let transactionOnNetwork = new MockTransactionOnNetwork({
-            contractResults: new MockContractResults([
-                new MockContractResultItem({ nonce: new Nonce(7), data: "@6f6b@2a@abba" })
+        let transactionOnNetwork = new TransactionOnNetwork({
+            contractResults: new ContractResults([
+                new ContractResultItem({ nonce: new Nonce(7), data: "@6f6b@2a@abba" })
             ])
         });
 
@@ -82,9 +82,9 @@ describe("test smart contract results parser", () => {
     });
 
     it("should parse contract outcome, on easily found result with return data", async () => {
-        let transaction = new MockTransactionOnNetwork({
-            contractResults: new MockContractResults([
-                new MockContractResultItem({
+        let transaction = new TransactionOnNetwork({
+            contractResults: new ContractResults([
+                new ContractResultItem({
                     nonce: new Nonce(42),
                     data: "@6f6b@03",
                     returnMessage: "foobar"
@@ -99,20 +99,16 @@ describe("test smart contract results parser", () => {
     });
 
     it("should parse contract outcome, on signal error", async () => {
-        let transaction = new MockTransactionOnNetwork({
-            logs: new MockTransactionLogs(
-                new Address(), 
-                [
-                    new MockTransactionEvent(
-                        new Address(), 
-                        "signalError", 
-                        [
-                            new MockTransactionEventTopic(Buffer.from("something happened").toString("base64"))
-                        ],
-                        `@${Buffer.from("user error").toString("hex")}@07`
-                    )    
-                ]
-            )
+        let transaction = new TransactionOnNetwork({
+            logs: new TransactionLogs(new Address(), [
+                new TransactionEvent({
+                    identifier: "signalError",
+                    topics: [
+                        new TransactionEventTopic(Buffer.from("something happened").toString("base64"))
+                    ],
+                    data: `@${Buffer.from("user error").toString("hex")}@07`
+                })
+            ])
         });
 
         let bundle = parser.parseUntypedOutcome(transaction);
@@ -122,20 +118,16 @@ describe("test smart contract results parser", () => {
     });
 
     it("should parse contract outcome, on too much gas warning", async () => {
-        let transaction = new MockTransactionOnNetwork({
-            logs: new MockTransactionLogs(
-                new Address(), 
-                [
-                    new MockTransactionEvent(
-                        new Address(), 
-                        "writeLog", 
-                        [
-                            new MockTransactionEventTopic("QHRvbyBtdWNoIGdhcyBwcm92aWRlZCBmb3IgcHJvY2Vzc2luZzogZ2FzIHByb3ZpZGVkID0gNTk2Mzg0NTAwLCBnYXMgdXNlZCA9IDczMzAxMA==")
-                        ],
-                        Buffer.from("QDZmNmI=", "base64").toString()
-                    )    
-                ]
-            )
+        let transaction = new TransactionOnNetwork({
+            logs: new TransactionLogs(new Address(), [
+                new TransactionEvent({
+                    identifier: "writeLog",
+                    topics: [
+                        new TransactionEventTopic("QHRvbyBtdWNoIGdhcyBwcm92aWRlZCBmb3IgcHJvY2Vzc2luZzogZ2FzIHByb3ZpZGVkID0gNTk2Mzg0NTAwLCBnYXMgdXNlZCA9IDczMzAxMA==")
+                    ],
+                    data: Buffer.from("QDZmNmI=", "base64").toString()
+                })
+            ])
         });
 
         let bundle = parser.parseUntypedOutcome(transaction);

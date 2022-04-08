@@ -8,11 +8,8 @@ import * as errors from "../errors";
 import { Query } from "../smartcontracts/query";
 import { TypedEvent } from "../events";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
-import { MockAccountOnNetwork, MockContractResultItem, MockContractResults, MockTransactionOnNetwork, MockTransactionStatus } from "./networkProviders";
 import { ErrMock } from "../errors";
-
-const DummyHyperblockNonce = 42;
-const DummyHyperblockHash = "a".repeat(32);
+import { AccountOnNetwork, ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "@elrondnetwork/erdjs-network-providers";
 
 export class MockProvider {
     static AddressOfAlice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -32,15 +29,15 @@ export class MockProvider {
 
         this.accounts.set(
             MockProvider.AddressOfAlice.bech32(),
-            new MockAccountOnNetwork({ nonce: new Nonce(0), balance: Balance.egld(1000) })
+            new AccountOnNetwork({ nonce: new Nonce(0), balance: Balance.egld(1000) })
         );
         this.accounts.set(
             MockProvider.AddressOfBob.bech32(),
-            new MockAccountOnNetwork({ nonce: new Nonce(5), balance: Balance.egld(500) })
+            new AccountOnNetwork({ nonce: new Nonce(5), balance: Balance.egld(500) })
         );
         this.accounts.set(
             MockProvider.AddressOfCarol.bech32(),
-            new MockAccountOnNetwork({ nonce: new Nonce(42), balance: Balance.egld(300) })
+            new AccountOnNetwork({ nonce: new Nonce(42), balance: Balance.egld(300) })
         );
     }
 
@@ -72,10 +69,9 @@ export class MockProvider {
 
         let predicate = (_hash: IHash) => true;
         let response = new TransactionOnNetwork({
-            status: new MockTransactionStatus("executed"),
-            hyperblockNonce: DummyHyperblockNonce,
-            hyperblockHash: DummyHyperblockHash,
-            contractResults: new ContractResults([contractResult])
+            status: new TransactionStatus("executed"),
+            contractResults: new ContractResults([contractResult]),
+            isCompleted: () => true
         });
 
         this.getTransactionResponders.unshift(new GetTransactionResponder(predicate, response));
@@ -103,14 +99,13 @@ export class MockProvider {
         await timeline.start(0);
 
         for (const point of timelinePoints) {
-            if (point instanceof MockTransactionStatus) {
+            if (point instanceof TransactionStatus) {
                 this.mockUpdateTransaction(hash, (transaction) => {
                     transaction.status = point;
                 });
-            } else if (point instanceof InHyperblock) {
+            } else if (point instanceof MarkCompleted) {
                 this.mockUpdateTransaction(hash, (transaction) => {
-                    transaction.hyperblockNonce = DummyHyperblockNonce;
-                    transaction.hyperblockHash = DummyHyperblockHash;
+                    transaction.isCompleted = () => true;
                 });
             } else if (point instanceof Wait) {
                 await timeline.start(point.milliseconds);
@@ -130,11 +125,11 @@ export class MockProvider {
     async sendTransaction(transaction: Transaction): Promise<TransactionHash> {
         this.mockPutTransaction(
             transaction.getHash(),
-            new MockTransactionOnNetwork({
+            new TransactionOnNetwork({
                 sender: transaction.getSender(),
                 receiver: transaction.getReceiver(),
                 data: transaction.getData(),
-                status: new MockTransactionStatus("pending"),
+                status: new TransactionStatus("pending"),
             })
         );
 
@@ -196,7 +191,7 @@ export class Wait {
     }
 }
 
-export class InHyperblock { }
+export class MarkCompleted { }
 
 class QueryContractResponder {
     readonly matches: (query: Query) => boolean;

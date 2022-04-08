@@ -4,12 +4,12 @@ import { Code } from "./code";
 import { Nonce } from "../nonce";
 import { SmartContract } from "./smartContract";
 import { ChainID, GasLimit } from "../networkParams";
-import { InHyperblock, loadTestWallets, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
+import { loadTestWallets, MarkCompleted, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
 import { ContractFunction } from "./function";
 import { U32Value } from "./typesystem";
 import { BytesValue } from "./typesystem/bytes";
 import { TransactionWatcher } from "../transactionWatcher";
-import { MockTransactionStatus } from "../testutils/networkProviders";
+import { TransactionStatus } from "@elrondnetwork/erdjs-network-providers";
 
 
 describe("test contract", () => {
@@ -64,7 +64,7 @@ describe("test contract", () => {
         let hash = await provider.sendTransaction(deployTransaction);
 
         await Promise.all([
-            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new MockTransactionStatus("pending"), new Wait(40), new MockTransactionStatus("executed"), new InHyperblock()]),
+            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
             watcher.awaitCompleted(deployTransaction)
         ]);
 
@@ -115,8 +115,8 @@ describe("test contract", () => {
         let hashTwo = await provider.sendTransaction(callTransactionTwo);
 
         await Promise.all([
-            provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new MockTransactionStatus("pending"), new Wait(40), new MockTransactionStatus("executed"), new InHyperblock()]),
-            provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new MockTransactionStatus("pending"), new Wait(40), new MockTransactionStatus("executed"), new InHyperblock()]),
+            provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
+            provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
             watcher.awaitCompleted(callTransactionOne),
             watcher.awaitCompleted(callTransactionTwo)
         ]);

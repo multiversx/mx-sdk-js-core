@@ -1,5 +1,3 @@
-import { PathLike } from "fs";
-import * as fs from "fs";
 import axios, { AxiosResponse } from "axios";
 
 /**
@@ -17,14 +15,6 @@ export class Code {
      */
     static fromBuffer(code: Buffer): Code {
         return new Code(code.toString("hex"));
-    }
-
-    /**
-     * Creates a Code object by loading the bytecode from a specified WASM file.
-     */
-    static async fromFile(file: PathLike): Promise<Code> {
-        let buffer: Buffer = await fs.promises.readFile(file);
-        return Code.fromBuffer(buffer);
     }
 
     /**

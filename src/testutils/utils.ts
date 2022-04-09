@@ -1,4 +1,5 @@
 import { PathLike } from "fs";
+import * as fs from "fs";
 import { SmartContract } from "../smartcontracts/smartContract";
 import { Code } from "../smartcontracts/code";
 import { AbiRegistry, TypedValue } from "../smartcontracts/typesystem";
@@ -39,7 +40,9 @@ export async function loadContractCode(path: PathLike): Promise<Code> {
         return Code.fromUrl(path.toString());
     }
 
-    return Code.fromFile(path);
+    // Load from file.
+    let buffer: Buffer = await fs.promises.readFile(path);
+    return Code.fromBuffer(buffer);
 }
 
 export async function loadAbiRegistry(paths: PathLike[]): Promise<AbiRegistry> {

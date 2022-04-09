@@ -2,7 +2,6 @@ import { Balance } from "../balance";
 import { Address } from "../address";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
-import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
 import { CallArguments, DeployArguments, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
@@ -24,8 +23,6 @@ const createKeccakHash = require("keccak");
  */
 export class SmartContract implements ISmartContract {
     private address: IBech32Address = new Address();
-    private code: Code = Code.nothing();
-    private codeMetadata: CodeMetadata = new CodeMetadata();
     private abi?: SmartContractAbi;
 
     /**
@@ -95,20 +92,6 @@ export class SmartContract implements ISmartContract {
         return this.address;
     }
 
-    /**
-     * Gets the {@link Code} of the Smart Contract. Does not query the Network.
-     */
-    getCode(): Code {
-        return this.code;
-    }
-
-    /**
-     * Gets the {@link CodeMetadata} of the Smart Contract. Does not query the Network.
-     */
-    getCodeMetadata(): CodeMetadata {
-        return this.codeMetadata;
-    }
-
     setAbi(abi: SmartContractAbi) {
         this.abi = abi;
     }
@@ -145,8 +128,6 @@ export class SmartContract implements ISmartContract {
             chainID: chainID
         });
 
-        this.code = code;
-        this.codeMetadata = codeMetadata;
         return transaction;
     }
 
@@ -174,9 +155,6 @@ export class SmartContract implements ISmartContract {
             data: payload,
             chainID: chainID
         });
-
-        this.code = code;
-        this.codeMetadata = codeMetadata;
 
         return transaction;
     }

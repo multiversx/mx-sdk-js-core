@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IBech32Address, IChainID, IGasLimit, IGasPrice, ISignable, ISignature } from "./interface";
+import { IBech32Address, IChainID, IGasLimit, IGasPrice, ISignature } from "./interface";
 import { Address } from "./address";
 import { Balance } from "./balance";
 import {
@@ -24,7 +24,7 @@ const TRANSACTION_HASH_LENGTH = 32;
 /**
  * An abstraction for creating, signing and broadcasting Elrond transactions.
  */
-export class Transaction implements ISignable {
+export class Transaction {
   /**
    * The nonce of the transaction (the account sequence number of the sender).
    */

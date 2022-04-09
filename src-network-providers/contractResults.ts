@@ -1,6 +1,6 @@
 import { IBech32Address, IHash } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
-import { Bech32Address, Hash, Nonce, TransactionValue } from "./primitives";
+import { Bech32Address, Hash } from "./primitives";
 
 export class ContractResults {
     readonly items: ContractResultItem[];
@@ -31,7 +31,7 @@ export class ContractResults {
 export class ContractResultItem {
     hash: IHash = new Hash("");
     nonce: number = 0;
-    value: TransactionValue = new TransactionValue("");
+    value: string = "";
     receiver: IBech32Address = new Bech32Address("");
     sender: IBech32Address = new Bech32Address("");
     data: string = "";
@@ -66,7 +66,7 @@ export class ContractResultItem {
 
         item.hash = new Hash(response.hash);
         item.nonce = Number(response.nonce || 0);
-        item.value = new TransactionValue((response.value || 0).toString());
+        item.value = (response.value || 0).toString();
         item.receiver = new Bech32Address(response.receiver);
         item.sender = new Bech32Address(response.sender);
         item.previousHash = new Hash(response.prevTxHash);

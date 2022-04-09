@@ -1,6 +1,6 @@
 import { TransactionStatus } from "./transactionStatus";
 import { ContractResults } from "./contractResults";
-import { Bech32Address, Hash, TransactionValue, TransactionPayload } from "./primitives";
+import { Bech32Address, Hash, TransactionPayload } from "./primitives";
 import { IBech32Address, IHash } from "./interface";
 import { TransactionCompletionStrategyOnAPI, TransactionCompletionStrategyOnProxy } from "./transactionCompletionStrategy";
 import { TransactionLogs } from "./transactionLogs";
@@ -13,7 +13,7 @@ export class TransactionOnNetwork {
     nonce: number = 0;
     round: number = 0;
     epoch: number = 0;
-    value: TransactionValue = new TransactionValue("");
+    value: string = "";
     receiver: IBech32Address = new Bech32Address("");
     sender: IBech32Address = new Bech32Address("");
     gasLimit: number = 0;
@@ -59,7 +59,7 @@ export class TransactionOnNetwork {
         result.nonce = response.nonce || 0;
         result.round = response.round;
         result.epoch = response.epoch || 0;
-        result.value = new TransactionValue((response.value || 0).toString());
+        result.value = (response.value || 0).toString();
         result.sender = new Bech32Address(response.sender);
         result.receiver = new Bech32Address(response.receiver);
         result.gasPrice = response.gasPrice || 0;

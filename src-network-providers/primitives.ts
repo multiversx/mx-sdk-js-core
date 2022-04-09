@@ -40,18 +40,6 @@ export class Nonce {
     }
 }
 
-export class TransactionValue {
-    private readonly value: string;
-
-    constructor(value: string) {
-        this.value = value;
-    }
-
-    toString(): string {
-        return this.value;
-    }
-}
-
 export class TransactionPayload {
     private readonly decoded: Buffer;
 
@@ -83,18 +71,6 @@ export class ContractReturnCode {
 
     isSuccess(): boolean {
         return this.value == ContractReturnCode.OK;
-    }
-}
-
-export class AccountBalance {
-    private readonly value: string;
-
-    constructor(value: string) {
-        this.value = value;
-    }
-
-    toString(): string {
-        return this.value;
     }
 }
 

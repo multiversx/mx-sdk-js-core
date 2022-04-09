@@ -5,7 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## Unreleased
- - TBD
+ - [Breaking changes: cleanup and minor improvements prior release (step 1)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/190)
 
 ## 10.0.0-alpha.5
  - [Breaking change: adjustements to transaction awaitening and completion, transaction watcher](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/173)
@@ -41,8 +41,14 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Moved network providers and contract wrappers to separate repositories:
    - https://github.com/ElrondNetwork/elrond-sdk-erdjs-network-providers
    - https://github.com/ElrondNetwork/elrond-sdk-erdjs-contract-wrappers
- - Rename `methods` to `methodsExplicit`. Rename `methodsAuto` (only added in erdjs 10 beta) to `methods` (default choice). Therefore, by default, interactions are created without having to pass `TypedValue` objects as parameters. Automatic type inference is applied.
- - Remove `SmartContractController` (downgraded to a mere test utility).
+ - Renamed `methods` to `methodsExplicit`. Rename `methodsAuto` (only added in erdjs 10 beta) to `methods` (default choice). Therefore, by default, interactions are created without having to pass `TypedValue` objects as parameters. Automatic type inference is applied.
+ - Removed `SmartContractController` (downgraded to a mere test utility).
+ - erdjs does not depend on `axios` and `fs` anymore. Changed the way an `AbiRegistry` is created. Removed function `Code.fromFile()` (was relying on `fs`).
+ - Removed `smartContract.getOwner()` (surprising behavior of function, usage not recommended).
+ - Removed `transaction.awaitHashed()` (lacks use-case).
+ - Removed `transaction.awaitSigned()` (it isn't useful in relation with any of our signing providers).
+ - Removed not used interfaces (e.g. `ISignable` is not needed in erdjs, but in walletcore).
+ - Removed `interaction.getContract()`. Add `interaction.getContractAddress()`.
 
 ## [10.0.0-beta.3]
  - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)

@@ -14,7 +14,6 @@ import { Signature } from "./signature";
 import { guardNotEmpty } from "./utils";
 import { TransactionPayload } from "./transactionPayload";
 import * as errors from "./errors";
-import { TypedEvent } from "./events";
 import { ProtoSerializer } from "./proto";
 import { Hash } from "./hash";
 import { INetworkConfig } from "./interfaceOfNetwork";
@@ -26,10 +25,6 @@ const TRANSACTION_HASH_LENGTH = 32;
  * An abstraction for creating, signing and broadcasting Elrond transactions.
  */
 export class Transaction implements ISignable {
-  readonly onSigned: TypedEvent<{
-    transaction: Transaction;
-    signedBy: IBech32Address;
-  }>;
   /**
    * The nonce of the transaction (the account sequence number of the sender).
    */
@@ -129,8 +124,6 @@ export class Transaction implements ISignable {
 
     this.signature = Signature.empty();
     this.hash = TransactionHash.empty();
-
-    this.onSigned = new TypedEvent();
   }
 
   getNonce(): Nonce {
@@ -293,9 +286,7 @@ export class Transaction implements ISignable {
   applySignature(signature: ISignature, signedBy: IBech32Address) {
     this.signature = signature;
     this.sender = signedBy;
-
     this.hash = TransactionHash.compute(this);
-    this.onSigned.emit({ transaction: this, signedBy: signedBy });
   }
 
   /**

@@ -56,8 +56,8 @@ export class Interaction {
         this.tokenTransfers = new TokenTransfersWithinInteraction([], this);
     }
     
-    getContract(): ISmartContractWithinInteraction {
-        return this.contract;
+    getContractAddress(): IBech32Address {
+        return this.contract.getAddress();
     }
 
     getFunction(): ContractFunction {
@@ -104,7 +104,6 @@ export class Interaction {
             args = this.tokenTransfers.buildArgsForMultiESDTNFTTransfer();
         }
 
-        // TODO: create as "deploy" transaction if the function is "init" (or find a better pattern for deployments).
         let transaction = this.contract.call({
             func: func,
             // GasLimit will be set using "withGasLimit()".
@@ -288,7 +287,7 @@ class TokenTransfersWithinInteraction {
 
     private getTypedTokensReceiver(): TypedValue {
         // The actual receiver of the token(s): the contract
-        return new AddressValue(this.interaction.getContract().getAddress());
+        return new AddressValue(this.interaction.getContractAddress());
     }
 
     private getTypedInteractionFunction(): TypedValue {

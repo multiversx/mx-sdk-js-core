@@ -1,4 +1,3 @@
-import { Address } from "../address";
 import { Balance } from "../balance";
 import { IBech32Address, IChainID, IGasLimit, IGasPrice } from "../interface";
 import { IContractQueryResponse, ITransactionOnNetwork } from "../interfaceOfNetwork";

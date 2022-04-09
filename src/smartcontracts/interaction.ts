@@ -31,7 +31,6 @@ export class Interaction {
     private readonly contract: ISmartContractWithinInteraction;
     private readonly function: ContractFunction;
     private readonly args: TypedValue[];
-    private readonly receiver?: IBech32Address;
 
     private nonce: Nonce = new Nonce(0);
     private value: Balance = Balance.Zero();
@@ -49,13 +48,11 @@ export class Interaction {
     constructor(
         contract: ISmartContractWithinInteraction,
         func: ContractFunction,
-        args: TypedValue[],
-        receiver?: IBech32Address,
+        args: TypedValue[]
     ) {
         this.contract = contract;
         this.function = func;
         this.args = args;
-        this.receiver = receiver;
         this.tokenTransfers = new TokenTransfersWithinInteraction([], this);
     }
     
@@ -88,7 +85,7 @@ export class Interaction {
     }
 
     buildTransaction(): Transaction {
-        let receiver = this.receiver;
+        let receiver = this.contract.getAddress();
         let func: ContractFunction = this.function;
         let args = this.args;
 

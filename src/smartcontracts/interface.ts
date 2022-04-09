@@ -85,11 +85,3 @@ export interface UntypedOutcomeBundle {
     returnMessage: string;
     values: Buffer[];
 }
-
-export interface IResultsParser {
-    parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle;
-    parseUntypedQueryResponse(queryResponse: IContractQueryResponse): UntypedOutcomeBundle;
-
-    parseOutcome(transaction: ITransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle;
-    parseUntypedOutcome(transaction: ITransactionOnNetwork): UntypedOutcomeBundle;
-}

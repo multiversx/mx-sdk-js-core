@@ -4,7 +4,7 @@ import { ErrCannotParseContractResults } from "../errors";
 import { Logger } from "../logger";
 import { IContractQueryResponse, IContractResults, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { ArgSerializer } from "./argSerializer";
-import { TypedOutcomeBundle, IResultsParser, UntypedOutcomeBundle } from "./interface";
+import { TypedOutcomeBundle, UntypedOutcomeBundle } from "./interface";
 import { ReturnCode } from "./returnCode";
 import { EndpointDefinition } from "./typesystem";
 import { IBech32Address } from "../interface";
@@ -23,7 +23,7 @@ enum WellKnownTopics {
  * Parses contract query responses and smart contract results.
  * The parsing involves some heuristics, in order to handle slight inconsistencies (e.g. some SCRs are present on API, but missing on Gateway).
  */
-export class ResultsParser implements IResultsParser {
+export class ResultsParser {
     parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle {
         let parts = queryResponse.getReturnDataParts();
         let values = new ArgSerializer().buffersToValues(parts, endpoint.output);

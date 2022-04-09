@@ -34,13 +34,6 @@ export class Code {
     }
 
     /**
-     * Null-object pattern: creates an empty Code object.
-     */
-    static nothing(): Code {
-        return new Code("");
-    }
-
-    /**
      * Returns the bytecode as a hex-encoded string.
      */
     toString(): string {

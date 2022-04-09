@@ -3,16 +3,16 @@ import { INetworkProvider } from "./interface";
 import { Hash } from "./primitives";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
-import { Address, Nonce } from "./primitives";
+import { Bech32Address, Nonce } from "./primitives";
 import { MockQuery } from "./testscommon/dummyQuery";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 
 describe("test network providers on devnet: Proxy and API", function () {
-    let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-    let bob = new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
-    let carol = new Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
-    let dan = new Address("erd1kyaqzaprcdnv4luvanah0gfxzzsnpaygsy6pytrexll2urtd05ts9vegu7");
+    let alice = new Bech32Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+    let bob = new Bech32Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+    let carol = new Bech32Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
+    let dan = new Bech32Address("erd1kyaqzaprcdnv4luvanah0gfxzzsnpaygsy6pytrexll2urtd05ts9vegu7");
 
     let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.elrond.com", { timeout: 10000 });
     let proxyProvider: INetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.elrond.com", { timeout: 10000 });
@@ -193,7 +193,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getNonFungibleToken()", async function () {
         this.timeout(10000);
 
-        let tokens = [{ id: "ERDJS-38f249", nonce: new Nonce(1) }];
+        let tokens = [{ id: "ERDJS-38f249", nonce: 1 }];
 
         for (const token of tokens) {
             let apiResponse = await apiProvider.getNonFungibleToken(token.id, token.nonce);

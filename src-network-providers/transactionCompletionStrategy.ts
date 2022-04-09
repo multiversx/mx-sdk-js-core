@@ -1,13 +1,12 @@
 import { TransactionStatus } from "./transactionStatus";
-import { ITransactionPayload } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
-import { isPaddedHex } from "./primitives";
+import { isPaddedHex, TransactionPayload } from "./primitives";
 
 interface ITransactionOnNetwork {
     logs: TransactionLogs;
     status: TransactionStatus;
     hyperblockNonce: number;
-    data: ITransactionPayload;
+    data: TransactionPayload;
 }
 
 const WellKnownCompletionEvents = ["completedTxEvent", "SCDeploy", "signalError"];

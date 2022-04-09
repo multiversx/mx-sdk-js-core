@@ -1,13 +1,13 @@
-import { IAccountBalance, IAddress, INonce } from "./interface";
-import { AccountBalance, Address, Nonce } from "./primitives";
+import { IBech32Address } from "./interface";
+import { AccountBalance, Bech32Address } from "./primitives";
 
 /**
  * A plain view of an account, as queried from the Network.
  */
  export class AccountOnNetwork {
-    address: IAddress = new Address("");
-    nonce: INonce = new Nonce(0);
-    balance: IAccountBalance = new AccountBalance("");
+    address: IBech32Address = new Bech32Address("");
+    nonce: number = 0;
+    balance: AccountBalance = new AccountBalance("");
     code: string = "";
     userName: string = "";
 
@@ -18,8 +18,8 @@ import { AccountBalance, Address, Nonce } from "./primitives";
     static fromHttpResponse(payload: any): AccountOnNetwork {
         let result = new AccountOnNetwork();
 
-        result.address = new Address(payload["address"] || 0);
-        result.nonce = new Nonce(payload["nonce"] || 0);
+        result.address = new Bech32Address(payload["address"] || 0);
+        result.nonce = Number(payload["nonce"] || 0);
         result.balance = new AccountBalance(payload["balance"] || "0");
         result.code = payload["code"] || "";
         result.userName = payload["username"] || "";

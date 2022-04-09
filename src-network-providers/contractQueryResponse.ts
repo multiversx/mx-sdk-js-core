@@ -1,13 +1,13 @@
 import BigNumber from "bignumber.js";
 import { MaxUint64AsBigNumber } from "./constants";
-import { IContractReturnCode, IGasLimit } from "./interface";
+import { IContractReturnCode } from "./interface";
 import { ContractReturnCode } from "./primitives";
 
 export class ContractQueryResponse {
     returnData: string[];
     returnCode: IContractReturnCode;
     returnMessage: string;
-    gasUsed: IGasLimit;
+    gasUsed: number;
 
     constructor(init?: Partial<ContractQueryResponse>) {
         this.returnData = init?.returnData || [];
@@ -24,7 +24,7 @@ export class ContractQueryResponse {
         let returnCode = payload["returnCode"] || payload["ReturnCode"];
         let returnMessage = payload["returnMessage"] || payload["ReturnMessage"];
         let gasRemaining = new BigNumber(payload["gasRemaining"] || payload["GasRemaining"] || 0);
-        let gasUsed = new Number(MaxUint64AsBigNumber.minus(gasRemaining).toNumber());
+        let gasUsed = MaxUint64AsBigNumber.minus(gasRemaining).toNumber();
 
         return new ContractQueryResponse({
             returnData: returnData,

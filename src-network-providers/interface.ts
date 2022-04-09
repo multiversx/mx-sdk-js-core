@@ -36,27 +36,27 @@ export interface INetworkProvider {
     /**
      * Fetches the state of an account.
      */
-    getAccount(address: IAddress): Promise<AccountOnNetwork>;
+    getAccount(address: IBech32Address): Promise<AccountOnNetwork>;
 
     /**
      * Fetches data about the fungible tokens held by an account.
      */
-    getFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: IBech32Address, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
-    getNonFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
+    getNonFungibleTokensOfAccount(address: IBech32Address, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about a specific fungible token held by an account.
      */
-    getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork>;
+    getFungibleTokenOfAccount(address: IBech32Address, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches data about a specific non-fungible token (instance) held by an account.
      */
-    getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: INonce): Promise<NonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleTokenOfAccount(address: IBech32Address, collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches the state of a transaction.
@@ -97,7 +97,7 @@ export interface INetworkProvider {
     /**
      * Fetches data about a specific non-fungible token (instance).
      */
-    getNonFungibleToken(collection: string, nonce: INonce): Promise<NonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleToken(collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Performs a generic GET action against the provider (useful for new HTTP endpoints, not yet supported by erdjs).
@@ -129,13 +129,5 @@ export interface ITransaction {
     toSendable(): any;
 }
 
-export interface IHexable { hex(): string; }
-export interface IHash extends IHexable { }
-export interface IAddress { bech32(): string; }
-export interface INonce extends IHexable { valueOf(): number; }
-export interface ITransactionPayload { encoded(): string; }
-export interface IGasLimit { valueOf(): number; }
-export interface IGasPrice { valueOf(): number; }
-export interface IChainID { valueOf(): string; }
-export interface ITransactionVersion { valueOf(): number; }
-export interface IAccountBalance { toString(): string; }
+export interface IHash { hex(): string; }
+export interface IBech32Address { bech32(): string; }

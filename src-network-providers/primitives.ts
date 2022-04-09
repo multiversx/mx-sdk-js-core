@@ -1,4 +1,4 @@
-import { IAddress, IHash, INonce, ITransactionPayload } from "./interface";
+import { IBech32Address, IHash } from "./interface";
 
 export class Hash implements IHash {
     private readonly value: string;
@@ -12,7 +12,7 @@ export class Hash implements IHash {
     }
 }
 
-export class Address implements IAddress {
+export class Bech32Address implements IBech32Address {
     private readonly value: string;
 
     constructor(value: string) {
@@ -24,7 +24,7 @@ export class Address implements IAddress {
     }
 }
 
-export class Nonce implements INonce {
+export class Nonce {
     private readonly value: number;
 
     constructor(value: number) {
@@ -52,7 +52,7 @@ export class TransactionValue {
     }
 }
 
-export class TransactionPayload implements ITransactionPayload {
+export class TransactionPayload {
     private readonly decoded: Buffer;
 
     constructor(encoded: string) {

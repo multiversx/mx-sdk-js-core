@@ -1,6 +1,4 @@
-import * as fs from "fs";
 import * as errors from "../../errors";
-import axios, { AxiosResponse } from "axios";
 import { guardValueIsSetWithMessage } from "../../utils";
 import { StructType } from "./struct";
 import { ContractInterface } from "./contractInterface";
@@ -12,38 +10,14 @@ import { EndpointDefinition, EndpointParameterDefinition } from "./endpoint";
 export class AbiRegistry {
     readonly interfaces: ContractInterface[] = [];
     readonly customTypes: CustomType[] = [];
-    /**
-     * Convenience factory function to load ABIs (from files or URLs).
-     * This function will also remap ABI types to know types (on best-efforts basis).
-     */
-    static async load(json: { files?: string[]; urls?: string[] }): Promise<AbiRegistry> {
-        let registry = new AbiRegistry();
-        for (const file of json.files || []) {
-            await registry.extendFromFile(file);
-        }
-        for (const url of json.urls || []) {
-            await registry.extendFromUrl(url);
-        }
-        registry = registry.remapToKnownTypes();
-        return registry;
+
+    static create(json: { name: string; endpoints: any[]; types: any[] }): AbiRegistry {
+        let registry = new AbiRegistry().extend(json);
+        let remappedRegistry = registry.remapToKnownTypes();
+        return remappedRegistry;
     }
-    /**
-     * Generally, one should use {@link AbiRegistry.load} instead.
-     */
-    async extendFromFile(file: string): Promise<AbiRegistry> {
-        let jsonContent: string = await fs.promises.readFile(file, { encoding: "utf8" });
-        let json = JSON.parse(jsonContent);
-        return this.extend(json);
-    }
-    /**
-     * Generally, one should use {@link AbiRegistry.load} instead.
-     */
-    async extendFromUrl(url: string): Promise<AbiRegistry> {
-        let response: AxiosResponse = await axios.get(url);
-        let json = response.data;
-        return this.extend(json);
-    }
-    extend(json: { name: string; endpoints: any[]; types: any[] }): AbiRegistry {
+
+    private extend(json: { name: string; endpoints: any[]; types: any[] }): AbiRegistry {
         json.types = json.types || {};
         // The "endpoints" collection is interpreted by "ContractInterface".
         let iface = ContractInterface.fromJSON(json);
@@ -92,7 +66,7 @@ export class AbiRegistry {
         return names.map((name) => this.getEnum(name));
     }
     /**
-     * Right after loading ABI definitions into a registry (e.g. from a file), the endpoints and the custom types (structs, enums)
+     * Right after loading ABI definitions into a registry, the endpoints and the custom types (structs, enums)
      * use raw types for their I/O parameters (in the case of endpoints), or for their fields (in the case of structs).
      *
      * A raw type is merely an instance of {@link Type}, with a given name and type parameters (if it's a generic type).

@@ -29,7 +29,6 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@elrondnetwork/transaction-decoder": "0.1.0",
-    "axios": "0.24.0",
     "bech32": "1.1.4",
     "bignumber.js": "9.0.1",
     "buffer": "6.0.3",
@@ -46,6 +45,7 @@
     "@types/node": "13.13.2",
     "@types/protobufjs": "6.0.0",
     "assert": "2.0.0",
+    "axios": "0.24.0",
     "browserify": "17.0.0",
     "chai": "4.2.0",
     "esmify": "2.1.1",

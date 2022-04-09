@@ -21,7 +21,7 @@ describe("test smart contract interactor", function () {
     it("should interact with 'answer' (local testnet)", async function () {
         this.timeout(80000);
 
-        let abiRegistry = await loadAbiRegistry(["src/testdata/answer.abi.json"]);
+        let abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
         let abi = new SmartContractAbi(abiRegistry, ["answer"]);
         let contract = new SmartContract({ abi: abi });
         let controller = new ContractController(provider);
@@ -69,7 +69,7 @@ describe("test smart contract interactor", function () {
     it("should interact with 'counter' (local testnet)", async function () {
         this.timeout(120000);
 
-        let abiRegistry = await loadAbiRegistry(["src/testdata/counter.abi.json"]);
+        let abiRegistry = await loadAbiRegistry("src/testdata/counter.abi.json");
         let abi = new SmartContractAbi(abiRegistry, ["counter"]);
         let contract = new SmartContract({ abi: abi });
         let controller = new ContractController(provider);
@@ -122,7 +122,7 @@ describe("test smart contract interactor", function () {
     it("should interact with 'lottery-esdt' (local testnet)", async function () {
         this.timeout(140000);
 
-        let abiRegistry = await loadAbiRegistry(["src/testdata/lottery-esdt.abi.json"]);
+        let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
         let contract = new SmartContract({ abi: abi });
         let controller = new ContractController(provider);

@@ -77,7 +77,7 @@ export interface INetworkProvider {
      * Simulates the processing of an already-signed transaction.
      * 
      */
-    simulateTransaction(tx: ITransaction): Promise<ISimulationResults>;
+    simulateTransaction(tx: ITransaction): Promise<any>;
 
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
@@ -86,13 +86,11 @@ export interface INetworkProvider {
 
     /**
      * Fetches the definition of a fungible token.
-     *
      */
     getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork>;
 
     /**
      * Fetches the definition of a SFT (including Meta ESDT) or NFT.
-     * 
      */
     getDefinitionOfTokenCollection(collection: string): Promise<DefinitionOfTokenCollectionOnNetwork>;
 
@@ -120,9 +118,6 @@ export interface IContractQuery {
 export interface IContractReturnCode {
     toString(): string;
     isSuccess(): boolean;
-}
-
-export interface ISimulationResults {
 }
 
 export interface IPagination {

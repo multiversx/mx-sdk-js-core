@@ -37,7 +37,8 @@ describe("test smart contract interactor", function () {
             chainID: network.ChainID
         });
 
-        deployTransaction.setNonce(alice.account.getNonceThenIncrement());
+        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
+        deployTransaction.setNonce(alice.account.getNonceThenIncrement()); 
         await alice.signer.sign(deployTransaction);
         let { bundle: { returnCode } } = await controller.deploy(deployTransaction);
         assert.isTrue(returnCode.isSuccess());
@@ -85,6 +86,7 @@ describe("test smart contract interactor", function () {
             chainID: network.ChainID
         });
 
+        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
         deployTransaction.setNonce(alice.account.getNonceThenIncrement());
         await alice.signer.sign(deployTransaction);
         let { bundle: { returnCode } } = await controller.deploy(deployTransaction);
@@ -138,6 +140,7 @@ describe("test smart contract interactor", function () {
             chainID: network.ChainID
         });
 
+        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
         deployTransaction.setNonce(alice.account.getNonceThenIncrement());
         await alice.signer.sign(deployTransaction);
         let { bundle: { returnCode } } = await controller.deploy(deployTransaction);

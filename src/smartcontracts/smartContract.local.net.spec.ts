@@ -40,6 +40,7 @@ describe("test on local testnet", function () {
         });
 
         transactionDeploy.setNonce(alice.account.nonce);
+        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
         await alice.signer.sign(transactionDeploy);
 
         alice.account.incrementNonce();
@@ -112,6 +113,7 @@ describe("test on local testnet", function () {
         });
 
         transactionDeploy.setNonce(alice.account.nonce);
+        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
         await alice.signer.sign(transactionDeploy);
 
         alice.account.incrementNonce();
@@ -176,6 +178,7 @@ describe("test on local testnet", function () {
         // The deploy transaction should be signed, so that the address of the contract
         // (required for the subsequent transactions) is computed.
         transactionDeploy.setNonce(alice.account.nonce);
+        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
         await alice.signer.sign(transactionDeploy);
         alice.account.incrementNonce();
 
@@ -263,6 +266,7 @@ describe("test on local testnet", function () {
         // The deploy transaction should be signed, so that the address of the contract
         // (required for the subsequent transactions) is computed.
         transactionDeploy.setNonce(alice.account.nonce);
+        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
         await alice.signer.sign(transactionDeploy);
         alice.account.incrementNonce();
 

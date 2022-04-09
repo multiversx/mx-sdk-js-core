@@ -35,6 +35,7 @@ describe("fetch transactions from local testnet", function () {
         });
 
         transactionDeploy.setNonce(alice.account.nonce);
+        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
         await alice.signer.sign(transactionDeploy);
 
         alice.account.incrementNonce();

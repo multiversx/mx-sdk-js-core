@@ -3,7 +3,7 @@ import { GasLimit } from "../networkParams";
 import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction } from "./function";
 import { loadTestWallets, TestWallet } from "../testutils/wallets";
-import { loadContractCode } from "../testutils";
+import { prepareDeployment } from "../testutils";
 import { Logger } from "../logger";
 import { assert } from "chai";
 import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
@@ -33,17 +33,15 @@ describe("test on local testnet", function () {
 
         // Deploy
         let contract = new SmartContract({});
-        let transactionDeploy = contract.deploy({
-            code: await loadContractCode("src/testdata/counter.wasm"),
+        
+        let transactionDeploy = await prepareDeployment({
+            contract: contract,
+            deployer: alice,
+            codePath: "src/testdata/counter.wasm",
             gasLimit: new GasLimit(3000000),
+            initArguments: [],
             chainID: network.ChainID
         });
-
-        transactionDeploy.setNonce(alice.account.nonce);
-        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
-        await alice.signer.sign(transactionDeploy);
-
-        alice.account.incrementNonce();
 
         // ++
         let transactionIncrement = contract.call({
@@ -106,17 +104,15 @@ describe("test on local testnet", function () {
 
         // Deploy
         let contract = new SmartContract({});
-        let transactionDeploy = contract.deploy({
-            code: await loadContractCode("src/testdata/counter.wasm"),
+
+        let transactionDeploy = await prepareDeployment({
+            contract: contract,
+            deployer: alice,
+            codePath: "src/testdata/counter.wasm",
             gasLimit: new GasLimit(3000000),
+            initArguments: [],
             chainID: network.ChainID
         });
-
-        transactionDeploy.setNonce(alice.account.nonce);
-        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
-        await alice.signer.sign(transactionDeploy);
-
-        alice.account.incrementNonce();
 
         // ++
         let transactionIncrementFirst = contract.call({
@@ -168,19 +164,15 @@ describe("test on local testnet", function () {
 
         // Deploy
         let contract = new SmartContract({});
-        let transactionDeploy = contract.deploy({
-            code: await loadContractCode("src/testdata/erc20.wasm"),
+
+        let transactionDeploy = await prepareDeployment({
+            contract: contract,
+            deployer: alice,
+            codePath: "src/testdata/erc20.wasm",
             gasLimit: new GasLimit(50000000),
             initArguments: [new U32Value(10000)],
             chainID: network.ChainID
         });
-
-        // The deploy transaction should be signed, so that the address of the contract
-        // (required for the subsequent transactions) is computed.
-        transactionDeploy.setNonce(alice.account.nonce);
-        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
-        await alice.signer.sign(transactionDeploy);
-        alice.account.incrementNonce();
 
         // Minting
         let transactionMintBob = contract.call({
@@ -256,19 +248,15 @@ describe("test on local testnet", function () {
 
         // Deploy
         let contract = new SmartContract({});
-        let transactionDeploy = contract.deploy({
-            code: await loadContractCode("src/testdata/lottery-esdt.wasm"),
+        
+        let transactionDeploy = await prepareDeployment({
+            contract: contract,
+            deployer: alice,
+            codePath: "src/testdata/lottery-esdt.wasm",
             gasLimit: new GasLimit(50000000),
             initArguments: [],
             chainID: network.ChainID
         });
-
-        // The deploy transaction should be signed, so that the address of the contract
-        // (required for the subsequent transactions) is computed.
-        transactionDeploy.setNonce(alice.account.nonce);
-        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
-        await alice.signer.sign(transactionDeploy);
-        alice.account.incrementNonce();
 
         // Start
         let transactionStart = contract.call({

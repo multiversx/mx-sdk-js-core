@@ -1,6 +1,6 @@
 import { ContractController } from "../testutils/contractController";
 import { SmartContract } from "./smartContract";
-import { loadAbiRegistry, loadContractCode, loadTestWallets, TestWallet } from "../testutils";
+import { prepareDeployment, loadAbiRegistry, loadTestWallets, TestWallet } from "../testutils";
 import { SmartContractAbi } from "./abi";
 import { assert } from "chai";
 import { Interaction } from "./interaction";
@@ -30,16 +30,15 @@ describe("test smart contract interactor", function () {
         await alice.sync(provider);
 
         // Deploy the contract
-        let deployTransaction = contract.deploy({
-            code: await loadContractCode("src/testdata/answer.wasm"),
+        let deployTransaction = await prepareDeployment({
+            contract: contract,
+            deployer: alice,
+            codePath: "src/testdata/answer.wasm",
             gasLimit: new GasLimit(3000000),
             initArguments: [],
             chainID: network.ChainID
         });
 
-        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
-        deployTransaction.setNonce(alice.account.getNonceThenIncrement()); 
-        await alice.signer.sign(deployTransaction);
         let { bundle: { returnCode } } = await controller.deploy(deployTransaction);
         assert.isTrue(returnCode.isSuccess());
 
@@ -79,16 +78,15 @@ describe("test smart contract interactor", function () {
         await alice.sync(provider);
 
         // Deploy the contract
-        let deployTransaction = contract.deploy({
-            code: await loadContractCode("src/testdata/counter.wasm"),
+        let deployTransaction = await prepareDeployment({
+            contract: contract,
+            deployer: alice,
+            codePath: "src/testdata/counter.wasm",
             gasLimit: new GasLimit(3000000),
             initArguments: [],
             chainID: network.ChainID
         });
 
-        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
-        deployTransaction.setNonce(alice.account.getNonceThenIncrement());
-        await alice.signer.sign(deployTransaction);
         let { bundle: { returnCode } } = await controller.deploy(deployTransaction);
         assert.isTrue(returnCode.isSuccess());
 
@@ -133,16 +131,15 @@ describe("test smart contract interactor", function () {
         await alice.sync(provider);
 
         // Deploy the contract
-        let deployTransaction = contract.deploy({
-            code: await loadContractCode("src/testdata/lottery-esdt.wasm"),
+        let deployTransaction = await prepareDeployment({
+            contract: contract,
+            deployer: alice,
+            codePath: "src/testdata/lottery-esdt.wasm",
             gasLimit: new GasLimit(100000000),
             initArguments: [],
             chainID: network.ChainID
         });
 
-        contract.setAddress(SmartContract.computeAddress(alice.address, alice.account.nonce));
-        deployTransaction.setNonce(alice.account.getNonceThenIncrement());
-        await alice.signer.sign(deployTransaction);
         let { bundle: { returnCode } } = await controller.deploy(deployTransaction);
         assert.isTrue(returnCode.isSuccess());
 

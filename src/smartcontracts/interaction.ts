@@ -161,19 +161,6 @@ export class Interaction {
         return this;
     }
 
-    withGasLimitComponents(args: { minGasLimit: number, gasPerDataByte: number, estimatedExecutionComponent: number }): Interaction {
-        let minGasLimit = args.minGasLimit;
-        let gasPerDataByte = args.gasPerDataByte;
-
-        let transaction = this.buildTransaction();
-        let dataLength = transaction.getData().length();
-        let movementComponent = new GasLimit(minGasLimit + gasPerDataByte * dataLength);
-        let executionComponent = new GasLimit(args.estimatedExecutionComponent);
-        let gasLimit = movementComponent.add(executionComponent);
-
-        return this.withGasLimit(gasLimit);
-    }
-
     withGasPrice(gasPrice: GasPrice): Interaction {
         this.gasPrice = gasPrice;
         return this;

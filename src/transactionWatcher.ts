@@ -1,8 +1,7 @@
-import { ITransactionFetcher, IHash } from "./interface";
+import { ITransactionFetcher } from "./interface";
 import { AsyncTimer } from "./asyncTimer";
 import { Logger } from "./logger";
 import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached } from "./errors";
-import { Address } from "./address";
 import { ITransactionEvent, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 
 export type PredicateIsAwaitedStatus = (status: ITransactionStatus) => boolean;
@@ -11,7 +10,7 @@ export type PredicateIsAwaitedStatus = (status: ITransactionStatus) => boolean;
  * Internal interface: a transaction, as seen from the perspective of a {@link TransactionWatcher}.
  */
 interface ITransaction {
-    getHash(): IHash;
+    getHash(): { hex(): string; }
 }
 
 /**
@@ -48,7 +47,7 @@ export class TransactionWatcher {
      */
     public async awaitPending(transaction: ITransaction): Promise<ITransactionOnNetwork> {
         let isPending = (transaction: ITransactionOnNetwork) => transaction.status.isPending();
-        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash());
+        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash().hex());
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
         
         return this.awaitConditionally<ITransactionOnNetwork>(
@@ -63,7 +62,7 @@ export class TransactionWatcher {
       */
     public async awaitCompleted(transaction: ITransaction): Promise<ITransactionOnNetwork> {
         let isCompleted = (transactionOnNetwork: ITransactionOnNetwork) => transactionOnNetwork.isCompleted;
-        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
+        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash().hex());
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 
         return this.awaitConditionally<ITransactionOnNetwork>(
@@ -80,7 +79,7 @@ export class TransactionWatcher {
             return allAreFound;
         };
 
-        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
+        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash().hex());
         let errorProvider = () => new ErrExpectedTransactionEventsNotFound();
 
         return this.awaitConditionally<ITransactionOnNetwork>(
@@ -97,7 +96,7 @@ export class TransactionWatcher {
             return anyIsFound;
         };
 
-        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
+        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash().hex());
         let errorProvider = () => new ErrExpectedTransactionEventsNotFound();
 
         return this.awaitConditionally<ITransactionOnNetwork>(
@@ -108,7 +107,7 @@ export class TransactionWatcher {
     }
 
     public async awaitOnCondition(transaction: ITransaction, condition: (data: ITransactionOnNetwork) => boolean): Promise<ITransactionOnNetwork> {
-        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash(), undefined, true);
+        let doFetch = async () => await this.fetcher.getTransaction(transaction.getHash().hex());
         let errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 
         return this.awaitConditionally<ITransactionOnNetwork>(
@@ -183,8 +182,8 @@ class TransactionFetcherWithTracing implements ITransactionFetcher {
         this.fetcher = fetcher;
     }
 
-    async getTransaction(txHash: IHash, hintSender?: Address, withResults?: boolean): Promise<ITransactionOnNetwork> {
-        Logger.debug(`transactionWatcher, getTransaction(${txHash.toString()})`);
-        return await this.fetcher.getTransaction(txHash, hintSender, withResults);
+    async getTransaction(txHash: string): Promise<ITransactionOnNetwork> {
+        Logger.debug(`transactionWatcher, getTransaction(${txHash})`);
+        return await this.fetcher.getTransaction(txHash);
     }
 }

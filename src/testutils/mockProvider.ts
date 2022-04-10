@@ -1,7 +1,6 @@
-import { IBech32Address, IHash } from "../interface";
+import { IBech32Address } from "../interface";
 import { Transaction, TransactionHash } from "../transaction";
 import { Address } from "../address";
-import { Nonce } from "../nonce";
 import { AsyncTimer } from "../asyncTimer";
 import { Balance } from "../balance";
 import * as errors from "../errors";
@@ -65,7 +64,7 @@ export class MockProvider {
     mockGetTransactionWithAnyHashAsNotarizedWithOneResult(returnCodeAndData: string) {
         let contractResult = new ContractResultItem({ nonce: 1, data: returnCodeAndData });
 
-        let predicate = (_hash: IHash) => true;
+        let predicate = (_hash: string) => true;
         let response = new TransactionOnNetwork({
             status: new TransactionStatus("executed"),
             contractResults: new ContractResults([contractResult]),
@@ -112,7 +111,7 @@ export class MockProvider {
         throw new ErrMock("Account not found")
     }
 
-    async sendTransaction(transaction: Transaction): Promise<TransactionHash> {
+    async sendTransaction(transaction: Transaction): Promise<string> {
         this.mockPutTransaction(
             transaction.getHash(),
             new TransactionOnNetwork({
@@ -124,18 +123,14 @@ export class MockProvider {
         );
 
         this.mockTransactionTimeline(transaction, this.nextTransactionTimelinePoints);
-        return transaction.getHash();
+        return transaction.getHash().hex();
     }
 
     async simulateTransaction(_transaction: Transaction): Promise<any> {
         return {};
     }
 
-    async getTransaction(
-        txHash: IHash,
-        _hintSender?: IBech32Address,
-        _withResults?: boolean
-    ): Promise<ITransactionOnNetwork> {
+    async getTransaction(txHash: string): Promise<ITransactionOnNetwork> {
         // At first, try to use a mock responder
         for (const responder of this.getTransactionResponders) {
             if (responder.matches(txHash)) {
@@ -152,7 +147,7 @@ export class MockProvider {
         throw new ErrMock("Transaction not found");
     }
 
-    async getTransactionStatus(txHash: TransactionHash): Promise<ITransactionStatus> {
+    async getTransactionStatus(txHash: string): Promise<ITransactionStatus> {
         let transaction = await this.getTransaction(txHash);
         return transaction.status;
     }
@@ -193,10 +188,10 @@ class QueryContractResponder {
 }
 
 class GetTransactionResponder {
-    readonly matches: (hash: IHash) => boolean;
+    readonly matches: (hash: string) => boolean;
     readonly response: ITransactionOnNetwork;
 
-    constructor(matches: (hash: IHash) => boolean, response: ITransactionOnNetwork) {
+    constructor(matches: (hash: string) => boolean, response: ITransactionOnNetwork) {
         this.matches = matches;
         this.response = response;
     }

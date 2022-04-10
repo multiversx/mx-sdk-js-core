@@ -166,7 +166,7 @@ describe("test smart contract results parser", () => {
         let samples: [ITransactionOnNetwork, string][] = [];
 
         for (const file of transactionFiles) {
-            let txHash = new TransactionHash(path.basename(file, ".json"));
+            let txHash = path.basename(file, ".json");
             let filePath = path.resolve(folder, file);
             let jsonContent: string = fs.readFileSync(filePath, { encoding: "utf8" });
             let json = JSON.parse(jsonContent);

@@ -211,8 +211,8 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         // Query: get sum (of adder contract)
         let query = new MockQuery({
-            contract: "erd1qqqqqqqqqqqqqpgquykqja5c4v33zdmnwglj3jphqwrelzdn396qlc9g33",
-            function: "getSum"
+            address: new Bech32Address("erd1qqqqqqqqqqqqqpgquykqja5c4v33zdmnwglj3jphqwrelzdn396qlc9g33"),
+            func: "getSum"
         });
 
         let apiResponse = await apiProvider.queryContract(query);
@@ -227,9 +227,9 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         // Query: increment counter
         query = new MockQuery({
-            contract: "erd1qqqqqqqqqqqqqpgqzeq07xvhs5g7cg4ama85upaqarrcgu49396q0gz4yf",
-            function: "increment",
-            arguments: []
+            address: new Bech32Address("erd1qqqqqqqqqqqqqpgqzeq07xvhs5g7cg4ama85upaqarrcgu49396q0gz4yf"),
+            func: "increment",
+            args: []
         });
 
         apiResponse = await apiProvider.queryContract(query);
@@ -248,10 +248,10 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         // Query: issue ESDT
         let query = new MockQuery({
-            contract: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
-            function: "issue",
+            address: new Bech32Address("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
+            func: "issue",
             value: "50000000000000000",
-            arguments: [
+            args: [
                 Buffer.from("HELLO").toString("hex"),
                 Buffer.from("WORLD").toString("hex"),
                 "0A", // Supply

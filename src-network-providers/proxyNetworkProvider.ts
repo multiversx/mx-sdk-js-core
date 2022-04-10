@@ -13,6 +13,7 @@ import { defaultAxiosConfig } from "./config";
 import { NetworkStatus } from "./networkStatus";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
+import { ContractQueryRequest } from "./contractQueryRequest";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ProxyNetworkProvider implements INetworkProvider {
@@ -118,7 +119,8 @@ export class ProxyNetworkProvider implements INetworkProvider {
 
     async queryContract(query: IContractQuery): Promise<ContractQueryResponse> {
         try {
-            let response = await this.doPostGeneric("vm-values/query", query.toHttpRequest());
+            let request = new ContractQueryRequest(query).toHttpRequest();
+            let response = await this.doPostGeneric("vm-values/query", request);
             return ContractQueryResponse.fromHttpResponse(response.data);
         } catch (error: any) {
             throw new ErrContractQuery(error);

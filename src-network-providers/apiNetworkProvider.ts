@@ -14,6 +14,7 @@ import { ErrContractQuery, ErrNetworkProvider } from "./errors";
 import { defaultAxiosConfig, defaultPagination } from "./config";
 import { NetworkStatus } from "./networkStatus";
 import { ContractQueryResponse } from "./contractQueryResponse";
+import { ContractQueryRequest } from "./contractQueryRequest";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ApiNetworkProvider implements INetworkProvider {
@@ -114,7 +115,8 @@ export class ApiNetworkProvider implements INetworkProvider {
 
     async queryContract(query: IContractQuery): Promise<ContractQueryResponse> {
         try {
-            let response = await this.doPostGeneric("query", query.toHttpRequest());
+            let request = new ContractQueryRequest(query).toHttpRequest();
+            let response = await this.doPostGeneric("query", request);
             return ContractQueryResponse.fromHttpResponse(response);
         } catch (error: any) {
             throw new ErrContractQuery(error);

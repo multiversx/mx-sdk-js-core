@@ -110,9 +110,12 @@ export interface INetworkProvider {
     doPostGeneric(resourceUrl: string, payload: any): Promise<any>;
 }
 
-// TODO: network-providers package should be responsible with formatting the http request.
 export interface IContractQuery {
-    toHttpRequest(): any;
+    address: IBech32Address;
+    caller: IBech32Address;
+    func: { toString(): string; };
+    value: { toString(): string; };
+    getEncodedArguments(): string[];
 }
 
 export interface IPagination {

@@ -1,11 +1,11 @@
-import { createProxyNetworkProvider } from "@elrondnetwork/erdjs-network-providers";
+import { ProxyNetworkProvider } from "@elrondnetwork/erdjs-network-providers";
 import { IBech32Address, IHash } from "../interface";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
 import { Query } from "../smartcontracts/query";
 import { Transaction } from "../transaction";
 
 export function createLocalnetProvider(): INetworkProvider {
-    return createProxyNetworkProvider("http://localhost:7950", { timeout: 5000 });
+    return new ProxyNetworkProvider("http://localhost:7950", { timeout: 5000 });
 }
 
 export interface INetworkProvider {

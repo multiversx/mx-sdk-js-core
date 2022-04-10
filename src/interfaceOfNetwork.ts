@@ -1,4 +1,4 @@
-import { IAccountBalance, IBech32Address, IChainID, IGasLimit, IHash, INonce, ITransactionPayload, ITransactionValue } from "./interface";
+import { IAccountBalance, IBech32Address, IChainID, IGasLimit, IHash, INonce, ITransactionValue } from "./interface";
 
 export interface IAccountOnNetwork {
     nonce: INonce;
@@ -6,10 +6,10 @@ export interface IAccountOnNetwork {
 }
 
 export interface INetworkConfig {
-    MinGasLimit: IGasLimit;
+    MinGasLimit: number;
     GasPerDataByte: number;
     GasPriceModifier: number;
-    ChainID: IChainID;
+    ChainID: string;
 }
 
 export interface ITransactionOnNetwork {
@@ -20,7 +20,7 @@ export interface ITransactionOnNetwork {
     value: ITransactionValue;
     receiver: IBech32Address;
     sender: IBech32Address;
-    data: ITransactionPayload;
+    data: Buffer;
     status: ITransactionStatus;
     receipt: ITransactionReceipt;
     contractResults: IContractResults;

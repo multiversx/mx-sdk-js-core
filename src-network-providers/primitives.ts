@@ -40,22 +40,6 @@ export class Nonce {
     }
 }
 
-export class TransactionPayload {
-    private readonly decoded: Buffer;
-
-    constructor(encoded: string) {
-        this.decoded = Buffer.from(encoded || "", "base64");
-    }
-
-    encoded(): string {
-        return this.decoded.toString("base64");
-    }
-
-    toString() {
-        return this.decoded.toString();
-    }
-}
-
 export class ContractReturnCode {
     private static OK: string = "ok";
 

@@ -115,11 +115,6 @@ export interface IContractQuery {
     toHttpRequest(): any;
 }
 
-export interface IContractReturnCode {
-    toString(): string;
-    isSuccess(): boolean;
-}
-
 export interface IPagination {
     from: number;
     size: number;

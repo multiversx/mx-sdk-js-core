@@ -1,17 +1,15 @@
 import BigNumber from "bignumber.js";
 import { MaxUint64AsBigNumber } from "./constants";
-import { IContractReturnCode } from "./interface";
-import { ContractReturnCode } from "./primitives";
 
 export class ContractQueryResponse {
     returnData: string[];
-    returnCode: IContractReturnCode;
+    returnCode: string;
     returnMessage: string;
     gasUsed: number;
 
     constructor(init?: Partial<ContractQueryResponse>) {
         this.returnData = init?.returnData || [];
-        this.returnCode = init?.returnCode || new ContractReturnCode("");
+        this.returnCode = init?.returnCode || "";
         this.returnMessage = init?.returnMessage || "";
         this.gasUsed = init?.gasUsed || 0;
     }
@@ -28,7 +26,7 @@ export class ContractQueryResponse {
 
         return new ContractQueryResponse({
             returnData: returnData,
-            returnCode: new ContractReturnCode(returnCode),
+            returnCode: returnCode,
             returnMessage: returnMessage,
             gasUsed: gasUsed,
         });
@@ -38,16 +36,11 @@ export class ContractQueryResponse {
         return this.returnData.map((item) => Buffer.from(item || "", "base64"));
     }
 
-    isSuccess(): boolean {
-        return this.returnCode.isSuccess();
-    }
-
     /**
      * Converts the object to a pretty, plain JavaScript object.
      */
     toJSON(): object {
         return {
-            success: this.isSuccess(),
             returnData: this.returnData,
             returnCode: this.returnCode,
             returnMessage: this.returnMessage,

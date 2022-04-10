@@ -40,24 +40,6 @@ export class Nonce {
     }
 }
 
-export class ContractReturnCode {
-    private static OK: string = "ok";
-
-    private readonly value: string;
-
-    constructor(value: string) {
-        this.value = value;
-    }
-
-    toString() {
-        return this.value;
-    }
-
-    isSuccess(): boolean {
-        return this.value == ContractReturnCode.OK;
-    }
-}
-
 export function numberToPaddedHex(value: number) {
     let hex = value.toString(16);
     return zeroPadStringIfOddLength(hex);

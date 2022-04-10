@@ -27,15 +27,15 @@ export class MockProvider {
 
         this.accounts.set(
             MockProvider.AddressOfAlice.bech32(),
-            new AccountOnNetwork({ nonce: new Nonce(0), balance: Balance.egld(1000) })
+            new AccountOnNetwork({ nonce: 0, balance: Balance.egld(1000).toString() })
         );
         this.accounts.set(
             MockProvider.AddressOfBob.bech32(),
-            new AccountOnNetwork({ nonce: new Nonce(5), balance: Balance.egld(500) })
+            new AccountOnNetwork({ nonce: 5, balance: Balance.egld(500).toString() })
         );
         this.accounts.set(
             MockProvider.AddressOfCarol.bech32(),
-            new AccountOnNetwork({ nonce: new Nonce(42), balance: Balance.egld(300) })
+            new AccountOnNetwork({ nonce: 42, balance: Balance.egld(300).toString() })
         );
     }
 
@@ -63,7 +63,7 @@ export class MockProvider {
     }
 
     mockGetTransactionWithAnyHashAsNotarizedWithOneResult(returnCodeAndData: string) {
-        let contractResult = new ContractResultItem({ nonce: new Nonce(1), data: returnCodeAndData });
+        let contractResult = new ContractResultItem({ nonce: 1, data: returnCodeAndData });
 
         let predicate = (_hash: IHash) => true;
         let response = new TransactionOnNetwork({
@@ -118,7 +118,7 @@ export class MockProvider {
             new TransactionOnNetwork({
                 sender: transaction.getSender(),
                 receiver: transaction.getReceiver(),
-                data: transaction.getData(),
+                data: transaction.getData().valueOf(),
                 status: new TransactionStatus("pending"),
             })
         );

@@ -142,7 +142,7 @@ describe("test transaction construction", async () => {
         });
 
         let networkConfig = {
-            MinGasLimit: new GasLimit(10),
+            MinGasLimit: 10,
             GasPerDataByte: 1500,
             GasPriceModifier: 0.01,
             ChainID: "T"
@@ -164,7 +164,7 @@ describe("test transaction construction", async () => {
         });
 
         let networkConfig = {
-            MinGasLimit: new GasLimit(10),
+            MinGasLimit: 10,
             GasPerDataByte: 1500,
             GasPriceModifier: 0.01,
             ChainID: "T"

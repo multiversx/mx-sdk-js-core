@@ -126,7 +126,7 @@ describe("test smart contract interactor", function() {
 
         provider.mockQueryContractOnFunction(
             "getUltimateAnswer",
-            new ContractQueryResponse({ returnData: [Buffer.from([42]).toString("base64")], returnCode: ReturnCode.Ok })
+            new ContractQueryResponse({ returnData: [Buffer.from([42]).toString("base64")], returnCode: "ok" })
         );
 
         // Query
@@ -183,7 +183,7 @@ describe("test smart contract interactor", function() {
         // For "get()", return fake 7
         provider.mockQueryContractOnFunction(
             "get",
-            new ContractQueryResponse({ returnData: [Buffer.from([7]).toString("base64")], returnCode: ReturnCode.Ok })
+            new ContractQueryResponse({ returnData: [Buffer.from([7]).toString("base64")], returnCode: "ok" })
         );
 
         // Query "get()"

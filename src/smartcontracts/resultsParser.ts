@@ -125,7 +125,7 @@ export class ResultsParser {
         return new TransactionDecoder().getTransactionMetadata({
             sender: transaction.sender.bech32(),
             receiver: transaction.receiver.bech32(),
-            data: transaction.data.encoded(),
+            data: transaction.data.toString("base64"),
             value: transaction.value.toString(),
             type: transaction.type
         });

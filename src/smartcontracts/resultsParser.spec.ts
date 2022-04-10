@@ -47,7 +47,7 @@ describe("test smart contract results parser", () => {
                 Buffer.from([42]).toString("base64"),
                 Buffer.from("abba", "hex").toString("base64"),
             ],
-            returnCode: ReturnCode.Ok,
+            returnCode: "ok",
             returnMessage: "foobar"
         });
 
@@ -69,7 +69,7 @@ describe("test smart contract results parser", () => {
 
         let transactionOnNetwork = new TransactionOnNetwork({
             contractResults: new ContractResults([
-                new ContractResultItem({ nonce: new Nonce(7), data: "@6f6b@2a@abba" })
+                new ContractResultItem({ nonce: 7, data: "@6f6b@2a@abba" })
             ])
         });
 
@@ -85,7 +85,7 @@ describe("test smart contract results parser", () => {
         let transaction = new TransactionOnNetwork({
             contractResults: new ContractResults([
                 new ContractResultItem({
-                    nonce: new Nonce(42),
+                    nonce: 42,
                     data: "@6f6b@03",
                     returnMessage: "foobar"
                 })

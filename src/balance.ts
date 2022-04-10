@@ -1,5 +1,4 @@
 import { BigNumber } from "bignumber.js";
-import { Token } from "./token";
 import { ErrInvalidArgument } from "./errors";
 import { Egld } from "./balanceBuilder";
 
@@ -11,18 +10,27 @@ const DEFAULT_BIGNUMBER_DECIMAL_PLACES = 18;
 
 BigNumber.set({ DECIMAL_PLACES: DEFAULT_BIGNUMBER_DECIMAL_PLACES, ROUNDING_MODE: 1 });
 
+interface ITokenDefinition {
+    getTokenIdentifier(): string;
+    isEgld(): boolean;
+    decimals: number;
+}
+
 /**
  * Balance, as an immutable object.
  */
 export class Balance {
-    readonly token: Token;
+    // TODO: Rename class to "Tokens" or "TokenAmount" etc.
+    // "Balance" is not an appropriate name.
+
+    readonly token: ITokenDefinition;
     private readonly nonce: BigNumber = new BigNumber(0);
     private readonly value: BigNumber = new BigNumber(0);
 
     /**
      * Creates a Balance object.
      */
-    public constructor(token: Token, nonce: BigNumber.Value, value: BigNumber.Value) {
+    public constructor(token: ITokenDefinition, nonce: BigNumber.Value, value: BigNumber.Value) {
         this.token = token;
         this.nonce = new BigNumber(nonce);
         this.value = new BigNumber(value);
@@ -32,6 +40,8 @@ export class Balance {
      * Creates a balance object from an EGLD value (denomination will be applied).
      */
     static egld(value: BigNumber.Value): Balance {
+        // TODO: We should decouple the [built] object from it's [builder] (that is, "Egld"), if possible
+        // (perhaps not possible yet).
         return Egld(value);
     }
 
@@ -89,6 +99,7 @@ export class Balance {
         };
     }
 
+    // TODO: We should not keep a property of a token instance (its nonce) here, in the "Tokens" (still called "Balance") class.
     getNonce(): BigNumber {
         return this.nonce;
     }
@@ -121,6 +132,7 @@ export class Balance {
     }
 
     checkSameToken(other: Balance) {
+        // TODO: Fix or remove. Comparing by reference isn't necessarily correct here.
         if (this.token != other.token) {
             throw new ErrInvalidArgument("Different token types");
         }

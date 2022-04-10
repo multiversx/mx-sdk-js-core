@@ -272,7 +272,7 @@ class TokenTransfersWithinInteraction {
     private getTypedTokenIdentifier(transfer: Balance): TypedValue {
         // Important: for NFTs, this has to be the "collection" name, actually.
         // We will reconsider adding the field "collection" on "Token" upon merging "ApiProvider" and "ProxyProvider".
-        return BytesValue.fromUTF8(transfer.token.identifier);
+        return BytesValue.fromUTF8(transfer.token.getTokenIdentifier());
     }
 
     private getTypedTokenNonce(transfer: Balance): TypedValue {

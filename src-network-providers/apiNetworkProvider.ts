@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "./accounts";
-import { IBech32Address, IContractQuery, IHash, INetworkProvider, ITransaction, IPagination } from "./interface";
+import { IBech32Address, IContractQuery, INetworkProvider, ITransaction, IPagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
@@ -9,7 +9,7 @@ import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwor
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
-import { Hash, Nonce } from "./primitives";
+import { Nonce } from "./primitives";
 import { ErrContractQuery, ErrNetworkProvider } from "./errors";
 import { defaultAxiosConfig, defaultPagination } from "./config";
 import { NetworkStatus } from "./networkStatus";
@@ -91,22 +91,21 @@ export class ApiNetworkProvider implements INetworkProvider {
         return tokenData;
     }
 
-    async getTransaction(txHash: IHash): Promise<TransactionOnNetwork> {
-        let response = await this.doGetGeneric(`transactions/${txHash.hex()}`);
+    async getTransaction(txHash: string): Promise<TransactionOnNetwork> {
+        let response = await this.doGetGeneric(`transactions/${txHash}`);
         let transaction = TransactionOnNetwork.fromApiHttpResponse(txHash, response);
         return transaction;
     }
 
-    async getTransactionStatus(txHash: IHash): Promise<TransactionStatus> {
-        let response = await this.doGetGeneric(`transactions/${txHash.hex()}?fields=status`);
+    async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
+        let response = await this.doGetGeneric(`transactions/${txHash}?fields=status`);
         let status = new TransactionStatus(response.status);
         return status;
     }
 
-    async sendTransaction(tx: ITransaction): Promise<IHash> {
+    async sendTransaction(tx: ITransaction): Promise<string> {
         let response = await this.doPostGeneric("transactions", tx.toSendable());
-        let hash = new Hash(response.txHash);
-        return hash;
+        return response.txHash;
     }
 
     async simulateTransaction(tx: ITransaction): Promise<any> {

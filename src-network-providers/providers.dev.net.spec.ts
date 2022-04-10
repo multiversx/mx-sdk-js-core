@@ -1,6 +1,5 @@
 import { assert } from "chai";
 import { INetworkProvider } from "./interface";
-import { Hash } from "./primitives";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { Bech32Address, Nonce } from "./primitives";
@@ -104,12 +103,12 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(20000);
 
         let hashes = [
-            new Hash("a069c663831002651fd542479869cc61103465f3284dace772e7480f81429fa8"),
-            new Hash("de3bc87f3e057e28ea6a625acd6d6d332e24f35ea73e820462b71256c8ecffb7"),
-            new Hash("dbefa0299fe6b2336eb0bc3123fa623845c276e5c6e2a175adf1a562d5e77718"),
-            new Hash("2a8ccbd91b7d9460a86174b5a8d4e6aa073b38674d1ee8107e728980a66f0676"),
+            "a069c663831002651fd542479869cc61103465f3284dace772e7480f81429fa8",
+            "de3bc87f3e057e28ea6a625acd6d6d332e24f35ea73e820462b71256c8ecffb7",
+            "dbefa0299fe6b2336eb0bc3123fa623845c276e5c6e2a175adf1a562d5e77718",
+            "2a8ccbd91b7d9460a86174b5a8d4e6aa073b38674d1ee8107e728980a66f0676",
             // TODO: uncomment after fix (SCR missing on API)
-            // new TransactionHash("be7914b1eb4c6bd352ba1d86991959b443e446e0ad49fb796be3495c287b2472")
+            // "be7914b1eb4c6bd352ba1d86991959b443e446e0ad49fb796be3495c287b2472"
         ];
 
         for (const hash of hashes) {
@@ -143,11 +142,11 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(20000);
 
         let hashes = [
-            new Hash("a069c663831002651fd542479869cc61103465f3284dace772e7480f81429fa8"),
-            new Hash("de3bc87f3e057e28ea6a625acd6d6d332e24f35ea73e820462b71256c8ecffb7"),
-            new Hash("dbefa0299fe6b2336eb0bc3123fa623845c276e5c6e2a175adf1a562d5e77718"),
-            new Hash("2a8ccbd91b7d9460a86174b5a8d4e6aa073b38674d1ee8107e728980a66f0676"),
-            new Hash("be7914b1eb4c6bd352ba1d86991959b443e446e0ad49fb796be3495c287b2472")
+            "a069c663831002651fd542479869cc61103465f3284dace772e7480f81429fa8",
+            "de3bc87f3e057e28ea6a625acd6d6d332e24f35ea73e820462b71256c8ecffb7",
+            "dbefa0299fe6b2336eb0bc3123fa623845c276e5c6e2a175adf1a562d5e77718",
+            "2a8ccbd91b7d9460a86174b5a8d4e6aa073b38674d1ee8107e728980a66f0676",
+            "be7914b1eb4c6bd352ba1d86991959b443e446e0ad49fb796be3495c287b2472"
         ];
 
         for (const hash of hashes) {

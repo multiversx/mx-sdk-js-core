@@ -1,14 +1,14 @@
 import { TransactionStatus } from "./transactionStatus";
 import { ContractResults } from "./contractResults";
-import { Bech32Address, Hash } from "./primitives";
-import { IBech32Address, IHash } from "./interface";
+import { Bech32Address } from "./primitives";
+import { IBech32Address } from "./interface";
 import { TransactionCompletionStrategyOnAPI, TransactionCompletionStrategyOnProxy } from "./transactionCompletionStrategy";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
 
 export class TransactionOnNetwork {
     isCompleted: boolean = false;
-    hash: IHash = new Hash("");
+    hash: string = "";
     type: string = "";
     nonce: number = 0;
     round: number = 0;
@@ -35,7 +35,7 @@ export class TransactionOnNetwork {
         Object.assign(this, init);
     }
 
-    static fromProxyHttpResponse(txHash: IHash, response: any): TransactionOnNetwork {
+    static fromProxyHttpResponse(txHash: string, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromProxyHttpResponse(response.smartContractResults || []);
         result.isCompleted = new TransactionCompletionStrategyOnProxy().isCompleted(result);
@@ -43,7 +43,7 @@ export class TransactionOnNetwork {
         return result;
     }
 
-    static fromApiHttpResponse(txHash: IHash, response: any): TransactionOnNetwork {
+    static fromApiHttpResponse(txHash: string, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromApiHttpResponse(response.results || []);
         result.isCompleted = new TransactionCompletionStrategyOnAPI().isCompleted(result);
@@ -51,7 +51,7 @@ export class TransactionOnNetwork {
         return result;
     }
 
-    private static fromHttpResponse(txHash: IHash, response: any): TransactionOnNetwork {
+    private static fromHttpResponse(txHash: string, response: any): TransactionOnNetwork {
         let result = new TransactionOnNetwork();
 
         result.hash = txHash;

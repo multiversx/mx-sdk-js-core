@@ -1,16 +1,4 @@
-import { IBech32Address, IHash } from "./interface";
-
-export class Hash implements IHash {
-    private readonly value: string;
-
-    constructor(value: string) {
-        this.value = value;
-    }
-
-    hex(): string {
-        return this.value;
-    }
-}
+import { IBech32Address } from "./interface";
 
 export class Bech32Address implements IBech32Address {
     private readonly value: string;

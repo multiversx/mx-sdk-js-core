@@ -1,6 +1,6 @@
-import { IBech32Address, IHash } from "./interface";
+import { IBech32Address } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
-import { Bech32Address, Hash } from "./primitives";
+import { Bech32Address } from "./primitives";
 
 export class ContractResults {
     readonly items: ContractResultItem[];
@@ -29,14 +29,14 @@ export class ContractResults {
 }
 
 export class ContractResultItem {
-    hash: IHash = new Hash("");
+    hash: string = "";
     nonce: number = 0;
     value: string = "";
     receiver: IBech32Address = new Bech32Address("");
     sender: IBech32Address = new Bech32Address("");
     data: string = "";
-    previousHash: Hash = new Hash("");
-    originalHash: Hash = new Hash("");
+    previousHash: string = "";
+    originalHash: string = "";
     gasLimit: number = 0;
     gasPrice: number = 0;
     callType: number = 0;
@@ -64,13 +64,13 @@ export class ContractResultItem {
     private static fromHttpResponse(response: any): ContractResultItem {
         let item = new ContractResultItem();
 
-        item.hash = new Hash(response.hash);
+        item.hash = response.hash;
         item.nonce = Number(response.nonce || 0);
         item.value = (response.value || 0).toString();
         item.receiver = new Bech32Address(response.receiver);
         item.sender = new Bech32Address(response.sender);
-        item.previousHash = new Hash(response.prevTxHash);
-        item.originalHash = new Hash(response.originalTxHash);
+        item.previousHash = response.prevTxHash;
+        item.originalHash = response.originalTxHash;
         item.gasLimit = Number(response.gasLimit || 0);
         item.gasPrice = Number(response.gasPrice || 0);
         item.data = response.data || "";

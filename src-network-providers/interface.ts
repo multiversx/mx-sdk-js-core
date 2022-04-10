@@ -61,17 +61,17 @@ export interface INetworkProvider {
     /**
      * Fetches the state of a transaction.
      */
-    getTransaction(txHash: IHash): Promise<TransactionOnNetwork>;
+    getTransaction(txHash: string): Promise<TransactionOnNetwork>;
 
     /**
      * Queries the status of a transaction.
      */
-    getTransactionStatus(txHash: IHash): Promise<TransactionStatus>;
+    getTransactionStatus(txHash: string): Promise<TransactionStatus>;
 
     /**
      * Broadcasts an already-signed transaction.
      */
-    sendTransaction(tx: ITransaction): Promise<IHash>;
+    sendTransaction(tx: ITransaction): Promise<string>;
 
     /**
      * Simulates the processing of an already-signed transaction.
@@ -127,5 +127,4 @@ export interface ITransaction {
     toSendable(): any;
 }
 
-export interface IHash { hex(): string; }
 export interface IBech32Address { bech32(): string; }

@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IBech32Address, IChainID, IGasLimit, IGasPrice, ISignature } from "./interface";
+import { IBech32Address, IChainID, IGasLimit, IGasPrice, INonce, ISignature } from "./interface";
 import { Address } from "./address";
 import { Balance } from "./balance";
 import {
@@ -28,7 +28,7 @@ export class Transaction {
   /**
    * The nonce of the transaction (the account sequence number of the sender).
    */
-  private nonce: Nonce;
+  private nonce: INonce;
 
   /**
    * The value to transfer.
@@ -126,7 +126,7 @@ export class Transaction {
     this.hash = TransactionHash.empty();
   }
 
-  getNonce(): Nonce {
+  getNonce(): INonce {
     return this.nonce;
   }
 
@@ -146,7 +146,7 @@ export class Transaction {
    * await alice.signer.sign(tx);
    * ```
    */
-  setNonce(nonce: Nonce) {
+  setNonce(nonce: INonce) {
     this.nonce = nonce;
   }
 

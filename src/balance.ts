@@ -100,6 +100,7 @@ export class Balance {
     }
 
     // TODO: We should not keep a property of a token instance (its nonce) here, in the "Tokens" (still called "Balance") class.
+    // however, "tokenIdentifier" and "decimals" still have to be available.
     getNonce(): BigNumber {
         return this.nonce;
     }

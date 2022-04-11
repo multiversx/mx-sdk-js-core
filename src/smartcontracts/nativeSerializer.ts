@@ -6,11 +6,12 @@ import { BalanceBuilder } from "../balanceBuilder";
 import { Address } from "../address";
 import { Code } from "./code";
 import { ErrInvalidArgument, ErrTypeInferenceSystemRequiresRegularJavascriptObjects, ErrTypingSystem } from "../errors";
+import { IAddress } from "../interface";
 
 export namespace NativeTypes {
     export type NativeBuffer = Buffer | string | BalanceBuilder;
     export type NativeBytes = Code | Buffer | string | BalanceBuilder;
-    export type NativeAddress = Address | string | Buffer | { getAddress(): Address };
+    export type NativeAddress = string | Buffer | IAddress | { getAddress(): IAddress };
 }
 
 export namespace NativeSerializer {
@@ -241,16 +242,18 @@ export namespace NativeSerializer {
         errorContext.convertError(native, "Buffer");
     }
 
-    export function convertNativeToAddress(native: NativeTypes.NativeAddress, errorContext: ArgumentErrorContext): Address {
+    export function convertNativeToAddress(native: NativeTypes.NativeAddress, errorContext: ArgumentErrorContext): IAddress {
+        if ((<any>native).bech32) {
+            return <IAddress>native;
+        }
         if ((<any>native).getAddress) {
             return (<any>native).getAddress();
         }
 
         switch (native.constructor) {
-            case Address:
             case Buffer:
             case String:
-                return new Address(<Address | Buffer | string>native);
+                return new Address(<Buffer | string>native);
             default:
                 errorContext.convertError(native, "Address");
         }

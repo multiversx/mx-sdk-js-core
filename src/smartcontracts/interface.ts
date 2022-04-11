@@ -1,12 +1,11 @@
 import { Balance } from "../balance";
 import { IAddress, IChainID, IGasLimit, IGasPrice } from "../interface";
-import { IContractQueryResponse, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { Transaction } from "../transaction";
 import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
 import { ReturnCode } from "./returnCode";
-import { EndpointDefinition, TypedValue } from "./typesystem";
+import { TypedValue } from "./typesystem";
 
 /**
  * ISmartContract defines a general interface for operating with {@link SmartContract} objects.

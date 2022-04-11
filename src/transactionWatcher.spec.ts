@@ -23,6 +23,6 @@ describe("test transactionWatcher", () => {
             watcher.awaitCompleted(dummyTransaction)
         ]);
 
-        assert.isTrue((await provider.getTransactionStatus(hash)).isExecuted());
+        assert.isTrue((await provider.getTransactionStatus(hash.hex())).isExecuted());
     });
 });

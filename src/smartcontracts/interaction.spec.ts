@@ -40,17 +40,13 @@ describe("test smart contract interactor", function() {
         let transaction = interaction
             .withNonce(new Nonce(7))
             .withValue(Balance.egld(1))
-            .withGasLimitComponents({ minGasLimit: 50000, gasPerDataByte: 1500, estimatedExecutionComponent: 20000000 })
+            .withGasLimit(new GasLimit(20000000))
             .buildTransaction();
-
-        let expectedGasLimit = new GasLimit(50000)
-            .add(new GasLimit("dummy".length * 1500))
-            .add(new GasLimit(20000000));
 
         assert.deepEqual(transaction.getReceiver(), dummyAddress);
         assert.deepEqual(transaction.getValue(), Balance.egld(1));
         assert.deepEqual(transaction.getNonce(), new Nonce(7));
-        assert.deepEqual(transaction.getGasLimit(), expectedGasLimit);
+        assert.equal(transaction.getGasLimit().valueOf(), 20000000);
     });
 
     it("should set transfers (payments) on contract calls (transfer and execute)", async function () {
@@ -126,7 +122,7 @@ describe("test smart contract interactor", function() {
 
         provider.mockQueryContractOnFunction(
             "getUltimateAnswer",
-            new ContractQueryResponse({ returnData: [Buffer.from([42]).toString("base64")], returnCode: ReturnCode.Ok })
+            new ContractQueryResponse({ returnData: [Buffer.from([42]).toString("base64")], returnCode: "ok" })
         );
 
         // Query
@@ -183,7 +179,7 @@ describe("test smart contract interactor", function() {
         // For "get()", return fake 7
         provider.mockQueryContractOnFunction(
             "get",
-            new ContractQueryResponse({ returnData: [Buffer.from([7]).toString("base64")], returnCode: ReturnCode.Ok })
+            new ContractQueryResponse({ returnData: [Buffer.from([7]).toString("base64")], returnCode: "ok" })
         );
 
         // Query "get()"

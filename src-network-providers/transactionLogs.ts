@@ -4,22 +4,19 @@ import { Address } from "./primitives";
 import { TransactionEvent } from "./transactionEvents";
 
 export class TransactionLogs {
-    readonly address: IAddress;
-    readonly events: TransactionEvent[];
+    address: IAddress = new Address("");
+    events: TransactionEvent[] = [];
 
-    constructor(address: IAddress, events: TransactionEvent[]) {
-        this.address = address;
-        this.events = events;
-    }
-
-    static empty(): TransactionLogs {
-        return new TransactionLogs(new Address(""), []);
+    constructor(init?: Partial<TransactionLogs>) {
+        Object.assign(this, init);
     }
 
     static fromHttpResponse(logs: any): TransactionLogs {
-        let address = new Address(logs.address);
-        let events = (logs.events || []).map((event: any) => TransactionEvent.fromHttpResponse(event));
-        return new TransactionLogs(address, events);
+        let result = new TransactionLogs();
+        result.address = new Address(logs.address);
+        result.events = (logs.events || []).map((event: any) => TransactionEvent.fromHttpResponse(event));
+        
+        return result;
     }
 
     findSingleOrNoneEvent(identifier: string, predicate?: (event: TransactionEvent) => boolean): TransactionEvent | undefined {

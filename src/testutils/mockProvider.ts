@@ -1,4 +1,4 @@
-import { IBech32Address } from "../interface";
+import { IAddress } from "../interface";
 import { Transaction, TransactionHash } from "../transaction";
 import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
@@ -102,7 +102,7 @@ export class MockProvider {
         }
     }
 
-    async getAccount(address: IBech32Address): Promise<IAccountOnNetwork> {
+    async getAccount(address: IAddress): Promise<IAccountOnNetwork> {
         let account = this.accounts.get(address.bech32());
         if (account) {
             return account;

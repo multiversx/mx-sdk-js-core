@@ -8,7 +8,7 @@ export interface ITransactionFetcher {
 }
 
 export interface ISignature { hex(): string; }
-export interface IBech32Address { bech32(): string; }
+export interface IAddress { bech32(): string; }
 export interface ITransactionValue { toString(): string; }
 export interface IAccountBalance { toString(): string; }
 export interface INonce { valueOf(): number; }

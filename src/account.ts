@@ -2,7 +2,7 @@ import { Address } from "./address";
 import { Nonce } from "./nonce";
 import { Balance } from "./balance";
 import { Egld } from "./balanceBuilder";
-import { IAccountBalance, IBech32Address, INonce } from "./interface";
+import { IAccountBalance, IAddress, INonce } from "./interface";
 
 /**
  * An abstraction representing an account (user or Smart Contract) on the Network.
@@ -11,7 +11,7 @@ export class Account {
     /**
      * The address of the account.
      */
-    readonly address: IBech32Address = new Address();
+    readonly address: IAddress = new Address();
 
     /**
      * The nonce of the account (the account sequence number).
@@ -26,7 +26,7 @@ export class Account {
     /**
      * Creates an account object from an address
      */
-    constructor(address: IBech32Address) {
+    constructor(address: IAddress) {
         this.address = address;
     }
 

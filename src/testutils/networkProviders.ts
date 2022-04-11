@@ -1,5 +1,5 @@
 import { ProxyNetworkProvider } from "@elrondnetwork/erdjs-network-providers";
-import { IBech32Address } from "../interface";
+import { IAddress } from "../interface";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
 import { Query } from "../smartcontracts/query";
 import { Transaction } from "../transaction";
@@ -10,7 +10,7 @@ export function createLocalnetProvider(): INetworkProvider {
 
 export interface INetworkProvider {
     getNetworkConfig(): Promise<INetworkConfig>;
-    getAccount(address: IBech32Address): Promise<IAccountOnNetwork>;
+    getAccount(address: IAddress): Promise<IAccountOnNetwork>;
     getTransaction(txHash: string): Promise<ITransactionOnNetwork>;
     getTransactionStatus(txHash: string): Promise<ITransactionStatus>;
     sendTransaction(tx: Transaction): Promise<string>;

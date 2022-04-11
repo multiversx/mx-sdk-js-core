@@ -1,4 +1,4 @@
-import { IAccountBalance, IAddress, ITransactionValue } from "./interface";
+import { IAccountBalance, IAddress } from "./interface";
 
 export interface IAccountOnNetwork {
     nonce: number;

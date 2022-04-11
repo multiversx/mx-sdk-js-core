@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IBech32Address, IChainID, IGasLimit, IGasPrice, ISignature } from "./interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice, ISignature } from "./interface";
 import { Address } from "./address";
 import { Balance } from "./balance";
 import {
@@ -38,12 +38,12 @@ export class Transaction {
   /**
    * The address of the sender.
    */
-  private sender: IBech32Address;
+  private sender: IAddress;
 
   /**
    * The address of the receiver.
    */
-  private readonly receiver: IBech32Address;
+  private readonly receiver: IAddress;
 
   /**
    * The gas price to be used.
@@ -102,8 +102,8 @@ export class Transaction {
   }: {
     nonce?: Nonce;
     value?: Balance;
-    receiver: IBech32Address;
-    sender?: IBech32Address;
+    receiver: IAddress;
+    sender?: IAddress;
     gasPrice?: IGasPrice;
     gasLimit: IGasLimit;
     data?: TransactionPayload;
@@ -158,11 +158,11 @@ export class Transaction {
     this.value = value;
   }
 
-  getSender(): IBech32Address {
+  getSender(): IAddress {
     return this.sender;
   }
 
-  getReceiver(): IBech32Address {
+  getReceiver(): IAddress {
     return this.receiver;
   }
 
@@ -217,7 +217,7 @@ export class Transaction {
    *
    * @param signedBy The address of the future signer
    */
-  serializeForSigning(signedBy: IBech32Address): Buffer {
+  serializeForSigning(signedBy: IAddress): Buffer {
     // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
     let plain = this.toPlainObject(signedBy);
     // Make sure we never sign the transaction with another signature set up (useful when using the same method for verification)
@@ -235,7 +235,7 @@ export class Transaction {
    *
    * @param sender The address of the sender (will be provided when called within the signing procedure)
    */
-  toPlainObject(sender?: IBech32Address): any {
+  toPlainObject(sender?: IAddress): any {
     return {
       nonce: this.nonce.valueOf(),
       value: this.value.toString(),
@@ -283,7 +283,7 @@ export class Transaction {
    * @param signature The signature, as computed by a signer.
    * @param signedBy The address of the signer.
    */
-  applySignature(signature: ISignature, signedBy: IBech32Address) {
+  applySignature(signature: ISignature, signedBy: IAddress) {
     this.signature = signature;
     this.sender = signedBy;
     this.hash = TransactionHash.compute(this);

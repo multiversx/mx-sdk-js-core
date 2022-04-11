@@ -1,4 +1,4 @@
-import { IAccountBalance, IBech32Address, IChainID, IGasLimit, IHash, INonce, ITransactionPayload, ITransactionValue } from "./interface";
+import { IAccountBalance, IAddress, IChainID, IGasLimit, IHash, INonce, ITransactionPayload, ITransactionValue } from "./interface";
 
 export interface IAccountOnNetwork {
     nonce: INonce;
@@ -18,8 +18,8 @@ export interface ITransactionOnNetwork {
     hash: IHash;
     type: string;
     value: ITransactionValue;
-    receiver: IBech32Address;
-    sender: IBech32Address;
+    receiver: IAddress;
+    sender: IAddress;
     data: ITransactionPayload;
     status: ITransactionStatus;
     receipt: ITransactionReceipt;
@@ -45,8 +45,8 @@ export interface IContractResults {
 export interface IContractResultItem {
     hash: IHash;
     nonce: INonce;
-    receiver: IBech32Address;
-    sender: IBech32Address;
+    receiver: IAddress;
+    sender: IAddress;
     data: string;
     returnMessage: string;
     logs: ITransactionLogs;
@@ -71,7 +71,7 @@ export interface ITransactionLogs {
 }
 
 export interface ITransactionEvent {
-    readonly address: IBech32Address;
+    readonly address: IAddress;
     readonly identifier: string;
     readonly topics: ITransactionEventTopic[];
     readonly data: string;

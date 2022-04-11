@@ -1,4 +1,4 @@
-import { IBech32Address, IHash } from "../interface";
+import { IAddress, IHash } from "../interface";
 import { Transaction, TransactionHash } from "../transaction";
 import { Address } from "../address";
 import { Nonce } from "../nonce";
@@ -103,7 +103,7 @@ export class MockProvider {
         }
     }
 
-    async getAccount(address: IBech32Address): Promise<IAccountOnNetwork> {
+    async getAccount(address: IAddress): Promise<IAccountOnNetwork> {
         let account = this.accounts.get(address.bech32());
         if (account) {
             return account;
@@ -133,7 +133,7 @@ export class MockProvider {
 
     async getTransaction(
         txHash: IHash,
-        _hintSender?: IBech32Address,
+        _hintSender?: IAddress,
         _withResults?: boolean
     ): Promise<ITransactionOnNetwork> {
         // At first, try to use a mock responder

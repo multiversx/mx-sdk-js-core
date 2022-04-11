@@ -7,7 +7,7 @@ import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "./interface";
 import { ReturnCode } from "./returnCode";
 import { EndpointDefinition } from "./typesystem";
-import { IBech32Address } from "../interface";
+import { IAddress } from "../interface";
 
 enum WellKnownEvents {
     OnTransactionCompleted = "completedTxEvent",
@@ -216,7 +216,7 @@ export class ResultsParser {
         };
     }
 
-    private createBundleOnWriteLogWhereFirstTopicEqualsAddress(logs: ITransactionLogs, address: IBech32Address): UntypedOutcomeBundle | null {
+    private createBundleOnWriteLogWhereFirstTopicEqualsAddress(logs: ITransactionLogs, address: IAddress): UntypedOutcomeBundle | null {
         let hexAddress = new Address(address.bech32()).hex();
         
         let eventWriteLogWhereTopicIsSender = logs.findSingleOrNoneEvent(

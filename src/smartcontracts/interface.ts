@@ -1,5 +1,5 @@
 import { Balance } from "../balance";
-import { IBech32Address, IChainID, IGasLimit, IGasPrice } from "../interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice } from "../interface";
 import { IContractQueryResponse, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { Transaction } from "../transaction";
 import { Code } from "./code";
@@ -15,7 +15,7 @@ export interface ISmartContract {
     /**
      * Gets the address of the Smart Contract.
      */
-    getAddress(): IBech32Address;
+    getAddress(): IAddress;
 
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
@@ -58,7 +58,7 @@ export interface CallArguments {
     args?: TypedValue[];
     value?: Balance;
     gasLimit: IGasLimit;
-    receiver?: IBech32Address;
+    receiver?: IAddress;
     gasPrice?: IGasPrice;
     chainID: IChainID;
 }
@@ -67,7 +67,7 @@ export interface QueryArguments {
     func: ContractFunction;
     args?: TypedValue[];
     value?: Balance;
-    caller?: IBech32Address
+    caller?: IAddress
 }
 
 export interface TypedOutcomeBundle {

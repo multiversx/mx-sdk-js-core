@@ -1,5 +1,4 @@
 import BigNumber from "bignumber.js";
-import { IChainID, IGasLimit, IGasPrice, ITransactionVersion } from "./interface";
 
 /**
  * An object holding Network configuration parameters.
@@ -8,10 +7,10 @@ export class NetworkConfig {
     /**
      * The chain ID. E.g. "1" for the Mainnet.
      */
-    public ChainID: IChainID;
+    public ChainID: string;
 
     /**
-     * The gas required by the Network to process a byte of the {@link TransactionPayload}.
+     * The gas required by the Network to process a byte of the transaction data.
      */
     public GasPerDataByte: number;
     /**
@@ -33,25 +32,22 @@ export class NetworkConfig {
      */
     public TopUpRewardsGradientPoint: BigNumber;
 
-    /**
-     *
-     */
     public GasPriceModifier: number;
 
     /**
-     * The minimum gas limit required to be set when broadcasting a {@link Transaction}.
+     * The minimum gas limit required to be set when broadcasting a transaction.
      */
-    public MinGasLimit: IGasLimit;
+    public MinGasLimit: number;
 
     /**
-     * The minimum gas price required to be set when broadcasting a {@link Transaction}.
+     * The minimum gas price required to be set when broadcasting a transaction.
      */
-    public MinGasPrice: IGasPrice;
+    public MinGasPrice: number;
 
     /**
      * The oldest transaction version accepted by the Network.
      */
-    public MinTransactionVersion: ITransactionVersion;
+    public MinTransactionVersion: number;
 
     constructor() {
         this.ChainID = "T";

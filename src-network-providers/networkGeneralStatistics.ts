@@ -1,5 +1,5 @@
 /**
- * An object holding Network stats parameters.
+ * An object holding general Network statistics and parameters.
  */
 export class NetworkGeneralStatistics {
     /**
@@ -11,26 +11,32 @@ export class NetworkGeneralStatistics {
      * The Number of Blocks.
      */
     public Blocks: number;
+    
     /**
      * The Number of Accounts.
      */
     public Accounts: number;
+    
     /**
      * The Number of transactions.
      */
     public Transactions: number;
+    
     /**
      * The Refresh rate.
      */
     public RefreshRate: number;
+    
     /**
      * The Number of the current Epoch.
      */
     public Epoch: number;
+    
     /**
      * The Number of rounds passed.
      */
     public RoundsPassed: number;
+
     /**
      * The Number of Rounds per epoch.
      */

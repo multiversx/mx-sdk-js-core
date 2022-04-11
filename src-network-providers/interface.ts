@@ -36,48 +36,48 @@ export interface INetworkProvider {
     /**
      * Fetches the state of an account.
      */
-    getAccount(address: IAddress): Promise<AccountOnNetwork>;
+    getAccount(address: IBech32Address): Promise<AccountOnNetwork>;
 
     /**
      * Fetches data about the fungible tokens held by an account.
      */
-    getFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: IBech32Address, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
-    getNonFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
+    getNonFungibleTokensOfAccount(address: IBech32Address, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about a specific fungible token held by an account.
      */
-    getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork>;
+    getFungibleTokenOfAccount(address: IBech32Address, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches data about a specific non-fungible token (instance) held by an account.
      */
-    getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: INonce): Promise<NonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleTokenOfAccount(address: IBech32Address, collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches the state of a transaction.
      */
-    getTransaction(txHash: IHash): Promise<TransactionOnNetwork>;
+    getTransaction(txHash: string): Promise<TransactionOnNetwork>;
 
     /**
      * Queries the status of a transaction.
      */
-    getTransactionStatus(txHash: IHash): Promise<TransactionStatus>;
+    getTransactionStatus(txHash: string): Promise<TransactionStatus>;
 
     /**
      * Broadcasts an already-signed transaction.
      */
-    sendTransaction(tx: ITransaction): Promise<IHash>;
+    sendTransaction(tx: ITransaction): Promise<string>;
 
     /**
      * Simulates the processing of an already-signed transaction.
      * 
      */
-    simulateTransaction(tx: ITransaction): Promise<ISimulationResults>;
+    simulateTransaction(tx: ITransaction): Promise<any>;
 
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
@@ -86,20 +86,18 @@ export interface INetworkProvider {
 
     /**
      * Fetches the definition of a fungible token.
-     *
      */
     getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork>;
 
     /**
      * Fetches the definition of a SFT (including Meta ESDT) or NFT.
-     * 
      */
     getDefinitionOfTokenCollection(collection: string): Promise<DefinitionOfTokenCollectionOnNetwork>;
 
     /**
      * Fetches data about a specific non-fungible token (instance).
      */
-    getNonFungibleToken(collection: string, nonce: INonce): Promise<NonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleToken(collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Performs a generic GET action against the provider (useful for new HTTP endpoints, not yet supported by erdjs).
@@ -112,17 +110,12 @@ export interface INetworkProvider {
     doPostGeneric(resourceUrl: string, payload: any): Promise<any>;
 }
 
-// TODO: network-providers package should be responsible with formatting the http request.
 export interface IContractQuery {
-    toHttpRequest(): any;
-}
-
-export interface IContractReturnCode {
-    toString(): string;
-    isSuccess(): boolean;
-}
-
-export interface ISimulationResults {
+    address: IBech32Address;
+    caller: IBech32Address;
+    func: { toString(): string; };
+    value: { toString(): string; };
+    getEncodedArguments(): string[];
 }
 
 export interface IPagination {
@@ -134,13 +127,4 @@ export interface ITransaction {
     toSendable(): any;
 }
 
-export interface IHexable { hex(): string; }
-export interface IHash extends IHexable { }
-export interface IAddress { bech32(): string; }
-export interface INonce extends IHexable { valueOf(): number; }
-export interface ITransactionPayload { encoded(): string; }
-export interface IGasLimit { valueOf(): number; }
-export interface IGasPrice { valueOf(): number; }
-export interface IChainID { valueOf(): string; }
-export interface ITransactionVersion { valueOf(): number; }
-export interface IAccountBalance { toString(): string; }
+export interface IBech32Address { bech32(): string; }

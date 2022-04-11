@@ -1,5 +1,4 @@
 import { TransactionStatus } from "./transactionStatus";
-import { ITransactionPayload } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
 import { isPaddedHex } from "./primitives";
 
@@ -7,7 +6,7 @@ interface ITransactionOnNetwork {
     logs: TransactionLogs;
     status: TransactionStatus;
     hyperblockNonce: number;
-    data: ITransactionPayload;
+    data: Buffer;
 }
 
 const WellKnownCompletionEvents = ["completedTxEvent", "SCDeploy", "signalError"];
@@ -32,7 +31,7 @@ export class TransactionCompletionStrategyOnProxy {
             }
         }
 
-        if (this.isCertainlyMoveBalance(transaction.data.toString())) {
+        if (this.isCertainlyMoveBalance(transaction.data)) {
             return transaction.status.isExecuted();
         }
 
@@ -48,8 +47,8 @@ export class TransactionCompletionStrategyOnProxy {
         return false;
     }
 
-    private isCertainlyMoveBalance(transactionData: string): boolean {
-        let parts = transactionData.split("@");
+    private isCertainlyMoveBalance(transactionData: Buffer): boolean {
+        let parts = transactionData.toString().split("@");
         let prefix = parts[0];
         let otherParts = parts.slice(1);
         let emptyPrefix = !prefix;

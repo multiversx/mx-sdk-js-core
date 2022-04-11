@@ -1,11 +1,11 @@
-import { IAddress, IHash } from "./interface";
-import { Address, Hash, TransactionValue } from "./primitives";
+import { IBech32Address } from "./interface";
+import { Bech32Address } from "./primitives";
 
 export class TransactionReceipt {
-    value: TransactionValue = new TransactionValue("");
-    sender: IAddress = new Address("");
+    value: string = "";
+    sender: IBech32Address = new Bech32Address("");
     data: string = "";
-    hash: IHash = new Hash("");
+    hash: string = "";
 
     static fromHttpResponse(response: {
         value: string,
@@ -15,10 +15,10 @@ export class TransactionReceipt {
     }): TransactionReceipt {
         let receipt = new TransactionReceipt();
 
-        receipt.value = new TransactionValue(response.value);
-        receipt.sender = new Address(response.sender);
+        receipt.value = (response.value || 0).toString();
+        receipt.sender = new Bech32Address(response.sender);
         receipt.data = response.data;
-        receipt.hash = new Hash(response.txHash);
+        receipt.hash = response.txHash;
 
         return receipt;
     }

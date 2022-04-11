@@ -1,18 +1,6 @@
-import { IAddress, IHash, INonce, ITransactionPayload } from "./interface";
+import { IBech32Address } from "./interface";
 
-export class Hash implements IHash {
-    private readonly value: string;
-
-    constructor(value: string) {
-        this.value = value;
-    }
-
-    hex(): string {
-        return this.value;
-    }
-}
-
-export class Address implements IAddress {
+export class Bech32Address implements IBech32Address {
     private readonly value: string;
 
     constructor(value: string) {
@@ -24,7 +12,7 @@ export class Address implements IAddress {
     }
 }
 
-export class Nonce implements INonce {
+export class Nonce {
     private readonly value: number;
 
     constructor(value: number) {
@@ -37,64 +25,6 @@ export class Nonce implements INonce {
 
     hex(): string {
         return numberToPaddedHex(this.value);
-    }
-}
-
-export class TransactionValue {
-    private readonly value: string;
-
-    constructor(value: string) {
-        this.value = value;
-    }
-
-    toString(): string {
-        return this.value;
-    }
-}
-
-export class TransactionPayload implements ITransactionPayload {
-    private readonly decoded: Buffer;
-
-    constructor(encoded: string) {
-        this.decoded = Buffer.from(encoded || "", "base64");
-    }
-
-    encoded(): string {
-        return this.decoded.toString("base64");
-    }
-
-    toString() {
-        return this.decoded.toString();
-    }
-}
-
-export class ContractReturnCode {
-    private static OK: string = "ok";
-
-    private readonly value: string;
-
-    constructor(value: string) {
-        this.value = value;
-    }
-
-    toString() {
-        return this.value;
-    }
-
-    isSuccess(): boolean {
-        return this.value == ContractReturnCode.OK;
-    }
-}
-
-export class AccountBalance {
-    private readonly value: string;
-
-    constructor(value: string) {
-        this.value = value;
-    }
-
-    toString(): string {
-        return this.value;
     }
 }
 

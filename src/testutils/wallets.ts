@@ -3,13 +3,13 @@ import * as fs from "fs";
 import * as path from "path";
 import { Account } from "../account";
 import { Address } from "../address";
-import { IBech32Address } from "../interface";
+import { IAddress } from "../interface";
 import { isOnBrowserTests } from "./utils";
 import { UserSecretKey, UserSigner } from "@elrondnetwork/erdjs-walletcore"
 import { IAccountOnNetwork } from "../interfaceOfNetwork";
 
 interface IAccountFetcher {
-    getAccount(address: IBech32Address): Promise<IAccountOnNetwork>;
+    getAccount(address: IAddress): Promise<IAccountOnNetwork>;
 }
 
 export async function loadAndSyncTestWallets(provider: IAccountFetcher): Promise<Record<string, TestWallet>> {

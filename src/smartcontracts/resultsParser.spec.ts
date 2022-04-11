@@ -5,8 +5,6 @@ import { BigUIntType, BigUIntValue, EndpointDefinition, EndpointModifiers, Endpo
 import { BytesType, BytesValue } from "./typesystem/bytes";
 import { ReturnCode } from "./returnCode";
 import { ResultsParser } from "./resultsParser";
-import { Nonce } from "../nonce";
-import { TransactionHash } from "../transaction";
 import { Logger, LogLevel } from "../logger";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { ContractQueryResponse, ContractResultItem, ContractResults, TransactionEvent, TransactionEventTopic, TransactionLogs, TransactionOnNetwork } from "@elrondnetwork/erdjs-network-providers";
@@ -100,15 +98,16 @@ describe("test smart contract results parser", () => {
 
     it("should parse contract outcome, on signal error", async () => {
         let transaction = new TransactionOnNetwork({
-            logs: new TransactionLogs(new Address(), [
-                new TransactionEvent({
-                    identifier: "signalError",
-                    topics: [
-                        new TransactionEventTopic(Buffer.from("something happened").toString("base64"))
-                    ],
-                    data: `@${Buffer.from("user error").toString("hex")}@07`
-                })
-            ])
+            logs: new TransactionLogs({
+                address: new Address(),
+                events: [
+                    new TransactionEvent({
+                        identifier: "signalError",
+                        topics: [new TransactionEventTopic(Buffer.from("something happened").toString("base64"))],
+                        data: `@${Buffer.from("user error").toString("hex")}@07`
+                    })
+                ]
+            })
         });
 
         let bundle = parser.parseUntypedOutcome(transaction);
@@ -119,15 +118,16 @@ describe("test smart contract results parser", () => {
 
     it("should parse contract outcome, on too much gas warning", async () => {
         let transaction = new TransactionOnNetwork({
-            logs: new TransactionLogs(new Address(), [
-                new TransactionEvent({
-                    identifier: "writeLog",
-                    topics: [
-                        new TransactionEventTopic("QHRvbyBtdWNoIGdhcyBwcm92aWRlZCBmb3IgcHJvY2Vzc2luZzogZ2FzIHByb3ZpZGVkID0gNTk2Mzg0NTAwLCBnYXMgdXNlZCA9IDczMzAxMA==")
-                    ],
-                    data: Buffer.from("QDZmNmI=", "base64").toString()
-                })
-            ])
+            logs: new TransactionLogs({
+                address: new Address(),
+                events: [
+                    new TransactionEvent({
+                        identifier: "writeLog",
+                        topics: [new TransactionEventTopic("QHRvbyBtdWNoIGdhcyBwcm92aWRlZCBmb3IgcHJvY2Vzc2luZzogZ2FzIHByb3ZpZGVkID0gNTk2Mzg0NTAwLCBnYXMgdXNlZCA9IDczMzAxMA==")],
+                        data: Buffer.from("QDZmNmI=", "base64").toString()
+                    })
+                ]
+            })
         });
 
         let bundle = parser.parseUntypedOutcome(transaction);
@@ -166,7 +166,7 @@ describe("test smart contract results parser", () => {
         let samples: [ITransactionOnNetwork, string][] = [];
 
         for (const file of transactionFiles) {
-            let txHash = new TransactionHash(path.basename(file, ".json"));
+            let txHash = path.basename(file, ".json");
             let filePath = path.resolve(folder, file);
             let jsonContent: string = fs.readFileSync(filePath, { encoding: "utf8" });
             let json = JSON.parse(jsonContent);

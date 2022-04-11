@@ -79,12 +79,12 @@ describe("test on local testnet", function () {
         await provider.sendTransaction(transactionIncrement);
 
         await watcher.awaitCompleted(transactionDeploy);
-        let transactionOnNetwork = await provider.getTransaction(transactionDeploy.getHash());
+        let transactionOnNetwork = await provider.getTransaction(transactionDeploy.getHash().hex());
         let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
         await watcher.awaitCompleted(transactionIncrement);
-        transactionOnNetwork = await provider.getTransaction(transactionIncrement.getHash());
+        transactionOnNetwork = await provider.getTransaction(transactionIncrement.getHash().hex());
         bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
@@ -289,11 +289,11 @@ describe("test on local testnet", function () {
         await watcher.awaitAnyEvent(transactionStart, ["completedTxEvent"]);
 
         // Let's check the SCRs
-        let transactionOnNetwork = await provider.getTransaction(transactionDeploy.getHash());
+        let transactionOnNetwork = await provider.getTransaction(transactionDeploy.getHash().hex());
         let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
-        transactionOnNetwork = await provider.getTransaction(transactionStart.getHash());
+        transactionOnNetwork = await provider.getTransaction(transactionStart.getHash().hex());
         bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 

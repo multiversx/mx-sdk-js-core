@@ -1,5 +1,5 @@
 import { Balance } from "../balance";
-import { ChainID, GasLimit, GasPrice } from "../networkParams";
+import { ChainID, GasLimit } from "../networkParams";
 import { Transaction } from "../transaction";
 import { Query } from "./query";
 import { ContractFunction } from "./function";
@@ -9,7 +9,7 @@ import { Nonce } from "../nonce";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
 import { Account } from "../account";
 import { CallArguments } from "./interface";
-import { IBech32Address, IChainID, IGasLimit, IGasPrice } from "../interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce } from "../interface";
 import { InteractionChecker } from "./interactionChecker";
 
 /**
@@ -17,7 +17,7 @@ import { InteractionChecker } from "./interactionChecker";
  */
 interface ISmartContractWithinInteraction {
     call({ func, args, value, gasLimit, receiver }: CallArguments): Transaction;
-    getAddress(): IBech32Address;
+    getAddress(): IAddress;
     getEndpoint(name: ContractFunction): EndpointDefinition;
 }
 
@@ -32,18 +32,18 @@ export class Interaction {
     private readonly function: ContractFunction;
     private readonly args: TypedValue[];
 
-    private nonce: Nonce = new Nonce(0);
+    private nonce: INonce = new Nonce(0);
     private value: Balance = Balance.Zero();
     private gasLimit: IGasLimit = new GasLimit(0);
     private gasPrice: IGasPrice | undefined = undefined;
     private chainID: IChainID = ChainID.unspecified();
-    private querent: IBech32Address = new Address();
+    private querent: IAddress = new Address();
 
     private isWithSingleESDTTransfer: boolean = false;
     private isWithSingleESDTNFTTransfer: boolean = false;
     private isWithMultiESDTNFTTransfer: boolean = false;
     private tokenTransfers: TokenTransfersWithinInteraction;
-    private tokenTransfersSender: IBech32Address = new Address();
+    private tokenTransfersSender: IAddress = new Address();
 
     constructor(
         contract: ISmartContractWithinInteraction,
@@ -56,7 +56,7 @@ export class Interaction {
         this.tokenTransfers = new TokenTransfersWithinInteraction([], this);
     }
     
-    getContractAddress(): IBech32Address {
+    getContractAddress(): IAddress {
         return this.contract.getAddress();
     }
 
@@ -142,44 +142,31 @@ export class Interaction {
         return this;
     }
 
-    withSingleESDTNFTTransfer(transfer: Balance, sender: Address) {
+    withSingleESDTNFTTransfer(transfer: Balance, sender: IAddress) {
         this.isWithSingleESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction([transfer], this);
         this.tokenTransfersSender = sender;
         return this;
     }
 
-    withMultiESDTNFTTransfer(transfers: Balance[], sender: Address) {
+    withMultiESDTNFTTransfer(transfers: Balance[], sender: IAddress) {
         this.isWithMultiESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction(transfers, this);
         this.tokenTransfersSender = sender;
         return this;
     }
 
-    withGasLimit(gasLimit: GasLimit): Interaction {
+    withGasLimit(gasLimit: IGasLimit): Interaction {
         this.gasLimit = gasLimit;
         return this;
     }
 
-    withGasLimitComponents(args: { minGasLimit: number, gasPerDataByte: number, estimatedExecutionComponent: number }): Interaction {
-        let minGasLimit = args.minGasLimit;
-        let gasPerDataByte = args.gasPerDataByte;
-
-        let transaction = this.buildTransaction();
-        let dataLength = transaction.getData().length();
-        let movementComponent = new GasLimit(minGasLimit + gasPerDataByte * dataLength);
-        let executionComponent = new GasLimit(args.estimatedExecutionComponent);
-        let gasLimit = movementComponent.add(executionComponent);
-
-        return this.withGasLimit(gasLimit);
-    }
-
-    withGasPrice(gasPrice: GasPrice): Interaction {
+    withGasPrice(gasPrice: IGasPrice): Interaction {
         this.gasPrice = gasPrice;
         return this;
     }
 
-    withNonce(nonce: Nonce): Interaction {
+    withNonce(nonce: INonce): Interaction {
         this.nonce = nonce;
         return this;
     }
@@ -196,7 +183,7 @@ export class Interaction {
     /**
      * Sets the "caller" field on contract queries.
      */
-    withQuerent(querent: Address): Interaction {
+    withQuerent(querent: IAddress): Interaction {
         this.querent = querent;
         return this;
     }

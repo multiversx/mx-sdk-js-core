@@ -57,8 +57,8 @@ describe("fetch transactions from local testnet", function () {
         await watcher.awaitCompleted(transactionDeploy);
         await watcher.awaitCompleted(transactionIncrement);
 
-        let transactionOnNetworkDeploy = await provider.getTransaction(transactionDeploy.getHash());
-        let transactionOnNetworkIncrement = await provider.getTransaction(transactionIncrement.getHash());
+        let transactionOnNetworkDeploy = await provider.getTransaction(transactionDeploy.getHash().hex());
+        let transactionOnNetworkIncrement = await provider.getTransaction(transactionIncrement.getHash().hex());
 
         let bundle = resultsParser.parseUntypedOutcome(transactionOnNetworkDeploy);
         assert.isTrue(bundle.returnCode.isSuccess());

@@ -3,18 +3,18 @@ import { Balance } from "../balance";
 import { Address } from "../address";
 import { TypedValue } from "./typesystem";
 import { ArgSerializer } from "./argSerializer";
-import { IBech32Address, ITransactionValue } from "../interface";
+import { IAddress, ITransactionValue } from "../interface";
 
 export class Query {
-    caller: IBech32Address;
-    address: IBech32Address;
+    caller: IAddress;
+    address: IAddress;
     func: ContractFunction;
     args: TypedValue[];
     value: ITransactionValue;
 
     constructor(obj: {
-        caller?: IBech32Address,
-        address: IBech32Address,
+        caller?: IAddress,
+        address: IAddress,
         func: ContractFunction,
         args?: TypedValue[],
         value?: ITransactionValue

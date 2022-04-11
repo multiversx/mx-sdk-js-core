@@ -22,6 +22,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - [Breaking change: extractions (network providers and contract wrappers)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/186)
  - [Breaking change: rename "methods" to "methodsExplicit". Rename "methodsAuto" to "methods" (default choice)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/187)
  - [Remove SmartContractController (downgraded to a mere test utility)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/188)
+ - [Breaking changes: cleanup and minor improvements prior release (step 1)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/190)
+ - [Breaking changes: cleanup and minor improvements prior release (step 2)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/191)
 
  **Breaking changes**
  - Removed utility functions: `transaction.awaitExecuted()`, `transaction.awaitPending()`. `TransactionWatcher` should be used directly, instead.
@@ -49,6 +51,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Removed `transaction.awaitSigned()` (it isn't useful in relation with any of our signing providers).
  - Removed not used interfaces (e.g. `ISignable` is not needed in erdjs, but in walletcore).
  - Removed `interaction.getContract()`. Add `interaction.getContractAddress()`.
+ - Remove `interaction.withGasLimitComponents()`. Not so helpful anymore (since `NetworkConfig` isn't a singleton anymore).
 
 ## [10.0.0-beta.3]
  - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)

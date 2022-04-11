@@ -43,7 +43,7 @@ describe("test contract", () => {
         });
 
         provider.mockUpdateAccount(alice.address, account => {
-            account.nonce = new Nonce(42);
+            account.nonce = 42;
         });
 
         await alice.sync(provider);
@@ -78,7 +78,7 @@ describe("test contract", () => {
         let contract = new SmartContract({ address: new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3") });
 
         provider.mockUpdateAccount(alice.address, account => {
-            account.nonce = new Nonce(42);
+            account.nonce = 42
         });
 
         let callTransactionOne = contract.call({

@@ -1,5 +1,5 @@
 import { Balance } from "../balance";
-import { ChainID, GasLimit, GasPrice } from "../networkParams";
+import { ChainID, GasLimit } from "../networkParams";
 import { Transaction } from "../transaction";
 import { Query } from "./query";
 import { ContractFunction } from "./function";
@@ -142,14 +142,14 @@ export class Interaction {
         return this;
     }
 
-    withSingleESDTNFTTransfer(transfer: Balance, sender: Address) {
+    withSingleESDTNFTTransfer(transfer: Balance, sender: IBech32Address) {
         this.isWithSingleESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction([transfer], this);
         this.tokenTransfersSender = sender;
         return this;
     }
 
-    withMultiESDTNFTTransfer(transfers: Balance[], sender: Address) {
+    withMultiESDTNFTTransfer(transfers: Balance[], sender: IBech32Address) {
         this.isWithMultiESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction(transfers, this);
         this.tokenTransfersSender = sender;
@@ -183,7 +183,7 @@ export class Interaction {
     /**
      * Sets the "caller" field on contract queries.
      */
-    withQuerent(querent: Address): Interaction {
+    withQuerent(querent: IBech32Address): Interaction {
         this.querent = querent;
         return this;
     }

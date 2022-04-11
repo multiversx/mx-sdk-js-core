@@ -1,4 +1,4 @@
-import { IBech32Address, IHash } from "../interface";
+import { IAddress, IHash } from "../interface";
 import { Transaction, TransactionHash } from "../transaction";
 import { Address } from "../address";
 import { Nonce } from "../nonce";
@@ -6,7 +6,6 @@ import { AsyncTimer } from "../asyncTimer";
 import { Balance } from "../balance";
 import * as errors from "../errors";
 import { Query } from "../smartcontracts/query";
-import { TypedEvent } from "../events";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
 import { ErrMock } from "../errors";
 import { AccountOnNetwork, ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "@elrondnetwork/erdjs-network-providers";
@@ -17,14 +16,13 @@ export class MockProvider {
     static AddressOfCarol = new Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
 
     private readonly transactions: Map<string, ITransactionOnNetwork>;
-    private readonly onTransactionSent: TypedEvent<{ transaction: Transaction }>;
+    private nextTransactionTimelinePoints: any[] = [];
     private readonly accounts: Map<string, IAccountOnNetwork>;
     private readonly queryContractResponders: QueryContractResponder[] = [];
     private readonly getTransactionResponders: GetTransactionResponder[] = [];
 
     constructor() {
         this.transactions = new Map<string, ITransactionOnNetwork>();
-        this.onTransactionSent = new TypedEvent();
         this.accounts = new Map<string, IAccountOnNetwork>();
 
         this.accounts.set(
@@ -78,19 +76,11 @@ export class MockProvider {
     }
 
     async mockTransactionTimeline(transaction: Transaction, timelinePoints: any[]): Promise<void> {
-        await transaction.awaitHashed();
         return this.mockTransactionTimelineByHash(transaction.getHash(), timelinePoints);
     }
 
     async mockNextTransactionTimeline(timelinePoints: any[]): Promise<void> {
-        let transaction = await this.nextTransactionSent();
-        return this.mockTransactionTimelineByHash(transaction.getHash(), timelinePoints);
-    }
-
-    private async nextTransactionSent(): Promise<Transaction> {
-        return new Promise<Transaction>((resolve, _reject) => {
-            this.onTransactionSent.on((eventArgs) => resolve(eventArgs.transaction));
-        });
+        this.nextTransactionTimelinePoints = timelinePoints;
     }
 
     async mockTransactionTimelineByHash(hash: TransactionHash, timelinePoints: any[]): Promise<void> {
@@ -113,7 +103,7 @@ export class MockProvider {
         }
     }
 
-    async getAccount(address: IBech32Address): Promise<IAccountOnNetwork> {
+    async getAccount(address: IAddress): Promise<IAccountOnNetwork> {
         let account = this.accounts.get(address.bech32());
         if (account) {
             return account;
@@ -133,8 +123,7 @@ export class MockProvider {
             })
         );
 
-        this.onTransactionSent.emit({ transaction: transaction });
-
+        this.mockTransactionTimeline(transaction, this.nextTransactionTimelinePoints);
         return transaction.getHash();
     }
 
@@ -144,7 +133,7 @@ export class MockProvider {
 
     async getTransaction(
         txHash: IHash,
-        _hintSender?: IBech32Address,
+        _hintSender?: IAddress,
         _withResults?: boolean
     ): Promise<ITransactionOnNetwork> {
         // At first, try to use a mock responder

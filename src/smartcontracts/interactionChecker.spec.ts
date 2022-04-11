@@ -15,7 +15,7 @@ describe("integration tests: test checker within interactor", function () {
     let checker = new InteractionChecker();
 
     it("should detect errors for 'ultimate answer'", async function () {
-        let abiRegistry = await loadAbiRegistry(["src/testdata/answer.abi.json"]);
+        let abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
         let abi = new SmartContractAbi(abiRegistry, ["answer"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
         let endpoint = abi.getEndpoint("getUltimateAnswer");
@@ -33,7 +33,7 @@ describe("integration tests: test checker within interactor", function () {
     });
 
     it("should detect errors for 'lottery'", async function () {
-        let abiRegistry = await loadAbiRegistry(["src/testdata/lottery-esdt.abi.json"]);
+        let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
         let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
         let endpoint = abi.getEndpoint("start");

@@ -2,11 +2,9 @@ import { Balance } from "../balance";
 import { Address } from "../address";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
-import { Code } from "./code";
 import { CodeMetadata } from "./codeMetadata";
 import { CallArguments, DeployArguments, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
-import { Nonce } from "../nonce";
 import { ContractFunction } from "./function";
 import { Query } from "./query";
 import { SmartContractAbi } from "./abi";
@@ -16,16 +14,15 @@ import { bigIntToBuffer } from "./codec/utils";
 import BigNumber from "bignumber.js";
 import { Interaction } from "./interaction";
 import { NativeSerializer } from "./nativeSerializer";
+import { IAddress, INonce } from "../interface";
+import { ErrContractHasNoAddress } from "../errors";
 const createKeccakHash = require("keccak");
 
 /**
  * An abstraction for deploying and interacting with Smart Contracts.
  */
 export class SmartContract implements ISmartContract {
-    private owner: Address = new Address();
-    private address: Address = new Address();
-    private code: Code = Code.nothing();
-    private codeMetadata: CodeMetadata = new CodeMetadata();
+    private address: IAddress = new Address();
     private abi?: SmartContractAbi;
 
     /**
@@ -46,7 +43,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Create a SmartContract object by providing its address on the Network.
      */
-    constructor({ address, abi }: { address?: Address, abi?: SmartContractAbi }) {
+    constructor({ address, abi }: { address?: IAddress, abi?: SmartContractAbi }) {
         this.address = address || new Address();
         this.abi = abi;
 
@@ -84,40 +81,15 @@ export class SmartContract implements ISmartContract {
     /**
      * Sets the address, as on Network.
      */
-    setAddress(address: Address) {
+    setAddress(address: IAddress) {
         this.address = address;
     }
 
     /**
      * Gets the address, as on Network.
      */
-    getAddress(): Address {
+    getAddress(): IAddress {
         return this.address;
-    }
-
-    /**
-     * Gets the owner address. 
-     * 
-     * Note that this function doesn't query the Network, but uses the information acquired when signing a deployment transaction.
-     * Therefore, currently, this function is useful only in the context of deploying Smart Contracts.
-     */
-    getOwner(): Address {
-        this.owner.assertNotEmpty();
-        return this.owner;
-    }
-
-    /**
-     * Gets the {@link Code} of the Smart Contract. Does not query the Network.
-     */
-    getCode(): Code {
-        return this.code;
-    }
-
-    /**
-     * Gets the {@link CodeMetadata} of the Smart Contract. Does not query the Network.
-     */
-    getCodeMetadata(): CodeMetadata {
-        return this.codeMetadata;
     }
 
     setAbi(abi: SmartContractAbi) {
@@ -156,24 +128,15 @@ export class SmartContract implements ISmartContract {
             chainID: chainID
         });
 
-        this.code = code;
-        this.codeMetadata = codeMetadata;
-        transaction.onSigned.on(this.onDeploySigned.bind(this));
-
         return transaction;
-    }
-
-    private onDeploySigned({ transaction, signedBy }: { transaction: Transaction, signedBy: Address }) {
-        this.owner = signedBy;
-        let nonce = transaction.getNonce();
-        let address = SmartContract.computeAddress(this.owner, nonce);
-        this.setAddress(address);
     }
 
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
     upgrade({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
+        this.ensureHasAddress();
+
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
         value = value || Balance.Zero();
@@ -193,9 +156,6 @@ export class SmartContract implements ISmartContract {
             chainID: chainID
         });
 
-        this.code = code;
-        this.codeMetadata = codeMetadata;
-
         return transaction;
     }
 
@@ -203,6 +163,8 @@ export class SmartContract implements ISmartContract {
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
     call({ func, args, value, gasLimit, receiver, gasPrice, chainID }: CallArguments): Transaction {
+        this.ensureHasAddress();
+
         args = args || [];
         value = value || Balance.Zero();
 
@@ -224,13 +186,21 @@ export class SmartContract implements ISmartContract {
     }
 
     createQuery({ func, args, value, caller }: QueryArguments): Query {
+        this.ensureHasAddress();
+
         return new Query({
-            address: this.address,
+            address: this.getAddress(),
             func: func,
             args: args,
             value: value,
             caller: caller
         });
+    }
+
+    private ensureHasAddress() {
+        if (!this.getAddress().bech32()) {
+            throw new ErrContractHasNoAddress();
+        }
     }
 
     /**
@@ -240,9 +210,9 @@ export class SmartContract implements ISmartContract {
      * @param owner The owner of the Smart Contract
      * @param nonce The owner nonce used for the deployment transaction
      */
-    static computeAddress(owner: Address, nonce: Nonce): Address {
+    static computeAddress(owner: IAddress, nonce: INonce): IAddress {
         let initialPadding = Buffer.alloc(8, 0);
-        let ownerPubkey = owner.pubkey();
+        let ownerPubkey = new Address(owner.bech32()).pubkey();
         let shardSelector = ownerPubkey.slice(30);
         let ownerNonceBytes = Buffer.alloc(8);
 

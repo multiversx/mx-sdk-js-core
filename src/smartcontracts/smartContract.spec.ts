@@ -25,11 +25,9 @@ describe("test contract", () => {
         let owner = new Address("93ee6143cdc10ce79f15b2a6c2ad38e9b6021c72a1779051f47154fd54cfbd5e");
 
         let firstContractAddress = SmartContract.computeAddress(owner, new Nonce(0));
-        assert.equal(firstContractAddress.hex(), "00000000000000000500bb652200ed1f994200ab6699462cab4b1af7b11ebd5e");
         assert.equal(firstContractAddress.bech32(), "erd1qqqqqqqqqqqqqpgqhdjjyq8dr7v5yq9tv6v5vt9tfvd00vg7h40q6779zn");
 
         let secondContractAddress = SmartContract.computeAddress(owner, new Nonce(1));
-        assert.equal(secondContractAddress.hex(), "000000000000000005006e4f90488e27342f9a46e1809452c85ee7186566bd5e");
         assert.equal(secondContractAddress.bech32(), "erd1qqqqqqqqqqqqqpgqde8eqjywyu6zlxjxuxqfg5kgtmn3setxh40qen8egy");
     });
 
@@ -55,10 +53,12 @@ describe("test contract", () => {
         assert.equal(deployTransaction.getGasLimit().valueOf(), 1000000);
         assert.equal(deployTransaction.getNonce().valueOf(), 42);
 
-        // Sign transaction, then check contract address (should be computed upon signing)
-        alice.signer.sign(deployTransaction);
-        assert.equal(contract.getOwner().bech32(), alice.address.bech32());
+        // Compute & set the contract address
+        contract.setAddress(SmartContract.computeAddress(alice.address, 42));
         assert.equal(contract.getAddress().bech32(), "erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q");
+
+        // Sign the transaction
+        alice.signer.sign(deployTransaction);
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);

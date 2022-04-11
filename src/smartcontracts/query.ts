@@ -4,11 +4,11 @@ import { Address } from "../address";
 import { guardValueIsSet } from "../utils";
 import { TypedValue } from "./typesystem";
 import { ArgSerializer } from "./argSerializer";
-import { IBech32Address, ITransactionValue } from "../interface";
+import { IAddress, ITransactionValue } from "../interface";
 
 export class Query {
-    caller: Address;
-    address: IBech32Address;
+    caller: IAddress;
+    address: IAddress;
     func: ContractFunction;
     args: TypedValue[];
     value: ITransactionValue;
@@ -38,7 +38,7 @@ export class Query {
             "value": this.value.toString()
         };
 
-        if (!this.caller.isEmpty()) {
+        if (this.caller.bech32()) {
             request["caller"] = this.caller.bech32();
         }
 

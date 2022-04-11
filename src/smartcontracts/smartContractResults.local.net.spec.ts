@@ -1,4 +1,4 @@
-import { loadContractCode, loadTestWallets, TestWallet } from "../testutils";
+import { loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
 import { TransactionWatcher } from "../transactionWatcher";
 import { GasLimit } from "../networkParams";
 import { assert } from "chai";
@@ -28,16 +28,15 @@ describe("fetch transactions from local testnet", function () {
 
         // Deploy
         let contract = new SmartContract({});
-        let transactionDeploy = contract.deploy({
-            code: await loadContractCode("src/testdata/counter.wasm"),
+
+        let transactionDeploy = await prepareDeployment({
+            contract: contract,
+            deployer: alice,
+            codePath: "src/testdata/counter.wasm",
             gasLimit: new GasLimit(3000000),
+            initArguments: [],
             chainID: network.ChainID
         });
-
-        transactionDeploy.setNonce(alice.account.nonce);
-        await alice.signer.sign(transactionDeploy);
-
-        alice.account.incrementNonce();
 
         // ++
         let transactionIncrement = contract.call({

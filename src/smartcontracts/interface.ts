@@ -1,6 +1,5 @@
-import { Address } from "../address";
 import { Balance } from "../balance";
-import { IChainID, IGasLimit, IGasPrice } from "../interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice } from "../interface";
 import { IContractQueryResponse, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { Transaction } from "../transaction";
 import { Code } from "./code";
@@ -16,7 +15,7 @@ export interface ISmartContract {
     /**
      * Gets the address of the Smart Contract.
      */
-    getAddress(): Address;
+    getAddress(): IAddress;
 
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
@@ -59,7 +58,7 @@ export interface CallArguments {
     args?: TypedValue[];
     value?: Balance;
     gasLimit: IGasLimit;
-    receiver?: Address;
+    receiver?: IAddress;
     gasPrice?: IGasPrice;
     chainID: IChainID;
 }
@@ -68,7 +67,7 @@ export interface QueryArguments {
     func: ContractFunction;
     args?: TypedValue[];
     value?: Balance;
-    caller?: Address
+    caller?: IAddress
 }
 
 export interface TypedOutcomeBundle {
@@ -85,12 +84,4 @@ export interface UntypedOutcomeBundle {
     returnCode: ReturnCode;
     returnMessage: string;
     values: Buffer[];
-}
-
-export interface IResultsParser {
-    parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle;
-    parseUntypedQueryResponse(queryResponse: IContractQueryResponse): UntypedOutcomeBundle;
-
-    parseOutcome(transaction: ITransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle;
-    parseUntypedOutcome(transaction: ITransactionOnNetwork): UntypedOutcomeBundle;
 }

@@ -10,19 +10,7 @@ export class SmartContractAbi {
     constructor(registry: AbiRegistry, implementsInterfaces: string[]) {
         this.interfaces.push(...registry.getInterfaces(implementsInterfaces));
     }
-
-    static async fromAbiPath(abiPath: string): Promise<SmartContractAbi> {
-        let abiRegistry = await AbiRegistry.load({ files: [abiPath] });
-        let interfaceNames = abiRegistry.interfaces.map(iface => iface.name);
-        return new SmartContractAbi(abiRegistry, interfaceNames);
-    }
-
-    static async fromAbiUrl(abiUrl: string): Promise<SmartContractAbi> {
-        let abiRegistry = await AbiRegistry.load({ urls: [abiUrl] });
-        let interfaceNames = abiRegistry.interfaces.map(iface => iface.name);
-        return new SmartContractAbi(abiRegistry, interfaceNames);
-    }
-
+    
     getAllEndpoints(): EndpointDefinition[] {
         let endpoints = [];
 

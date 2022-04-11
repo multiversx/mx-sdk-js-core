@@ -4,11 +4,10 @@ import { ErrCannotParseContractResults } from "../errors";
 import { Logger } from "../logger";
 import { IContractQueryResponse, IContractResults, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { ArgSerializer } from "./argSerializer";
-import { TypedOutcomeBundle, IResultsParser, UntypedOutcomeBundle } from "./interface";
+import { TypedOutcomeBundle, UntypedOutcomeBundle } from "./interface";
 import { ReturnCode } from "./returnCode";
 import { EndpointDefinition } from "./typesystem";
-import { adaptToAddress } from "../boundaryAdapters";
-import { IBech32Address } from "../interface";
+import { IAddress } from "../interface";
 
 enum WellKnownEvents {
     OnTransactionCompleted = "completedTxEvent",
@@ -24,7 +23,7 @@ enum WellKnownTopics {
  * Parses contract query responses and smart contract results.
  * The parsing involves some heuristics, in order to handle slight inconsistencies (e.g. some SCRs are present on API, but missing on Gateway).
  */
-export class ResultsParser implements IResultsParser {
+export class ResultsParser {
     parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle {
         let parts = queryResponse.getReturnDataParts();
         let values = new ArgSerializer().buffersToValues(parts, endpoint.output);
@@ -217,8 +216,8 @@ export class ResultsParser implements IResultsParser {
         };
     }
 
-    private createBundleOnWriteLogWhereFirstTopicEqualsAddress(logs: ITransactionLogs, address: IBech32Address): UntypedOutcomeBundle | null {
-        let hexAddress = adaptToAddress(address).hex();
+    private createBundleOnWriteLogWhereFirstTopicEqualsAddress(logs: ITransactionLogs, address: IAddress): UntypedOutcomeBundle | null {
+        let hexAddress = new Address(address.bech32()).hex();
         
         let eventWriteLogWhereTopicIsSender = logs.findSingleOrNoneEvent(
             WellKnownEvents.OnWriteLog,

@@ -9,7 +9,7 @@ import { Nonce } from "../nonce";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
 import { Account } from "../account";
 import { CallArguments } from "./interface";
-import { IChainID, IGasLimit, IGasPrice } from "../interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice } from "../interface";
 import { InteractionChecker } from "./interactionChecker";
 
 /**
@@ -17,7 +17,7 @@ import { InteractionChecker } from "./interactionChecker";
  */
 interface ISmartContractWithinInteraction {
     call({ func, args, value, gasLimit, receiver }: CallArguments): Transaction;
-    getAddress(): Address;
+    getAddress(): IAddress;
     getEndpoint(name: ContractFunction): EndpointDefinition;
 }
 
@@ -31,36 +31,33 @@ export class Interaction {
     private readonly contract: ISmartContractWithinInteraction;
     private readonly function: ContractFunction;
     private readonly args: TypedValue[];
-    private readonly receiver?: Address;
 
     private nonce: Nonce = new Nonce(0);
     private value: Balance = Balance.Zero();
     private gasLimit: IGasLimit = new GasLimit(0);
     private gasPrice: IGasPrice | undefined = undefined;
     private chainID: IChainID = ChainID.unspecified();
-    private querent: Address = new Address();
+    private querent: IAddress = new Address();
 
     private isWithSingleESDTTransfer: boolean = false;
     private isWithSingleESDTNFTTransfer: boolean = false;
     private isWithMultiESDTNFTTransfer: boolean = false;
     private tokenTransfers: TokenTransfersWithinInteraction;
-    private tokenTransfersSender: Address = new Address();
+    private tokenTransfersSender: IAddress = new Address();
 
     constructor(
         contract: ISmartContractWithinInteraction,
         func: ContractFunction,
-        args: TypedValue[],
-        receiver?: Address,
+        args: TypedValue[]
     ) {
         this.contract = contract;
         this.function = func;
         this.args = args;
-        this.receiver = receiver;
         this.tokenTransfers = new TokenTransfersWithinInteraction([], this);
     }
     
-    getContract(): ISmartContractWithinInteraction {
-        return this.contract;
+    getContractAddress(): IAddress {
+        return this.contract.getAddress();
     }
 
     getFunction(): ContractFunction {
@@ -88,7 +85,7 @@ export class Interaction {
     }
 
     buildTransaction(): Transaction {
-        let receiver = this.receiver;
+        let receiver = this.contract.getAddress();
         let func: ContractFunction = this.function;
         let args = this.args;
 
@@ -107,7 +104,6 @@ export class Interaction {
             args = this.tokenTransfers.buildArgsForMultiESDTNFTTransfer();
         }
 
-        // TODO: create as "deploy" transaction if the function is "init" (or find a better pattern for deployments).
         let transaction = this.contract.call({
             func: func,
             // GasLimit will be set using "withGasLimit()".
@@ -291,7 +287,7 @@ class TokenTransfersWithinInteraction {
 
     private getTypedTokensReceiver(): TypedValue {
         // The actual receiver of the token(s): the contract
-        return new AddressValue(this.interaction.getContract().getAddress());
+        return new AddressValue(this.interaction.getContractAddress());
     }
 
     private getTypedInteractionFunction(): TypedValue {

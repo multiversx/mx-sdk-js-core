@@ -4,6 +4,7 @@ import { bigIntToBuffer } from "../smartcontracts/codec/utils";
 import { Transaction } from "../transaction";
 import { proto } from "./compiled";
 import {TRANSACTION_OPTIONS_DEFAULT} from "../constants";
+import { Address } from "../address";
 
 /**
  * Hides away the serialization complexity, for each type of object (e.g. transactions).
@@ -15,13 +16,16 @@ export class ProtoSerializer {
      * Serializes a Transaction object to a Buffer. Handles low-level conversion logic and field-mappings as well.
      */
     serializeTransaction(transaction: Transaction): Buffer {
+        let receiverPubkey = new Address(transaction.getReceiver().bech32()).pubkey();
+        let senderPubkey = new Address(transaction.getSender().bech32()).pubkey();
+
         let protoTransaction = new proto.Transaction({
             // elrond-go's serializer handles nonce == 0 differently, thus we treat 0 as "undefined".
             Nonce: transaction.getNonce().valueOf() ? transaction.getNonce().valueOf() : undefined,
             Value: this.serializeBalance(transaction.getValue()),
-            RcvAddr: transaction.getReceiver().pubkey(),
+            RcvAddr: receiverPubkey,
             RcvUserName: null,
-            SndAddr: transaction.getSender().pubkey(),
+            SndAddr: senderPubkey,
             SndUserName: null,
             GasPrice: transaction.getGasPrice().valueOf(),
             GasLimit: transaction.getGasLimit().valueOf(),

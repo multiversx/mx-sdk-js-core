@@ -1,6 +1,6 @@
 import { Interaction } from "../smartcontracts/interaction";
 import { Transaction } from "../transaction";
-import { TypedOutcomeBundle, IResultsParser, UntypedOutcomeBundle } from "../smartcontracts/interface";
+import { TypedOutcomeBundle, UntypedOutcomeBundle } from "../smartcontracts/interface";
 import { ResultsParser } from "../smartcontracts/resultsParser";
 import { Logger } from "../logger";
 import { TransactionWatcher } from "../transactionWatcher";
@@ -8,7 +8,7 @@ import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { INetworkProvider } from "./networkProviders";
 
 export class ContractController {
-    private readonly parser: IResultsParser;
+    private readonly parser: ResultsParser;
     private readonly provider: INetworkProvider;
     private readonly transactionCompletionAwaiter: TransactionWatcher;
 

@@ -1,5 +1,3 @@
-const JSONbig = require("json-bigint");
-
 export const TRANSACTION_MIN_GAS_PRICE = 1000000000;
 export const TRANSACTION_OPTIONS_DEFAULT = 0;
 export const TRANSACTION_OPTIONS_TX_HASH_SIGN = 1;
@@ -10,14 +8,3 @@ export const ESDT_TRANSFER_FUNCTION_NAME = "ESDTTransfer";
 export const ESDTNFT_TRANSFER_FUNCTION_NAME = "ESDTNFTTransfer";
 export const MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME = "MultiESDTNFTTransfer";
 export const ESDT_TRANSFER_VALUE = "0";
-
-// TODO: Rename fo "AxiosDefaultConfig" (less ambiguous).
-export const defaultConfig = {
-    timeout: 1000,
-    // See: https://github.com/axios/axios/issues/983 regarding transformResponse
-    transformResponse: [
-        function(data: any) {
-            return JSONbig.parse(data);
-        },
-    ],
-};

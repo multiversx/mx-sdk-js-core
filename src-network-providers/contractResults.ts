@@ -13,10 +13,6 @@ export class ContractResults {
         });
     }
 
-    static empty(): ContractResults {
-        return new ContractResults([]);
-    }
-
     static fromProxyHttpResponse(results: any[]): ContractResults {
         let items = results.map(item => ContractResultItem.fromProxyHttpResponse(item));
         return new ContractResults(items);
@@ -41,7 +37,7 @@ export class ContractResultItem {
     gasPrice: number = 0;
     callType: number = 0;
     returnMessage: string = "";
-    logs: TransactionLogs = TransactionLogs.empty();
+    logs: TransactionLogs = new TransactionLogs();
 
     constructor(init?: Partial<ContractResultItem>) {
         Object.assign(this, init);

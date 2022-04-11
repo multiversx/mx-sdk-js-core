@@ -4,22 +4,19 @@ import { Bech32Address } from "./primitives";
 import { TransactionEvent } from "./transactionEvents";
 
 export class TransactionLogs {
-    readonly address: IBech32Address;
-    readonly events: TransactionEvent[];
+    address: IBech32Address = new Bech32Address("");
+    events: TransactionEvent[] = [];
 
-    constructor(address: IBech32Address, events: TransactionEvent[]) {
-        this.address = address;
-        this.events = events;
-    }
-
-    static empty(): TransactionLogs {
-        return new TransactionLogs(new Bech32Address(""), []);
+    constructor(init?: Partial<TransactionLogs>) {
+        Object.assign(this, init);
     }
 
     static fromHttpResponse(logs: any): TransactionLogs {
-        let address = new Bech32Address(logs.address);
-        let events = (logs.events || []).map((event: any) => TransactionEvent.fromHttpResponse(event));
-        return new TransactionLogs(address, events);
+        let result = new TransactionLogs();
+        result.address = new Bech32Address(logs.address);
+        result.events = (logs.events || []).map((event: any) => TransactionEvent.fromHttpResponse(event));
+        
+        return result;
     }
 
     findSingleOrNoneEvent(identifier: string, predicate?: (event: TransactionEvent) => boolean): TransactionEvent | undefined {

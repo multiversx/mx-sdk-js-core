@@ -10,10 +10,10 @@ export class TokenPayment {
     readonly amountAsBigInteger: BigNumber;
     private readonly numDecimals: number;
 
-    constructor(tokenIdentifier: string, nonce: number, amountAsAtoms: BigNumber.Value, numDecimals: number) {
-        let amount = new BigNumber(amountAsAtoms);
+    constructor(tokenIdentifier: string, nonce: number, amountAsBigInteger: BigNumber.Value, numDecimals: number) {
+        let amount = new BigNumber(amountAsBigInteger);
         if (!amount.isInteger() || amount.isNegative()) {
-            throw new ErrInvalidArgument(`bad amountAsAtoms: ${amountAsAtoms}`);
+            throw new ErrInvalidArgument(`bad amountAsBigInteger: ${amountAsBigInteger}`);
         }
 
         this.tokenIdentifier = tokenIdentifier;
@@ -22,18 +22,18 @@ export class TokenPayment {
         this.numDecimals = numDecimals;
     }
 
-    static egldFromRationalNumber(amountAsRationalNumber: BigNumber.Value) {
-        let amountAsAtoms = new BigNumber(amountAsRationalNumber).shiftedBy(EGLDNumDecimals).decimalPlaces(0);
-        return this.egldFromBigInteger(amountAsAtoms);
+    static egldFromAmount(amount: BigNumber.Value) {
+        let amountAsBigInteger = new BigNumber(amount).shiftedBy(EGLDNumDecimals).decimalPlaces(0);
+        return this.egldFromBigInteger(amountAsBigInteger);
     }
 
     static egldFromBigInteger(amountAsBigInteger: BigNumber.Value) {
         return new TokenPayment(EGLDTokenIdentifier, 0, amountAsBigInteger, EGLDNumDecimals);
     }
 
-    static fungibleFromRationalNumber(tokenIdentifier: string, amountAsRationalNumber: BigNumber.Value, numDecimals: number = 0): TokenPayment {
-        let amountAsAtoms = new BigNumber(amountAsRationalNumber).shiftedBy(numDecimals).decimalPlaces(0);
-        return this.fungibleFromBigInteger(tokenIdentifier, amountAsAtoms, numDecimals);
+    static fungibleFromAmount(tokenIdentifier: string, amount: BigNumber.Value, numDecimals: number = 0): TokenPayment {
+        let amountAsBigInteger = new BigNumber(amount).shiftedBy(numDecimals).decimalPlaces(0);
+        return this.fungibleFromBigInteger(tokenIdentifier, amountAsBigInteger, numDecimals);
     }
 
     static fungibleFromBigInteger(tokenIdentifier: string, amountAsBigInteger: BigNumber.Value, numDecimals: number = 0): TokenPayment {
@@ -48,9 +48,9 @@ export class TokenPayment {
         return new TokenPayment(tokenIdentifier, nonce, quantity, 0);
     }
 
-    static metaEsdtFromRationalNumber(tokenIdentifier: string, nonce: number, amountAsRationalNumber: BigNumber.Value, numDecimals = 0) {
-        let amountAsAtoms = new BigNumber(amountAsRationalNumber).shiftedBy(numDecimals).decimalPlaces(0);
-        return this.metaEsdtFromBigInteger(tokenIdentifier, nonce, amountAsAtoms, numDecimals);
+    static metaEsdtFromAmount(tokenIdentifier: string, nonce: number, amount: BigNumber.Value, numDecimals = 0) {
+        let amountAsBigInteger = new BigNumber(amount).shiftedBy(numDecimals).decimalPlaces(0);
+        return this.metaEsdtFromBigInteger(tokenIdentifier, nonce, amountAsBigInteger, numDecimals);
     }
 
     static metaEsdtFromBigInteger(tokenIdentifier: string, nonce: number, amountAsBigInteger: BigNumber.Value, numDecimals = 0) {

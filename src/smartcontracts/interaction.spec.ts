@@ -38,7 +38,7 @@ describe("test smart contract interactor", function() {
 
         let transaction = interaction
             .withNonce(new Nonce(7))
-            .withValue(TokenPayment.egldFromRationalNumber(1))
+            .withValue(TokenPayment.egldFromAmount(1))
             .withGasLimit(new GasLimit(20000000))
             .buildTransaction();
 
@@ -53,9 +53,9 @@ describe("test smart contract interactor", function() {
         let dummyFunction = new ContractFunction("dummy");
         let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         
-        const TokenFoo = (amount: BigNumber.Value) => TokenPayment.fungibleFromRationalNumber("FOO-6ce17b", amount, 0);
-        const TokenBar = (amount: BigNumber.Value) => TokenPayment.fungibleFromRationalNumber("BAR-5bc08f", amount, 3);
-        const LKMEX = (nonce: number, amount: BigNumber.Value) => TokenPayment.metaEsdtFromRationalNumber("LKMEX-aab910", nonce, amount, 18);
+        const TokenFoo = (amount: BigNumber.Value) => TokenPayment.fungibleFromAmount("FOO-6ce17b", amount, 0);
+        const TokenBar = (amount: BigNumber.Value) => TokenPayment.fungibleFromAmount("BAR-5bc08f", amount, 3);
+        const LKMEX = (nonce: number, amount: BigNumber.Value) => TokenPayment.metaEsdtFromAmount("LKMEX-aab910", nonce, amount, 18);
         const Strămoși = (nonce: number) => TokenPayment.nonFungible("MOS-b9b4b2", nonce);
 
         const hexFoo = "464f4f2d366365313762";

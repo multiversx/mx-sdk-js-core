@@ -1,10 +1,10 @@
 import { ErrUnexpectedCondition } from "./errors";
-import { IBech32Address } from "./interface";
-import { Bech32Address } from "./primitives";
+import { IAddress } from "./interface";
+import { Address } from "./primitives";
 import { TransactionEvent } from "./transactionEvents";
 
 export class TransactionLogs {
-    address: IBech32Address = new Bech32Address("");
+    address: IAddress = new Address("");
     events: TransactionEvent[] = [];
 
     constructor(init?: Partial<TransactionLogs>) {
@@ -13,7 +13,7 @@ export class TransactionLogs {
 
     static fromHttpResponse(logs: any): TransactionLogs {
         let result = new TransactionLogs();
-        result.address = new Bech32Address(logs.address);
+        result.address = new Address(logs.address);
         result.events = (logs.events || []).map((event: any) => TransactionEvent.fromHttpResponse(event));
         
         return result;

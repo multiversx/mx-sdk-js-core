@@ -1,12 +1,12 @@
 import { BigNumber } from "bignumber.js";
-import { Bech32Address } from "./primitives";
-import { IBech32Address } from "./interface";
+import { Address } from "./primitives";
+import { IAddress } from "./interface";
 
 export class DefinitionOfFungibleTokenOnNetwork {
     identifier: string = "";
     name: string = "";
     ticker: string = "";
-    owner: IBech32Address = new Bech32Address("");
+    owner: IAddress = new Address("");
     decimals: number = 0;
     supply: BigNumber = new BigNumber(0);
     isPaused: boolean = false;
@@ -25,7 +25,7 @@ export class DefinitionOfFungibleTokenOnNetwork {
         result.identifier = payload.identifier || "";
         result.name = payload.name || "";
         result.ticker = payload.ticker || "";
-        result.owner = new Bech32Address(payload.owner || "");
+        result.owner = new Address(payload.owner || "");
         result.decimals = payload.decimals || 0;
         result.supply = new BigNumber(payload.supply || "0");
         result.isPaused = payload.isPaused || false;
@@ -47,7 +47,7 @@ export class DefinitionOfTokenCollectionOnNetwork {
     type: string = "";
     name: string = "";
     ticker: string = "";
-    owner: IBech32Address = new Bech32Address("");
+    owner: IAddress = new Address("");
     decimals: number = 0;
     canPause: boolean = false;
     canFreeze: boolean = false;
@@ -61,7 +61,7 @@ export class DefinitionOfTokenCollectionOnNetwork {
         result.type = payload.type || "";
         result.name = payload.name || "";
         result.ticker = payload.ticker || "";
-        result.owner = new Bech32Address(payload.owner || "");
+        result.owner = new Address(payload.owner || "");
         result.decimals = payload.decimals || 0;
         result.canPause = payload.canPause || false;
         result.canFreeze = payload.canFreeze || false;

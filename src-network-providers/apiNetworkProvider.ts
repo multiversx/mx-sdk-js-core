@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "./accounts";
-import { IBech32Address, IContractQuery, INetworkProvider, ITransaction, IPagination } from "./interface";
+import { IAddress, IContractQuery, INetworkProvider, ITransaction, IPagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStake } from "./networkStake";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
@@ -48,13 +48,13 @@ export class ApiNetworkProvider implements INetworkProvider {
         return stats;
     }
 
-    async getAccount(address: IBech32Address): Promise<AccountOnNetwork> {
+    async getAccount(address: IAddress): Promise<AccountOnNetwork> {
         let response = await this.doGetGeneric(`accounts/${address.bech32()}`);
         let account = AccountOnNetwork.fromHttpResponse(response);
         return account;
     }
 
-    async getFungibleTokensOfAccount(address: IBech32Address, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]> {
+    async getFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]> {
         pagination = pagination || defaultPagination;
 
         let url = `accounts/${address.bech32()}/tokens?${this.buildPaginationParams(pagination)}`;
@@ -66,7 +66,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(address: IBech32Address, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+    async getNonFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
         pagination = pagination || defaultPagination;
 
         let url = `accounts/${address.bech32()}/nfts?${this.buildPaginationParams(pagination)}`;
@@ -78,13 +78,13 @@ export class ApiNetworkProvider implements INetworkProvider {
         return tokens;
     }
 
-    async getFungibleTokenOfAccount(address: IBech32Address, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
+    async getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`accounts/${address.bech32()}/tokens/${tokenIdentifier}`);
         let tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response);
         return tokenData;
     }
 
-    async getNonFungibleTokenOfAccount(address: IBech32Address, collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork> {
+    async getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork> {
         let nonceAsHex = new Nonce(nonce).hex();
         let response = await this.doGetGeneric(`accounts/${address.bech32()}/nfts/${collection}-${nonceAsHex}`);
         let tokenData = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);

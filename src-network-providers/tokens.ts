@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
-import { Bech32Address, Nonce } from "./primitives";
-import { IBech32Address } from "./interface";
+import { Address, Nonce } from "./primitives";
+import { IAddress } from "./interface";
 
 export class FungibleTokenOfAccountOnNetwork {
     identifier: string = "";
@@ -24,7 +24,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
     nonce: number = 0;
     type: string = "";
     name: string = "";
-    creator: IBech32Address = new Bech32Address("");
+    creator: IAddress = new Address("");
     supply: BigNumber = new BigNumber(0);
     decimals: number = 0;
     royalties: BigNumber = new BigNumber(0);
@@ -73,7 +73,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
         result.nonce = payload.nonce || 0;
         result.type = payload.type || "";
         result.name = payload.name || "";
-        result.creator = new Bech32Address(payload.creator || "");
+        result.creator = new Address(payload.creator || "");
         result.decimals = Number(payload.decimals || 0);
         result.supply = new BigNumber(payload.balance || 1);
         result.royalties = new BigNumber(payload.royalties || 0);

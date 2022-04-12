@@ -36,27 +36,27 @@ export interface INetworkProvider {
     /**
      * Fetches the state of an account.
      */
-    getAccount(address: IBech32Address): Promise<AccountOnNetwork>;
+    getAccount(address: IAddress): Promise<AccountOnNetwork>;
 
     /**
      * Fetches data about the fungible tokens held by an account.
      */
-    getFungibleTokensOfAccount(address: IBech32Address, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
-    getNonFungibleTokensOfAccount(address: IBech32Address, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
+    getNonFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about a specific fungible token held by an account.
      */
-    getFungibleTokenOfAccount(address: IBech32Address, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork>;
+    getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches data about a specific non-fungible token (instance) held by an account.
      */
-    getNonFungibleTokenOfAccount(address: IBech32Address, collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches the state of a transaction.
@@ -111,10 +111,10 @@ export interface INetworkProvider {
 }
 
 export interface IContractQuery {
-    address: IBech32Address;
-    caller: IBech32Address;
+    address: IAddress;
+    caller?: IAddress;
     func: { toString(): string; };
-    value: { toString(): string; };
+    value?: { toString(): string; };
     getEncodedArguments(): string[];
 }
 
@@ -127,4 +127,4 @@ export interface ITransaction {
     toSendable(): any;
 }
 
-export interface IBech32Address { bech32(): string; }
+export interface IAddress { bech32(): string; }

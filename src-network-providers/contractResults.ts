@@ -1,6 +1,6 @@
-import { IBech32Address } from "./interface";
+import { IAddress } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
-import { Bech32Address } from "./primitives";
+import { Address } from "./primitives";
 
 export class ContractResults {
     readonly items: ContractResultItem[];
@@ -28,8 +28,8 @@ export class ContractResultItem {
     hash: string = "";
     nonce: number = 0;
     value: string = "";
-    receiver: IBech32Address = new Bech32Address("");
-    sender: IBech32Address = new Bech32Address("");
+    receiver: IAddress = new Address("");
+    sender: IAddress = new Address("");
     data: string = "";
     previousHash: string = "";
     originalHash: string = "";
@@ -63,8 +63,8 @@ export class ContractResultItem {
         item.hash = response.hash;
         item.nonce = Number(response.nonce || 0);
         item.value = (response.value || 0).toString();
-        item.receiver = new Bech32Address(response.receiver);
-        item.sender = new Bech32Address(response.sender);
+        item.receiver = new Address(response.receiver);
+        item.sender = new Address(response.sender);
         item.previousHash = response.prevTxHash;
         item.originalHash = response.originalTxHash;
         item.gasLimit = Number(response.gasLimit || 0);

@@ -1,10 +1,11 @@
 import * as errors from "../errors";
-import { Balance } from "../balance";
 import { bigIntToBuffer } from "../smartcontracts/codec/utils";
 import { Transaction } from "../transaction";
 import { proto } from "./compiled";
 import {TRANSACTION_OPTIONS_DEFAULT} from "../constants";
 import { Address } from "../address";
+import { ITransactionValue } from "../interface";
+import BigNumber from "bignumber.js";
 
 /**
  * Hides away the serialization complexity, for each type of object (e.g. transactions).
@@ -22,7 +23,7 @@ export class ProtoSerializer {
         let protoTransaction = new proto.Transaction({
             // elrond-go's serializer handles nonce == 0 differently, thus we treat 0 as "undefined".
             Nonce: transaction.getNonce().valueOf() ? transaction.getNonce().valueOf() : undefined,
-            Value: this.serializeBalance(transaction.getValue()),
+            Value: this.serializeTransactionValue(transaction.getValue()),
             RcvAddr: receiverPubkey,
             RcvUserName: null,
             SndAddr: senderPubkey,
@@ -47,8 +48,8 @@ export class ProtoSerializer {
     /**
      * Custom serialization, compatible with elrond-go.
      */
-    private serializeBalance(balance: Balance): Buffer {
-        let value = balance.valueOf();
+    private serializeTransactionValue(transactionValue: ITransactionValue): Buffer {
+        let value = new BigNumber(transactionValue.toString());
         if (value.isZero()) {
             return Buffer.from([0, 0]);
         }

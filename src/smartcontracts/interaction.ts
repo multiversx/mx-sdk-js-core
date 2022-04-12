@@ -9,7 +9,7 @@ import { Nonce } from "../nonce";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
 import { Account } from "../account";
 import { CallArguments } from "./interface";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce } from "../interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITransactionValue } from "../interface";
 import { InteractionChecker } from "./interactionChecker";
 
 /**
@@ -33,7 +33,7 @@ export class Interaction {
     private readonly args: TypedValue[];
 
     private nonce: INonce = new Nonce(0);
-    private value: Balance = Balance.Zero();
+    private value: ITransactionValue = Balance.Zero();
     private gasLimit: IGasLimit = new GasLimit(0);
     private gasPrice: IGasPrice | undefined = undefined;
     private chainID: IChainID = ChainID.unspecified();
@@ -72,7 +72,7 @@ export class Interaction {
         return this.args;
     }
 
-    getValue(): Balance {
+    getValue(): ITransactionValue {
         return this.value;
     }
 
@@ -131,7 +131,7 @@ export class Interaction {
         });
     }
 
-    withValue(value: Balance): Interaction {
+    withValue(value: ITransactionValue): Interaction {
         this.value = value;
         return this;
     }

@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ISignature } from "./interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ISignature, ITransactionValue } from "./interface";
 import { Address } from "./address";
 import { Balance } from "./balance";
 import {
@@ -33,7 +33,7 @@ export class Transaction {
   /**
    * The value to transfer.
    */
-  private value: Balance;
+  private value: ITransactionValue;
 
   /**
    * The address of the sender.
@@ -101,7 +101,7 @@ export class Transaction {
     options,
   }: {
     nonce?: Nonce;
-    value?: Balance;
+    value?: ITransactionValue;
     receiver: IAddress;
     sender?: IAddress;
     gasPrice?: IGasPrice;
@@ -150,11 +150,11 @@ export class Transaction {
     this.nonce = nonce;
   }
 
-  getValue(): Balance {
+  getValue(): ITransactionValue {
     return this.value;
   }
 
-  setValue(value: Balance) {
+  setValue(value: ITransactionValue) {
     this.value = value;
   }
 

@@ -4,6 +4,9 @@ import { ErrInvalidArgument } from "./errors";
 const EGLDTokenIdentifier = "EGLD";
 const EGLDNumDecimals = 18;
 
+// Note: this will actually set the default rounding mode for all BigNumber objects in the environment (in the application / dApp).
+BigNumber.set({ ROUNDING_MODE: 1 });
+
 export class TokenPayment {
     readonly tokenIdentifier: string;
     readonly nonce: number;

@@ -1,7 +1,6 @@
 import { Transaction } from "./transaction";
 import { GasLimit } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
-import { Balance } from "./balance";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { Logger } from "./logger";
 import { assert } from "chai";

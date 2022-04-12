@@ -8,6 +8,7 @@ import { TransactionWatcher } from "../transactionWatcher";
 import { IChainID, IGasLimit } from "../interface";
 import { TestWallet } from "./wallets";
 import axios, { AxiosResponse } from "axios";
+import BigNumber from "bignumber.js";
 
 export async function prepareDeployment(obj: {
     deployer: TestWallet,
@@ -82,4 +83,8 @@ export function isOnBrowserTests() {
 export function setupUnitTestWatcherTimeouts() {
     TransactionWatcher.DefaultPollingInterval = 42;
     TransactionWatcher.DefaultTimeout = 42 * 42;
+}
+
+export function createAccountBalance(egld: number): BigNumber {
+    return new BigNumber(egld.toString() + "0".repeat(18));
 }

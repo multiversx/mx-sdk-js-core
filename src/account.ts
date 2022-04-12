@@ -31,8 +31,8 @@ export class Account {
      * Updates account properties (such as nonce, balance).
      */
     async update(obj: { nonce: INonce, balance: IAccountBalance}) {
-        this.nonce = obj.nonce.valueOf();
-        this.balance = obj.balance.toString();
+        this.nonce = obj.nonce;
+        this.balance = obj.balance;
     }
 
     /**

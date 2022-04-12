@@ -18,7 +18,6 @@ import { Nonce } from "../nonce";
 import { ReturnCode } from "./returnCode";
 import BigNumber from "bignumber.js";
 import { BytesValue } from "./typesystem/bytes";
-import { Token, TokenType } from "../token";
 import { TokenPayment } from "../tokenPayment";
 import { ContractQueryResponse } from "@elrondnetwork/erdjs-network-providers";
 

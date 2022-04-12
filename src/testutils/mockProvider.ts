@@ -2,12 +2,12 @@ import { IAddress } from "../interface";
 import { Transaction, TransactionHash } from "../transaction";
 import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
-import { Balance } from "../balance";
 import * as errors from "../errors";
 import { Query } from "../smartcontracts/query";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
 import { ErrMock } from "../errors";
 import { AccountOnNetwork, ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "@elrondnetwork/erdjs-network-providers";
+import { createAccountBalance } from "./utils";
 
 export class MockProvider {
     static AddressOfAlice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -26,15 +26,15 @@ export class MockProvider {
 
         this.accounts.set(
             MockProvider.AddressOfAlice.bech32(),
-            new AccountOnNetwork({ nonce: 0, balance: Balance.egld(1000).toString() })
+            new AccountOnNetwork({ nonce: 0, balance: createAccountBalance(1000).toString() })
         );
         this.accounts.set(
             MockProvider.AddressOfBob.bech32(),
-            new AccountOnNetwork({ nonce: 5, balance: Balance.egld(500).toString() })
+            new AccountOnNetwork({ nonce: 5, balance: createAccountBalance(500).toString() })
         );
         this.accounts.set(
             MockProvider.AddressOfCarol.bech32(),
-            new AccountOnNetwork({ nonce: 42, balance: Balance.egld(300).toString() })
+            new AccountOnNetwork({ nonce: 42, balance: createAccountBalance(300).toString() })
         );
     }
 

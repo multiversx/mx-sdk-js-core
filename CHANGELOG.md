@@ -5,7 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## Unreleased
- - [Breaking changes: cleanup and minor improvements prior release (step 1)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/190)
+ - [TokenPayment instead of Balance, where applicable](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/193)
 
 ## 10.0.0-alpha.5
  - [Breaking change: adjustements to transaction awaitening and completion, transaction watcher](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/173)
@@ -24,7 +24,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - [Remove SmartContractController (downgraded to a mere test utility)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/188)
  - [Breaking changes: cleanup and minor improvements prior release (step 1)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/190)
  - [Breaking changes: cleanup and minor improvements prior release (step 2)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/191)
- - [TokenPayment instead of Balance, where applicable](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/193)
 
  **Breaking changes**
  - Removed utility functions: `transaction.awaitExecuted()`, `transaction.awaitPending()`. `TransactionWatcher` should be used directly, instead.

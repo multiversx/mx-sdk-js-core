@@ -1,4 +1,3 @@
-import { Balance } from "../balance";
 import { Address } from "../address";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
@@ -111,7 +110,7 @@ export class SmartContract implements ISmartContract {
     deploy({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
-        value = value || Balance.Zero();
+        value = value || 0;
 
         let payload = TransactionPayload.contractDeploy()
             .setCode(code)
@@ -139,7 +138,7 @@ export class SmartContract implements ISmartContract {
 
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
-        value = value || Balance.Zero();
+        value = value || 0;
 
         let payload = TransactionPayload.contractUpgrade()
             .setCode(code)
@@ -166,7 +165,7 @@ export class SmartContract implements ISmartContract {
         this.ensureHasAddress();
 
         args = args || [];
-        value = value || Balance.Zero();
+        value = value || 0;
 
         let payload = TransactionPayload.contractCall()
             .setFunction(func)

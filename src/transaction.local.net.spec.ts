@@ -8,6 +8,7 @@ import { assert } from "chai";
 import { TransactionWatcher } from "./transactionWatcher";
 import { createLocalnetProvider } from "./testutils/networkProviders";
 import { TokenPayment } from "./tokenPayment";
+import BigNumber from "bignumber.js";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;
@@ -26,18 +27,18 @@ describe("test transaction", function () {
         await alice.sync(provider);
 
         await bob.sync(provider);
-        let initialBalanceOfBob = Balance.fromString(bob.account.balance.toString());
+        let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
 
         let transactionOne = new Transaction({
             receiver: bob.address,
-            value: TokenPayment.egldWithRationalNumber(42),
+            value: TokenPayment.egldFromAmount(42),
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID
         });
 
         let transactionTwo = new Transaction({
             receiver: bob.address,
-            value: TokenPayment.egldWithRationalNumber(43),
+            value: TokenPayment.egldFromAmount(43),
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID
         });
@@ -56,9 +57,9 @@ describe("test transaction", function () {
         await watcher.awaitCompleted(transactionTwo);
 
         await bob.sync(provider);
-        let newBalanceOfBob = Balance.fromString(bob.account.balance.toString());
+        let newBalanceOfBob = new BigNumber(bob.account.balance.toString());
 
-        assert.deepEqual(TokenPayment.egldWithRationalNumber(85), newBalanceOfBob.valueOf().minus(initialBalanceOfBob.valueOf()));
+        assert.deepEqual(TokenPayment.egldFromAmount(85).valueOf(), newBalanceOfBob.minus(initialBalanceOfBob));
     });
 
     it("should simulate transactions", async function () {

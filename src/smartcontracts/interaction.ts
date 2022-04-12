@@ -267,7 +267,7 @@ class TokenTransfersWithinInteraction {
 
     private getTypedTokenQuantity(transfer: ITokenPayment): TypedValue {
         // For NFTs, this will be 1.
-        return new BigUIntValue(transfer.amountAsAtoms);
+        return new BigUIntValue(transfer.amountAsBigInteger);
     }
 
     private getTypedTokensReceiver(): TypedValue {

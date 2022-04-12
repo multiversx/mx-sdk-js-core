@@ -20,5 +20,5 @@ export interface IGasPrice { valueOf(): number; }
 export interface ITokenPayment {
     readonly tokenIdentifier: string;
     readonly nonce: number;
-    readonly amountAsAtoms: BigNumber;
+    readonly amountAsBigInteger: BigNumber;
 }

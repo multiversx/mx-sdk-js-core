@@ -178,12 +178,10 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         for (const collection of collections) {
             let apiResponse = await apiProvider.getDefinitionOfTokenCollection(collection);
+            let proxyResponse = await proxyProvider.getDefinitionOfTokenCollection(collection);
 
             assert.equal(apiResponse.collection, collection);
-
-            // TODO: Uncomment after implementing the function in the proxy provider.
-            // let proxyResponse = await proxyProvider.getDefinitionOfTokenCollection(identifier);
-            // assert.deepEqual(apiResponse, proxyResponse);
+            assert.deepEqual(apiResponse, proxyResponse);
         }
     });
 

@@ -48,7 +48,7 @@ export class DefinitionOfFungibleTokenOnNetwork {
         let result = new DefinitionOfFungibleTokenOnNetwork();
 
         let [tokenName, _tokenType, owner, supply, ...propertiesBuffers] = data;
-        let properties = this.parseTokenProperties(propertiesBuffers);
+        let properties = parseTokenProperties(propertiesBuffers);
 
         result.identifier = identifier;
         result.name = tokenName.toString();
@@ -67,26 +67,6 @@ export class DefinitionOfFungibleTokenOnNetwork {
 
         return result;
     }
-
-    private static parseTokenProperties(propertiesBuffers: Buffer[]): Record<string, any> {
-        let properties: Record<string, any> = {};
-
-        for (let buffer of propertiesBuffers) {
-            let [name, value] = buffer.toString().split("-");
-            properties[name] = this.parseValueOfTokenProperty(value);
-        }
-
-        return properties;
-    }
-
-    // This only handles booleans and numbers.
-    private static parseValueOfTokenProperty(value: string): any {
-        switch (value) {
-            case "true": return true;
-            case "false": return false;
-            default: return new BigNumber(value);
-        }
-    }
 }
 
 export class DefinitionOfTokenCollectionOnNetwork {
@@ -99,7 +79,7 @@ export class DefinitionOfTokenCollectionOnNetwork {
     canPause: boolean = false;
     canFreeze: boolean = false;
     canWipe: boolean = false;
-    canTransferRole: boolean = false;
+    canTransferNftCreateRole: boolean = false;
 
     static fromApiHttpResponse(payload: any): DefinitionOfTokenCollectionOnNetwork {
         let result = new DefinitionOfTokenCollectionOnNetwork();
@@ -113,8 +93,53 @@ export class DefinitionOfTokenCollectionOnNetwork {
         result.canPause = payload.canPause || false;
         result.canFreeze = payload.canFreeze || false;
         result.canWipe = payload.canWipe || false;
-        result.canTransferRole = payload.canTransferRole || false;
+        result.canTransferNftCreateRole = payload.canTransferNftCreateRole || false;
 
         return result;
+    }
+
+    /**
+     * The implementation has been moved here from the following location:
+     * https://github.com/ElrondNetwork/elrond-sdk-erdjs/blob/release/v9/src/token.ts
+     */
+     static fromResponseOfGetTokenProperties(collection: string, data: Buffer[]): DefinitionOfTokenCollectionOnNetwork {
+        let result = new DefinitionOfTokenCollectionOnNetwork();
+
+        let [tokenName, tokenType, owner, _, __, ...propertiesBuffers] = data;
+        let properties = parseTokenProperties(propertiesBuffers);
+
+        result.collection = collection;
+        result.type = tokenType.toString();
+        result.name = tokenName.toString();
+        result.ticker = collection;
+        result.owner = Address.fromPubkey(owner);
+        result.decimals = properties.NumDecimals.toNumber();
+        result.canPause = properties.CanPause;
+        result.canFreeze = properties.CanFreeze;
+        result.canWipe = properties.CanWipe;
+        result.canTransferNftCreateRole = properties.CanTransferNFTCreateRole;
+
+        return result;
+    }
+}
+
+// Token properties have the following format: {PropertyName}-{PropertyValue}.
+function parseTokenProperties(propertiesBuffers: Buffer[]): Record<string, any> {
+    let properties: Record<string, any> = {};
+
+    for (let buffer of propertiesBuffers) {
+        let [name, value] = buffer.toString().split("-");
+        properties[name] = parseValueOfTokenProperty(value);
+    }
+
+    return properties;
+}
+
+// This only handles booleans and numbers.
+function parseValueOfTokenProperty(value: string): any {
+    switch (value) {
+        case "true": return true;
+        case "false": return false;
+        default: return new BigNumber(value);
     }
 }

@@ -140,11 +140,18 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return definition;
     }
 
-    async getDefinitionOfTokenCollection(_collection: string): Promise<DefinitionOfTokenCollectionOnNetwork> {
-        // TODO: Implement wrt.:
-        // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/collections/collection.service.ts
-        // https://docs.elrond.com/developers/esdt-tokens/#get-esdt-token-properties
-        throw new Error("Method not implemented.");
+    async getDefinitionOfTokenCollection(collection: string): Promise<DefinitionOfTokenCollectionOnNetwork> {
+        let encodedCollection = Buffer.from(collection).toString("hex");
+
+        let queryResponse = await this.queryContract({
+            address: EsdtContractAddress,
+            func: "getTokenProperties",
+            getEncodedArguments: () => [encodedCollection]
+        });
+
+        let dataParts = queryResponse.getReturnDataParts();
+        let definition = DefinitionOfTokenCollectionOnNetwork.fromResponseOfGetTokenProperties(collection, dataParts);
+        return definition;
     }
 
     async getNonFungibleToken(_collection: string, _nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork> {

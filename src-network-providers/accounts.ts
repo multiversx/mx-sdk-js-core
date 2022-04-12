@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { IBech32Address } from "./interface";
 import { Bech32Address } from "./primitives";
 
@@ -7,7 +8,7 @@ import { Bech32Address } from "./primitives";
  export class AccountOnNetwork {
     address: IBech32Address = new Bech32Address("");
     nonce: number = 0;
-    balance: string = "";
+    balance: BigNumber = new BigNumber(0);
     code: string = "";
     userName: string = "";
 
@@ -20,7 +21,7 @@ import { Bech32Address } from "./primitives";
 
         result.address = new Bech32Address(payload["address"] || 0);
         result.nonce = Number(payload["nonce"] || 0);
-        result.balance = (payload["balance"] || 0).toString();
+        result.balance = new BigNumber(payload["balance"] || 0);
         result.code = payload["code"] || "";
         result.userName = payload["username"] || "";
 

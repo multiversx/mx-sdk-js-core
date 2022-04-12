@@ -16,11 +16,10 @@ import { ChainID, GasLimit } from "../networkParams";
 import { ContractFunction } from "./function";
 import { Nonce } from "../nonce";
 import { ReturnCode } from "./returnCode";
-import { Balance } from "../balance";
 import BigNumber from "bignumber.js";
 import { BytesValue } from "./typesystem/bytes";
 import { Token, TokenType } from "../token";
-import { createBalanceBuilder } from "../balanceBuilder";
+import { TokenPayment } from "../tokenPayment";
 import { ContractQueryResponse } from "@elrondnetwork/erdjs-network-providers";
 
 describe("test smart contract interactor", function() {
@@ -39,13 +38,13 @@ describe("test smart contract interactor", function() {
 
         let transaction = interaction
             .withNonce(new Nonce(7))
-            .withValue(Balance.egld(1))
+            .withValue(TokenPayment.egldWithRationalNumber(1))
             .withGasLimit(new GasLimit(20000000))
             .buildTransaction();
 
         assert.deepEqual(transaction.getReceiver(), dummyAddress);
-        assert.deepEqual(transaction.getValue(), Balance.egld(1));
-        assert.deepEqual(transaction.getNonce(), new Nonce(7));
+        assert.equal(transaction.getValue().toString(), "1000000000000000000");
+        assert.equal(transaction.getNonce(), 7);
         assert.equal(transaction.getGasLimit().valueOf(), 20000000);
     });
 
@@ -54,10 +53,10 @@ describe("test smart contract interactor", function() {
         let dummyFunction = new ContractFunction("dummy");
         let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         
-        const TokenFoo = createBalanceBuilder(new Token({ identifier: "FOO-6ce17b", decimals: 0, type: TokenType.Fungible }));
-        const TokenBar = createBalanceBuilder(new Token({ identifier: "BAR-5bc08f", decimals: 3, type: TokenType.Fungible }));
-        const LKMEX = createBalanceBuilder(new Token({ identifier: "LKMEX-aab910", decimals: 18, type: TokenType.Semifungible }));
-        const Strămoși = createBalanceBuilder(new Token({ identifier: "MOS-b9b4b2", decimals: 0, type: TokenType.Nonfungible }));
+        const TokenFoo = (amount: BigNumber.Value) => TokenPayment.fungibleWithRationalNumber("FOO-6ce17b", amount, 0);
+        const TokenBar = (amount: BigNumber.Value) => TokenPayment.fungibleWithRationalNumber("BAR-5bc08f", amount, 3);
+        const LKMEX = (nonce: number, amount: BigNumber.Value) => TokenPayment.metaEsdtWithRationalNumber("LKMEX-aab910", nonce, amount, 18);
+        const Strămoși = (nonce: number) => TokenPayment.nonFungible("MOS-b9b4b2", nonce);
 
         const hexFoo = "464f4f2d366365313762";
         const hexBar = "4241522d356263303866";
@@ -68,21 +67,21 @@ describe("test smart contract interactor", function() {
 
         // ESDT, single
         let transaction = new Interaction(contract, dummyFunction, [])
-            .withSingleESDTTransfer(TokenFoo("10"))
+            .withSingleESDTTransfer(TokenFoo(10))
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `ESDTTransfer@${hexFoo}@0a@${hexDummyFunction}`);
 
         // Meta ESDT (special SFT), single
         transaction = new Interaction(contract, dummyFunction, [])
-            .withSingleESDTNFTTransfer(LKMEX.nonce(123456).value(123.456), alice)
+            .withSingleESDTNFTTransfer(LKMEX(123456, 123.456), alice)
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`);
 
         // NFT, single
         transaction = new Interaction(contract, dummyFunction, [])
-            .withSingleESDTNFTTransfer(Strămoși.nonce(1).one(), alice)
+            .withSingleESDTNFTTransfer(Strămoși(1), alice)
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexStrămoși}@01@01@${hexContractAddress}@${hexDummyFunction}`);
@@ -96,7 +95,7 @@ describe("test smart contract interactor", function() {
 
         // NFT, multiple
         transaction = new Interaction(contract, dummyFunction, [])
-            .withMultiESDTNFTTransfer([Strămoși.nonce(1).one(), Strămoși.nonce(42).one()], alice)
+            .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)], alice)
             .buildTransaction();
         
         assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexStrămoși}@01@01@${hexStrămoși}@2a@01@${hexDummyFunction}`);

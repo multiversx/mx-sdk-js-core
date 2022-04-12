@@ -1,15 +1,13 @@
-import { Balance } from "../balance";
-import { ChainID, GasLimit } from "../networkParams";
+import { ChainID } from "../networkParams";
 import { Transaction } from "../transaction";
 import { Query } from "./query";
 import { ContractFunction } from "./function";
 import { Address } from "../address";
 import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
-import { Nonce } from "../nonce";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
 import { Account } from "../account";
 import { CallArguments } from "./interface";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITransactionValue } from "../interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenPayment, ITransactionValue } from "../interface";
 import { InteractionChecker } from "./interactionChecker";
 
 /**
@@ -32,9 +30,9 @@ export class Interaction {
     private readonly function: ContractFunction;
     private readonly args: TypedValue[];
 
-    private nonce: INonce = new Nonce(0);
-    private value: ITransactionValue = Balance.Zero();
-    private gasLimit: IGasLimit = new GasLimit(0);
+    private nonce: INonce = 0;
+    private value: ITransactionValue = "0";
+    private gasLimit: IGasLimit = 0;
     private gasPrice: IGasPrice | undefined = undefined;
     private chainID: IChainID = ChainID.unspecified();
     private querent: IAddress = new Address();
@@ -76,7 +74,7 @@ export class Interaction {
         return this.value;
     }
 
-    getTokenTransfers(): Balance[] {
+    getTokenTransfers(): ITokenPayment[] {
         return this.tokenTransfers.getTransfers();
     }
 
@@ -136,20 +134,20 @@ export class Interaction {
         return this;
     }
 
-    withSingleESDTTransfer(transfer: Balance): Interaction {
+    withSingleESDTTransfer(transfer: ITokenPayment): Interaction {
         this.isWithSingleESDTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction([transfer], this);
         return this;
     }
 
-    withSingleESDTNFTTransfer(transfer: Balance, sender: IAddress) {
+    withSingleESDTNFTTransfer(transfer: ITokenPayment, sender: IAddress) {
         this.isWithSingleESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction([transfer], this);
         this.tokenTransfersSender = sender;
         return this;
     }
 
-    withMultiESDTNFTTransfer(transfers: Balance[], sender: IAddress) {
+    withMultiESDTNFTTransfer(transfers: ITokenPayment[], sender: IAddress) {
         this.isWithMultiESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction(transfers, this);
         this.tokenTransfersSender = sender;
@@ -198,10 +196,10 @@ export class Interaction {
 }
 
 class TokenTransfersWithinInteraction {
-    private readonly transfers: Balance[];
+    private readonly transfers: ITokenPayment[];
     private readonly interaction: Interaction;
 
-    constructor(transfers: Balance[], interaction: Interaction) {
+    constructor(transfers: ITokenPayment[], interaction: Interaction) {
         this.transfers = transfers;
         this.interaction = interaction;
     }
@@ -256,20 +254,20 @@ class TokenTransfersWithinInteraction {
         return new U8Value(this.transfers.length);
     }
 
-    private getTypedTokenIdentifier(transfer: Balance): TypedValue {
+    private getTypedTokenIdentifier(transfer: ITokenPayment): TypedValue {
         // Important: for NFTs, this has to be the "collection" name, actually.
         // We will reconsider adding the field "collection" on "Token" upon merging "ApiProvider" and "ProxyProvider".
-        return BytesValue.fromUTF8(transfer.token.getTokenIdentifier());
+        return BytesValue.fromUTF8(transfer.tokenIdentifier);
     }
 
-    private getTypedTokenNonce(transfer: Balance): TypedValue {
+    private getTypedTokenNonce(transfer: ITokenPayment): TypedValue {
         // The token nonce (creation nonce)
-        return new U64Value(transfer.getNonce())
+        return new U64Value(transfer.nonce);
     }
 
-    private getTypedTokenQuantity(transfer: Balance): TypedValue {
+    private getTypedTokenQuantity(transfer: ITokenPayment): TypedValue {
         // For NFTs, this will be 1.
-        return new BigUIntValue(transfer.valueOf());
+        return new BigUIntValue(transfer.amountAsAtoms);
     }
 
     private getTypedTokensReceiver(): TypedValue {

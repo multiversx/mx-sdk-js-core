@@ -7,7 +7,7 @@ const EGLDNumDecimals = 18;
 export class TokenPayment {
     readonly tokenIdentifier: string;
     readonly nonce: number;
-    readonly amountAsAtoms: BigNumber;
+    readonly amountAsBigInteger: BigNumber;
     private readonly numDecimals: number;
 
     constructor(tokenIdentifier: string, nonce: number, amountAsAtoms: BigNumber.Value, numDecimals: number) {
@@ -18,26 +18,26 @@ export class TokenPayment {
 
         this.tokenIdentifier = tokenIdentifier;
         this.nonce = nonce;
-        this.amountAsAtoms = amount;
+        this.amountAsBigInteger = amount;
         this.numDecimals = numDecimals;
     }
 
-    static egldWithRationalNumber(amount: BigNumber.Value) {
-        let amountAsAtoms = new BigNumber(amount).shiftedBy(EGLDNumDecimals).decimalPlaces(0);
-        return this.egldWithAtoms(amountAsAtoms);
+    static egldFromRationalNumber(amountAsRationalNumber: BigNumber.Value) {
+        let amountAsAtoms = new BigNumber(amountAsRationalNumber).shiftedBy(EGLDNumDecimals).decimalPlaces(0);
+        return this.egldFromBigInteger(amountAsAtoms);
     }
 
-    static egldWithAtoms(amountAsAtoms: BigNumber.Value) {
-        return new TokenPayment(EGLDTokenIdentifier, 0, amountAsAtoms, EGLDNumDecimals);
+    static egldFromBigInteger(amountAsBigInteger: BigNumber.Value) {
+        return new TokenPayment(EGLDTokenIdentifier, 0, amountAsBigInteger, EGLDNumDecimals);
     }
 
-    static fungibleWithRationalNumber(tokenIdentifier: string, amount: BigNumber.Value, numDecimals: number = 0): TokenPayment {
-        let amountAsAtoms = new BigNumber(amount).shiftedBy(numDecimals).decimalPlaces(0);
-        return this.fungibleWithAtoms(tokenIdentifier, amountAsAtoms, numDecimals);
+    static fungibleFromRationalNumber(tokenIdentifier: string, amountAsRationalNumber: BigNumber.Value, numDecimals: number = 0): TokenPayment {
+        let amountAsAtoms = new BigNumber(amountAsRationalNumber).shiftedBy(numDecimals).decimalPlaces(0);
+        return this.fungibleFromBigInteger(tokenIdentifier, amountAsAtoms, numDecimals);
     }
 
-    static fungibleWithAtoms(tokenIdentifier: string, amountAsAtoms: BigNumber.Value, numDecimals: number = 0): TokenPayment {
-        return new TokenPayment(tokenIdentifier, 0, amountAsAtoms, numDecimals);
+    static fungibleFromBigInteger(tokenIdentifier: string, amountAsBigInteger: BigNumber.Value, numDecimals: number = 0): TokenPayment {
+        return new TokenPayment(tokenIdentifier, 0, amountAsBigInteger, numDecimals);
     }
 
     static nonFungible(tokenIdentifier: string, nonce: number) {
@@ -48,17 +48,17 @@ export class TokenPayment {
         return new TokenPayment(tokenIdentifier, nonce, quantity, 0);
     }
 
-    static metaEsdtWithRationalNumber(tokenIdentifier: string, nonce: number, amount: BigNumber.Value, numDecimals = 0) {
-        let amountAsAtoms = new BigNumber(amount).shiftedBy(numDecimals).decimalPlaces(0);
-        return this.metaEsdtWithAtoms(tokenIdentifier, nonce, amountAsAtoms, numDecimals);
+    static metaEsdtFromRationalNumber(tokenIdentifier: string, nonce: number, amountAsRationalNumber: BigNumber.Value, numDecimals = 0) {
+        let amountAsAtoms = new BigNumber(amountAsRationalNumber).shiftedBy(numDecimals).decimalPlaces(0);
+        return this.metaEsdtFromBigInteger(tokenIdentifier, nonce, amountAsAtoms, numDecimals);
     }
 
-    static metaEsdtWithAtoms(tokenIdentifier: string, nonce: number, amountAsAtoms: BigNumber.Value, numDecimals = 0) {
-        return new TokenPayment(tokenIdentifier, nonce, amountAsAtoms, numDecimals);
+    static metaEsdtFromBigInteger(tokenIdentifier: string, nonce: number, amountAsBigInteger: BigNumber.Value, numDecimals = 0) {
+        return new TokenPayment(tokenIdentifier, nonce, amountAsBigInteger, numDecimals);
     }
 
     toString() {
-        return this.amountAsAtoms.toFixed(0);
+        return this.amountAsBigInteger.toFixed(0);
     }
 
     toPrettyString() {
@@ -66,7 +66,7 @@ export class TokenPayment {
     }
 
     toRationalNumber() {
-        return this.amountAsAtoms.shiftedBy(-this.numDecimals).toFixed(this.numDecimals);
+        return this.amountAsBigInteger.shiftedBy(-this.numDecimals).toFixed(this.numDecimals);
     }
 
     isEgld() {

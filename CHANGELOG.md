@@ -24,6 +24,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - [Remove SmartContractController (downgraded to a mere test utility)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/188)
  - [Breaking changes: cleanup and minor improvements prior release (step 1)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/190)
  - [Breaking changes: cleanup and minor improvements prior release (step 2)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/191)
+ - [TokenPayment instead of Balance, where applicable](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/193)
 
  **Breaking changes**
  - Removed utility functions: `transaction.awaitExecuted()`, `transaction.awaitPending()`. `TransactionWatcher` should be used directly, instead.
@@ -52,6 +53,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Removed not used interfaces (e.g. `ISignable` is not needed in erdjs, but in walletcore).
  - Removed `interaction.getContract()`. Add `interaction.getContractAddress()`.
  - Remove `interaction.withGasLimitComponents()`. Not so helpful anymore (since `NetworkConfig` isn't a singleton anymore).
+ - `TokenPayment` should be used instead of `Balance`, where applicable.
 
 ## [10.0.0-beta.3]
  - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)

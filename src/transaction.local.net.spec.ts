@@ -73,7 +73,7 @@ describe("test transaction", function () {
             data: new TransactionPayload("helloWorld"),
             gasLimit: new GasLimit(70000),
             receiver: alice.address,
-            value: Balance.egld(1000),
+            value: TokenPayment.egldFromAmount(1000),
             chainID: network.ChainID
         });
 
@@ -81,7 +81,7 @@ describe("test transaction", function () {
             data: new TransactionPayload("helloWorld"),
             gasLimit: new GasLimit(70000),
             receiver: alice.address,
-            value: Balance.egld(1000000),
+            value: TokenPayment.egldFromAmount(1000000),
             chainID: network.ChainID
         });
 

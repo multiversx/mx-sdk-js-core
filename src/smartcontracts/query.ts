@@ -1,5 +1,4 @@
 import { ContractFunction } from "./function";
-import { Balance } from "../balance";
 import { Address } from "../address";
 import { TypedValue } from "./typesystem";
 import { ArgSerializer } from "./argSerializer";
@@ -23,7 +22,7 @@ export class Query {
         this.address = obj.address;
         this.func = obj.func;
         this.args = obj.args || [];
-        this.value = obj.value || Balance.Zero();
+        this.value = obj.value || 0;
     }
 
     getEncodedArguments(): string[] {

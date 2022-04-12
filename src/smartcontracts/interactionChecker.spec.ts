@@ -7,8 +7,8 @@ import { SmartContractAbi } from "./abi";
 import { Address } from "../address";
 import { assert } from "chai";
 import { Interaction } from "./interaction";
-import { Balance } from "../balance";
 import { BytesValue } from "./typesystem/bytes";
+import { TokenPayment } from "../tokenPayment";
 
 describe("integration tests: test checker within interactor", function () {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");
@@ -22,7 +22,7 @@ describe("integration tests: test checker within interactor", function () {
 
         // Send value to non-payable
         assert.throw(() => {
-            let interaction = (<Interaction>contract.methods.getUltimateAnswer()).withValue(Balance.egld(1));
+            let interaction = (<Interaction>contract.methods.getUltimateAnswer()).withValue(TokenPayment.egldFromAmount(1));
             checker.checkInteraction(interaction, endpoint);
         }, errors.ErrContractInteraction, "cannot send EGLD value to non-payable");
 
@@ -42,7 +42,7 @@ describe("integration tests: test checker within interactor", function () {
         assert.throw(() => {
             contract.methods.start([
                 "lucky",
-                Balance.egld(1)
+                TokenPayment.egldFromAmount(1)
             ]);
         }, Error, "Wrong number of arguments for endpoint start: expected between 8 and 9 arguments, have 2");
 

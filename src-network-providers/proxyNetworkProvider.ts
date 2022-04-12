@@ -13,6 +13,7 @@ import { NetworkStatus } from "./networkStatus";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { ContractQueryRequest } from "./contractQueryRequest";
+import { EsdtContractAddress } from "./constants";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ProxyNetworkProvider implements INetworkProvider {
@@ -125,10 +126,18 @@ export class ProxyNetworkProvider implements INetworkProvider {
         }
     }
 
-    async getDefinitionOfFungibleToken(_tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
-        // TODO: Implement wrt.:
-        // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/esdt/esdt.service.ts#L221
-        throw new Error("Method not implemented.");
+    async getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
+        let encodedTokenIdentifier = Buffer.from(tokenIdentifier).toString("hex");
+
+        let queryResponse = await this.queryContract({
+            address: EsdtContractAddress,
+            func: "getTokenProperties",
+            getEncodedArguments: () => [encodedTokenIdentifier]
+        });
+
+        let dataParts = queryResponse.getReturnDataParts();
+        let definition = DefinitionOfFungibleTokenOnNetwork.fromResponseOfGetTokenProperties(tokenIdentifier, dataParts);
+        return definition;
     }
 
     async getDefinitionOfTokenCollection(_collection: string): Promise<DefinitionOfTokenCollectionOnNetwork> {

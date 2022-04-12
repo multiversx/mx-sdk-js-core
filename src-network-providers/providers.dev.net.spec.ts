@@ -164,12 +164,10 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         for (const identifier of identifiers) {
             let apiResponse = await apiProvider.getDefinitionOfFungibleToken(identifier);
+            let proxyResponse = await proxyProvider.getDefinitionOfFungibleToken(identifier);
 
             assert.equal(apiResponse.identifier, identifier);
-
-            // TODO: Uncomment after implementing the function in the proxy provider.
-            // let proxyResponse = await proxyProvider.getDefinitionOfFungibleToken(identifier);
-            // assert.deepEqual(apiResponse, proxyResponse);
+            assert.deepEqual(apiResponse, proxyResponse);
         }
     });
 

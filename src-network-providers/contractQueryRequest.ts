@@ -11,9 +11,9 @@ export class ContractQueryRequest {
         let request: any = {};
         let query = this.query;
         request.scAddress = query.address.bech32();
-        request.caller = query.caller.bech32() ? query.caller.bech32() : undefined;
+        request.caller = query.caller?.bech32() ? query.caller.bech32() : undefined;
         request.funcName = query.func.toString();
-        request.value = query.value.toString();
+        request.value = query.value ? query.value.toString() : undefined;
         request.args = query.getEncodedArguments();
         
         return request;

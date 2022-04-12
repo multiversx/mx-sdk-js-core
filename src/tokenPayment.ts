@@ -57,8 +57,12 @@ export class TokenPayment {
         return new TokenPayment(tokenIdentifier, nonce, amountAsAtoms, numDecimals);
     }
 
-    toString() {
+    toString(): string {
         return this.amountAsAtoms.toFixed(0);
+    }
+
+    valueOf(): BigNumber {
+        return this.amountAsAtoms;
     }
 
     toPrettyString() {

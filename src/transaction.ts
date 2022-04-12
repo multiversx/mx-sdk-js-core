@@ -100,7 +100,7 @@ export class Transaction {
     version,
     options,
   }: {
-    nonce?: Nonce;
+    nonce?: INonce;
     value?: ITransactionValue;
     receiver: IAddress;
     sender?: IAddress;
@@ -111,7 +111,7 @@ export class Transaction {
     version?: TransactionVersion;
     options?: TransactionOptions;
   }) {
-    this.nonce = nonce || new Nonce(0);
+    this.nonce = nonce || 0;
     this.value = value || Balance.Zero();
     this.sender = sender || Address.Zero();
     this.receiver = receiver;

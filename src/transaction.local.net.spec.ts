@@ -7,6 +7,7 @@ import { Logger } from "./logger";
 import { assert } from "chai";
 import { TransactionWatcher } from "./transactionWatcher";
 import { createLocalnetProvider } from "./testutils/networkProviders";
+import { TokenPayment } from "./tokenPayment";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;
@@ -29,14 +30,14 @@ describe("test transaction", function () {
 
         let transactionOne = new Transaction({
             receiver: bob.address,
-            value: Balance.egld(42),
+            value: TokenPayment.egldWithRationalNumber(42),
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID
         });
 
         let transactionTwo = new Transaction({
             receiver: bob.address,
-            value: Balance.egld(43),
+            value: TokenPayment.egldWithRationalNumber(43),
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID
         });
@@ -57,7 +58,7 @@ describe("test transaction", function () {
         await bob.sync(provider);
         let newBalanceOfBob = Balance.fromString(bob.account.balance.toString());
 
-        assert.deepEqual(Balance.egld(85).valueOf(), newBalanceOfBob.valueOf().minus(initialBalanceOfBob.valueOf()));
+        assert.deepEqual(TokenPayment.egldWithRationalNumber(85), newBalanceOfBob.valueOf().minus(initialBalanceOfBob.valueOf()));
     });
 
     it("should simulate transactions", async function () {

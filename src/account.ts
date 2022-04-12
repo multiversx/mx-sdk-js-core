@@ -1,7 +1,4 @@
 import { Address } from "./address";
-import { Nonce } from "./nonce";
-import { Balance } from "./balance";
-import { Egld } from "./balanceBuilder";
 import { IAccountBalance, IAddress, INonce } from "./interface";
 
 /**
@@ -16,12 +13,12 @@ export class Account {
     /**
      * The nonce of the account (the account sequence number).
      */
-    nonce: Nonce = new Nonce(0);
+    nonce: INonce = 0;
 
     /**
      * The balance of the account.
      */
-    balance: IAccountBalance = Egld("0");
+    balance: IAccountBalance = "0";
 
     /**
      * Creates an account object from an address
@@ -34,23 +31,23 @@ export class Account {
      * Updates account properties (such as nonce, balance).
      */
     async update(obj: { nonce: INonce, balance: IAccountBalance}) {
-        this.nonce = new Nonce(obj.nonce.valueOf());
-        this.balance = Balance.fromString(obj.balance.toString());
+        this.nonce = obj.nonce.valueOf();
+        this.balance = obj.balance.toString();
     }
 
     /**
      * Increments (locally) the nonce (the account sequence number).
      */
     incrementNonce() {
-        this.nonce = this.nonce.increment();
+        this.nonce = this.nonce.valueOf() + 1;
     }
 
     /**
      * Gets then increments (locally) the nonce (the account sequence number).
      */
-    getNonceThenIncrement(): Nonce {
+    getNonceThenIncrement(): INonce {
         let nonce = this.nonce;
-        this.nonce = this.nonce.increment();
+        this.nonce = this.nonce.valueOf() + 1;
         return nonce;
     }
 

@@ -1,12 +1,13 @@
 import { Transaction } from "./transaction";
 import { GasLimit } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
-import { Balance } from "./balance";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { Logger } from "./logger";
 import { assert } from "chai";
 import { TransactionWatcher } from "./transactionWatcher";
 import { createLocalnetProvider } from "./testutils/networkProviders";
+import { TokenPayment } from "./tokenPayment";
+import BigNumber from "bignumber.js";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;
@@ -25,18 +26,18 @@ describe("test transaction", function () {
         await alice.sync(provider);
 
         await bob.sync(provider);
-        let initialBalanceOfBob = Balance.fromString(bob.account.balance.toString());
+        let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
 
         let transactionOne = new Transaction({
             receiver: bob.address,
-            value: Balance.egld(42),
+            value: TokenPayment.egldFromAmount(42),
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID
         });
 
         let transactionTwo = new Transaction({
             receiver: bob.address,
-            value: Balance.egld(43),
+            value: TokenPayment.egldFromAmount(43),
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID
         });
@@ -55,9 +56,9 @@ describe("test transaction", function () {
         await watcher.awaitCompleted(transactionTwo);
 
         await bob.sync(provider);
-        let newBalanceOfBob = Balance.fromString(bob.account.balance.toString());
+        let newBalanceOfBob = new BigNumber(bob.account.balance.toString());
 
-        assert.deepEqual(Balance.egld(85).valueOf(), newBalanceOfBob.valueOf().minus(initialBalanceOfBob.valueOf()));
+        assert.deepEqual(TokenPayment.egldFromAmount(85).valueOf(), newBalanceOfBob.minus(initialBalanceOfBob));
     });
 
     it("should simulate transactions", async function () {
@@ -71,7 +72,7 @@ describe("test transaction", function () {
             data: new TransactionPayload("helloWorld"),
             gasLimit: new GasLimit(70000),
             receiver: alice.address,
-            value: Balance.egld(1000),
+            value: TokenPayment.egldFromAmount(1000),
             chainID: network.ChainID
         });
 
@@ -79,7 +80,7 @@ describe("test transaction", function () {
             data: new TransactionPayload("helloWorld"),
             gasLimit: new GasLimit(70000),
             receiver: alice.address,
-            value: Balance.egld(1000000),
+            value: TokenPayment.egldFromAmount(1000000),
             chainID: network.ChainID
         });
 

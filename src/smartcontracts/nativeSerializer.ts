@@ -2,15 +2,14 @@ import BigNumber from "bignumber.js";
 import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, TokenIdentifierType, TokenIdentifierValue, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
 import { ArgumentErrorContext } from "./argumentErrorContext";
 import { Struct, Field, StructType, Tuple } from "./typesystem";
-import { BalanceBuilder } from "../balanceBuilder";
 import { Address } from "../address";
 import { Code } from "./code";
-import { ErrInvalidArgument, ErrTypeInferenceSystemRequiresRegularJavascriptObjects, ErrTypingSystem } from "../errors";
+import { ErrInvalidArgument, ErrTypeInferenceSystemRequiresRegularJavascriptObjects } from "../errors";
 import { IAddress } from "../interface";
 
 export namespace NativeTypes {
-    export type NativeBuffer = Buffer | string | BalanceBuilder;
-    export type NativeBytes = Code | Buffer | string | BalanceBuilder;
+    export type NativeBuffer = Buffer | string;
+    export type NativeBytes = Code | Buffer | string;
     export type NativeAddress = string | Buffer | IAddress | { getAddress(): IAddress };
 }
 
@@ -220,9 +219,6 @@ export namespace NativeSerializer {
         if (typeof native === "string") {
             return BytesValue.fromUTF8(native);
         }
-        if (((<BalanceBuilder>native).getTokenIdentifier)) {
-            return BytesValue.fromUTF8(native.getTokenIdentifier());
-        }
         errorContext.convertError(native, "BytesValue");
     }
 
@@ -235,9 +231,6 @@ export namespace NativeSerializer {
         }
         if (typeof native === "string") {
             return native;
-        }
-        if (((<BalanceBuilder>native).getTokenIdentifier)) {
-            return native.getTokenIdentifier();
         }
         errorContext.convertError(native, "Buffer");
     }

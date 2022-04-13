@@ -3,8 +3,8 @@ import { Transaction } from "./transaction";
 import { Nonce } from "./nonce";
 import { ChainID, GasLimit, GasPrice, TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
-import { Balance } from "./balance";
 import { loadTestWallets, TestWallet } from "./testutils";
+import { TokenPayment } from "./tokenPayment";
 
 
 describe("test transaction construction", async () => {
@@ -18,8 +18,8 @@ describe("test transaction construction", async () => {
 
     it("with no data, no value", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(89),
-            value: Balance.Zero(),
+            nonce: 89,
+            value: "0",
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
             gasLimit: minGasLimit,
@@ -33,13 +33,13 @@ describe("test transaction construction", async () => {
 
     it("with data, no value", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(90),
-            value: Balance.Zero(),
+            nonce: 90,
+            value: "0",
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
             gasLimit: new GasLimit(80000),
             data: new TransactionPayload("hello"),
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         await wallets.alice.signer.sign(transaction);
@@ -50,11 +50,11 @@ describe("test transaction construction", async () => {
     it("with data, with opaque, unused options (the protocol ignores the options when version == 1)", async () => {
         let transaction = new Transaction({
             nonce: new Nonce(89),
-            value: Balance.Zero(),
+            value: "0",
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
             gasLimit: minGasLimit,
-            chainID: new ChainID("local-testnet"),
+            chainID: "local-testnet",
             version: new TransactionVersion(1),
             options: new TransactionOptions(1)
         });
@@ -66,8 +66,8 @@ describe("test transaction construction", async () => {
 
     it("with data, with value", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(91),
-            value: Balance.egld(10),
+            nonce: 91,
+            value: TokenPayment.egldFromAmount(10),
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
             gasLimit: new GasLimit(100000),
@@ -82,8 +82,8 @@ describe("test transaction construction", async () => {
 
     it("with data, with large value", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(92),
-            value: Balance.fromString("123456789000000000000000000000"),
+            nonce: 92,
+            value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
             gasLimit: new GasLimit(100000),
@@ -98,13 +98,13 @@ describe("test transaction construction", async () => {
 
     it("with nonce = 0", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(0),
-            value: Balance.fromString("0"),
+            nonce: 0,
+            value: 0,
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
-            gasLimit: new GasLimit(80000),
+            gasLimit: 80000,
             data: new TransactionPayload("hello"),
-            chainID: new ChainID("local-testnet"),
+            chainID: "local-testnet",
             version: new TransactionVersion(1)
         });
 
@@ -115,12 +115,12 @@ describe("test transaction construction", async () => {
 
     it("without options field, should be omitted", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(89),
-            value: Balance.Zero(),
+            nonce: 89,
+            value: 0,
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
             gasLimit: minGasLimit,
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         await wallets.alice.signer.sign(transaction);
@@ -134,7 +134,7 @@ describe("test transaction construction", async () => {
     it("computes correct fee", () => {
         let transaction = new Transaction({
             nonce: new Nonce(92),
-            value: Balance.fromString("123456789000000000000000000000"),
+            value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
             receiver: wallets.bob.address,
             gasPrice: new GasPrice(500),
             gasLimit: new GasLimit(20),
@@ -155,7 +155,7 @@ describe("test transaction construction", async () => {
     it("computes correct fee with data field", () => {
         let transaction = new Transaction({
             nonce: new Nonce(92),
-            value: Balance.fromString("123456789000000000000000000000"),
+            value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
             receiver: wallets.bob.address,
             data: new TransactionPayload("testdata"),
             gasPrice: new GasPrice(500),

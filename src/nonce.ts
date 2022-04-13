@@ -22,14 +22,7 @@ export class Nonce {
 
         this.value = value;
     }
-
-    /**
-     * Creates a new Nonce object by incrementing the current one.
-     */
-    increment(): Nonce {
-        return new Nonce(this.value + 1);
-    }
-
+    
     hex(): string {
         return numberToPaddedHex(this.value);
     }

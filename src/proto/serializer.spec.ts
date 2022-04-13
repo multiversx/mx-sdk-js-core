@@ -4,9 +4,10 @@ import { Nonce } from "../nonce";
 import { Transaction } from "../transaction";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { Signature } from "../signature";
-import { Balance } from "../balance";
 import { ChainID, GasLimit, GasPrice, TransactionVersion } from "../networkParams";
 import { TransactionPayload } from "../transactionPayload";
+import BigNumber from "bignumber.js";
+import { TokenPayment } from "../tokenPayment";
 
 describe("serialize transactions", () => {
     let wallets: Record<string, TestWallet>;
@@ -19,7 +20,7 @@ describe("serialize transactions", () => {
     it("with no data, no value", async () => {
         let transaction = new Transaction({
             nonce: new Nonce(89),
-            value: Balance.Zero(),
+            value: 0,
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
             gasLimit: new GasLimit(50000),
@@ -35,7 +36,7 @@ describe("serialize transactions", () => {
     it("with data, no value", async () => {
         let transaction = new Transaction({
             nonce: new Nonce(90),
-            value: Balance.Zero(),
+            value: 0,
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
             gasLimit: new GasLimit(80000),
@@ -52,7 +53,7 @@ describe("serialize transactions", () => {
     it("with data, with value", async () => {
         let transaction = new Transaction({
             nonce: new Nonce(91),
-            value: Balance.egld(10),
+            value: TokenPayment.egldFromAmount(10),
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
             gasLimit: new GasLimit(100000),
@@ -69,7 +70,7 @@ describe("serialize transactions", () => {
     it("with data, with large value", async () => {
         let transaction = new Transaction({
             nonce: new Nonce(92),
-            value: Balance.fromString("123456789000000000000000000000"),
+            value: new BigNumber("123456789000000000000000000000"),
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
             gasLimit: new GasLimit(100000),
@@ -86,7 +87,7 @@ describe("serialize transactions", () => {
     it("with nonce = 0", async () => {
         let transaction = new Transaction({
             nonce: new Nonce(0),
-            value: Balance.fromString("0"),
+            value: new BigNumber("0"),
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
             gasLimit: new GasLimit(80000),

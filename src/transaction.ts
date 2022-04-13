@@ -1,7 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ISignature, ITransactionValue } from "./interface";
 import { Address } from "./address";
-import { Balance } from "./balance";
 import {
   ChainID,
   GasLimit,
@@ -100,7 +99,7 @@ export class Transaction {
     version,
     options,
   }: {
-    nonce?: Nonce;
+    nonce?: INonce;
     value?: ITransactionValue;
     receiver: IAddress;
     sender?: IAddress;
@@ -111,8 +110,8 @@ export class Transaction {
     version?: TransactionVersion;
     options?: TransactionOptions;
   }) {
-    this.nonce = nonce || new Nonce(0);
-    this.value = value || Balance.Zero();
+    this.nonce = nonce || 0;
+    this.value = value || 0;
     this.sender = sender || Address.Zero();
     this.receiver = receiver;
     this.gasPrice = gasPrice || GasPrice.min();
@@ -138,7 +137,7 @@ export class Transaction {
    * alice.update(aliceOnNetwork);
    *
    * let tx = new Transaction({
-   *      value: Balance.egld(1),
+   *      value: TokenPayment.egldFromAmount(1),
    *      receiver: bob.address
    * });
    *
@@ -259,7 +258,7 @@ export class Transaction {
   static fromPlainObject(plainObjectTransaction: any): Transaction {
     const tx = new Transaction({
       nonce: new Nonce(plainObjectTransaction.nonce),
-      value: Balance.fromString(plainObjectTransaction.value),
+      value: new BigNumber(plainObjectTransaction.value),
       receiver: Address.fromString(plainObjectTransaction.receiver),
       gasPrice: new GasPrice(plainObjectTransaction.gasPrice),
       gasLimit: new GasLimit(plainObjectTransaction.gasLimit),

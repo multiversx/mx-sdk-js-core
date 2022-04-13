@@ -127,30 +127,27 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
-        let encodedTokenIdentifier = Buffer.from(tokenIdentifier).toString("hex");
-
-        let queryResponse = await this.queryContract({
-            address: EsdtContractAddress,
-            func: "getTokenProperties",
-            getEncodedArguments: () => [encodedTokenIdentifier]
-        });
-
-        let dataParts = queryResponse.getReturnDataParts();
-        let definition = DefinitionOfFungibleTokenOnNetwork.fromResponseOfGetTokenProperties(tokenIdentifier, dataParts);
+        let properties = await this.getTokenProperties(tokenIdentifier);
+        let definition = DefinitionOfFungibleTokenOnNetwork.fromResponseOfGetTokenProperties(tokenIdentifier, properties);
         return definition;
     }
 
-    async getDefinitionOfTokenCollection(collection: string): Promise<DefinitionOfTokenCollectionOnNetwork> {
-        let encodedCollection = Buffer.from(collection).toString("hex");
+    private async getTokenProperties(identifier: string): Promise<Buffer[]> {
+        let encodedIdentifier = Buffer.from(identifier).toString("hex");
 
         let queryResponse = await this.queryContract({
             address: EsdtContractAddress,
             func: "getTokenProperties",
-            getEncodedArguments: () => [encodedCollection]
+            getEncodedArguments: () => [encodedIdentifier]
         });
 
-        let dataParts = queryResponse.getReturnDataParts();
-        let definition = DefinitionOfTokenCollectionOnNetwork.fromResponseOfGetTokenProperties(collection, dataParts);
+        let properties = queryResponse.getReturnDataParts();
+        return properties;
+    }
+
+    async getDefinitionOfTokenCollection(collection: string): Promise<DefinitionOfTokenCollectionOnNetwork> {
+        let properties = await this.getTokenProperties(collection);
+        let definition = DefinitionOfTokenCollectionOnNetwork.fromResponseOfGetTokenProperties(collection, properties);
         return definition;
     }
 

@@ -4,6 +4,7 @@ Elrond SDK for JavaScript and TypeScript (written in TypeScript).
 
 ## Documentation
 
+[Cookbook](https://docs.elrond.com/sdk-and-tools/erdjs/erdjs-cookbook/)
 [TypeDoc](https://elrondnetwork.github.io/elrond-sdk-docs/erdjs/latest)
 
 ## CHANGELOG
@@ -13,64 +14,6 @@ Elrond SDK for JavaScript and TypeScript (written in TypeScript).
 ## Distribution
 
 [npm](https://www.npmjs.com/package/@elrondnetwork/erdjs)
-
-## Usage
-
-The most comprehensive usage examples are captured within the unit and the integration tests. Specifically, in the `*.spec.ts` files of the source code. For example:
-
- - [transaction.local.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/transaction.local.net.spec.ts)
- - [address.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/address.spec.ts)
- - [transactionPayloadBuilders.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/transactionPayloadBuilders.spec.ts)
- - [smartContract.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/smartContract.spec.ts)
- - [smartContract.local.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/smartContract.local.net.spec.ts)
- - [query.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/query.spec.ts)
- - [query.main.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/query.main.net.spec.ts)
-
-For advanced smart contract interaction, using ABIs, please see the following test files:
-
- - [interaction.local.net.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/interaction.local.net.spec.ts) 
- - [abiRegistry.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/typesystem/abiRegistry.spec.ts)
- - [argSerializer.spec.ts](https://github.com/ElrondNetwork/elrond-sdk-erdjs/tree/main/src/smartcontracts/argSerializer.spec.ts) 
-
-### Fetching network parameters
-
-```
-let provider = new ProxyProvider("https://localhost:7950");
-let network = await provider.getNetworkConfig();
-console.log(network.MinGasPrice);
-console.log(network.ChainID);
-```
-
-### Synchronizing an account object
-
-The following snippet fetches (from the Network) the nonce and the balance of an account, and updates the local representation of the account.
-
-```
-let addressOfAlice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-let alice = new Account(addressOfAlice);
-let aliceOnNetwork = await provider.getAccount(addressOfAlice);
-alice.update(aliceOnNetwork);
-
-console.log(alice.nonce);
-console.log(alice.balance);
-```
-
-### Creating value-transfer transactions
-
-```
-await alice.sync(provider);
-
-let tx = new Transaction({
-    data: new TransactionPayload("helloWorld"),
-    gasLimit: new GasLimit(70000),
-    receiver: new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"),
-    value: Balance.egld(1)
-});
-
-tx.setNonce(alice.nonce);
-await signer.sign(tx);
-await provider.sendTransaction(tx);
-```
 
 ### Creating Smart Contract transactions
 
@@ -118,16 +61,6 @@ await Promise.all([watcher.awaitCompleted(tx1), watcher.awaitCompleted(tx2), wat
 ### Managing the sender nonce locally
 
 ```
-let aliceOnNetwork = await provider.getAccount(alice.address);
-alice.update(aliceOnNetwork);
-
-txA.setNonce(alice.nonce);
-alice.incrementNonce();
-txB.setNonce(alice.nonce);
-alice.incrementNonce();
-
-await signer.sign(txA);
-await signer.sign(txB);
 
 await provider.sendTransaction(txA);
 await provider.sendTransaction(txB);

@@ -19,7 +19,7 @@ import { Address } from "./primitives";
     static fromHttpResponse(payload: any): AccountOnNetwork {
         let result = new AccountOnNetwork();
 
-        result.address = new Address(payload["address"] || 0);
+        result.address = new Address(payload["address"] || "");
         result.nonce = Number(payload["nonce"] || 0);
         result.balance = new BigNumber(payload["balance"] || 0);
         result.code = payload["code"] || "";

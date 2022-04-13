@@ -18,4 +18,5 @@ export * from "./utils";
 export * from "./scArgumentsParser";
 export * from "./esdtHelpers";
 export * from "./token";
+export * from "./tokenPayment";
 export * from "./smartcontracts";

@@ -25,7 +25,7 @@ describe("test transaction", function () {
         await alice.sync(provider);
 
         await bob.sync(provider);
-        let initialBalanceOfBob = bob.account.balance;
+        let initialBalanceOfBob = Balance.fromString(bob.account.balance.toString());
 
         let transactionOne = new Transaction({
             receiver: bob.address,
@@ -55,7 +55,7 @@ describe("test transaction", function () {
         await watcher.awaitCompleted(transactionTwo);
 
         await bob.sync(provider);
-        let newBalanceOfBob = bob.account.balance;
+        let newBalanceOfBob = Balance.fromString(bob.account.balance.toString());
 
         assert.deepEqual(Balance.egld(85).valueOf(), newBalanceOfBob.valueOf().minus(initialBalanceOfBob.valueOf()));
     });

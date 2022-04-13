@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { ITransactionOnNetwork } from "./interfaceOfNetwork";
 
 export interface ITransactionFetcher {
@@ -15,3 +16,9 @@ export interface INonce { valueOf(): number; }
 export interface IChainID { valueOf(): string; }
 export interface IGasLimit { valueOf(): number; }
 export interface IGasPrice { valueOf(): number; }
+
+export interface ITokenPayment {
+    readonly tokenIdentifier: string;
+    readonly nonce: number;
+    readonly amountAsBigInteger: BigNumber;
+}

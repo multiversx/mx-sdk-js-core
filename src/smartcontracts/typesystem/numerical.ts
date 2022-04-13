@@ -164,11 +164,11 @@ export class NumericalValue extends PrimitiveValue {
         this.withSign = type.withSign;
 
         if (this.value.isNaN()) {
-            throw new errors.ErrInvalidArgument("value", value, "not a number");
+            throw new errors.ErrInvalidArgument(`not a number: ${value}`);
         }
 
         if (!this.withSign && this.value.isNegative()) {
-            throw new errors.ErrInvalidArgument("value", value.toString(10), "negative, but type is unsigned");
+            throw new errors.ErrInvalidArgument(`negative, but type is unsigned: ${value}`);
         }
     }
 

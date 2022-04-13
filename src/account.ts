@@ -21,7 +21,7 @@ export class Account {
     /**
      * The balance of the account.
      */
-    balance: Balance = Egld("0");
+    balance: IAccountBalance = Egld("0");
 
     /**
      * Creates an account object from an address

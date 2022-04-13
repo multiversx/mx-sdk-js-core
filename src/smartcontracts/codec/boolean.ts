@@ -18,7 +18,7 @@ export class BooleanBinaryCodec {
 
     decodeTopLevel(buffer: Buffer): BooleanValue {
         if (buffer.length > 1) {
-            throw new errors.ErrInvalidArgument("buffer", buffer, "should be a buffer of size <= 1");
+            throw new errors.ErrInvalidArgument("buffer should be of size <= 1");
         }
 
         let firstByte = buffer[0];

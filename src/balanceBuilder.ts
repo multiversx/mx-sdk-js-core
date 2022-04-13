@@ -5,6 +5,7 @@ import { Token, TokenType } from "./token";
 
 /**
  * Creates balances for ESDTs (Fungible, Semi-Fungible (SFT) or Non-Fungible Tokens).
+ * @deprecated: when preparing token transfers, one should use the class "TokenPayment" instead.
  */
 export interface BalanceBuilder {
 
@@ -60,6 +61,9 @@ export interface BalanceBuilder {
     one(): Balance;
 }
 
+/**
+ * @deprecated: when preparing token transfers, one should use the class "TokenPayment" instead.
+ */
 class BalanceBuilderImpl {
     readonly token: Token;
     nonce_: BigNumber | null;
@@ -114,6 +118,9 @@ class BalanceBuilderImpl {
     }
 }
 
+/**
+ * @deprecated: when preparing token transfers, one should use the class "TokenPayment" instead.
+ */
 export function createBalanceBuilder(token: Token): BalanceBuilder {
     let impl = new BalanceBuilderImpl(token);
     let denominated = <BalanceBuilder>impl.value.bind(impl);

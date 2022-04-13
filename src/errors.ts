@@ -63,21 +63,8 @@ export class Err extends Error {
  * Signals invalid arguments for a function, for an operation.
  */
 export class ErrInvalidArgument extends Err {
-  public constructor(
-    name: string,
-    value?: any,
-    reason: string = "not specified",
-    inner?: Error
-  ) {
-    super(ErrInvalidArgument.getMessage(name, value, reason), inner);
-  }
-
-  static getMessage(name: string, value?: any, reason?: string): string {
-    if (value) {
-      return `Invalid argument "${name}": ${value}. Reason: ${reason}`;
-    }
-
-    return `Invalid argument "${name}"`;
+  public constructor(message: string, inner?: Error) {
+    super(`Invalid argument: ${message}`, inner);
   }
 }
 

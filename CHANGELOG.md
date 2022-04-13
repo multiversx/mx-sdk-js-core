@@ -5,8 +5,12 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## Unreleased
+ - TBD
+
+## 10.0.1-beta.1
  - [TokenPayment instead of Balance, where applicable](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/193)
- - [Breaking change: deprecate / remove balance & balance builder](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/194)
+ - [Breaking change: Deprecate / remove balance & balance builder](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/194)
+ - [Breaking change: Deprecate EsdtHelpers in favor of @elrondnetwork/transaction-decoder](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/195/files)
 
 ## 10.0.0-alpha.5
  - [Breaking change: adjustements to transaction awaitening and completion, transaction watcher](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/173)
@@ -55,6 +59,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Remove `interaction.withGasLimitComponents()`. Not so helpful anymore (since `NetworkConfig` isn't a singleton anymore).
  - `TokenPayment` should be used instead of `Balance`, where applicable.
  - Deprecate / remove `Balance` & `BalanceBuilder`. `TokenPayment` / `IAccountBalance` (a simple big number) should be used instead, depending on the purpose.
+ - Deprecated `EsdtHelpers` in favor of `@elrondnetwork/transaction-decoder`.
 
 ## [10.0.0-beta.3]
  - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)

@@ -23,14 +23,16 @@
         "src/**/*"
     ],
     "exclude": [
-        "node_modules",
-        "out",
-        "out-tests",
-        "out-browser",
-        "out-browser-tests",
-        "**/*.spec.ts",
-        "src/testutils",
-        "src/examples",
-        "src/_docs"
-    ]
+    ],
+    "typedocOptions": {
+        "entryPoints": [
+            "./src/_docs/basic.ts",
+            "./src/_docs/smartcontracts.ts",
+            "./src/_docs/errors.ts",
+            "./src/_docs/typesystem.ts",
+            "./src/_docs/codec.ts"
+        ],
+        "excludePrivate": true,
+        "includeVersion": true
+    }
 }

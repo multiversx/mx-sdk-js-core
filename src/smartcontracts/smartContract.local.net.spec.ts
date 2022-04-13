@@ -38,7 +38,7 @@ describe("test on local testnet", function () {
             contract: contract,
             deployer: alice,
             codePath: "src/testdata/counter.wasm",
-            gasLimit: new GasLimit(3000000),
+            gasLimit: 3000000,
             initArguments: [],
             chainID: network.ChainID
         });
@@ -46,7 +46,7 @@ describe("test on local testnet", function () {
         // ++
         let transactionIncrement = contract.call({
             func: new ContractFunction("increment"),
-            gasLimit: new GasLimit(3000000),
+            gasLimit: 3000000,
             chainID: network.ChainID
         });
 
@@ -58,13 +58,13 @@ describe("test on local testnet", function () {
         // Now, let's build a few transactions, to be simulated
         let simulateOne = contract.call({
             func: new ContractFunction("increment"),
-            gasLimit: new GasLimit(100000),
+            gasLimit: 100000,
             chainID: network.ChainID
         });
 
         let simulateTwo = contract.call({
             func: new ContractFunction("foobar"),
-            gasLimit: new GasLimit(500000),
+            gasLimit: 500000,
             chainID: network.ChainID
         });
 

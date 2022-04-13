@@ -36,9 +36,9 @@ describe("test smart contract interactor", function() {
         let interaction = new Interaction(contract, dummyFunction, []);
 
         let transaction = interaction
-            .withNonce(new Nonce(7))
+            .withNonce(7)
             .withValue(TokenPayment.egldFromAmount(1))
-            .withGasLimit(new GasLimit(20000000))
+            .withGasLimit(20000000)
             .buildTransaction();
 
         assert.deepEqual(transaction.getReceiver(), dummyAddress);

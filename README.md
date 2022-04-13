@@ -4,8 +4,8 @@ Elrond SDK for JavaScript and TypeScript (written in TypeScript).
 
 ## Documentation
 
-[Cookbook](https://docs.elrond.com/sdk-and-tools/erdjs/erdjs-cookbook/)
-[TypeDoc](https://elrondnetwork.github.io/elrond-sdk-docs/erdjs/latest)
+ - [Cookbook](https://docs.elrond.com/sdk-and-tools/erdjs/erdjs-cookbook/)
+ - [TypeDoc](https://elrondnetwork.github.io/elrond-sdk-docs/erdjs/latest)
 
 ## CHANGELOG
 
@@ -48,8 +48,6 @@ npm run compile-browser-min
 
 ### Running the tests
 
-#### On NodeJS
-
 In order to run the tests **on NodeJS**, do as follows:
 
 ```
@@ -57,12 +55,9 @@ npm run tests-unit
 npm run tests-localnet
 npm run tests-devnet
 npm run tests-testnet
-npm run tests-mainnet
 ```
 
-#### In the browser
-
-Make sure you have the package `http-server` installed globally.
+Before running the tests **in the browser**, make sure you have the package `http-server` installed globally.
 
 ```
 npm install --global http-server
@@ -73,7 +68,5 @@ In order to run the tests **in the browser**, do as follows:
 ```
 make clean && npm run browser-tests
 ```
-
-#### Notes
 
 For the `localnet` tests, make sure you have a *local testnet* up & running. A *local testnet* can be started from the Elrond IDE or from [erdpy](https://docs.elrond.com/developers/setup-local-testnet/).

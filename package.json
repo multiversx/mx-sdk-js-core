@@ -14,7 +14,6 @@
     "tests-localnet": "mocha $(find . -name '*.local.net.spec.ts')",
     "tests-devnet": "mocha $(find . -name '*.dev.net.spec.ts')",
     "tests-testnet": "mocha $(find . -name '*.test.net.spec.ts')",
-    "tests-mainnet": "mocha $(find . -name '*.main.net.spec.ts')",
     "compile-browser": "tsc -p tsconfig.json && browserify out/index.js -o out-browser/erdjs.js --standalone erdjs -p esmify",
     "compile-browser-min": "tsc -p tsconfig.json && browserify out/index.js -o out-browser/erdjs.min.js --standalone erdjs -p esmify -p tinyify",
     "compile": "tsc -p tsconfig.json",

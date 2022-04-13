@@ -2,16 +2,16 @@ import { assert } from "chai";
 import { INetworkProvider } from "./interface";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
-import { Bech32Address, Nonce } from "./primitives";
+import { Address } from "./primitives";
 import { MockQuery } from "./testscommon/dummyQuery";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 
 describe("test network providers on devnet: Proxy and API", function () {
-    let alice = new Bech32Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-    let bob = new Bech32Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
-    let carol = new Bech32Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
-    let dan = new Bech32Address("erd1kyaqzaprcdnv4luvanah0gfxzzsnpaygsy6pytrexll2urtd05ts9vegu7");
+    let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+    let bob = new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+    let carol = new Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
+    let dan = new Address("erd1kyaqzaprcdnv4luvanah0gfxzzsnpaygsy6pytrexll2urtd05ts9vegu7");
 
     let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.elrond.com", { timeout: 10000 });
     let proxyProvider: INetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.elrond.com", { timeout: 10000 });
@@ -164,12 +164,10 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         for (const identifier of identifiers) {
             let apiResponse = await apiProvider.getDefinitionOfFungibleToken(identifier);
+            let proxyResponse = await proxyProvider.getDefinitionOfFungibleToken(identifier);
 
             assert.equal(apiResponse.identifier, identifier);
-
-            // TODO: Uncomment after implementing the function in the proxy provider.
-            // let proxyResponse = await proxyProvider.getDefinitionOfFungibleToken(identifier);
-            // assert.deepEqual(apiResponse, proxyResponse);
+            assert.deepEqual(apiResponse, proxyResponse);
         }
     });
 
@@ -180,12 +178,10 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         for (const collection of collections) {
             let apiResponse = await apiProvider.getDefinitionOfTokenCollection(collection);
+            let proxyResponse = await proxyProvider.getDefinitionOfTokenCollection(collection);
 
             assert.equal(apiResponse.collection, collection);
-
-            // TODO: Uncomment after implementing the function in the proxy provider.
-            // let proxyResponse = await proxyProvider.getDefinitionOfTokenCollection(identifier);
-            // assert.deepEqual(apiResponse, proxyResponse);
+            assert.deepEqual(apiResponse, proxyResponse);
         }
     });
 
@@ -210,7 +206,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         // Query: get sum (of adder contract)
         let query = new MockQuery({
-            address: new Bech32Address("erd1qqqqqqqqqqqqqpgquykqja5c4v33zdmnwglj3jphqwrelzdn396qlc9g33"),
+            address: new Address("erd1qqqqqqqqqqqqqpgquykqja5c4v33zdmnwglj3jphqwrelzdn396qlc9g33"),
             func: "getSum"
         });
 
@@ -226,7 +222,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         // Query: increment counter
         query = new MockQuery({
-            address: new Bech32Address("erd1qqqqqqqqqqqqqpgqzeq07xvhs5g7cg4ama85upaqarrcgu49396q0gz4yf"),
+            address: new Address("erd1qqqqqqqqqqqqqpgqzeq07xvhs5g7cg4ama85upaqarrcgu49396q0gz4yf"),
             func: "increment",
             args: []
         });
@@ -247,7 +243,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         // Query: issue ESDT
         let query = new MockQuery({
-            address: new Bech32Address("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
+            address: new Address("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
             func: "issue",
             value: "50000000000000000",
             args: [

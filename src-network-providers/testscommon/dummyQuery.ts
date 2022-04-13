@@ -1,9 +1,9 @@
-import { IBech32Address, IContractQuery } from "../interface";
-import { Bech32Address } from "../primitives";
+import { IAddress, IContractQuery } from "../interface";
+import { Address } from "../primitives";
 
 export class MockQuery implements IContractQuery {
-    caller: IBech32Address = new Bech32Address("");
-    address: IBech32Address = new Bech32Address("");
+    caller: IAddress = new Address("");
+    address: IAddress = new Address("");
     func: string = "";
     args: string[] = [];
     value: string = "";

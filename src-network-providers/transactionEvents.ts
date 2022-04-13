@@ -1,8 +1,8 @@
-import { IBech32Address } from "./interface";
-import { Bech32Address } from "./primitives";
+import { IAddress } from "./interface";
+import { Address } from "./primitives";
 
 export class TransactionEvent {
-    address: IBech32Address = new Bech32Address("");
+    address: IAddress = new Address("");
     identifier: string = "";
     topics: TransactionEventTopic[] = [];
     data: string = "";
@@ -18,7 +18,7 @@ export class TransactionEvent {
         data: string
     }): TransactionEvent {
         let result = new TransactionEvent();
-        result.address = new Bech32Address(responsePart.address);
+        result.address = new Address(responsePart.address);
         result.identifier = responsePart.identifier || "";
         result.topics = (responsePart.topics || []).map(topic => new TransactionEventTopic(topic));
         result.data = Buffer.from(responsePart.data || "", "base64").toString();

@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { Transaction } from "./transaction";
-import { ChainID, GasPrice, TransactionOptions, TransactionVersion } from "./networkParams";
+import { ChainID, TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { TokenPayment } from "./tokenPayment";
@@ -9,7 +9,7 @@ import { TokenPayment } from "./tokenPayment";
 describe("test transaction construction", async () => {
     let wallets: Record<string, TestWallet>;
     let minGasLimit = 50000;
-    let minGasPrice = new GasPrice(1000000000);
+    let minGasPrice = 1000000000;
 
     before(async function () {
         wallets = await loadTestWallets();
@@ -135,7 +135,7 @@ describe("test transaction construction", async () => {
             nonce: 92,
             value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
             receiver: wallets.bob.address,
-            gasPrice: new GasPrice(500),
+            gasPrice: 500,
             gasLimit: 20,
             chainID: new ChainID("local-testnet")
         });
@@ -157,7 +157,7 @@ describe("test transaction construction", async () => {
             value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
             receiver: wallets.bob.address,
             data: new TransactionPayload("testdata"),
-            gasPrice: new GasPrice(500),
+            gasPrice: 500,
             gasLimit: 12010,
             chainID: new ChainID("local-testnet")
         });

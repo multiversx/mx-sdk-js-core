@@ -3,7 +3,6 @@ import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ISignature, ITransact
 import { Address } from "./address";
 import {
   ChainID,
-  GasPrice,
   TransactionOptions,
   TransactionVersion,
 } from "./networkParams";
@@ -14,6 +13,7 @@ import * as errors from "./errors";
 import { ProtoSerializer } from "./proto";
 import { Hash } from "./hash";
 import { INetworkConfig } from "./interfaceOfNetwork";
+import { TRANSACTION_MIN_GAS_PRICE } from "./constants";
 
 const createTransactionHasher = require("blake2b");
 const TRANSACTION_HASH_LENGTH = 32;
@@ -112,7 +112,7 @@ export class Transaction {
     this.value = value || 0;
     this.sender = sender || Address.Zero();
     this.receiver = receiver;
-    this.gasPrice = gasPrice || GasPrice.min();
+    this.gasPrice = gasPrice || TRANSACTION_MIN_GAS_PRICE;
     this.gasLimit = gasLimit;
     this.data = data || new TransactionPayload();
     this.chainID = chainID;
@@ -245,7 +245,7 @@ export class Transaction {
       nonce: Number(plainObjectTransaction.nonce),
       value: new BigNumber(plainObjectTransaction.value),
       receiver: Address.fromString(plainObjectTransaction.receiver),
-      gasPrice: new GasPrice(plainObjectTransaction.gasPrice),
+      gasPrice: Number(plainObjectTransaction.gasPrice),
       gasLimit: Number(plainObjectTransaction.gasLimit),
       data: new TransactionPayload(atob(plainObjectTransaction.data)),
       chainID: new ChainID(plainObjectTransaction.chainID),

@@ -3,7 +3,7 @@ import { ProtoSerializer } from "./serializer";
 import { Transaction } from "../transaction";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { Signature } from "../signature";
-import { ChainID, GasPrice, TransactionVersion } from "../networkParams";
+import { ChainID, TransactionVersion } from "../networkParams";
 import { TransactionPayload } from "../transactionPayload";
 import BigNumber from "bignumber.js";
 import { TokenPayment } from "../tokenPayment";
@@ -21,7 +21,6 @@ describe("serialize transactions", () => {
             nonce: 89,
             value: 0,
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
             gasLimit: 50000,
             chainID: new ChainID("local-testnet")
         });
@@ -37,7 +36,6 @@ describe("serialize transactions", () => {
             nonce: 90,
             value: 0,
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
             gasLimit: 80000,
             data: new TransactionPayload("hello"),
             chainID: new ChainID("local-testnet")
@@ -54,7 +52,6 @@ describe("serialize transactions", () => {
             nonce: 91,
             value: TokenPayment.egldFromAmount(10),
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
             gasLimit: 100000,
             data: new TransactionPayload("for the book"),
             chainID: new ChainID("local-testnet")
@@ -71,7 +68,6 @@ describe("serialize transactions", () => {
             nonce: 92,
             value: new BigNumber("123456789000000000000000000000"),
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
             gasLimit: 100000,
             data: new TransactionPayload("for the spaceship"),
             chainID: new ChainID("local-testnet")
@@ -88,7 +84,6 @@ describe("serialize transactions", () => {
             nonce: 0,
             value: new BigNumber("0"),
             receiver: wallets.bob.address,
-            gasPrice: GasPrice.min(),
             gasLimit: 80000,
             data: new TransactionPayload("hello"),
             chainID: new ChainID("local-testnet"),

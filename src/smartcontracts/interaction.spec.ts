@@ -12,7 +12,6 @@ import { SmartContractAbi } from "./abi";
 import { Address } from "../address";
 import { assert } from "chai";
 import { Interaction } from "./interaction";
-import { ChainID } from "../networkParams";
 import { ContractFunction } from "./function";
 import { ReturnCode } from "./returnCode";
 import BigNumber from "bignumber.js";
@@ -110,7 +109,7 @@ describe("test smart contract interactor", function() {
         let interaction = <Interaction>contract.methods
             .getUltimateAnswer()
             .withGasLimit(543210)
-            .withChainID(new ChainID("T"));
+            .withChainID("T");
 
         assert.equal(contract.getAddress(), dummyAddress);
         assert.deepEqual(interaction.getFunction(), new ContractFunction("getUltimateAnswer"));

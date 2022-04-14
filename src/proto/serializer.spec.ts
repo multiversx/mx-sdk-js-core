@@ -3,7 +3,7 @@ import { ProtoSerializer } from "./serializer";
 import { Transaction } from "../transaction";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { Signature } from "../signature";
-import { ChainID, TransactionVersion } from "../networkParams";
+import { TransactionVersion } from "../networkParams";
 import { TransactionPayload } from "../transactionPayload";
 import BigNumber from "bignumber.js";
 import { TokenPayment } from "../tokenPayment";
@@ -22,7 +22,7 @@ describe("serialize transactions", () => {
             value: 0,
             receiver: wallets.bob.address,
             gasLimit: 50000,
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         transaction.applySignature(new Signature("b56769014f2bdc5cf9fc4a05356807d71fcf8775c819b0f1b0964625b679c918ffa64862313bfef86f99b38cb84fcdb16fa33ad6eb565276616723405cd8f109"), wallets.alice.address);
@@ -38,7 +38,7 @@ describe("serialize transactions", () => {
             receiver: wallets.bob.address,
             gasLimit: 80000,
             data: new TransactionPayload("hello"),
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         transaction.applySignature(new Signature("e47fd437fc17ac9a69f7bf5f85bafa9e7628d851c4f69bd9fedc7e36029708b2e6d168d5cd652ea78beedd06d4440974ca46c403b14071a1a148d4188f6f2c0d"), wallets.alice.address);
@@ -54,7 +54,7 @@ describe("serialize transactions", () => {
             receiver: wallets.bob.address,
             gasLimit: 100000,
             data: new TransactionPayload("for the book"),
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         transaction.applySignature(new Signature("9074789e0b4f9b2ac24b1fd351a4dd840afcfeb427b0f93e2a2d429c28c65ee9f4c288ca4dbde79de0e5bcf8c1a5d26e1b1c86203faea923e0edefb0b5099b0c"), wallets.alice.address);
@@ -70,7 +70,7 @@ describe("serialize transactions", () => {
             receiver: wallets.bob.address,
             gasLimit: 100000,
             data: new TransactionPayload("for the spaceship"),
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         transaction.applySignature(new Signature("39938d15812708475dfc8125b5d41dbcea0b2e3e7aabbbfceb6ce4f070de3033676a218b73facd88b1432d7d4accab89c6130b3abe5cc7bbbb5146e61d355b03"), wallets.alice.address)
@@ -86,7 +86,7 @@ describe("serialize transactions", () => {
             receiver: wallets.bob.address,
             gasLimit: 80000,
             data: new TransactionPayload("hello"),
-            chainID: new ChainID("local-testnet"),
+            chainID: "local-testnet",
             version: new TransactionVersion(1)
         });
 

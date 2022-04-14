@@ -1,4 +1,3 @@
-import { ChainID } from "../networkParams";
 import { Transaction } from "../transaction";
 import { Query } from "./query";
 import { ContractFunction } from "./function";
@@ -34,7 +33,7 @@ export class Interaction {
     private value: ITransactionValue = "0";
     private gasLimit: IGasLimit = 0;
     private gasPrice: IGasPrice | undefined = undefined;
-    private chainID: IChainID = ChainID.unspecified();
+    private chainID: IChainID = "";
     private querent: IAddress = new Address();
 
     private isWithSingleESDTTransfer: boolean = false;

@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { Transaction } from "./transaction";
-import { ChainID, TransactionOptions, TransactionVersion } from "./networkParams";
+import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { TokenPayment } from "./tokenPayment";
@@ -22,7 +22,7 @@ describe("test transaction construction", async () => {
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
             gasLimit: minGasLimit,
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         await wallets.alice.signer.sign(transaction);
@@ -71,7 +71,7 @@ describe("test transaction construction", async () => {
             gasPrice: minGasPrice,
             gasLimit: 100000,
             data: new TransactionPayload("for the book"),
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         await wallets.alice.signer.sign(transaction);
@@ -87,7 +87,7 @@ describe("test transaction construction", async () => {
             gasPrice: minGasPrice,
             gasLimit: 100000,
             data: new TransactionPayload("for the spaceship"),
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         await wallets.alice.signer.sign(transaction);
@@ -137,7 +137,7 @@ describe("test transaction construction", async () => {
             receiver: wallets.bob.address,
             gasPrice: 500,
             gasLimit: 20,
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         let networkConfig = {
@@ -159,7 +159,7 @@ describe("test transaction construction", async () => {
             data: new TransactionPayload("testdata"),
             gasPrice: 500,
             gasLimit: 12010,
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         let networkConfig = {

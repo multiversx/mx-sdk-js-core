@@ -5,32 +5,6 @@ import {
     TRANSACTION_VERSION_DEFAULT, TRANSACTION_VERSION_TX_HASH_SIGN
 } from "./constants";
 
-export class ChainID {
-    /**
-     * The actual value, as a string.
-     */
-    private readonly value: string;
-
-    /**
-     * Creates a ChainID object given a value.
-     */
-    constructor(value: string) {
-        if (!value) {
-            throw new errors.ErrChainIDInvalid(value);
-        }
-
-        this.value = value;
-    }
-
-    static unspecified(): ChainID {
-        return new ChainID("?");
-    }
-
-    valueOf(): string {
-        return this.value;
-    }
-}
-
 export class TransactionVersion {
     /**
      * The actual numeric value.

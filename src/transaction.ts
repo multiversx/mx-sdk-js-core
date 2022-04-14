@@ -2,7 +2,6 @@ import { BigNumber } from "bignumber.js";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ISignature, ITransactionValue } from "./interface";
 import { Address } from "./address";
 import {
-  ChainID,
   TransactionOptions,
   TransactionVersion,
 } from "./networkParams";
@@ -248,7 +247,7 @@ export class Transaction {
       gasPrice: Number(plainObjectTransaction.gasPrice),
       gasLimit: Number(plainObjectTransaction.gasLimit),
       data: new TransactionPayload(atob(plainObjectTransaction.data)),
-      chainID: new ChainID(plainObjectTransaction.chainID),
+      chainID: String(plainObjectTransaction.chainID),
       version: new TransactionVersion(plainObjectTransaction.version),
     });
     if (plainObjectTransaction.signature) {

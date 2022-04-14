@@ -2,7 +2,6 @@ import { assert } from "chai";
 import { Address } from "../address";
 import { Code } from "./code";
 import { SmartContract } from "./smartContract";
-import { ChainID } from "../networkParams";
 import { loadTestWallets, MarkCompleted, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
 import { ContractFunction } from "./function";
 import { U32Value } from "./typesystem";
@@ -13,7 +12,7 @@ import { TransactionStatus } from "@elrondnetwork/erdjs-network-providers";
 
 describe("test contract", () => {
     let provider = new MockProvider();
-    let chainID = new ChainID("test");
+    let chainID = "test";
     let alice: TestWallet;
 
     before(async function () {

@@ -7,6 +7,7 @@
 export * from "../account";
 export * from "../address";
 export * from "../interface";
+export * from "../interfaceOfNetwork";
 export * from "../transaction";
 export * from "../transactionPayload";
 export * from "../transactionWatcher";

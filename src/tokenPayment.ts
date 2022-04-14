@@ -34,7 +34,7 @@ export class TokenPayment {
         return new TokenPayment(EGLDTokenIdentifier, 0, amountAsBigInteger, EGLDNumDecimals);
     }
 
-    static fungibleFromAmount(tokenIdentifier: string, amount: BigNumber.Value, numDecimals: number = 0): TokenPayment {
+    static fungibleFromAmount(tokenIdentifier: string, amount: BigNumber.Value, numDecimals: number): TokenPayment {
         let amountAsBigInteger = new BigNumber(amount).shiftedBy(numDecimals).decimalPlaces(0);
         return this.fungibleFromBigInteger(tokenIdentifier, amountAsBigInteger, numDecimals);
     }
@@ -51,7 +51,7 @@ export class TokenPayment {
         return new TokenPayment(tokenIdentifier, nonce, quantity, 0);
     }
 
-    static metaEsdtFromAmount(tokenIdentifier: string, nonce: number, amount: BigNumber.Value, numDecimals = 0) {
+    static metaEsdtFromAmount(tokenIdentifier: string, nonce: number, amount: BigNumber.Value, numDecimals: number) {
         let amountAsBigInteger = new BigNumber(amount).shiftedBy(numDecimals).decimalPlaces(0);
         return this.metaEsdtFromBigInteger(tokenIdentifier, nonce, amountAsBigInteger, numDecimals);
     }

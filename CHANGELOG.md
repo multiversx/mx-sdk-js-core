@@ -9,16 +9,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## 10.1.0
  - [Fix exports and prepare release of erdjs 10](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/197)
-
-## 10.0.1-beta.2
  - [Bit of cleanup prior release (breaking changes), update readme & docs. Add payload builders for token transfers](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/196)
-
-## 10.0.1-beta.1
  - [TokenPayment instead of Balance, where applicable](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/193)
  - [Breaking change: Deprecate / remove balance & balance builder](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/194)
  - [Breaking change: Deprecate EsdtHelpers in favor of @elrondnetwork/transaction-decoder](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/195/files)
-
-## 10.0.0-alpha.5
  - [Breaking change: adjustements to transaction awaitening and completion, transaction watcher](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/173)
  - [Breaking change: simplify network config / improve design - not a singleton anymore](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/176)
  - [Fix / improve results parser (better heuristics)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/177)
@@ -35,8 +29,19 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - [Remove SmartContractController (downgraded to a mere test utility)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/188)
  - [Breaking changes: cleanup and minor improvements prior release (step 1)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/190)
  - [Breaking changes: cleanup and minor improvements prior release (step 2)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/191)
+ - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)
+ - [Remove trackOfTransactions (private field, not actually used)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/172)
+ - [Breaking changes: improve contract interactions and interpretation of contract results](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/159)
 
  **Breaking changes**
+ - Moved network providers and contract wrappers to separate repositories:
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-network-providers
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-contract-wrappers
+ - The dapp / signing providers have been extracted to separate repositories:
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-hw-provider
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-web-wallet-provider
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-wallet-connect-provider
+   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-extension-provider
  - Removed utility functions: `transaction.awaitExecuted()`, `transaction.awaitPending()`. `TransactionWatcher` should be used directly, instead.
  - Changed interface of `TransactionWatcher`. The constructor does not expect a transaction hash anymore, but the functions `await*` do.
  - Introduced new functions on `TransactionWatcher`: `awaitCompleted()`, `awaitAllEvents()`, `awaitAnyEvent()` etc.
@@ -51,11 +56,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Removed `transaction.send()`. `Provider.sendTransaction()` has to be used instead.
  - Removed the static functions `getDefault()` and `sync()` from `networkStake`, `networkStatus` and `stats`.
  - Removed `smartContract.runQuery()` in order to decouple the contract class from the network provider. `smartContract.createQuery()` + `provider.queryContract()` have to be used, instead.
- - Moved network providers and contract wrappers to separate repositories:
-   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-network-providers
-   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-contract-wrappers
- - Renamed `methods` to `methodsExplicit`. Rename `methodsAuto` (only added in erdjs 10 beta) to `methods` (default choice). Therefore, by default, interactions are created without having to pass `TypedValue` objects as parameters. Automatic type inference is applied.
- - Removed `SmartContractController` (downgraded to a mere test utility).
+ - Renamed `methods` to `methodsExplicit` (explicitly typed values). Added a new `contract.methods` object, which performs automatic type inference. Therefore, by default, interactions are created without having to pass `TypedValue` objects as parameters. The type inference system was implemented in the past, in the `nativeSerializer` component - PR https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9 by @claudiu725.
  - erdjs does not depend on `axios` and `fs` anymore. Changed the way an `AbiRegistry` is created. Removed function `Code.fromFile()` (was relying on `fs`).
  - Removed `smartContract.getOwner()` (surprising behavior of function, usage not recommended).
  - Removed `transaction.awaitHashed()` (lacks use-case).
@@ -72,41 +73,23 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - Breaking change: removed `ChainID` in favor of the interface `IChainID`.
  - Breaking change: deprecate `scArgumentsParser` in favor of `@elrondnetwork/transaction-decoder`.
 
-## [10.0.0-beta.3]
- - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)
- - [Remove trackOfTransactions (private field, not actually used)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/172)
-
-**Breaking changes**
- - The dapp / signing providers have been extracted to separate repositories:
-   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-hw-provider
-   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-web-wallet-provider
-   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-wallet-connect-provider
-   - https://github.com/ElrondNetwork/elrond-sdk-erdjs-extension-provider
-
-## [10.0.0-beta.2]
- - [Hardcode class names for classes within erdjs' typesystem.](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/165)
-
-## [10.0.0-beta.1]
- - [Breaking changes: improve contract interactions and interpretation of contract results](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/159)
- 
-**Breaking changes**
-
  - `ExecutionResultsBundle` and `QueryResponseBundle` have been removed, and replaced by `TypedOutcomeBundle` (and its untyped counterpart, `UntypedOutcomeBundle`).
- - `SmartContractResults` has been changed to not use the concepts `immediate result` and `resulting calls` anymore. Instead, interpreting `SmartContractResults.items` is now the responsibility of the `ResultsParser` (on which the contract controllers depend).
- - Redesigned `QueryResponse`, changed most of its public interface. Results interpretation is now the responsibility of the results parser, called by the smart contract controllers.
- - `interpretQueryResponse()` and `interpretExecutionResults()` do not exist on the `Interaction` object anymore. Now, querying / executing an interaction against the controller will return the interpreted results.
+ - `SmartContractResults` has been changed to not use the concepts `immediate result` and `resulting calls` anymore. Instead, interpreting `SmartContractResults.items` is now the responsibility of the `ResultsParser`.
+ - Redesigned `QueryResponse`, changed most of its public interface. Results interpretation is now the responsibility of the results parser.
+ - `interpretQueryResponse()` and `interpretExecutionResults()` do not exist on the `Interaction` object anymore.
  - `TokenIdentifierValue` is constructed using a `string`, not a `buffer`. Its `valueOf()` is now a string, as well.
  - The `Interaction` constructor does not receive the `interpretingFunction` parameter anymore.
  - `Interaction.getInterpretingFunction()` and `Interaction.getExecutingFunction()` have been removed, replaced by `Interaction.getFunction()`.
- - `DefaultInteractionRunner` has been removed, and replaced by **smart contract controllers**.
+ - `DefaultInteractionRunner` has been removed.
  - `StrictChecker` has been renamed to `InteractionChecker`. It's public interface - the function `checkInteraction()` - has changed as well (it also requires the endpoint definition now, as a second parameter).
  - The functions `getReceipt()`, `getSmartContractResults()` and `getLogs()` of `TransactionOnNetwork` have been removed. The underlying properties are now public.
  - Renamed `OptionValue.newMissingType()` to `OptionValue.newMissingTyped()`
  - Queries with a return code different than `Ok` do not automatically throw an exception anymore (`assertSuccess()` has to be called explicitly in order to throw).
  
 **Other changes**
-
- - `SmartContract`, in addition to `methods`, now also has a `methodAuto` object that allows one to create interactions without explicitly specifying the types of the arguments. Automatic type inference (within erdjs' typesystem) is leveraged. The type inference system was implemented in the past, in the `nativeSerializer` component - PR https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/9 by @claudiu725.
+ - Implement the `ResultsParser` for parsing query responses and contract results.
+ - Improved transaction completion detection, via the `TransactionWatcher`.
+ - Added new transaction payload builders, for token transfers.
  - Added utility function `getFieldValue()` on `Struct` and `EnumValue`.
  - Refactoring in the `networkProvider` package (under development, in order to merge the provider interfaces under a single one)
  - Added utility function `Interaction.useThenIncrementNonceOf()`

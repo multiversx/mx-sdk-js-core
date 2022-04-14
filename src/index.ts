@@ -12,6 +12,5 @@ export * from "./logger";
 export * from "./networkParams";
 export * from "./signableMessage";
 export * from "./utils";
-export * from "./scArgumentsParser";
 export * from "./tokenPayment";
 export * from "./smartcontracts";

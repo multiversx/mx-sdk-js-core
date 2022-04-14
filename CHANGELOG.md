@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - TBD
 
+## 10.0.1-beta.2
+ - [Bit of cleanup prior release (breaking changes), update readme & docs. Add payload builders for token transfers](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/196)
+
 ## 10.0.1-beta.1
  - [TokenPayment instead of Balance, where applicable](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/193)
  - [Breaking change: Deprecate / remove balance & balance builder](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/194)
@@ -60,6 +63,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
  - `TokenPayment` should be used instead of `Balance`, where applicable.
  - Deprecate / remove `Balance` & `BalanceBuilder`. `TokenPayment` / `IAccountBalance` (a simple big number) should be used instead, depending on the purpose.
  - Deprecated `EsdtHelpers` in favor of `@elrondnetwork/transaction-decoder`.
+ - Breaking change: removed `Nonce`, in favor of the interface `INonce`.
+ - Breaking change: removed `GasLimit` in favor of the interface `IGasLimit`.
+ - Breaking change: removed `GasPrice` in favor of the interface `IGasPrice`.
+ - Breaking change: removed `ChainID` in favor of the interface `IChainID`.
+ - Breaking change: deprecate `scArgumentsParser` in favor of `@elrondnetwork/transaction-decoder`.
 
 ## [10.0.0-beta.3]
  - [Extract dapp / signing providers to separate repositories](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/170)

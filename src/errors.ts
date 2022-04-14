@@ -1,8 +1,6 @@
 /**
  * The base class for `erdjs` exceptions (errors).
  */
-import BigNumber from "bignumber.js";
-
 export class Err extends Error {
   inner: Error | undefined = undefined;
 
@@ -26,36 +24,6 @@ export class Err extends Error {
     }
 
     return result;
-  }
-
-  /**
-   * Returns a HTML-friendly summary for the error or for the chain of errros (if appropriate).
-   */
-  html(): string {
-    let summary = this.summary();
-    let error = summary[0];
-    let causedBy = summary.slice(1);
-
-    let html = `
-            An error of type <strong>${error.name}</strong> occurred: ${error.message}.
-        `;
-
-    causedBy.forEach((cause) => {
-      html += `<br /> ... <strong>${cause.name}</strong>: ${cause.message}`;
-    });
-
-    return html;
-  }
-
-  /**
-   * Returns a HTML-friendly summary for the error or for the chain of errros (if appropriate).
-   */
-  static html(error: Error): string {
-    if (error instanceof Err) {
-      return error.html();
-    } else {
-      return `Unexpected error of type <strong>${error.name}</strong> occurred: ${error.message}.`;
-    }
   }
 }
 
@@ -133,33 +101,6 @@ export class ErrAddressEmpty extends Err {
 }
 
 /**
- * Signals an invalid value for {@link Balance} objects.
- */
-export class ErrBalanceInvalid extends Err {
-  public constructor(value: BigNumber) {
-    super(`Invalid balance: ${value.toString()}`);
-  }
-}
-
-/**
- * Signals an invalid value for {@link GasPrice} objects.
- */
-export class ErrGasPriceInvalid extends Err {
-  public constructor(value: number) {
-    super(`Invalid gas price: ${value}`);
-  }
-}
-
-/**
- * Signals an invalid value for {@link GasLimit} objects.
- */
-export class ErrGasLimitInvalid extends Err {
-  public constructor(value: number) {
-    super(`Invalid gas limit: ${value}`);
-  }
-}
-
-/**
  * Signals an invalid value for {@link GasLimit} objects.
  */
 export class ErrNotEnoughGas extends Err {
@@ -174,15 +115,6 @@ export class ErrNotEnoughGas extends Err {
 export class ErrNonceInvalid extends Err {
   public constructor(value: number) {
     super(`Invalid nonce: ${value}`);
-  }
-}
-
-/**
- * Signals an invalid value for {@link ChainID} objects.
- */
-export class ErrChainIDInvalid extends Err {
-  public constructor(value: string) {
-    super(`Invalid chain ID: ${value}`);
   }
 }
 
@@ -205,30 +137,12 @@ export class ErrTransactionOptionsInvalid extends Err {
 }
 
 /**
- * Signals that the hash of the {@link Transaction} is not known (not set).
- */
-export class ErrTransactionHashUnknown extends Err {
-  public constructor() {
-    super(`Transaction hash isn't known`);
-  }
-}
-
-/**
  * Signals an error related to signing a message (a transaction).
  */
 export class ErrSignatureCannotCreate extends Err {
   public constructor(input: any, inner?: Error) {
     let message = `Cannot create signature from: ${input}`;
     super(message, inner);
-  }
-}
-
-/**
- * Signals the usage of an empty signature.
- */
-export class ErrSignatureEmpty extends Err {
-  public constructor() {
-    super(`Signature is empty`);
   }
 }
 
@@ -314,15 +228,6 @@ export class ErrMock extends Err {
 }
 
 /**
- * Signals a generic serialization error.
- */
-export class ErrSerialization extends Err {
-  public constructor(message: string) {
-    super(message);
-  }
-}
-
-/**
  * Signals a generic type error.
  */
 export class ErrTypingSystem extends Err {
@@ -390,38 +295,10 @@ export class ErrContractInteraction extends Err {
 }
 
 /**
- * Signals an invalid smart contract call data field
- */
-export class ErrInvalidScCallDataField extends Err {
-  public constructor(message?: string) {
-    message = " " + message ? message : ".";
-    super("Invalid smart contract call data field" + message);
-  }
-}
-
-/**
- * Signals an invalid ESDT transfer data field
- */
-export class ErrInvalidEsdtTransferDataField extends Err {
-  public constructor() {
-    super("Invalid ESDT transfer call data field");
-  }
-}
-
-/**
  * Signals that a method is not yet implemented
  */
 export class ErrNotImplemented extends Err {
   public constructor() {
     super("Method not yet implemented");
-  }
-}
-
-/**
- * Signals that a specific transaction event was not found (i.e. in the transaction logs).
- */
-export class ErrTransactionEventNotFound extends Err {
-  public constructor(identifier: string) {
-    super(`Transaction event with identifier [${identifier}] not found (in logs)`);
   }
 }

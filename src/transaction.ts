@@ -2,13 +2,9 @@ import { BigNumber } from "bignumber.js";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ISignature, ITransactionValue } from "./interface";
 import { Address } from "./address";
 import {
-  ChainID,
-  GasLimit,
-  GasPrice,
   TransactionOptions,
   TransactionVersion,
 } from "./networkParams";
-import { Nonce } from "./nonce";
 import { Signature } from "./signature";
 import { guardNotEmpty } from "./utils";
 import { TransactionPayload } from "./transactionPayload";
@@ -16,6 +12,7 @@ import * as errors from "./errors";
 import { ProtoSerializer } from "./proto";
 import { Hash } from "./hash";
 import { INetworkConfig } from "./interfaceOfNetwork";
+import { TRANSACTION_MIN_GAS_PRICE } from "./constants";
 
 const createTransactionHasher = require("blake2b");
 const TRANSACTION_HASH_LENGTH = 32;
@@ -114,7 +111,7 @@ export class Transaction {
     this.value = value || 0;
     this.sender = sender || Address.Zero();
     this.receiver = receiver;
-    this.gasPrice = gasPrice || GasPrice.min();
+    this.gasPrice = gasPrice || TRANSACTION_MIN_GAS_PRICE;
     this.gasLimit = gasLimit;
     this.data = data || new TransactionPayload();
     this.chainID = chainID;
@@ -131,19 +128,6 @@ export class Transaction {
 
   /**
    * Sets the account sequence number of the sender. Must be done prior signing.
-   *
-   * ```
-   * let aliceOnNetwork = await provider.getAccount(alice.address);
-   * alice.update(aliceOnNetwork);
-   *
-   * let tx = new Transaction({
-   *      value: TokenPayment.egldFromAmount(1),
-   *      receiver: bob.address
-   * });
-   *
-   * tx.setNonce(alice.nonce);
-   * await alice.signer.sign(tx);
-   * ```
    */
   setNonce(nonce: INonce) {
     this.nonce = nonce;
@@ -212,7 +196,7 @@ export class Transaction {
 
   /**
    * Serializes a transaction to a sequence of bytes, ready to be signed.
-   * This function is called internally, by {@link Signer} objects.
+   * This function is called internally by signers.
    *
    * @param signedBy The address of the future signer
    */
@@ -257,13 +241,13 @@ export class Transaction {
    */
   static fromPlainObject(plainObjectTransaction: any): Transaction {
     const tx = new Transaction({
-      nonce: new Nonce(plainObjectTransaction.nonce),
+      nonce: Number(plainObjectTransaction.nonce),
       value: new BigNumber(plainObjectTransaction.value),
       receiver: Address.fromString(plainObjectTransaction.receiver),
-      gasPrice: new GasPrice(plainObjectTransaction.gasPrice),
-      gasLimit: new GasLimit(plainObjectTransaction.gasLimit),
+      gasPrice: Number(plainObjectTransaction.gasPrice),
+      gasLimit: Number(plainObjectTransaction.gasLimit),
       data: new TransactionPayload(atob(plainObjectTransaction.data)),
-      chainID: new ChainID(plainObjectTransaction.chainID),
+      chainID: String(plainObjectTransaction.chainID),
       version: new TransactionVersion(plainObjectTransaction.version),
     });
     if (plainObjectTransaction.signature) {
@@ -334,7 +318,6 @@ export class TransactionHash extends Hash {
 
   /**
    * Computes the hash of a transaction.
-   * Not yet implemented.
    */
   static compute(transaction: Transaction): TransactionHash {
     let serializer = new ProtoSerializer();

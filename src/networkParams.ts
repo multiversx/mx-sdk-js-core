@@ -1,99 +1,9 @@
 import * as errors from "./errors";
 import {
-    TRANSACTION_MIN_GAS_PRICE,
     TRANSACTION_OPTIONS_DEFAULT,
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
     TRANSACTION_VERSION_DEFAULT, TRANSACTION_VERSION_TX_HASH_SIGN
 } from "./constants";
-
-/**
- * The gas price, as an immutable object.
- */
-export class GasPrice {
-    /**
-     * The actual numeric value.
-     */
-    private readonly value: number;
-
-    /**
-     * Creates a GasPrice object given a value.
-     */
-    constructor(value: number) {
-        value = Number(value);
-
-        if (Number.isNaN(value) || value < 0) {
-            throw new errors.ErrGasPriceInvalid(value);
-        }
-
-        this.value = value;
-    }
-
-    static min(): GasPrice {
-        return new GasPrice(TRANSACTION_MIN_GAS_PRICE);
-    }
-
-    valueOf(): number {
-        return this.value;
-    }
-}
-
-/**
- * The gas limit, as an immutable object.
- */
-export class GasLimit {
-    /**
-     * The actual numeric value.
-     */
-    private readonly value: number;
-
-    /**
-     * Creates a GasLimit object given a value.
-     */
-    constructor(value: number) {
-        value = Number(value);
-
-        if (Number.isNaN(value) || value < 0) {
-            throw new errors.ErrGasLimitInvalid(value);
-        }
-
-        this.value = value;
-    }
-
-    add(other: GasLimit): GasLimit {
-        return new GasLimit(this.value + other.value);
-    }
-
-    valueOf(): number {
-        return this.value;
-    }
-}
-
-
-export class ChainID {
-    /**
-     * The actual value, as a string.
-     */
-    private readonly value: string;
-
-    /**
-     * Creates a ChainID object given a value.
-     */
-    constructor(value: string) {
-        if (!value) {
-            throw new errors.ErrChainIDInvalid(value);
-        }
-
-        this.value = value;
-    }
-
-    static unspecified(): ChainID {
-        return new ChainID("?");
-    }
-
-    valueOf(): string {
-        return this.value;
-    }
-}
 
 export class TransactionVersion {
     /**

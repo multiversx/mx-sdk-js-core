@@ -1,5 +1,4 @@
 import { Transaction } from "./transaction";
-import { GasLimit } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { Logger } from "./logger";
@@ -70,7 +69,7 @@ describe("test transaction", function () {
 
         let transactionOne = new Transaction({
             data: new TransactionPayload("helloWorld"),
-            gasLimit: new GasLimit(70000),
+            gasLimit: 70000,
             receiver: alice.address,
             value: TokenPayment.egldFromAmount(1000),
             chainID: network.ChainID
@@ -78,7 +77,7 @@ describe("test transaction", function () {
 
         let transactionTwo = new Transaction({
             data: new TransactionPayload("helloWorld"),
-            gasLimit: new GasLimit(70000),
+            gasLimit: 70000,
             receiver: alice.address,
             value: TokenPayment.egldFromAmount(1000000),
             chainID: network.ChainID

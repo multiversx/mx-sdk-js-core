@@ -1,7 +1,6 @@
 import { assert } from "chai";
 import { Transaction } from "./transaction";
-import { Nonce } from "./nonce";
-import { ChainID, GasLimit, GasPrice, TransactionOptions, TransactionVersion } from "./networkParams";
+import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { TokenPayment } from "./tokenPayment";
@@ -9,8 +8,8 @@ import { TokenPayment } from "./tokenPayment";
 
 describe("test transaction construction", async () => {
     let wallets: Record<string, TestWallet>;
-    let minGasLimit = new GasLimit(50000);
-    let minGasPrice = new GasPrice(1000000000);
+    let minGasLimit = 50000;
+    let minGasPrice = 1000000000;
 
     before(async function () {
         wallets = await loadTestWallets();
@@ -23,7 +22,7 @@ describe("test transaction construction", async () => {
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
             gasLimit: minGasLimit,
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         await wallets.alice.signer.sign(transaction);
@@ -37,7 +36,7 @@ describe("test transaction construction", async () => {
             value: "0",
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
-            gasLimit: new GasLimit(80000),
+            gasLimit: 80000,
             data: new TransactionPayload("hello"),
             chainID: "local-testnet"
         });
@@ -49,7 +48,7 @@ describe("test transaction construction", async () => {
 
     it("with data, with opaque, unused options (the protocol ignores the options when version == 1)", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(89),
+            nonce: 89,
             value: "0",
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
@@ -70,9 +69,9 @@ describe("test transaction construction", async () => {
             value: TokenPayment.egldFromAmount(10),
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
-            gasLimit: new GasLimit(100000),
+            gasLimit: 100000,
             data: new TransactionPayload("for the book"),
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         await wallets.alice.signer.sign(transaction);
@@ -86,9 +85,9 @@ describe("test transaction construction", async () => {
             value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
-            gasLimit: new GasLimit(100000),
+            gasLimit: 100000,
             data: new TransactionPayload("for the spaceship"),
-            chainID: new ChainID("local-testnet")
+            chainID: "local-testnet"
         });
 
         await wallets.alice.signer.sign(transaction);
@@ -133,12 +132,12 @@ describe("test transaction construction", async () => {
 
     it("computes correct fee", () => {
         let transaction = new Transaction({
-            nonce: new Nonce(92),
+            nonce: 92,
             value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
             receiver: wallets.bob.address,
-            gasPrice: new GasPrice(500),
-            gasLimit: new GasLimit(20),
-            chainID: new ChainID("local-testnet")
+            gasPrice: 500,
+            gasLimit: 20,
+            chainID: "local-testnet"
         });
 
         let networkConfig = {
@@ -154,13 +153,13 @@ describe("test transaction construction", async () => {
 
     it("computes correct fee with data field", () => {
         let transaction = new Transaction({
-            nonce: new Nonce(92),
+            nonce: 92,
             value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
             receiver: wallets.bob.address,
             data: new TransactionPayload("testdata"),
-            gasPrice: new GasPrice(500),
-            gasLimit: new GasLimit(12010),
-            chainID: new ChainID("local-testnet")
+            gasPrice: 500,
+            gasLimit: 12010,
+            chainID: "local-testnet"
         });
 
         let networkConfig = {

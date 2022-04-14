@@ -1,9 +1,7 @@
 import { assert } from "chai";
 import { Address } from "../address";
 import { Code } from "./code";
-import { Nonce } from "../nonce";
 import { SmartContract } from "./smartContract";
-import { ChainID, GasLimit } from "../networkParams";
 import { loadTestWallets, MarkCompleted, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
 import { ContractFunction } from "./function";
 import { U32Value } from "./typesystem";
@@ -14,7 +12,7 @@ import { TransactionStatus } from "@elrondnetwork/erdjs-network-providers";
 
 describe("test contract", () => {
     let provider = new MockProvider();
-    let chainID = new ChainID("test");
+    let chainID = "test";
     let alice: TestWallet;
 
     before(async function () {
@@ -24,10 +22,10 @@ describe("test contract", () => {
     it("should compute contract address", async () => {
         let owner = new Address("93ee6143cdc10ce79f15b2a6c2ad38e9b6021c72a1779051f47154fd54cfbd5e");
 
-        let firstContractAddress = SmartContract.computeAddress(owner, new Nonce(0));
+        let firstContractAddress = SmartContract.computeAddress(owner, 0);
         assert.equal(firstContractAddress.bech32(), "erd1qqqqqqqqqqqqqpgqhdjjyq8dr7v5yq9tv6v5vt9tfvd00vg7h40q6779zn");
 
-        let secondContractAddress = SmartContract.computeAddress(owner, new Nonce(1));
+        let secondContractAddress = SmartContract.computeAddress(owner, 1);
         assert.equal(secondContractAddress.bech32(), "erd1qqqqqqqqqqqqqpgqde8eqjywyu6zlxjxuxqfg5kgtmn3setxh40qen8egy");
     });
 
@@ -38,7 +36,7 @@ describe("test contract", () => {
         let contract = new SmartContract({});
         let deployTransaction = contract.deploy({
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
-            gasLimit: new GasLimit(1000000),
+            gasLimit: 1000000,
             chainID: chainID
         });
 
@@ -84,14 +82,14 @@ describe("test contract", () => {
         let callTransactionOne = contract.call({
             func: new ContractFunction("helloEarth"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
-            gasLimit: new GasLimit(150000),
+            gasLimit: 150000,
             chainID: chainID
         });
 
         let callTransactionTwo = contract.call({
             func: new ContractFunction("helloMars"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
-            gasLimit: new GasLimit(1500000),
+            gasLimit: 1500000,
             chainID: chainID
         });
 

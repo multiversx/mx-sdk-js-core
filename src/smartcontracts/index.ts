@@ -1,8 +1,3 @@
-/**
- * @packageDocumentation
- * @module smartcontracts
- */
-
 export * from "./abi";
 export * from "./argSerializer";
 export * from "./code";

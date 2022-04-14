@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
         "module": "CommonJS",
-        "target": "ES2015",
-        "outDir": "out-tests",
+        "target": "es2015",
+        "outDir": "out",
         "lib": [
             "ES2015",
             "DOM"
@@ -20,15 +20,19 @@
         "declaration": true
     },
     "include": [
-        "src/**/*",
+        "src/**/*"
     ],
     "exclude": [
-		"node_modules",
-        "out",
-        "out-tests",
-        "out-browser",
-        "out-browser-tests",
-        "src/examples",
-        "src/_docs"
-    ]
+    ],
+    "typedocOptions": {
+        "entryPoints": [
+            "./src/_docs/basic.ts",
+            "./src/_docs/smartcontracts.ts",
+            "./src/_docs/errors.ts",
+            "./src/_docs/typesystem.ts",
+            "./src/_docs/codec.ts"
+        ],
+        "excludePrivate": true,
+        "includeVersion": true
+    }
 }

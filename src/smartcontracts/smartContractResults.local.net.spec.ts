@@ -1,6 +1,5 @@
 import { loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
 import { TransactionWatcher } from "../transactionWatcher";
-import { GasLimit } from "../networkParams";
 import { assert } from "chai";
 import { SmartContract } from "./smartContract";
 import { ContractFunction } from "./function";
@@ -33,7 +32,7 @@ describe("fetch transactions from local testnet", function () {
             contract: contract,
             deployer: alice,
             codePath: "src/testdata/counter.wasm",
-            gasLimit: new GasLimit(3000000),
+            gasLimit: 3000000,
             initArguments: [],
             chainID: network.ChainID
         });
@@ -41,7 +40,7 @@ describe("fetch transactions from local testnet", function () {
         // ++
         let transactionIncrement = contract.call({
             func: new ContractFunction("increment"),
-            gasLimit: new GasLimit(3000000),
+            gasLimit: 3000000,
             chainID: network.ChainID
         });
 

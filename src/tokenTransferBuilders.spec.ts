@@ -10,7 +10,7 @@ describe("test token transfer builders", () => {
         assert.equal(payload.toString(), "ESDTTransfer@434f554e5445522d386230323866@64");
     });
 
-    it("should work with ESDTNFT transfers", () => {
+    it("should work with ESDTNFT transfers (NFT)", () => {
         let payment = TokenPayment.nonFungible("ERDJS-38f249", 1);
         let payload = new ESDTNFTTransferPayloadBuilder()
             .setPayment(payment)
@@ -18,6 +18,17 @@ describe("test token transfer builders", () => {
             .build();
 
         assert.equal(payload.toString(), "ESDTNFTTransfer@4552444a532d333866323439@01@01@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8");
+    });
+
+    it("should work with ESDTNFT transfers (SFT)", () => {
+        let payment = TokenPayment.semiFungible("SEMI-9efd0f", 1, 5);
+
+        let payload = new ESDTNFTTransferPayloadBuilder()
+            .setPayment(payment)
+            .setDestination(new Address("erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7"))
+            .build();
+
+        assert.equal(payload.toString(), "ESDTNFTTransfer@53454d492d396566643066@01@05@5e60b9ff2385ea27ba0c3da4689779a8f7364acee1db0ee7bee59ac660a28974");
     });
 
     it("should work with Multi ESDTNFT transfers", () => {

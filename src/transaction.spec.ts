@@ -1,6 +1,5 @@
 import { assert } from "chai";
 import { Transaction } from "./transaction";
-import { Nonce } from "./nonce";
 import { ChainID, GasLimit, GasPrice, TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
 import { loadTestWallets, TestWallet } from "./testutils";
@@ -49,7 +48,7 @@ describe("test transaction construction", async () => {
 
     it("with data, with opaque, unused options (the protocol ignores the options when version == 1)", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(89),
+            nonce: 89,
             value: "0",
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
@@ -133,7 +132,7 @@ describe("test transaction construction", async () => {
 
     it("computes correct fee", () => {
         let transaction = new Transaction({
-            nonce: new Nonce(92),
+            nonce: 92,
             value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
             receiver: wallets.bob.address,
             gasPrice: new GasPrice(500),
@@ -154,7 +153,7 @@ describe("test transaction construction", async () => {
 
     it("computes correct fee with data field", () => {
         let transaction = new Transaction({
-            nonce: new Nonce(92),
+            nonce: 92,
             value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
             receiver: wallets.bob.address,
             data: new TransactionPayload("testdata"),

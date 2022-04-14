@@ -1,7 +1,6 @@
 import { assert } from "chai";
 import { Address } from "../address";
 import { Code } from "./code";
-import { Nonce } from "../nonce";
 import { SmartContract } from "./smartContract";
 import { ChainID, GasLimit } from "../networkParams";
 import { loadTestWallets, MarkCompleted, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
@@ -24,10 +23,10 @@ describe("test contract", () => {
     it("should compute contract address", async () => {
         let owner = new Address("93ee6143cdc10ce79f15b2a6c2ad38e9b6021c72a1779051f47154fd54cfbd5e");
 
-        let firstContractAddress = SmartContract.computeAddress(owner, new Nonce(0));
+        let firstContractAddress = SmartContract.computeAddress(owner, 0);
         assert.equal(firstContractAddress.bech32(), "erd1qqqqqqqqqqqqqpgqhdjjyq8dr7v5yq9tv6v5vt9tfvd00vg7h40q6779zn");
 
-        let secondContractAddress = SmartContract.computeAddress(owner, new Nonce(1));
+        let secondContractAddress = SmartContract.computeAddress(owner, 1);
         assert.equal(secondContractAddress.bech32(), "erd1qqqqqqqqqqqqqpgqde8eqjywyu6zlxjxuxqfg5kgtmn3setxh40qen8egy");
     });
 

@@ -8,7 +8,6 @@ import {
   TransactionOptions,
   TransactionVersion,
 } from "./networkParams";
-import { Nonce } from "./nonce";
 import { Signature } from "./signature";
 import { guardNotEmpty } from "./utils";
 import { TransactionPayload } from "./transactionPayload";
@@ -131,19 +130,6 @@ export class Transaction {
 
   /**
    * Sets the account sequence number of the sender. Must be done prior signing.
-   *
-   * ```
-   * let aliceOnNetwork = await provider.getAccount(alice.address);
-   * alice.update(aliceOnNetwork);
-   *
-   * let tx = new Transaction({
-   *      value: TokenPayment.egldFromAmount(1),
-   *      receiver: bob.address
-   * });
-   *
-   * tx.setNonce(alice.nonce);
-   * await alice.signer.sign(tx);
-   * ```
    */
   setNonce(nonce: INonce) {
     this.nonce = nonce;
@@ -212,7 +198,7 @@ export class Transaction {
 
   /**
    * Serializes a transaction to a sequence of bytes, ready to be signed.
-   * This function is called internally, by {@link Signer} objects.
+   * This function is called internally by signers.
    *
    * @param signedBy The address of the future signer
    */
@@ -257,7 +243,7 @@ export class Transaction {
    */
   static fromPlainObject(plainObjectTransaction: any): Transaction {
     const tx = new Transaction({
-      nonce: new Nonce(plainObjectTransaction.nonce),
+      nonce: Number(plainObjectTransaction.nonce),
       value: new BigNumber(plainObjectTransaction.value),
       receiver: Address.fromString(plainObjectTransaction.receiver),
       gasPrice: new GasPrice(plainObjectTransaction.gasPrice),
@@ -334,7 +320,6 @@ export class TransactionHash extends Hash {
 
   /**
    * Computes the hash of a transaction.
-   * Not yet implemented.
    */
   static compute(transaction: Transaction): TransactionHash {
     let serializer = new ProtoSerializer();

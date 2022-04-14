@@ -1,6 +1,5 @@
 import { assert } from "chai";
 import { ProtoSerializer } from "./serializer";
-import { Nonce } from "../nonce";
 import { Transaction } from "../transaction";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { Signature } from "../signature";
@@ -19,7 +18,7 @@ describe("serialize transactions", () => {
 
     it("with no data, no value", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(89),
+            nonce: 89,
             value: 0,
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
@@ -35,7 +34,7 @@ describe("serialize transactions", () => {
 
     it("with data, no value", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(90),
+            nonce: 90,
             value: 0,
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
@@ -52,7 +51,7 @@ describe("serialize transactions", () => {
 
     it("with data, with value", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(91),
+            nonce: 91,
             value: TokenPayment.egldFromAmount(10),
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
@@ -69,7 +68,7 @@ describe("serialize transactions", () => {
 
     it("with data, with large value", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(92),
+            nonce: 92,
             value: new BigNumber("123456789000000000000000000000"),
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
@@ -86,7 +85,7 @@ describe("serialize transactions", () => {
 
     it("with nonce = 0", async () => {
         let transaction = new Transaction({
-            nonce: new Nonce(0),
+            nonce: 0,
             value: new BigNumber("0"),
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),

@@ -13,4 +13,5 @@ export * from "./networkParams";
 export * from "./signableMessage";
 export * from "./utils";
 export * from "./tokenPayment";
+export * from "./tokenTransferBuilders";
 export * from "./smartcontracts";

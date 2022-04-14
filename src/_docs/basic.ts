@@ -14,3 +14,4 @@ export * from "../logger";
 export * from "../networkParams";
 export * from "../signableMessage";
 export * from "../tokenPayment";
+export * from "../tokenTransferBuilders";

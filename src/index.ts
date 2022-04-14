@@ -1,6 +1,7 @@
 require('./globals');
 
 export * from "./interface";
+export * from "./interfaceOfNetwork";
 export * from "./errors";
 export * from "./account";
 export * from "./address";

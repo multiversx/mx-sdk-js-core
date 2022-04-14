@@ -3,7 +3,6 @@ import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ISignature, ITransact
 import { Address } from "./address";
 import {
   ChainID,
-  GasLimit,
   GasPrice,
   TransactionOptions,
   TransactionVersion,
@@ -247,7 +246,7 @@ export class Transaction {
       value: new BigNumber(plainObjectTransaction.value),
       receiver: Address.fromString(plainObjectTransaction.receiver),
       gasPrice: new GasPrice(plainObjectTransaction.gasPrice),
-      gasLimit: new GasLimit(plainObjectTransaction.gasLimit),
+      gasLimit: Number(plainObjectTransaction.gasLimit),
       data: new TransactionPayload(atob(plainObjectTransaction.data)),
       chainID: new ChainID(plainObjectTransaction.chainID),
       version: new TransactionVersion(plainObjectTransaction.version),

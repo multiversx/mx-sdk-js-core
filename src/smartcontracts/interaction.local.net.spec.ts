@@ -4,7 +4,6 @@ import { prepareDeployment, loadAbiRegistry, loadTestWallets, TestWallet } from 
 import { SmartContractAbi } from "./abi";
 import { assert } from "chai";
 import { Interaction } from "./interaction";
-import { GasLimit } from "../networkParams";
 import { ReturnCode } from "./returnCode";
 import BigNumber from "bignumber.js";
 import { createLocalnetProvider } from "../testutils/networkProviders";
@@ -34,7 +33,7 @@ describe("test smart contract interactor", function () {
             contract: contract,
             deployer: alice,
             codePath: "src/testdata/answer.wasm",
-            gasLimit: new GasLimit(3000000),
+            gasLimit: 3000000,
             initArguments: [],
             chainID: network.ChainID
         });
@@ -43,7 +42,7 @@ describe("test smart contract interactor", function () {
         assert.isTrue(returnCode.isSuccess());
 
         let interaction = <Interaction>contract.methods.getUltimateAnswer()
-            .withGasLimit(new GasLimit(3000000))
+            .withGasLimit(3000000)
             .withChainID(network.ChainID);
 
         // Query
@@ -82,7 +81,7 @@ describe("test smart contract interactor", function () {
             contract: contract,
             deployer: alice,
             codePath: "src/testdata/counter.wasm",
-            gasLimit: new GasLimit(3000000),
+            gasLimit: 3000000,
             initArguments: [],
             chainID: network.ChainID
         });
@@ -92,10 +91,10 @@ describe("test smart contract interactor", function () {
 
         let getInteraction = <Interaction>contract.methods.get();
         let incrementInteraction = (<Interaction>contract.methods.increment())
-            .withGasLimit(new GasLimit(3000000))
+            .withGasLimit(3000000)
             .withChainID(network.ChainID);
         let decrementInteraction = (<Interaction>contract.methods.decrement())
-            .withGasLimit(new GasLimit(3000000))
+            .withGasLimit(3000000)
             .withChainID(network.ChainID);
 
         // Query "get()"
@@ -135,7 +134,7 @@ describe("test smart contract interactor", function () {
             contract: contract,
             deployer: alice,
             codePath: "src/testdata/lottery-esdt.wasm",
-            gasLimit: new GasLimit(100000000),
+            gasLimit: 100000000,
             initArguments: [],
             chainID: network.ChainID
         });
@@ -153,15 +152,15 @@ describe("test smart contract interactor", function () {
             null,
             null
         ])
-        .withGasLimit(new GasLimit(30000000))
+        .withGasLimit(30000000)
         .withChainID(network.ChainID);
 
         let lotteryStatusInteraction = <Interaction>contract.methods.status(["lucky"])
-        .withGasLimit(new GasLimit(5000000))
+        .withGasLimit(5000000)
         .withChainID(network.ChainID);
 
         let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo(["lucky"])
-        .withGasLimit(new GasLimit(5000000))
+        .withGasLimit(5000000)
         .withChainID(network.ChainID);
 
         // start()

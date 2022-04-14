@@ -12,7 +12,7 @@ import { SmartContractAbi } from "./abi";
 import { Address } from "../address";
 import { assert } from "chai";
 import { Interaction } from "./interaction";
-import { ChainID, GasLimit } from "../networkParams";
+import { ChainID } from "../networkParams";
 import { ContractFunction } from "./function";
 import { ReturnCode } from "./returnCode";
 import BigNumber from "bignumber.js";
@@ -109,13 +109,13 @@ describe("test smart contract interactor", function() {
 
         let interaction = <Interaction>contract.methods
             .getUltimateAnswer()
-            .withGasLimit(new GasLimit(543210))
+            .withGasLimit(543210)
             .withChainID(new ChainID("T"));
 
         assert.equal(contract.getAddress(), dummyAddress);
         assert.deepEqual(interaction.getFunction(), new ContractFunction("getUltimateAnswer"));
         assert.lengthOf(interaction.getArguments(), 0);
-        assert.deepEqual(interaction.getGasLimit(), new GasLimit(543210));
+        assert.deepEqual(interaction.getGasLimit(), 543210);
 
         provider.mockQueryContractOnFunction(
             "getUltimateAnswer",
@@ -170,8 +170,8 @@ describe("test smart contract interactor", function() {
         let controller = new ContractController(provider);
 
         let getInteraction = <Interaction>contract.methodsExplicit.get().check();
-        let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(new GasLimit(543210));
-        let decrementInteraction = (<Interaction>contract.methods.decrement()).withGasLimit(new GasLimit(987654));
+        let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(543210);
+        let decrementInteraction = (<Interaction>contract.methods.decrement()).withGasLimit(987654);
 
         // For "get()", return fake 7
         provider.mockQueryContractOnFunction(
@@ -229,16 +229,16 @@ describe("test smart contract interactor", function() {
                     OptionValue.newMissing(),
                     OptionalValue.newMissing()
                 ])
-                .withGasLimit(new GasLimit(5000000))
+                .withGasLimit(5000000)
                 .check()
         );
 
         let statusInteraction = <Interaction>(
-            contract.methods.status(["lucky"]).withGasLimit(new GasLimit(5000000))
+            contract.methods.status(["lucky"]).withGasLimit(5000000)
         );
 
         let getLotteryInfoInteraction = <Interaction>(
-            contract.methods.getLotteryInfo(["lucky"]).withGasLimit(new GasLimit(5000000))
+            contract.methods.getLotteryInfo(["lucky"]).withGasLimit(5000000)
         );
 
         // start()

@@ -5,7 +5,6 @@ export * from "./errors";
 export * from "./account";
 export * from "./address";
 export * from "./asyncTimer";
-export * from "./nonce";
 export * from "./transaction";
 export * from "./transactionPayload";
 export * from "./transactionWatcher";

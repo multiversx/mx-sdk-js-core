@@ -3,7 +3,7 @@ import { ProtoSerializer } from "./serializer";
 import { Transaction } from "../transaction";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { Signature } from "../signature";
-import { ChainID, GasLimit, GasPrice, TransactionVersion } from "../networkParams";
+import { ChainID, GasPrice, TransactionVersion } from "../networkParams";
 import { TransactionPayload } from "../transactionPayload";
 import BigNumber from "bignumber.js";
 import { TokenPayment } from "../tokenPayment";
@@ -22,7 +22,7 @@ describe("serialize transactions", () => {
             value: 0,
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
-            gasLimit: new GasLimit(50000),
+            gasLimit: 50000,
             chainID: new ChainID("local-testnet")
         });
 
@@ -38,7 +38,7 @@ describe("serialize transactions", () => {
             value: 0,
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
-            gasLimit: new GasLimit(80000),
+            gasLimit: 80000,
             data: new TransactionPayload("hello"),
             chainID: new ChainID("local-testnet")
         });
@@ -55,7 +55,7 @@ describe("serialize transactions", () => {
             value: TokenPayment.egldFromAmount(10),
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
-            gasLimit: new GasLimit(100000),
+            gasLimit: 100000,
             data: new TransactionPayload("for the book"),
             chainID: new ChainID("local-testnet")
         });
@@ -72,7 +72,7 @@ describe("serialize transactions", () => {
             value: new BigNumber("123456789000000000000000000000"),
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
-            gasLimit: new GasLimit(100000),
+            gasLimit: 100000,
             data: new TransactionPayload("for the spaceship"),
             chainID: new ChainID("local-testnet")
         });
@@ -89,7 +89,7 @@ describe("serialize transactions", () => {
             value: new BigNumber("0"),
             receiver: wallets.bob.address,
             gasPrice: GasPrice.min(),
-            gasLimit: new GasLimit(80000),
+            gasLimit: 80000,
             data: new TransactionPayload("hello"),
             chainID: new ChainID("local-testnet"),
             version: new TransactionVersion(1)

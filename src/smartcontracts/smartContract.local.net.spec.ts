@@ -1,5 +1,4 @@
 import { SmartContract } from "./smartContract";
-import { GasLimit } from "../networkParams";
 import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction } from "./function";
 import { loadTestWallets, TestWallet } from "../testutils/wallets";
@@ -109,7 +108,7 @@ describe("test on local testnet", function () {
             contract: contract,
             deployer: alice,
             codePath: "src/testdata/counter.wasm",
-            gasLimit: new GasLimit(3000000),
+            gasLimit: 3000000,
             initArguments: [],
             chainID: network.ChainID
         });
@@ -117,7 +116,7 @@ describe("test on local testnet", function () {
         // ++
         let transactionIncrementFirst = contract.call({
             func: new ContractFunction("increment"),
-            gasLimit: new GasLimit(2000000),
+            gasLimit: 2000000,
             chainID: network.ChainID
         });
 
@@ -129,7 +128,7 @@ describe("test on local testnet", function () {
         // ++
         let transactionIncrementSecond = contract.call({
             func: new ContractFunction("increment"),
-            gasLimit: new GasLimit(2000000),
+            gasLimit: 2000000,
             chainID: network.ChainID
         });
 
@@ -169,7 +168,7 @@ describe("test on local testnet", function () {
             contract: contract,
             deployer: alice,
             codePath: "src/testdata/erc20.wasm",
-            gasLimit: new GasLimit(50000000),
+            gasLimit: 50000000,
             initArguments: [new U32Value(10000)],
             chainID: network.ChainID
         });
@@ -177,14 +176,14 @@ describe("test on local testnet", function () {
         // Minting
         let transactionMintBob = contract.call({
             func: new ContractFunction("transferToken"),
-            gasLimit: new GasLimit(9000000),
+            gasLimit: 9000000,
             args: [new AddressValue(bob.address), new U32Value(1000)],
             chainID: network.ChainID
         });
 
         let transactionMintCarol = contract.call({
             func: new ContractFunction("transferToken"),
-            gasLimit: new GasLimit(9000000),
+            gasLimit: 9000000,
             args: [new AddressValue(carol.address), new U32Value(1500)],
             chainID: network.ChainID
         });
@@ -253,7 +252,7 @@ describe("test on local testnet", function () {
             contract: contract,
             deployer: alice,
             codePath: "src/testdata/lottery-esdt.wasm",
-            gasLimit: new GasLimit(50000000),
+            gasLimit: 50000000,
             initArguments: [],
             chainID: network.ChainID
         });
@@ -261,7 +260,7 @@ describe("test on local testnet", function () {
         // Start
         let transactionStart = contract.call({
             func: new ContractFunction("start"),
-            gasLimit: new GasLimit(10000000),
+            gasLimit: 10000000,
             args: [
                 BytesValue.fromUTF8("lucky"),
                 new TokenIdentifierValue("EGLD"),

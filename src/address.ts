@@ -151,15 +151,6 @@ export class Address {
     }
 
     /**
-     * Throws an error if the address is empty.
-     */
-    assertNotEmpty() {
-        if (this.isEmpty()) {
-            throw new errors.ErrAddressEmpty();
-        }
-    }
-
-    /**
      * Returns whether the address is empty.
      */
     isEmpty() {

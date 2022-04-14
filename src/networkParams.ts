@@ -37,38 +37,6 @@ export class GasPrice {
     }
 }
 
-/**
- * The gas limit, as an immutable object.
- */
-export class GasLimit {
-    /**
-     * The actual numeric value.
-     */
-    private readonly value: number;
-
-    /**
-     * Creates a GasLimit object given a value.
-     */
-    constructor(value: number) {
-        value = Number(value);
-
-        if (Number.isNaN(value) || value < 0) {
-            throw new errors.ErrGasLimitInvalid(value);
-        }
-
-        this.value = value;
-    }
-
-    add(other: GasLimit): GasLimit {
-        return new GasLimit(this.value + other.value);
-    }
-
-    valueOf(): number {
-        return this.value;
-    }
-}
-
-
 export class ChainID {
     /**
      * The actual value, as a string.

@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { Address } from "../address";
 import { Code } from "./code";
 import { SmartContract } from "./smartContract";
-import { ChainID, GasLimit } from "../networkParams";
+import { ChainID } from "../networkParams";
 import { loadTestWallets, MarkCompleted, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
 import { ContractFunction } from "./function";
 import { U32Value } from "./typesystem";
@@ -37,7 +37,7 @@ describe("test contract", () => {
         let contract = new SmartContract({});
         let deployTransaction = contract.deploy({
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
-            gasLimit: new GasLimit(1000000),
+            gasLimit: 1000000,
             chainID: chainID
         });
 
@@ -83,14 +83,14 @@ describe("test contract", () => {
         let callTransactionOne = contract.call({
             func: new ContractFunction("helloEarth"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
-            gasLimit: new GasLimit(150000),
+            gasLimit: 150000,
             chainID: chainID
         });
 
         let callTransactionTwo = contract.call({
             func: new ContractFunction("helloMars"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
-            gasLimit: new GasLimit(1500000),
+            gasLimit: 1500000,
             chainID: chainID
         });
 

@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - TBD
 
+## 10.1.0
+ - [Fix exports and prepare release of erdjs 10](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/197)
+
 ## 10.0.1-beta.2
  - [Bit of cleanup prior release (breaking changes), update readme & docs. Add payload builders for token transfers](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/196)
 

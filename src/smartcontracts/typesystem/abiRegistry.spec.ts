@@ -6,6 +6,7 @@ import { OptionalType } from "./algebraic";
 import { BytesType } from "./bytes";
 import { EnumType } from "./enum";
 import { ListType, OptionType } from "./generic";
+import { ArrayVecType } from "./genericArray";
 import { BigUIntType, I64Type, U32Type, U64Type, U8Type } from "./numerical";
 import { StructType } from "./struct";
 import { TokenIdentifierType } from "./tokenIdentifier";
@@ -77,8 +78,19 @@ describe("test abi registry", () => {
         assert.equal(result.valueOf().name, "SendTransferExecute");
     });
 
-    it.only("should load ABI containing arrayN and nested structs", async () => {
-        let registry = await loadAbiRegistry("src/testdata/arrays-sample.abi.json");
-        let iface = registry.getInterface("ArraysSample");
+    it("should load ABI containing arrayN and nested structs", async () => {
+        let registry = await loadAbiRegistry("src/testdata/array-in-nested-structs.abi.json");
+        let dummyType = registry.getStruct("Dummy");
+        let fooType = registry.getStruct("Foo");
+        let barType = registry.getStruct("Bar");
+        let fooTypeFromBarType = <StructType>barType.getFieldDefinition("foo")!.type;
+        let dummyTypeFromFooTypeFromBarType = <StructType>fooTypeFromBarType.getFieldDefinition("dummy")!.type;
+
+        assert.equal(dummyType.getClassName(), StructType.ClassName);
+        assert.equal(fooType.getClassName(), StructType.ClassName);
+        assert.equal(barType.getClassName(), StructType.ClassName);
+        assert.isTrue(fooType == fooTypeFromBarType);
+        assert.isTrue(dummyType == dummyTypeFromFooTypeFromBarType);
+        assert.equal(dummyType.getFieldDefinition("raw")!.type.getClassName(), ArrayVecType.ClassName);
     });
 });

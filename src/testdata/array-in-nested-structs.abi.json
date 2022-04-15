@@ -1,14 +1,22 @@
 {
     "name": "ArraysSample",
-    "endpoints": [
-    ],
+    "endpoints": [],
     "types": {
+        "Dummy": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "raw",
+                    "type": "array20<u8>"
+                }
+            ]
+        },
         "Foo": {
             "type": "struct",
             "fields": [
                 {
-                    "name": "raw_addr",
-                    "type": "array20<u8>"
+                    "name": "dummy",
+                    "type": "Dummy"
                 }
             ]
         },
@@ -16,7 +24,7 @@
             "type": "struct",
             "fields": [
                 {
-                    "name": "from",
+                    "name": "foo",
                     "type": "Foo"
                 }
             ]

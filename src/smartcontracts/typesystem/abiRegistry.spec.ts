@@ -76,4 +76,9 @@ describe("test abi registry", () => {
         );
         assert.equal(result.valueOf().name, "SendTransferExecute");
     });
+
+    it.only("should load ABI containing arrayN and nested structs", async () => {
+        let registry = await loadAbiRegistry("src/testdata/arrays-sample.abi.json");
+        let iface = registry.getInterface("ArraysSample");
+    });
 });

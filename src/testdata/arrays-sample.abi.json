@@ -1,0 +1,25 @@
+{
+    "name": "ArraysSample",
+    "endpoints": [
+    ],
+    "types": {
+        "Foo": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "raw_addr",
+                    "type": "array20<u8>"
+                }
+            ]
+        },
+        "Bar": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "Foo"
+                }
+            ]
+        }
+    }
+}

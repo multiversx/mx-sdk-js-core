@@ -95,6 +95,7 @@ export class TypeMapper {
 
         this.learnedTypesMap = new Map<string, Type>();
 
+        // Boostrap from previously learned types, if any.
         for (const type of learnedTypes) {
             this.learnedTypesMap.set(type.getName(), type);
         }

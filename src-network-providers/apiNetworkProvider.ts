@@ -157,7 +157,6 @@ export class ApiNetworkProvider implements INetworkProvider {
 
     private async doGet(resourceUrl: string): Promise<any> {
         let url = `${this.url}/${resourceUrl}`;
-        console.debug(`ApiNetworkProvider.doGet(): ${url}`);
 
         try {
             let response = await axios.get(url, this.config);
@@ -169,7 +168,6 @@ export class ApiNetworkProvider implements INetworkProvider {
 
     private async doPost(resourceUrl: string, payload: any): Promise<any> {
         let url = `${this.url}/${resourceUrl}`;
-        console.debug(`ApiNetworkProvider.doPost(): ${url}`);
 
         try {
             let response = await axios.post(url, payload, {

@@ -23,7 +23,7 @@ export class EndpointDefinition {
 
     static fromJSON(json: {
         name: string,
-        storageModifier: string,
+        mutability: string,
         payableInTokens: string[],
         inputs: any[],
         outputs: []
@@ -35,18 +35,18 @@ export class EndpointDefinition {
 
         let input = json.inputs.map(param => EndpointParameterDefinition.fromJSON(param));
         let output = json.outputs.map(param => EndpointParameterDefinition.fromJSON(param));
-        let modifiers = new EndpointModifiers(json.storageModifier, json.payableInTokens);
+        let modifiers = new EndpointModifiers(json.mutability, json.payableInTokens);
 
         return new EndpointDefinition(json.name, input, output, modifiers);
     }
 }
 
 export class EndpointModifiers {
-    readonly storageModifier: string;
+    readonly mutability: string;
     readonly payableInTokens: string[];
 
-    constructor(storageModifier: string, payableInTokens: string[]) {
-        this.storageModifier = storageModifier || "";
+    constructor(mutability: string, payableInTokens: string[]) {
+        this.mutability = mutability || "";
         this.payableInTokens = payableInTokens || [];
     }
 
@@ -75,7 +75,7 @@ export class EndpointModifiers {
     }
 
     isReadonly() {
-        return this.storageModifier == "readonly";
+        return this.mutability == "readonly";
     }
 }
 

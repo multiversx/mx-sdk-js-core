@@ -30,6 +30,10 @@ describe("test abi registry", () => {
         let start = lottery.getEndpoint("start");
         let getStatus = lottery.getEndpoint("status");
         let getLotteryInfo = lottery.getEndpoint("getLotteryInfo");
+
+        assert.isFalse(start.modifiers.isReadonly());
+        assert.isTrue(getStatus.modifiers.isReadonly());
+        assert.isTrue(getLotteryInfo.modifiers.isReadonly());
         assert.instanceOf(start.input[0].type, BytesType);
         assert.instanceOf(start.input[1].type, TokenIdentifierType);
         assert.instanceOf(start.input[2].type, BigUIntType);

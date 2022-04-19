@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - TBD
 
+## 10.1.2
+ - [Fix ABI endpoint definition: attribute "mutability"](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/200)
+
 ## 10.1.1
  - [Add missing package "blake2b" (removed by mistake)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/199)
 

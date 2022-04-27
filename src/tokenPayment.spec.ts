@@ -17,7 +17,7 @@ describe("test token payment", () => {
         assert.equal(TokenPayment.egldFromAmount(1).toPrettyString(), "1.000000000000000000 EGLD");
         assert.equal(TokenPayment.egldFromAmount(10).toPrettyString(), "10.000000000000000000 EGLD");
         assert.equal(TokenPayment.egldFromAmount(100).toPrettyString(), "100.000000000000000000 EGLD");
-        assert.equal(TokenPayment.egldFromAmount(1000).toPrettyString(), "1000.000000000000000000 EGLD");
+        assert.equal(TokenPayment.egldFromAmount(1000).toPrettyString(), "1,000.000000000000000000 EGLD");
         assert.equal(TokenPayment.egldFromAmount("0.123456789").toPrettyString(), "0.123456789000000000 EGLD");
         assert.equal(TokenPayment.egldFromAmount("0.123456789123456789777777888888").toPrettyString(), "0.123456789123456789 EGLD");
 
@@ -58,7 +58,7 @@ describe("test token payment", () => {
         assert.equal(tokenPayment.toPrettyString(), "1 ERDJS-38f249");
     });
 
-    it.only("should format a pretty string", () => {
+    it("should format a pretty string", () => {
         assert.equal(TokenPayment.egldFromAmount(0.1).toPrettyString({ decimalPlaces: 2 }), "0.10 EGLD");
         assert.equal(TokenPayment.egldFromAmount(1).toPrettyString({ decimalPlaces: 2 }), "1.00 EGLD");
         assert.equal(TokenPayment.egldFromAmount(10).toPrettyString({ decimalPlaces: 2 }), "10.00 EGLD");

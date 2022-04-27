@@ -57,4 +57,16 @@ describe("test token payment", () => {
         assert.equal(tokenPayment.nonce, nonce);
         assert.equal(tokenPayment.toPrettyString(), "1 ERDJS-38f249");
     });
+
+    it.only("should format a pretty string", () => {
+        assert.equal(TokenPayment.egldFromAmount(0.1).toPrettyString({ decimalPlaces: 2 }), "0.10 EGLD");
+        assert.equal(TokenPayment.egldFromAmount(1).toPrettyString({ decimalPlaces: 2 }), "1.00 EGLD");
+        assert.equal(TokenPayment.egldFromAmount(10).toPrettyString({ decimalPlaces: 2 }), "10.00 EGLD");
+        assert.equal(TokenPayment.egldFromAmount(100).toPrettyString({ decimalPlaces: 2 }), "100.00 EGLD");
+        assert.equal(TokenPayment.egldFromAmount(1000).toPrettyString({ decimalPlaces: 2 }), "1,000.00 EGLD");
+        assert.equal(TokenPayment.egldFromAmount("0.123456789").toPrettyString({ decimalPlaces: 4 }), "0.1234 EGLD");
+        assert.equal(TokenPayment.fungibleFromBigInteger("USDC-c76f1f", "1000000", 6).toPrettyString({ decimalPlaces: 2, tokenTicker: "USDC" }), "1.00 USDC");
+        assert.equal(TokenPayment.fungibleFromBigInteger("FOOBAR-123456", "1000000", 3).toPrettyString({ decimalPlaces: 4, tokenTicker: "FOO" }), "1,000.0000 FOO");
+        assert.equal(TokenPayment.nonFungible("ERDJS-38f249", 7).toPrettyString(), "1 ERDJS-38f249");
+    });
 });

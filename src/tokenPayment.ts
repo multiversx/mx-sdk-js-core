@@ -7,6 +7,18 @@ const EGLDNumDecimals = 18;
 // Note: this will actually set the default rounding mode for all BigNumber objects in the environment (in the application / dApp).
 BigNumber.set({ ROUNDING_MODE: 1 });
 
+interface FormatOptions {
+    groupSeparator?: string;
+    groupSize?: number;
+    decimalSeparator?: string;
+    decimalPlaces?: number;
+    tokenTicker?: string;
+}
+
+const DefaultFormatGroupSeparator = ",";
+const DefaultFormatGroupSize = 3;
+const DefaultDecimalSeparator = ".";
+
 export class TokenPayment {
     readonly tokenIdentifier: string;
     readonly nonce: number;
@@ -68,8 +80,19 @@ export class TokenPayment {
         return this.amountAsBigInteger;
     }
 
-    toPrettyString() {
-        return `${this.toRationalNumber()} ${this.tokenIdentifier}`;
+    toPrettyString(options?: FormatOptions) {
+        let decimalPlaces = options?.decimalPlaces || this.numDecimals;
+        let suffix = options?.tokenTicker || this.tokenIdentifier;
+
+        let bigNumberFormat: BigNumber.Format = {
+            groupSeparator: options?.groupSeparator || DefaultFormatGroupSeparator,
+            groupSize: options?.groupSize || DefaultFormatGroupSize,
+            decimalSeparator: options?.decimalSeparator || DefaultDecimalSeparator
+        };
+
+        let amount = this.amountAsBigInteger.shiftedBy(-this.numDecimals);
+        let formattedAmount = amount.toFormat(decimalPlaces, bigNumberFormat);
+        return `${formattedAmount} ${suffix}`;
     }
 
     toRationalNumber() {

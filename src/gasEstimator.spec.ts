@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { GasEstimator } from "./gasEstimator";
 
-describe.only("test gas estimator", () => {
+describe("test gas estimator", () => {
     it("should estimate gas limit (default gas configuration)", () => {
         const estimator = new GasEstimator();
 

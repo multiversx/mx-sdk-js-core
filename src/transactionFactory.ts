@@ -71,15 +71,15 @@ export class TransactionFactory {
     createESDTNFTTransfer(args: {
         payment: ITokenPayment,
         nonce?: INonce;
-        receiver: IAddress;
-        sender?: IAddress;
+        destination: IAddress;
+        sender: IAddress;
         gasPrice?: IGasPrice;
         gasLimit?: IGasLimit;
         chainID: IChainID;
     }) {
         const transactionPayload = new ESDTNFTTransferPayloadBuilder()
             .setPayment(args.payment)
-            .setDestination(args.receiver)
+            .setDestination(args.destination)
             .build();
 
         const dataLength = transactionPayload.length() || 0;
@@ -87,7 +87,7 @@ export class TransactionFactory {
 
         return new Transaction({
             nonce: args.nonce,
-            receiver: args.receiver,
+            receiver: args.sender,
             sender: args.sender,
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
@@ -99,15 +99,15 @@ export class TransactionFactory {
     createMultiESDTNFTTransfer(args: {
         payments: ITokenPayment[],
         nonce?: INonce;
-        receiver: IAddress;
-        sender?: IAddress;
+        destination: IAddress;
+        sender: IAddress;
         gasPrice?: IGasPrice;
         gasLimit?: IGasLimit;
         chainID: IChainID;
     }) {
         const transactionPayload = new MultiESDTNFTTransferPayloadBuilder()
             .setPayments(args.payments)
-            .setDestination(args.receiver)
+            .setDestination(args.destination)
             .build();
 
         const dataLength = transactionPayload.length() || 0;
@@ -115,7 +115,7 @@ export class TransactionFactory {
 
         return new Transaction({
             nonce: args.nonce,
-            receiver: args.receiver,
+            receiver: args.sender,
             sender: args.sender,
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,

@@ -5,7 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## Unreleased
- - TBD
+ - [Define Transaction Factory and Gas Estimator](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/203)
 
 ## 10.1.2
  - [Fix ABI endpoint definition: attribute "mutability"](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/200)

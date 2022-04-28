@@ -1,7 +1,6 @@
 interface IGasConfiguration {
     readonly minGasLimit: number;
     readonly gasPerDataByte: number;
-    readonly gasPriceModifier: number;
     readonly gasCostESDTTransfer: number;
     readonly gasCostESDTNFTTransfer: number;
     readonly gasCostESDTNFTMultiTransfer: number;
@@ -16,7 +15,6 @@ interface IGasConfiguration {
 const DefaultGasConfiguration: IGasConfiguration = {
     minGasLimit: 50000,
     gasPerDataByte: 1500,
-    gasPriceModifier: 100,
     gasCostESDTTransfer: 200000,
     gasCostESDTNFTTransfer: 200000,
     gasCostESDTNFTMultiTransfer: 200000

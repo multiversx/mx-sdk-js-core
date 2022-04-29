@@ -7,6 +7,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - [Fix type mapper / ABI registry (scenario: nested structs with ArrayN)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/198)
 
+## 10.1.2
+ - [Fix ABI endpoint definition: attribute "mutability"](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/200)
+
+## 10.1.1
+ - [Add missing package "blake2b" (removed by mistake)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/199)
+
 ## 10.1.0
  - [Fix exports and prepare release of erdjs 10](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/197)
  - [Bit of cleanup prior release (breaking changes), update readme & docs. Add payload builders for token transfers](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/196)

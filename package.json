@@ -1,6 +1,6 @@
 {
   "name": "@elrondnetwork/erdjs",
-  "version": "10.1.0",
+  "version": "10.1.2",
   "description": "Smart Contracts interaction framework",
   "main": "out/index.js",
   "types": "out/index.d.js",
@@ -29,6 +29,7 @@
     "@elrondnetwork/transaction-decoder": "0.1.0",
     "bech32": "1.1.4",
     "bignumber.js": "9.0.1",
+    "blake2b": "2.1.3",
     "buffer": "6.0.3",
     "json-duplicate-key-handle": "1.0.0",
     "keccak": "3.0.1",

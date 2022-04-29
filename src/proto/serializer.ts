@@ -30,7 +30,7 @@ export class ProtoSerializer {
             SndUserName: null,
             GasPrice: transaction.getGasPrice().valueOf(),
             GasLimit: transaction.getGasLimit().valueOf(),
-            Data: transaction.getData().isEmpty() ? null : transaction.getData().valueOf(),
+            Data: transaction.getData().length() == 0 ? null : transaction.getData().valueOf(),
             ChainID: Buffer.from(transaction.getChainID().valueOf()),
             Version: transaction.getVersion().valueOf(),
             Signature: Buffer.from(transaction.getSignature().hex(), "hex")

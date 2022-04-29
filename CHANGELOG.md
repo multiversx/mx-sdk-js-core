@@ -5,6 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## Unreleased
+ - [Define Transaction Factory and Gas Estimator](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/203)
  - [Fix type mapper / ABI registry (scenario: nested structs with ArrayN)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/198)
 
 ## 10.1.2

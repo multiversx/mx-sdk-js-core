@@ -1,14 +1,14 @@
 import { Address } from "./address";
-import { IAddress } from "./interface";
+import { IAddress, ITokenPayment } from "./interface";
 import { ArgSerializer } from "./smartcontracts/argSerializer";
 import { AddressValue, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "./smartcontracts/typesystem";
 import { TokenPayment } from "./tokenPayment";
 import { TransactionPayload } from "./transactionPayload";
 
 export class ESDTTransferPayloadBuilder {
-    payment = TokenPayment.fungibleFromAmount("", "0", 0);
+    payment: ITokenPayment = TokenPayment.fungibleFromAmount("", "0", 0);
 
-    setPayment(payment: TokenPayment): ESDTTransferPayloadBuilder {
+    setPayment(payment: ITokenPayment): ESDTTransferPayloadBuilder {
         this.payment = payment;
         return this;
     }
@@ -28,10 +28,10 @@ export class ESDTTransferPayloadBuilder {
 }
 
 export class ESDTNFTTransferPayloadBuilder {
-    payment: TokenPayment = TokenPayment.nonFungible("", 0);
+    payment: ITokenPayment = TokenPayment.nonFungible("", 0);
     destination: IAddress = new Address("");
 
-    setPayment(payment: TokenPayment): ESDTNFTTransferPayloadBuilder {
+    setPayment(payment: ITokenPayment): ESDTNFTTransferPayloadBuilder {
         this.payment = payment;
         return this;
     }
@@ -60,10 +60,10 @@ export class ESDTNFTTransferPayloadBuilder {
 }
 
 export class MultiESDTNFTTransferPayloadBuilder {
-    payments: TokenPayment[] = [];
+    payments: ITokenPayment[] = [];
     destination: IAddress = new Address("");
 
-    setPayments(payments: TokenPayment[]): MultiESDTNFTTransferPayloadBuilder {
+    setPayments(payments: ITokenPayment[]): MultiESDTNFTTransferPayloadBuilder {
         this.payments = payments;
         return this;
     }

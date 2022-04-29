@@ -17,8 +17,16 @@ export interface IChainID { valueOf(): string; }
 export interface IGasLimit { valueOf(): number; }
 export interface IGasPrice { valueOf(): number; }
 
+export interface ITransactionPayload {
+    length(): number;
+    encoded(): string;
+    toString(): string;
+    valueOf(): Buffer;
+}
+
 export interface ITokenPayment {
     readonly tokenIdentifier: string;
     readonly nonce: number;
     readonly amountAsBigInteger: BigNumber;
+    valueOf(): BigNumber;
 }

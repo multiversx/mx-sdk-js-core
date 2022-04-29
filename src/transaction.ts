@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ISignature, ITransactionValue } from "./interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ISignature, ITransactionPayload, ITransactionValue } from "./interface";
 import { Address } from "./address";
 import {
   TransactionOptions,
@@ -54,7 +54,7 @@ export class Transaction {
   /**
    * The payload of the transaction.
    */
-  private readonly data: TransactionPayload;
+  private readonly data: ITransactionPayload;
 
   /**
    * The chain ID of the Network (e.g. "1" for Mainnet).
@@ -102,7 +102,7 @@ export class Transaction {
     sender?: IAddress;
     gasPrice?: IGasPrice;
     gasLimit: IGasLimit;
-    data?: TransactionPayload;
+    data?: ITransactionPayload;
     chainID: IChainID;
     version?: TransactionVersion;
     options?: TransactionOptions;
@@ -165,7 +165,7 @@ export class Transaction {
     this.gasLimit = gasLimit;
   }
 
-  getData(): TransactionPayload {
+  getData(): ITransactionPayload {
     return this.data;
   }
 
@@ -226,7 +226,7 @@ export class Transaction {
       sender: sender ? sender.bech32() : this.sender.bech32(),
       gasPrice: this.gasPrice.valueOf(),
       gasLimit: this.gasLimit.valueOf(),
-      data: this.data.isEmpty() ? undefined : this.data.encoded(),
+      data: this.data.length() == 0 ? undefined : this.data.encoded(),
       chainID: this.chainID.valueOf(),
       version: this.version.valueOf(),
       options: this.options.valueOf() == 0 ? undefined : this.options.valueOf(),

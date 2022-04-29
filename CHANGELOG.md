@@ -5,7 +5,7 @@ All notable changes will be documented in this file.
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## Unreleased
- - TBD
+ - [Fix type mapper / ABI registry (scenario: nested structs with ArrayN)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/198)
 
 ## 10.1.0
  - [Fix exports and prepare release of erdjs 10](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/197)

@@ -160,11 +160,14 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getDefinitionOfFungibleToken()", async function () {
         this.timeout(10000);
 
-        let identifiers = ["FOO-b6f543", "BAR-c80d29", "COUNTER-b7401d"];
+        let identifiers = ["FOO-b6f543", "BAR-c80d29", "COUNTER-b7401d", "WEB-5d08be"];
 
         for (const identifier of identifiers) {
             let apiResponse = await apiProvider.getDefinitionOfFungibleToken(identifier);
             let proxyResponse = await proxyProvider.getDefinitionOfFungibleToken(identifier);
+
+            // Assets are only present on API response.
+            apiResponse.assets = {};
 
             assert.equal(apiResponse.identifier, identifier);
             assert.deepEqual(apiResponse, proxyResponse);

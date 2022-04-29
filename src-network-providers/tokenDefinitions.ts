@@ -18,6 +18,7 @@ export class DefinitionOfFungibleTokenOnNetwork {
     canFreeze: boolean = false;
     canWipe: boolean = false;
     canAddSpecialRoles: boolean = false;
+    assets: Record<string, any> = {}; 
 
     static fromApiHttpResponse(payload: any): DefinitionOfFungibleTokenOnNetwork {
         let result = new DefinitionOfFungibleTokenOnNetwork();
@@ -36,6 +37,7 @@ export class DefinitionOfFungibleTokenOnNetwork {
         result.canPause = payload.canPause || false;
         result.canFreeze = payload.canFreeze || false;
         result.canWipe = payload.canWipe || false;
+        result.assets = payload.assets || {};
 
         return result;
     }

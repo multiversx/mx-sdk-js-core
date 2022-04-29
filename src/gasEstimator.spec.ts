@@ -11,11 +11,11 @@ describe("test gas estimator", () => {
         assert.equal(estimator.forESDTTransfer(80), 50000 + 80 * 1500 + 200000 + 100000);
         assert.equal(estimator.forESDTTransfer(100), 50000 + 100 * 1500 + 200000 + 100000);
 
-        assert.equal(estimator.forESDTNFTTransfer(80), 50000 + 80 * 1500 + 200000 + 1000000);
-        assert.equal(estimator.forESDTNFTTransfer(100), 50000 + 100 * 1500 + 200000 + 1000000);
+        assert.equal(estimator.forESDTNFTTransfer(80), 50000 + 80 * 1500 + 200000 + 800000);
+        assert.equal(estimator.forESDTNFTTransfer(100), 50000 + 100 * 1500 + 200000 + 800000);
 
-        assert.equal(estimator.forMultiESDTNFTTransfer(80, 1), 50000 + 80 * 1500 + (200000 + 1000000) * 1);
-        assert.equal(estimator.forMultiESDTNFTTransfer(80, 3), 50000 + 80 * 1500 + (200000 + 1000000) * 3);
+        assert.equal(estimator.forMultiESDTNFTTransfer(80, 1), 50000 + 80 * 1500 + (200000 + 800000) * 1);
+        assert.equal(estimator.forMultiESDTNFTTransfer(80, 3), 50000 + 80 * 1500 + (200000 + 800000) * 3);
     });
 
     it("should estimate gas limit (custom gas configuration)", () => {
@@ -33,10 +33,10 @@ describe("test gas estimator", () => {
         assert.equal(estimator.forESDTTransfer(80), 10000 + 80 * 3000 + 200000 + 100000);
         assert.equal(estimator.forESDTTransfer(100), 10000 + 100 * 3000 + 200000 + 100000);
 
-        assert.equal(estimator.forESDTNFTTransfer(80), 10000 + 80 * 3000 + 300000 + 1000000);
-        assert.equal(estimator.forESDTNFTTransfer(100), 10000 + 100 * 3000 + 300000 + 1000000);
+        assert.equal(estimator.forESDTNFTTransfer(80), 10000 + 80 * 3000 + 300000 + 800000);
+        assert.equal(estimator.forESDTNFTTransfer(100), 10000 + 100 * 3000 + 300000 + 800000);
 
-        assert.equal(estimator.forMultiESDTNFTTransfer(80, 1), 10000 + 80 * 3000 + (400000 + 1000000) * 1);
-        assert.equal(estimator.forMultiESDTNFTTransfer(80, 3), 10000 + 80 * 3000 + (400000 + 1000000) * 3);
+        assert.equal(estimator.forMultiESDTNFTTransfer(80, 1), 10000 + 80 * 3000 + (400000 + 800000) * 1);
+        assert.equal(estimator.forMultiESDTNFTTransfer(80, 3), 10000 + 80 * 3000 + (400000 + 800000) * 3);
     });
 });

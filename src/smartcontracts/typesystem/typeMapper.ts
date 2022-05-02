@@ -35,8 +35,9 @@ type TypeFactory = (...typeParameters: Type[]) => Type;
 export class TypeMapper {
     private readonly openTypesFactories: Map<string, TypeFactory>;
     private readonly closedTypesMap: Map<string, Type>;
+    private readonly learnedTypesMap: Map<string, Type>;
 
-    constructor(customTypes: CustomType[] = []) {
+    constructor(learnedTypes: CustomType[] = []) {
         this.openTypesFactories = new Map<string, TypeFactory>([
             ["Option", (...typeParameters: Type[]) => new OptionType(typeParameters[0])],
             ["List", (...typeParameters: Type[]) => new ListType(typeParameters[0])],
@@ -61,7 +62,7 @@ export class TypeMapper {
             ["tuple7", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
             ["tuple8", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
             // Known-length arrays.
-            // TODO: Handle these in typeExpressionParser, perhaps?
+            // TODO: Handle these in typeExpressionParser!
             ["array20", (...typeParameters: Type[]) => new ArrayVecType(20, typeParameters[0])],
             ["array32", (...typeParameters: Type[]) => new ArrayVecType(32, typeParameters[0])],
             ["array46", (...typeParameters: Type[]) => new ArrayVecType(46, typeParameters[0])],
@@ -93,13 +94,40 @@ export class TypeMapper {
             ["AsyncCall", new NothingType()]
         ]);
 
-        for (const customType of customTypes) {
-            this.closedTypesMap.set(customType.getName(), customType);
+        this.learnedTypesMap = new Map<string, Type>();
+
+        // Boostrap from previously learned types, if any.
+        for (const type of learnedTypes) {
+            this.learnedTypesMap.set(type.getName(), type);
         }
+    }
+
+    mapType(type: Type): Type {
+        let mappedType = this.mapRecursiveType(type);
+        if (mappedType) {
+            // We do not learn generic types (that also have type parameters)
+            if (!mappedType.isGenericType()) {
+                this.learnType(mappedType);
+            }
+            
+            return mappedType;
+        }
+
+        throw new errors.ErrTypingSystem(`Cannot map the type "${type.getName()}" to a known type`);
     }
 
     mapRecursiveType(type: Type): Type | null {
         let isGeneric = type.isGenericType();
+
+        let previouslyLearnedType = this.learnedTypesMap.get(type.getName());
+        if (previouslyLearnedType) {
+            return previouslyLearnedType;
+        }
+
+        let knownClosedType = this.closedTypesMap.get(type.getName());
+        if (knownClosedType) {
+            return knownClosedType;
+        }
 
         if (type.hasExactClass(EnumType.ClassName)) {
             // This will call mapType() recursively, for all the enum variant fields.
@@ -115,27 +143,13 @@ export class TypeMapper {
             // This will call mapType() recursively, for all the type parameters.
             return this.mapGenericType(type);
         }
-        
+
         return null;
     }
 
-    mapType(type: Type): Type {
-        let mappedType = this.mapRecursiveType(type);
-        if (mappedType !== null) {
-            return mappedType;
-        }
-
-        let knownClosedType = this.closedTypesMap.get(type.getName());
-        if (!knownClosedType) {
-            throw new errors.ErrTypingSystem(`Cannot map the type "${type.getName()}" to a known type`);
-        }
-
-        return this.mapRecursiveType(knownClosedType) ?? knownClosedType;
-    }
-
-    feedCustomType(type: Type): void {
-        this.closedTypesMap.delete(type.getName());
-        this.closedTypesMap.set(type.getName(), type);
+    private learnType(type: Type): void {
+        this.learnedTypesMap.delete(type.getName());
+        this.learnedTypesMap.set(type.getName(), type);
     }
 
     private mapStructType(type: StructType): StructType {

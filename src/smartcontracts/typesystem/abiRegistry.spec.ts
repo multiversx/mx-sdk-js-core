@@ -92,4 +92,19 @@ describe("test abi registry", () => {
         );
         assert.equal(result.valueOf().name, "SendTransferExecute");
     });
+
+    it("should load ABI containing arrayN and nested structs", async () => {
+        let registry = await loadAbiRegistry(["src/testdata/array-in-nested-structs.abi.json"]);
+        let dummyType = registry.getStruct("Dummy");
+        let fooType = registry.getStruct("Foo");
+        let barType = registry.getStruct("Bar");
+        let fooTypeFromBarType = <StructType>barType.getFieldDefinition("foo")!.type;
+        let dummyTypeFromFooTypeFromBarType = <StructType>fooTypeFromBarType.getFieldDefinition("dummy")!.type;
+
+        assert.equal(dummyType.getClassName(), StructType.ClassName);
+        assert.equal(fooType.getClassName(), StructType.ClassName);
+        assert.equal(barType.getClassName(), StructType.ClassName);
+        assert.isTrue(fooType == fooTypeFromBarType);
+        assert.isTrue(dummyType == dummyTypeFromFooTypeFromBarType);
+    });
 });

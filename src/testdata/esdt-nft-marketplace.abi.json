@@ -403,6 +403,19 @@
     ],
     "hasCallback": false,
     "types": {
+        "EsdtToken": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_type",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "nonce",
+                    "type": "u64"
+                }
+            ]
+        },
         "Auction": {
             "type": "struct",
             "fields": [
@@ -478,19 +491,6 @@
                 {
                     "name": "SftOnePerPayment",
                     "discriminant": 3
-                }
-            ]
-        },
-        "EsdtToken": {
-            "type": "struct",
-            "fields": [
-                {
-                    "name": "token_type",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "nonce",
-                    "type": "u64"
                 }
             ]
         }

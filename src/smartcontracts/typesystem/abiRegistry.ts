@@ -76,14 +76,13 @@ export class AbiRegistry {
      * The result is an equivalent, more explicit ABI registry.
      */
     remapToKnownTypes(): AbiRegistry {
-        let mapper = new TypeMapper(this.customTypes);
+        let mapper = new TypeMapper([]);
         let newCustomTypes: CustomType[] = [];
         let newInterfaces: ContractInterface[] = [];
         // First, remap custom types (actually, under the hood, this will remap types of struct fields)
         for (const type of this.customTypes) {
             const mappedTyped = mapper.mapType(type);
             newCustomTypes.push(mappedTyped);
-            mapper.feedCustomType(mappedTyped);
         }
         // Then, remap types of all endpoint parameters.
         // But we'll use an enhanced mapper, that takes into account the results from the previous step.

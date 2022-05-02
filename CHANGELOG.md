@@ -6,6 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Unreleased
  - [Define Transaction Factory and Gas Estimator](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/203)
+ - [Fix type mapper / ABI registry (scenario: nested structs with ArrayN)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/198)
 
 ## 10.1.2
  - [Fix ABI endpoint definition: attribute "mutability"](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/200)

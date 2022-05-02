@@ -20,8 +20,12 @@ export class StructType extends CustomType {
         return new StructType(json.name, definitions);
     }
 
-    getFieldsDefinitions() {
+    getFieldsDefinitions(): FieldDefinition[] {
         return this.fieldsDefinitions;
+    }
+
+    getFieldDefinition(name: string): FieldDefinition | undefined {
+        return this.fieldsDefinitions.find(item => item.name == name);
     }
 }
 

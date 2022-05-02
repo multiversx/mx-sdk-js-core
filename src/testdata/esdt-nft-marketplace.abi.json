@@ -416,6 +416,27 @@
                 }
             ]
         },
+        "AuctionType": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "None",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Nft",
+                    "discriminant": 1
+                },
+                {
+                    "name": "SftAll",
+                    "discriminant": 2
+                },
+                {
+                    "name": "SftOnePerPayment",
+                    "discriminant": 3
+                }
+            ]
+        },
         "Auction": {
             "type": "struct",
             "fields": [
@@ -470,27 +491,6 @@
                 {
                     "name": "creator_royalties_percentage",
                     "type": "BigUint"
-                }
-            ]
-        },
-        "AuctionType": {
-            "type": "enum",
-            "variants": [
-                {
-                    "name": "None",
-                    "discriminant": 0
-                },
-                {
-                    "name": "Nft",
-                    "discriminant": 1
-                },
-                {
-                    "name": "SftAll",
-                    "discriminant": 2
-                },
-                {
-                    "name": "SftOnePerPayment",
-                    "discriminant": 3
                 }
             ]
         }

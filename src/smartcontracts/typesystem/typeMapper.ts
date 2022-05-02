@@ -64,7 +64,8 @@ export class TypeMapper {
             // TODO: Handle these in typeExpressionParser, perhaps?
             ["array20", (...typeParameters: Type[]) => new ArrayVecType(20, typeParameters[0])],
             ["array32", (...typeParameters: Type[]) => new ArrayVecType(32, typeParameters[0])],
-            ["array64", (...typeParameters: Type[]) => new ArrayVecType(64, typeParameters[0])],
+            ["array46", (...typeParameters: Type[]) => new ArrayVecType(46, typeParameters[0])],
+            ["array64", (...typeParameters: Type[]) => new ArrayVecType(64, typeParameters[0])]
         ]);
 
         // For closed types, we hold actual type instances instead of type constructors / factories (no type parameters needed).

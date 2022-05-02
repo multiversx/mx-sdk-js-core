@@ -97,4 +97,8 @@ describe("test abi registry", () => {
         assert.isTrue(dummyType == dummyTypeFromFooTypeFromBarType);
         assert.equal(dummyType.getFieldDefinition("raw")!.type.getClassName(), ArrayVecType.ClassName);
     });
+
+    it("should load ABI when custom types are out of order", async () => {
+        await loadAbiRegistry("src/testdata/custom-types-out-of-order.abi.json");
+    });
 });

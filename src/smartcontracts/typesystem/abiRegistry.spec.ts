@@ -99,6 +99,10 @@ describe("test abi registry", () => {
     });
 
     it("should load ABI when custom types are out of order", async () => {
-        await loadAbiRegistry("src/testdata/custom-types-out-of-order.abi.json");
+        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order.abi.json");
+
+        assert.deepEqual(registry.getStruct("TypeA").getNamesOfDependencies(), ["TypeB", "TypeC", "u64"]);
+        assert.deepEqual(registry.getStruct("TypeB").getNamesOfDependencies(), ["TypeC", "u64"]);
+        assert.deepEqual(registry.getStruct("TypeC").getNamesOfDependencies(), ["u64"]);
     });
 });

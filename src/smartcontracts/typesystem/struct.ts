@@ -27,6 +27,10 @@ export class StructType extends CustomType {
     getFieldDefinition(name: string): FieldDefinition | undefined {
         return this.fieldsDefinitions.find(item => item.name == name);
     }
+
+    getNamesOfDependencies(): string[] {
+        return Fields.getNamesOfTypeDependencies(this.fieldsDefinitions);
+    }
 }
 
 export class Struct extends TypedValue {

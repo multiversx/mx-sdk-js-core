@@ -34,6 +34,33 @@
                     "discriminant": 1
                 }
             ]
+        },
+        "TypeA": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "b",
+                    "type": "TypeB"
+                }
+            ]
+        },
+        "TypeB": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "c",
+                    "type": "TypeC"
+                }
+            ]
+        },
+        "TypeC": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "foobar",
+                    "type": "u64"
+                }
+            ]
         }
     }
 }

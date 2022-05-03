@@ -34,6 +34,16 @@ export class EnumType extends CustomType {
         guardValueIsSet(`variant by name (${name})`, result);
         return result!;
     }
+
+    getNamesOfDependencies(): string[] {
+        const dependencies: string[] = [];
+
+        for (const variant of this.variants) {
+            dependencies.push(...variant.getNamesOfDependencies());
+        }
+
+        return [...new Set(dependencies)];
+    }
 }
 
 export class EnumVariantDefinition {
@@ -63,6 +73,10 @@ export class EnumVariantDefinition {
 
     getFieldDefinition(name: string): FieldDefinition | undefined {
         return this.fieldsDefinitions.find(item => item.name == name);
+    }
+
+    getNamesOfDependencies(): string[] {
+        return Fields.getNamesOfTypeDependencies(this.fieldsDefinitions);
     }
 }
 

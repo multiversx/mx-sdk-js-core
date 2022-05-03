@@ -74,4 +74,15 @@ export class Fields {
 
         return true;
     }
+
+    static getNamesOfTypeDependencies(definitions: FieldDefinition[]): string[] {
+        const dependencies: string[] = [];
+
+        for (const definition of definitions) {
+            dependencies.push(definition.type.getName());
+            dependencies.push(...definition.type.getNamesOfDependencies());
+        }
+
+        return [...new Set(dependencies)];
+    }
 }

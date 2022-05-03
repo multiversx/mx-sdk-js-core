@@ -66,4 +66,10 @@ describe("test types", () => {
         assert.deepEqual(new BytesType().getClassHierarchy(), ["Type", "PrimitiveType", "BytesType"]);
         assert.deepEqual(new BytesValue(Buffer.from("foobar")).getClassHierarchy(), ["TypedValue", "PrimitiveValue", "BytesValue"]);
     });
+
+    it("should report type dependencies", () => {
+        assert.deepEqual(parser.parse("MultiResultVec<u32>").getNamesOfDependencies(), ["u32"]);
+        assert.deepEqual(parser.parse("tuple2<Address,BigUint>").getNamesOfDependencies(), ["Address", "BigUint"]);
+        assert.deepEqual(parser.parse("Option<FooBar>").getNamesOfDependencies(), ["FooBar"]);
+    });
 });

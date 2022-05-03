@@ -19,9 +19,11 @@ export class AbiRegistry {
 
     private extend(json: { name: string; endpoints: any[]; types: any[] }): AbiRegistry {
         json.types = json.types || {};
+
         // The "endpoints" collection is interpreted by "ContractInterface".
         let iface = ContractInterface.fromJSON(json);
         this.interfaces.push(iface);
+
         for (const customTypeName in json.types) {
             let itemJson = json.types[customTypeName];
             let typeDiscriminant = itemJson.type;
@@ -30,8 +32,12 @@ export class AbiRegistry {
             let customType = this.createCustomType(typeDiscriminant, itemJson);
             this.customTypes.push(customType);
         }
+
+        this.sortCustomTypesByDependencies();
+
         return this;
     }
+
     private createCustomType(typeDiscriminant: string, json: any): CustomType {
         if (typeDiscriminant == "struct") {
             return StructType.fromJSON(json);
@@ -41,30 +47,50 @@ export class AbiRegistry {
         }
         throw new errors.ErrTypingSystem(`Unknown type discriminant: ${typeDiscriminant}`);
     }
+
+    private sortCustomTypesByDependencies() {
+        this.customTypes.sort((a: CustomType, b: CustomType) => {
+            const bDependsonA = b.getNamesOfDependencies().indexOf(a.getName()) > -1;
+            if (bDependsonA) {
+                // Sort "a" before "b".
+                return -1;
+            }
+
+            // Keep original order.
+            return 0;
+        });
+    }
+
     getInterface(name: string): ContractInterface {
         let result = this.interfaces.find((e) => e.name == name);
         guardValueIsSetWithMessage(`interface [${name}] not found`, result);
         return result!;
     }
+
     getInterfaces(names: string[]): ContractInterface[] {
         return names.map((name) => this.getInterface(name));
     }
+
     getStruct(name: string): StructType {
         let result = this.customTypes.find((e) => e.getName() == name && e.hasExactClass(StructType.ClassName));
         guardValueIsSetWithMessage(`struct [${name}] not found`, result);
         return <StructType>result!;
     }
+
     getStructs(names: string[]): StructType[] {
         return names.map((name) => this.getStruct(name));
     }
+
     getEnum(name: string): EnumType {
         let result = this.customTypes.find((e) => e.getName() == name && e.hasExactClass(EnumType.ClassName));
         guardValueIsSetWithMessage(`enum [${name}] not found`, result);
         return <EnumType>result!;
     }
+
     getEnums(names: string[]): EnumType[] {
         return names.map((name) => this.getEnum(name));
     }
+
     /**
      * Right after loading ABI definitions into a registry, the endpoints and the custom types (structs, enums)
      * use raw types for their I/O parameters (in the case of endpoints), or for their fields (in the case of structs).
@@ -79,11 +105,13 @@ export class AbiRegistry {
         let mapper = new TypeMapper([]);
         let newCustomTypes: CustomType[] = [];
         let newInterfaces: ContractInterface[] = [];
+
         // First, remap custom types (actually, under the hood, this will remap types of struct fields)
         for (const type of this.customTypes) {
             const mappedTyped = mapper.mapType(type);
             newCustomTypes.push(mappedTyped);
         }
+
         // Then, remap types of all endpoint parameters.
         // But we'll use an enhanced mapper, that takes into account the results from the previous step.
         mapper = new TypeMapper(newCustomTypes);
@@ -95,6 +123,7 @@ export class AbiRegistry {
             let newConstructor = iface.constructorDefinition ? mapEndpoint(iface.constructorDefinition, mapper) : null;
             newInterfaces.push(new ContractInterface(iface.name, newConstructor, newEndpoints));
         }
+
         // Now return the new registry, with all types remapped to known types
         let newRegistry = new AbiRegistry();
         newRegistry.customTypes.push(...newCustomTypes);

@@ -133,6 +133,17 @@ export class Type {
         return fullyQualifiedNames;
     }
 
+    getNamesOfDependencies(): string[] {
+        const dependencies: string[] = [];
+
+        for (const type of this.typeParameters) {
+            dependencies.push(type.getName());
+            dependencies.push(...type.getNamesOfDependencies());
+        }
+
+        return [...new Set(dependencies)];
+    }
+
     /**
      * Converts the account to a pretty, plain JavaScript object.
      */

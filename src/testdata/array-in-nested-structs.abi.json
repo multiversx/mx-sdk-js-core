@@ -1,0 +1,33 @@
+{
+    "name": "ArraysSample",
+    "endpoints": [],
+    "types": {
+        "Dummy": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "raw",
+                    "type": "array20<u8>"
+                }
+            ]
+        },
+        "Foo": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "dummy",
+                    "type": "Dummy"
+                }
+            ]
+        },
+        "Bar": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "foo",
+                    "type": "Foo"
+                }
+            ]
+        }
+    }
+}

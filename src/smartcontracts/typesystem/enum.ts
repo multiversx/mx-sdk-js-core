@@ -56,8 +56,12 @@ export class EnumVariantDefinition {
         return new EnumVariantDefinition(json.name, json.discriminant, definitions);
     }
 
-    getFieldsDefinitions() {
+    getFieldsDefinitions(): FieldDefinition[] {
         return this.fieldsDefinitions;
+    }
+
+    getFieldDefinition(name: string): FieldDefinition | undefined {
+        return this.fieldsDefinitions.find(item => item.name == name);
     }
 }
 

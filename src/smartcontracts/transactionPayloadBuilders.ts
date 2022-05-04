@@ -1,26 +1,35 @@
 
 import { TransactionPayload } from "../transactionPayload";
 import { guardValueIsSet } from "../utils";
-import { Code } from "./code";
-import { CodeMetadata } from "./codeMetadata";
-import { ContractFunction } from "./function";
 import { ArgSerializer } from "./argSerializer";
 import { TypedValue } from "./typesystem";
 
 export const ArwenVirtualMachine = "0500";
 
+interface ICode {
+    toString(): string;
+}
+
+interface ICodeMetadata {
+    toString(): string;
+}
+
+interface IContractFunction {
+    name: string;
+}
+
 /**
  * A builder for {@link TransactionPayload} objects, to be used for Smart Contract deployment transactions.
  */
 export class ContractDeployPayloadBuilder {
-    private code: Code | null = null;
-    private codeMetadata: CodeMetadata = new CodeMetadata();
+    private code: ICode | null = null;
+    private codeMetadata: ICodeMetadata = "";
     private arguments: TypedValue[] = [];
 
     /**
      * Sets the code of the Smart Contract.
      */
-    setCode(code: Code): ContractDeployPayloadBuilder {
+    setCode(code: ICode): ContractDeployPayloadBuilder {
         this.code = code;
         return this;
     }
@@ -28,7 +37,7 @@ export class ContractDeployPayloadBuilder {
     /**
      * Sets the code metadata of the Smart Contract.
      */
-    setCodeMetadata(codeMetadata: CodeMetadata): ContractDeployPayloadBuilder {
+    setCodeMetadata(codeMetadata: ICodeMetadata): ContractDeployPayloadBuilder {
         this.codeMetadata = codeMetadata;
         return this;
     }
@@ -68,14 +77,14 @@ export class ContractDeployPayloadBuilder {
  * A builder for {@link TransactionPayload} objects, to be used for Smart Contract upgrade transactions.
  */
 export class ContractUpgradePayloadBuilder {
-    private code: Code | null = null;
-    private codeMetadata: CodeMetadata = new CodeMetadata();
+    private code: ICode | null = null;
+    private codeMetadata: ICodeMetadata = "";
     private arguments: TypedValue[] = [];
 
     /**
      * Sets the code of the Smart Contract.
      */
-    setCode(code: Code): ContractUpgradePayloadBuilder {
+    setCode(code: ICode): ContractUpgradePayloadBuilder {
         this.code = code;
         return this;
     }
@@ -83,7 +92,7 @@ export class ContractUpgradePayloadBuilder {
     /**
      * Sets the code metadata of the Smart Contract.
      */
-    setCodeMetadata(codeMetadata: CodeMetadata): ContractUpgradePayloadBuilder {
+    setCodeMetadata(codeMetadata: ICodeMetadata): ContractUpgradePayloadBuilder {
         this.codeMetadata = codeMetadata;
         return this;
     }
@@ -123,13 +132,13 @@ export class ContractUpgradePayloadBuilder {
  * A builder for {@link TransactionPayload} objects, to be used for Smart Contract execution transactions.
  */
 export class ContractCallPayloadBuilder {
-    private contractFunction: ContractFunction | null = null;
+    private contractFunction: IContractFunction | null = null;
     private arguments: TypedValue[] = [];
 
     /**
      * Sets the function to be called (executed).
      */
-    setFunction(contractFunction: ContractFunction): ContractCallPayloadBuilder {
+    setFunction(contractFunction: IContractFunction): ContractCallPayloadBuilder {
         this.contractFunction = contractFunction;
         return this;
     }

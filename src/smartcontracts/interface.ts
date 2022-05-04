@@ -1,8 +1,5 @@
 import { IAddress, IChainID, IGasLimit, IGasPrice, ITransactionValue } from "../interface";
 import { Transaction } from "../transaction";
-import { Code } from "./code";
-import { CodeMetadata } from "./codeMetadata";
-import { ContractFunction } from "./function";
 import { ReturnCode } from "./returnCode";
 import { TypedValue } from "./typesystem";
 
@@ -32,8 +29,8 @@ export interface ISmartContract {
 }
 
 export interface DeployArguments {
-    code: Code;
-    codeMetadata?: CodeMetadata;
+    code: ICode;
+    codeMetadata?: ICodeMetadata;
     initArguments?: TypedValue[];
     value?: ITransactionValue;
     gasLimit: IGasLimit;
@@ -42,8 +39,8 @@ export interface DeployArguments {
 }
 
 export interface UpgradeArguments {
-    code: Code;
-    codeMetadata?: CodeMetadata;
+    code: ICode;
+    codeMetadata?: ICodeMetadata;
     initArguments?: TypedValue[];
     value?: ITransactionValue;
     gasLimit: IGasLimit;
@@ -52,7 +49,7 @@ export interface UpgradeArguments {
 }
 
 export interface CallArguments {
-    func: ContractFunction;
+    func: IContractFunction;
     args?: TypedValue[];
     value?: ITransactionValue;
     gasLimit: IGasLimit;
@@ -62,7 +59,7 @@ export interface CallArguments {
 }
 
 export interface QueryArguments {
-    func: ContractFunction;
+    func: IContractFunction;
     args?: TypedValue[];
     value?: ITransactionValue;
     caller?: IAddress
@@ -82,4 +79,17 @@ export interface UntypedOutcomeBundle {
     returnCode: ReturnCode;
     returnMessage: string;
     values: Buffer[];
+}
+
+interface ICode {
+    toString(): string;
+}
+
+interface ICodeMetadata {
+    toString(): string;
+}
+
+export interface IContractFunction {
+    name: string;
+    toString(): string;
 }

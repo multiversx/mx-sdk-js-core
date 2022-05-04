@@ -1,20 +1,20 @@
-import { ContractFunction } from "./function";
 import { Address } from "../address";
 import { TypedValue } from "./typesystem";
 import { ArgSerializer } from "./argSerializer";
 import { IAddress, ITransactionValue } from "../interface";
+import { IContractFunction } from "./interface";
 
 export class Query {
     caller: IAddress;
     address: IAddress;
-    func: ContractFunction;
+    func: IContractFunction;
     args: TypedValue[];
     value: ITransactionValue;
 
     constructor(obj: {
         caller?: IAddress,
         address: IAddress,
-        func: ContractFunction,
+        func: IContractFunction,
         args?: TypedValue[],
         value?: ITransactionValue
     }) {

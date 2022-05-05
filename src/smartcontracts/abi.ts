@@ -1,24 +1,18 @@
-import { ErrInvariantFailed } from "../errors";
 import { guardValueIsSetWithMessage } from "../utils";
 import { ContractFunction } from "./function";
 import { AbiRegistry, EndpointDefinition } from "./typesystem";
 import { ContractInterface } from "./typesystem/contractInterface";
 
 export class SmartContractAbi {
-    private readonly interfaces: ContractInterface[] = [];
+    private readonly interface: ContractInterface;
 
-    constructor(registry: AbiRegistry, implementsInterfaces: string[]) {
-        this.interfaces.push(...registry.getInterfaces(implementsInterfaces));
+    // TODO (breaking, next major version): remove second parameter (not used anymore).
+    constructor(registry: AbiRegistry, _implementsInterfaces?: string[]) {
+        this.interface = registry.interfaces[0];
     }
     
     getAllEndpoints(): EndpointDefinition[] {
-        let endpoints = [];
-
-        for (const iface of this.interfaces) {
-            endpoints.push(...iface.endpoints);
-        }
-
-        return endpoints;
+        return this.interface.endpoints;
     }
 
     getEndpoint(name: string | ContractFunction): EndpointDefinition {
@@ -31,20 +25,6 @@ export class SmartContractAbi {
     }
 
     getConstructorDefinition(): EndpointDefinition | null {
-        let constructors = [];
-        for (const iface of this.interfaces) {
-            let constructor_definition = iface.getConstructorDefinition();
-            if (constructor_definition !== null) {
-                constructors.push(constructor_definition);
-            }
-        }
-        switch (constructors.length) {
-            case 0:
-                return null;
-            case 1:
-                return constructors[0];
-            default:
-                throw new ErrInvariantFailed(`Found more than 1 constructor (found ${constructors.length})`);
-        }
+        return this.interface.getConstructorDefinition();
     }
 }

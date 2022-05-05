@@ -81,11 +81,11 @@ export interface UntypedOutcomeBundle {
     values: Buffer[];
 }
 
-interface ICode {
+export interface ICode {
     toString(): string;
 }
 
-interface ICodeMetadata {
+export interface ICodeMetadata {
     toString(): string;
 }
 

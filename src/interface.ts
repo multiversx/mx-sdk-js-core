@@ -27,6 +27,6 @@ export interface ITransactionPayload {
 export interface ITokenPayment {
     readonly tokenIdentifier: string;
     readonly nonce: number;
-    readonly amountAsBigInteger: BigNumber;
-    valueOf(): BigNumber;
+    readonly amountAsBigInteger: BigNumber.Value;
+    valueOf(): BigNumber.Value;
 }

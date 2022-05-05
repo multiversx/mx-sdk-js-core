@@ -40,6 +40,7 @@ export class ContractFunction {
         return this.name;
     }
 
+    // TODO (breaking, next major version): remove function, not used.
     equals(other: ContractFunction | null): boolean {
         if (!other) {
             return false;

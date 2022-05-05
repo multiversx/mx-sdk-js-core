@@ -11,8 +11,9 @@ export class TokenPayment {
     readonly tokenIdentifier: string;
     readonly nonce: number;
     readonly amountAsBigInteger: BigNumber;
-    private readonly numDecimals: number;
+    readonly numDecimals: number;
 
+    // TODO (breaking, next major version): constructor({ ... })
     constructor(tokenIdentifier: string, nonce: number, amountAsBigInteger: BigNumber.Value, numDecimals: number) {
         let amount = new BigNumber(amountAsBigInteger);
         if (!amount.isInteger() || amount.isNegative()) {
@@ -72,6 +73,7 @@ export class TokenPayment {
         return `${this.toRationalNumber()} ${this.tokenIdentifier}`;
     }
 
+    // TODO (breaking, next major version): rename to "toAmount()", make it private.
     toRationalNumber() {
         return this.amountAsBigInteger.shiftedBy(-this.numDecimals).toFixed(this.numDecimals);
     }

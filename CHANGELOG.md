@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - TBD
 
+## 10.2.2
+ - [Decoupling, minor refactoring](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/209)
+
 ## 10.2.1
  - [When loading the ABI, sort custom types by their type dependencies](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/208)
 

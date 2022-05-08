@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ISignature, ITransactionPayload, ITransactionValue } from "./interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionPayload, ITransactionValue } from "./interface";
 import { Address } from "./address";
 import {
   TransactionOptions,
@@ -218,7 +218,7 @@ export class Transaction {
    *
    * @param sender The address of the sender (will be provided when called within the signing procedure)
    */
-  toPlainObject(sender?: IAddress): any {
+  toPlainObject(sender?: IAddress): IPlainTransactionObject {
     return {
       nonce: this.nonce.valueOf(),
       value: this.value.toString(),
@@ -239,14 +239,14 @@ export class Transaction {
    *
    * @param plainObjectTransaction Raw data of a transaction, usually obtained by calling toPlainObject()
    */
-  static fromPlainObject(plainObjectTransaction: any): Transaction {
+  static fromPlainObject(plainObjectTransaction: IPlainTransactionObject): Transaction {
     const tx = new Transaction({
       nonce: Number(plainObjectTransaction.nonce),
       value: new BigNumber(plainObjectTransaction.value),
       receiver: Address.fromString(plainObjectTransaction.receiver),
       gasPrice: Number(plainObjectTransaction.gasPrice),
       gasLimit: Number(plainObjectTransaction.gasLimit),
-      data: new TransactionPayload(atob(plainObjectTransaction.data)),
+      data: new TransactionPayload(atob(plainObjectTransaction.data || "")),
       chainID: String(plainObjectTransaction.chainID),
       version: new TransactionVersion(plainObjectTransaction.version),
     });

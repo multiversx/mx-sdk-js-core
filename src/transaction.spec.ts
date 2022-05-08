@@ -172,4 +172,21 @@ describe("test transaction construction", async () => {
         let fee = transaction.computeFee(networkConfig);
         assert.equal(fee.toString(), "6005000");
     });
+
+    it("should convert transaction to plain object and back", () => {
+        const sender = wallets.alice.address;
+        const transaction = new Transaction({
+            nonce: 90,
+            value: TokenPayment.egldFromAmount(1).valueOf(),
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet"
+        });
+
+        const plainObject = transaction.toPlainObject(sender);
+        const restoredTransaction = Transaction.fromPlainObject(plainObject);
+        assert.deepEqual(restoredTransaction, transaction);
+    });
 });

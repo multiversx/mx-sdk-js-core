@@ -8,6 +8,20 @@ export interface ITransactionFetcher {
     getTransaction(txHash: string): Promise<ITransactionOnNetwork>;
 }
 
+export interface IPlainTransactionObject {
+    nonce: number;
+    value: string;
+    receiver: string;
+    sender: string;
+    gasPrice: number;
+    gasLimit: number;
+    data?: string;
+    chainID: string;
+    version: number;
+    options?: number;
+    signature?: string;
+}
+
 export interface ISignature { hex(): string; }
 export interface IAddress { bech32(): string; }
 export interface ITransactionValue { toString(): string; }

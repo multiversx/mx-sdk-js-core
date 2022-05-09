@@ -21,4 +21,8 @@ export class Code {
     toString(): string {
         return this.hex;
     }
+
+    valueOf(): Buffer {
+        return Buffer.from(this.hex, "hex");
+    }
 }

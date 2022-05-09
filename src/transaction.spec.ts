@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import BigNumber from "bignumber.js";
 import { Transaction } from "./transaction";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
@@ -171,5 +172,22 @@ describe("test transaction construction", async () => {
 
         let fee = transaction.computeFee(networkConfig);
         assert.equal(fee.toString(), "6005000");
+    });
+
+    it("should convert transaction to plain object and back", () => {
+        const sender = wallets.alice.address;
+        const transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet"
+        });
+
+        const plainObject = transaction.toPlainObject(sender);
+        const restoredTransaction = Transaction.fromPlainObject(plainObject);
+        assert.deepEqual(restoredTransaction, transaction);
     });
 });

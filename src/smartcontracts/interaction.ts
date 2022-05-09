@@ -35,6 +35,7 @@ export class Interaction {
     private gasPrice: IGasPrice | undefined = undefined;
     private chainID: IChainID = "";
     private querent: IAddress = new Address();
+    private explicitReceiver?: IAddress;
 
     private isWithSingleESDTTransfer: boolean = false;
     private isWithSingleESDTNFTTransfer: boolean = false;
@@ -81,8 +82,12 @@ export class Interaction {
         return this.gasLimit;
     }
 
+    getExplicitReceiver(): IAddress | undefined {
+        return this.explicitReceiver;
+    }
+
     buildTransaction(): Transaction {
-        let receiver = this.contract.getAddress();
+        let receiver = this.explicitReceiver || this.contract.getAddress();
         let func: ContractFunction = this.function;
         let args = this.args;
 
@@ -182,6 +187,11 @@ export class Interaction {
      */
     withQuerent(querent: IAddress): Interaction {
         this.querent = querent;
+        return this;
+    }
+
+    withExplicitReceiver(receiver: IAddress): Interaction {
+        this.explicitReceiver = receiver;
         return this;
     }
 

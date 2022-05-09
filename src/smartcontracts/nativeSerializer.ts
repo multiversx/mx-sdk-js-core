@@ -3,13 +3,13 @@ import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIn
 import { ArgumentErrorContext } from "./argumentErrorContext";
 import { Struct, Field, StructType, Tuple } from "./typesystem";
 import { Address } from "../address";
-import { Code } from "./code";
 import { ErrInvalidArgument, ErrTypeInferenceSystemRequiresRegularJavascriptObjects } from "../errors";
 import { IAddress } from "../interface";
+import { numberToPaddedHex } from "../utils.codec";
 
 export namespace NativeTypes {
     export type NativeBuffer = Buffer | string;
-    export type NativeBytes = Code | Buffer | string;
+    export type NativeBytes = Buffer | { valueOf(): Buffer; } | string;
     export type NativeAddress = string | Buffer | IAddress | { getAddress(): IAddress };
 }
 
@@ -207,11 +207,10 @@ export namespace NativeSerializer {
     }
 
     function convertNativeToBytesValue(native: NativeTypes.NativeBytes, errorContext: ArgumentErrorContext) {
+        const innerValue = native.valueOf();
+
         if (native === undefined) {
             errorContext.convertError(native, "BytesValue");
-        }
-        if (native instanceof Code) {
-            return BytesValue.fromHex(native.toString());
         }
         if (native instanceof Buffer) {
             return new BytesValue(native);
@@ -219,6 +218,13 @@ export namespace NativeSerializer {
         if (typeof native === "string") {
             return BytesValue.fromUTF8(native);
         }
+        if (innerValue instanceof Buffer) {
+            return new BytesValue(innerValue);
+        }
+        if (typeof innerValue ===  "number") {
+            return BytesValue.fromHex(numberToPaddedHex(innerValue))
+        }
+        
         errorContext.convertError(native, "BytesValue");
     }
 

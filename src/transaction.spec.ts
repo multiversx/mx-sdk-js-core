@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import BigNumber from "bignumber.js";
 import { Transaction } from "./transaction";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
@@ -177,7 +178,7 @@ describe("test transaction construction", async () => {
         const sender = wallets.alice.address;
         const transaction = new Transaction({
             nonce: 90,
-            value: TokenPayment.egldFromAmount(1).valueOf(),
+            value: new BigNumber("1000000000000000000"),
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
             gasLimit: 80000,

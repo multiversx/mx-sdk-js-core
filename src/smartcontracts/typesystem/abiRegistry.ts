@@ -49,15 +49,16 @@ export class AbiRegistry {
     }
 
     private sortCustomTypesByDependencies() {
+        // TODO: Improve consistency of the sorting function (and make sure the sorting is stable): https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
         this.customTypes.sort((a: CustomType, b: CustomType) => {
-            const bDependsonA = b.getNamesOfDependencies().indexOf(a.getName()) > -1;
-            if (bDependsonA) {
+            const bDependsOnA = b.getNamesOfDependencies().indexOf(a.getName()) > -1;
+            if (bDependsOnA) {
                 // Sort "a" before "b".
                 return -1;
             }
 
-            // Keep original order.
-            return 0;
+            // Sort "b" before "a".
+            return 1;
         });
     }
 

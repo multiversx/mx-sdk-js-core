@@ -3,10 +3,10 @@ import { EndpointParameterDefinition, Type } from "./typesystem";
 
 export class ArgumentErrorContext {
     endpointName: string;
-    argumentIndex: string;
+    argumentIndex: number;
     parameterDefinition: EndpointParameterDefinition;
 
-    constructor(endpointName: string, argumentIndex: string, parameterDefinition: EndpointParameterDefinition) {
+    constructor(endpointName: string, argumentIndex: number, parameterDefinition: EndpointParameterDefinition) {
         this.endpointName = endpointName;
         this.argumentIndex = argumentIndex;
         this.parameterDefinition = parameterDefinition;

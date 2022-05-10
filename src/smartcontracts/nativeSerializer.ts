@@ -25,7 +25,7 @@ export namespace NativeSerializer {
         let parameters = endpoint.input;
         let values: TypedValue[] = [];
 
-        for (let i in parameters) {
+        for (let i = 0; i < parameters.length; i++) {
             let parameter = parameters[i];
             let errorContext = new ArgumentErrorContext(endpoint.name, i, parameter);
             let value = convertToTypedValue(args[i], parameter.type, errorContext);
@@ -156,7 +156,7 @@ export namespace NativeSerializer {
         let typedValues = [];
         let typeParameters = type.getTypeParameters();
         errorContext.guardSameLength(native, typeParameters);
-        for (let i in typeParameters) {
+        for (let i = 0; i < typeParameters.length; i++) {
             typedValues.push(convertToTypedValue(native[i], typeParameters[i], errorContext));
         }
 
@@ -167,7 +167,7 @@ export namespace NativeSerializer {
         let typedValues = [];
         const fields = type.getFieldsDefinitions();
         errorContext.guardSameLength(native, fields);
-        for (let i in fields) {
+        for (let i = 0; i < fields.length; i++) {
             typedValues.push(convertToTypedValue(native[i], fields[i].type, errorContext));
         }
         return Tuple.fromItems(typedValues);
@@ -176,7 +176,7 @@ export namespace NativeSerializer {
     function toStructValue(native: any, type: StructType, errorContext: ArgumentErrorContext): TypedValue {
         let structFieldValues = [];
         const fields = type.getFieldsDefinitions();
-        for (let i in fields) {
+        for (let i = 0; i < fields.length; i++) {
             const fieldName = fields[i].name;
             errorContext.guardHasField(native, fieldName);
             const fieldNativeValue = native[fieldName];

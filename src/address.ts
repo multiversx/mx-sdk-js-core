@@ -98,7 +98,7 @@ export class Address {
 
         try {
             decoded = bech32.decode(value);
-        } catch (err) {
+        } catch (err: any) {
             throw new errors.ErrAddressCannotCreate(value, err);
         }
 

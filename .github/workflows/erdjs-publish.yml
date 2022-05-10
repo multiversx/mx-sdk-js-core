@@ -3,6 +3,9 @@ name: Publish erdjs
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   publish-npm:
     runs-on: ubuntu-latest

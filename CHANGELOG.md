@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - TBD
 
+## 10.2.5
+ - [Minor refactoring](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/214)
+
 ## 10.2.4
  - [Fix for loops](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/212)
 

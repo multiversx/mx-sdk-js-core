@@ -122,8 +122,8 @@ export class DefinitionOfTokenCollectionOnNetwork {
         result.canFreeze = properties.CanFreeze;
         result.canWipe = properties.CanWipe;
         result.canUpgrade = properties.CanUpgrade;
-        result.canChangeOwner = properties.CanChngeOwner;
-        result.canAddSpecialRoles = properties.CandAddSpecialRoles;
+        result.canChangeOwner = properties.CanChangeOwner;
+        result.canAddSpecialRoles = properties.CanAddSpecialRoles;
         result.canTransferNftCreateRole = properties.CanTransferNFTCreateRole;
         result.canCreateMultiShard = properties.CanCreateMultiShard;
 

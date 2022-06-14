@@ -1,4 +1,4 @@
-import { BigNumber } from "bignumber.js";
+import BigNumber from "bignumber.js";
 import { Address } from "./primitives";
 import { IAddress } from "./interface";
 
@@ -79,7 +79,11 @@ export class DefinitionOfTokenCollectionOnNetwork {
     canPause: boolean = false;
     canFreeze: boolean = false;
     canWipe: boolean = false;
+    canUpgrade: boolean = false;
+    canChangeOwner: boolean = false;
+    canAddSpecialRoles: boolean = false;
     canTransferNftCreateRole: boolean = false;
+    canCreateMultiShard: boolean = false;
 
     static fromApiHttpResponse(payload: any): DefinitionOfTokenCollectionOnNetwork {
         let result = new DefinitionOfTokenCollectionOnNetwork();
@@ -102,7 +106,7 @@ export class DefinitionOfTokenCollectionOnNetwork {
      * The implementation has been moved here from the following location:
      * https://github.com/ElrondNetwork/elrond-sdk-erdjs/blob/release/v9/src/token.ts
      */
-     static fromResponseOfGetTokenProperties(collection: string, data: Buffer[]): DefinitionOfTokenCollectionOnNetwork {
+    static fromResponseOfGetTokenProperties(collection: string, data: Buffer[]): DefinitionOfTokenCollectionOnNetwork {
         let result = new DefinitionOfTokenCollectionOnNetwork();
 
         let [tokenName, tokenType, owner, _, __, ...propertiesBuffers] = data;
@@ -117,7 +121,11 @@ export class DefinitionOfTokenCollectionOnNetwork {
         result.canPause = properties.CanPause;
         result.canFreeze = properties.CanFreeze;
         result.canWipe = properties.CanWipe;
+        result.canUpgrade = properties.CanUpgrade;
+        result.canChangeOwner = properties.CanChngeOwner;
+        result.canAddSpecialRoles = properties.CandAddSpecialRoles;
         result.canTransferNftCreateRole = properties.CanTransferNFTCreateRole;
+        result.canCreateMultiShard = properties.CanCreateMultiShard;
 
         return result;
     }

@@ -1,5 +1,7 @@
 import { PrimitiveType, PrimitiveValue } from "./types";
 
+const EGLDTokenIdentifier = "EGLD";
+
 export class TokenIdentifierType extends PrimitiveType {
     static ClassName = "TokenIdentifierType";
 
@@ -19,6 +21,14 @@ export class TokenIdentifierValue extends PrimitiveValue {
     constructor(value: string) {
         super(new TokenIdentifierType());
         this.value = value;
+    }
+
+    static egld(): TokenIdentifierValue {
+        return new TokenIdentifierValue(EGLDTokenIdentifier)
+    }
+
+    static esdtTokenIdentifier(identifier: string): TokenIdentifierValue {
+        return new TokenIdentifierValue(identifier);
     }
 
     getClassName(): string {

@@ -89,6 +89,7 @@ export class TypeMapper {
             ["H256", new H256Type()],
             ["utf-8 string", new StringType()],
             ["TokenIdentifier", new TokenIdentifierType()],
+            ["EgldOrEsdtTokenIdentifier", new TokenIdentifierType()],
             ["CodeMetadata", new CodeMetadataType()],
             ["nothing", new NothingType()],
             ["AsyncCall", new NothingType()]

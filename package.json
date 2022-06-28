@@ -33,7 +33,7 @@
     "buffer": "6.0.3",
     "json-duplicate-key-handle": "1.0.0",
     "keccak": "3.0.1",
-    "protobufjs": "^6.11.3"
+    "protobufjs": "6.11.3"
   },
   "devDependencies": {
     "@elrondnetwork/erdjs-network-providers": "0.1.4",

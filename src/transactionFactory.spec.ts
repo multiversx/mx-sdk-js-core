@@ -14,7 +14,7 @@ describe("test transaction factory", () => {
             receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             data: new TransactionPayload("hello"),
             chainID: "D"
-        })
+        });
 
         assert.equal(transactionWithData.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transactionWithData.getValue(), "10500000000000000000");
@@ -26,7 +26,7 @@ describe("test transaction factory", () => {
             value: TokenPayment.egldFromAmount(10.5),
             receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             chainID: "D"
-        })
+        });
 
         assert.equal(transactionWithoutData.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transactionWithoutData.getValue(), "10500000000000000000");
@@ -40,7 +40,7 @@ describe("test transaction factory", () => {
             payment: TokenPayment.fungibleFromAmount("COUNTER-8b028f", "100.00", 0),
             receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             chainID: "D"
-        })
+        });
 
         assert.equal(transaction.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transaction.getValue(), "");
@@ -55,7 +55,7 @@ describe("test transaction factory", () => {
             destination: new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"),
             sender: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             chainID: "D"
-        })
+        });
 
         assert.equal(transaction.getSender().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transaction.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
@@ -74,7 +74,7 @@ describe("test transaction factory", () => {
             destination: new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
             sender: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             chainID: "D"
-        })
+        });
 
         assert.equal(transaction.getSender().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transaction.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");

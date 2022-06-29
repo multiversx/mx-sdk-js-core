@@ -47,7 +47,7 @@ export class ESDTNFTTransferPayloadBuilder {
             BytesValue.fromUTF8(this.payment.tokenIdentifier),
             // The nonce of the token
             new U64Value(this.payment.nonce),
-            // The transfered quantity
+            // The transferred quantity
             new BigUIntValue(this.payment.valueOf()),
             // The destination address
             new AddressValue(this.destination)

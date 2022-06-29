@@ -55,7 +55,7 @@ export class RelayedTransactionV2Builder {
         if(!this.innerTransaction || !this.innerTransactionGasLimit || !this.netConfig || !this.innerTransaction.getSignature()) {
             throw new ErrInvalidRelayedV2BuilderArguments();
         }
-        if(this.innerTransaction.getGasLimit() !== 0){
+        if(this.innerTransaction.getGasLimit() != 0){
             throw new ErrGasLimitShouldBe0ForInnerTransaction();
         }
 

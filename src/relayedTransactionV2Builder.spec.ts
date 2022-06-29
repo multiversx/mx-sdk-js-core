@@ -37,6 +37,10 @@ describe("test relayed v2 transaction builder", function () {
         });
         builder = builder.setNetworkConfig(networkConfig).setInnerTransactionGasLimit(10).setInnerTransaction(innerTx);
         assert.throw(() => builder.build(), errors.ErrGasLimitShouldBe0ForInnerTransaction);
+
+        innerTx.setGasLimit({ valueOf: function() { return 10; } });
+        builder = builder.setNetworkConfig(networkConfig).setInnerTransactionGasLimit(10).setInnerTransaction(innerTx);
+        assert.throw(() => builder.build(), errors.ErrGasLimitShouldBe0ForInnerTransaction);
     });
 
     it("should compute relayed v2 tx", async function () {

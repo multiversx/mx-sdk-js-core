@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## Unreleased
  - TBD
 
+## 10.2.7
+ - [Update reference to keccak](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/222)
+
 ## 10.2.6
  - [Define EgldOrEsdtTokenIdentifier](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/220)
 

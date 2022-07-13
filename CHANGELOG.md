@@ -4,8 +4,7 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## Unreleased
- - TBD
+## 11.0.0
 
 ## 10.2.7
  - [Update reference to keccak](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/222)

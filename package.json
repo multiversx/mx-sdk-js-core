@@ -1,6 +1,6 @@
 {
   "name": "@elrondnetwork/erdjs",
-  "version": "10.2.7",
+  "version": "11.0.0",
   "description": "Smart Contracts interaction framework",
   "main": "out/index.js",
   "types": "out/index.d.js",
@@ -24,9 +24,9 @@
     "prepare": "npm run compile"
   },
   "author": "ElrondNetwork",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "dependencies": {
-    "@elrondnetwork/transaction-decoder": "0.1.0",
+    "@elrondnetwork/transaction-decoder": "1.0.0",
     "bech32": "1.1.4",
     "bignumber.js": "9.0.1",
     "blake2b": "2.1.3",
@@ -36,8 +36,8 @@
     "protobufjs": "6.11.3"
   },
   "devDependencies": {
-    "@elrondnetwork/erdjs-network-providers": "0.1.4",
-    "@elrondnetwork/erdjs-walletcore": "1.0.0",
+    "@elrondnetwork/erdjs-network-providers": "1.0.0",
+    "@elrondnetwork/erdjs-walletcore": "2.0.0",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",
     "@types/mocha": "9.1.0",

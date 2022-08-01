@@ -4,6 +4,8 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 12.0.0
+
 ## 11.0.0
  - [Breaking change: Sender is now mandatory when constructing a transaction](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/TBD)
  - Switched to MIT license

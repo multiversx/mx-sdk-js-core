@@ -7,6 +7,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## 12.0.0
  - [Breaking change: Implementation of topological sort to sort custom types by their type dependencies (change attribute visibility)](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/224)
 
+## 11.0.0
+ - [Breaking change: Sender is now mandatory when constructing a transaction](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/TBD)
+ - Switched to MIT license
 ## 10.2.7
  - [Update reference to keccak](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/222)
 

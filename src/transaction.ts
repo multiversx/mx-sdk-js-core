@@ -99,7 +99,7 @@ export class Transaction {
     nonce?: INonce;
     value?: ITransactionValue;
     receiver: IAddress;
-    sender?: IAddress;
+    sender: IAddress;
     gasPrice?: IGasPrice;
     gasLimit: IGasLimit;
     data?: ITransactionPayload;
@@ -109,7 +109,7 @@ export class Transaction {
   }) {
     this.nonce = nonce || 0;
     this.value = value || 0;
-    this.sender = sender || Address.Zero();
+    this.sender = sender;
     this.receiver = receiver;
     this.gasPrice = gasPrice || TRANSACTION_MIN_GAS_PRICE;
     this.gasLimit = gasLimit;
@@ -244,9 +244,10 @@ export class Transaction {
       nonce: Number(plainObjectTransaction.nonce),
       value: new BigNumber(plainObjectTransaction.value),
       receiver: Address.fromString(plainObjectTransaction.receiver),
+      sender: Address.fromString(plainObjectTransaction.sender),
       gasPrice: Number(plainObjectTransaction.gasPrice),
       gasLimit: Number(plainObjectTransaction.gasLimit),
-      data: new TransactionPayload(atob(plainObjectTransaction.data || "")),
+      data: new TransactionPayload(Buffer.from(plainObjectTransaction.data || "", "base64")),
       chainID: String(plainObjectTransaction.chainID),
       version: new TransactionVersion(plainObjectTransaction.version),
     });

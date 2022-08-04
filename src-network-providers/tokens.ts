@@ -5,12 +5,14 @@ import { IAddress } from "./interface";
 export class FungibleTokenOfAccountOnNetwork {
     identifier: string = "";
     balance: BigNumber = new BigNumber(0);
+    plainTokenData: any = {};
 
     static fromHttpResponse(payload: any): FungibleTokenOfAccountOnNetwork {
         let result = new FungibleTokenOfAccountOnNetwork();
 
         result.identifier = payload.tokenIdentifier || payload.identifier || "";
         result.balance = new BigNumber(payload.balance || 0);
+        result.plainTokenData = payload;
 
         return result;
     }
@@ -29,6 +31,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
     decimals: number = 0;
     royalties: BigNumber = new BigNumber(0);
     assets: string[] = [];
+    balance: BigNumber = new BigNumber(0);
 
     constructor(init?: Partial<NonFungibleTokenOfAccountOnNetwork>) {
         Object.assign(this, init);
@@ -78,6 +81,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
         result.supply = new BigNumber(payload.balance || 1);
         result.royalties = new BigNumber(payload.royalties || 0);
         result.assets = payload.assets || [];
+        result.balance = new BigNumber(payload.balance || 0);
 
         return result;
     }

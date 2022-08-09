@@ -5,14 +5,14 @@ import { IAddress } from "./interface";
 export class FungibleTokenOfAccountOnNetwork {
     identifier: string = "";
     balance: BigNumber = new BigNumber(0);
-    plainTokenData: any = {};
+    rawResponse: any = {};
 
     static fromHttpResponse(payload: any): FungibleTokenOfAccountOnNetwork {
         let result = new FungibleTokenOfAccountOnNetwork();
 
         result.identifier = payload.tokenIdentifier || payload.identifier || "";
         result.balance = new BigNumber(payload.balance || 0);
-        result.plainTokenData = payload;
+        result.rawResponse = payload;
 
         return result;
     }

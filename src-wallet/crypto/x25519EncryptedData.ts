@@ -4,6 +4,11 @@ export class X25519EncryptedData {
     cipher: string;
     ciphertext: string;
     mac: string;
+    identities: {
+        recipient: string,
+        ephemeralPubKey: string,
+        originatorPubKey: string,
+    };
 
     constructor(data: Omit<X25519EncryptedData, "toJSON">) {
         this.nonce = data.nonce;
@@ -11,12 +16,14 @@ export class X25519EncryptedData {
         this.cipher = data.cipher;
         this.ciphertext = data.ciphertext;
         this.mac = data.mac;
+        this.identities = data.identities;
     }
 
     toJSON(): any {
         return {
             version: this.version,
             nonce: this.nonce,
+            identities: this.identities,
             crypto: {
                 ciphertext: this.ciphertext,
                 cipher: this.cipher,
@@ -32,6 +39,7 @@ export class X25519EncryptedData {
             ciphertext: data.crypto.ciphertext,
             cipher: data.crypto.cipher,
             mac: data.crypto.mac,
+            identities: data.identities,
         });
     }
 }

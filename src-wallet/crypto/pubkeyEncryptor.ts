@@ -1,9 +1,9 @@
 import nacl from "tweetnacl";
 import ed2curve from "ed2curve";
-import crypto, {sign} from "crypto";
-import {X25519EncryptedData} from "./x25519EncryptedData";
-import {UserPublicKey, UserSecretKey} from "../userKeys";
-import {PubKeyEncCipher, PubKeyEncNonceLength, PubKeyEncVersion} from "./constants";
+import crypto from "crypto";
+import { X25519EncryptedData } from "./x25519EncryptedData";
+import { UserPublicKey, UserSecretKey } from "../userKeys";
+import { PubKeyEncCipher, PubKeyEncNonceLength, PubKeyEncVersion } from "./constants";
 
 export class PubkeyEncryptor {
     static encrypt(data: Buffer, recipientPubKey: UserPublicKey, authSecretKey: UserSecretKey): X25519EncryptedData {
@@ -19,7 +19,7 @@ export class PubkeyEncryptor {
         const encryptedMessage = nacl.box(data, nonce, recipientDHPubKey, edhConvertedSecretKey);
 
         // Note that the ciphertext is already authenticated for the ephemeral key - but we want it authenticated by
-        //  the an elrond ed25519 key which the user interacts with. A signature over H(ciphertext | edhPubKey)
+        //  the elrond ed25519 key which the user interacts with. A signature over H(ciphertext | edhPubKey)
         //  would be enough
         const authSig = crypto.createHash('sha256').update(
             Buffer.concat([encryptedMessage, edhPair.publicKey])

@@ -1,8 +1,8 @@
 import crypto from "crypto";
 import nacl from "tweetnacl";
 import ed2curve from "ed2curve";
-import {X25519EncryptedData} from "./x25519EncryptedData";
-import {UserPublicKey, UserSecretKey} from "../userKeys";
+import { X25519EncryptedData } from "./x25519EncryptedData";
+import { UserPublicKey, UserSecretKey } from "../userKeys";
 
 export class PubkeyDecryptor {
     static decrypt(data: X25519EncryptedData, decryptorSecretKey: UserSecretKey): Buffer {

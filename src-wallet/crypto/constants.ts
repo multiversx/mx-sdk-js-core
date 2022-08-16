@@ -6,4 +6,5 @@ export const KeyDerivationFunction = "scrypt";
 
 // X25519 public key encryption
 export const PubKeyEncVersion = 1;
+export const PubKeyEncNonceLength = 24;
 export const PubKeyEncCipher = "x25519-xsalsa20-poly1305";

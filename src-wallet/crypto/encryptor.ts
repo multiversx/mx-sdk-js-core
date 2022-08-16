@@ -5,7 +5,7 @@ import { CipherAlgorithm, DigestAlgorithm, Version, KeyDerivationFunction } from
 import {EncryptedData} from "./encryptedData";
 
 export class Encryptor {
-  public static encrypt(data: Buffer, password: string, randomness: Randomness = new Randomness()): EncryptedData {
+  static encrypt(data: Buffer, password: string, randomness: Randomness = new Randomness()): EncryptedData {
     const kdParams = new ScryptKeyDerivationParams();
     const derivedKey = kdParams.generateDerivedKey(Buffer.from(password), randomness.salt);
     const derivedKeyFirstHalf = derivedKey.slice(0, 16);

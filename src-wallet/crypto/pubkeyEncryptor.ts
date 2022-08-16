@@ -3,21 +3,20 @@ import ed2curve from "ed2curve";
 import crypto, {sign} from "crypto";
 import {X25519EncryptedData} from "./x25519EncryptedData";
 import {UserPublicKey, UserSecretKey} from "../userKeys";
-import {PubKeyEncCipher, PubKeyEncVersion} from "./constants";
-import {UserSigner} from "../userSigner";
+import {PubKeyEncCipher, PubKeyEncNonceLength, PubKeyEncVersion} from "./constants";
 
 export class PubkeyEncryptor {
-    public static encrypt(data: Buffer, recipientPubKey: UserPublicKey, authSecretKey: UserSecretKey): X25519EncryptedData {
+    static encrypt(data: Buffer, recipientPubKey: UserPublicKey, authSecretKey: UserSecretKey): X25519EncryptedData {
         // create a new x225519 keypair that will be used for EDH
         const edhPair = nacl.sign.keyPair();
-
         const recipientDHPubKey = ed2curve.convertPublicKey(recipientPubKey.valueOf());
         if (recipientDHPubKey === null) {
             throw new Error("Could not convert ed25519 public key to x25519");
         }
+        const edhConvertedSecretKey = ed2curve.convertSecretKey(edhPair.secretKey);
 
-        const nonce = nacl.randomBytes(24);
-        const encryptedMessage = nacl.box(data, nonce, recipientDHPubKey, edhPair.secretKey);
+        const nonce = nacl.randomBytes(PubKeyEncNonceLength);
+        const encryptedMessage = nacl.box(data, nonce, recipientDHPubKey, edhConvertedSecretKey);
 
         // Note that the ciphertext is already authenticated for the ephemeral key - but we want it authenticated by
         //  the an elrond ed25519 key which the user interacts with. A signature over H(ciphertext | edhPubKey)

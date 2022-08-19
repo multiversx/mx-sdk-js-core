@@ -15,6 +15,7 @@ import { defaultAxiosConfig, defaultPagination } from "./config";
 import { NetworkStatus } from "./networkStatus";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { ContractQueryRequest } from "./contractQueryRequest";
+import {PairOnNetwork} from "./pairs";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ApiNetworkProvider implements INetworkProvider {
@@ -89,6 +90,17 @@ export class ApiNetworkProvider implements INetworkProvider {
         let response = await this.doGetGeneric(`accounts/${address.bech32()}/nfts/${collection}-${nonceAsHex}`);
         let tokenData = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);
         return tokenData;
+    }
+
+    async getMexPairs(pagination?: IPagination): Promise<PairOnNetwork[]> {
+        let url = `mex/pairs`;
+        if (pagination) {
+            url = `${url}?from=${pagination.from}&size=${pagination.size}`;
+        }
+
+        let response: any[] = await this.doGetGeneric(url);
+
+        return response.map(item => PairOnNetwork.fromApiHttpResponse(item));
     }
 
     async getTransaction(txHash: string): Promise<TransactionOnNetwork> {

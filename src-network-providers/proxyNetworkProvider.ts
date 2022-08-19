@@ -14,7 +14,6 @@ import { ContractQueryResponse } from "./contractQueryResponse";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { EsdtContractAddress } from "./constants";
-import {PairOnNetwork} from "./pairs";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ProxyNetworkProvider implements INetworkProvider {

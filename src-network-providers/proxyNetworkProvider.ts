@@ -14,6 +14,7 @@ import { ContractQueryResponse } from "./contractQueryResponse";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { EsdtContractAddress } from "./constants";
+import {PairOnNetwork} from "./pairs";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ProxyNetworkProvider implements INetworkProvider {
@@ -91,6 +92,10 @@ export class ProxyNetworkProvider implements INetworkProvider {
         let response = await this.doGetGeneric(`address/${address.bech32()}/nft/${collection}/nonce/${nonce.valueOf()}`);
         let tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponseByNonce(response.tokenData);
         return tokenData;
+    }
+
+    async getMexPairs(_?: IPagination): Promise<PairOnNetwork[]> {
+        throw new Error("Method not implemented.");
     }
 
     async getTransaction(txHash: string): Promise<TransactionOnNetwork> {

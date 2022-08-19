@@ -94,10 +94,6 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokenData;
     }
 
-    async getMexPairs(_?: IPagination): Promise<PairOnNetwork[]> {
-        throw new Error("Method not implemented.");
-    }
-
     async getTransaction(txHash: string): Promise<TransactionOnNetwork> {
         let url = this.buildUrlWithQueryParameters(`transaction/${txHash}`, { withResults: "true" });
         let response = await this.doGetGeneric(url);

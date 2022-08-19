@@ -60,11 +60,6 @@ export interface INetworkProvider {
     getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
-     * Fetches data about available mex pairs.
-     */
-    getMexPairs(pagination?: IPagination): Promise<PairOnNetwork[]>;
-
-    /**
      * Fetches the state of a transaction.
      */
     getTransaction(txHash: string): Promise<TransactionOnNetwork>;

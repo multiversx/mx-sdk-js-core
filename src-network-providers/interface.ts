@@ -8,7 +8,6 @@ import { NetworkStatus } from "./networkStatus";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
-import {PairOnNetwork} from "./pairs";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.

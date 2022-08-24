@@ -15,17 +15,17 @@ export class PubkeyEncryptor {
         }
         const edhConvertedSecretKey = ed2curve.convertSecretKey(edhPair.secretKey);
 
-        const nonce = nacl.randomBytes(PubKeyEncNonceLength);
+        const nonce = crypto.createHash('sha256').update(data).digest().slice(0, PubKeyEncNonceLength);
         const encryptedMessage = nacl.box(data, nonce, recipientDHPubKey, edhConvertedSecretKey);
 
         // Note that the ciphertext is already authenticated for the ephemeral key - but we want it authenticated by
         //  the elrond ed25519 key which the user interacts with. A signature over H(ciphertext | edhPubKey)
         //  would be enough
-        const authSig = crypto.createHash('sha256').update(
+        const authMessage = crypto.createHash('sha256').update(
             Buffer.concat([encryptedMessage, edhPair.publicKey])
         ).digest();
 
-        const signature = authSecretKey.sign(authSig);
+        const signature = authSecretKey.sign(authMessage);
 
         return new X25519EncryptedData({
             version: PubKeyEncVersion,

@@ -282,7 +282,7 @@ export class Transaction {
       value: new BigNumber(plainObjectTransaction.value),
       receiver: Address.fromString(plainObjectTransaction.receiver),
       sender: Address.fromString(plainObjectTransaction.sender),
-      guardian: Address.fromString(plainObjectTransaction.guardian || ""),
+      guardian: plainObjectTransaction.guardian == undefined ? undefined : Address.fromString(plainObjectTransaction.guardian || ""),
       gasPrice: Number(plainObjectTransaction.gasPrice),
       gasLimit: Number(plainObjectTransaction.gasLimit),
       data: new TransactionPayload(Buffer.from(plainObjectTransaction.data || "", "base64")),

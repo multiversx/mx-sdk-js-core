@@ -16,40 +16,50 @@ export class TestTransaction implements ISignable, IVerifiable {
     options: number = 0;
 
     sender: string = "";
+    guardian: string = "";
+    guardianSignature: string = "";
     signature: string = "";
 
     constructor(init?: Partial<TestTransaction>) {
         Object.assign(this, init);
     }
 
-    serializeForSigning(signedBy: IAddress): Buffer {
-        let sender = signedBy.bech32();
+    serializeForSigning(): Buffer {
         let dataEncoded = this.data ? Buffer.from(this.data).toString("base64") : undefined;
+        let guardian = this.guardian ? this.guardian : undefined;
         let options = this.options ? this.options : undefined;
 
         let plainObject = {
             nonce: this.nonce,
             value: this.value,
             receiver: this.receiver,
-            sender: sender,
+            sender: this.sender,
+            guardian: guardian,
             gasPrice: this.gasPrice,
             gasLimit: this.gasLimit,
             data: dataEncoded,
             chainID: this.chainID,
-            version: this.version,
-            options: options
+            options: options,
+            version: this.version
         };
 
         let serialized = JSON.stringify(plainObject);
         return Buffer.from(serialized);
     }
 
-    applySignature(signature: ISignature, signedBy: IAddress): void {
-        this.sender = signedBy.bech32();
+    applySignature(signature: ISignature): void {
         this.signature = signature.hex();
+    }
+
+    applyGuardianSignature(guardianSignature: ISignature): void {
+        this.guardianSignature = guardianSignature.hex()
     }
 
     getSignature(): ISignature {
         return new Signature(Buffer.from(this.signature, "hex"));
+    }
+
+    getGuardianSignature(): ISignature {
+        return new Signature(Buffer.from(this.guardianSignature, "hex"));
     }
 }

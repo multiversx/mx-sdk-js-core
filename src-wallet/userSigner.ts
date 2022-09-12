@@ -1,4 +1,4 @@
-import { IAddress, ISignable, ISigner } from "./interface";
+import { IAddress, ISignable, ISignature, ISigner } from "./interface";
 import { Signature } from "./signature";
 import { UserSecretKey } from "./userKeys";
 import { UserWallet } from "./userWallet";
@@ -23,7 +23,7 @@ export class UserSigner implements ISigner {
         let secretKey = UserSecretKey.fromPem(text, index);
         return new UserSigner(secretKey);
     }
-    
+
     /**
      * Signs a message.
      * @param signable the message to be signed (e.g. a {@link Transaction}).
@@ -37,12 +37,15 @@ export class UserSigner implements ISigner {
     }
 
     private trySign(signable: ISignable) {
-        let signedBy = this.getAddress();
-        let bufferToSign = signable.serializeForSigning(signedBy);
+        let bufferToSign = signable.serializeForSigning();
         let signatureBuffer = this.secretKey.sign(bufferToSign);
         let signature = new Signature(signatureBuffer);
 
-        signable.applySignature(signature, signedBy);
+        this.doApplySignature(signable, signature);
+    }
+
+    protected doApplySignature(signable: ISignable, signature: ISignature) {
+        signable.applySignature(signature);
     }
 
     /**

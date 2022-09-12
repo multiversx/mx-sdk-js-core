@@ -8,12 +8,13 @@ export class TestMessage implements ISignable, IVerifiable {
     foo: string = "";
     bar: string = "";
     signature: string = "";
+    guardianSignature: string = "";
 
     constructor(init?: Partial<TestMessage>) {
         Object.assign(this, init);
     }
 
-    serializeForSigning(_signedBy: IAddress): Buffer {
+    serializeForSigning(): Buffer {
         let plainObject = {
             foo: this.foo,
             bar: this.bar
@@ -23,8 +24,12 @@ export class TestMessage implements ISignable, IVerifiable {
         return Buffer.from(serialized);
     }
 
-    applySignature(signature: ISignature, _signedBy: IAddress): void {
+    applySignature(signature: ISignature): void {
         this.signature = signature.hex();
+    }
+
+    applyGuardianSignature(guardianSignature: ISignature): void {
+        this.guardianSignature = guardianSignature.hex()
     }
 
     getSignature(): ISignature {

@@ -4,5 +4,6 @@ export * from "./userWallet";
 export * from "./userKeys";
 export * from "./validatorKeys";
 export * from "./userSigner";
+export * from "./guardianSigner"
 export * from "./userVerifier";
 export * from "./validatorSigner";

@@ -23,6 +23,21 @@ export interface ISigner {
     sign(signable: ISignable): Promise<void>;
 }
 
+/**
+ * An interface that defines a signing-capable object.
+ */
+export interface IGuardianSigner {
+    /**
+     * Gets the {@link Address} of the signer.
+     */
+    getAddress(): IAddress;
+
+    /**
+     * Signs a message (e.g. a transaction).
+     */
+    guard(signable: ISignable): Promise<void>;
+}
+
 export interface IVerifier {
     verify(message: IVerifiable): boolean;
 }
@@ -34,15 +49,26 @@ export interface ISignable {
     /**
      * Returns the signable object in its raw form - a sequence of bytes to be signed.
      */
-    serializeForSigning(signedBy: IAddress): Buffer;
+    serializeForSigning(): Buffer;
+
+    /**
+     * Returns the signature of the sender.
+     */
+    getSignature(): ISignature;
 
     /**
      * Applies the computed signature on the object itself.
      *
      * @param signature The computed signature
-     * @param signedBy The address of the {@link ISignature}
-     */
-    applySignature(signature: ISignature, signedBy: IAddress): void;
+    */
+    applySignature(signature: ISignature): void;
+
+    /**
+    * Applies the guardian signature on the transaction.
+    *
+    * @param guardianSignature The signature, as computed by a guardian.
+    */
+    applyGuardianSignature(guardianSignature: ISignature): void;
 }
 
 /**

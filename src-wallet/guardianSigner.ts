@@ -15,7 +15,7 @@ export class GuardianSigner extends UserSigner {
         this.guardianSecretKey = guardianSecretKey
     }
 
-    /**
+/**
  * Signs a message.
  * @param signable the message to be signed (e.g. a {@link Transaction}).
  */

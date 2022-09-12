@@ -1,10 +1,10 @@
-import {assert} from "chai";
-import {TransactionOptions, TransactionVersion} from "./networkParams";
+import { assert } from "chai";
+import { TransactionOptions, TransactionVersion } from "./networkParams";
 import {
     TRANSACTION_OPTIONS_DEFAULT,
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
     TRANSACTION_VERSION_DEFAULT,
-    TRANSACTION_VERSION_TX_HASH_SIGN
+    TRANSACTION_VERSION_TX_OPTIONS
 } from "./constants";
 
 describe("test transaction version", () => {
@@ -16,10 +16,10 @@ describe("test transaction version", () => {
 
     it("should init with correct numeric values based on static constructors", () => {
         let txVersionDefault = TransactionVersion.withDefaultVersion();
-        let txVersionTxHashSign = TransactionVersion.withTxHashSignVersion();
+        let txVersionTxHashSign = TransactionVersion.withTxOptions();
 
         assert.equal(TRANSACTION_VERSION_DEFAULT, txVersionDefault.valueOf());
-        assert.equal(TRANSACTION_VERSION_TX_HASH_SIGN, txVersionTxHashSign.valueOf());
+        assert.equal(TRANSACTION_VERSION_TX_OPTIONS, txVersionTxHashSign.valueOf());
     });
 });
 

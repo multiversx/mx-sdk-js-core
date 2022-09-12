@@ -18,3 +18,4 @@ export * from "./utils";
 export * from "./tokenPayment";
 export * from "./tokenTransferBuilders";
 export * from "./smartcontracts";
+export * from "./relayedTransactionV2Builder"

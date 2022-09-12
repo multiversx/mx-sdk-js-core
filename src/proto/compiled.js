@@ -37,6 +37,8 @@ $root.proto = (function() {
          * @property {number|null} [Version] Transaction Version
          * @property {Uint8Array|null} [Signature] Transaction Signature
          * @property {number|null} [Options] Transaction Options
+         * @property {Uint8Array|null} [GuardAddr] Transaction GuardAddr
+         * @property {Uint8Array|null} [GuardSignature] Transaction GuardSignature
          */
 
         /**
@@ -159,6 +161,22 @@ $root.proto = (function() {
         Transaction.prototype.Options = 0;
 
         /**
+         * Transaction GuardAddr.
+         * @member {Uint8Array} GuardAddr
+         * @memberof proto.Transaction
+         * @instance
+         */
+        Transaction.prototype.GuardAddr = $util.newBuffer([]);
+
+        /**
+         * Transaction GuardSignature.
+         * @member {Uint8Array} GuardSignature
+         * @memberof proto.Transaction
+         * @instance
+         */
+        Transaction.prototype.GuardSignature = $util.newBuffer([]);
+
+        /**
          * Creates a new Transaction instance using the specified properties.
          * @function create
          * @memberof proto.Transaction
@@ -208,6 +226,10 @@ $root.proto = (function() {
                 writer.uint32(/* id 12, wireType 2 =*/98).bytes(message.Signature);
             if (message.Options != null && Object.hasOwnProperty.call(message, "Options"))
                 writer.uint32(/* id 13, wireType 0 =*/104).uint32(message.Options);
+            if (message.GuardAddr != null && Object.hasOwnProperty.call(message, "GuardAddr"))
+                writer.uint32(/* id 14, wireType 2 =*/114).bytes(message.GuardAddr);
+            if (message.GuardSignature != null && Object.hasOwnProperty.call(message, "GuardSignature"))
+                writer.uint32(/* id 15, wireType 2 =*/122).bytes(message.GuardSignature);
             return writer;
         };
 
@@ -280,6 +302,12 @@ $root.proto = (function() {
                     break;
                 case 13:
                     message.Options = reader.uint32();
+                    break;
+                case 14:
+                    message.GuardAddr = reader.bytes();
+                    break;
+                case 15:
+                    message.GuardSignature = reader.bytes();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -355,6 +383,12 @@ $root.proto = (function() {
             if (message.Options != null && message.hasOwnProperty("Options"))
                 if (!$util.isInteger(message.Options))
                     return "Options: integer expected";
+            if (message.GuardAddr != null && message.hasOwnProperty("GuardAddr"))
+                if (!(message.GuardAddr && typeof message.GuardAddr.length === "number" || $util.isString(message.GuardAddr)))
+                    return "GuardAddr: buffer expected";
+            if (message.GuardSignature != null && message.hasOwnProperty("GuardSignature"))
+                if (!(message.GuardSignature && typeof message.GuardSignature.length === "number" || $util.isString(message.GuardSignature)))
+                    return "GuardSignature: buffer expected";
             return null;
         };
 
@@ -441,6 +475,16 @@ $root.proto = (function() {
                     message.Signature = object.Signature;
             if (object.Options != null)
                 message.Options = object.Options >>> 0;
+            if (object.GuardAddr != null)
+                if (typeof object.GuardAddr === "string")
+                    $util.base64.decode(object.GuardAddr, message.GuardAddr = $util.newBuffer($util.base64.length(object.GuardAddr)), 0);
+                else if (object.GuardAddr.length)
+                    message.GuardAddr = object.GuardAddr;
+            if (object.GuardSignature != null)
+                if (typeof object.GuardSignature === "string")
+                    $util.base64.decode(object.GuardSignature, message.GuardSignature = $util.newBuffer($util.base64.length(object.GuardSignature)), 0);
+                else if (object.GuardSignature.length)
+                    message.GuardSignature = object.GuardSignature;
             return message;
         };
 
@@ -531,6 +575,20 @@ $root.proto = (function() {
                         object.Signature = $util.newBuffer(object.Signature);
                 }
                 object.Options = 0;
+                if (options.bytes === String)
+                    object.GuardAddr = "";
+                else {
+                    object.GuardAddr = [];
+                    if (options.bytes !== Array)
+                        object.GuardAddr = $util.newBuffer(object.GuardAddr);
+                }
+                if (options.bytes === String)
+                    object.GuardSignature = "";
+                else {
+                    object.GuardSignature = [];
+                    if (options.bytes !== Array)
+                        object.GuardSignature = $util.newBuffer(object.GuardSignature);
+                }
             }
             if (message.Nonce != null && message.hasOwnProperty("Nonce"))
                 if (typeof message.Nonce === "number")
@@ -567,6 +625,10 @@ $root.proto = (function() {
                 object.Signature = options.bytes === String ? $util.base64.encode(message.Signature, 0, message.Signature.length) : options.bytes === Array ? Array.prototype.slice.call(message.Signature) : message.Signature;
             if (message.Options != null && message.hasOwnProperty("Options"))
                 object.Options = message.Options;
+            if (message.GuardAddr != null && message.hasOwnProperty("GuardAddr"))
+                object.GuardAddr = options.bytes === String ? $util.base64.encode(message.GuardAddr, 0, message.GuardAddr.length) : options.bytes === Array ? Array.prototype.slice.call(message.GuardAddr) : message.GuardAddr;
+            if (message.GuardSignature != null && message.hasOwnProperty("GuardSignature"))
+                object.GuardSignature = options.bytes === String ? $util.base64.encode(message.GuardSignature, 0, message.GuardSignature.length) : options.bytes === Array ? Array.prototype.slice.call(message.GuardSignature) : message.GuardSignature;
             return object;
         };
 

@@ -2,9 +2,9 @@ import * as errors from "../errors";
 import { bigIntToBuffer } from "../smartcontracts/codec/utils";
 import { Transaction } from "../transaction";
 import { proto } from "./compiled";
-import {TRANSACTION_OPTIONS_DEFAULT} from "../constants";
+import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED } from "../constants";
 import { Address } from "../address";
-import { ITransactionValue } from "../interface";
+import { IAddress, ITransactionValue } from "../interface";
 import BigNumber from "bignumber.js";
 
 /**
@@ -17,8 +17,8 @@ export class ProtoSerializer {
      * Serializes a Transaction object to a Buffer. Handles low-level conversion logic and field-mappings as well.
      */
     serializeTransaction(transaction: Transaction): Buffer {
-        let receiverPubkey = new Address(transaction.getReceiver().bech32()).pubkey();
-        let senderPubkey = new Address(transaction.getSender().bech32()).pubkey();
+        const receiverPubkey = new Address(transaction.getReceiver().bech32()).pubkey();
+        const senderPubkey = new Address(transaction.getSender().bech32()).pubkey();
 
         let protoTransaction = new proto.Transaction({
             // elrond-go's serializer handles nonce == 0 differently, thus we treat 0 as "undefined".
@@ -36,13 +36,28 @@ export class ProtoSerializer {
             Signature: Buffer.from(transaction.getSignature().hex(), "hex")
         });
 
-        if ( transaction.getOptions().valueOf() !== TRANSACTION_OPTIONS_DEFAULT ) {
+        if (transaction.getOptions().valueOf() !== TRANSACTION_OPTIONS_DEFAULT) {
             protoTransaction.Options = transaction.getOptions().valueOf();
         }
-        
-        let encoded = proto.Transaction.encode(protoTransaction).finish();
-        let buffer = Buffer.from(encoded);
+
+        if (transaction.getOptions().isGuardedTx()) {
+            const guardianAddress = this.tryGetGuardianAddress(transaction.getGuardian());
+            protoTransaction.GuardAddr = new Address(guardianAddress.bech32()).pubkey();
+            protoTransaction.GuardSignature = Buffer.from(transaction.getGuardianSignature().hex(), "hex");
+        }
+
+        const encoded = proto.Transaction.encode(protoTransaction).finish();
+        const buffer = Buffer.from(encoded);
+
         return buffer;
+    }
+
+    private tryGetGuardianAddress(guardianAddress: IAddress | undefined): IAddress {
+        if (guardianAddress) {
+            return guardianAddress
+        }
+
+        throw new errors.ErrUnsupportedOperation("getGuardianAddress");
     }
 
     /**

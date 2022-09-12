@@ -21,7 +21,7 @@ describe("test transaction", function () {
         let provider = createLocalnetProvider();
         let watcher = new TransactionWatcher(provider);
         let network = await provider.getNetworkConfig();
-        
+
         await alice.sync(provider);
 
         await bob.sync(provider);
@@ -29,6 +29,7 @@ describe("test transaction", function () {
 
         let transactionOne = new Transaction({
             receiver: bob.address,
+            sender: alice.address,
             value: TokenPayment.egldFromAmount(42),
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID
@@ -36,6 +37,7 @@ describe("test transaction", function () {
 
         let transactionTwo = new Transaction({
             receiver: bob.address,
+            sender: alice.address,
             value: TokenPayment.egldFromAmount(43),
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID
@@ -71,6 +73,7 @@ describe("test transaction", function () {
             data: new TransactionPayload("helloWorld"),
             gasLimit: 70000,
             receiver: alice.address,
+            sender: alice.address,
             value: TokenPayment.egldFromAmount(1000),
             chainID: network.ChainID
         });
@@ -79,6 +82,7 @@ describe("test transaction", function () {
             data: new TransactionPayload("helloWorld"),
             gasLimit: 70000,
             receiver: alice.address,
+            sender: alice.address,
             value: TokenPayment.egldFromAmount(1000000),
             chainID: network.ChainID
         });

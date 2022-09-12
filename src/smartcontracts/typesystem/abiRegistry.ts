@@ -9,15 +9,15 @@ import { EndpointDefinition, EndpointParameterDefinition } from "./endpoint";
 
 export class AbiRegistry {
     readonly interfaces: ContractInterface[] = [];
-    readonly customTypes: CustomType[] = [];
+    private customTypes: CustomType[] = [];
 
-    static create(json: { name: string; endpoints: any[]; types: any[] }): AbiRegistry {
+    static create(json: { name: string; endpoints: any[]; types: Record<string, any> }): AbiRegistry {
         let registry = new AbiRegistry().extend(json);
         let remappedRegistry = registry.remapToKnownTypes();
         return remappedRegistry;
     }
 
-    private extend(json: { name: string; endpoints: any[]; types: any[] }): AbiRegistry {
+    private extend(json: { name: string; endpoints: any[]; types: Record<string, any> }): AbiRegistry {
         json.types = json.types || {};
 
         // The "endpoints" collection is interpreted by "ContractInterface".
@@ -49,17 +49,37 @@ export class AbiRegistry {
     }
 
     private sortCustomTypesByDependencies() {
-        // TODO: Improve consistency of the sorting function (and make sure the sorting is stable): https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-        this.customTypes.sort((a: CustomType, b: CustomType) => {
-            const bDependsOnA = b.getNamesOfDependencies().indexOf(a.getName()) > -1;
-            if (bDependsOnA) {
-                // Sort "a" before "b".
-                return -1;
-            }
-
-            // Sort "b" before "a".
-            return 1;
+        // Use of topological sort algorithm to sort custom types by dependencies.
+        let dependencies: { [key: string]: string[] } = {};
+        let visited: { [key: string]: boolean } = {};
+        this.customTypes.forEach((type: CustomType) => {
+            dependencies[type.getName()] = type.getNamesOfDependencies();
+            visited[type.getName()] = false;
         });
+        let sortedArray = new Array<CustomType>();
+
+        const topologicalSortUtil = (name: string, visited: { [key: string]: boolean }, sortedArray: CustomType[]) => {
+            visited[name] = true;
+
+            for (const dependency of dependencies[name]) {
+                if (!this.customTypes.find((e) => e.getName() == dependency)) continue;
+                if (!visited[dependency]) {
+                    topologicalSortUtil(dependency, visited, sortedArray);
+                }
+            }
+            const type = this.customTypes.find((e) => e.getName() == name);
+            if (type) {
+                sortedArray.push(type);
+            }
+        };
+
+        for (const type of this.customTypes) {
+            if (!visited[type.getName()]) {
+                topologicalSortUtil(type.getName(), visited, sortedArray);
+            }
+        }
+
+        this.customTypes = sortedArray;
     }
 
     getInterface(name: string): ContractInterface {

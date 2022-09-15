@@ -186,6 +186,7 @@ export class ApiNetworkProvider implements INetworkProvider {
                 ...this.config,
                 headers: {
                     "Content-Type": "application/json",
+                    ...this.config.headers,
                 },
             });
             let responsePayload = response.data;

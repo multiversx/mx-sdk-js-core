@@ -1,8 +1,7 @@
 import {Transaction} from "./transaction";
 import {TransactionPayload} from "./transactionPayload";
 import {AddressValue, BytesValue, ContractFunction, U64Value} from "./smartcontracts";
-import {IAddress, IChainID, IGasLimit, INonce, ITransactionPayload} from "./interface";
-import {ISigner} from "@elrondnetwork/erdjs-walletcore/out/interface";
+import {IGasLimit} from "./interface";
 import {INetworkConfig} from "./interfaceOfNetwork";
 import {ErrGasLimitShouldBe0ForInnerTransaction, ErrInvalidRelayedV2BuilderArguments} from "./errors";
 
@@ -69,6 +68,7 @@ export class RelayedTransactionV2Builder {
             ])
             .build();
 
+        // TODO: fix sender, or don't set it at all
         return new Transaction({
             sender: this.innerTransaction.getSender(),
             receiver: this.innerTransaction.getSender(),

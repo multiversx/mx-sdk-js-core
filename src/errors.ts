@@ -183,7 +183,7 @@ export class ErrTransactionWatcherTimeout extends Err {
 }
 
 /**
- * Signals an issue related to waiting for a specific {@link TransactionStatus}.
+ * Signals an issue related to waiting for a specific transaction status.
  */
 export class ErrExpectedTransactionStatusNotReached extends Err {
   public constructor() {
@@ -300,6 +300,15 @@ export class ErrContractInteraction extends Err {
 export class ErrNotImplemented extends Err {
   public constructor() {
     super("Method not yet implemented");
+  }
+}
+
+/**
+ * Signals invalid arguments when using the relayed v1 builder
+ */
+export class ErrInvalidRelayedV1BuilderArguments extends Err {
+  public constructor() {
+    super("invalid arguments for relayed v1 builder");
   }
 }
 

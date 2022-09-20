@@ -4,9 +4,13 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 11.0.1
+ - [Fix construction of AbiRegistry](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/234)
+
 ## 11.0.0
- - [Breaking change: Sender is now mandatory when constructing a transaction](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/TBD)
+ - [Breaking change: Sender is now mandatory when constructing a transaction](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/226)
  - Switched to MIT license
+
 ## 10.2.7
  - [Update reference to keccak](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/222)
 

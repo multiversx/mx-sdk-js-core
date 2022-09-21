@@ -36,7 +36,11 @@ describe("test relayed v2 transaction builder", function () {
             chainID: networkConfig.ChainID,
             data: new TransactionPayload("getContractConfig"),
         });
-        builder = builder.setNetworkConfig(networkConfig).setInnerTransactionGasLimit(10).setInnerTransaction(innerTx);
+        builder = builder
+            .setNetworkConfig(networkConfig)
+            .setInnerTransactionGasLimit(10)
+            .setInnerTransaction(innerTx)
+            .setRelayerAddress(alice.address);
         assert.throw(() => builder.build(), errors.ErrGasLimitShouldBe0ForInnerTransaction);
 
         innerTx.setGasLimit({

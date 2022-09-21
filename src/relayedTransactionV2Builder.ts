@@ -80,7 +80,6 @@ export class RelayedTransactionV2Builder {
             ])
             .build();
 
-        // TODO: fix sender, or don't set it at all
         return new Transaction({
             sender: this.relayerAddress,
             receiver: this.innerTransaction.getSender(),

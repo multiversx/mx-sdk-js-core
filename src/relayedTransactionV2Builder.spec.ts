@@ -1,9 +1,9 @@
-import { loadTestWallets, TestWallet } from "./testutils";
-import { RelayedTransactionV2Builder } from "./relayedTransactionV2Builder";
-import { Address } from "./address";
-import { TransactionPayload } from "./transactionPayload";
-import { assert } from "chai";
-import { Transaction } from "./transaction";
+import {loadTestWallets, TestWallet} from "./testutils";
+import {RelayedTransactionV2Builder} from "./relayedTransactionV2Builder";
+import {Address} from "./address";
+import {TransactionPayload} from "./transactionPayload";
+import {assert} from "chai";
+import {Transaction} from "./transaction";
 import * as errors from "./errors";
 
 describe("test relayed v2 transaction builder", function () {
@@ -39,7 +39,11 @@ describe("test relayed v2 transaction builder", function () {
         builder = builder.setNetworkConfig(networkConfig).setInnerTransactionGasLimit(10).setInnerTransaction(innerTx);
         assert.throw(() => builder.build(), errors.ErrGasLimitShouldBe0ForInnerTransaction);
 
-        innerTx.setGasLimit({ valueOf: function() { return 10; } });
+        innerTx.setGasLimit({
+            valueOf: function () {
+                return 10;
+            }
+        });
         builder = builder.setNetworkConfig(networkConfig).setInnerTransactionGasLimit(10).setInnerTransaction(innerTx);
         assert.throw(() => builder.build(), errors.ErrGasLimitShouldBe0ForInnerTransaction);
     });
@@ -68,6 +72,7 @@ describe("test relayed v2 transaction builder", function () {
             .setInnerTransaction(innerTx)
             .setInnerTransactionGasLimit(60_000_000)
             .setNetworkConfig(networkConfig)
+            .setRelayerAddress(alice.getAddress())
             .build();
         await alice.signer.sign(relayedTxV2);
 

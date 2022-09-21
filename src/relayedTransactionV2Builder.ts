@@ -1,7 +1,7 @@
 import {Transaction} from "./transaction";
 import {TransactionPayload} from "./transactionPayload";
 import {AddressValue, BytesValue, ContractFunction, U64Value} from "./smartcontracts";
-import {IGasLimit} from "./interface";
+import {IAddress, IGasLimit} from "./interface";
 import {INetworkConfig} from "./interfaceOfNetwork";
 import {ErrGasLimitShouldBe0ForInnerTransaction, ErrInvalidRelayedV2BuilderArguments} from "./errors";
 
@@ -9,6 +9,7 @@ export class RelayedTransactionV2Builder {
 
     innerTransaction: Transaction | undefined;
     innerTransactionGasLimit: IGasLimit | undefined;
+    relayerAddress: IAddress | undefined;
     netConfig: INetworkConfig | undefined;
 
     /**
@@ -17,7 +18,7 @@ export class RelayedTransactionV2Builder {
      *
      * @param {Transaction} transaction The inner transaction to be used
      */
-    setInnerTransaction(transaction: Transaction) : RelayedTransactionV2Builder {
+    setInnerTransaction(transaction: Transaction): RelayedTransactionV2Builder {
         this.innerTransaction = transaction;
         return this;
     }
@@ -28,7 +29,7 @@ export class RelayedTransactionV2Builder {
      * @param {IGasLimit} gasLimit The gas limit to be used. The inner transaction needs to have the gas limit set to 0,
      * so this field will specify the gas to be used for the SC call of the inner transaction
      */
-    setInnerTransactionGasLimit(gasLimit: IGasLimit) : RelayedTransactionV2Builder {
+    setInnerTransactionGasLimit(gasLimit: IGasLimit): RelayedTransactionV2Builder {
         this.innerTransactionGasLimit = gasLimit;
         return this;
     }
@@ -38,23 +39,34 @@ export class RelayedTransactionV2Builder {
      *
      * @param {INetworkConfig} netConfig The network configuration to be used
      */
-    setNetworkConfig(netConfig: INetworkConfig) : RelayedTransactionV2Builder {
+    setNetworkConfig(netConfig: INetworkConfig): RelayedTransactionV2Builder {
         this.netConfig = netConfig;
         return this;
     }
 
     /**
-     * Tries to build the relayed v2 transaction based on the previously set fields
+     * Sets the address of the relayer (the one that will actually pay the fee
+     *
+     * @param relayerAddress
+     */
+    setRelayerAddress(relayerAddress: IAddress): RelayedTransactionV2Builder {
+        this.relayerAddress = relayerAddress;
+        return this;
+    }
+
+    /**
+     * Tries to build the relayed v2 transaction based on the previously set fields.
+     * It returns a transaction that isn't signed
      *
      * @throws ErrInvalidRelayedV2BuilderArguments
      * @throws ErrGasLimitShouldBe0ForInnerTransaction
      * @return Transaction
      */
-    build() : Transaction {
-        if(!this.innerTransaction || !this.innerTransactionGasLimit || !this.netConfig || !this.innerTransaction.getSignature()) {
+    build(): Transaction {
+        if (!this.innerTransaction || !this.innerTransactionGasLimit || !this.relayerAddress || !this.netConfig || !this.innerTransaction.getSignature()) {
             throw new ErrInvalidRelayedV2BuilderArguments();
         }
-        if(this.innerTransaction.getGasLimit() != 0){
+        if (this.innerTransaction.getGasLimit() != 0) {
             throw new ErrGasLimitShouldBe0ForInnerTransaction();
         }
 
@@ -70,7 +82,7 @@ export class RelayedTransactionV2Builder {
 
         // TODO: fix sender, or don't set it at all
         return new Transaction({
-            sender: this.innerTransaction.getSender(),
+            sender: this.relayerAddress,
             receiver: this.innerTransaction.getSender(),
             value: 0,
             gasLimit:

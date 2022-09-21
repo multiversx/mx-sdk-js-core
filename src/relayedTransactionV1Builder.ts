@@ -33,6 +33,11 @@ export class RelayedTransactionV1Builder {
         return this;
     }
 
+    /**
+     * Sets the address of the relayer (the one that will actually pay the fee
+     *
+     * @param relayerAddress
+     */
     setRelayerAddress(relayerAddress: IAddress): RelayedTransactionV1Builder {
         this.relayerAddress = relayerAddress;
         return this;
@@ -69,7 +74,7 @@ export class RelayedTransactionV1Builder {
         });
     }
 
-    private prepareInnerTransaction() : string {
+    private prepareInnerTransaction(): string {
         if (!this.innerTransaction) {
             return "";
         }

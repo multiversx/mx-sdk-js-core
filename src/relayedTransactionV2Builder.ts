@@ -1,7 +1,7 @@
 import {Transaction} from "./transaction";
 import {TransactionPayload} from "./transactionPayload";
 import {AddressValue, BytesValue, ContractFunction, U64Value} from "./smartcontracts";
-import {IAddress, IGasLimit} from "./interface";
+import {IAddress, IGasLimit, INonce} from "./interface";
 import {INetworkConfig} from "./interfaceOfNetwork";
 import {ErrGasLimitShouldBe0ForInnerTransaction, ErrInvalidRelayedV2BuilderArguments} from "./errors";
 
@@ -10,6 +10,7 @@ export class RelayedTransactionV2Builder {
     innerTransaction: Transaction | undefined;
     innerTransactionGasLimit: IGasLimit | undefined;
     relayerAddress: IAddress | undefined;
+    relayerNonce: INonce | undefined;
     netConfig: INetworkConfig | undefined;
 
     /**
@@ -55,6 +56,16 @@ export class RelayedTransactionV2Builder {
     }
 
     /**
+     * (optional) Sets the nonce of the relayer
+     *
+     * @param relayerNonce
+     */
+    setRelayerNonce(relayerNonce: INonce): RelayedTransactionV2Builder {
+        this.relayerNonce = relayerNonce;
+        return this;
+    }
+
+    /**
      * Tries to build the relayed v2 transaction based on the previously set fields.
      * It returns a transaction that isn't signed
      *
@@ -80,7 +91,7 @@ export class RelayedTransactionV2Builder {
             ])
             .build();
 
-        return new Transaction({
+        let relayedTransaction = new Transaction({
             sender: this.relayerAddress,
             receiver: this.innerTransaction.getSender(),
             value: 0,
@@ -89,5 +100,11 @@ export class RelayedTransactionV2Builder {
             data: payload,
             chainID: this.netConfig.ChainID,
         });
+
+        if (this.relayerNonce) {
+            relayedTransaction.setNonce(this.relayerNonce);
+        }
+
+        return relayedTransaction;
     }
 }

@@ -1,5 +1,5 @@
 import {Transaction} from "./transaction";
-import {IAddress} from "./interface";
+import {IAddress, INonce} from "./interface";
 import {INetworkConfig} from "./interfaceOfNetwork";
 import {ErrInvalidRelayedV1BuilderArguments} from "./errors";
 import {TransactionPayload} from "./transactionPayload";
@@ -11,6 +11,7 @@ export class RelayedTransactionV1Builder {
 
     innerTransaction: Transaction | undefined;
     relayerAddress: IAddress | undefined;
+    relayerNonce: INonce | undefined;
     netConfig: INetworkConfig | undefined;
 
     /**
@@ -44,6 +45,16 @@ export class RelayedTransactionV1Builder {
     }
 
     /**
+     * (optional) Sets the nonce of the relayer
+     *
+     * @param relayerNonce
+     */
+    setRelayerNonce(relayerNonce: INonce) : RelayedTransactionV1Builder {
+        this.relayerNonce = relayerNonce;
+        return this;
+    }
+
+    /**
      * Tries to build the relayed v1 transaction based on the previously set fields
      *
      * @throws ErrInvalidRelayedV1BuilderArguments
@@ -63,7 +74,8 @@ export class RelayedTransactionV1Builder {
             ])
             .build();
 
-        return new Transaction({
+        let relayedTransaction = new Transaction({
+            nonce: this.relayerNonce,
             sender: this.relayerAddress,
             receiver: this.innerTransaction.getSender(),
             value: 0,
@@ -72,6 +84,12 @@ export class RelayedTransactionV1Builder {
             data: payload,
             chainID: this.netConfig.ChainID,
         });
+
+        if (this.relayerNonce) {
+            relayedTransaction.setNonce(this.relayerNonce);
+        }
+
+        return relayedTransaction;
     }
 
     private prepareInnerTransaction(): string {

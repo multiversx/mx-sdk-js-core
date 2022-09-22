@@ -1,9 +1,9 @@
-import {loadTestWallets, TestWallet} from "./testutils";
-import {RelayedTransactionV2Builder} from "./relayedTransactionV2Builder";
-import {Address} from "./address";
-import {TransactionPayload} from "./transactionPayload";
-import {assert} from "chai";
-import {Transaction} from "./transaction";
+import { loadTestWallets, TestWallet } from "./testutils";
+import { RelayedTransactionV2Builder } from "./relayedTransactionV2Builder";
+import { Address } from "./address";
+import { TransactionPayload } from "./transactionPayload";
+import { assert } from "chai";
+import { Transaction } from "./transaction";
 import * as errors from "./errors";
 
 describe("test relayed v2 transaction builder", function () {
@@ -75,11 +75,7 @@ describe("test relayed v2 transaction builder", function () {
         const relayedTxV2 = builder
             .setInnerTransaction(innerTx)
             .setInnerTransactionGasLimit(60_000_000)
-            .setRelayerNonce({
-                valueOf(): number {
-                    return 37;
-                }
-            })
+            .setRelayerNonce(37)
             .setNetworkConfig(networkConfig)
             .setRelayerAddress(alice.getAddress())
             .build();

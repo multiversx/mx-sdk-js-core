@@ -1,9 +1,9 @@
-import {Transaction} from "./transaction";
-import {TransactionPayload} from "./transactionPayload";
-import {AddressValue, BytesValue, ContractFunction, U64Value} from "./smartcontracts";
-import {IAddress, IGasLimit, INonce} from "./interface";
-import {INetworkConfig} from "./interfaceOfNetwork";
-import {ErrGasLimitShouldBe0ForInnerTransaction, ErrInvalidRelayedV2BuilderArguments} from "./errors";
+import { Transaction } from "./transaction";
+import { TransactionPayload } from "./transactionPayload";
+import { AddressValue, BytesValue, ContractFunction, U64Value } from "./smartcontracts";
+import { IAddress, IGasLimit, INonce } from "./interface";
+import { INetworkConfig } from "./interfaceOfNetwork";
+import { ErrGasLimitShouldBe0ForInnerTransaction, ErrInvalidRelayedV2BuilderArguments } from "./errors";
 
 export class RelayedTransactionV2Builder {
     innerTransaction: Transaction | undefined;

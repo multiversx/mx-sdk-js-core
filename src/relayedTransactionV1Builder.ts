@@ -1,10 +1,10 @@
-import {Transaction} from "./transaction";
-import {IAddress, INonce} from "./interface";
-import {INetworkConfig} from "./interfaceOfNetwork";
-import {ErrInvalidRelayedV1BuilderArguments} from "./errors";
-import {TransactionPayload} from "./transactionPayload";
-import {ContractFunction, StringValue} from "./smartcontracts";
-import {Address} from "./address";
+import { Transaction } from "./transaction";
+import { IAddress, INonce } from "./interface";
+import { INetworkConfig } from "./interfaceOfNetwork";
+import { ErrInvalidRelayedV1BuilderArguments } from "./errors";
+import { TransactionPayload } from "./transactionPayload";
+import { ContractFunction, StringValue } from "./smartcontracts";
+import { Address } from "./address";
 import BigNumber from "bignumber.js";
 
 export class RelayedTransactionV1Builder {
@@ -72,13 +72,13 @@ export class RelayedTransactionV1Builder {
             ])
             .build();
 
+        const gasLimit = this.netConfig.MinGasLimit + this.netConfig.GasPerDataByte * payload.length() + this.innerTransaction.getGasLimit().valueOf();
         let relayedTransaction = new Transaction({
             nonce: this.relayerNonce,
             sender: this.relayerAddress,
             receiver: this.innerTransaction.getSender(),
             value: 0,
-            gasLimit:
-                this.netConfig.MinGasLimit + this.netConfig.GasPerDataByte * payload.length() + this.innerTransaction.getGasLimit().valueOf(),
+            gasLimit: gasLimit,
             data: payload,
             chainID: this.netConfig.ChainID,
         });

@@ -1,10 +1,10 @@
-import {loadTestWallets, TestWallet} from "./testutils";
-import {assert} from "chai";
+import { loadTestWallets, TestWallet } from "./testutils";
+import { assert} from "chai";
 import * as errors from "./errors";
-import {RelayedTransactionV1Builder} from "./relayedTransactionV1Builder";
-import {Transaction} from "./transaction";
-import {Address} from "./address";
-import {TransactionPayload} from "./transactionPayload";
+import { RelayedTransactionV1Builder } from "./relayedTransactionV1Builder";
+import { Transaction } from "./transaction";
+import { Address } from "./address";
+import { TransactionPayload } from "./transactionPayload";
 
 describe("test relayed v1 transaction builder", function () {
     let alice: TestWallet, bob: TestWallet;
@@ -21,7 +21,7 @@ describe("test relayed v1 transaction builder", function () {
             nonce: 15,
             sender: alice.address,
             receiver: Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
-            gasLimit: 10,
+            gasLimit: 10000000,
             chainID: "1",
             data: new TransactionPayload("getContractConfig"),
         });
@@ -63,11 +63,7 @@ describe("test relayed v1 transaction builder", function () {
         const builder = new RelayedTransactionV1Builder();
         const relayedTxV1 = builder
             .setInnerTransaction(innerTx)
-            .setRelayerNonce({
-                valueOf: function () {
-                    return 2627;
-                }
-            })
+            .setRelayerNonce(2627)
             .setNetworkConfig(networkConfig)
             .setRelayerAddress(alice.address)
             .build();

@@ -6,7 +6,6 @@ import {INetworkConfig} from "./interfaceOfNetwork";
 import {ErrGasLimitShouldBe0ForInnerTransaction, ErrInvalidRelayedV2BuilderArguments} from "./errors";
 
 export class RelayedTransactionV2Builder {
-
     innerTransaction: Transaction | undefined;
     innerTransactionGasLimit: IGasLimit | undefined;
     relayerAddress: IAddress | undefined;
@@ -46,7 +45,7 @@ export class RelayedTransactionV2Builder {
     }
 
     /**
-     * Sets the address of the relayer (the one that will actually pay the fee
+     * Sets the address of the relayer (the one that will actually pay the fee)
      *
      * @param relayerAddress
      */

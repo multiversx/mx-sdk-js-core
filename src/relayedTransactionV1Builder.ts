@@ -8,7 +8,6 @@ import {Address} from "./address";
 import BigNumber from "bignumber.js";
 
 export class RelayedTransactionV1Builder {
-
     innerTransaction: Transaction | undefined;
     relayerAddress: IAddress | undefined;
     relayerNonce: INonce | undefined;
@@ -25,7 +24,7 @@ export class RelayedTransactionV1Builder {
     }
 
     /**
-     * Sets the network config to be used for building the relayed v2 transaction
+     * Sets the network config to be used for building the relayed v1 transaction
      *
      * @param {INetworkConfig} netConfig The network configuration to be used
      */
@@ -35,7 +34,7 @@ export class RelayedTransactionV1Builder {
     }
 
     /**
-     * Sets the address of the relayer (the one that will actually pay the fee
+     * Sets the address of the relayer (the one that will actually pay the fee)
      *
      * @param relayerAddress
      */
@@ -70,7 +69,6 @@ export class RelayedTransactionV1Builder {
             .setFunction(new ContractFunction("relayedTx"))
             .setArgs([
                 new StringValue(serializedTransaction),
-                //new StringValue(serializedTransaction.toString("hex"))
             ])
             .build();
 

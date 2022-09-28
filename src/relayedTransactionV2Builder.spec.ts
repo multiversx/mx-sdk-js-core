@@ -36,10 +36,18 @@ describe("test relayed v2 transaction builder", function () {
             chainID: networkConfig.ChainID,
             data: new TransactionPayload("getContractConfig"),
         });
-        builder = builder.setNetworkConfig(networkConfig).setInnerTransactionGasLimit(10).setInnerTransaction(innerTx);
+        builder = builder
+            .setNetworkConfig(networkConfig)
+            .setInnerTransactionGasLimit(10)
+            .setInnerTransaction(innerTx)
+            .setRelayerAddress(alice.address);
         assert.throw(() => builder.build(), errors.ErrGasLimitShouldBe0ForInnerTransaction);
 
-        innerTx.setGasLimit({ valueOf: function() { return 10; } });
+        innerTx.setGasLimit({
+            valueOf: function () {
+                return 10;
+            }
+        });
         builder = builder.setNetworkConfig(networkConfig).setInnerTransactionGasLimit(10).setInnerTransaction(innerTx);
         assert.throw(() => builder.build(), errors.ErrGasLimitShouldBe0ForInnerTransaction);
     });
@@ -67,10 +75,13 @@ describe("test relayed v2 transaction builder", function () {
         const relayedTxV2 = builder
             .setInnerTransaction(innerTx)
             .setInnerTransactionGasLimit(60_000_000)
+            .setRelayerNonce(37)
             .setNetworkConfig(networkConfig)
+            .setRelayerAddress(alice.getAddress())
             .build();
         await alice.signer.sign(relayedTxV2);
 
+        assert.equal(relayedTxV2.getNonce().valueOf(), 37);
         assert.equal(
             relayedTxV2.getData().toString(),
             "relayedTxV2@000000000000000000010000000000000000000000000000000000000002ffff@0f@676574436f6e7472616374436f6e666967@bcf4d4aa206c649855aced3168db9684c77bcc0a9a75793bf64fef462bea17afe51625acd11bb9dd84b068fec7661e4d63c2b787f7235f37c237775c9867c105");

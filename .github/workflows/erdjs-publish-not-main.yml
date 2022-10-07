@@ -1,4 +1,4 @@
-name: Publish erdjs (alpha / beta)
+name: Publish erdjs (not main)
 
 on:
   workflow_dispatch:
@@ -9,6 +9,7 @@ on:
         options: 
         - alpha
         - beta
+        - previous
 
 permissions:
   contents: write

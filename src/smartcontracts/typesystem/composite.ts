@@ -42,7 +42,7 @@ export class CompositeValue extends TypedValue {
     }
 
     valueOf(): any[] {
-        return this.items.map(item => item.valueOf());
+        return this.items.map(item => item?.valueOf());
     }
 
     equals(other: CompositeValue): boolean {

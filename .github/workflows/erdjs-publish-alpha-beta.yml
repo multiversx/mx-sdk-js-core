@@ -1,4 +1,5 @@
-name: Publish erdjs (alpha / beta)
+# TODO: Rename this file to "erdjs-publish-not-main.yml"
+name: Publish erdjs (alpha / beta / previous)
 
 on:
   workflow_dispatch:
@@ -9,6 +10,7 @@ on:
         options: 
         - alpha
         - beta
+        - previous
 
 permissions:
   contents: write

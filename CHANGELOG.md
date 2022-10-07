@@ -4,8 +4,11 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 11.1.1
+ - [Fix `CompositeValue.valueOf()`](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/241)
+
 ## 11.1.0
-- [Add builder for relayed v1 transactions](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/235)
+ - [Add builder for relayed v1 transactions](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/235)
 
 ## 11.0.1
  - [Fix construction of AbiRegistry](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/234)

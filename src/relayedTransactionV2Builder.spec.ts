@@ -62,7 +62,7 @@ describe("test relayed v2 transaction builder", function () {
 
         const innerTx = new Transaction({
             nonce: 15,
-            sender: alice.address,
+            sender: bob.address,
             receiver: Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
             gasLimit: 0,
             chainID: networkConfig.ChainID,

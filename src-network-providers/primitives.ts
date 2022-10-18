@@ -22,6 +22,10 @@ export class Address implements IAddress {
     bech32(): string {
         return this.value;
     }
+
+    toString() {
+        return this.value;
+    }
 }
 
 export class Nonce {

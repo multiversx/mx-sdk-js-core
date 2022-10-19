@@ -181,7 +181,7 @@ describe("test user wallets", () => {
 
         let serialized = transaction.serializeForSigning().toString();
         await signer.sign(transaction);
-        await guardianSigner.sign(transaction);
+        await guardianSigner.guard(transaction);
 
         assert.equal(serialized, `{"nonce":0,"value":"0","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","guardian":"erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx","gasPrice":1000000000,"gasLimit":50000,"data":"Zm9v","chainID":"1","options":2,"version":2}`);
         assert.equal(transaction.getSignature().hex(), "00b867ae749616954711ef227c0a3f5c6556246f26dbde12ad929a099094065341a0fae7c5ced98e6bdd100ce922c975667444ea859dce9597b46e63cade2a03");

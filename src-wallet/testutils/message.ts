@@ -24,11 +24,11 @@ export class TestMessage implements ISignable, IVerifiable {
         return Buffer.from(serialized);
     }
 
-    applySignature(signature: ISignature): void {
+    applySignature(signature: ISignature) {
         this.signature = signature.hex();
     }
 
-    applyGuardianSignature(guardianSignature: ISignature): void {
+    applyGuardianSignature(guardianSignature: ISignature) {
         this.guardianSignature = guardianSignature.hex()
     }
 

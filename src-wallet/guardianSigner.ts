@@ -8,17 +8,15 @@ import { ErrSignerCannotSign } from "./errors";
  * ed25519 signer
  */
 export class GuardianSigner extends UserSigner {
-    private readonly guardianSecretKey: UserSecretKey;
 
-    constructor(guardianSecretKey: UserSecretKey) {
-        super(guardianSecretKey)
-        this.guardianSecretKey = guardianSecretKey
+    constructor(secretKey: UserSecretKey) {
+        super(secretKey)
     }
 
-/**
- * Signs a message.
- * @param signable the message to be signed (e.g. a {@link Transaction}).
- */
+    /**
+     * Signs a message.
+     * @param signable the message to be signed (e.g. a {@link Transaction}).
+     */
     async guard(signable: ISignable): Promise<void> {
         try {
             this.tryGuard(signable);
@@ -28,16 +26,16 @@ export class GuardianSigner extends UserSigner {
     }
 
     private tryGuard(signable: ISignable) {
-        let ownerSignature = signable.getSignature()
-        let bufferToSign = signable.serializeForSigning();
-        let guardianSignatureBuffer = this.guardianSecretKey.sign(bufferToSign);
-        let guardianSignature = new Signature(guardianSignatureBuffer);
+        const ownerSignature = signable.getSignature()
+        const bufferToSign = signable.serializeForSigning();
+        const guardianSignatureBuffer = this.secretKey.sign(bufferToSign);
+        const guardianSignature = new Signature(guardianSignatureBuffer);
 
         this.addOwnerSignature(signable, ownerSignature)
         this.doApplySignature(signable, guardianSignature);
     }
 
-    protected doApplySignature(signable: ISignable, guardianSignature: ISignature): void {
+    protected doApplySignature(signable: ISignable, guardianSignature: ISignature) {
         signable.applyGuardianSignature(guardianSignature);
     }
 

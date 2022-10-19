@@ -8,7 +8,7 @@ import { ErrSignerCannotSign } from "./errors";
  * ed25519 signer
  */
 export class UserSigner implements ISigner {
-    private readonly secretKey: UserSecretKey;
+    protected readonly secretKey: UserSecretKey;
 
     constructor(secretKey: UserSecretKey) {
         this.secretKey = secretKey;

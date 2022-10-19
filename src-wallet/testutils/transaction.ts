@@ -25,11 +25,11 @@ export class TestTransaction implements ISignable, IVerifiable {
     }
 
     serializeForSigning(): Buffer {
-        let dataEncoded = this.data ? Buffer.from(this.data).toString("base64") : undefined;
-        let guardian = this.guardian ? this.guardian : undefined;
-        let options = this.options ? this.options : undefined;
+        const dataEncoded = this.data ? Buffer.from(this.data).toString("base64") : undefined;
+        const guardian = this.guardian ? this.guardian : undefined;
+        const options = this.options ? this.options : undefined;
 
-        let plainObject = {
+        const plainObject = {
             nonce: this.nonce,
             value: this.value,
             receiver: this.receiver,
@@ -43,15 +43,15 @@ export class TestTransaction implements ISignable, IVerifiable {
             version: this.version
         };
 
-        let serialized = JSON.stringify(plainObject);
+        const serialized = JSON.stringify(plainObject);
         return Buffer.from(serialized);
     }
 
-    applySignature(signature: ISignature): void {
+    applySignature(signature: ISignature) {
         this.signature = signature.hex();
     }
 
-    applyGuardianSignature(guardianSignature: ISignature): void {
+    applyGuardianSignature(guardianSignature: ISignature) {
         this.guardianSignature = guardianSignature.hex()
     }
 

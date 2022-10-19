@@ -41,10 +41,10 @@ export class UserSigner implements ISigner {
         let signatureBuffer = this.secretKey.sign(bufferToSign);
         let signature = new Signature(signatureBuffer);
 
-        this.doApplySignature(signable, signature);
+        this.applySignature(signable, signature);
     }
 
-    protected doApplySignature(signable: ISignable, signature: ISignature) {
+    protected applySignature(signable: ISignable, signature: ISignature) {
         signable.applySignature(signature);
     }
 

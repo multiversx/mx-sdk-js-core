@@ -24,7 +24,7 @@ export class Address implements IAddress {
     }
 
     toString() {
-        return this.value;
+        return this.bech32();
     }
 }
 

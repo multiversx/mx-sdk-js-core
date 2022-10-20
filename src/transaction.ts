@@ -215,6 +215,10 @@ export class Transaction {
     this.sender = sender;
   }
 
+  setGuardian(guardian: IAddress) {
+    this.guardian = guardian;
+  }
+
   getHash(): TransactionHash {
     guardNotEmpty(this.hash, "hash");
     return this.hash;
@@ -246,8 +250,8 @@ export class Transaction {
   }
 
   /**
-   * Checks the integrity of the guarded transaction if it is set
-   *///
+   * Checks the integrity of the guarded transaction if
+   */
   isGuardedTransaction(): boolean {
     let guardianComp = this.guardian.bech32() === (Address.empty().bech32());
     let guardianSignature = this.guardianSignature.hex() === "";

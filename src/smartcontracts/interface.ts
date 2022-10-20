@@ -25,7 +25,7 @@ export interface ISmartContract {
     /**
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
-    call({ func, args, value, gasLimit }: CallArguments): Transaction;
+    call({ func, args, value, gasLimit, sender }: CallArguments): Transaction;
 }
 
 export interface DeployArguments {
@@ -56,6 +56,7 @@ export interface CallArguments {
     receiver?: IAddress;
     gasPrice?: IGasPrice;
     chainID: IChainID;
+    sender: IAddress;
 }
 
 export interface QueryArguments {

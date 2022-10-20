@@ -2,7 +2,7 @@ import * as errors from "./errors";
 import {
     TRANSACTION_OPTIONS_DEFAULT,
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
-    TRANSACTION_VERSION_DEFAULT, TRANSACTION_VERSION_TX_OPTIONS, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_GUARDED_MASK
+    TRANSACTION_VERSION_DEFAULT, TRANSACTION_VERSION_WITH_TX_OPTIONS, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_GUARDED_MASK
 } from "./constants";
 
 export class TransactionVersion {
@@ -35,7 +35,7 @@ export class TransactionVersion {
      * Creates a TransactionVersion object with the VERSION setting for hash signing
      */
     static withTxOptions(): TransactionVersion {
-        return new TransactionVersion(TRANSACTION_VERSION_TX_OPTIONS);
+        return new TransactionVersion(TRANSACTION_VERSION_WITH_TX_OPTIONS);
     }
 
     valueOf(): number {
@@ -70,14 +70,14 @@ export class TransactionOptions {
     }
 
     /**
-     * Created a TransactionsOptions object with the setting for hash signing
+     * Creates a TransactionsOptions object with the setting for hash signing
      */
     static withTxHashSignOptions(): TransactionOptions {
         return new TransactionOptions(TRANSACTION_OPTIONS_TX_HASH_SIGN);
     }
 
     /**
-     * Created a TransactionsOptions object with the setting for guarded transaction
+     * Creates a TransactionsOptions object with the setting for guarded transaction
      */
     static withTxGuardedOptions(): TransactionOptions {
         return new TransactionOptions(TRANSACTION_OPTIONS_TX_GUARDED);
@@ -86,15 +86,11 @@ export class TransactionOptions {
     /**
      * Returns true if Guarded Transaction Option is set
      */
-    isGuardedTx(): boolean {
-        if ((this.value & TRANSACTION_OPTIONS_TX_GUARDED_MASK) == TRANSACTION_OPTIONS_TX_GUARDED) {
-            return true
-        }
-        return false
+    withGuardedOptions(): boolean {
+        return ((this.value & TRANSACTION_OPTIONS_TX_GUARDED_MASK) == TRANSACTION_OPTIONS_TX_GUARDED)
     }
 
     valueOf(): number {
         return this.value;
     }
 }
-

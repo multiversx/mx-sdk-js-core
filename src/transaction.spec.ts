@@ -5,6 +5,8 @@ import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { TokenPayment } from "./tokenPayment";
+import { BooleanBinaryCodec } from "./smartcontracts/codec/boolean";
+import { Signature } from "./signature";
 
 
 describe("test transaction construction", async () => {
@@ -218,5 +220,96 @@ describe("test transaction construction", async () => {
         const plainObject = transaction.toPlainObject();
         const restoredTransaction = Transaction.fromPlainObject(plainObject);
         assert.deepEqual(restoredTransaction, transaction);
+    });
+
+    it("checks correctly the version and options of the transaction", async () => {
+        const sender = wallets.alice.address;
+        let transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(1),
+            options: TransactionOptions.withDefaultOptions(),
+        });
+        assert.isFalse(transaction.isGuardedTransaction());
+
+        transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(1),
+            options: TransactionOptions.withTxHashSignOptions(),
+        });
+        assert.isFalse(transaction.isGuardedTransaction());
+
+        transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(2),
+            options: TransactionOptions.withTxHashSignOptions(),
+        });
+        assert.isFalse(transaction.isGuardedTransaction());
+
+        transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(2),
+            options: TransactionOptions.withTxGuardedOptions(),
+        });
+        assert.isFalse(transaction.isGuardedTransaction());
+
+        transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            guardian: wallets.bob.address,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(2),
+            options: TransactionOptions.withTxGuardedOptions(),
+        });
+        assert.isFalse(transaction.isGuardedTransaction());
+
+        transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            guardian: wallets.bob.address,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(2),
+            options: TransactionOptions.withTxGuardedOptions(),
+        });
+        await wallets.alice.signer.sign(transaction);
+        transaction.applyGuardianSignature(transaction.getSignature());
+        assert.isTrue(transaction.isGuardedTransaction());
     });
 });

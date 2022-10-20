@@ -31,4 +31,3 @@ message Transaction {
 	bytes    GuardAddr      = 14 [(gogoproto.jsontag) = "guardian,omitempty"];
 	bytes    GuardSignature = 15 [(gogoproto.jsontag) = "guardianSignature,omitempty"];
 }
-

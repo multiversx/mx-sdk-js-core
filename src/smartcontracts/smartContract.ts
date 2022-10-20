@@ -163,7 +163,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
-    call({ func, args, value, gasLimit, receiver, gasPrice, chainID }: CallArguments): Transaction {
+    call({ func, args, value, gasLimit, receiver, gasPrice, chainID, sender }: CallArguments): Transaction {
         this.ensureHasAddress();
 
         args = args || [];
@@ -175,13 +175,13 @@ export class SmartContract implements ISmartContract {
             .build();
 
         let transaction = new Transaction({
-            sender: Address.Zero(),
+            sender: sender,
             receiver: receiver ? receiver : this.getAddress(),
             value: value,
             gasLimit: gasLimit,
             gasPrice: gasPrice,
             data: payload,
-            chainID: chainID
+            chainID: chainID,
         });
 
         return transaction;

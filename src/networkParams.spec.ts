@@ -4,7 +4,7 @@ import {
     TRANSACTION_OPTIONS_DEFAULT,
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
     TRANSACTION_VERSION_DEFAULT,
-    TRANSACTION_VERSION_TX_OPTIONS
+    TRANSACTION_VERSION_WITH_TX_OPTIONS
 } from "./constants";
 
 describe("test transaction version", () => {
@@ -19,7 +19,7 @@ describe("test transaction version", () => {
         let txVersionTxHashSign = TransactionVersion.withTxOptions();
 
         assert.equal(TRANSACTION_VERSION_DEFAULT, txVersionDefault.valueOf());
-        assert.equal(TRANSACTION_VERSION_TX_OPTIONS, txVersionTxHashSign.valueOf());
+        assert.equal(TRANSACTION_VERSION_WITH_TX_OPTIONS, txVersionTxHashSign.valueOf());
     });
 });
 

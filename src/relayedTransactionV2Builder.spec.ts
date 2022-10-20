@@ -10,7 +10,7 @@ describe("test relayed v2 transaction builder", function () {
     let alice: TestWallet, bob: TestWallet;
 
     before(async function () {
-        ({alice, bob} = await loadTestWallets());
+        ({ alice, bob } = await loadTestWallets());
     });
 
     it("should throw exception if args were not set", async function () {
@@ -62,7 +62,7 @@ describe("test relayed v2 transaction builder", function () {
 
         const innerTx = new Transaction({
             nonce: 15,
-            sender: alice.address,
+            sender: bob.address,
             receiver: Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
             gasLimit: 0,
             chainID: networkConfig.ChainID,
@@ -79,12 +79,14 @@ describe("test relayed v2 transaction builder", function () {
             .setNetworkConfig(networkConfig)
             .setRelayerAddress(alice.getAddress())
             .build();
+
+        relayedTxV2.setSender(alice.address);
         await alice.signer.sign(relayedTxV2);
 
         assert.equal(relayedTxV2.getNonce().valueOf(), 37);
         assert.equal(
             relayedTxV2.getData().toString(),
-            "relayedTxV2@000000000000000000010000000000000000000000000000000000000002ffff@0f@676574436f6e7472616374436f6e666967@bcf4d4aa206c649855aced3168db9684c77bcc0a9a75793bf64fef462bea17afe51625acd11bb9dd84b068fec7661e4d63c2b787f7235f37c237775c9867c105");
+            "relayedTxV2@000000000000000000010000000000000000000000000000000000000002ffff@0f@676574436f6e7472616374436f6e666967@b6c5262d9837853e2201de357c1cc4c9803988a42d7049d26b7785dd0ac2bd4c6a8804b6fd9cf845fe2c2a622774b1a2dbd0a417c9a0bc3f0563a85bd15e710a");
     });
 });
 

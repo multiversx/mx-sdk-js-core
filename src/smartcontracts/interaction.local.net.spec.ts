@@ -12,7 +12,7 @@ import { createLocalnetProvider } from "../testutils/networkProviders";
 describe("test smart contract interactor", function () {
     let provider = createLocalnetProvider();
     let alice: TestWallet;
-    
+
     before(async function () {
         ({ alice } = await loadTestWallets());
     });
@@ -43,7 +43,8 @@ describe("test smart contract interactor", function () {
 
         let interaction = <Interaction>contract.methods.getUltimateAnswer()
             .withGasLimit(3000000)
-            .withChainID(network.ChainID);
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
 
         // Query
         let queryResponseBundle = await controller.query(interaction);
@@ -53,10 +54,16 @@ describe("test smart contract interactor", function () {
 
         // Execute, do not wait for execution
         let transaction = interaction.useThenIncrementNonceOf(alice.account).buildTransaction();
+        transaction.setSender(alice.address);
+
         await alice.signer.sign(transaction);
+
+        console.log("test1");
         await provider.sendTransaction(transaction);
+
         // Execute, and wait for execution
         transaction = interaction.useThenIncrementNonceOf(alice.account).buildTransaction();
+        transaction.setSender(alice.address);
         await alice.signer.sign(transaction);
         let { bundle: executionResultsBundle } = await controller.execute(interaction, transaction);
 
@@ -92,10 +99,12 @@ describe("test smart contract interactor", function () {
         let getInteraction = <Interaction>contract.methods.get();
         let incrementInteraction = (<Interaction>contract.methods.increment())
             .withGasLimit(3000000)
-            .withChainID(network.ChainID);
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
         let decrementInteraction = (<Interaction>contract.methods.decrement())
             .withGasLimit(3000000)
-            .withChainID(network.ChainID);
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
 
         // Query "get()"
         let { firstValue: counterValue } = await controller.query(getInteraction);
@@ -152,19 +161,23 @@ describe("test smart contract interactor", function () {
             null,
             null
         ])
-        .withGasLimit(30000000)
-        .withChainID(network.ChainID);
+            .withGasLimit(30000000)
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
 
         let lotteryStatusInteraction = <Interaction>contract.methods.status(["lucky"])
-        .withGasLimit(5000000)
-        .withChainID(network.ChainID);
+            .withGasLimit(5000000)
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
 
         let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo(["lucky"])
-        .withGasLimit(5000000)
-        .withChainID(network.ChainID);
+            .withGasLimit(5000000)
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
 
         // start()
         let startTransaction = startInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
+        startTransaction.setSender(alice.address);
         await alice.signer.sign(startTransaction);
         let { bundle: bundleStart } = await controller.execute(startInteraction, startTransaction);
         assert.isTrue(bundleStart.returnCode.equals(ReturnCode.Ok));
@@ -172,6 +185,7 @@ describe("test smart contract interactor", function () {
 
         // status()
         let lotteryStatusTransaction = lotteryStatusInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
+        lotteryStatusTransaction.setSender(alice.address);
         await alice.signer.sign(lotteryStatusTransaction);
         let { bundle: bundleStatus } = await controller.execute(lotteryStatusInteraction, lotteryStatusTransaction);
         assert.isTrue(bundleStatus.returnCode.equals(ReturnCode.Ok));
@@ -180,6 +194,7 @@ describe("test smart contract interactor", function () {
 
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
         let lotteryInfoTransaction = getLotteryInfoInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
+        lotteryInfoTransaction.setSender(alice.address);
         await alice.signer.sign(lotteryInfoTransaction);
         let { bundle: bundleLotteryInfo } = await controller.execute(getLotteryInfoInteraction, lotteryInfoTransaction);
         assert.isTrue(bundleLotteryInfo.returnCode.equals(ReturnCode.Ok));

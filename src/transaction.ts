@@ -74,7 +74,7 @@ export class Transaction {
   /**
    * The address of the guardian.
    */
-  private guardian?: IAddress;
+  private guardian: IAddress;
 
   /**
    * The signature.
@@ -163,7 +163,7 @@ export class Transaction {
     return this.receiver;
   }
 
-  getGuardian(): IAddress | undefined {
+  getGuardian(): IAddress {
     return this.guardian;
   }
 
@@ -223,8 +223,6 @@ export class Transaction {
   /**
    * Serializes a transaction to a sequence of bytes, ready to be signed.
    * This function is called internally by signers.
-   *
-   * @param signedBy The address of the future signer
    */
   serializeForSigning(): Buffer {
     // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
@@ -238,7 +236,7 @@ export class Transaction {
       delete plain.guardianSignature;
     }
 
-    if ((plain.guardian == undefined) || (plain.guardian == "")) {
+    if (!plain.guardian) {
       delete plain.guardian
     }
 
@@ -248,10 +246,17 @@ export class Transaction {
   }
 
   /**
+   * Checks the integrity of the guarded transaction if it is set
+   *///
+  isGuardedTransaction(): boolean {
+    let guardianComp = this.guardian.bech32() === (Address.empty().bech32());
+    let guardianSignature = this.guardianSignature.hex() === "";
+    return (this.getOptions().withGuardedOptions() && !guardianComp && !guardianSignature)
+  }
+
+  /**
    * Converts the transaction object into a ready-to-serialize, plain JavaScript object.
    * This function is called internally within the signing procedure.
-   *
-   * @param sender The address of the sender (will be provided when called within the signing procedure)
    */
   toPlainObject(): IPlainTransactionObject {
     return {
@@ -288,6 +293,7 @@ export class Transaction {
       data: new TransactionPayload(Buffer.from(plainObjectTransaction.data || "", "base64")),
       chainID: String(plainObjectTransaction.chainID),
       version: new TransactionVersion(plainObjectTransaction.version),
+      options: plainObjectTransaction.options == undefined ? undefined : new TransactionOptions(plainObjectTransaction.options)
     });
 
     if (plainObjectTransaction.signature) {

@@ -72,7 +72,7 @@ describe("test contract", () => {
     it("should call", async () => {
         setupUnitTestWatcherTimeouts();
         let watcher = new TransactionWatcher(provider);
-        
+
         let contract = new SmartContract({ address: new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3") });
 
         provider.mockUpdateAccount(alice.address, account => {
@@ -83,14 +83,16 @@ describe("test contract", () => {
             func: new ContractFunction("helloEarth"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
             gasLimit: 150000,
-            chainID: chainID
+            chainID: chainID,
+            sender: alice.address
         });
 
         let callTransactionTwo = contract.call({
             func: new ContractFunction("helloMars"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
             gasLimit: 1500000,
-            chainID: chainID
+            chainID: chainID,
+            sender: alice.address
         });
 
         await alice.sync(provider);

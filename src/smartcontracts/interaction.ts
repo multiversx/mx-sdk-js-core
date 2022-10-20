@@ -116,11 +116,11 @@ export class Interaction {
             // Value will be set using "withValue()".
             value: this.value,
             receiver: receiver,
-            chainID: this.chainID
+            chainID: this.chainID,
+            sender: this.sender
         });
 
         transaction.setNonce(this.nonce);
-        transaction.setSender(this.sender);
 
         return transaction;
     }

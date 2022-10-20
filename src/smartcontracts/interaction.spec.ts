@@ -131,26 +131,29 @@ describe("test smart contract interactor", function () {
 
         // Execute, do not wait for execution
         let transaction = interaction.withNonce(0).buildTransaction();
+        transaction.setSender(alice.address);
         await alice.signer.sign(transaction);
         await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce().valueOf(), 0);
         assert.equal(transaction.getData().toString(), "getUltimateAnswer");
         assert.equal(
             transaction.getHash().toString(),
-            "580056f13a82d1df9fed421be7ec3d1024c18fd8f4261c823c0fb3a8766d8561"
+            "60d0956a8902c1179dce92d91bd9670e31b9a9cd07c1d620edb7754a315b4818"
         );
 
         transaction = interaction.withNonce(1).buildTransaction();
+        transaction.setSender(alice.address);
         await alice.signer.sign(transaction);
         await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce().valueOf(), 1);
         assert.equal(
             transaction.getHash().toString(),
-            "1ed7182a50302b061d833b772fa78460cb05f4c452ac01c7343d324ff58ad708"
+            "acd207c38f6c3341b18d8ef331fa07ba49615fa12d7610aad5d8495293049f24"
         );
 
         // Execute, and wait for execution
         transaction = interaction.withNonce(2).buildTransaction();
+        transaction.setSender(alice.address);
         await alice.signer.sign(transaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@2bs");
         let { bundle } = await controller.execute(interaction, transaction);

@@ -31,9 +31,10 @@ export async function prepareDeployment(obj: {
     let nonce = deployer.account.getNonceThenIncrement();
     let contractAddress = SmartContract.computeAddress(deployer.address, nonce);
     transaction.setNonce(nonce);
+    transaction.setSender(deployer.address)
     contract.setAddress(contractAddress);
     await deployer.signer.sign(transaction);
-    
+
     return transaction;
 }
 
@@ -50,7 +51,7 @@ export async function loadContractCode(path: PathLike): Promise<Code> {
         let buffer = Buffer.from(response.data);
         return Code.fromBuffer(buffer);
     }
-    
+
     // Load from file.
     let buffer: Buffer = await fs.promises.readFile(path);
     return Code.fromBuffer(buffer);

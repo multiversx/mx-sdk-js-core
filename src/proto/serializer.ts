@@ -40,8 +40,8 @@ export class ProtoSerializer {
             protoTransaction.Options = transaction.getOptions().valueOf();
         }
 
-        if (transaction.getOptions().isGuardedTx()) {
-            const guardianAddress = this.tryGetGuardianAddress(transaction.getGuardian());
+        if (transaction.isGuardedTransaction()) {
+            const guardianAddress = transaction.getGuardian();
             protoTransaction.GuardAddr = new Address(guardianAddress.bech32()).pubkey();
             protoTransaction.GuardSignature = Buffer.from(transaction.getGuardianSignature().hex(), "hex");
         }
@@ -50,14 +50,6 @@ export class ProtoSerializer {
         const buffer = Buffer.from(encoded);
 
         return buffer;
-    }
-
-    private tryGetGuardianAddress(guardianAddress: IAddress | undefined): IAddress {
-        if (guardianAddress) {
-            return guardianAddress
-        }
-
-        throw new errors.ErrUnsupportedOperation("getGuardianAddress");
     }
 
     /**

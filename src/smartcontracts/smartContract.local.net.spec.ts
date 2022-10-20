@@ -47,7 +47,7 @@ describe("test on local testnet", function () {
             func: new ContractFunction("increment"),
             gasLimit: 3000000,
             chainID: network.ChainID,
-            sender: alice.address
+            caller: alice.address
         });
         transactionIncrement.setNonce(alice.account.nonce);
         await alice.signer.sign(transactionIncrement);
@@ -59,7 +59,7 @@ describe("test on local testnet", function () {
             func: new ContractFunction("increment"),
             gasLimit: 100000,
             chainID: network.ChainID,
-            sender: alice.address
+            caller: alice.address
         });
         simulateOne.setSender(alice.address);
 
@@ -67,7 +67,7 @@ describe("test on local testnet", function () {
             func: new ContractFunction("foobar"),
             gasLimit: 500000,
             chainID: network.ChainID,
-            sender: alice.address
+            caller: alice.address
         });
         simulateTwo.setSender(alice.address);
 
@@ -122,7 +122,7 @@ describe("test on local testnet", function () {
             func: new ContractFunction("increment"),
             gasLimit: 2000000,
             chainID: network.ChainID,
-            sender: alice.address
+            caller: alice.address
         });
         transactionIncrementFirst.setNonce(alice.account.nonce);
         await alice.signer.sign(transactionIncrementFirst);
@@ -134,7 +134,7 @@ describe("test on local testnet", function () {
             func: new ContractFunction("increment"),
             gasLimit: 2000000,
             chainID: network.ChainID,
-            sender: alice.address
+            caller: alice.address
         });
         transactionIncrementSecond.setNonce(alice.account.nonce);
         await alice.signer.sign(transactionIncrementSecond);
@@ -183,7 +183,7 @@ describe("test on local testnet", function () {
             gasLimit: 9000000,
             args: [new AddressValue(bob.address), new U32Value(1000)],
             chainID: network.ChainID,
-            sender: alice.address
+            caller: alice.address
         });
 
         let transactionMintCarol = contract.call({
@@ -191,7 +191,7 @@ describe("test on local testnet", function () {
             gasLimit: 9000000,
             args: [new AddressValue(carol.address), new U32Value(1500)],
             chainID: network.ChainID,
-            sender: alice.address
+            caller: alice.address
         });
 
         // Apply nonces and sign the remaining transactions
@@ -279,7 +279,7 @@ describe("test on local testnet", function () {
                 OptionalValue.newMissing()
             ],
             chainID: network.ChainID,
-            sender: alice.address,
+            caller: alice.address,
         });
         // Apply nonces and sign the remaining transactions
         transactionStart.setNonce(alice.account.nonce);

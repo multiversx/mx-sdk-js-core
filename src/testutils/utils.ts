@@ -25,7 +25,8 @@ export async function prepareDeployment(obj: {
         code: await loadContractCode(obj.codePath),
         gasLimit: obj.gasLimit,
         initArguments: obj.initArguments,
-        chainID: obj.chainID
+        chainID: obj.chainID,
+        deployer: deployer.address
     });
 
     let nonce = deployer.account.getNonceThenIncrement();

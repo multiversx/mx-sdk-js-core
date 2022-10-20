@@ -117,7 +117,7 @@ export class Interaction {
             value: this.value,
             receiver: receiver,
             chainID: this.chainID,
-            sender: this.sender
+            caller: this.sender
         });
 
         transaction.setNonce(this.nonce);

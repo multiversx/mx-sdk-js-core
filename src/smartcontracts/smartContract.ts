@@ -107,7 +107,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
      */
-    deploy({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
+    deploy({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID, deployer }: DeployArguments): Transaction {
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
         value = value || 0;
@@ -120,7 +120,7 @@ export class SmartContract implements ISmartContract {
 
         let transaction = new Transaction({
             receiver: Address.Zero(),
-            sender: Address.Zero(),
+            sender: deployer,
             value: value,
             gasLimit: gasLimit,
             gasPrice: gasPrice,
@@ -134,7 +134,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
-    upgrade({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
+    upgrade({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID, caller }: UpgradeArguments): Transaction {
         this.ensureHasAddress();
 
         codeMetadata = codeMetadata || new CodeMetadata();
@@ -148,7 +148,7 @@ export class SmartContract implements ISmartContract {
             .build();
 
         let transaction = new Transaction({
-            sender: Address.Zero(),
+            sender: caller,
             receiver: this.getAddress(),
             value: value,
             gasLimit: gasLimit,
@@ -163,7 +163,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
-    call({ func, args, value, gasLimit, receiver, gasPrice, chainID, sender }: CallArguments): Transaction {
+    call({ func, args, value, gasLimit, receiver, gasPrice, chainID, caller: sender }: CallArguments): Transaction {
         this.ensureHasAddress();
 
         args = args || [];

@@ -37,7 +37,8 @@ describe("test contract", () => {
         let deployTransaction = contract.deploy({
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
             gasLimit: 1000000,
-            chainID: chainID
+            chainID: chainID,
+            deployer: alice.address
         });
 
         provider.mockUpdateAccount(alice.address, account => {
@@ -84,7 +85,7 @@ describe("test contract", () => {
             args: [new U32Value(5), BytesValue.fromHex("0123")],
             gasLimit: 150000,
             chainID: chainID,
-            sender: alice.address
+            caller: alice.address
         });
 
         let callTransactionTwo = contract.call({
@@ -92,7 +93,7 @@ describe("test contract", () => {
             args: [new U32Value(5), BytesValue.fromHex("0123")],
             gasLimit: 1500000,
             chainID: chainID,
-            sender: alice.address
+            caller: alice.address
         });
 
         await alice.sync(provider);

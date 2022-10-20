@@ -42,7 +42,7 @@ describe("fetch transactions from local testnet", function () {
             func: new ContractFunction("increment"),
             gasLimit: 3000000,
             chainID: network.ChainID,
-            sender: alice.address
+            caller: alice.address
         });
 
         transactionIncrement.setNonce(alice.account.nonce);

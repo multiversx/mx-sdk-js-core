@@ -58,7 +58,6 @@ describe("test smart contract interactor", function () {
 
         await alice.signer.sign(transaction);
 
-        console.log("test1");
         await provider.sendTransaction(transaction);
 
         // Execute, and wait for execution

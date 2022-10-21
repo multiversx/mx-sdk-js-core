@@ -32,7 +32,7 @@ export class TransactionVersion {
     }
 
     /**
-     * Creates a TransactionVersion object with the VERSION setting for hash signing
+     * Creates a TransactionVersion object with the VERSION setting for enabling options
      */
     static withTxOptions(): TransactionVersion {
         return new TransactionVersion(TRANSACTION_VERSION_WITH_TX_OPTIONS);

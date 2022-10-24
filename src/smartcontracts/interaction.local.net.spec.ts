@@ -41,7 +41,7 @@ describe("test smart contract interactor", function () {
         let { bundle: { returnCode } } = await controller.deploy(deployTransaction);
         assert.isTrue(returnCode.isSuccess());
 
-        let interaction = <Interaction>contract.methods.getUltimateAnswer()
+        const interaction = <Interaction>contract.methods.getUltimateAnswer()
             .withGasLimit(3000000)
             .withChainID(network.ChainID)
             .withSender(alice.address);

@@ -74,6 +74,11 @@ export interface INetworkProvider {
     sendTransaction(tx: ITransaction): Promise<string>;
 
     /**
+     * Broadcasts a list of already-signed transactions.
+     */
+    sendBulkTransaction(tx: ITransaction[]): Promise<string>;
+
+    /**
      * Simulates the processing of an already-signed transaction.
      * 
      */

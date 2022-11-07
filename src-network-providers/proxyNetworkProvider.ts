@@ -111,6 +111,15 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return response.txHash;
     }
 
+    async sendBulkTransaction(txs: ITransaction[]): Promise<string> {
+        let sendable: any = [];
+        txs.forEach((tx) => {
+            sendable.push(tx.toSendable());
+        });
+        let response = await this.doPostGeneric("transaction/send-multiple", sendable);
+        return response.txsHashes;
+    }
+    
     async simulateTransaction(tx: ITransaction): Promise<any> {
         let response = await this.doPostGeneric("transaction/simulate", tx.toSendable());
         return response;

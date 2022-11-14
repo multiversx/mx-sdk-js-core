@@ -1,6 +1,6 @@
 import { IPagination } from "./interface";
 
-const JSONbig = require("json-bigint");
+const JSONbig = require("json-bigint")({ constructorAction: 'ignore' });
 
 export const defaultAxiosConfig = {
     timeout: 5000,

@@ -1,10 +1,6 @@
 import * as bech32 from "bech32";
+import { Defaults } from "./defaults";
 import * as errors from "./errors";
-
-/**
- * The human-readable-part of the bech32 addresses.
- */
-const HRP = "erd";
 
 /**
  * The length (in bytes) of a public key (from which a bech32 address can be obtained).
@@ -110,8 +106,8 @@ export class Address {
         }
 
         let prefix = decoded.prefix;
-        if (prefix != HRP) {
-            throw new errors.ErrAddressBadHrp(HRP, prefix);
+        if (prefix != Defaults.getAddressHrp()) {
+            throw new errors.ErrAddressBadHrp(Defaults.getAddressHrp(), prefix);
         }
 
         let pubkey = Buffer.from(bech32.fromWords(decoded.words));
@@ -142,7 +138,7 @@ export class Address {
         }
 
         let words = bech32.toWords(this.pubkey());
-        let address = bech32.encode(HRP, words);
+        let address = bech32.encode(Defaults.getAddressHrp(), words);
         return address;
     }
 

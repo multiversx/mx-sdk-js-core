@@ -1,17 +1,34 @@
 import { BinaryCodec } from "./codec";
-import { Type, EndpointParameterDefinition, TypedValue } from "./typesystem";
+import { EndpointParameterDefinition, Type, TypedValue } from "./typesystem";
+import { OptionalType, OptionalValue } from "./typesystem/algebraic";
 import { CompositeType, CompositeValue } from "./typesystem/composite";
 import { VariadicType, VariadicValue } from "./typesystem/variadic";
-import { OptionalType, OptionalValue } from "./typesystem/algebraic";
 
 export const ArgumentsSeparator = "@";
 
-/**
- * For the moment, this is the only codec used.
- */
-const Codec = new BinaryCodec();
+interface IArgSerializerOptions {
+    codec: ICodec;
+}
+
+interface ICodec {
+    decodeTopLevel<TResult extends TypedValue = TypedValue>(buffer: Buffer, type: Type): TResult;
+    encodeTopLevel(typedValue: TypedValue): Buffer;
+}
+
+// TODO: perhaps move default construction options to a factory (ArgSerializerFactory), instead of referencing them in the constructor
+// (postpone as much as possible, breaking change)
+const defaultArgSerializerrOptions: IArgSerializerOptions = {
+    codec: new BinaryCodec()
+};
 
 export class ArgSerializer {
+    codec: ICodec;
+
+    constructor(options?: IArgSerializerOptions) {
+        options = { ...defaultArgSerializerrOptions, ...options };
+        this.codec = options.codec;
+    }
+
     /**
      * Reads typed values from an arguments string (e.g. aa@bb@@cc), given parameter definitions.
      */
@@ -34,6 +51,7 @@ export class ArgSerializer {
      */
     buffersToValues(buffers: Buffer[], parameters: EndpointParameterDefinition[]): TypedValue[] {
         // TODO: Refactor, split (function is quite complex).
+        const self = this;
 
         buffers = buffers || [];
 
@@ -85,7 +103,7 @@ export class ArgSerializer {
             }
 
             let buffer = buffers[bufferIndex++];
-            let decodedValue = Codec.decodeTopLevel(buffer, type);
+            let decodedValue = self.codec.decodeTopLevel(buffer, type);
             return decodedValue;
         }
 
@@ -121,6 +139,7 @@ export class ArgSerializer {
      */
     valuesToBuffers(values: TypedValue[]): Buffer[] {
         // TODO: Refactor, split (function is quite complex).
+        const self = this;
 
         let buffers: Buffer[] = [];
 
@@ -150,7 +169,7 @@ export class ArgSerializer {
             } else {
                 // Non-composite (singular), non-variadic (fixed) type.
                 // The only branching without a recursive call.
-                let buffer: Buffer = Codec.encodeTopLevel(value);
+                let buffer: Buffer = self.codec.encodeTopLevel(value);
                 buffers.push(buffer);
             }
         }

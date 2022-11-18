@@ -1,9 +1,9 @@
 import { IPagination } from "./interface";
 
-const JSONbig = require("json-bigint");
+const JSONbig = require("json-bigint")({ constructorAction: 'ignore' });
 
 export const defaultAxiosConfig = {
-    timeout: 1000,
+    timeout: 5000,
     // See: https://github.com/axios/axios/issues/983 regarding transformResponse
     transformResponse: [
         function (data: any) {

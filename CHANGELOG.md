@@ -4,6 +4,9 @@ All notable changes will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 11.1.2
+ - [Allow one to configure dependencies of: ResultsParser, ArgsSerializer](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/245)
+
 ## 11.1.1
  - [Fix `CompositeValue.valueOf()`](https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/241)
 

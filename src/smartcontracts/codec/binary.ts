@@ -125,8 +125,8 @@ export class BinaryCodecConstraints {
     maxListLength: number;
 
     constructor(init?: Partial<BinaryCodecConstraints>) {
-        this.maxBufferLength = init?.maxBufferLength || 4096;
-        this.maxListLength = init?.maxListLength || 1024;
+        this.maxBufferLength = init?.maxBufferLength || 40960;
+        this.maxListLength = init?.maxListLength || 8192;
     }
 
     checkBufferLength(buffer: Buffer) {

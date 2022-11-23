@@ -11,7 +11,7 @@ interface IArgSerializerOptions {
 }
 
 interface ICodec {
-    decodeTopLevel<TResult extends TypedValue = TypedValue>(buffer: Buffer, type: Type): TResult;
+    decodeTopLevel(buffer: Buffer, type: Type): TypedValue;
     encodeTopLevel(typedValue: TypedValue): Buffer;
 }
 

@@ -120,7 +120,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         return response.txHash;
     }
 
-    async sendTransactions(txs: ITransaction[]): Promise<Map<number, string>> {
+    async sendTransactions(txs: ITransaction[]): Promise<string[]> {
         return await this.backingProxyNetworkProvider.sendTransactions(txs);
     }
 

@@ -111,10 +111,16 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return response.txHash;
     }
 
-    async sendTransactions(txs: ITransaction[]): Promise<Map<number, string>> {
+    async sendTransactions(txs: ITransaction[]): Promise<string[]> {
         const data: any = txs.map(tx => tx.toSendable());
         const response = await this.doPostGeneric("transaction/send-multiple", data);
-        return response.txsHashes;
+        const hashes = Array(txs.length).fill(null);
+
+        for (let i = 0; i < txs.length; i++) {
+            hashes[i] = response.txsHashes[i.toString()] || null;
+        }
+
+        return hashes;
     }
 
     async simulateTransaction(tx: ITransaction): Promise<any> {

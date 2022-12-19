@@ -1,11 +1,11 @@
 import { assert } from "chai";
+import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { INetworkProvider } from "./interface";
+import { Address } from "./primitives";
+import { ProxyNetworkProvider } from "./proxyNetworkProvider";
+import { MockQuery } from "./testscommon/dummyQuery";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
-import { Address } from "./primitives";
-import { MockQuery } from "./testscommon/dummyQuery";
-import { ApiNetworkProvider } from "./apiNetworkProvider";
-import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -166,7 +166,7 @@ describe("test network providers on devnet: Proxy and API", function () {
             let apiResponse = await apiProvider.getDefinitionOfFungibleToken(identifier);
             let proxyResponse = await proxyProvider.getDefinitionOfFungibleToken(identifier);
 
-            // Assets are only present on API response.
+            // Assets are only present on API responses, thus we ignore them for comparison.
             apiResponse.assets = {};
 
             assert.equal(apiResponse.identifier, identifier);
@@ -259,7 +259,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         let apiResponse = await apiProvider.queryContract(query);
         let proxyResponse = await proxyProvider.queryContract(query);
-        
+
         assert.deepEqual(apiResponse, proxyResponse);
         assert.deepEqual(apiResponse.getReturnDataParts(), proxyResponse.getReturnDataParts());
     });

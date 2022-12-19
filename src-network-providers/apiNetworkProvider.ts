@@ -1,21 +1,21 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "./accounts";
-import { IAddress, IContractQuery, INetworkProvider, ITransaction, IPagination } from "./interface";
+import { defaultAxiosConfig, defaultPagination } from "./config";
+import { ContractQueryRequest } from "./contractQueryRequest";
+import { ContractQueryResponse } from "./contractQueryResponse";
+import { ErrContractQuery, ErrNetworkProvider } from "./errors";
+import { IAddress, IContractQuery, INetworkProvider, IPagination, ITransaction } from "./interface";
 import { NetworkConfig } from "./networkConfig";
-import { NetworkStake } from "./networkStake";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
+import { NetworkStake } from "./networkStake";
+import { NetworkStatus } from "./networkStatus";
+import { PairOnNetwork } from "./pairs";
+import { Nonce } from "./primitives";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
-import { Nonce } from "./primitives";
-import { ErrContractQuery, ErrNetworkProvider } from "./errors";
-import { defaultAxiosConfig, defaultPagination } from "./config";
-import { NetworkStatus } from "./networkStatus";
-import { ContractQueryResponse } from "./contractQueryResponse";
-import { ContractQueryRequest } from "./contractQueryRequest";
-import {PairOnNetwork} from "./pairs";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ApiNetworkProvider implements INetworkProvider {
@@ -73,7 +73,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         let url = `accounts/${address.bech32()}/nfts?${this.buildPaginationParams(pagination)}`;
         let response: any[] = await this.doGetGeneric(url);
         let tokens = response.map(item => NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(item));
-        
+
         // TODO: Fix sorting
         tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
         return tokens;
@@ -120,13 +120,8 @@ export class ApiNetworkProvider implements INetworkProvider {
         return response.txHash;
     }
 
-    async sendBulkTransaction(txs: ITransaction[]): Promise<string> {
-        let sendable: any = [];
-        txs.forEach((tx) => {
-            sendable.push(tx.toSendable());
-        });
-        let response = await this.doPostGeneric("transaction/send-multiple", sendable);
-        return response.txsHashes;
+    async sendTransactions(txs: ITransaction[]): Promise<Map<number, string>> {
+        return await this.backingProxyNetworkProvider.sendTransactions(txs);
     }
 
     async simulateTransaction(tx: ITransaction): Promise<any> {

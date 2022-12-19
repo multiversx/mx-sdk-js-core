@@ -1,19 +1,19 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { AccountOnNetwork } from "./accounts";
+import { defaultAxiosConfig } from "./config";
+import { EsdtContractAddress } from "./constants";
+import { ContractQueryRequest } from "./contractQueryRequest";
+import { ContractQueryResponse } from "./contractQueryResponse";
+import { ErrContractQuery, ErrNetworkProvider } from "./errors";
 import { IAddress, IContractQuery, INetworkProvider, IPagination, ITransaction } from "./interface";
 import { NetworkConfig } from "./networkConfig";
-import { NetworkStake } from "./networkStake";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
+import { NetworkStake } from "./networkStake";
+import { NetworkStatus } from "./networkStatus";
+import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
-import { ErrContractQuery, ErrNetworkProvider } from "./errors";
-import { defaultAxiosConfig } from "./config";
-import { NetworkStatus } from "./networkStatus";
-import { ContractQueryResponse } from "./contractQueryResponse";
-import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
-import { ContractQueryRequest } from "./contractQueryRequest";
-import { EsdtContractAddress } from "./constants";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ProxyNetworkProvider implements INetworkProvider {
@@ -111,15 +111,12 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return response.txHash;
     }
 
-    async sendBulkTransaction(txs: ITransaction[]): Promise<string> {
-        let sendable: any = [];
-        txs.forEach((tx) => {
-            sendable.push(tx.toSendable());
-        });
-        let response = await this.doPostGeneric("transaction/send-multiple", sendable);
+    async sendTransactions(txs: ITransaction[]): Promise<Map<number, string>> {
+        const data: any = txs.map(tx => tx.toSendable());
+        const response = await this.doPostGeneric("transaction/send-multiple", data);
         return response.txsHashes;
     }
-    
+
     async simulateTransaction(tx: ITransaction): Promise<any> {
         let response = await this.doPostGeneric("transaction/simulate", tx.toSendable());
         return response;

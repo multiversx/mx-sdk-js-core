@@ -1,13 +1,13 @@
 import { AccountOnNetwork } from "./accounts";
+import { ContractQueryResponse } from "./contractQueryResponse";
 import { NetworkConfig } from "./networkConfig";
-import { NetworkStake } from "./networkStake";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
+import { NetworkStake } from "./networkStake";
+import { NetworkStatus } from "./networkStatus";
+import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
+import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
-import { NetworkStatus } from "./networkStatus";
-import { ContractQueryResponse } from "./contractQueryResponse";
-import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
-import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
@@ -76,7 +76,7 @@ export interface INetworkProvider {
     /**
      * Broadcasts a list of already-signed transactions.
      */
-    sendBulkTransaction(tx: ITransaction[]): Promise<string>;
+    sendTransactions(txs: ITransaction[]): Promise<Map<number, string>>;
 
     /**
      * Simulates the processing of an already-signed transaction.

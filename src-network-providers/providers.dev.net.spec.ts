@@ -99,6 +99,62 @@ describe("test network providers on devnet: Proxy and API", function () {
         }
     });
 
+    it("should be able to send transaction(s)", async function () {
+        this.timeout(5000);
+
+        const txs = [
+            {
+                toSendable: function () {
+                    return {
+                        "nonce": 42,
+                        "value": "1",
+                        "receiver": "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
+                        "sender": "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
+                        "gasPrice": 1000000000,
+                        "gasLimit": 50000,
+                        "chainID": "D",
+                        "version": 1,
+                        "signature": "c8eb539e486db7d703d8c70cab3b7679113f77c4685d8fcc94db027ceacc6b8605115034355386dffd7aa12e63dbefa03251a2f1b1d971f52250187298d12900"
+                    }
+                }
+            },
+            {
+                toSendable: function () {
+                    return {
+                        "nonce": 43,
+                        "value": "1",
+                        "receiver": "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
+                        "sender": "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
+                        "gasPrice": 1000000000,
+                        "gasLimit": 50000,
+                        "chainID": "D",
+                        "version": 1,
+                        "signature": "9c4c22d0ae1b5a10c39583a5ab9020b00b27aa69d4ac8ab4922620dbf0df4036ed890f9946d38a9d0c85d6ac485c0d9b2eac0005e752f249fd0ad863b0471d02"
+                    }
+                }
+            },
+            {
+                toSendable: function () {
+                    return {
+                        "nonce": 44
+                    }
+                }
+            }
+        ];
+
+        const expectedHashes = [
+            "6e2fa63ea02937f00d7549f3e4eb9af241e4ac13027aa65a5300816163626c01",
+            "37d7e84313a5baea2a61c6ab10bb29b52bc54f7ac9e3918a9faeb1e08f42081c",
+            null
+        ]
+
+        assert.equal(await apiProvider.sendTransaction(txs[0]), expectedHashes[0]);
+        assert.equal(await proxyProvider.sendTransaction(txs[1]), expectedHashes[1]);
+
+        assert.deepEqual(await apiProvider.sendTransactions(txs), expectedHashes);
+        assert.deepEqual(await proxyProvider.sendTransactions(txs), expectedHashes);
+    });
+
     it("should have same response for getTransaction()", async function () {
         this.timeout(20000);
 

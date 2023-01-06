@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
-import { Address } from "./primitives";
 import { IAddress } from "./interface";
+import { Address } from "./primitives";
 
 export class DefinitionOfFungibleTokenOnNetwork {
     identifier: string = "";
@@ -18,7 +18,7 @@ export class DefinitionOfFungibleTokenOnNetwork {
     canFreeze: boolean = false;
     canWipe: boolean = false;
     canAddSpecialRoles: boolean = false;
-    assets: Record<string, any> = {}; 
+    assets: Record<string, any> = {};
 
     static fromApiHttpResponse(payload: any): DefinitionOfFungibleTokenOnNetwork {
         let result = new DefinitionOfFungibleTokenOnNetwork();
@@ -44,7 +44,7 @@ export class DefinitionOfFungibleTokenOnNetwork {
 
     /**
      * The implementation has been moved here from the following location:
-     * https://github.com/ElrondNetwork/elrond-sdk-erdjs/blob/release/v9/src/token.ts
+     * https://github.com/multiversx/mx-sdk-erdjs/blob/release/v9/src/token.ts
      */
     static fromResponseOfGetTokenProperties(identifier: string, data: Buffer[]): DefinitionOfFungibleTokenOnNetwork {
         let result = new DefinitionOfFungibleTokenOnNetwork();
@@ -106,7 +106,7 @@ export class DefinitionOfTokenCollectionOnNetwork {
 
     /**
      * The implementation has been moved here from the following location:
-     * https://github.com/ElrondNetwork/elrond-sdk-erdjs/blob/release/v9/src/token.ts
+     * https://github.com/multiversx/mx-sdk-erdjs/blob/release/v9/src/token.ts
      */
     static fromResponseOfGetTokenProperties(collection: string, data: Buffer[]): DefinitionOfTokenCollectionOnNetwork {
         let result = new DefinitionOfTokenCollectionOnNetwork();

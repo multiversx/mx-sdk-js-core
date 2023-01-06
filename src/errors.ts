@@ -177,9 +177,9 @@ export class ErrAsyncTimerAborted extends Err {
  * Signals a timout for a {@link TransactionWatcher}.
  */
 export class ErrTransactionWatcherTimeout extends Err {
-    public constructor() {
-        super(`TransactionWatcher has timed out`);
-    }
+  public constructor() {
+    super(`TransactionWatcher has timed out`);
+  }
 }
 
 /**
@@ -194,7 +194,7 @@ export class ErrExpectedTransactionStatusNotReached extends Err {
 /**
  * Signals an issue related to waiting for specific transaction events.
  */
- export class ErrExpectedTransactionEventsNotFound extends Err {
+export class ErrExpectedTransactionEventsNotFound extends Err {
   public constructor() {
     super(`Expected transaction events not found`);
   }
@@ -239,12 +239,12 @@ export class ErrTypingSystem extends Err {
 /**
  * Signals a usage error related to "contract.methods" vs. "contract.methodsExplicit".
  */
- export class ErrTypeInferenceSystemRequiresRegularJavascriptObjects extends ErrTypingSystem {
+export class ErrTypeInferenceSystemRequiresRegularJavascriptObjects extends ErrTypingSystem {
   public constructor(index: number) {
     super(`
 argument at position ${index} seems to be a TypedValue. The automatic type inference system requires regular javascript objects as input.
 This error might occur when you pass a TypedValue to contract.methods.myFunction([...]). For passing TypedValues instead of regular javascript objects, and bypass the automatic type inference system, use contract.methodsExplicit.myFunction([...]) instead.
-Also see https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/187.
+Also see https://github.com/multiversx/mx-sdk-erdjs/pull/187.
 `);
   }
 }
@@ -252,7 +252,7 @@ Also see https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/187.
 /**
  * Signals a missing field on a struct.
  */
- export class ErrMissingFieldOnStruct extends Err {
+export class ErrMissingFieldOnStruct extends Err {
   public constructor(fieldName: string, structName: string) {
     super(`field ${fieldName} does not exist on struct ${structName}`);
   }
@@ -261,7 +261,7 @@ Also see https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/187.
 /**
  * Signals a missing field on an enum.
  */
- export class ErrMissingFieldOnEnum extends Err {
+export class ErrMissingFieldOnEnum extends Err {
   public constructor(fieldName: string, enumName: string) {
     super(`field ${fieldName} does not exist on enum ${enumName}`);
   }
@@ -270,7 +270,7 @@ Also see https://github.com/ElrondNetwork/elrond-sdk-erdjs/pull/187.
 /**
  * Signals an error when parsing the contract results.
  */
- export class ErrCannotParseContractResults extends Err {
+export class ErrCannotParseContractResults extends Err {
   public constructor(details: string) {
     super(`cannot parse contract results: ${details}`);
   }
@@ -289,9 +289,9 @@ export class ErrCodec extends Err {
  * Signals a generic contract interaction error.
  */
 export class ErrContractInteraction extends Err {
-    public constructor(message: string) {
-        super(message);
-    }
+  public constructor(message: string) {
+    super(message);
+  }
 }
 
 /**

@@ -1,11 +1,10 @@
-# Elrond SDK for JavaScript
+# MultiversX SDK for JavaScript and TypeScript
 
-Elrond SDK for JavaScript and TypeScript (written in TypeScript).
+MultiversX SDK for JavaScript and TypeScript (written in TypeScript).
 
 ## Documentation
 
- - [Cookbook](https://docs.elrond.com/sdk-and-tools/erdjs/erdjs-cookbook/)
- - [TypeDoc](https://elrondnetwork.github.io/elrond-sdk-docs/erdjs/latest)
+ - [Cookbook](https://docs.multiversx.com/sdk-and-tools/erdjs/erdjs-cookbook/)
 
 ## CHANGELOG
 
@@ -13,14 +12,14 @@ Elrond SDK for JavaScript and TypeScript (written in TypeScript).
 
 ## Distribution
 
-[npm](https://www.npmjs.com/package/@elrondnetwork/erdjs)
+[npm](https://www.npmjs.com/package/@multiversx/erdjs)
 
 ## Installation
 
 `erdjs` is delivered via **npm** and it can be installed as follows:
 
 ```
-npm install @elrondnetwork/erdjs
+npm install @multiversx/erdjs
 ```
 
 ## Development
@@ -69,4 +68,4 @@ In order to run the tests **in the browser**, do as follows:
 make clean && npm run browser-tests
 ```
 
-For the `localnet` tests, make sure you have a *local testnet* up & running. A *local testnet* can be started from the Elrond IDE or from [erdpy](https://docs.elrond.com/developers/setup-local-testnet/).
+For the `localnet` tests, make sure you have a *local testnet* up & running. In order to start a *local testnet*, follow [this](https://docs.multiversx.com/developers/setup-local-testnet/).

@@ -1,7 +1,7 @@
 {
   "name": "@elrondnetwork/erdjs",
   "version": "11.1.2",
-  "description": "Smart Contracts interaction framework",
+  "description": "MultiversX SDK for JavaScript and TypeScript",
   "main": "out/index.js",
   "types": "out/index.d.js",
   "files": [
@@ -23,7 +23,7 @@
     "pretest": "npm run compile",
     "prepare": "npm run compile"
   },
-  "author": "ElrondNetwork",
+  "author": "MultiversX",
   "license": "MIT",
   "dependencies": {
     "@elrondnetwork/transaction-decoder": "1.0.0",

@@ -6,10 +6,6 @@ MultiversX SDK for JavaScript and TypeScript (written in TypeScript).
 
  - [Cookbook](https://docs.multiversx.com/sdk-and-tools/erdjs/erdjs-cookbook/)
 
-## CHANGELOG
-
-[CHANGELOG](CHANGELOG.md)
-
 ## Distribution
 
 [npm](https://www.npmjs.com/package/@multiversx/erdjs)

@@ -1,5 +1,5 @@
 {
-  "name": "@elrondnetwork/erdjs",
+  "name": "@multiversx/erdjs",
   "version": "11.1.3",
   "description": "MultiversX SDK for JavaScript and TypeScript",
   "main": "out/index.js",

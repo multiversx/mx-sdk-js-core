@@ -39,13 +39,13 @@ export class ProxyNetworkProvider implements INetworkProvider {
 
     async getNetworkStakeStatistics(): Promise<NetworkStake> {
         // TODO: Implement wrt.:
-        // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/stake/stake.service.ts
+        // https://github.com/multiversx/mx-api-service/blob/main/src/endpoints/stake/stake.service.ts
         throw new Error("Method not implemented.");
     }
 
     async getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics> {
         // TODO: Implement wrt. (full implementation may not be possible):
-        // https://github.com/ElrondNetwork/api.elrond.com/blob/main/src/endpoints/network/network.service.ts
+        // https://github.com/multiversx/mx-api-service/blob/main/src/endpoints/network/network.service.ts
         throw new Error("Method not implemented.");
     }
 

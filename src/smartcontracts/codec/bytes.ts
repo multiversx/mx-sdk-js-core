@@ -2,8 +2,7 @@ import { BytesValue } from "../typesystem/bytes";
 import { SizeOfU32 } from "./constants";
 
 /**
- * Encodes and decodes "BytesValue" objects
- * with respect to: {@link https://docs.elrond.com/developers/developer-reference/elrond-serialization-format/ | The Elrond Serialization Format}. 
+ * Encodes and decodes "BytesValue" objects.
  */
 export class BytesBinaryCodec {
     decodeNested(buffer: Buffer): [BytesValue, number] {

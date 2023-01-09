@@ -40,8 +40,8 @@ export class Type {
     getFullyQualifiedName(): string {
         let joinedTypeParameters = this.getTypeParameters().map(type => type.getFullyQualifiedName()).join(", ");
 
-        return this.isGenericType() ? 
-            `erdjs:types:${this.getName()}<${joinedTypeParameters}>` : 
+        return this.isGenericType() ?
+            `erdjs:types:${this.getName()}<${joinedTypeParameters}>` :
             `erdjs:types:${this.getName()}`;
     }
 
@@ -68,7 +68,7 @@ export class Type {
     }
 
     /**
-     * Generates type expressions similar to elrond-wasm-rs. 
+     * Generates type expressions similar to mx-sdk-rs. 
      */
     toString() {
         let typeParameters: string = this.getTypeParameters().map(type => type.toString()).join(", ");
@@ -161,7 +161,7 @@ export class Type {
     /**
      * A special marker for types within erdjs' typesystem.
      */
-    belongsToTypesystem() {}
+    belongsToTypesystem() { }
 }
 
 /**
@@ -278,7 +278,7 @@ export abstract class TypedValue {
     /**
      * A special marker for values within erdjs' typesystem.
      */
-    belongsToTypesystem() {}
+    belongsToTypesystem() { }
 }
 
 export abstract class PrimitiveValue extends TypedValue {

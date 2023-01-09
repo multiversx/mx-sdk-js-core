@@ -2,8 +2,7 @@ import * as errors from "../../errors";
 import { BooleanValue } from "../typesystem";
 
 /**
- * Encodes and decodes "BooleanValue" objects
- * with respect to: {@link https://docs.elrond.com/developers/developer-reference/elrond-serialization-format/ | The Elrond Serialization Format}. 
+ * Encodes and decodes "BooleanValue" objects.
  */
 export class BooleanBinaryCodec {
     private static readonly TRUE: number = 0x01;

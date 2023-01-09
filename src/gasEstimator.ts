@@ -8,9 +8,9 @@ interface IGasConfiguration {
 
 /**
  * This is mirroring (on a best efforts basis) the network's gas configuration & gas schedule:
- *  - https://gateway.elrond.com/network/config
- *  - https://github.com/ElrondNetwork/elrond-config-mainnet/tree/master/gasSchedules
- *  - https://github.com/ElrondNetwork/elrond-config-mainnet/blob/master/enableEpochs.toml#L200
+ *  - https://gateway.multiversx.com/network/config
+ *  - https://github.com/multiversx/mx-chain-mainnet-config/tree/master/gasSchedules
+ *  - https://github.com/multiversx/mx-chain-mainnet-config/blob/master/enableEpochs.toml#L200
  */
 export const DefaultGasConfiguration: IGasConfiguration = {
     minGasLimit: 50000,

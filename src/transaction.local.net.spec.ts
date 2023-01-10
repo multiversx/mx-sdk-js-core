@@ -1,12 +1,12 @@
-import { Transaction } from "./transaction";
-import { TransactionPayload } from "./transactionPayload";
-import { loadTestWallets, TestWallet } from "./testutils";
-import { Logger } from "./logger";
+import BigNumber from "bignumber.js";
 import { assert } from "chai";
-import { TransactionWatcher } from "./transactionWatcher";
+import { Logger } from "./logger";
+import { loadTestWallets, TestWallet } from "./testutils";
 import { createLocalnetProvider } from "./testutils/networkProviders";
 import { TokenPayment } from "./tokenPayment";
-import BigNumber from "bignumber.js";
+import { Transaction } from "./transaction";
+import { TransactionPayload } from "./transactionPayload";
+import { TransactionWatcher } from "./transactionWatcher";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;
@@ -21,13 +21,14 @@ describe("test transaction", function () {
         let provider = createLocalnetProvider();
         let watcher = new TransactionWatcher(provider);
         let network = await provider.getNetworkConfig();
-        
+
         await alice.sync(provider);
 
         await bob.sync(provider);
         let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
 
         let transactionOne = new Transaction({
+            sender: alice.address,
             receiver: bob.address,
             value: TokenPayment.egldFromAmount(42),
             gasLimit: network.MinGasLimit,
@@ -35,6 +36,7 @@ describe("test transaction", function () {
         });
 
         let transactionTwo = new Transaction({
+            sender: alice.address,
             receiver: bob.address,
             value: TokenPayment.egldFromAmount(43),
             gasLimit: network.MinGasLimit,
@@ -68,6 +70,7 @@ describe("test transaction", function () {
         await alice.sync(provider);
 
         let transactionOne = new Transaction({
+            sender: alice.address,
             data: new TransactionPayload("helloWorld"),
             gasLimit: 70000,
             receiver: alice.address,
@@ -76,6 +79,7 @@ describe("test transaction", function () {
         });
 
         let transactionTwo = new Transaction({
+            sender: alice.address,
             data: new TransactionPayload("helloWorld"),
             gasLimit: 70000,
             receiver: alice.address,

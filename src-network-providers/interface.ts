@@ -105,12 +105,12 @@ export interface INetworkProvider {
     getNonFungibleToken(collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
-     * Performs a generic GET action against the provider (useful for new HTTP endpoints, not yet supported by erdjs).
+     * Performs a generic GET action against the provider (useful for new HTTP endpoints).
      */
     doGetGeneric(resourceUrl: string): Promise<any>;
 
     /**
-     * Performs a generic POST action against the provider (useful for new HTTP endpoints, not yet supported by erdjs).
+     * Performs a generic POST action against the provider (useful for new HTTP endpoints).
      */
     doPostGeneric(resourceUrl: string, payload: any): Promise<any>;
 }

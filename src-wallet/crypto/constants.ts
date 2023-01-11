@@ -1,4 +1,4 @@
-// In a future PR, improve versioning infrastructure for key-file objects in erdjs.
+// In a future PR, improve versioning infrastructure for key-file objects.
 export const Version = 4;
 export const CipherAlgorithm = "aes-128-ctr";
 export const DigestAlgorithm = "sha256";

@@ -2,7 +2,7 @@ import { guardLength } from "./assertions";
 import { ErrInvariantFailed } from "./errors";
 import { parseValidatorKey } from "./pem";
 
-const bls = require('@elrondnetwork/bls-wasm');
+const bls = require('@multiversx/sdk-bls-wasm');
 
 export const VALIDATOR_SECRETKEY_LENGTH = 32;
 export const VALIDATOR_PUBKEY_LENGTH = 96;

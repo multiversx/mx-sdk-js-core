@@ -10,7 +10,7 @@ export class UserWallet {
      * Copied from: https://github.com/multiversx/mx-deprecated-core-js/blob/v1.28.0/src/account.js#L76
      * Notes: adjustements (code refactoring, no change in logic), in terms of: 
      *  - typing (since this is the TypeScript version)
-     *  - error handling (in line with erdjs's error system)
+     *  - error handling (in line with sdk-core's error system)
      *  - references to crypto functions
      *  - references to object members
      * 
@@ -27,7 +27,7 @@ export class UserWallet {
      * Copied from: https://github.com/multiversx/mx-deprecated-core-js/blob/v1.28.0/src/account.js#L42
      * Notes: adjustements (code refactoring, no change in logic), in terms of: 
      *  - typing (since this is the TypeScript version)
-     *  - error handling (in line with erdjs's error system)
+     *  - error handling (in line with sdk-core's error system)
      *  - references to crypto functions
      *  - references to object members
      * 

@@ -1,30 +1,30 @@
-import { ContractController } from "../testutils/contractController";
-import { SmartContract } from "./smartContract";
-import { BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
+import { ContractQueryResponse } from "@multiversx/sdk-network-providers";
+import BigNumber from "bignumber.js";
+import { assert } from "chai";
+import { Address } from "../address";
 import {
     loadAbiRegistry,
     loadTestWallets,
     MockProvider,
     setupUnitTestWatcherTimeouts,
-    TestWallet,
+    TestWallet
 } from "../testutils";
-import { SmartContractAbi } from "./abi";
-import { Address } from "../address";
-import { assert } from "chai";
-import { Interaction } from "./interaction";
-import { ContractFunction } from "./function";
-import { ReturnCode } from "./returnCode";
-import BigNumber from "bignumber.js";
-import { BytesValue } from "./typesystem/bytes";
+import { ContractController } from "../testutils/contractController";
 import { TokenPayment } from "../tokenPayment";
-import { ContractQueryResponse } from "@elrondnetwork/erdjs-network-providers";
+import { SmartContractAbi } from "./abi";
+import { ContractFunction } from "./function";
+import { Interaction } from "./interaction";
+import { ReturnCode } from "./returnCode";
+import { SmartContract } from "./smartContract";
+import { BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
+import { BytesValue } from "./typesystem/bytes";
 
-describe("test smart contract interactor", function() {
+describe("test smart contract interactor", function () {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");
     let provider = new MockProvider();
     let alice: TestWallet;
 
-    before(async function() {
+    before(async function () {
         ({ alice } = await loadTestWallets());
     });
 
@@ -49,7 +49,7 @@ describe("test smart contract interactor", function() {
         let contract = new SmartContract({ address: dummyAddress });
         let dummyFunction = new ContractFunction("dummy");
         let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        
+
         const TokenFoo = (amount: BigNumber.Value) => TokenPayment.fungibleFromAmount("FOO-6ce17b", amount, 0);
         const TokenBar = (amount: BigNumber.Value) => TokenPayment.fungibleFromAmount("BAR-5bc08f", amount, 3);
         const LKMEX = (nonce: number, amount: BigNumber.Value) => TokenPayment.metaEsdtFromAmount("LKMEX-aab910", nonce, amount, 18);
@@ -94,7 +94,7 @@ describe("test smart contract interactor", function() {
         transaction = new Interaction(contract, dummyFunction, [])
             .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)], alice)
             .buildTransaction();
-        
+
         assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexStrămoși}@01@01@${hexStrămoși}@2a@01@${hexDummyFunction}`);
     });
 
@@ -160,7 +160,7 @@ describe("test smart contract interactor", function() {
         assert.isTrue(bundle.returnCode.equals(ReturnCode.Ok));
     });
 
-    it("should interact with 'counter'", async function() {
+    it("should interact with 'counter'", async function () {
         setupUnitTestWatcherTimeouts();
 
         let abiRegistry = await loadAbiRegistry("src/testdata/counter.abi.json");
@@ -207,7 +207,7 @@ describe("test smart contract interactor", function() {
         assert.deepEqual(valueAfterDecrement!.valueOf(), new BigNumber(5));
     });
 
-    it("should interact with 'lottery-esdt'", async function() {
+    it("should interact with 'lottery-esdt'", async function () {
         setupUnitTestWatcherTimeouts();
 
         let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
@@ -256,7 +256,7 @@ describe("test smart contract interactor", function() {
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@01");
         let { bundle: { returnCode: statusReturnCode, values: statusReturnValues, firstValue: statusFirstValue } } = await controller.execute(statusInteraction, statusTransaction);
 
-        assert.equal(statusTransaction.getData().toString(),"status@6c75636b79");
+        assert.equal(statusTransaction.getData().toString(), "status@6c75636b79");
         assert.isTrue(statusReturnCode.equals(ReturnCode.Ok));
         assert.lengthOf(statusReturnValues, 1);
         assert.deepEqual(statusFirstValue!.valueOf(), { name: "Running", fields: [] });
@@ -265,7 +265,7 @@ describe("test smart contract interactor", function() {
         let getLotteryInfoTransaction = getLotteryInfoInteraction.withNonce(15).buildTransaction();
         await alice.signer.sign(getLotteryInfoTransaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@0000000b6c75636b792d746f6b656e000000010100000000000000005fc2b9dbffffffff00000001640000000a140ec80fa7ee88000000");
-        let { bundle: { returnCode: infoReturnCode, values: infoReturnValues, firstValue: infoFirstValue} } = await controller.execute(getLotteryInfoInteraction, getLotteryInfoTransaction);
+        let { bundle: { returnCode: infoReturnCode, values: infoReturnValues, firstValue: infoFirstValue } } = await controller.execute(getLotteryInfoInteraction, getLotteryInfoTransaction);
 
         assert.equal(getLotteryInfoTransaction.getData().toString(), "getLotteryInfo@6c75636b79");
         assert.isTrue(infoReturnCode.equals(ReturnCode.Ok));

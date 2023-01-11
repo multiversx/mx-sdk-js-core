@@ -1,14 +1,14 @@
-import * as errors from "../../errors";
-import { assert } from "chai";
-import { I64Type, NumericalValue, U16Type, U32Type, U32Value, U8Type } from "./numerical";
-import { PrimitiveType, Type, NullType } from "./types";
-import { BooleanType } from "./boolean";
-import { AddressType } from "./address";
-import { OptionType } from "./generic";
-import { TypeExpressionParser } from "./typeExpressionParser";
 import BigNumber from "bignumber.js";
-import { BytesType, BytesValue} from "./bytes";
+import { assert } from "chai";
+import * as errors from "../../errors";
+import { AddressType } from "./address";
+import { BooleanType } from "./boolean";
+import { BytesType, BytesValue } from "./bytes";
+import { OptionType } from "./generic";
+import { I64Type, NumericalValue, U16Type, U32Type, U32Value } from "./numerical";
 import { StringType } from "./string";
+import { TypeExpressionParser } from "./typeExpressionParser";
+import { NullType, PrimitiveType, Type } from "./types";
 
 describe("test types", () => {
     let parser = new TypeExpressionParser();
@@ -52,11 +52,11 @@ describe("test types", () => {
     });
 
     it("should get fully qualified name", () => {
-        assert.equal(new Type("foo").getFullyQualifiedName(), "erdjs:types:foo");
-        assert.equal(new U32Type().getFullyQualifiedName(), "erdjs:types:u32");
-        assert.equal(parser.parse("MultiResultVec<u32>").getFullyQualifiedName(), "erdjs:types:MultiResultVec<erdjs:types:u32>");
-        assert.equal(parser.parse("utf-8 string").getFullyQualifiedName(), "erdjs:types:utf-8 string");
-        assert.equal(parser.parse("Option<u32>").getFullyQualifiedName(), "erdjs:types:Option<erdjs:types:u32>");
+        assert.equal(new Type("foo").getFullyQualifiedName(), "multiversx:types:foo");
+        assert.equal(new U32Type().getFullyQualifiedName(), "multiversx:types:u32");
+        assert.equal(parser.parse("MultiResultVec<u32>").getFullyQualifiedName(), "multiversx:types:MultiResultVec<multiversx:types:u32>");
+        assert.equal(parser.parse("utf-8 string").getFullyQualifiedName(), "multiversx:types:utf-8 string");
+        assert.equal(parser.parse("Option<u32>").getFullyQualifiedName(), "multiversx:types:Option<multiversx:types:u32>");
     });
 
     it("types and values should have correct JavaScript class hierarchy", () => {

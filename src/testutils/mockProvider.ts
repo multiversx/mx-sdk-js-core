@@ -1,12 +1,12 @@
-import { IAddress } from "../interface";
-import { Transaction, TransactionHash } from "../transaction";
+import { AccountOnNetwork, ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "@multiversx/sdk-network-providers";
 import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
 import * as errors from "../errors";
-import { Query } from "../smartcontracts/query";
-import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
 import { ErrMock } from "../errors";
-import { AccountOnNetwork, ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "@elrondnetwork/erdjs-network-providers";
+import { IAddress } from "../interface";
+import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
+import { Query } from "../smartcontracts/query";
+import { Transaction, TransactionHash } from "../transaction";
 import { createAccountBalance } from "./utils";
 
 export class MockProvider {

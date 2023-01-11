@@ -1,7 +1,15 @@
-name: Publish erdjs
+name: Publish (not main)
 
 on:
   workflow_dispatch:
+    inputs:
+      channel:
+        type: choice
+        description: NPM channel
+        options: 
+        - alpha
+        - beta
+        - previous
 
 permissions:
   contents: write
@@ -21,12 +29,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           RELEASE_TAG=v$(node -p "require('./package.json').version")
-          gh release create $RELEASE_TAG --target=$GITHUB_SHA --title="$RELEASE_TAG" --generate-notes
-      
+          gh release create --prerelease $RELEASE_TAG --target=$GITHUB_SHA --title="$RELEASE_TAG" --generate-notes
+
       - run: npm ci
       - run: npm test
       
       - name: Publish to npmjs
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-        run: npm publish --access=public
+        run: npm publish --access=public --tag=${{ github.event.inputs.channel }}

@@ -1,4 +1,4 @@
-import { TransactionDecoder, TransactionMetadata } from "@elrondnetwork/transaction-decoder";
+import { TransactionDecoder, TransactionMetadata } from "@multiversx/sdk-transaction-decoder/lib/src/transaction.decoder";
 import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
 import { IAddress } from "../interface";
@@ -148,8 +148,7 @@ export class ResultsParser {
             sender: transaction.sender.bech32(),
             receiver: transaction.receiver.bech32(),
             data: transaction.data.toString("base64"),
-            value: transaction.value.toString(),
-            type: transaction.type
+            value: transaction.value.toString()
         });
     }
 

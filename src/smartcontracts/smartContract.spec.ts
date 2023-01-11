@@ -1,13 +1,13 @@
+import { TransactionStatus } from "@multiversx/sdk-network-providers";
 import { assert } from "chai";
 import { Address } from "../address";
-import { Code } from "./code";
-import { SmartContract } from "./smartContract";
 import { loadTestWallets, MarkCompleted, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
+import { TransactionWatcher } from "../transactionWatcher";
+import { Code } from "./code";
 import { ContractFunction } from "./function";
+import { SmartContract } from "./smartContract";
 import { U32Value } from "./typesystem";
 import { BytesValue } from "./typesystem/bytes";
-import { TransactionWatcher } from "../transactionWatcher";
-import { TransactionStatus } from "@elrondnetwork/erdjs-network-providers";
 
 
 describe("test contract", () => {
@@ -72,7 +72,7 @@ describe("test contract", () => {
     it("should call", async () => {
         setupUnitTestWatcherTimeouts();
         let watcher = new TransactionWatcher(provider);
-        
+
         let contract = new SmartContract({ address: new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3") });
 
         provider.mockUpdateAccount(alice.address, account => {

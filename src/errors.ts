@@ -1,5 +1,5 @@
 /**
- * The base class for `erdjs` exceptions (errors).
+ * The base class for exceptions (errors).
  */
 export class Err extends Error {
   inner: Error | undefined = undefined;
@@ -244,7 +244,7 @@ export class ErrTypeInferenceSystemRequiresRegularJavascriptObjects extends ErrT
     super(`
 argument at position ${index} seems to be a TypedValue. The automatic type inference system requires regular javascript objects as input.
 This error might occur when you pass a TypedValue to contract.methods.myFunction([...]). For passing TypedValues instead of regular javascript objects, and bypass the automatic type inference system, use contract.methodsExplicit.myFunction([...]) instead.
-Also see https://github.com/multiversx/mx-sdk-erdjs/pull/187.
+Also see https://github.com/multiversx/mx-sdk-js-core/pull/187.
 `);
   }
 }

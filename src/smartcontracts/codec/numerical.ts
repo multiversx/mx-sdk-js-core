@@ -84,7 +84,7 @@ export class NumericalBinaryCodec {
         }
 
         // Negative:
-        // Also see: https://github.com/ElrondNetwork/big-int-util/blob/master/twos-complement/bigint2twos.go
+        // Also see: https://github.com/multiversx/mx-components-big-int/blob/master/twos-complement/bigint2twos.go
         let valuePlusOne = primitive.value.plus(new BigNumber(1));
         let buffer = bigIntToBuffer(valuePlusOne);
         flipBufferBitsInPlace(buffer);

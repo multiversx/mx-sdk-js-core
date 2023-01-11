@@ -1,8 +1,8 @@
+import { TransactionOnNetwork, TransactionStatus } from "@multiversx/sdk-network-providers";
 import { assert } from "chai";
-import { TransactionWatcher } from "./transactionWatcher";
+import { MarkCompleted, MockProvider, Wait } from "./testutils";
 import { TransactionHash } from "./transaction";
-import { MockProvider, MarkCompleted, Wait } from "./testutils";
-import { TransactionOnNetwork, TransactionStatus } from "@elrondnetwork/erdjs-network-providers";
+import { TransactionWatcher } from "./transactionWatcher";
 
 
 describe("test transactionWatcher", () => {

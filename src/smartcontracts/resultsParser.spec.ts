@@ -1,4 +1,4 @@
-import { ContractQueryResponse, ContractResultItem, ContractResults, TransactionEvent, TransactionEventTopic, TransactionLogs, TransactionOnNetwork } from "@elrondnetwork/erdjs-network-providers";
+import { ContractQueryResponse, ContractResultItem, ContractResults, TransactionEvent, TransactionEventTopic, TransactionLogs, TransactionOnNetwork } from "@multiversx/sdk-network-providers";
 import { assert } from "chai";
 import * as fs from "fs";
 import path from "path";

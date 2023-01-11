@@ -8,14 +8,14 @@ MultiversX SDK for JavaScript and TypeScript (written in TypeScript).
 
 ## Distribution
 
-[npm](https://www.npmjs.com/package/@multiversx/erdjs)
+[npm](https://www.npmjs.com/package/@multiversx/sdk-core)
 
 ## Installation
 
-`erdjs` is delivered via **npm** and it can be installed as follows:
+`sdk-core` is delivered via **npm** and it can be installed as follows:
 
 ```
-npm install @multiversx/erdjs
+npm install @multiversx/sdk-core
 ```
 
 ## Development
@@ -24,7 +24,7 @@ Feel free to skip this section if you are not a contributor.
 
 ### Prerequisites
 
-`browserify` is required to compile the browser-friendly versions of `erdjs`. It can be installed as follows:
+`browserify` is required to compile the browser-friendly versions of `sdk-core`. It can be installed as follows:
 
 ```
 npm install --global browserify
@@ -32,7 +32,7 @@ npm install --global browserify
 
 ### Building the library
 
-In order to compile `erdjs`, run the following:
+In order to compile the library, run the following:
 
 ```
 npm install

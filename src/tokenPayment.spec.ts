@@ -49,12 +49,12 @@ describe("test token payment", () => {
     });
 
     it("should work with NFTs", () => {
-        let identifier = "ERDJS-38f249";
+        let identifier = "TEST-38f249";
         let nonce = 1;
 
         let tokenPayment = TokenPayment.nonFungible(identifier, nonce)
         assert.equal(tokenPayment.tokenIdentifier, identifier);
         assert.equal(tokenPayment.nonce, nonce);
-        assert.equal(tokenPayment.toPrettyString(), "1 ERDJS-38f249");
+        assert.equal(tokenPayment.toPrettyString(), "1 TEST-38f249");
     });
 });

@@ -20,11 +20,11 @@ export const DefaultGasConfiguration: IGasConfiguration = {
     gasCostESDTNFTMultiTransfer: 200000
 };
 
-// Additional gas to account for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of erdjs).
+// Additional gas to account for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of the library).
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 
 // Additional gas to account for extra blockchain operations (e.g. data movement (between accounts) for NFTs), 
-// and for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of erdjs).
+// and for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of the library).
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
 
 export class GasEstimator {

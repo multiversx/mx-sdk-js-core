@@ -1,4 +1,4 @@
-import { ProxyNetworkProvider } from "@elrondnetwork/erdjs-network-providers";
+import { ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
 import { IAddress } from "../interface";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
 import { Query } from "../smartcontracts/query";

@@ -30,7 +30,6 @@
         "out-browser-tests",
         "**/*.spec.ts",
         "src/testutils",
-        "src/examples",
-        "src/_docs"
+        "src/examples"
     ]
 }

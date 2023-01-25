@@ -42,6 +42,3 @@ describe("test contract payload builders", () => {
         assert.equal(payload.valueOf().toString(), "transferToken@fd691bb5e85d102687d81079dffce842d4dc328276d2d4c60d8fd1c3433c3293@0400");
     });
 });
-
-
-

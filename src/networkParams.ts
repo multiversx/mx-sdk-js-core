@@ -86,7 +86,7 @@ export class TransactionOptions {
     /**
      * Returns true if Guarded Transaction Option is set
      */
-    withGuardedOptions(): boolean {
+    hasGuardedOption(): boolean {
         return ((this.value & TRANSACTION_OPTIONS_TX_GUARDED_MASK) == TRANSACTION_OPTIONS_TX_GUARDED)
     }
 

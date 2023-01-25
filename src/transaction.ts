@@ -250,12 +250,12 @@ export class Transaction {
   }
 
   /**
-   * Checks the integrity of the guarded transaction if
+   * Checks the integrity of the guarded transaction
    */
   isGuardedTransaction(): boolean {
-    let guardianComp = this.guardian.bech32() === (Address.empty().bech32());
-    let guardianSignature = this.guardianSignature.hex() === "";
-    return (this.getOptions().withGuardedOptions() && !guardianComp && !guardianSignature)
+    const guardianComp = this.guardian.bech32() === (Address.empty().bech32());
+    const guardianSignature = this.guardianSignature.hex() === "";
+    return (this.getOptions().hasGuardedOption() && !guardianComp && !guardianSignature)
   }
 
   /**

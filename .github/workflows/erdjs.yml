@@ -5,7 +5,7 @@ name: Build and Test erdjs
 
 on:
   pull_request:
-    branches: [ main, development , feat/*]
+    branches: [ main, development ]
   workflow_dispatch:
 
 jobs:

@@ -1,6 +1,6 @@
 {
   "name": "@elrondnetwork/erdjs",
-  "version": "12.0.0",
+  "version": "12.0.1",
   "description": "Smart Contracts interaction framework",
   "main": "out/index.js",
   "types": "out/index.d.js",
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@elrondnetwork/erdjs-network-providers": "1.0.0",
-    "@elrondnetwork/erdjs-walletcore": "2.0.0",
+    "@elrondnetwork/erdjs-walletcore": "3.0.1",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",
     "@types/mocha": "9.1.0",

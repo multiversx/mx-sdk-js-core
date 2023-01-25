@@ -13,6 +13,7 @@ export interface IPlainTransactionObject {
     value: string;
     receiver: string;
     sender: string;
+    guardian?: string;
     gasPrice: number;
     gasLimit: number;
     data?: string;
@@ -20,6 +21,7 @@ export interface IPlainTransactionObject {
     version: number;
     options?: number;
     signature?: string;
+    guardianSignature?: string;
 }
 
 export interface ISignature { hex(): string; }

@@ -32,7 +32,7 @@ describe("test on local testnet", function () {
 
         // Deploy
         let contract = new SmartContract({});
-        
+
         let transactionDeploy = await prepareDeployment({
             contract: contract,
             deployer: alice,
@@ -46,9 +46,9 @@ describe("test on local testnet", function () {
         let transactionIncrement = contract.call({
             func: new ContractFunction("increment"),
             gasLimit: 3000000,
-            chainID: network.ChainID
+            chainID: network.ChainID,
+            caller: alice.address
         });
-
         transactionIncrement.setNonce(alice.account.nonce);
         await alice.signer.sign(transactionIncrement);
 
@@ -58,14 +58,18 @@ describe("test on local testnet", function () {
         let simulateOne = contract.call({
             func: new ContractFunction("increment"),
             gasLimit: 100000,
-            chainID: network.ChainID
+            chainID: network.ChainID,
+            caller: alice.address
         });
+        simulateOne.setSender(alice.address);
 
         let simulateTwo = contract.call({
             func: new ContractFunction("foobar"),
             gasLimit: 500000,
-            chainID: network.ChainID
+            chainID: network.ChainID,
+            caller: alice.address
         });
+        simulateTwo.setSender(alice.address);
 
         simulateOne.setNonce(alice.account.nonce);
         simulateTwo.setNonce(alice.account.nonce);
@@ -117,9 +121,9 @@ describe("test on local testnet", function () {
         let transactionIncrementFirst = contract.call({
             func: new ContractFunction("increment"),
             gasLimit: 2000000,
-            chainID: network.ChainID
+            chainID: network.ChainID,
+            caller: alice.address
         });
-
         transactionIncrementFirst.setNonce(alice.account.nonce);
         await alice.signer.sign(transactionIncrementFirst);
 
@@ -129,9 +133,9 @@ describe("test on local testnet", function () {
         let transactionIncrementSecond = contract.call({
             func: new ContractFunction("increment"),
             gasLimit: 2000000,
-            chainID: network.ChainID
+            chainID: network.ChainID,
+            caller: alice.address
         });
-
         transactionIncrementSecond.setNonce(alice.account.nonce);
         await alice.signer.sign(transactionIncrementSecond);
 
@@ -178,14 +182,16 @@ describe("test on local testnet", function () {
             func: new ContractFunction("transferToken"),
             gasLimit: 9000000,
             args: [new AddressValue(bob.address), new U32Value(1000)],
-            chainID: network.ChainID
+            chainID: network.ChainID,
+            caller: alice.address
         });
 
         let transactionMintCarol = contract.call({
             func: new ContractFunction("transferToken"),
             gasLimit: 9000000,
             args: [new AddressValue(carol.address), new U32Value(1500)],
-            chainID: network.ChainID
+            chainID: network.ChainID,
+            caller: alice.address
         });
 
         // Apply nonces and sign the remaining transactions
@@ -247,7 +253,7 @@ describe("test on local testnet", function () {
 
         // Deploy
         let contract = new SmartContract({});
-        
+
         let transactionDeploy = await prepareDeployment({
             contract: contract,
             deployer: alice,
@@ -272,9 +278,9 @@ describe("test on local testnet", function () {
                 OptionValue.newMissing(),
                 OptionalValue.newMissing()
             ],
-            chainID: network.ChainID
+            chainID: network.ChainID,
+            caller: alice.address,
         });
-
         // Apply nonces and sign the remaining transactions
         transactionStart.setNonce(alice.account.nonce);
 

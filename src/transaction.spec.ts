@@ -5,6 +5,8 @@ import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { TransactionPayload } from "./transactionPayload";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { TokenPayment } from "./tokenPayment";
+import { BooleanBinaryCodec } from "./smartcontracts/codec/boolean";
+import { Signature } from "./signature";
 
 
 describe("test transaction construction", async () => {
@@ -134,7 +136,26 @@ describe("test transaction construction", async () => {
         assert.equal("b56769014f2bdc5cf9fc4a05356807d71fcf8775c819b0f1b0964625b679c918ffa64862313bfef86f99b38cb84fcdb16fa33ad6eb565276616723405cd8f109", transaction.getSignature().hex());
         assert.equal(transaction.getHash().toString(), "eb30c50c8831885ebcfac986d27e949ec02cf25676e22a009b7a486e5431ec2e");
 
-        let result = transaction.serializeForSigning(wallets.alice.address);
+        let result = transaction.serializeForSigning();
+        assert.isFalse(result.toString().includes("options"));
+    });
+
+    it("with guardian field, should be omitted", async () => {
+        let transaction = new Transaction({
+            nonce: 89,
+            value: 0,
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            gasLimit: minGasLimit,
+            chainID: "local-testnet"
+        });
+
+        await wallets.alice.signer.sign(transaction);
+        assert.equal("b56769014f2bdc5cf9fc4a05356807d71fcf8775c819b0f1b0964625b679c918ffa64862313bfef86f99b38cb84fcdb16fa33ad6eb565276616723405cd8f109", transaction.getSignature().hex());
+        assert.equal(transaction.getHash().toString(), "eb30c50c8831885ebcfac986d27e949ec02cf25676e22a009b7a486e5431ec2e");
+
+        let result = transaction.serializeForSigning();
         assert.isFalse(result.toString().includes("options"));
     });
 
@@ -196,8 +217,99 @@ describe("test transaction construction", async () => {
             chainID: "local-testnet"
         });
 
-        const plainObject = transaction.toPlainObject(sender);
+        const plainObject = transaction.toPlainObject();
         const restoredTransaction = Transaction.fromPlainObject(plainObject);
         assert.deepEqual(restoredTransaction, transaction);
+    });
+
+    it("checks correctly the version and options of the transaction", async () => {
+        const sender = wallets.alice.address;
+        let transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(1),
+            options: TransactionOptions.withDefaultOptions(),
+        });
+        assert.isFalse(transaction.isGuardedTransaction());
+
+        transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(1),
+            options: TransactionOptions.withTxHashSignOptions(),
+        });
+        assert.isFalse(transaction.isGuardedTransaction());
+
+        transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(2),
+            options: TransactionOptions.withTxHashSignOptions(),
+        });
+        assert.isFalse(transaction.isGuardedTransaction());
+
+        transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(2),
+            options: TransactionOptions.withTxGuardedOptions(),
+        });
+        assert.isFalse(transaction.isGuardedTransaction());
+
+        transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            guardian: wallets.bob.address,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(2),
+            options: TransactionOptions.withTxGuardedOptions(),
+        });
+        assert.isFalse(transaction.isGuardedTransaction());
+
+        transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            guardian: wallets.bob.address,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(2),
+            options: TransactionOptions.withTxGuardedOptions(),
+        });
+        await wallets.alice.signer.sign(transaction);
+        transaction.applyGuardianSignature(transaction.getSignature());
+        assert.isTrue(transaction.isGuardedTransaction());
     });
 });

@@ -36,6 +36,7 @@ export class Interaction {
     private chainID: IChainID = "";
     private querent: IAddress = new Address();
     private explicitReceiver?: IAddress;
+    private sender: IAddress = new Address();
 
     private isWithSingleESDTTransfer: boolean = false;
     private isWithSingleESDTNFTTransfer: boolean = false;
@@ -53,7 +54,7 @@ export class Interaction {
         this.args = args;
         this.tokenTransfers = new TokenTransfersWithinInteraction([], this);
     }
-    
+
     getContractAddress(): IAddress {
         return this.contract.getAddress();
     }
@@ -115,10 +116,12 @@ export class Interaction {
             // Value will be set using "withValue()".
             value: this.value,
             receiver: receiver,
-            chainID: this.chainID
+            chainID: this.chainID,
+            caller: this.sender
         });
 
         transaction.setNonce(this.nonce);
+
         return transaction;
     }
 
@@ -173,12 +176,17 @@ export class Interaction {
         return this;
     }
 
-    useThenIncrementNonceOf(account: Account) : Interaction {
+    useThenIncrementNonceOf(account: Account): Interaction {
         return this.withNonce(account.getNonceThenIncrement());
     }
 
     withChainID(chainID: IChainID): Interaction {
         this.chainID = chainID;
+        return this;
+    }
+
+    withSender(sender: IAddress): Interaction {
+        this.sender = sender;
         return this;
     }
 

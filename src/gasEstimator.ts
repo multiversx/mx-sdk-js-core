@@ -8,9 +8,9 @@ interface IGasConfiguration {
 
 /**
  * This is mirroring (on a best efforts basis) the network's gas configuration & gas schedule:
- *  - https://gateway.elrond.com/network/config
- *  - https://github.com/ElrondNetwork/elrond-config-mainnet/tree/master/gasSchedules
- *  - https://github.com/ElrondNetwork/elrond-config-mainnet/blob/master/enableEpochs.toml#L200
+ *  - https://gateway.multiversx.com/network/config
+ *  - https://github.com/multiversx/mx-chain-mainnet-config/tree/master/gasSchedules
+ *  - https://github.com/multiversx/mx-chain-mainnet-config/blob/master/enableEpochs.toml#L200
  */
 export const DefaultGasConfiguration: IGasConfiguration = {
     minGasLimit: 50000,
@@ -20,11 +20,11 @@ export const DefaultGasConfiguration: IGasConfiguration = {
     gasCostESDTNFTMultiTransfer: 200000
 };
 
-// Additional gas to account for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of erdjs).
+// Additional gas to account for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of the library).
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 
 // Additional gas to account for extra blockchain operations (e.g. data movement (between accounts) for NFTs), 
-// and for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of erdjs).
+// and for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of the library).
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
 
 export class GasEstimator {

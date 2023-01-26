@@ -1,10 +1,9 @@
-import { Type, TypedValue, List } from "../typesystem";
+import { List, Type, TypedValue } from "../typesystem";
 import { BinaryCodec } from "./binary";
 import { SizeOfU32 } from "./constants";
 
 /**
- * Encodes and decodes "List" objects
- * with respect to: {@link https://docs.elrond.com/developers/developer-reference/elrond-serialization-format/ | The Elrond Serialization Format}. 
+ * Encodes and decodes "List" objects.
  */
 export class ListBinaryCodec {
     private readonly binaryCodec: BinaryCodec;

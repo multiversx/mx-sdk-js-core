@@ -3,7 +3,7 @@
 <head>
     <base href="../" />
     <meta charset="utf-8">
-    <title>Run erdjs Tests in the Browser</title>
+    <title>Run Tests in the Browser</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/node_modules/mocha/mocha.css">
 </head>
@@ -14,27 +14,22 @@
             <div class="col-sm-12">
                 <ul id="TestChoices" class="list-group">
                     <li class="list-group-item">
-                        <button class="btn btn-link" onclick="runTests('/out-browser-tests/erdjs-tests-unit.js')">
+                        <button class="btn btn-link" onclick="runTests('/out-browser-tests/tests-unit.js')">
                             Unit tests
                         </button>
                     </li>
                     <li class="list-group-item">
-                        <button class="btn btn-link" onclick="runTests('/out-browser-tests/erdjs-tests-unit-min.js')">
-                            Unit tests (minified code)
-                        </button>
-                    </li>
-                    <li class="list-group-item">
-                        <button class="btn btn-link" onclick="runTests('/out-browser-tests/erdjs-tests-localnet.js')">
+                        <button class="btn btn-link" onclick="runTests('/out-browser-tests/tests-localnet.js')">
                             Integration tests - local testnet
                         </button>
                     </li>
                     <li class="list-group-item">
-                        <button class="btn btn-link" onclick="runTests('/out-browser-tests/erdjs-tests-devnet.js')">
+                        <button class="btn btn-link" onclick="runTests('/out-browser-tests/tests-devnet.js')">
                             Integration tests - devnet
                         </button>
                     </li>
                     <li class="list-group-item">
-                        <button class="btn btn-link" onclick="runTests('/out-browser-tests/erdjs-tests-testnet.js')">
+                        <button class="btn btn-link" onclick="runTests('/out-browser-tests/tests-testnet.js')">
                             Integration tests - testnet
                         </button>
                     </li>

@@ -1,10 +1,9 @@
 import * as errors from "../../errors";
-import { Type, OptionValue } from "../typesystem";
+import { OptionValue, Type } from "../typesystem";
 import { BinaryCodec } from "./binary";
 
 /**
  * Encodes and decodes "OptionValue" objects
- * with respect to: {@link https://docs.elrond.com/developers/developer-reference/elrond-serialization-format/ | The Elrond Serialization Format}.
  */
 export class OptionValueBinaryCodec {
     private readonly binaryCodec: BinaryCodec;

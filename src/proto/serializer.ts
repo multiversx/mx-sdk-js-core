@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import * as errors from "../errors";
 import { bigIntToBuffer } from "../smartcontracts/codec/utils";
 import { Transaction } from "../transaction";
@@ -5,8 +6,6 @@ import { proto } from "./compiled";
 import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED } from "../constants";
 import { Address } from "../address";
 import { IAddress, ITransactionValue } from "../interface";
-import BigNumber from "bignumber.js";
-
 /**
  * Hides away the serialization complexity, for each type of object (e.g. transactions).
  
@@ -21,7 +20,7 @@ export class ProtoSerializer {
         const senderPubkey = new Address(transaction.getSender().bech32()).pubkey();
 
         let protoTransaction = new proto.Transaction({
-            // elrond-go's serializer handles nonce == 0 differently, thus we treat 0 as "undefined".
+            // mx-chain-go's serializer handles nonce == 0 differently, thus we treat 0 as "undefined".
             Nonce: transaction.getNonce().valueOf() ? transaction.getNonce().valueOf() : undefined,
             Value: this.serializeTransactionValue(transaction.getValue()),
             RcvAddr: receiverPubkey,
@@ -53,7 +52,7 @@ export class ProtoSerializer {
     }
 
     /**
-     * Custom serialization, compatible with elrond-go.
+     * Custom serialization, compatible with mx-chain-go.
      */
     private serializeTransactionValue(transactionValue: ITransactionValue): Buffer {
         let value = new BigNumber(transactionValue.toString());
@@ -63,7 +62,7 @@ export class ProtoSerializer {
 
         // Will retain the magnitude, as a buffer.
         let buffer = bigIntToBuffer(value);
-        // We prepend the "positive" sign marker, in order to be compatible with Elrond Go's "sign & magnitude" proto-representation (a custom one).
+        // We prepend the "positive" sign marker, in order to be compatible with mx-chain-go's "sign & magnitude" proto-representation (a custom one).
         buffer = Buffer.concat([Buffer.from([0x00]), buffer]);
         return buffer;
     }

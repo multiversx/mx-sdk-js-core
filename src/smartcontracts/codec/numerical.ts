@@ -1,11 +1,10 @@
-import { NumericalType, NumericalValue } from "../typesystem";
-import { isMsbZero, isMsbOne, bigIntToBuffer, bufferToBigInt, cloneBuffer, flipBufferBitsInPlace, prependByteToBuffer } from "./utils";
 import BigNumber from "bignumber.js";
+import { NumericalType, NumericalValue } from "../typesystem";
 import { SizeOfU32 } from "./constants";
+import { bigIntToBuffer, bufferToBigInt, cloneBuffer, flipBufferBitsInPlace, isMsbOne, isMsbZero, prependByteToBuffer } from "./utils";
 
 /**
- * Encodes and decodes "NumericalValue" objects
- * with respect to: {@link https://docs.elrond.com/developers/developer-reference/elrond-serialization-format/ | The Elrond Serialization Format}. 
+ * Encodes and decodes "NumericalValue" objects.
  */
 export class NumericalBinaryCodec {
     decodeNested(buffer: Buffer, type: NumericalType): [NumericalValue, number] {
@@ -39,7 +38,7 @@ export class NumericalBinaryCodec {
             return new NumericalValue(type, value);
         }
 
-        // Also see: https://github.com/ElrondNetwork/big-int-util/blob/master/twos-complement/twos2bigint.go
+        // Also see: https://github.com/multiversx/mx-components-big-int/blob/master/twos-complement/twos2bigint.go
         flipBufferBitsInPlace(payload);
         let value = bufferToBigInt(payload);
         let negativeValue = value.multipliedBy(new BigNumber(-1));
@@ -85,7 +84,7 @@ export class NumericalBinaryCodec {
         }
 
         // Negative:
-        // Also see: https://github.com/ElrondNetwork/big-int-util/blob/master/twos-complement/bigint2twos.go
+        // Also see: https://github.com/multiversx/mx-components-big-int/blob/master/twos-complement/bigint2twos.go
         let valuePlusOne = primitive.value.plus(new BigNumber(1));
         let buffer = bigIntToBuffer(valuePlusOne);
         flipBufferBitsInPlace(buffer);
@@ -129,7 +128,7 @@ export class NumericalBinaryCodec {
         }
 
         // Negative:
-        // Also see: https://github.com/ElrondNetwork/big-int-util/blob/master/twos-complement/bigint2twos.go
+        // Also see: https://github.com/multiversx/mx-components-big-int/blob/master/twos-complement/bigint2twos.go
         let valuePlusOne = primitive.value.plus(new BigNumber(1));
         let buffer = bigIntToBuffer(valuePlusOne);
         flipBufferBitsInPlace(buffer);

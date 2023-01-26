@@ -1,24 +1,21 @@
 import { BigNumber } from "bignumber.js";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionPayload, ITransactionValue } from "./interface";
 import { Address } from "./address";
-import {
-  TransactionOptions,
-  TransactionVersion,
-} from "./networkParams";
-import { Signature } from "./signature";
-import { guardNotEmpty } from "./utils";
-import { TransactionPayload } from "./transactionPayload";
 import * as errors from "./errors";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionPayload, ITransactionValue } from "./interface";
+import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
 import { Hash } from "./hash";
 import { INetworkConfig } from "./interfaceOfNetwork";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_GUARDED_MASK } from "./constants";
+import { Signature } from "./signature";
+import { TransactionPayload } from "./transactionPayload";
+import { guardNotEmpty } from "./utils";
 
 const createTransactionHasher = require("blake2b");
 const TRANSACTION_HASH_LENGTH = 32;
 
 /**
- * An abstraction for creating, signing and broadcasting Elrond transactions.
+ * An abstraction for creating, signing and broadcasting transactions.
  */
 export class Transaction {
   /**

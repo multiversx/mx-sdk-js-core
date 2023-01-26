@@ -1,23 +1,23 @@
-import { ContractController } from "../testutils/contractController";
-import { SmartContract } from "./smartContract";
-import { BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
+import { ContractQueryResponse } from "@multiversx/sdk-network-providers";
+import BigNumber from "bignumber.js";
+import { assert } from "chai";
+import { Address } from "../address";
 import {
     loadAbiRegistry,
     loadTestWallets,
     MockProvider,
     setupUnitTestWatcherTimeouts,
-    TestWallet,
+    TestWallet
 } from "../testutils";
-import { SmartContractAbi } from "./abi";
-import { Address } from "../address";
-import { assert } from "chai";
-import { Interaction } from "./interaction";
-import { ContractFunction } from "./function";
-import { ReturnCode } from "./returnCode";
-import BigNumber from "bignumber.js";
-import { BytesValue } from "./typesystem/bytes";
+import { ContractController } from "../testutils/contractController";
 import { TokenPayment } from "../tokenPayment";
-import { ContractQueryResponse } from "@elrondnetwork/erdjs-network-providers";
+import { SmartContractAbi } from "./abi";
+import { ContractFunction } from "./function";
+import { Interaction } from "./interaction";
+import { ReturnCode } from "./returnCode";
+import { SmartContract } from "./smartContract";
+import { BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
+import { BytesValue } from "./typesystem/bytes";
 
 describe("test smart contract interactor", function () {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");

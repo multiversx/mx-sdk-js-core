@@ -1,15 +1,15 @@
 import { assert } from "chai";
-import { UserSecretKey } from "./userKeys";
-import { Mnemonic } from "./mnemonic";
-import { UserWallet } from "./userWallet";
 import { Randomness } from "./crypto";
+import { ErrInvariantFailed } from "./errors";
+import { Mnemonic } from "./mnemonic";
+import { TestMessage } from "./testutils/message";
+import { TestTransaction } from "./testutils/transaction";
+import { DummyMnemonic, DummyPassword, loadTestWallet, TestWallet } from "./testutils/wallets";
 import { UserAddress } from "./userAddress";
+import { UserSecretKey } from "./userKeys";
 import { UserSigner } from "./userSigner";
 import { UserVerifier } from "./userVerifier";
-import { ErrInvariantFailed } from "./errors";
-import { TestMessage } from "./testutils/message";
-import { DummyMnemonic, DummyPassword, loadTestWallet, TestWallet } from "./testutils/wallets";
-import { TestTransaction } from "./testutils/transaction";
+import { UserWallet } from "./userWallet";
 
 describe("test user wallets", () => {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
@@ -79,9 +79,9 @@ describe("test user wallets", () => {
         let carolSecretKey = UserSecretKey.fromString(carol.secretKeyHex);
 
         console.time("encrypt");
-        let aliceKeyFile = new UserWallet(aliceSecretKey, password);
-        let bobKeyFile = new UserWallet(bobSecretKey, password);
-        let carolKeyFile = new UserWallet(carolSecretKey, password);
+        let aliceKeyFile = UserWallet.fromSecretKey({ secretKey: aliceSecretKey, password: password });
+        let bobKeyFile = UserWallet.fromSecretKey({ secretKey: bobSecretKey, password: password });
+        let carolKeyFile = UserWallet.fromSecretKey({ secretKey: carolSecretKey, password: password });
         console.timeEnd("encrypt");
 
         assert.equal(aliceKeyFile.toJSON().bech32, alice.address.bech32());
@@ -96,23 +96,35 @@ describe("test user wallets", () => {
 
         // With provided randomness, in order to reproduce our development wallets
 
-        aliceKeyFile = new UserWallet(aliceSecretKey, password, new Randomness({
-            id: alice.keyFileObject.id,
-            iv: Buffer.from(alice.keyFileObject.crypto.cipherparams.iv, "hex"),
-            salt: Buffer.from(alice.keyFileObject.crypto.kdfparams.salt, "hex")
-        }));
+        aliceKeyFile = UserWallet.fromSecretKey({
+            secretKey: aliceSecretKey,
+            password: password,
+            randomness: new Randomness({
+                id: alice.keyFileObject.id,
+                iv: Buffer.from(alice.keyFileObject.crypto.cipherparams.iv, "hex"),
+                salt: Buffer.from(alice.keyFileObject.crypto.kdfparams.salt, "hex")
+            })
+        });
 
-        bobKeyFile = new UserWallet(bobSecretKey, password, new Randomness({
-            id: bob.keyFileObject.id,
-            iv: Buffer.from(bob.keyFileObject.crypto.cipherparams.iv, "hex"),
-            salt: Buffer.from(bob.keyFileObject.crypto.kdfparams.salt, "hex")
-        }));
+        bobKeyFile = UserWallet.fromSecretKey({
+            secretKey: bobSecretKey,
+            password: password,
+            randomness: new Randomness({
+                id: bob.keyFileObject.id,
+                iv: Buffer.from(bob.keyFileObject.crypto.cipherparams.iv, "hex"),
+                salt: Buffer.from(bob.keyFileObject.crypto.kdfparams.salt, "hex")
+            })
+        });
 
-        carolKeyFile = new UserWallet(carolSecretKey, password, new Randomness({
-            id: carol.keyFileObject.id,
-            iv: Buffer.from(carol.keyFileObject.crypto.cipherparams.iv, "hex"),
-            salt: Buffer.from(carol.keyFileObject.crypto.kdfparams.salt, "hex")
-        }));
+        carolKeyFile = UserWallet.fromSecretKey({
+            secretKey: carolSecretKey,
+            password: password,
+            randomness: new Randomness({
+                id: carol.keyFileObject.id,
+                iv: Buffer.from(carol.keyFileObject.crypto.cipherparams.iv, "hex"),
+                salt: Buffer.from(carol.keyFileObject.crypto.kdfparams.salt, "hex")
+            })
+        });
 
         assert.deepEqual(aliceKeyFile.toJSON(), alice.keyFileObject);
         assert.deepEqual(bobKeyFile.toJSON(), bob.keyFileObject);
@@ -123,7 +135,7 @@ describe("test user wallets", () => {
         let signer = new UserSigner(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf"));
         let verifier = new UserVerifier(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf").generatePublicKey());
         let sender = UserAddress.fromBech32("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz");
-        
+
         // With data field
         let transaction = new TestTransaction({
             nonce: 0,

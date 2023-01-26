@@ -35,14 +35,14 @@ export class Type {
     }
 
     /**
-     * Gets the fully qualified name of the type, to allow for better (efficient and non-ambiguous) type comparison within erdjs' typesystem.
+     * Gets the fully qualified name of the type, to allow for better (efficient and non-ambiguous) type comparison within the custom typesystem.
      */
     getFullyQualifiedName(): string {
         let joinedTypeParameters = this.getTypeParameters().map(type => type.getFullyQualifiedName()).join(", ");
 
-        return this.isGenericType() ? 
-            `erdjs:types:${this.getName()}<${joinedTypeParameters}>` : 
-            `erdjs:types:${this.getName()}`;
+        return this.isGenericType() ?
+            `multiversx:types:${this.getName()}<${joinedTypeParameters}>` :
+            `multiversx:types:${this.getName()}`;
     }
 
     hasExactClass(className: string): boolean {
@@ -68,7 +68,7 @@ export class Type {
     }
 
     /**
-     * Generates type expressions similar to elrond-wasm-rs. 
+     * Generates type expressions similar to mx-sdk-rs. 
      */
     toString() {
         let typeParameters: string = this.getTypeParameters().map(type => type.toString()).join(", ");
@@ -159,9 +159,9 @@ export class Type {
     }
 
     /**
-     * A special marker for types within erdjs' typesystem.
+     * A special marker for types within the custom typesystem.
      */
-    belongsToTypesystem() {}
+    belongsToTypesystem() { }
 }
 
 /**
@@ -276,9 +276,9 @@ export abstract class TypedValue {
     }
 
     /**
-     * A special marker for values within erdjs' typesystem.
+     * A special marker for values within the custom typesystem.
      */
-    belongsToTypesystem() {}
+    belongsToTypesystem() { }
 }
 
 export abstract class PrimitiveValue extends TypedValue {

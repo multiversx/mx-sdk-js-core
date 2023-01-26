@@ -1,26 +1,21 @@
-# Elrond SDK for JavaScript
+# MultiversX SDK for JavaScript and TypeScript
 
-Elrond SDK for JavaScript and TypeScript (written in TypeScript).
+MultiversX SDK for JavaScript and TypeScript (written in TypeScript).
 
 ## Documentation
 
- - [Cookbook](https://docs.elrond.com/sdk-and-tools/erdjs/erdjs-cookbook/)
- - [TypeDoc](https://elrondnetwork.github.io/elrond-sdk-docs/erdjs/latest)
-
-## CHANGELOG
-
-[CHANGELOG](CHANGELOG.md)
+ - [Cookbook](https://docs.multiversx.com/sdk-and-tools/erdjs/erdjs-cookbook/)
 
 ## Distribution
 
-[npm](https://www.npmjs.com/package/@elrondnetwork/erdjs)
+[npm](https://www.npmjs.com/package/@multiversx/sdk-core)
 
 ## Installation
 
-`erdjs` is delivered via **npm** and it can be installed as follows:
+`sdk-core` is delivered via **npm** and it can be installed as follows:
 
 ```
-npm install @elrondnetwork/erdjs
+npm install @multiversx/sdk-core
 ```
 
 ## Development
@@ -29,7 +24,7 @@ Feel free to skip this section if you are not a contributor.
 
 ### Prerequisites
 
-`browserify` is required to compile the browser-friendly versions of `erdjs`. It can be installed as follows:
+`browserify` is required to compile the browser-friendly versions of `sdk-core`. It can be installed as follows:
 
 ```
 npm install --global browserify
@@ -37,13 +32,12 @@ npm install --global browserify
 
 ### Building the library
 
-In order to compile `erdjs`, run the following:
+In order to compile the library, run the following:
 
 ```
 npm install
 npm run compile
 npm run compile-browser
-npm run compile-browser-min
 ```
 
 ### Running the tests
@@ -69,4 +63,4 @@ In order to run the tests **in the browser**, do as follows:
 make clean && npm run browser-tests
 ```
 
-For the `localnet` tests, make sure you have a *local testnet* up & running. A *local testnet* can be started from the Elrond IDE or from [erdpy](https://docs.elrond.com/developers/setup-local-testnet/).
+For the `localnet` tests, make sure you have a *local testnet* up & running. In order to start a *local testnet*, follow [this](https://docs.multiversx.com/developers/setup-local-testnet/).

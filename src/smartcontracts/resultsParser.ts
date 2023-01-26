@@ -1,13 +1,13 @@
-import { TransactionDecoder, TransactionMetadata } from "@elrondnetwork/transaction-decoder";
+import { TransactionDecoder, TransactionMetadata } from "@multiversx/sdk-transaction-decoder/lib/src/transaction.decoder";
 import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
-import { Logger } from "../logger";
+import { IAddress } from "../interface";
 import { IContractQueryResponse, IContractResults, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { Logger } from "../logger";
 import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "./interface";
 import { ReturnCode } from "./returnCode";
-import { EndpointDefinition } from "./typesystem";
-import { IAddress } from "../interface";
+import { EndpointDefinition, EndpointParameterDefinition, TypedValue } from "./typesystem";
 
 enum WellKnownEvents {
     OnTransactionCompleted = "completedTxEvent",
@@ -19,14 +19,36 @@ enum WellKnownTopics {
     TooMuchGas = "@too much gas provided for processing"
 }
 
+interface IResultsParserOptions {
+    argsSerializer: IArgsSerializer;
+}
+
+interface IArgsSerializer {
+    buffersToValues(buffers: Buffer[], parameters: EndpointParameterDefinition[]): TypedValue[];
+    stringToBuffers(joinedString: string): Buffer[];
+}
+
+// TODO: perhaps move default construction options to a factory (ResultsParserFactory), instead of referencing them in the constructor
+// (postpone as much as possible, breaking change)
+const defaultResultsParserOptions: IResultsParserOptions = {
+    argsSerializer: new ArgSerializer()
+};
+
 /**
  * Parses contract query responses and smart contract results.
  * The parsing involves some heuristics, in order to handle slight inconsistencies (e.g. some SCRs are present on API, but missing on Gateway).
  */
 export class ResultsParser {
+    private readonly argsSerializer: IArgsSerializer;
+
+    constructor(options?: IResultsParserOptions) {
+        options = { ...defaultResultsParserOptions, ...options };
+        this.argsSerializer = options.argsSerializer;
+    }
+
     parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle {
         let parts = queryResponse.getReturnDataParts();
-        let values = new ArgSerializer().buffersToValues(parts, endpoint.output);
+        let values = this.argsSerializer.buffersToValues(parts, endpoint.output);
         let returnCode = new ReturnCode(queryResponse.returnCode.toString());
 
         return {
@@ -52,7 +74,7 @@ export class ResultsParser {
 
     parseOutcome(transaction: ITransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle {
         let untypedBundle = this.parseUntypedOutcome(transaction);
-        let values = new ArgSerializer().buffersToValues(untypedBundle.values, endpoint.output);
+        let values = this.argsSerializer.buffersToValues(untypedBundle.values, endpoint.output);
 
         return {
             returnCode: untypedBundle.returnCode,
@@ -126,8 +148,7 @@ export class ResultsParser {
             sender: transaction.sender.bech32(),
             receiver: transaction.receiver.bech32(),
             data: transaction.data.toString("base64"),
-            value: transaction.value.toString(),
-            type: transaction.type
+            value: transaction.value.toString()
         });
     }
 
@@ -218,7 +239,7 @@ export class ResultsParser {
 
     private createBundleOnWriteLogWhereFirstTopicEqualsAddress(logs: ITransactionLogs, address: IAddress): UntypedOutcomeBundle | null {
         let hexAddress = new Address(address.bech32()).hex();
-        
+
         let eventWriteLogWhereTopicIsSender = logs.findSingleOrNoneEvent(
             WellKnownEvents.OnWriteLog,
             event => event.findFirstOrNoneTopic(topic => topic.hex() == hexAddress) != undefined
@@ -283,10 +304,10 @@ export class ResultsParser {
             // TODO: Upon gathering more transaction samples, fix for other kinds of transfers, as well (future PR, as needed).
         }
 
-        let parts = new ArgSerializer().stringToBuffers(data);
+        let parts = this.argsSerializer.stringToBuffers(data);
         let returnCodePart = parts[startingIndex] || Buffer.from([]);
         let returnDataParts = parts.slice(startingIndex + 1);
-        
+
         if (returnCodePart.length == 0) {
             throw new ErrCannotParseContractResults("no return code");
         }

@@ -1,14 +1,15 @@
+import { ContractQueryResponse, ContractResultItem, ContractResults, TransactionEvent, TransactionEventTopic, TransactionLogs, TransactionOnNetwork } from "@multiversx/sdk-network-providers";
+import { assert } from "chai";
 import * as fs from "fs";
 import path from "path";
-import { assert } from "chai";
-import { BigUIntType, BigUIntValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition } from "./typesystem";
-import { BytesType, BytesValue } from "./typesystem/bytes";
-import { ReturnCode } from "./returnCode";
-import { ResultsParser } from "./resultsParser";
-import { Logger, LogLevel } from "../logger";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { ContractQueryResponse, ContractResultItem, ContractResults, TransactionEvent, TransactionEventTopic, TransactionLogs, TransactionOnNetwork } from "@elrondnetwork/erdjs-network-providers";
 import { Address } from "../address";
+import { ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { Logger, LogLevel } from "../logger";
+import { ArgSerializer } from "./argSerializer";
+import { ResultsParser } from "./resultsParser";
+import { ReturnCode } from "./returnCode";
+import { BigUIntType, BigUIntValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, TypedValue, U64Type, U64Value } from "./typesystem";
+import { BytesType, BytesValue } from "./typesystem/bytes";
 
 const KnownReturnCodes: string[] = [
     ReturnCode.None.valueOf(),
@@ -31,6 +32,45 @@ const KnownReturnCodes: string[] = [
 
 describe("test smart contract results parser", () => {
     let parser = new ResultsParser();
+
+    it("should create parser with custom dependencies (1)", async () => {
+        const customParser = new ResultsParser({
+            argsSerializer: {
+                buffersToValues(_buffers, _parameters) {
+                    return [new U64Value(42)];
+                },
+                stringToBuffers(_joinedString) {
+                    return []
+                }
+            }
+        });
+
+        const endpoint = new EndpointDefinition("", [], [], new EndpointModifiers("", []));
+        const queryResponse = new ContractQueryResponse({});
+        const bundle = customParser.parseQueryResponse(queryResponse, endpoint);
+        assert.deepEqual(bundle.firstValue, new U64Value(42));
+    });
+
+    it("should create parser with custom dependencies (2)", async () => {
+        const customParser = new ResultsParser({
+            argsSerializer: new ArgSerializer({
+                codec: {
+                    decodeTopLevel(_buffer, _type): TypedValue {
+                        return new U64Value(42);
+                    },
+                    encodeTopLevel(_typedValue): Buffer {
+                        return Buffer.from([])
+                    },
+                }
+            })
+        });
+
+        const outputParameters = [new EndpointParameterDefinition("", "", new U64Type())];
+        const endpoint = new EndpointDefinition("", [], outputParameters, new EndpointModifiers("", []));
+        const queryResponse = new ContractQueryResponse({ returnData: [""] });
+        const bundle = customParser.parseQueryResponse(queryResponse, endpoint);
+        assert.deepEqual(bundle.firstValue, new U64Value(42));
+    });
 
     it("should parse query response", async () => {
         let endpointModifiers = new EndpointModifiers("", []);

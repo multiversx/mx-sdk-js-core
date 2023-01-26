@@ -1,11 +1,16 @@
 import * as errors from "../../errors";
 import { AddressType } from "./address";
+import { OptionalType } from "./algebraic";
 import { BooleanType } from "./boolean";
 import { BytesType } from "./bytes";
+import { CodeMetadataType } from "./codeMetadata";
 import { CompositeType } from "./composite";
 import { EnumType, EnumVariantDefinition } from "./enum";
+import { FieldDefinition } from "./fields";
 import { ListType, OptionType } from "./generic";
+import { ArrayVecType } from "./genericArray";
 import { H256Type } from "./h256";
+import { NothingType } from "./nothing";
 import {
     BigIntType,
     BigUIntType,
@@ -16,19 +21,14 @@ import {
     U16Type,
     U32Type,
     U64Type,
-    U8Type,
+    U8Type
 } from "./numerical";
-import { StructType } from "./struct";
-import { FieldDefinition } from "./fields";
-import { TokenIdentifierType } from "./tokenIdentifier";
-import { Type, CustomType } from "./types";
-import { VariadicType } from "./variadic";
-import { OptionalType } from "./algebraic";
-import { ArrayVecType } from "./genericArray";
 import { StringType } from "./string";
+import { StructType } from "./struct";
+import { TokenIdentifierType } from "./tokenIdentifier";
 import { TupleType } from "./tuple";
-import { CodeMetadataType } from "./codeMetadata";
-import { NothingType } from "./nothing";
+import { CustomType, Type } from "./types";
+import { VariadicType } from "./variadic";
 
 type TypeFactory = (...typeParameters: Type[]) => Type;
 
@@ -41,7 +41,7 @@ export class TypeMapper {
         this.openTypesFactories = new Map<string, TypeFactory>([
             ["Option", (...typeParameters: Type[]) => new OptionType(typeParameters[0])],
             ["List", (...typeParameters: Type[]) => new ListType(typeParameters[0])],
-            // For the following open generics, we use a slightly different typing than the one defined by elrond-wasm-rs (temporary workaround).
+            // For the following open generics, we use a slightly different typing than the one defined by mx-sdk-rs (temporary workaround).
             ["VarArgs", (...typeParameters: Type[]) => new VariadicType(typeParameters[0])],
             ["MultiResultVec", (...typeParameters: Type[]) => new VariadicType(typeParameters[0])],
             ["variadic", (...typeParameters: Type[]) => new VariadicType(typeParameters[0])],
@@ -110,7 +110,7 @@ export class TypeMapper {
             if (!mappedType.isGenericType()) {
                 this.learnType(mappedType);
             }
-            
+
             return mappedType;
         }
 

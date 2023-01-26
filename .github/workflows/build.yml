@@ -1,7 +1,7 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Build and Test erdjs
+name: Build and Test
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-erdjs:
+  build:
 
     runs-on: ubuntu-latest
 
@@ -26,5 +26,4 @@ jobs:
     - run: npm ci
     - run: npm run compile
     - run: npm run compile-browser
-    - run: npm run compile-browser-min
     - run: npm test

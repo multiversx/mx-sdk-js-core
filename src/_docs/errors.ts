@@ -1,5 +1,5 @@
 /**
- * This module contains the errors raised by erdjs.
+ * This module contains the errors raised by the library.
  * @packageDocumentation
  * @module errors
  */

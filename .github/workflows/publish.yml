@@ -1,4 +1,4 @@
-name: Publish erdjs
+name: Publish
 
 on:
   workflow_dispatch:
@@ -20,12 +20,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo " - [npmjs](https://www.npmjs.com/package/@elrondnetwork/erdjs)" >> notes.txt
-          echo " - [CHANGELOG](https://github.com/ElrondNetwork/elrond-sdk-erdjs/blob/main/CHANGELOG.md)" >> notes.txt
-          echo "" >> notes.txt
-
           RELEASE_TAG=v$(node -p "require('./package.json').version")
-          gh release create $RELEASE_TAG --target=$GITHUB_SHA --title="$RELEASE_TAG" --generate-notes --notes-file=notes.txt
+          gh release create $RELEASE_TAG --target=$GITHUB_SHA --title="$RELEASE_TAG" --generate-notes
       
       - run: npm ci
       - run: npm test

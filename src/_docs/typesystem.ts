@@ -1,5 +1,5 @@
 /**
- * This module defines erdjs' typesystem, that resembles the typesystem of `elrond-wasm-rs`.
+ * This module defines a custom typesystem, that resembles the typesystem of `mx-sdk-rs`.
  * @packageDocumentation
  * @module typesystem
  */

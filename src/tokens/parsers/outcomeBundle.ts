@@ -1,4 +1,4 @@
-import { Err } from "../errors";
+import { Err } from "../../errors";
 import { IOutcomeBundle, IOutcomeError } from "./interface";
 
 export class OutcomeBundle<TOutcome> implements IOutcomeBundle<TOutcome> {

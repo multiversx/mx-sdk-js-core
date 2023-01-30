@@ -7,7 +7,7 @@ export class ESDTLocalBurnParser extends BaseParser<IBurnOutcome> {
         for (const event of events) {
             if (event.identifier == "ESDTLocalBurn") {
                 return {
-                    userAddress: event.address.toString(),
+                    userAddress: event.address,
                     tokenIdentifier: event.topics[0].valueOf().toString(),
                     nonce: bufferToBigInt(event.topics[1].valueOf()).toNumber() || 0,
                     burntSupply: bufferToBigInt(event.topics[2].valueOf()).toString()

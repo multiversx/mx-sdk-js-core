@@ -6,7 +6,7 @@ export class ESDTSetSpecialRoleParser extends BaseParser<ISetSpecialRoleOutcome>
         for (const event of events) {
             if (event.identifier == "ESDTSetRole") {
                 return {
-                    userAddress: event.address.toString(),
+                    userAddress: event.address,
                     tokenIdentifier: event.topics[0].valueOf().toString(),
                     roles: event.topics.slice(3).map(topic => topic.valueOf().toString())
                 };

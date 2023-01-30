@@ -1,46 +1,54 @@
-import { addressToBuffer, stringToBuffer } from "../codec";
-import { IAddress, IESDTSetSpecialRoleBuilderConstructorOptions, IGasLimit, IPlainTransactionObject, ITokenIdentifier } from "../interface";
-import { BuilderBase } from "./baseBuilder";
+import BigNumber from "bignumber.js";
+import { IAddress, IGasLimit } from "../../interface";
+import { addressToHex, utf8ToHex } from "../codec";
+import { BuilderBase, IBaseBuilderConstructorOptions, IBuilderBaseConfiguration } from "./baseBuilder";
+
+
+
+interface IESDTSetSpecialRoleConfiguration extends IBuilderBaseConfiguration {
+    gasLimitSetSpecialRole: IGasLimit;
+    issueCost: BigNumber.Value;
+    esdtContractAddress: IAddress;
+}
+
+interface IESDTSetSpecialRoleBuilderConstructorOptions extends IBaseBuilderConstructorOptions {
+    manager: IAddress;
+    user: IAddress;
+    tokenIdentifier: string;
+    addRoleLocalMint: boolean;
+    addRoleLocalBurn: boolean;
+}
+
 
 export class ESDTSetSpecialRoleBuilder extends BuilderBase {
-    public readonly managerAddress: IAddress;
-    public readonly userAddress: IAddress;
-    public readonly tokenIdentifier: ITokenIdentifier;
-    public readonly addRoleLocalMint: boolean;
-    public readonly addRoleLocalBurn: boolean;
+    private readonly executionGasLimit: IGasLimit;
+    private readonly user: IAddress;
+    private readonly tokenIdentifier: string;
+    private readonly addRoleLocalMint: boolean;
+    private readonly addRoleLocalBurn: boolean;
 
-    constructor(options: IESDTSetSpecialRoleBuilderConstructorOptions) {
-        super(options);
+    constructor(config: IESDTSetSpecialRoleConfiguration, options: IESDTSetSpecialRoleBuilderConstructorOptions) {
+        super(config, options);
 
-        this.managerAddress = options.managerAddress;
-        this.userAddress = options.userAddress;
+        this.executionGasLimit = config.gasLimitSetSpecialRole;
+        this.sender = options.manager;
+        this.user = options.user;
         this.tokenIdentifier = options.tokenIdentifier;
         this.addRoleLocalMint = options.addRoleLocalMint;
         this.addRoleLocalBurn = options.addRoleLocalBurn;
     }
 
-    protected getDefaultGasLimit(): IGasLimit {
-        return this.getConfiguration().GasLimitSetSpecialRole;
+    protected estimateExecutionGas(): IGasLimit {
+        return this.executionGasLimit;
     }
 
-    getFunctionName(): string {
-        return "setSpecialRole";
-    }
-
-    protected partiallyBuildPlainTransaction(): Partial<IPlainTransactionObject> {
-        return {
-            value: "0",
-            sender: this.managerAddress.toString(),
-            receiver: this.getConfiguration().ESDTContractAddress.toString(),
-        };
-    }
-
-    buildArguments(): Buffer[] {
+    protected buildTransactionPayloadParts(): string[] {
         return [
-            stringToBuffer(this.tokenIdentifier.valueOf()),
-            addressToBuffer(this.userAddress),
-            ...(this.addRoleLocalMint ? [stringToBuffer("ESDTRoleLocalMint")] : []),
-            ...(this.addRoleLocalBurn ? [stringToBuffer("ESDTRoleLocalBurn")] : []),
-        ];
+            "setSpecialRole",
+            utf8ToHex(this.tokenIdentifier),
+            addressToHex(this.user),
+            ...(this.addRoleLocalMint ? [utf8ToHex("ESDTRoleLocalMint")] : []),
+            ...(this.addRoleLocalBurn ? [utf8ToHex("ESDTRoleLocalBurn")] : []),
+        ]
     }
 }

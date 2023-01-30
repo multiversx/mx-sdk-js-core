@@ -1,4 +1,4 @@
-import { Err } from "../errors";
+import { Err } from "../../errors";
 import { IOutcomeBundle, IOutcomeError, ITransactionEvent } from "./interface";
 import { OutcomeBundle } from "./outcomeBundle";
 import { TransactionEvent } from "./transactionEvent";

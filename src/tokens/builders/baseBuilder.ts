@@ -1,9 +1,9 @@
-import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "../../constants";
-import { IAddress, ITransactionValue } from "../../interface";
+import { ARGUMENTS_SEPARATOR, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "../../constants";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITransactionValue } from "../../interface";
+import { TransactionOptions, TransactionVersion } from "../../networkParams";
 import { Transaction } from "../../transaction";
 import { TransactionPayload } from "../../transactionPayload";
-import { bufferToPaddedHex, stringToBuffer } from "../codec";
-import { IBaseBuilderConstructorOptions, IChainID, IGasLimit, IGasPrice, INonce, ITransactionOptions, ITransactionVersion } from "../interface";
+import { guardValueIsSet } from "../../utils";
 
 export interface IBuilderBaseConfiguration {
     chainID: IChainID;
@@ -12,7 +12,7 @@ export interface IBuilderBaseConfiguration {
     gasLimitPerByte: IGasLimit;
 }
 
-interface IBaseBuilderConstructorOptions {
+export interface IBaseBuilderConstructorOptions {
     nonce?: INonce;
     value?: ITransactionValue;
     gasPrice?: IGasPrice;
@@ -25,11 +25,11 @@ export abstract class BuilderBase {
     private gasLimitPerByte: IGasLimit;
 
     private nonce?: INonce;
-    private value?: ITransactionValue;
+    protected value?: ITransactionValue;
     private gasPrice?: IGasPrice;
     private gasLimit?: IGasLimit;
-    private sender?: IAddress;
-    private receiver?: IAddress;
+    protected sender?: IAddress;
+    protected receiver?: IAddress;
 
     constructor(config: IBuilderBaseConfiguration, options: IBaseBuilderConstructorOptions) {
         this.chainID = config.chainID;
@@ -43,67 +43,74 @@ export abstract class BuilderBase {
     }
 
     buildTransaction(): Transaction {
-        const chainID = this.getChainID();
-        const sender = this.getSender();
         const payload = this.buildTransactionPayload();
 
+        const chainID = this.chainID;
+        const sender = this.getSender();
+        const receiver = this.getReceiver();
+        const gasLimit = this.getGasLimit(payload);
+        const gasPrice = this.gasPrice;
+        const nonce = this.nonce || 0;
+        const value = this.getValue();
+        const version = this.getTransactionVersion();
+        const options = this.getTransactionOptions();
 
+        return new Transaction({
+            chainID: chainID,
+            sender: sender,
+            receiver: receiver,
+            gasLimit: gasLimit,
+            gasPrice: gasPrice,
+            nonce: nonce,
+            value: value,
+            data: payload,
+            version: version,
+            options: options
+        });
     }
 
     buildTransactionPayload(): TransactionPayload {
-        const data = this.buildTransactionPayloadString();
+        const parts = this.buildTransactionPayloadParts();
+        const data = parts.join(ARGUMENTS_SEPARATOR);
         return new TransactionPayload(data);
     }
 
-    protected buildTransactionPayloadString(): string {
-        const hexArguments = this.buildArguments().map(arg => bufferToPaddedHex(arg));
-        const parts = [this.getFunctionName()].concat(hexArguments);
-        const data = parts.join("@");
-        return data;
+    protected abstract buildTransactionPayloadParts(): string[];
+
+    protected getSender(): IAddress {
+        guardValueIsSet("sender", this.sender);
+        return this.sender!;
     }
 
-    protected buildTransactionPayloadParts(): Buffer[] {
-        const func = stringToBuffer(this.getFunctionName());
-        const args = this.buildArguments();
-        const parts = [func].concat(args);
-        return parts;
+    protected getReceiver(): IAddress {
+        guardValueIsSet("receiver", this.receiver);
+        return this.receiver!;
     }
 
-    getChainID(): IChainID {
-        return this.chainID;
+    protected getGasLimit(payload: TransactionPayload): IGasLimit {
+        if (this.gasLimit) {
+            return this.gasLimit;
+        }
+
+        const gasLimit = this.computeDataMovementGas(payload).valueOf() + this.estimateExecutionGas().valueOf();
+        return gasLimit;
     }
 
-    getNonce(): INonce {
-        return this.nonce || 0;
+    protected computeDataMovementGas(payload: TransactionPayload): IGasLimit {
+        return this.minGasLimit.valueOf() + this.gasLimitPerByte.valueOf() * payload.length();
     }
 
-    setNonce(value: INonce) {
-        this.nonce = value;
+    protected abstract estimateExecutionGas(): IGasLimit;
+
+    protected getValue(): ITransactionValue {
+        return this.value || 0;
     }
 
-    getGasPrice(): IGasPrice {
-        return this.gasPrice;
+    protected getTransactionVersion(): TransactionVersion {
+        return new TransactionVersion(TRANSACTION_VERSION_DEFAULT);
     }
 
-    setGasPrice(value: IGasPrice) {
-        this.gasPrice = value;
-    }
-
-    getGasLimit(): IGasLimit {
-        return this.gasLimit || this.getDefaultGasLimit();
-    }
-
-    protected abstract getDefaultGasLimit(): IGasLimit;
-
-    setGasLimit(value: IGasLimit) {
-        this.gasLimit = value;
-    }
-
-    getTransactionVersion(): ITransactionVersion {
-        return TRANSACTION_VERSION_DEFAULT;
-    }
-
-    getTransactionOptions(): ITransactionOptions {
-        return TRANSACTION_OPTIONS_DEFAULT;
+    protected getTransactionOptions(): TransactionOptions {
+        return new TransactionOptions(TRANSACTION_OPTIONS_DEFAULT);
     }
 }

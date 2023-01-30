@@ -1,4 +1,4 @@
-import { IAddress, INonce } from "../interface";
+import { IAddress, INonce } from "../../interface";
 
 export interface ITransactionEvent {
     readonly address: IAddress;

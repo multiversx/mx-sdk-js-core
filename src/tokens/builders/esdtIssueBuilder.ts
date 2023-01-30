@@ -1,29 +1,56 @@
 import BigNumber from "bignumber.js";
-import { bigIntToBuffer, stringToBuffer } from "../codec";
-import { ESDT_CONTRACT_ADDRESS } from "../constants";
-import { IAddress, IESDTIssueBuilderConstructorOptions, IGasLimit, IPlainTransactionObject } from "../interface";
-import { BuilderBase } from "./baseBuilder";
+import { IAddress, IGasLimit } from "../../interface";
+import { bigIntToHex, utf8ToHex } from "../codec";
+import { BuilderBase, IBaseBuilderConstructorOptions, IBuilderBaseConfiguration } from "./baseBuilder";
+
+
+interface IESDTIssueConfiguration extends IBuilderBaseConfiguration {
+    gasLimitESDTIssue: IGasLimit;
+    issueCost: BigNumber.Value;
+    esdtContractAddress: IAddress;
+}
+
+interface IESDTIssueBuilderConstructorOptions extends IBaseBuilderConstructorOptions {
+    issuer: IAddress;
+    tokenName: string;
+    tokenTicker: string;
+    initialSupply: number;
+    numDecimals: number;
+    canFreeze: boolean;
+    canWipe: boolean;
+    canPause: boolean;
+    canMint: boolean;
+    canBurn: boolean;
+    canChangeOwner: boolean;
+    canUpgrade: boolean;
+    canAddSpecialRoles: boolean;
+}
 
 export class ESDTIssueBuilder extends BuilderBase {
-    public readonly issuer: IAddress;
-    public readonly tokenName: string;
-    public readonly tokenTicker: string;
-    public readonly initialSupply: BigNumber.Value;
-    public readonly numDecimals: number;
+    private readonly executionGasLimit: IGasLimit;
 
-    public readonly canFreeze?: boolean;
-    public readonly canWipe?: boolean;
-    public readonly canPause?: boolean;
-    public readonly canMint?: boolean;
-    public readonly canBurn?: boolean;
-    public readonly canChangeOwner?: boolean;
-    public readonly canUpgrade?: boolean;
-    public readonly canAddSpecialRoles?: boolean;
+    private readonly tokenName: string;
+    private readonly tokenTicker: string;
+    private readonly initialSupply: BigNumber.Value;
+    private readonly numDecimals: number;
 
-    constructor(options: IESDTIssueBuilderConstructorOptions) {
-        super(options);
+    private readonly canFreeze: boolean;
+    private readonly canWipe: boolean;
+    private readonly canPause: boolean;
+    private readonly canMint: boolean;
+    private readonly canBurn: boolean;
+    private readonly canChangeOwner: boolean;
+    private readonly canUpgrade: boolean;
+    private readonly canAddSpecialRoles: boolean;
 
-        this.issuer = options.issuer;
+    constructor(config: IESDTIssueConfiguration, options: IESDTIssueBuilderConstructorOptions) {
+        super(config, options);
+        this.executionGasLimit = config.gasLimitESDTIssue;
+
+        this.sender = options.issuer;
+        this.receiver = config.esdtContractAddress;
+        this.value = config.issueCost;
+
         this.tokenName = options.tokenName;
         this.tokenTicker = options.tokenTicker;
         this.initialSupply = options.initialSupply;
@@ -37,42 +64,29 @@ export class ESDTIssueBuilder extends BuilderBase {
         this.canChangeOwner = options.canChangeOwner;
         this.canUpgrade = options.canUpgrade;
         this.canAddSpecialRoles = options.canAddSpecialRoles;
-
-        
     }
 
-    protected getDefaultGasLimit(): IGasLimit {
-        return this.getConfiguration().GasLimitESDTIssue;
+    protected estimateExecutionGas(): IGasLimit {
+        return this.executionGasLimit;
     }
 
-    getFunctionName(): string {
-        return "issue";
-    }
-
-    protected partiallyBuildPlainTransaction(): Partial<IPlainTransactionObject> {
-        return {
-            value: this.getConfiguration().IssueCost.toString(),
-            sender: this.issuer.toString(),
-            receiver: ESDT_CONTRACT_ADDRESS
-        };
-    }
-
-    buildArguments(): Buffer[] {
-        const trueBuffer = stringToBuffer("true")
+    protected buildTransactionPayloadParts(): string[] {
+        const trueAsHex = utf8ToHex("true");
 
         return [
-            stringToBuffer(this.tokenName),
-            stringToBuffer(this.tokenTicker),
-            bigIntToBuffer(this.initialSupply),
-            bigIntToBuffer(this.numDecimals),
-            ...(this.canFreeze ? [stringToBuffer("canFreeze"), trueBuffer] : []),
-            ...(this.canWipe ? [stringToBuffer("canWipe"), trueBuffer] : []),
-            ...(this.canPause ? [stringToBuffer("canPause"), trueBuffer] : []),
-            ...(this.canMint ? [stringToBuffer("canMint"), trueBuffer] : []),
-            ...(this.canBurn ? [stringToBuffer("canBurn"), trueBuffer] : []),
-            ...(this.canChangeOwner ? [stringToBuffer("canChangeOwner"), trueBuffer] : []),
-            ...(this.canUpgrade ? [stringToBuffer("canUpgrade"), trueBuffer] : []),
-            ...(this.canAddSpecialRoles ? [stringToBuffer("canAddSpecialRoles"), trueBuffer] : []),
+            "issue",
+            utf8ToHex(this.tokenName),
+            utf8ToHex(this.tokenTicker),
+            bigIntToHex(this.initialSupply),
+            bigIntToHex(this.numDecimals),
+            ...(this.canFreeze ? [utf8ToHex("canFreeze"), trueAsHex] : []),
+            ...(this.canWipe ? [utf8ToHex("canWipe"), trueAsHex] : []),
+            ...(this.canPause ? [utf8ToHex("canPause"), trueAsHex] : []),
+            ...(this.canMint ? [utf8ToHex("canMint"), trueAsHex] : []),
+            ...(this.canBurn ? [utf8ToHex("canBurn"), trueAsHex] : []),
+            ...(this.canChangeOwner ? [utf8ToHex("canChangeOwner"), trueAsHex] : []),
+            ...(this.canUpgrade ? [utf8ToHex("canUpgrade"), trueAsHex] : []),
+            ...(this.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), trueAsHex] : []),
         ];
     }
 }

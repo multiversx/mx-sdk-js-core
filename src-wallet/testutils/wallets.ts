@@ -5,6 +5,7 @@ import { readTestFile } from "./files";
 
 export const DummyPassword = "password";
 export const DummyMnemonic = "moral volcano peasant pass circle pen over picture flat shop clap goat never lyrics gather prepare woman film husband gravity behind test tiger improve";
+export const DummyMnemonicOf12Words = "matter trumpet twenty parade fame north lift sail valve salon foster cinnamon";
 
 export async function loadTestWallet(name: string): Promise<TestWallet> {
     let testdataPath = path.resolve(__dirname, "..", "testdata");

@@ -4,7 +4,7 @@ import { ErrInvariantFailed } from "./errors";
 import { Mnemonic } from "./mnemonic";
 import { TestMessage } from "./testutils/message";
 import { TestTransaction } from "./testutils/transaction";
-import { DummyMnemonic, DummyPassword, loadTestWallet, TestWallet } from "./testutils/wallets";
+import { DummyMnemonic, DummyMnemonicOf12Words, DummyPassword, loadTestWallet, TestWallet } from "./testutils/wallets";
 import { UserAddress } from "./userAddress";
 import { UserSecretKey } from "./userKeys";
 import { UserSigner } from "./userSigner";
@@ -33,6 +33,14 @@ describe("test user wallets", () => {
         assert.equal(mnemonic.deriveKey(0).hex(), alice.secretKeyHex);
         assert.equal(mnemonic.deriveKey(1).hex(), bob.secretKeyHex);
         assert.equal(mnemonic.deriveKey(2).hex(), carol.secretKeyHex);
+    });
+
+    it("should derive keys (12 words)", async () => {
+        const mnemonic = Mnemonic.fromString(DummyMnemonicOf12Words);
+
+        assert.equal(mnemonic.deriveKey(0).generatePublicKey().toAddress().bech32(), "erd1l8g9dk3gz035gkjhwegsjkqzdu3augrwhcfxrnucnyyrpc2220pqg4g7na");
+        assert.equal(mnemonic.deriveKey(1).generatePublicKey().toAddress().bech32(), "erd1fmhwg84rldg0xzngf53m0y607wvefvamh07n2mkypedx27lcqnts4zs09p");
+        assert.equal(mnemonic.deriveKey(2).generatePublicKey().toAddress().bech32(), "erd1tyuyemt4xz2yjvc7rxxp8kyfmk2n3h8gv3aavzd9ru4v2vhrkcksptewtj");
     });
 
     it("should create secret key", () => {

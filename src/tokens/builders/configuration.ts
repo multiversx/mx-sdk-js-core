@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { Address } from "../../address";
 import { IAddress, IChainID, IGasLimit, IGasPrice } from "../../interface";
 
-export class DefaultBuildersConfiguration {
+export class DefaultBuildersConfig {
     chainID: IChainID;
     minGasPrice: IGasPrice = 1000000000;
     minGasLimit = 50000;

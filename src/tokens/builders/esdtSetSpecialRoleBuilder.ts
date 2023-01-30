@@ -1,17 +1,13 @@
-import BigNumber from "bignumber.js";
 import { IAddress, IGasLimit } from "../../interface";
 import { addressToHex, utf8ToHex } from "../codec";
-import { BuilderBase, IBaseBuilderConstructorOptions, IBuilderBaseConfiguration } from "./baseBuilder";
+import { BuilderBase, IBaseArgs, IBaseConfig } from "./baseBuilder";
 
-
-
-interface IESDTSetSpecialRoleConfiguration extends IBuilderBaseConfiguration {
+interface IESDTSetSpecialRoleConfig extends IBaseConfig {
     gasLimitSetSpecialRole: IGasLimit;
-    issueCost: BigNumber.Value;
     esdtContractAddress: IAddress;
 }
 
-interface IESDTSetSpecialRoleBuilderConstructorOptions extends IBaseBuilderConstructorOptions {
+interface IESDTSetSpecialRoleArgs extends IBaseArgs {
     manager: IAddress;
     user: IAddress;
     tokenIdentifier: string;
@@ -27,15 +23,17 @@ export class ESDTSetSpecialRoleBuilder extends BuilderBase {
     private readonly addRoleLocalMint: boolean;
     private readonly addRoleLocalBurn: boolean;
 
-    constructor(config: IESDTSetSpecialRoleConfiguration, options: IESDTSetSpecialRoleBuilderConstructorOptions) {
-        super(config, options);
-
+    constructor(config: IESDTSetSpecialRoleConfig, args: IESDTSetSpecialRoleArgs) {
+        super(config, args);
         this.executionGasLimit = config.gasLimitSetSpecialRole;
-        this.sender = options.manager;
-        this.user = options.user;
-        this.tokenIdentifier = options.tokenIdentifier;
-        this.addRoleLocalMint = options.addRoleLocalMint;
-        this.addRoleLocalBurn = options.addRoleLocalBurn;
+
+        this.sender = args.manager;
+        this.receiver = config.esdtContractAddress;
+
+        this.user = args.user;
+        this.tokenIdentifier = args.tokenIdentifier;
+        this.addRoleLocalMint = args.addRoleLocalMint;
+        this.addRoleLocalBurn = args.addRoleLocalBurn;
     }
 
     protected estimateExecutionGas(): IGasLimit {

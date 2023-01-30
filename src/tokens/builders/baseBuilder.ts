@@ -5,14 +5,14 @@ import { Transaction } from "../../transaction";
 import { TransactionPayload } from "../../transactionPayload";
 import { guardValueIsSet } from "../../utils";
 
-export interface IBuilderBaseConfiguration {
+export interface IBaseConfig {
     chainID: IChainID;
     minGasPrice: IGasPrice;
     minGasLimit: IGasLimit;
     gasLimitPerByte: IGasLimit;
 }
 
-export interface IBaseBuilderConstructorOptions {
+export interface IBaseArgs {
     nonce?: INonce;
     value?: ITransactionValue;
     gasPrice?: IGasPrice;
@@ -31,7 +31,7 @@ export abstract class BuilderBase {
     protected sender?: IAddress;
     protected receiver?: IAddress;
 
-    constructor(config: IBuilderBaseConfiguration, options: IBaseBuilderConstructorOptions) {
+    constructor(config: IBaseConfig, options: IBaseArgs) {
         this.chainID = config.chainID;
         this.minGasLimit = config.minGasLimit;
         this.gasLimitPerByte = config.gasLimitPerByte;

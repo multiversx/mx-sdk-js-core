@@ -1,16 +1,16 @@
 import BigNumber from "bignumber.js";
 import { IAddress, IGasLimit } from "../../interface";
 import { bigIntToHex, utf8ToHex } from "../codec";
-import { BuilderBase, IBaseBuilderConstructorOptions, IBuilderBaseConfiguration } from "./baseBuilder";
+import { BuilderBase, IBaseArgs, IBaseConfig } from "./baseBuilder";
 
 
-interface IESDTIssueConfiguration extends IBuilderBaseConfiguration {
+interface IESDTIssueConfig extends IBaseConfig {
     gasLimitESDTIssue: IGasLimit;
     issueCost: BigNumber.Value;
     esdtContractAddress: IAddress;
 }
 
-interface IESDTIssueBuilderConstructorOptions extends IBaseBuilderConstructorOptions {
+interface IESDTIssueArgs extends IBaseArgs {
     issuer: IAddress;
     tokenName: string;
     tokenTicker: string;
@@ -43,27 +43,27 @@ export class ESDTIssueBuilder extends BuilderBase {
     private readonly canUpgrade: boolean;
     private readonly canAddSpecialRoles: boolean;
 
-    constructor(config: IESDTIssueConfiguration, options: IESDTIssueBuilderConstructorOptions) {
-        super(config, options);
+    constructor(config: IESDTIssueConfig, args: IESDTIssueArgs) {
+        super(config, args);
         this.executionGasLimit = config.gasLimitESDTIssue;
 
-        this.sender = options.issuer;
+        this.sender = args.issuer;
         this.receiver = config.esdtContractAddress;
         this.value = config.issueCost;
 
-        this.tokenName = options.tokenName;
-        this.tokenTicker = options.tokenTicker;
-        this.initialSupply = options.initialSupply;
-        this.numDecimals = options.numDecimals;
+        this.tokenName = args.tokenName;
+        this.tokenTicker = args.tokenTicker;
+        this.initialSupply = args.initialSupply;
+        this.numDecimals = args.numDecimals;
 
-        this.canFreeze = options.canFreeze;
-        this.canWipe = options.canWipe;
-        this.canPause = options.canPause;
-        this.canMint = options.canMint;
-        this.canBurn = options.canBurn;
-        this.canChangeOwner = options.canChangeOwner;
-        this.canUpgrade = options.canUpgrade;
-        this.canAddSpecialRoles = options.canAddSpecialRoles;
+        this.canFreeze = args.canFreeze;
+        this.canWipe = args.canWipe;
+        this.canPause = args.canPause;
+        this.canMint = args.canMint;
+        this.canBurn = args.canBurn;
+        this.canChangeOwner = args.canChangeOwner;
+        this.canUpgrade = args.canUpgrade;
+        this.canAddSpecialRoles = args.canAddSpecialRoles;
     }
 
     protected estimateExecutionGas(): IGasLimit {

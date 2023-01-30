@@ -1,41 +1,43 @@
 import BigNumber from "bignumber.js";
-import { bigIntToBuffer, stringToBuffer } from "../codec";
-import { IAddress, IESDTLocalBurnBuilderConstructorOptions, IGasLimit, IPlainTransactionObject, ITokenIdentifier } from "../interface";
-import { BuilderBase } from "./baseBuilder";
+import { IAddress, IGasLimit } from "../../interface";
+import { bigIntToHex, utf8ToHex } from "../codec";
+import { BuilderBase, IBaseArgs, IBaseConfig } from "./baseBuilder";
+
+interface IESDTLocalBurnConfig extends IBaseConfig {
+    gasLimitESDTLocalBurn: IGasLimit;
+}
+
+interface IESDTLocalBurnArgs extends IBaseArgs {
+    manager: IAddress;
+    user: IAddress;
+    tokenIdentifier: string;
+    supplyToBurn: BigNumber.Value
+}
 
 export class ESDTLocalBurnBuilder extends BuilderBase {
-    public readonly managerAddress: IAddress;
-    public readonly tokenIdentifier: ITokenIdentifier;
-    public readonly supplyToBurn: BigNumber.Value;
+    private readonly executionGasLimit: IGasLimit;
+    private readonly tokenIdentifier: string;
+    private readonly supplyToBurn: BigNumber.Value;
 
-    constructor(options: IESDTLocalBurnBuilderConstructorOptions) {
-        super(options);
+    constructor(config: IESDTLocalBurnConfig, args: IESDTLocalBurnArgs) {
+        super(config, args);
+        this.executionGasLimit = config.gasLimitESDTLocalBurn;
 
-        this.managerAddress = options.managerAddress;
-        this.tokenIdentifier = options.tokenIdentifier;
-        this.supplyToBurn = options.supplyToBurn;
+        this.sender = args.manager;
+        this.receiver = args.manager;
+        this.tokenIdentifier = args.tokenIdentifier;
+        this.supplyToBurn = args.supplyToBurn;
     }
 
-    protected getDefaultGasLimit(): IGasLimit {
-        return this.getConfiguration().GasLimitESDTLocalBurn;
+    protected estimateExecutionGas(): IGasLimit {
+        return this.executionGasLimit;
     }
 
-    getFunctionName(): string {
-        return "ESDTLocalBurn";
-    }
-
-    protected partiallyBuildPlainTransaction(): Partial<IPlainTransactionObject> {
-        return {
-            value: "0",
-            sender: this.managerAddress.toString(),
-            receiver: this.managerAddress.toString()
-        };
-    }
-
-    buildArguments(): Buffer[] {
+    protected buildTransactionPayloadParts(): string[] {
         return [
-            stringToBuffer(this.tokenIdentifier.valueOf()),
-            bigIntToBuffer(this.supplyToBurn)
-        ];
+            "ESDTLocalBurn",
+            utf8ToHex(this.tokenIdentifier),
+            bigIntToHex(this.supplyToBurn),
+        ]
     }
 }

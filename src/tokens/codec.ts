@@ -31,7 +31,7 @@ export function bufferToHex(value: Buffer) {
 }
 
 export function addressToHex(address: IAddress): string {
-    return addressToBuffer(address).toString("hex"
+    return addressToBuffer(address).toString("hex");
 }
 
 export function addressToBuffer(address: IAddress): Buffer {

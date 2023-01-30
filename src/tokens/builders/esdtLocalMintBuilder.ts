@@ -1,41 +1,43 @@
 import BigNumber from "bignumber.js";
-import { bigIntToBuffer, stringToBuffer } from "../codec";
-import { IAddress, IESDTLocalMintBuilderConstructorOptions, IGasLimit, IPlainTransactionObject, ITokenIdentifier } from "../interface";
-import { BuilderBase } from "./baseBuilder";
+import { IAddress, IGasLimit } from "../../interface";
+import { bigIntToHex, utf8ToHex } from "../codec";
+import { BuilderBase, IBaseArgs, IBaseConfig } from "./baseBuilder";
+
+interface IESDTLocalMintConfig extends IBaseConfig {
+    gasLimitESDTLocalMint: IGasLimit;
+}
+
+interface IESDTLocalMintArgs extends IBaseArgs {
+    manager: IAddress;
+    user: IAddress;
+    tokenIdentifier: string;
+    supplyToMint: BigNumber.Value
+}
 
 export class ESDTLocalMintBuilder extends BuilderBase {
-    public readonly managerAddress: IAddress;
-    public readonly tokenIdentifier: ITokenIdentifier;
-    public readonly supplyToMint: BigNumber.Value;
+    private readonly executionGasLimit: IGasLimit;
+    private readonly tokenIdentifier: string;
+    private readonly supplyToMint: BigNumber.Value;
 
-    constructor(options: IESDTLocalMintBuilderConstructorOptions) {
-        super(options);
+    constructor(config: IESDTLocalMintConfig, args: IESDTLocalMintArgs) {
+        super(config, args);
+        this.executionGasLimit = config.gasLimitESDTLocalMint;
 
-        this.managerAddress = options.managerAddress;
-        this.tokenIdentifier = options.tokenIdentifier;
-        this.supplyToMint = options.supplyToMint;
+        this.sender = args.manager;
+        this.receiver = args.manager;
+        this.tokenIdentifier = args.tokenIdentifier;
+        this.supplyToMint = args.supplyToMint;
     }
 
-    protected getDefaultGasLimit(): IGasLimit {
-        return this.getConfiguration().GasLimitESDTLocalMint;
+    protected estimateExecutionGas(): IGasLimit {
+        return this.executionGasLimit;
     }
 
-    getFunctionName(): string {
-        return "ESDTLocalMint";
-    }
-
-    protected partiallyBuildPlainTransaction(): Partial<IPlainTransactionObject> {
-        return {
-            value: "0",
-            sender: this.managerAddress.toString(),
-            receiver: this.managerAddress.toString()
-        };
-    }
-
-    buildArguments(): Buffer[] {
+    protected buildTransactionPayloadParts(): string[] {
         return [
-            stringToBuffer(this.tokenIdentifier.valueOf()),
-            bigIntToBuffer(this.supplyToMint)
-        ];
+            "ESDTLocalMint",
+            utf8ToHex(this.tokenIdentifier),
+            bigIntToHex(this.supplyToMint),
+        ]
     }
 }

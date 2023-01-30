@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { Err } from "../errors";
 import { CipherAlgorithm, DigestAlgorithm, KeyDerivationFunction } from "./constants";
 import { ScryptKeyDerivationParams } from "./derivationParams";
 import { EncryptedData } from "./encryptedData";
@@ -10,6 +11,10 @@ export enum EncryptorVersion {
 
 export class Encryptor {
   static encrypt(version: EncryptorVersion, data: Buffer, password: string, randomness: Randomness = new Randomness()): EncryptedData {
+    if (version != EncryptorVersion.V4) {
+      throw new Err(`Encryptor: unsupported version ${version}`);
+    }
+
     const kdParams = new ScryptKeyDerivationParams();
     const derivedKey = kdParams.generateDerivedKey(Buffer.from(password), randomness.salt);
     const derivedKeyFirstHalf = derivedKey.slice(0, 16);

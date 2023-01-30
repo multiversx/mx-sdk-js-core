@@ -58,6 +58,8 @@ export class UserWallet {
         encryptorVersion = encryptorVersion || EncryptorVersion.V4;
         randomness = randomness || new Randomness();
 
+        requireVersion(envelopeVersion, [EnvelopeVersion.V4, EnvelopeVersion.V5]);
+
         const publicKey = secretKey.generatePublicKey();
         const text = Buffer.concat([secretKey.valueOf(), publicKey.valueOf()]);
         const encryptedData = Encryptor.encrypt(encryptorVersion, text, password, randomness);
@@ -87,6 +89,8 @@ export class UserWallet {
         encryptorVersion = encryptorVersion || EncryptorVersion.V4;
         randomness = randomness || new Randomness();
 
+        requireVersion(envelopeVersion, [EnvelopeVersion.V5]);
+
         const encryptedData = Encryptor.encrypt(encryptorVersion, Buffer.from(mnemonic), password, randomness);
 
         return new UserWallet({
@@ -113,6 +117,8 @@ export class UserWallet {
         encryptorVersion = encryptorVersion || EncryptorVersion.V4;
         randomness = randomness || new Randomness();
 
+        requireVersion(envelopeVersion, [EnvelopeVersion.V5]);
+
         const encryptedData = Encryptor.encrypt(encryptorVersion, arbitraryData, password, randomness);
 
         return new UserWallet({
@@ -133,8 +139,10 @@ export class UserWallet {
      * From an encrypted keyfile, given the password, loads the secret key and the public key.
      */
     static decryptSecretKey(keyFileObject: any, password: string): UserSecretKey {
+        requireVersion(keyFileObject.version, [EnvelopeVersion.V4, EnvelopeVersion.V5]);
+
         if (keyFileObject.version >= EnvelopeVersion.V5) {
-            this.requireKind(keyFileObject.kind, UserWalletKind.SecretKey, "decryptSecretKey")
+            requireKind(keyFileObject.kind, UserWalletKind.SecretKey)
         }
 
         const encryptedData = UserWallet.edFromJSON(keyFileObject);
@@ -150,8 +158,8 @@ export class UserWallet {
     }
 
     static decryptMnemonic(keyFileObject: any, password: string): string {
-        this.requireV5OrHigher(keyFileObject.version, "decryptMnemonic");
-        this.requireKind(keyFileObject.kind, UserWalletKind.Mnemonic, "decryptMnemonic")
+        requireVersion(keyFileObject.version, [EnvelopeVersion.V5]);
+        requireKind(keyFileObject.kind, UserWalletKind.Mnemonic)
 
         const encryptedData = UserWallet.edFromJSON(keyFileObject);
         const text = Decryptor.decrypt(encryptedData, password);
@@ -159,8 +167,8 @@ export class UserWallet {
     }
 
     static decryptArbitrary(keyFileObject: any, password: string): Buffer {
-        this.requireV5OrHigher(keyFileObject.version, "decryptArbitrary");
-        this.requireKind(keyFileObject.kind, UserWalletKind.Arbitrary, "decryptArbitrary")
+        requireVersion(keyFileObject.version, [EnvelopeVersion.V5]);
+        requireKind(keyFileObject.kind, UserWalletKind.Arbitrary)
 
         const encryptedData = UserWallet.edFromJSON(keyFileObject);
         const data = Decryptor.decrypt(encryptedData, password);
@@ -254,16 +262,17 @@ export class UserWallet {
             crypto: cryptoSection
         };
     }
+}
 
-    private static requireKind(kind: UserWalletKind, expectedKind: UserWalletKind, context: string) {
-        if (kind != expectedKind) {
-            throw new Err(`Expected kind to be ${expectedKind}, but it was ${kind}. Context: ${context}`);
-        }
+function requireKind(kind: UserWalletKind, expectedKind: UserWalletKind) {
+    if (kind != expectedKind) {
+        throw new Err(`Expected kind to be ${expectedKind}, but it was ${kind}.`);
     }
+}
 
-    private static requireV5OrHigher(version: EnvelopeVersion, context: string) {
-        if (version < EnvelopeVersion.V5) {
-            throw new Err(`Unsupported version: ${version}. Context: ${context}`);
-        }
+function requireVersion(version: EnvelopeVersion, allowedVersions: EnvelopeVersion[]) {
+    const isAllowed = allowedVersions.includes(version);
+    if (!isAllowed) {
+        throw new Err(`Envelope version must be one of: [${allowedVersions.join(", ")}].`);
     }
 }

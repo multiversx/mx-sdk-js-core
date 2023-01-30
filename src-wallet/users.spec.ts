@@ -9,7 +9,7 @@ import { UserAddress } from "./userAddress";
 import { UserSecretKey } from "./userKeys";
 import { UserSigner } from "./userSigner";
 import { UserVerifier } from "./userVerifier";
-import { UserWallet } from "./userWallet";
+import { EnvelopeVersion, UserWallet } from "./userWallet";
 
 describe("test user wallets", () => {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
@@ -79,7 +79,7 @@ describe("test user wallets", () => {
         assert.equal(UserSecretKey.fromPem(carol.pemFileText).hex(), carol.secretKeyHex);
     });
 
-    it("should create and load encrypted files", function () {
+    it("should create and load keystore files (with secret keys)", function () {
         this.timeout(10000);
 
         let aliceSecretKey = UserSecretKey.fromString(alice.secretKeyHex);
@@ -137,6 +137,73 @@ describe("test user wallets", () => {
         assert.deepEqual(aliceKeyFile.toJSON(), alice.keyFileObject);
         assert.deepEqual(bobKeyFile.toJSON(), bob.keyFileObject);
         assert.deepEqual(carolKeyFile.toJSON(), carol.keyFileObject);
+    });
+
+    it("should create and load keystore files both as V4 and V5", function () {
+        this.timeout(10000);
+
+        const aliceSecretKey = UserSecretKey.fromString(alice.secretKeyHex);
+        const walletV4 = UserWallet.fromSecretKey({ secretKey: aliceSecretKey, password: password });
+        const walletV5 = UserWallet.fromSecretKey({ envelopeVersion: EnvelopeVersion.V5, secretKey: aliceSecretKey, password: password });
+        const jsonV4 = walletV4.toJSON();
+        const jsonV5 = walletV5.toJSON();
+
+        assert.equal(jsonV4.version, 4);
+        assert.isUndefined(jsonV4.kind);
+        assert.equal(jsonV4.bech32, alice.address.bech32());
+
+        assert.equal(jsonV5.version, 5);
+        assert.equal(jsonV5.kind, "secretKey");
+        assert.equal(jsonV5.bech32, alice.address.bech32());
+
+        const secretKeyV4 = UserWallet.decryptSecretKey(jsonV4, password);
+        const secretKeyV5 = UserWallet.decryptSecretKey(jsonV5, password);
+        assert.equal(secretKeyV4.hex(), alice.secretKeyHex);
+        assert.equal(secretKeyV5.hex(), alice.secretKeyHex);
+    });
+
+    it("should create and load keystore files (with mnemonics)", function () {
+        this.timeout(10000);
+
+        const wallet = UserWallet.fromMnemonic({ mnemonic: DummyMnemonic, password: password });
+        const json = wallet.toJSON();
+
+        assert.equal(json.version, 5);
+        assert.equal(json.kind, "mnemonic");
+        assert.isUndefined(json.bech32);
+
+        const mnemonicText = UserWallet.decryptMnemonic(json, password);
+        const mnemonic = Mnemonic.fromString(mnemonicText);
+
+        assert.equal(mnemonicText, DummyMnemonic);
+        assert.equal(mnemonic.deriveKey(0).generatePublicKey().toAddress().bech32(), alice.address.bech32());
+        assert.equal(mnemonic.deriveKey(1).generatePublicKey().toAddress().bech32(), bob.address.bech32());
+        assert.equal(mnemonic.deriveKey(2).generatePublicKey().toAddress().bech32(), carol.address.bech32());
+    });
+
+    it("should create and load keystore files (with arbitrary data)", function () {
+        const data = Buffer.from("hello");
+        const wallet = UserWallet.fromArbitrary({ arbitraryData: data, password: password });
+        const json = wallet.toJSON();
+
+        assert.equal(json.version, 5);
+        assert.equal(json.kind, "arbitrary");
+        assert.isUndefined(json.bech32);
+
+        const decryptedData = UserWallet.decryptArbitrary(json, password);
+        assert.deepEqual(decryptedData, data);
+    });
+
+    it("should fail if using bad versions", function () {
+        const aliceSecretKey = UserSecretKey.fromString(alice.secretKeyHex);
+
+        assert.throws(() => UserWallet.fromSecretKey({ envelopeVersion: 7, secretKey: aliceSecretKey, password: password }), "Envelope version must be one of: [4, 5].");
+        assert.throws(() => UserWallet.fromMnemonic({ envelopeVersion: 4, mnemonic: DummyMnemonic, password: password }), "Envelope version must be one of: [5].");
+        assert.throws(() => UserWallet.fromArbitrary({ envelopeVersion: 4, arbitraryData: Buffer.from(""), password: password }), "Envelope version must be one of: [5].");
+
+        assert.throws(() => UserWallet.decryptSecretKey({ version: 3, crypto: {} }, password), "Envelope version must be one of: [4, 5].");
+        assert.throws(() => UserWallet.decryptMnemonic({ version: 6, crypto: {} }, password), "Envelope version must be one of: [5].");
+        assert.throws(() => UserWallet.decryptArbitrary({ version: 7, crypto: {} }, password), "Envelope version must be one of: [5].");
     });
 
     it("should sign transactions", async () => {

@@ -1,8 +1,8 @@
-//export * from "./esdtFreezingBuilder";
+export * from "./esdtFreezingBuilder";
 export * from "./esdtIssueBuilder";
 export * from "./esdtLocalBurnBuilder";
 export * from "./esdtLocalMintBuilder";
-// export * from "./esdtPausingBuilder";
+export * from "./esdtPausingBuilder";
 export * from "./esdtSetSpecialRoleBuilder";
 
 // Done:

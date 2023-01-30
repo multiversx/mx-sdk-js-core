@@ -1,51 +1,52 @@
-import { UserAddress } from "../address";
-import { stringToBuffer } from "../codec";
-import { ESDT_CONTRACT_ADDRESS } from "../constants";
-import { Err } from "../errors";
-import { IAddress, IESDTFreezingBuilderConstructorOptions, IGasLimit, IPlainTransactionObject, ITokenIdentifier } from "../interface";
-import { BuilderBase } from "./baseBuilder";
+import { Err } from "../../errors";
+import { IAddress, IGasLimit } from "../../interface";
+import { addressToHex, utf8ToHex } from "../codec";
+import { BuilderBase, IBaseArgs, IBaseConfig } from "./baseBuilder";
+
+interface IESDTFreezingConfig extends IBaseConfig {
+    gasLimitFreezing: IGasLimit;
+    esdtContractAddress: IAddress;
+}
+
+interface IESDTFreezingArgs extends IBaseArgs {
+    manager: IAddress;
+    user: IAddress;
+    tokenIdentifier: string;
+    freeze: boolean;
+    unfreeze: boolean;
+}
 
 export class ESDTFreezingBuilder extends BuilderBase {
-    public readonly managerAddress: IAddress;
-    public readonly userAddress: IAddress;
-    public readonly tokenIdentifier: ITokenIdentifier;
-    public readonly toggleFreeze: boolean;
+    private readonly executionGasLimit: IGasLimit;
+    private readonly user: IAddress;
+    private readonly tokenIdentifier: string;
+    private readonly toggleFreeze: boolean;
 
-    constructor(options: IESDTFreezingBuilderConstructorOptions) {
-        super(options);
+    constructor(config: IESDTFreezingConfig, args: IESDTFreezingArgs) {
+        super(config, args);
+        this.executionGasLimit = config.gasLimitFreezing;
 
-        if (options.freeze == options.unfreeze) {
+        if (args.freeze == args.unfreeze) {
             throw new Err("Must set either 'freeze' or 'unfreeze' (one and only one should be set).")
         }
 
-        this.managerAddress = options.managerAddress;
-        this.userAddress = options.userAddress;
-        this.tokenIdentifier = options.tokenIdentifier;
-
+        this.sender = args.manager;
+        this.receiver = config.esdtContractAddress;
+        this.user = args.user;
+        this.tokenIdentifier = args.tokenIdentifier;
         // We only hold the value of "freeze".
-        this.toggleFreeze = options.freeze;
+        this.toggleFreeze = args.freeze;
     }
 
-    protected getDefaultGasLimit(): IGasLimit {
-        return this.getConfiguration().GasLimitFreezing;
+    protected estimateExecutionGas(): IGasLimit {
+        return this.executionGasLimit;
     }
 
-    getFunctionName(): string {
-        return this.toggleFreeze ? "freeze" : "unFreeze";
-    }
-
-    protected partiallyBuildPlainTransaction(): Partial<IPlainTransactionObject> {
-        return {
-            value: "0",
-            sender: this.managerAddress.toString(),
-            receiver: ESDT_CONTRACT_ADDRESS
-        };
-    }
-
-    buildArguments(): Buffer[] {
+    protected buildTransactionPayloadParts(): string[] {
         return [
-            stringToBuffer(this.tokenIdentifier.valueOf()),
-            UserAddress.fromBech32(this.userAddress.toString()).pubkey(),
+            this.toggleFreeze ? "freeze" : "unfreeze",
+            utf8ToHex(this.tokenIdentifier),
+            addressToHex(this.user)
         ];
     }
 }

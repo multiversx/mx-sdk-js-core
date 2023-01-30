@@ -1,47 +1,49 @@
-import { stringToBuffer } from "../codec";
-import { ESDT_CONTRACT_ADDRESS } from "../constants";
-import { Err } from "../errors";
-import { IAddress, IESDTPausingBuilderConstructorOptions, IGasLimit, IPlainTransactionObject, ITokenIdentifier } from "../interface";
-import { BuilderBase } from "./baseBuilder";
+import BigNumber from "bignumber.js";
+import { Err } from "../../errors";
+import { IAddress, IGasLimit } from "../../interface";
+import { utf8ToHex } from "../codec";
+import { BuilderBase, IBaseArgs, IBaseConfig } from "./baseBuilder";
+
+interface IESDTPausingConfig extends IBaseConfig {
+    gasLimitPausing: IGasLimit;
+    esdtContractAddress: IAddress;
+}
+
+interface IESDTPausingArgs extends IBaseArgs {
+    manager: IAddress;
+    tokenIdentifier: string;
+    pause: boolean;
+    unpause: boolean;
+}
 
 export class ESDTPausingBuilder extends BuilderBase {
-    public readonly managerAddress: IAddress;
-    public readonly tokenIdentifier: ITokenIdentifier;
-    public readonly togglePause: boolean;
+    private readonly executionGasLimit: IGasLimit;
+    private readonly tokenIdentifier: string;
+    private readonly togglePause: boolean;
 
-    constructor(options: IESDTPausingBuilderConstructorOptions) {
-        super(options);
+    constructor(config: IESDTPausingConfig, args: IESDTPausingArgs) {
+        super(config, args);
+        this.executionGasLimit = config.gasLimitPausing;
 
-        if (options.pause == options.unpause) {
+        if (args.pause == args.unpause) {
             throw new Err("Must set either 'pause' or 'unpause' (one and only one should be set).")
         }
 
-        this.managerAddress = options.managerAddress;
-        this.tokenIdentifier = options.tokenIdentifier;
-
+        this.sender = args.manager;
+        this.receiver = config.esdtContractAddress;
+        this.tokenIdentifier = args.tokenIdentifier;
         // We only hold the value of "pause".
-        this.togglePause = options.pause;
+        this.togglePause = args.pause;
     }
 
-    protected getDefaultGasLimit(): IGasLimit {
-        return this.getConfiguration().GasLimitPausing;
+    protected estimateExecutionGas(): IGasLimit {
+        return this.executionGasLimit;
     }
 
-    getFunctionName(): string {
-        return this.togglePause ? "pause" : "unPause";
-    }
-
-    protected partiallyBuildPlainTransaction(): Partial<IPlainTransactionObject> {
-        return {
-            value: "0",
-            sender: this.managerAddress.toString(),
-            receiver: ESDT_CONTRACT_ADDRESS
-        };
-    }
-
-    buildArguments(): Buffer[] {
+    protected buildTransactionPayloadParts(): string[] {
         return [
-            stringToBuffer(this.tokenIdentifier.valueOf())
+            this.togglePause ? "pause" : "unPause",
+            utf8ToHex(this.tokenIdentifier),
         ];
     }
 }

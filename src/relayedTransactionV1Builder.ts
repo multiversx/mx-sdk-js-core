@@ -5,6 +5,7 @@ import { ErrInvalidRelayedV1BuilderArguments } from "./errors";
 import { TransactionPayload } from "./transactionPayload";
 import { ContractFunction, StringValue } from "./smartcontracts";
 import { Address } from "./address";
+import { TransactionOptions, TransactionVersion } from "./networkParams";
 import BigNumber from "bignumber.js";
 
 export class RelayedTransactionV1Builder {
@@ -12,6 +13,9 @@ export class RelayedTransactionV1Builder {
     relayerAddress: IAddress | undefined;
     relayerNonce: INonce | undefined;
     netConfig: INetworkConfig | undefined;
+    relayTransactionOptions: TransactionOptions | undefined;
+    relayTransactionVersion: TransactionVersion | undefined;
+    relayTransactionGuardian: IAddress | undefined;
 
     /**
      * Sets the inner transaction to be used. It has to be already signed.
@@ -54,6 +58,36 @@ export class RelayedTransactionV1Builder {
     }
 
     /**
+     * (optional) Sets the version of the relayed transaction
+     *
+     * @param relayedTxVersion
+    */
+    setRelayedTransactionVersion(relayedTxVersion: TransactionVersion): RelayedTransactionV1Builder {
+        this.relayTransactionVersion = relayedTxVersion;
+        return this;
+    }
+
+    /**
+     * (optional) Sets the options of the relayed transaction
+     *
+     * @param relayedTxOptions
+    */
+    setRelayedTransactionOptions(relayedTxOptions: TransactionOptions): RelayedTransactionV1Builder {
+        this.relayTransactionOptions = relayedTxOptions;
+        return this;
+    }
+
+    /**
+     * (optional) Sets the guardian of the relayed transaction
+     *
+     * @param guardian
+     */
+    setRelayedTransactionGuardian(guardian: IAddress): RelayedTransactionV1Builder {
+        this.relayTransactionGuardian = guardian;
+        return this;
+    }
+
+    /**
      * Tries to build the relayed v1 transaction based on the previously set fields
      *
      * @throws ErrInvalidRelayedV1BuilderArguments
@@ -81,9 +115,9 @@ export class RelayedTransactionV1Builder {
             gasLimit: gasLimit,
             data: payload,
             chainID: this.netConfig.ChainID,
-            version: this.innerTransaction.getVersion() || 1,
-            options: this.innerTransaction.getOptions() || 0,
-            guardian: this.innerTransaction.getGuardian() || "",
+            version: this.relayTransactionVersion,
+            options: this.relayTransactionOptions,
+            guardian: this.relayTransactionGuardian,
         });
 
         if (this.relayerNonce) {

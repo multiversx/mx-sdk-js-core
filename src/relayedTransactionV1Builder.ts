@@ -48,7 +48,7 @@ export class RelayedTransactionV1Builder {
      *
      * @param relayerNonce
      */
-    setRelayerNonce(relayerNonce: INonce) : RelayedTransactionV1Builder {
+    setRelayerNonce(relayerNonce: INonce): RelayedTransactionV1Builder {
         this.relayerNonce = relayerNonce;
         return this;
     }
@@ -81,6 +81,9 @@ export class RelayedTransactionV1Builder {
             gasLimit: gasLimit,
             data: payload,
             chainID: this.netConfig.ChainID,
+            version: this.innerTransaction.getVersion() || 1,
+            options: this.innerTransaction.getOptions() || 0,
+            guardian: this.innerTransaction.getGuardian() || "",
         });
 
         if (this.relayerNonce) {
@@ -106,6 +109,9 @@ export class RelayedTransactionV1Builder {
             "signature": Buffer.from(this.innerTransaction.getSignature().hex(), 'hex').toString("base64"),
             "chainID": Buffer.from(this.innerTransaction.getChainID().valueOf()).toString("base64"),
             "version": this.innerTransaction.getVersion().valueOf(),
+            "options": this.innerTransaction.getOptions().valueOf() == 0 ? undefined : this.innerTransaction.getOptions().valueOf(),
+            "guardian": this.innerTransaction.getGuardian().bech32() ? new Address(this.innerTransaction.getGuardian().bech32()).pubkey().toString("base64") : undefined,
+            "guardianSignature": this.innerTransaction.getGuardianSignature().hex() ? Buffer.from(this.innerTransaction.getGuardianSignature().hex(), 'hex').toString("base64") : undefined,
         };
 
         return JSON.stringify(txObject);

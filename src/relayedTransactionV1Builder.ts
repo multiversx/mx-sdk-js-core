@@ -13,9 +13,9 @@ export class RelayedTransactionV1Builder {
     relayerAddress: IAddress | undefined;
     relayerNonce: INonce | undefined;
     netConfig: INetworkConfig | undefined;
-    relayTransactionOptions: TransactionOptions | undefined;
-    relayTransactionVersion: TransactionVersion | undefined;
-    relayTransactionGuardian: IAddress | undefined;
+    relayedTransactionOptions: TransactionOptions | undefined;
+    relayedTransactionVersion: TransactionVersion | undefined;
+    relayedTransactionGuardian: IAddress | undefined;
 
     /**
      * Sets the inner transaction to be used. It has to be already signed.
@@ -63,7 +63,7 @@ export class RelayedTransactionV1Builder {
      * @param relayedTxVersion
     */
     setRelayedTransactionVersion(relayedTxVersion: TransactionVersion): RelayedTransactionV1Builder {
-        this.relayTransactionVersion = relayedTxVersion;
+        this.relayedTransactionVersion = relayedTxVersion;
         return this;
     }
 
@@ -73,17 +73,17 @@ export class RelayedTransactionV1Builder {
      * @param relayedTxOptions
     */
     setRelayedTransactionOptions(relayedTxOptions: TransactionOptions): RelayedTransactionV1Builder {
-        this.relayTransactionOptions = relayedTxOptions;
+        this.relayedTransactionOptions = relayedTxOptions;
         return this;
     }
 
     /**
      * (optional) Sets the guardian of the relayed transaction
      *
-     * @param guardian
+     * @param relayedTxGuardian
      */
-    setRelayedTransactionGuardian(guardian: IAddress): RelayedTransactionV1Builder {
-        this.relayTransactionGuardian = guardian;
+    setRelayedTransactionGuardian(relayedTxGuardian: IAddress): RelayedTransactionV1Builder {
+        this.relayedTransactionGuardian = relayedTxGuardian;
         return this;
     }
 
@@ -115,9 +115,9 @@ export class RelayedTransactionV1Builder {
             gasLimit: gasLimit,
             data: payload,
             chainID: this.netConfig.ChainID,
-            version: this.relayTransactionVersion,
-            options: this.relayTransactionOptions,
-            guardian: this.relayTransactionGuardian,
+            version: this.relayedTransactionVersion,
+            options: this.relayedTransactionOptions,
+            guardian: this.relayedTransactionGuardian,
         });
 
         if (this.relayerNonce) {

@@ -5,6 +5,7 @@ import { ErrInvalidRelayedV1BuilderArguments } from "./errors";
 import { TransactionPayload } from "./transactionPayload";
 import { ContractFunction, StringValue } from "./smartcontracts";
 import { Address } from "./address";
+import { TransactionOptions, TransactionVersion } from "./networkParams";
 import BigNumber from "bignumber.js";
 
 export class RelayedTransactionV1Builder {
@@ -12,6 +13,9 @@ export class RelayedTransactionV1Builder {
     relayerAddress: IAddress | undefined;
     relayerNonce: INonce | undefined;
     netConfig: INetworkConfig | undefined;
+    relayedTransactionOptions: TransactionOptions | undefined;
+    relayedTransactionVersion: TransactionVersion | undefined;
+    relayedTransactionGuardian: IAddress | undefined;
 
     /**
      * Sets the inner transaction to be used. It has to be already signed.
@@ -48,8 +52,38 @@ export class RelayedTransactionV1Builder {
      *
      * @param relayerNonce
      */
-    setRelayerNonce(relayerNonce: INonce) : RelayedTransactionV1Builder {
+    setRelayerNonce(relayerNonce: INonce): RelayedTransactionV1Builder {
         this.relayerNonce = relayerNonce;
+        return this;
+    }
+
+    /**
+     * (optional) Sets the version of the relayed transaction
+     *
+     * @param relayedTxVersion
+    */
+    setRelayedTransactionVersion(relayedTxVersion: TransactionVersion): RelayedTransactionV1Builder {
+        this.relayedTransactionVersion = relayedTxVersion;
+        return this;
+    }
+
+    /**
+     * (optional) Sets the options of the relayed transaction
+     *
+     * @param relayedTxOptions
+    */
+    setRelayedTransactionOptions(relayedTxOptions: TransactionOptions): RelayedTransactionV1Builder {
+        this.relayedTransactionOptions = relayedTxOptions;
+        return this;
+    }
+
+    /**
+     * (optional) Sets the guardian of the relayed transaction
+     *
+     * @param relayedTxGuardian
+     */
+    setRelayedTransactionGuardian(relayedTxGuardian: IAddress): RelayedTransactionV1Builder {
+        this.relayedTransactionGuardian = relayedTxGuardian;
         return this;
     }
 
@@ -81,6 +115,9 @@ export class RelayedTransactionV1Builder {
             gasLimit: gasLimit,
             data: payload,
             chainID: this.netConfig.ChainID,
+            version: this.relayedTransactionVersion,
+            options: this.relayedTransactionOptions,
+            guardian: this.relayedTransactionGuardian,
         });
 
         if (this.relayerNonce) {
@@ -106,6 +143,9 @@ export class RelayedTransactionV1Builder {
             "signature": Buffer.from(this.innerTransaction.getSignature().hex(), 'hex').toString("base64"),
             "chainID": Buffer.from(this.innerTransaction.getChainID().valueOf()).toString("base64"),
             "version": this.innerTransaction.getVersion().valueOf(),
+            "options": this.innerTransaction.getOptions().valueOf() == 0 ? undefined : this.innerTransaction.getOptions().valueOf(),
+            "guardian": this.innerTransaction.getGuardian().bech32() ? new Address(this.innerTransaction.getGuardian().bech32()).pubkey().toString("base64") : undefined,
+            "guardianSignature": this.innerTransaction.getGuardianSignature().hex() ? Buffer.from(this.innerTransaction.getGuardianSignature().hex(), 'hex').toString("base64") : undefined,
         };
 
         return JSON.stringify(txObject);

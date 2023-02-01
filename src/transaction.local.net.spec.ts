@@ -30,7 +30,6 @@ describe("test transaction", function () {
         let transactionOne = new Transaction({
             sender: alice.address,
             receiver: bob.address,
-            sender: alice.address,
             value: TokenPayment.egldFromAmount(42),
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID
@@ -39,7 +38,6 @@ describe("test transaction", function () {
         let transactionTwo = new Transaction({
             sender: alice.address,
             receiver: bob.address,
-            sender: alice.address,
             value: TokenPayment.egldFromAmount(43),
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID
@@ -76,7 +74,6 @@ describe("test transaction", function () {
             data: new TransactionPayload("helloWorld"),
             gasLimit: 70000,
             receiver: alice.address,
-            sender: alice.address,
             value: TokenPayment.egldFromAmount(1000),
             chainID: network.ChainID
         });
@@ -86,7 +83,6 @@ describe("test transaction", function () {
             data: new TransactionPayload("helloWorld"),
             gasLimit: 70000,
             receiver: alice.address,
-            sender: alice.address,
             value: TokenPayment.egldFromAmount(1000000),
             chainID: network.ChainID
         });

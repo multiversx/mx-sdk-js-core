@@ -14,8 +14,7 @@ export enum EnvelopeVersion {
 
 export enum UserWalletKind {
     SecretKey = "secretKey",
-    Mnemonic = "mnemonic",
-    Arbitrary = "arbitrary"
+    Mnemonic = "mnemonic"
 }
 
 export class UserWallet {
@@ -100,34 +99,6 @@ export class UserWallet {
         });
     }
 
-    static fromArbitrary({
-        envelopeVersion,
-        encryptorVersion,
-        arbitraryData,
-        password,
-        randomness,
-    }: {
-        envelopeVersion?: EnvelopeVersion;
-        encryptorVersion?: EncryptorVersion;
-        arbitraryData: Buffer;
-        password: string;
-        randomness?: Randomness;
-    }): UserWallet {
-        envelopeVersion = envelopeVersion || EnvelopeVersion.V5;
-        encryptorVersion = encryptorVersion || EncryptorVersion.V4;
-        randomness = randomness || new Randomness();
-
-        requireVersion(envelopeVersion, [EnvelopeVersion.V5]);
-
-        const encryptedData = Encryptor.encrypt(encryptorVersion, arbitraryData, password, randomness);
-
-        return new UserWallet({
-            envelopeVersion: envelopeVersion,
-            kind: UserWalletKind.Arbitrary,
-            encryptedData
-        });
-    }
-
     /**
      * Copied from: https://github.com/multiversx/mx-deprecated-core-js/blob/v1.28.0/src/account.js#L42
      * Notes: adjustements (code refactoring, no change in logic), in terms of: 
@@ -166,15 +137,6 @@ export class UserWallet {
         return text.toString();
     }
 
-    static decryptArbitrary(keyFileObject: any, password: string): Buffer {
-        requireVersion(keyFileObject.version, [EnvelopeVersion.V5]);
-        requireKind(keyFileObject.kind, UserWalletKind.Arbitrary)
-
-        const encryptedData = UserWallet.edFromJSON(keyFileObject);
-        const data = Decryptor.decrypt(encryptedData, password);
-        return data;
-    }
-
     static edFromJSON(keyfileObject: any): EncryptedData {
         const encryptorVersion: number = (keyfileObject.version == EnvelopeVersion.V4) ?
             // In V4, the "crypto" section inherits the version from the envelope.
@@ -208,7 +170,7 @@ export class UserWallet {
             return this.getEnvelopeWhenKindIsSecretKey();
         }
 
-        return this.getEnvelopeWhenKindIsMnemonicOrArbitrary();
+        return this.getEnvelopeWhenKindIsMnemonic();
     }
 
     getEnvelopeWhenKindIsSecretKey(): any {
@@ -252,7 +214,7 @@ export class UserWallet {
         return cryptoSection;
     }
 
-    getEnvelopeWhenKindIsMnemonicOrArbitrary(): any {
+    getEnvelopeWhenKindIsMnemonic(): any {
         const cryptoSection = this.getCryptoSectionAsJSON();
 
         return {

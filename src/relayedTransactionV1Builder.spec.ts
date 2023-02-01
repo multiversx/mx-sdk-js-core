@@ -6,6 +6,7 @@ import { Transaction } from "./transaction";
 import { Address } from "./address";
 import { TransactionPayload } from "./transactionPayload";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
+import { Signature } from "./signature";
 
 describe("test relayed v1 transaction builder", function () {
     let alice: TestWallet, bob: TestWallet, grace: TestWallet, frank: TestWallet;
@@ -97,7 +98,7 @@ describe("test relayed v1 transaction builder", function () {
         });
 
         await bob.signer.sign(innerTx);
-        innerTx.applyGuardianSignature(innerTx.getSignature());
+        innerTx.applyGuardianSignature(new Signature("grace-signature"));
 
         const builder = new RelayedTransactionV1Builder();
         const relayedTxV1 = builder
@@ -114,7 +115,7 @@ describe("test relayed v1 transaction builder", function () {
         assert.equal(relayedTxV1.getSignature().hex(), "92f4072647a8ee9ba6402db4004646955c85451246c11d5a0d432b2df72944aac25b21769a880804a95c48be7b3086f60341ffb68e94d63780220fd875bbdb0c");
     });
 
-    it("should compute guarded innder tx and guarded relayed v1 transaction", async function () {
+    it("should compute guarded inner tx and guarded relayed v1 transaction", async function () {
         const networkConfig = {
             MinGasLimit: 50_000,
             GasPerDataByte: 1_500,
@@ -135,7 +136,7 @@ describe("test relayed v1 transaction builder", function () {
         });
 
         await bob.signer.sign(innerTx);
-        innerTx.applyGuardianSignature(innerTx.getSignature());
+        innerTx.applyGuardianSignature(new Signature("grace-signature"));
 
         const builder = new RelayedTransactionV1Builder();
         const relayedTxV1 = builder
@@ -149,7 +150,7 @@ describe("test relayed v1 transaction builder", function () {
             .build();
 
         await alice.signer.sign(relayedTxV1);
-        relayedTxV1.applyGuardianSignature(relayedTxV1.getSignature());
+        relayedTxV1.applyGuardianSignature(new Signature("frank-signature"));
 
         assert.equal(relayedTxV1.getNonce().valueOf(), 2627);
         assert.equal(relayedTxV1.getData().toString(), "relayedTx@7b226e6f6e6365223a3139382c2273656e646572223a2267456e574f65576d6d413063306a6b71764d354241707a61644b46574e534f69417643575163776d4750673d222c227265636569766572223a22414141414141414141414146414b565841323879704877692f79693741364c64504b704f68464d386958513d222c2276616c7565223a302c226761735072696365223a313030303030303030302c226761734c696d6974223a36303030303030302c2264617461223a225957526b546e5674596d5679222c227369676e6174757265223a223469724d4b4a656d724d375174344e7635487633544c44683775654779487045564c4371674a3677652f7a662b746a4933354975573452633458543451533433475333356158386c6a533834324a38426854645043673d3d222c22636861696e4944223a2256413d3d222c2276657273696f6e223a322c226f7074696f6e73223a322c22677561726469616e223a22486f714c61306e655733766843716f56696c70715372744c5673774939535337586d7a563868477450684d3d222c22677561726469616e5369676e6174757265223a223469724d4b4a656d724d375174344e7635487633544c44683775654779487045564c4371674a3677652f7a662b746a4933354975573452633458543451533433475333356158386c6a533834324a38426854645043673d3d227d");

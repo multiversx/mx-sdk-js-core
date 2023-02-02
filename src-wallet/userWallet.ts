@@ -3,97 +3,55 @@ import { ScryptKeyDerivationParams } from "./crypto/derivationParams";
 import { Err } from "./errors";
 import { UserPublicKey, UserSecretKey } from "./userKeys";
 
-export enum EnvelopeVersion {
-    // Does not have the "kind" field, and is meant to hold the **secret key**.
-    // The "crypto" section is not versioned.
-    V4 = 4,
-    // Has the "kind" field, and is meant to hold the **secret key** or **the mnemonic** (or any other secret payload).
-    // Furthermore, the "crypto" section is versioned separately.
-    V5 = 5
-}
-
 export enum UserWalletKind {
     SecretKey = "secretKey",
     Mnemonic = "mnemonic"
 }
 
 export class UserWallet {
-    private readonly envelopeVersion: number;
     private readonly kind: UserWalletKind;
     private readonly encryptedData: EncryptedData;
     private readonly publicKeyWhenKindIsSecretKey?: UserPublicKey;
 
-    private constructor({
-        envelopeVersion: envelopeVersion,
-        kind,
-        encryptedData,
-        publicKeyWhenKindIsSecretKey
-    }: {
-        envelopeVersion: EnvelopeVersion;
+    private constructor({ kind, encryptedData, publicKeyWhenKindIsSecretKey }: {
         kind: UserWalletKind;
         encryptedData: EncryptedData;
         publicKeyWhenKindIsSecretKey?: UserPublicKey;
     }) {
-        this.envelopeVersion = envelopeVersion;
         this.kind = kind;
         this.encryptedData = encryptedData;
         this.publicKeyWhenKindIsSecretKey = publicKeyWhenKindIsSecretKey;
     }
 
-    static fromSecretKey({
-        envelopeVersion,
-        encryptorVersion,
-        secretKey,
-        password,
-        randomness,
-    }: {
-        envelopeVersion?: EnvelopeVersion;
+    static fromSecretKey({ secretKey, password, randomness }: {
         encryptorVersion?: EncryptorVersion;
         secretKey: UserSecretKey;
         password: string;
         randomness?: Randomness;
     }): UserWallet {
-        envelopeVersion = envelopeVersion || EnvelopeVersion.V4;
-        encryptorVersion = encryptorVersion || EncryptorVersion.V4;
         randomness = randomness || new Randomness();
-
-        requireVersion(envelopeVersion, [EnvelopeVersion.V4, EnvelopeVersion.V5]);
 
         const publicKey = secretKey.generatePublicKey();
         const text = Buffer.concat([secretKey.valueOf(), publicKey.valueOf()]);
-        const encryptedData = Encryptor.encrypt(encryptorVersion, text, password, randomness);
+        const encryptedData = Encryptor.encrypt(text, password, randomness);
 
         return new UserWallet({
-            envelopeVersion: envelopeVersion,
             kind: UserWalletKind.SecretKey,
             encryptedData,
             publicKeyWhenKindIsSecretKey: publicKey
         });
     }
 
-    static fromMnemonic({
-        envelopeVersion,
-        encryptorVersion,
-        mnemonic,
-        password,
-        randomness,
-    }: {
-        envelopeVersion?: EnvelopeVersion;
-        encryptorVersion?: EncryptorVersion;
+    static fromMnemonic({ mnemonic, password, randomness }: {
         mnemonic: string;
         password: string;
         randomness?: Randomness;
     }): UserWallet {
-        envelopeVersion = envelopeVersion || EnvelopeVersion.V5;
-        encryptorVersion = encryptorVersion || EncryptorVersion.V4;
         randomness = randomness || new Randomness();
 
-        requireVersion(envelopeVersion, [EnvelopeVersion.V5]);
-
-        const encryptedData = Encryptor.encrypt(encryptorVersion, Buffer.from(mnemonic), password, randomness);
+        const encryptedData = Encryptor.encrypt(Buffer.from(mnemonic), password, randomness);
 
         return new UserWallet({
-            envelopeVersion: envelopeVersion,
             kind: UserWalletKind.Mnemonic,
             encryptedData
         });
@@ -110,11 +68,7 @@ export class UserWallet {
      * From an encrypted keyfile, given the password, loads the secret key and the public key.
      */
     static decryptSecretKey(keyFileObject: any, password: string): UserSecretKey {
-        requireVersion(keyFileObject.version, [EnvelopeVersion.V4, EnvelopeVersion.V5]);
-
-        if (keyFileObject.version >= EnvelopeVersion.V5) {
-            requireKind(keyFileObject.kind, UserWalletKind.SecretKey)
-        }
+        // Here, we do not check the "kind" field. Older keystore files holding secret keys do not have this field.
 
         const encryptedData = UserWallet.edFromJSON(keyFileObject);
 
@@ -129,8 +83,9 @@ export class UserWallet {
     }
 
     static decryptMnemonic(keyFileObject: any, password: string): string {
-        requireVersion(keyFileObject.version, [EnvelopeVersion.V5]);
-        requireKind(keyFileObject.kind, UserWalletKind.Mnemonic)
+        if (keyFileObject.kind != UserWalletKind.Mnemonic) {
+            throw new Err(`Expected kind to be ${UserWalletKind.Mnemonic}, but it was ${keyFileObject.kind}.`);
+        }
 
         const encryptedData = UserWallet.edFromJSON(keyFileObject);
         const text = Decryptor.decrypt(encryptedData, password);
@@ -138,14 +93,8 @@ export class UserWallet {
     }
 
     static edFromJSON(keyfileObject: any): EncryptedData {
-        const encryptorVersion: number = (keyfileObject.version == EnvelopeVersion.V4) ?
-            // In V4, the "crypto" section inherits the version from the envelope.
-            EncryptorVersion.V4 :
-            // In V5, the "crypto" section has its own version.
-            keyfileObject.crypto.version;
-
         return new EncryptedData({
-            version: encryptorVersion,
+            version: keyfileObject.version,
             id: keyfileObject.id,
             cipher: keyfileObject.crypto.cipher,
             ciphertext: keyfileObject.crypto.ciphertext,
@@ -167,13 +116,13 @@ export class UserWallet {
      */
     toJSON(): any {
         if (this.kind == UserWalletKind.SecretKey) {
-            return this.getEnvelopeWhenKindIsSecretKey();
+            return this.toJSONWhenKindIsSecretKey();
         }
 
-        return this.getEnvelopeWhenKindIsMnemonic();
+        return this.toJSONWhenKindIsMnemonic();
     }
 
-    getEnvelopeWhenKindIsSecretKey(): any {
+    private toJSONWhenKindIsSecretKey(): any {
         if (!this.publicKeyWhenKindIsSecretKey) {
             throw new Err("Public key isn't available");
         }
@@ -181,9 +130,9 @@ export class UserWallet {
         const cryptoSection = this.getCryptoSectionAsJSON();
 
         const envelope: any = {
-            version: this.envelopeVersion,
+            version: this.encryptedData.version,
             // Adding "kind", if appropriate.
-            ...(this.envelopeVersion >= 5 ? { kind: UserWalletKind.SecretKey } : {}),
+            ...(this.kind ? { kind: this.kind } : {}),
             id: this.encryptedData.id,
             address: this.publicKeyWhenKindIsSecretKey.hex(),
             bech32: this.publicKeyWhenKindIsSecretKey.toAddress().toString(),
@@ -195,8 +144,6 @@ export class UserWallet {
 
     getCryptoSectionAsJSON(): any {
         const cryptoSection: any = {
-            // Adding "version", if appropriate.
-            ...(this.envelopeVersion >= 5 ? { version: this.encryptedData.version } : {}),
             ciphertext: this.encryptedData.ciphertext,
             cipherparams: { iv: this.encryptedData.iv },
             cipher: CipherAlgorithm,
@@ -214,11 +161,11 @@ export class UserWallet {
         return cryptoSection;
     }
 
-    getEnvelopeWhenKindIsMnemonic(): any {
+    toJSONWhenKindIsMnemonic(): any {
         const cryptoSection = this.getCryptoSectionAsJSON();
 
         return {
-            version: this.envelopeVersion,
+            version: this.encryptedData.version,
             id: this.encryptedData.id,
             kind: this.kind,
             crypto: cryptoSection
@@ -226,15 +173,3 @@ export class UserWallet {
     }
 }
 
-function requireKind(kind: UserWalletKind, expectedKind: UserWalletKind) {
-    if (kind != expectedKind) {
-        throw new Err(`Expected kind to be ${expectedKind}, but it was ${kind}.`);
-    }
-}
-
-function requireVersion(version: EnvelopeVersion, allowedVersions: EnvelopeVersion[]) {
-    const isAllowed = allowedVersions.includes(version);
-    if (!isAllowed) {
-        throw new Err(`Envelope version must be one of: [${allowedVersions.join(", ")}].`);
-    }
-}

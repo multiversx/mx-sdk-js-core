@@ -8,15 +8,25 @@ export const DummyMnemonic = "moral volcano peasant pass circle pen over picture
 export const DummyMnemonicOf12Words = "matter trumpet twenty parade fame north lift sail valve salon foster cinnamon";
 
 export async function loadTestWallet(name: string): Promise<TestWallet> {
-    let testdataPath = path.resolve(__dirname, "..", "testdata");
-    let jsonFilePath = path.resolve(testdataPath, `${name}.json`);
-    let pemFilePath = path.resolve(testdataPath, `${name}.pem`);
+    const keystore = await loadTestKeystore(`${name}.json`)
+    const pemText = await loadTestPemFile(`${name}.pem`)
+    const pemKey = UserSecretKey.fromPem(pemText);
+    const address = new UserAddress(Buffer.from(keystore.address, "hex"));
 
-    let jsonWallet = JSON.parse(await readTestFile(jsonFilePath));
-    let pemText = await readTestFile(pemFilePath);
-    let pemKey = UserSecretKey.fromPem(pemText);
-    let address = new UserAddress(Buffer.from(jsonWallet.address, "hex"));
-    return new TestWallet(address, pemKey.hex(), jsonWallet, pemText);
+    return new TestWallet(address, pemKey.hex(), keystore, pemText);
+}
+
+export async function loadTestKeystore(file: string): Promise<any> {
+    const testdataPath = path.resolve(__dirname, "..", "testdata");
+    const keystorePath = path.resolve(testdataPath, file);
+    const json = await readTestFile(keystorePath);
+    return JSON.parse(json);
+}
+
+export async function loadTestPemFile(file: string): Promise<string> {
+    const testdataPath = path.resolve(__dirname, "..", "testdata");
+    const pemFilePath = path.resolve(testdataPath, file);
+    return await readTestFile(pemFilePath);
 }
 
 export class TestWallet {

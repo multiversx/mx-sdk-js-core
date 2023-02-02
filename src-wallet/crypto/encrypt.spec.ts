@@ -6,7 +6,7 @@ import { Encryptor } from "./encryptor";
 describe("test address", () => {
   it("encrypts/decrypts", () => {
     const sensitiveData = Buffer.from("my mnemonic");
-    const encryptedData = Encryptor.encrypt(4, sensitiveData, "password123");
+    const encryptedData = Encryptor.encrypt(sensitiveData, "password123");
     const decryptedBuffer = Decryptor.decrypt(encryptedData, "password123");
 
     assert.equal(sensitiveData.toString('hex'), decryptedBuffer.toString('hex'));
@@ -14,13 +14,9 @@ describe("test address", () => {
 
   it("encodes/decodes kdfparams", () => {
     const sensitiveData = Buffer.from("my mnemonic");
-    const encryptedData = Encryptor.encrypt(4, sensitiveData, "password123");
+    const encryptedData = Encryptor.encrypt(sensitiveData, "password123");
     const decodedData = EncryptedData.fromJSON(encryptedData.toJSON());
 
     assert.deepEqual(decodedData, encryptedData, "invalid decoded data");
-  });
-
-  it("fails for bad version", () => {
-    assert.throws(() => Encryptor.encrypt(5, Buffer.from(""), ""), "Encryptor: unsupported version 5");
   });
 });

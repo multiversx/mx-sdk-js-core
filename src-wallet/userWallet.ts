@@ -1,8 +1,14 @@
-import { CipherAlgorithm, Decryptor, EncryptedData, Encryptor, EncryptorVersion, KeyDerivationFunction, Randomness } from "./crypto";
+import { CipherAlgorithm, Decryptor, EncryptedData, Encryptor, KeyDerivationFunction, Randomness } from "./crypto";
 import { ScryptKeyDerivationParams } from "./crypto/derivationParams";
 import { Err } from "./errors";
 import { Mnemonic } from "./mnemonic";
 import { UserPublicKey, UserSecretKey } from "./userKeys";
+
+interface IRandomness {
+    id: string;
+    iv: Buffer;
+    salt: Buffer;
+}
 
 export enum UserWalletKind {
     SecretKey = "secretKey",
@@ -25,16 +31,15 @@ export class UserWallet {
     }
 
     static fromSecretKey({ secretKey, password, randomness }: {
-        encryptorVersion?: EncryptorVersion;
         secretKey: UserSecretKey;
         password: string;
-        randomness?: Randomness;
+        randomness?: IRandomness;
     }): UserWallet {
         randomness = randomness || new Randomness();
 
         const publicKey = secretKey.generatePublicKey();
-        const text = Buffer.concat([secretKey.valueOf(), publicKey.valueOf()]);
-        const encryptedData = Encryptor.encrypt(text, password, randomness);
+        const data = Buffer.concat([secretKey.valueOf(), publicKey.valueOf()]);
+        const encryptedData = Encryptor.encrypt(data, password, randomness);
 
         return new UserWallet({
             kind: UserWalletKind.SecretKey,
@@ -46,12 +51,13 @@ export class UserWallet {
     static fromMnemonic({ mnemonic, password, randomness }: {
         mnemonic: string;
         password: string;
-        randomness?: Randomness;
+        randomness?: IRandomness;
     }): UserWallet {
         randomness = randomness || new Randomness();
 
         Mnemonic.assertTextIsValid(mnemonic);
-        const encryptedData = Encryptor.encrypt(Buffer.from(mnemonic), password, randomness);
+        const data = Buffer.from(mnemonic);
+        const encryptedData = Encryptor.encrypt(data, password, randomness);
 
         return new UserWallet({
             kind: UserWalletKind.Mnemonic,
@@ -70,7 +76,7 @@ export class UserWallet {
      * From an encrypted keyfile, given the password, loads the secret key and the public key.
      */
     static decryptSecretKey(keyFileObject: any, password: string): UserSecretKey {
-        // Here, we do not check the "kind" field. Older keystore files holding secret keys do not have this field.
+        // Here, we do not check the "kind" field. Older keystore files (holding only secret keys) do not have this field.
 
         const encryptedData = UserWallet.edFromJSON(keyFileObject);
 
@@ -134,8 +140,7 @@ export class UserWallet {
 
         const envelope: any = {
             version: this.encryptedData.version,
-            // Adding "kind", if appropriate.
-            ...(this.kind ? { kind: this.kind } : {}),
+            kind: this.kind,
             id: this.encryptedData.id,
             address: this.publicKeyWhenKindIsSecretKey.hex(),
             bech32: this.publicKeyWhenKindIsSecretKey.toAddress().toString(),

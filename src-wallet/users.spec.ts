@@ -156,8 +156,8 @@ describe("test user wallets", () => {
         assert.equal(json.kind, "mnemonic");
         assert.isUndefined(json.bech32);
 
-        const mnemonicText = UserWallet.decryptMnemonic(json, password);
-        const mnemonic = Mnemonic.fromString(mnemonicText);
+        const mnemonic = UserWallet.decryptMnemonic(json, password);
+        const mnemonicText = mnemonic.toString();
 
         assert.equal(mnemonicText, DummyMnemonic);
         assert.equal(mnemonic.deriveKey(0).generatePublicKey().toAddress().bech32(), alice.address.bech32());

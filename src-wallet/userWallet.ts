@@ -1,6 +1,7 @@
 import { CipherAlgorithm, Decryptor, EncryptedData, Encryptor, EncryptorVersion, KeyDerivationFunction, Randomness } from "./crypto";
 import { ScryptKeyDerivationParams } from "./crypto/derivationParams";
 import { Err } from "./errors";
+import { Mnemonic } from "./mnemonic";
 import { UserPublicKey, UserSecretKey } from "./userKeys";
 
 export enum UserWalletKind {
@@ -49,6 +50,7 @@ export class UserWallet {
     }): UserWallet {
         randomness = randomness || new Randomness();
 
+        Mnemonic.assertTextIsValid(mnemonic);
         const encryptedData = Encryptor.encrypt(Buffer.from(mnemonic), password, randomness);
 
         return new UserWallet({
@@ -82,14 +84,15 @@ export class UserWallet {
         return new UserSecretKey(seed);
     }
 
-    static decryptMnemonic(keyFileObject: any, password: string): string {
+    static decryptMnemonic(keyFileObject: any, password: string): Mnemonic {
         if (keyFileObject.kind != UserWalletKind.Mnemonic) {
             throw new Err(`Expected kind to be ${UserWalletKind.Mnemonic}, but it was ${keyFileObject.kind}.`);
         }
 
         const encryptedData = UserWallet.edFromJSON(keyFileObject);
-        const text = Decryptor.decrypt(encryptedData, password);
-        return text.toString();
+        const data = Decryptor.decrypt(encryptedData, password);
+        const mnemonic = Mnemonic.fromString(data.toString())
+        return mnemonic;
     }
 
     static edFromJSON(keyfileObject: any): EncryptedData {

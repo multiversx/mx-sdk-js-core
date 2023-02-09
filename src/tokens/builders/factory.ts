@@ -7,13 +7,29 @@ import { Transaction } from "../../transaction";
 import { TransactionPayload } from "../../transactionPayload";
 import { addressToHex, bigIntToHex, utf8ToHex } from "../codec";
 
+// TODO:
+// ESDTWipe
+// ESDTTransfer
+// ESDTSetRole
+// ESDTUnSetRole
+// ESDTSetLimitedTransfer
+// ESDTUnSetLimitedTransfer
+
+// ESDTNFTTransfer
+// ESDTNFTCreate
+// ESDTNFTAddQuantity
+// ESDTNFTBurn
+// ESDTNFTAddURI
+// ESDTNFTUpdateAttributes
+// MultiESDTNFTTransfer
+
 interface ITokensFactoryConfig {
     chainID: IChainID;
     minGasPrice: IGasPrice;
     minGasLimit: IGasLimit;
     gasLimitPerByte: IGasLimit;
 
-    gasLimitESDTIssue: IGasLimit;
+    gasLimitIssue: IGasLimit;
     gasLimitESDTLocalMint: IGasLimit;
     gasLimitESDTLocalBurn: IGasLimit;
     gasLimitSetSpecialRole: IGasLimit;
@@ -31,7 +47,7 @@ interface IBaseArgs {
     gasLimit?: IGasLimit;
 }
 
-interface IESDTIssueArgs extends IBaseArgs {
+interface IIssueFungibleArgs extends IBaseArgs {
     issuer: IAddress;
     tokenName: string;
     tokenTicker: string;
@@ -47,12 +63,53 @@ interface IESDTIssueArgs extends IBaseArgs {
     canAddSpecialRoles: boolean;
 }
 
-interface IESDTSetSpecialRoleArgs extends IBaseArgs {
+interface IIssueSemiFungibleArgs extends IBaseArgs {
+    issuer: IAddress;
+    tokenName: string;
+    tokenTicker: string;
+    canFreeze: boolean;
+    canWipe: boolean;
+    canPause: boolean;
+    canTransferNFTCreateRole: boolean;
+    canChangeOwner: boolean;
+    canUpgrade: boolean;
+    canAddSpecialRoles: boolean;
+}
+
+interface IIssueNonFungibleArgs extends IIssueSemiFungibleArgs {
+}
+
+interface IRegisterMetaESDT extends IIssueSemiFungibleArgs {
+    numDecimals: number;
+}
+
+interface IFungibleSetSpecialRoleArgs extends IBaseArgs {
     manager: IAddress;
     user: IAddress;
     tokenIdentifier: string;
     addRoleLocalMint: boolean;
     addRoleLocalBurn: boolean;
+}
+
+interface ISemiFungibleSetSpecialRoleArgs extends IBaseArgs {
+    manager: IAddress;
+    user: IAddress;
+    tokenIdentifier: string;
+    addRoleNFTCreate: boolean;
+    addRoleNFTBurn: boolean;
+    addRoleNFTAddQuantity: boolean;
+    addRoleESDTTransferRole: boolean;
+}
+
+interface INonFungibleSetSpecialRoleArgs extends IBaseArgs {
+    manager: IAddress;
+    user: IAddress;
+    tokenIdentifier: string;
+    addRoleNFTCreate: boolean;
+    addRoleNFTBurn: boolean;
+    addRoleNFTUpdateAttributes: boolean;
+    addRoleNFTAddURI: boolean;
+    addRoleESDTTransferRole: boolean;
 }
 
 interface IESDTPausingArgs extends IBaseArgs {
@@ -91,7 +148,7 @@ export class TokenTransactionsFactory {
         this.config = config;
     }
 
-    public issueFungible(args: IESDTIssueArgs): Transaction {
+    public issueFungible(args: IIssueFungibleArgs): Transaction {
         const trueAsHex = utf8ToHex("true");
 
         const parts = [
@@ -117,18 +174,148 @@ export class TokenTransactionsFactory {
             value: this.config.issueCost,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
-            executionGasLimit: this.config.gasLimitESDTIssue,
+            executionGasLimit: this.config.gasLimitIssue,
             dataParts: parts
         });
     }
 
-    public setSpecialRole(args: IESDTSetSpecialRoleArgs): Transaction {
+    public issueSemiFungible(args: IIssueSemiFungibleArgs): Transaction {
+        const trueAsHex = utf8ToHex("true");
+
+        const parts = [
+            "issueSemiFungible",
+            utf8ToHex(args.tokenName),
+            utf8ToHex(args.tokenTicker),
+            ...(args.canFreeze ? [utf8ToHex("canFreeze"), trueAsHex] : []),
+            ...(args.canWipe ? [utf8ToHex("canWipe"), trueAsHex] : []),
+            ...(args.canPause ? [utf8ToHex("canPause"), trueAsHex] : []),
+            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), trueAsHex] : []),
+            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), trueAsHex] : []),
+            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), trueAsHex] : []),
+            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), trueAsHex] : []),
+        ];
+
+        return this.createTransaction({
+            sender: args.issuer,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.nonce,
+            value: this.config.issueCost,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitIssue,
+            dataParts: parts
+        });
+    }
+
+    public issueNonFungible(args: IIssueNonFungibleArgs): Transaction {
+        const trueAsHex = utf8ToHex("true");
+
+        const parts = [
+            "issueNonFungible",
+            utf8ToHex(args.tokenName),
+            utf8ToHex(args.tokenTicker),
+            ...(args.canFreeze ? [utf8ToHex("canFreeze"), trueAsHex] : []),
+            ...(args.canWipe ? [utf8ToHex("canWipe"), trueAsHex] : []),
+            ...(args.canPause ? [utf8ToHex("canPause"), trueAsHex] : []),
+            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), trueAsHex] : []),
+            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), trueAsHex] : []),
+            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), trueAsHex] : []),
+            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), trueAsHex] : []),
+        ];
+
+        return this.createTransaction({
+            sender: args.issuer,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.nonce,
+            value: this.config.issueCost,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitIssue,
+            dataParts: parts
+        });
+    }
+
+    public registerMetaESDT(args: IRegisterMetaESDT): Transaction {
+        const trueAsHex = utf8ToHex("true");
+
+        const parts = [
+            "registerMetaESDT",
+            utf8ToHex(args.tokenName),
+            utf8ToHex(args.tokenTicker),
+            bigIntToHex(args.numDecimals),
+            ...(args.canFreeze ? [utf8ToHex("canFreeze"), trueAsHex] : []),
+            ...(args.canWipe ? [utf8ToHex("canWipe"), trueAsHex] : []),
+            ...(args.canPause ? [utf8ToHex("canPause"), trueAsHex] : []),
+            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), trueAsHex] : []),
+            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), trueAsHex] : []),
+            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), trueAsHex] : []),
+            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), trueAsHex] : []),
+        ];
+
+        return this.createTransaction({
+            sender: args.issuer,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.nonce,
+            value: this.config.issueCost,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitIssue,
+            dataParts: parts
+        });
+    }
+
+    public setSpecialRoleOnFungible(args: IFungibleSetSpecialRoleArgs): Transaction {
         const parts = [
             "setSpecialRole",
             utf8ToHex(args.tokenIdentifier),
             addressToHex(args.user),
             ...(args.addRoleLocalMint ? [utf8ToHex("ESDTRoleLocalMint")] : []),
             ...(args.addRoleLocalBurn ? [utf8ToHex("ESDTRoleLocalBurn")] : []),
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.nonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitSetSpecialRole,
+            dataParts: parts
+        });
+    }
+
+    public setSpecialRoleOnSemiFungible(args: ISemiFungibleSetSpecialRoleArgs): Transaction {
+        const parts = [
+            "setSpecialRole",
+            utf8ToHex(args.tokenIdentifier),
+            addressToHex(args.user),
+            ...(args.addRoleNFTCreate ? [utf8ToHex("ESDTRoleNFTCreate")] : []),
+            ...(args.addRoleNFTBurn ? [utf8ToHex("ESDTRoleNFTBurn")] : []),
+            ...(args.addRoleNFTAddQuantity ? [utf8ToHex("ESDTRoleNFTAddQuantity")] : []),
+            ...(args.addRoleESDTTransferRole ? [utf8ToHex("ESDTTransferRole")] : []),
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.nonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitSetSpecialRole,
+            dataParts: parts
+        });
+    }
+
+    public setSpecialRoleOnNonFungible(args: INonFungibleSetSpecialRoleArgs): Transaction {
+        const parts = [
+            "setSpecialRole",
+            utf8ToHex(args.tokenIdentifier),
+            addressToHex(args.user),
+            ...(args.addRoleNFTCreate ? [utf8ToHex("ESDTRoleNFTCreate")] : []),
+            ...(args.addRoleNFTBurn ? [utf8ToHex("ESDTRoleNFTBurn")] : []),
+            ...(args.addRoleNFTUpdateAttributes ? [utf8ToHex("ESDTRoleNFTUpdateAttributes")] : []),
+            ...(args.addRoleNFTAddURI ? [utf8ToHex("ESDTRoleNFTAddURI")] : []),
+            ...(args.addRoleESDTTransferRole ? [utf8ToHex("ESDTTransferRole")] : []),
         ];
 
         return this.createTransaction({

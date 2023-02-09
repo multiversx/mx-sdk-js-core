@@ -8,6 +8,10 @@ export function createLocalnetProvider(): INetworkProvider {
     return new ProxyNetworkProvider("http://localhost:7950", { timeout: 5000 });
 }
 
+export function createTestnetProvider(): INetworkProvider {
+    return new ProxyNetworkProvider("https://testnet-gateway.multiversx.com", { timeout: 5000 });
+}
+
 export interface INetworkProvider {
     getNetworkConfig(): Promise<INetworkConfig>;
     getAccount(address: IAddress): Promise<IAccountOnNetwork>;

@@ -1,11 +1,11 @@
 import BigNumber from "bignumber.js";
-import { ARGUMENTS_SEPARATOR, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "../../constants";
-import { Err } from "../../errors";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITransactionValue } from "../../interface";
-import { TransactionOptions, TransactionVersion } from "../../networkParams";
-import { Transaction } from "../../transaction";
-import { TransactionPayload } from "../../transactionPayload";
-import { addressToHex, bigIntToHex, utf8ToHex } from "../codec";
+import { ARGUMENTS_SEPARATOR, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "../constants";
+import { Err } from "../errors";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITransactionValue } from "../interface";
+import { TransactionOptions, TransactionVersion } from "../networkParams";
+import { Transaction } from "../transaction";
+import { TransactionPayload } from "../transactionPayload";
+import { addressToHex, bigIntToHex, utf8ToHex } from "./codec";
 
 // TODO:
 // ESDTWipe

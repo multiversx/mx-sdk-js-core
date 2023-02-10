@@ -35,6 +35,8 @@ interface ITokensFactoryConfig {
     gasLimitSetSpecialRole: IGasLimit;
     gasLimitPausing: IGasLimit;
     gasLimitFreezing: IGasLimit;
+    gasLimitESDTNFTCreate: IGasLimit;
+    gasLimitStorePerByte: IGasLimit;
     issueCost: BigNumber.Value;
 
     esdtContractAddress: IAddress;
@@ -112,6 +114,17 @@ interface INonFungibleSetSpecialRoleArgs extends IBaseArgs {
     addRoleESDTTransferRole: boolean;
 }
 
+interface IESDTNFTCreateArgs extends IBaseArgs {
+    creator: IAddress;
+    tokenIdentifier: string;
+    initialQuantity: number;
+    name: string;
+    royalties: number;
+    hash: string;
+    attributes: string;
+    uris: string[];
+}
+
 interface IESDTPausingArgs extends IBaseArgs {
     manager: IAddress;
     tokenIdentifier: string;
@@ -148,7 +161,7 @@ export class TokenTransactionsFactory {
         this.config = config;
     }
 
-    public issueFungible(args: IIssueFungibleArgs): Transaction {
+    issueFungible(args: IIssueFungibleArgs): Transaction {
         const trueAsHex = utf8ToHex("true");
 
         const parts = [
@@ -179,7 +192,7 @@ export class TokenTransactionsFactory {
         });
     }
 
-    public issueSemiFungible(args: IIssueSemiFungibleArgs): Transaction {
+    issueSemiFungible(args: IIssueSemiFungibleArgs): Transaction {
         const trueAsHex = utf8ToHex("true");
 
         const parts = [
@@ -207,7 +220,7 @@ export class TokenTransactionsFactory {
         });
     }
 
-    public issueNonFungible(args: IIssueNonFungibleArgs): Transaction {
+    issueNonFungible(args: IIssueNonFungibleArgs): Transaction {
         const trueAsHex = utf8ToHex("true");
 
         const parts = [
@@ -235,7 +248,7 @@ export class TokenTransactionsFactory {
         });
     }
 
-    public registerMetaESDT(args: IRegisterMetaESDT): Transaction {
+    registerMetaESDT(args: IRegisterMetaESDT): Transaction {
         const trueAsHex = utf8ToHex("true");
 
         const parts = [
@@ -264,7 +277,7 @@ export class TokenTransactionsFactory {
         });
     }
 
-    public setSpecialRoleOnFungible(args: IFungibleSetSpecialRoleArgs): Transaction {
+    setSpecialRoleOnFungible(args: IFungibleSetSpecialRoleArgs): Transaction {
         const parts = [
             "setSpecialRole",
             utf8ToHex(args.tokenIdentifier),
@@ -284,7 +297,7 @@ export class TokenTransactionsFactory {
         });
     }
 
-    public setSpecialRoleOnSemiFungible(args: ISemiFungibleSetSpecialRoleArgs): Transaction {
+    setSpecialRoleOnSemiFungible(args: ISemiFungibleSetSpecialRoleArgs): Transaction {
         const parts = [
             "setSpecialRole",
             utf8ToHex(args.tokenIdentifier),
@@ -306,7 +319,7 @@ export class TokenTransactionsFactory {
         });
     }
 
-    public setSpecialRoleOnNonFungible(args: INonFungibleSetSpecialRoleArgs): Transaction {
+    setSpecialRoleOnNonFungible(args: INonFungibleSetSpecialRoleArgs): Transaction {
         const parts = [
             "setSpecialRole",
             utf8ToHex(args.tokenIdentifier),
@@ -329,7 +342,34 @@ export class TokenTransactionsFactory {
         });
     }
 
-    public pause(args: IESDTPausingArgs): Transaction {
+    nftCreate(args: IESDTNFTCreateArgs): Transaction {
+        const parts = [
+            "ESDTNFTCreate",
+            utf8ToHex(args.tokenIdentifier),
+            bigIntToHex(args.initialQuantity),
+            utf8ToHex(args.name),
+            bigIntToHex(args.royalties),
+            utf8ToHex(args.hash),
+            utf8ToHex(args.attributes),
+            ...args.uris.map(utf8ToHex),
+        ];
+
+        // Question for review: is this the one to be considered as "NFT data"?
+        const nftData = args.attributes + args.uris.join("");
+        const storageGasLimit = nftData.length * this.config.gasLimitStorePerByte.valueOf();
+
+        return this.createTransaction({
+            sender: args.creator,
+            receiver: args.creator,
+            nonce: args.nonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitESDTNFTCreate.valueOf() + storageGasLimit.valueOf(),
+            dataParts: parts
+        });
+    }
+
+    pause(args: IESDTPausingArgs): Transaction {
         if (args.pause == args.unpause) {
             throw new Err("Must set either 'pause' or 'unpause' (one and only one should be set).")
         }
@@ -350,7 +390,7 @@ export class TokenTransactionsFactory {
         });
     }
 
-    public freeze(args: IESDTFreezingArgs): Transaction {
+    freeze(args: IESDTFreezingArgs): Transaction {
         if (args.freeze == args.unfreeze) {
             throw new Err("Must set either 'freeze' or 'unfreeze' (one and only one should be set).")
         }
@@ -372,7 +412,7 @@ export class TokenTransactionsFactory {
         });
     }
 
-    public localMint(args: IESDTLocalMintArgs): Transaction {
+    localMint(args: IESDTLocalMintArgs): Transaction {
         const parts = [
             "ESDTLocalMint",
             utf8ToHex(args.tokenIdentifier),
@@ -390,7 +430,7 @@ export class TokenTransactionsFactory {
         });
     }
 
-    public localBurn(args: IESDTLocalBurnArgs): Transaction {
+    localBurn(args: IESDTLocalBurnArgs): Transaction {
         const parts = [
             "ESDTLocalBurn",
             utf8ToHex(args.tokenIdentifier),

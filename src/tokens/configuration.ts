@@ -14,6 +14,8 @@ export class DefaultTokenTransactionsFactoryConfig {
     gasLimitSetSpecialRole: IGasLimit = 60000000;
     gasLimitPausing: IGasLimit = 60000000;
     gasLimitFreezing: IGasLimit = 60000000;
+    gasLimitESDTNFTCreate: IGasLimit = 3000000;
+    gasLimitStorePerByte: IGasLimit = 50000;
     issueCost: BigNumber.Value = "50000000000000000";
 
     esdtContractAddress: IAddress = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");

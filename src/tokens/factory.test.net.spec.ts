@@ -56,7 +56,7 @@ describe("test factory on testnet", function () {
         assert.isTrue(outcome.tokenIdentifier.includes("FRANK"));
     });
 
-    it.only("should issue and create NFT", async function () {
+    it("should issue and create NFT", async function () {
         this.timeout(180000);
         await frank.sync(provider);
         await grace.sync(provider);
@@ -115,7 +115,7 @@ describe("test factory on testnet", function () {
 
         // Create NFTs
         for (let i = 1; i <= 3; i++) {
-            const createNFTTransaction = factory.nftCreate({
+            const createTokenTransaction = factory.nftCreate({
                 creator: grace.address,
                 tokenIdentifier: tokenIdentifier,
                 initialQuantity: 1,
@@ -128,15 +128,98 @@ describe("test factory on testnet", function () {
             });
 
             grace.account.incrementNonce();
-            await grace.signer.sign(createNFTTransaction);
-            await provider.sendTransaction(createNFTTransaction);
+            await grace.signer.sign(createTokenTransaction);
+            await provider.sendTransaction(createTokenTransaction);
 
-            const createNFTTransactionOnNetwork = await watcher.awaitCompleted(createNFTTransaction);
-            const createNFTOutcome = parser.parseNFTCreate(createNFTTransactionOnNetwork);
+            const createTokenTransactionOnNetwork = await watcher.awaitCompleted(createTokenTransaction);
+            const createTokenOutcome = parser.parseNFTCreate(createTokenTransactionOnNetwork);
 
-            assert.equal(createNFTOutcome.tokenIdentifier, tokenIdentifier);
-            assert.equal(createNFTOutcome.nonce, i);
-            assert.equal(createNFTOutcome.initialQuantity, 1);
+            assert.equal(createTokenOutcome.tokenIdentifier, tokenIdentifier);
+            assert.equal(createTokenOutcome.nonce, i);
+            assert.equal(createTokenOutcome.initialQuantity, 1);
+        }
+    });
+
+    it.only("should issue and create SFT", async function () {
+        this.timeout(180000);
+        await frank.sync(provider);
+        await grace.sync(provider);
+
+        // Issue SFT
+        const issueTransaction = factory.issueSemiFungible({
+            issuer: frank.address,
+            tokenName: "FRANK",
+            tokenTicker: "FRANK",
+            canFreeze: true,
+            canWipe: true,
+            canPause: true,
+            canTransferNFTCreateRole: true,
+            canChangeOwner: true,
+            canUpgrade: true,
+            canAddSpecialRoles: true,
+            nonce: frank.account.nonce
+        });
+
+        frank.account.incrementNonce();
+        await frank.signer.sign(issueTransaction);
+        await provider.sendTransaction(issueTransaction);
+
+        const issueTransactionOnNetwork = await watcher.awaitCompleted(issueTransaction);
+        const issueOutcome = parser.parseIssueSemiFungible(issueTransactionOnNetwork);
+        const tokenIdentifier = issueOutcome.tokenIdentifier;
+        assert.isTrue(tokenIdentifier.includes("FRANK"));
+
+        // Set roles (give Grace the ability to create SFTs)
+        const setRolesTransaction = factory.setSpecialRoleOnSemiFungible({
+            manager: frank.address,
+            user: grace.address,
+            tokenIdentifier: tokenIdentifier,
+            addRoleNFTCreate: true,
+            addRoleNFTBurn: false,
+            addRoleNFTAddQuantity: true,
+            addRoleESDTTransferRole: false,
+            nonce: frank.account.nonce
+        });
+
+        frank.account.incrementNonce();
+        await frank.signer.sign(setRolesTransaction);
+        await provider.sendTransaction(setRolesTransaction);
+
+        let setRolesTransactionOnNetwork = await watcher.awaitCompleted(setRolesTransaction);
+
+        // For such transactions, the "isCompleted" field is somehow incorrect (false positive).
+        // Let's wait a bit more to have the outcome. 
+        await (new AsyncTimer("test")).start(1000);
+        setRolesTransactionOnNetwork = await watcher.awaitCompleted(setRolesTransaction);
+
+        const setRolesOutcome = parser.parseSetSpecialRole(setRolesTransactionOnNetwork);
+        assert.include(setRolesOutcome.roles, "ESDTRoleNFTCreate");
+        assert.include(setRolesOutcome.roles, "ESDTRoleNFTAddQuantity");
+
+        // Create SFTs
+        for (let i = 1; i <= 3; i++) {
+            const createTokenTransaction = factory.nftCreate({
+                creator: grace.address,
+                tokenIdentifier: tokenIdentifier,
+                initialQuantity: i * 10,
+                name: `test-${i}`,
+                royalties: 1000,
+                hash: "abba",
+                attributes: "test",
+                uris: ["a", "b"],
+                nonce: grace.account.nonce
+            });
+
+            grace.account.incrementNonce();
+            await grace.signer.sign(createTokenTransaction);
+            await provider.sendTransaction(createTokenTransaction);
+
+            const createTokenTransactionOnNetwork = await watcher.awaitCompleted(createTokenTransaction);
+            const createTokenOutcome = parser.parseNFTCreate(createTokenTransactionOnNetwork);
+
+            assert.equal(createTokenOutcome.tokenIdentifier, tokenIdentifier);
+            assert.equal(createTokenOutcome.nonce, i);
+            assert.equal(createTokenOutcome.initialQuantity, i * 10);
         }
     });
 });

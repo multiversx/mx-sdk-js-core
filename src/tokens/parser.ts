@@ -94,6 +94,14 @@ export class TokenTransactionsOutcomeParser {
         return { tokenIdentifier: tokenIdentifier };
     }
 
+    parseIssueSemiFungible(transaction: ITransactionOnNetwork): IESDTIssueOutcome {
+        this.ensureNoError(transaction);
+
+        const event = this.findSingleEventByIdentifier(transaction, "issueSemiFungible");
+        const tokenIdentifier = event.topics[0]?.valueOf().toString();
+        return { tokenIdentifier: tokenIdentifier };
+    }
+
     parseSetSpecialRole(transaction: ITransactionOnNetwork): ISetSpecialRoleOutcome {
         this.ensureNoError(transaction);
 

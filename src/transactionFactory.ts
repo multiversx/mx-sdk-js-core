@@ -11,7 +11,7 @@ interface IGasEstimator {
 }
 
 /**
- * @deprecated Use {@link TransfersFactory} instead.
+ * @deprecated Use {@link TransfersFactory} instead (same interface, different name).
  */
 export class TransactionFactory {
     private readonly gasEstimator;

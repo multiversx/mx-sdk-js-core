@@ -4,17 +4,17 @@ import { INetworkConfig } from "../interfaceOfNetwork";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { createTestnetProvider, INetworkProvider } from "../testutils/networkProviders";
 import { TransactionWatcher } from "../transactionWatcher";
-import { DefaultTokenTransactionsFactoryConfig } from "./configuration";
-import { TokenTransactionsFactory } from "./factory";
-import { TokenTransactionsOutcomeParser } from "./parser";
+import { TokenOperationsFactory } from "./tokenOperationsFactory";
+import { TokenOperationsFactoryConfig } from "./tokenOperationsFactoryConfig";
+import { TokenOperationsOutcomeParser } from "./tokenOperationsOutcomeParser";
 
 describe("test factory on testnet", function () {
     let frank: TestWallet, grace: TestWallet;
     let provider: INetworkProvider;
     let watcher: TransactionWatcher;
     let network: INetworkConfig;
-    let factory: TokenTransactionsFactory;
-    let parser: TokenTransactionsOutcomeParser;
+    let factory: TokenOperationsFactory;
+    let parser: TokenOperationsOutcomeParser;
 
     before(async function () {
         console.log(`> ${this.currentTest?.title} ...`);
@@ -24,8 +24,8 @@ describe("test factory on testnet", function () {
         provider = createTestnetProvider();
         watcher = new TransactionWatcher(provider);
         network = await provider.getNetworkConfig();
-        factory = new TokenTransactionsFactory(new DefaultTokenTransactionsFactoryConfig(network.ChainID));
-        parser = new TokenTransactionsOutcomeParser();
+        factory = new TokenOperationsFactory(new TokenOperationsFactoryConfig(network.ChainID));
+        parser = new TokenOperationsOutcomeParser();
     });
 
     it("should issue fungible, mint, burn", async function () {

@@ -7,28 +7,11 @@ import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { addressToHex, bigIntToHex, utf8ToHex } from "./codec";
 
-// TODO:
-// ESDTWipe
-// ESDTTransfer
-// ESDTSetRole
-// ESDTUnSetRole
-// ESDTSetLimitedTransfer
-// ESDTUnSetLimitedTransfer
-
-// ESDTNFTTransfer
-// ESDTNFTCreate
-// ESDTNFTAddQuantity
-// ESDTNFTBurn
-// ESDTNFTAddURI
-// ESDTNFTUpdateAttributes
-// MultiESDTNFTTransfer
-
-interface ITokensFactoryConfig {
+interface IConfig {
     chainID: IChainID;
     minGasPrice: IGasPrice;
     minGasLimit: IGasLimit;
     gasLimitPerByte: IGasLimit;
-
     gasLimitIssue: IGasLimit;
     gasLimitESDTLocalMint: IGasLimit;
     gasLimitESDTLocalBurn: IGasLimit;
@@ -38,7 +21,6 @@ interface ITokensFactoryConfig {
     gasLimitESDTNFTCreate: IGasLimit;
     gasLimitStorePerByte: IGasLimit;
     issueCost: BigNumber.Value;
-
     esdtContractAddress: IAddress;
 }
 
@@ -154,10 +136,10 @@ interface IESDTLocalBurnArgs extends IBaseArgs {
     supplyToBurn: BigNumber.Value
 }
 
-export class TokenTransactionsFactory {
-    private readonly config: ITokensFactoryConfig;
+export class TokenOperationsFactory {
+    private readonly config: IConfig;
 
-    constructor(config: ITokensFactoryConfig) {
+    constructor(config: IConfig) {
         this.config = config;
     }
 

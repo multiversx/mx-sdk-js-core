@@ -1,15 +1,15 @@
 import { assert } from "chai";
 import { loadTestWallets, TestWallet } from "../testutils";
-import { DefaultTokenTransactionsFactoryConfig } from "./configuration";
-import { TokenTransactionsFactory } from "./factory";
+import { TokenOperationsFactory } from "./tokenOperationsFactory";
+import { TokenOperationsFactoryConfig } from "./tokenOperationsFactoryConfig";
 
 describe("test factory", () => {
     let frank: TestWallet, grace: TestWallet;
-    let factory: TokenTransactionsFactory;
+    let factory: TokenOperationsFactory;
 
     before(async function () {
         ({ frank, grace } = await loadTestWallets());
-        factory = new TokenTransactionsFactory(new DefaultTokenTransactionsFactoryConfig("T"));
+        factory = new TokenOperationsFactory(new TokenOperationsFactoryConfig("T"));
     });
 
     it("should create <issueFungible>", () => {

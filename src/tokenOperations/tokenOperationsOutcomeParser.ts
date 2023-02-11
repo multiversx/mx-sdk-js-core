@@ -77,7 +77,7 @@ export interface IBurnOutcome {
 // export interface IEmptyOutcome {
 // }
 
-export class TokenTransactionsOutcomeParser {
+export class TokenOperationsOutcomeParser {
     parseIssueFungible(transaction: ITransactionOnNetwork): IESDTIssueOutcome {
         this.ensureNoError(transaction);
 

@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { loadTestWallets, TestWallet } from "../testutils";
-import { TokenTransactionsOutcomeParser } from "./parser";
+import { TokenOperationsOutcomeParser } from "./tokenOperationsOutcomeParser";
 
 describe("test parsers", () => {
     let frank: TestWallet, grace: TestWallet;
@@ -10,7 +10,7 @@ describe("test parsers", () => {
     });
 
     it("should parse outcome of issueFungible", () => {
-        const parser = new TokenTransactionsOutcomeParser();
+        const parser = new TokenOperationsOutcomeParser();
 
         const outcome = parser.parseIssueFungible({
             hash: "hash",

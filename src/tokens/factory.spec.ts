@@ -12,7 +12,7 @@ describe("test factory", () => {
         factory = new TokenTransactionsFactory(new DefaultTokenTransactionsFactoryConfig("T"));
     });
 
-    it("should create issueFungible", () => {
+    it("should create <issueFungible>", () => {
         const transaction = factory.issueFungible({
             issuer: frank.address,
             tokenName: "FRANK",
@@ -36,7 +36,7 @@ describe("test factory", () => {
         assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
     });
 
-    it("should issueSemiFungible", () => {
+    it("should create <issueSemiFungible>", () => {
         const transaction = factory.issueSemiFungible({
             issuer: frank.address,
             tokenName: "FRANK",
@@ -57,7 +57,7 @@ describe("test factory", () => {
         assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
     });
 
-    it("should issueNonFungible", () => {
+    it("should create <issueNonFungible>", () => {
         const transaction = factory.issueNonFungible({
             issuer: frank.address,
             tokenName: "FRANK",
@@ -78,7 +78,7 @@ describe("test factory", () => {
         assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
     });
 
-    it("should setSpecialRole", () => {
+    it("should create <setSpecialRole>", () => {
         const transaction = factory.setSpecialRoleOnNonFungible({
             manager: frank.address,
             user: grace.address,
@@ -97,7 +97,7 @@ describe("test factory", () => {
         assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
     });
 
-    it("should create NFT", () => {
+    it("should create <nftCreate>", () => {
         const transaction = factory.nftCreate({
             creator: grace.address,
             tokenIdentifier: "FRANK-aa9e8d",

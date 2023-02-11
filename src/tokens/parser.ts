@@ -48,19 +48,19 @@ export interface INFTCreateOutcome {
     initialQuantity: number;
 }
 
-// export interface IMintOutcome {
-//     userAddress: IAddress;
-//     tokenIdentifier: string;
-//     nonce: INonce;
-//     mintedSupply: string;
-// }
+export interface IMintOutcome {
+    userAddress: string;
+    tokenIdentifier: string;
+    nonce: number;
+    mintedSupply: string;
+}
 
-// export interface IBurnOutcome {
-//     userAddress: IAddress;
-//     tokenIdentifier: string;
-//     nonce: INonce;
-//     burntSupply: string;
-// }
+export interface IBurnOutcome {
+    userAddress: string;
+    tokenIdentifier: string;
+    nonce: number;
+    burntSupply: string;
+}
 
 // export interface IPausingOutcome {
 //     tokenIdentifier: string;
@@ -122,21 +122,27 @@ export class TokenTransactionsOutcomeParser {
         return { tokenIdentifier, nonce, initialQuantity };
     }
 
-    // export class ESDTSetSpecialRoleParser extends BaseParser<ISetSpecialRoleOutcome> {
-    //     protected parseSuccessfulOutcome(events: ITransactionEvent[]): ISetSpecialRoleOutcome | null {
-    //         for (const event of events) {
-    //             if (event.identifier == "ESDTSetRole") {
-    //                 return {
-    //                     userAddress: event.address,
-    //                     tokenIdentifier: event.topics[0].valueOf().toString(),
-    //                     roles: event.topics.slice(3).map(topic => topic.valueOf().toString())
-    //                 };
-    //             }
-    //         }
+    parseLocalMint(transaction: ITransactionOnNetwork): IMintOutcome {
+        this.ensureNoError(transaction);
 
-    //         return null;
-    //     }
-    // }
+        const event = this.findSingleEventByIdentifier(transaction, "ESDTLocalMint");
+        const userAddress = event.address.toString();
+        const tokenIdentifier = event.topics[0]?.valueOf().toString();
+        const nonce = bufferToBigInt(event.topics[1]?.valueOf()).toNumber();
+        const mintedSupply = bufferToBigInt(event.topics[2]?.valueOf()).toString();
+        return { userAddress, tokenIdentifier, nonce, mintedSupply };
+    }
+
+    parseLocalBurn(transaction: ITransactionOnNetwork): IBurnOutcome {
+        this.ensureNoError(transaction);
+
+        const event = this.findSingleEventByIdentifier(transaction, "ESDTLocalBurn");
+        const userAddress = event.address.toString();
+        const tokenIdentifier = event.topics[0]?.valueOf().toString();
+        const nonce = bufferToBigInt(event.topics[1]?.valueOf()).toNumber();
+        const burntSupply = bufferToBigInt(event.topics[2]?.valueOf()).toString();
+        return { userAddress, tokenIdentifier, nonce, burntSupply };
+    }
 
     private ensureNoError(transaction: ITransactionOnNetwork) {
         for (const event of transaction.logs.events) {
@@ -182,40 +188,6 @@ export class TokenTransactionsOutcomeParser {
 //     }
 // }
 
-
-// export class ESDTLocalMintParser extends BaseParser<IMintOutcome> {
-//     protected parseSuccessfulOutcome(events: ITransactionEvent[]): IMintOutcome | null {
-//         for (const event of events) {
-//             if (event.identifier == "ESDTLocalMint") {
-//                 return {
-//                     userAddress: event.address,
-//                     tokenIdentifier: event.topics[0].valueOf().toString(),
-//                     nonce: bufferToBigInt(event.topics[1].valueOf()).toNumber() || 0,
-//                     mintedSupply: bufferToBigInt(event.topics[2].valueOf()).toString()
-//                 };
-//             }
-//         }
-
-//         return null;
-//     }
-// }
-
-// export class ESDTLocalBurnParser extends BaseParser<IBurnOutcome> {
-//     protected parseSuccessfulOutcome(events: ITransactionEvent[]): IBurnOutcome | null {
-//         for (const event of events) {
-//             if (event.identifier == "ESDTLocalBurn") {
-//                 return {
-//                     userAddress: event.address,
-//                     tokenIdentifier: event.topics[0].valueOf().toString(),
-//                     nonce: bufferToBigInt(event.topics[1].valueOf()).toNumber() || 0,
-//                     burntSupply: bufferToBigInt(event.topics[2].valueOf()).toString()
-//                 };
-//             }
-//         }
-
-//         return null;
-//     }
-// }
 
 
 // export class ESDTFreezingParser extends BaseParser<IFreezingOutcome> {

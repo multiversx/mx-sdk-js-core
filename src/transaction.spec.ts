@@ -85,9 +85,10 @@ describe("test transaction construction", async () => {
     });
 
     it("with data, with large value", async () => {
+        const largeValue = "123456789000000000000000000000";
         let transaction = new Transaction({
             nonce: 92,
-            value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
+            value: new BigNumber(largeValue) ,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
@@ -99,6 +100,8 @@ describe("test transaction construction", async () => {
         await wallets.alice.signer.sign(transaction);
         assert.equal("39938d15812708475dfc8125b5d41dbcea0b2e3e7aabbbfceb6ce4f070de3033676a218b73facd88b1432d7d4accab89c6130b3abe5cc7bbbb5146e61d355b03", transaction.getSignature().hex());
         assert.equal(transaction.getHash().toString(), "e4a6048d92409cfe50f12e81218cb92f39966c618979a693b8d16320a06061c1");
+
+        assert.equal(transaction.toPlainObject().value, largeValue)
     });
 
     it("with nonce = 0", async () => {

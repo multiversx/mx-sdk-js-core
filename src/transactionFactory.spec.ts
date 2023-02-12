@@ -43,7 +43,7 @@ describe("test transaction factory", () => {
         });
 
         assert.equal(transaction.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
-        assert.equal(transaction.getValue(), "");
+        assert.equal(transaction.getValue(), "0");
         assert.equal(transaction.getGasLimit(), 50000 + 44 * 1500 + 200000 + 100000);
         assert.equal(transaction.getData().toString(), "ESDTTransfer@434f554e5445522d386230323866@64");
         assert.equal(transaction.getChainID(), "D");
@@ -59,7 +59,7 @@ describe("test transaction factory", () => {
 
         assert.equal(transaction.getSender().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transaction.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
-        assert.equal(transaction.getValue(), "");
+        assert.equal(transaction.getValue(), "0");
         assert.equal(transaction.getGasLimit(), 50000 + 111 * 1500 + 200000 + 800000);
         assert.equal(transaction.getData().toString(), "ESDTNFTTransfer@4552444a532d333866323439@01@01@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8");
         assert.equal(transaction.getChainID(), "D");
@@ -78,7 +78,7 @@ describe("test transaction factory", () => {
 
         assert.equal(transaction.getSender().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transaction.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
-        assert.equal(transaction.getValue(), "");
+        assert.equal(transaction.getValue(), "0");
         assert.equal(transaction.getGasLimit(), 50000 + 158 * 1500 + (200000 + 800000) * 2);
         assert.equal(transaction.getData().toString(), "MultiESDTNFTTransfer@0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1@02@4552444a532d333866323439@01@01@4241522d633830643239@@8ac7230489e80000");
         assert.equal(transaction.getChainID(), "D");

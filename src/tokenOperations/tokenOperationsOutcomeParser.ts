@@ -62,10 +62,8 @@ export interface IBurnOutcome {
     burntSupply: string;
 }
 
-// export interface IPausingOutcome {
-//     tokenIdentifier: string;
-//     paused: boolean;
-// }
+export interface IPausingOutcome {
+}
 
 // export interface IFreezingOutcome {
 //     userAddress: IAddress;
@@ -144,6 +142,42 @@ export class TokenOperationsOutcomeParser {
         return { userAddress, tokenIdentifier, nonce, burntSupply };
     }
 
+    parsePause(transaction: ITransactionOnNetwork): IPausingOutcome {
+        this.ensureNoError(transaction);
+        const _ = this.findSingleEventByIdentifier(transaction, "ESDTPause");
+        return {};
+    }
+
+    parseUnpause(transaction: ITransactionOnNetwork): IPausingOutcome {
+        this.ensureNoError(transaction);
+        const _ = this.findSingleEventByIdentifier(transaction, "ESDTUnPause");
+        return {};
+    }
+
+
+    // export class ESDTFreezingParser extends BaseParser<IFreezingOutcome> {
+    //     protected parseSuccessfulOutcome(events: ITransactionEvent[]): IFreezingOutcome | null {
+    //         for (const event of events) {
+    //             if (event.identifier == "ESDTFreeze" || event.identifier == "ESDTUnFreeze") {
+    //                 let balance = bufferToBigInt(event.topics[2].valueOf());
+    //                 if (balance.isNaN()) {
+    //                     balance = new BigNumber(0);
+    //                 }
+
+    //                 return {
+    //                     userAddress: new Address(event.topics[3].valueOf()),
+    //                     tokenIdentifier: event.topics[0].valueOf().toString(),
+    //                     nonce: bufferToBigInt(event.topics[1].valueOf()).toNumber() || 0,
+    //                     balance: balance.toString()
+    //                 };
+    //             }
+    //         }
+
+    //         return null;
+    //     }
+    // }
+
+
     private ensureNoError(transaction: ITransactionOnNetwork) {
         for (const event of transaction.logs.events) {
             if (event.identifier == "signalError") {
@@ -181,33 +215,3 @@ export class TokenOperationsOutcomeParser {
     }
 }
 
-
-// export class ESDTPausingParser extends BaseParser<IEmptyOutcome> {
-//     protected parseSuccessfulOutcome(_events: ITransactionEvent[]): IEmptyOutcome | null {
-//         return {};
-//     }
-// }
-
-
-
-// export class ESDTFreezingParser extends BaseParser<IFreezingOutcome> {
-//     protected parseSuccessfulOutcome(events: ITransactionEvent[]): IFreezingOutcome | null {
-//         for (const event of events) {
-//             if (event.identifier == "ESDTFreeze" || event.identifier == "ESDTUnFreeze") {
-//                 let balance = bufferToBigInt(event.topics[2].valueOf());
-//                 if (balance.isNaN()) {
-//                     balance = new BigNumber(0);
-//                 }
-
-//                 return {
-//                     userAddress: new Address(event.topics[3].valueOf()),
-//                     tokenIdentifier: event.topics[0].valueOf().toString(),
-//                     nonce: bufferToBigInt(event.topics[1].valueOf()).toNumber() || 0,
-//                     balance: balance.toString()
-//                 };
-//             }
-//         }
-
-//         return null;
-//     }
-// }

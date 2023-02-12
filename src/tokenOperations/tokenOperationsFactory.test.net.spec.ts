@@ -1,8 +1,9 @@
 import { assert } from "chai";
 import { AsyncTimer } from "../asyncTimer";
-import { INetworkConfig } from "../interfaceOfNetwork";
+import { INetworkConfig, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { createTestnetProvider, INetworkProvider } from "../testutils/networkProviders";
+import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
 import { TokenOperationsFactory } from "./tokenOperationsFactory";
 import { TokenOperationsFactoryConfig } from "./tokenOperationsFactoryConfig";
@@ -51,12 +52,7 @@ describe("test factory on testnet", function () {
             nonce: frank.account.nonce
         });
 
-        frank.account.incrementNonce();
-        await frank.signer.sign(tx1);
-        await provider.sendTransaction(tx1);
-        console.log("tx1", tx1.getHash().hex());
-
-        const tx1OnNetwork = await watcher.awaitCompleted(tx1);
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
         const tx1Outcome = parser.parseIssueFungible(tx1OnNetwork);
         const tokenIdentifier = tx1Outcome.tokenIdentifier;
         assert.isTrue(tokenIdentifier.includes("FRANK"));
@@ -71,12 +67,7 @@ describe("test factory on testnet", function () {
             nonce: frank.account.nonce
         });
 
-        frank.account.incrementNonce();
-        await frank.signer.sign(tx2);
-        await provider.sendTransaction(tx2);
-        console.log("tx2", tx2.getHash().hex());
-
-        const tx2OnNetwork = await watcher.awaitCompleted(tx2);
+        const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
         const tx2Outcome = parser.parseSetSpecialRole(tx2OnNetwork);
         assert.include(tx2Outcome.roles, "ESDTRoleLocalMint");
         assert.include(tx2Outcome.roles, "ESDTRoleLocalBurn");
@@ -90,12 +81,7 @@ describe("test factory on testnet", function () {
             nonce: grace.account.nonce
         });
 
-        grace.account.incrementNonce();
-        await grace.signer.sign(tx3);
-        await provider.sendTransaction(tx3);
-        console.log("tx3", tx3.getHash().hex());
-
-        const tx3OnNetwork = await watcher.awaitCompleted(tx3);
+        const tx3OnNetwork = await processTransaction(grace, tx3, "tx3");
         const tx3Outcome = parser.parseLocalMint(tx3OnNetwork);
         assert.equal(tx3Outcome.mintedSupply, "200");
 
@@ -108,14 +94,71 @@ describe("test factory on testnet", function () {
             nonce: grace.account.nonce
         });
 
-        grace.account.incrementNonce();
-        await grace.signer.sign(tx4);
-        await provider.sendTransaction(tx4);
-        console.log("tx4", tx4.getHash().hex());
-
-        const tx4OnNetwork = await watcher.awaitCompleted(tx4);
+        const tx4OnNetwork = await processTransaction(grace, tx4, "tx4");
         const tx4Outcome = parser.parseLocalBurn(tx4OnNetwork);
         assert.equal(tx4Outcome.burntSupply, "50");
+    });
+
+    it("should issue fungible, pause, unpause, freeze, unfreeze", async function () {
+        this.timeout(120000);
+        await frank.sync(provider);
+
+        // Issue
+        const tx1 = factory.issueFungible({
+            issuer: frank.address,
+            tokenName: "FRANK",
+            tokenTicker: "FRANK",
+            initialSupply: 100,
+            numDecimals: 0,
+            canFreeze: true,
+            canWipe: true,
+            canPause: true,
+            canMint: true,
+            canBurn: true,
+            canChangeOwner: true,
+            canUpgrade: true,
+            canAddSpecialRoles: true,
+            nonce: frank.account.nonce
+        });
+
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
+        const tx1Outcome = parser.parseIssueFungible(tx1OnNetwork);
+        const tokenIdentifier = tx1Outcome.tokenIdentifier;
+        assert.isTrue(tokenIdentifier.includes("FRANK"));
+
+        // Pause
+        const tx2 = factory.pause({
+            pause: true,
+            manager: frank.address,
+            tokenIdentifier: tokenIdentifier,
+            nonce: frank.account.nonce
+        });
+
+        const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
+        const _tx2Outcome = parser.parsePause(tx2OnNetwork);
+
+        // Unpause
+        const tx3 = factory.pause({
+            unpause: true,
+            manager: frank.address,
+            tokenIdentifier: tokenIdentifier,
+            nonce: frank.account.nonce
+        });
+
+        const tx3OnNetwork = await processTransaction(frank, tx3, "tx3");
+        const _tx3Outcome = parser.parseUnpause(tx3OnNetwork);
+
+        // Freeze
+        const tx4 = factory.freeze({
+            freeze: true,
+            manager: frank.address,
+            user: grace.address,
+            tokenIdentifier: tokenIdentifier,
+            nonce: frank.account.nonce
+        });
+
+        const tx4OnNetwork = await processTransaction(frank, tx4, "tx4");
+        // const _tx4Outcome = parser.parseFreeze(tx4OnNetwork);
     });
 
     it("should issue and create NFT", async function () {
@@ -138,12 +181,7 @@ describe("test factory on testnet", function () {
             nonce: frank.account.nonce
         });
 
-        frank.account.incrementNonce();
-        await frank.signer.sign(tx1);
-        await provider.sendTransaction(tx1);
-        console.log("tx1", tx1.getHash().hex());
-
-        const tx1OnNetwork = await watcher.awaitCompleted(tx1);
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
         const tx1Outcome = parser.parseIssueNonFungible(tx1OnNetwork);
         const tokenIdentifier = tx1Outcome.tokenIdentifier;
         assert.isTrue(tokenIdentifier.includes("FRANK"));
@@ -161,12 +199,7 @@ describe("test factory on testnet", function () {
             nonce: frank.account.nonce
         });
 
-        frank.account.incrementNonce();
-        await frank.signer.sign(tx2);
-        await provider.sendTransaction(tx2);
-        console.log("tx2", tx2.getHash().hex());
-
-        let tx2OnNetwork = await watcher.awaitCompleted(tx2);
+        let tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
 
         // For such transactions, the "isCompleted" field is somehow incorrect (false positive).
         // Let's wait a bit more to have the outcome. 
@@ -191,12 +224,7 @@ describe("test factory on testnet", function () {
                 nonce: grace.account.nonce
             });
 
-            grace.account.incrementNonce();
-            await grace.signer.sign(tx);
-            await provider.sendTransaction(tx);
-            console.log("tx", tx.getHash().hex());
-
-            const txOnNetwork = await watcher.awaitCompleted(tx);
+            const txOnNetwork = await processTransaction(grace, tx, "tx");
             const txOutcome = parser.parseNFTCreate(txOnNetwork);
 
             assert.equal(txOutcome.tokenIdentifier, tokenIdentifier);
@@ -225,12 +253,7 @@ describe("test factory on testnet", function () {
             nonce: frank.account.nonce
         });
 
-        frank.account.incrementNonce();
-        await frank.signer.sign(tx1);
-        await provider.sendTransaction(tx1);
-        console.log("tx1", tx1.getHash().hex());
-
-        const tx1OnNetwork = await watcher.awaitCompleted(tx1);
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
         const tx1Outcome = parser.parseIssueSemiFungible(tx1OnNetwork);
         const tokenIdentifier = tx1Outcome.tokenIdentifier;
         assert.isTrue(tokenIdentifier.includes("FRANK"));
@@ -247,12 +270,7 @@ describe("test factory on testnet", function () {
             nonce: frank.account.nonce
         });
 
-        frank.account.incrementNonce();
-        await frank.signer.sign(tx2);
-        await provider.sendTransaction(tx2);
-        console.log("tx2", tx2.getHash().hex());
-
-        let tx2OnNetwork = await watcher.awaitCompleted(tx2);
+        let tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
 
         // For such transactions, the "isCompleted" field is somehow incorrect (false positive).
         // Let's wait a bit more to have the outcome. 
@@ -277,12 +295,7 @@ describe("test factory on testnet", function () {
                 nonce: grace.account.nonce
             });
 
-            grace.account.incrementNonce();
-            await grace.signer.sign(tx);
-            await provider.sendTransaction(tx);
-            console.log("tx", tx.getHash().hex());
-
-            const txOnNetwork = await watcher.awaitCompleted(tx);
+            const txOnNetwork = await processTransaction(grace, tx, "tx");
             const txOutcome = parser.parseNFTCreate(txOnNetwork);
 
             assert.equal(txOutcome.tokenIdentifier, tokenIdentifier);
@@ -290,4 +303,14 @@ describe("test factory on testnet", function () {
             assert.equal(txOutcome.initialQuantity, i * 10);
         }
     });
+
+    async function processTransaction(wallet: TestWallet, transaction: Transaction, tag: string): Promise<ITransactionOnNetwork> {
+        wallet.account.incrementNonce();
+        await wallet.signer.sign(transaction);
+        await provider.sendTransaction(transaction);
+        console.log(`Sent transaction [${tag}]: ${transaction.getHash().hex()}`);
+
+        const transactionOnNetwork = await watcher.awaitCompleted(transaction);
+        return transactionOnNetwork;
+    }
 });

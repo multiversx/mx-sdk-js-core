@@ -110,16 +110,16 @@ interface IESDTNFTCreateArgs extends IBaseArgs {
 interface IESDTPausingArgs extends IBaseArgs {
     manager: IAddress;
     tokenIdentifier: string;
-    pause: boolean;
-    unpause: boolean;
+    pause?: boolean;
+    unpause?: boolean;
 }
 
 interface IESDTFreezingArgs extends IBaseArgs {
     manager: IAddress;
     user: IAddress;
     tokenIdentifier: string;
-    freeze: boolean;
-    unfreeze: boolean;
+    freeze?: boolean;
+    unfreeze?: boolean;
 }
 
 interface IESDTLocalMintArgs extends IBaseArgs {

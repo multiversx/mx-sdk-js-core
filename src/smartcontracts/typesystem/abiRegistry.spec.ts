@@ -7,7 +7,7 @@ import { BytesType } from "./bytes";
 import { EnumType } from "./enum";
 import { ListType, OptionType } from "./generic";
 import { ArrayVecType } from "./genericArray";
-import { BigUIntType, I64Type, U32Type, U64Type, U8Type } from "./numerical";
+import { BigUIntType, I64Type, U32Type, U64Type } from "./numerical";
 import { StructType } from "./struct";
 import { TokenIdentifierType } from "./tokenIdentifier";
 
@@ -98,13 +98,31 @@ describe("test abi registry", () => {
         assert.equal(dummyType.getFieldDefinition("raw")!.type.getClassName(), ArrayVecType.ClassName);
     });
 
-    it("should load ABI when custom types are out of order", async () => {
-        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order.abi.json");
+    it("should load ABI when custom types are out of order (A)", async () => {
+        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-A.abi.json");
 
         assert.deepEqual(registry.getStruct("EsdtTokenPayment").getNamesOfDependencies(), ["EsdtTokenType", "TokenIdentifier", "u64", "BigUint"]);
         assert.deepEqual(registry.getEnum("EsdtTokenType").getNamesOfDependencies(), []);
         assert.deepEqual(registry.getStruct("TypeA").getNamesOfDependencies(), ["TypeB", "TypeC", "u64"]);
         assert.deepEqual(registry.getStruct("TypeB").getNamesOfDependencies(), ["TypeC", "u64"]);
         assert.deepEqual(registry.getStruct("TypeC").getNamesOfDependencies(), ["u64"]);
+    });
+
+    it("should load ABI when custom types are out of order (B)", async () => {
+        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-B.abi.json");
+
+        assert.deepEqual(registry.getStruct("EsdtTokenPayment").getNamesOfDependencies(), ["EsdtTokenType", "TokenIdentifier", "u64", "BigUint"]);
+        assert.deepEqual(registry.getEnum("EsdtTokenType").getNamesOfDependencies(), []);
+        assert.deepEqual(registry.getStruct("TypeA").getNamesOfDependencies(), ["TypeB", "TypeC", "u64"]);
+        assert.deepEqual(registry.getStruct("TypeB").getNamesOfDependencies(), ["TypeC", "u64"]);
+        assert.deepEqual(registry.getStruct("TypeC").getNamesOfDependencies(), ["u64"]);
+    });
+
+    it("should load ABI when custom types are out of order (C, D)", async () => {
+        const c = await loadAbiRegistry("src/testdata/custom-types-out-of-order-C.abi.json");
+        assert.lengthOf(c.customTypes, 5);
+
+        const d = await loadAbiRegistry("src/testdata/custom-types-out-of-order-D.abi.json");
+        assert.lengthOf(d.customTypes, 12);
     });
 });

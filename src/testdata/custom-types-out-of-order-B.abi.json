@@ -1,0 +1,66 @@
+{
+    "name": "Sample",
+    "types": {
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_type",
+                    "type": "EsdtTokenType"
+                },
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "TypeC": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "foobar",
+                    "type": "u64"
+                }
+            ]
+        },
+        "EsdtTokenType": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "Fungible",
+                    "discriminant": 0
+                },
+                {
+                    "name": "NonFungible",
+                    "discriminant": 1
+                }
+            ]
+        },
+        "TypeB": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "c",
+                    "type": "TypeC"
+                }
+            ]
+        },
+        "TypeA": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "b",
+                    "type": "TypeB"
+                }
+            ]
+        }
+    }
+}

@@ -1,10 +1,9 @@
 import { assert } from "chai";
-import BigNumber from "bignumber.js";
-import { Transaction } from "./transaction";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
-import { TransactionPayload } from "./transactionPayload";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { TokenPayment } from "./tokenPayment";
+import { Transaction } from "./transaction";
+import { TransactionPayload } from "./transactionPayload";
 
 
 describe("test transaction construction", async () => {
@@ -187,7 +186,7 @@ describe("test transaction construction", async () => {
         const sender = wallets.alice.address;
         const transaction = new Transaction({
             nonce: 90,
-            value: new BigNumber("1000000000000000000"),
+            value: "123456789000000000000000000000",
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,

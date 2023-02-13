@@ -1,0 +1,254 @@
+{
+    "name": "Issue_237_Part_1",
+    "constructor": {
+        "inputs": [],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "getById",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "id",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "LoanInfo"
+                }
+            ]
+        },
+        {
+            "name": "getList",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "page",
+                    "type": "u64"
+                },
+                {
+                    "name": "size",
+                    "type": "u16"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<LoanShortInfo>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "create",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "data",
+                    "type": "LoanCreateOptions"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "LoanInfo"
+                }
+            ]
+        },
+        {
+            "name": "createByArgs",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "loaner_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token",
+                    "type": "EgldOrEsdtTokenIdentifier"
+                },
+                {
+                    "name": "status",
+                    "type": "Status"
+                },
+                {
+                    "name": "note",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "LoanInfo"
+                }
+            ]
+        },
+        {
+            "name": "updateStatus",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "id",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "status",
+                    "type": "Status"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Status"
+                }
+            ]
+        },
+        {
+            "name": "setArrayOfStruct",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "list",
+                    "type": "variadic<Item>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setArrayOfAddresses",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "list",
+                    "type": "variadic<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setArrayOfBigInt",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "list",
+                    "type": "variadic<BigInt>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        }
+    ],
+    "events": [],
+    "hasCallback": false,
+    "types": {
+        "Item": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ]
+        },
+        "LoanCreateOptions": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "loaner_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token",
+                    "type": "EgldOrEsdtTokenIdentifier"
+                },
+                {
+                    "name": "status",
+                    "type": "Status"
+                },
+                {
+                    "name": "note",
+                    "type": "bytes"
+                }
+            ]
+        },
+        "LoanInfo": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "loaner_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token",
+                    "type": "EgldOrEsdtTokenIdentifier"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "status",
+                    "type": "Status"
+                },
+                {
+                    "name": "note",
+                    "type": "bytes"
+                }
+            ]
+        },
+        "LoanShortInfo": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "loaner_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token",
+                    "type": "EgldOrEsdtTokenIdentifier"
+                }
+            ]
+        },
+        "Status": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "Redeemed",
+                    "discriminant": 0
+                },
+                {
+                    "name": "NotRedeemed",
+                    "discriminant": 1
+                }
+            ]
+        }
+    }
+}

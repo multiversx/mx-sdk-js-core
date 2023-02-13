@@ -1,0 +1,923 @@
+{
+    "name": "Issue_237_Part_2",
+    "constructor": {
+        "inputs": [],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "donate_permanent",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "donate_temporary",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "get_user_overview",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "wallet_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "UserOverview"
+                }
+            ]
+        },
+        {
+            "name": "get_donations_overview",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "DonationsOverview"
+                }
+            ]
+        },
+        {
+            "name": "set_staking_provider",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "staking_provider",
+                    "type": "Address"
+                },
+                {
+                    "name": "unbonding_duration",
+                    "type": "u8"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unbond",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "amount_to_unbond",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "initiate_withdraw",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "finalize_withdrawal",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "claimRewards",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "reinvestRewards",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "unbondRewards",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "moveUnbondedRewardsToSc",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "moveUnbondedRewardsBackToRewardsPile",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "withdrawRewards",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "get_staking_provider_address",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "get_staking_unbonding_duration",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u8"
+                }
+            ]
+        },
+        {
+            "name": "get_donators",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<Address>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "get_total_donated",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_open_donations",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_pending_donations",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_staked_donations",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_unbonding_donations",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_permanent_user_donations",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "wallet_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_permanent_user_donations_history",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "wallet_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<DonationHistory>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "get_lended_user_donations",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "wallet_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_lended_user_donations_history",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "wallet_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<DonationHistory>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "get_unbonding_user_donations",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "wallet_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<UnbondingData>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "get_waiting_unbonding_requesters",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<Address>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "get_waiting_unbonding_requests",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "requester",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_initiate_unbonding_pending",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "wallet_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_initiate_withdrawal_pending",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "get_epoch_last_withdrawal_initiated",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_claimed_rewards_in_sc",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_claimed_rewards_period",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_claimed_rewards_alltime",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_withdrawn_rewards_history",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<RewardsHistory>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "get_total_donation_points_for",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "donator",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_unclaimed_donation_points_for",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "donator",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_perm_donation_tier_list",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<DonationTier>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "get_lended_donation_tier_list",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<DonationTier>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "get_epoch_donation_points_last_updated",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "donator",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_donation_points",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "donator",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "createAuction",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "auction_start",
+                    "type": "u64"
+                },
+                {
+                    "name": "auction_end",
+                    "type": "u64"
+                },
+                {
+                    "name": "minimum_bid",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "cancelAuction",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "auction_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "auctionBid",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "auction_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "auctionClaim",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "auction_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "get_all_active_auctions",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "List<AuctionItem>"
+                }
+            ]
+        },
+        {
+            "name": "get_highest_auction_id",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_auctions",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "auction_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Auction"
+                }
+            ]
+        },
+        {
+            "name": "get_all_auctions",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<u64>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "get_active_auctions",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<u64>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "get_my_active_auctions",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "creator",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<u64>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "get_highest_bid_auction",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "auction_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_highest_bidder_auction",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "auction_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "get_fee_per_thousand_auction",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "identifier": "skipped_because_already_withdrawn",
+            "inputs": [
+                {
+                    "name": "from",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64",
+                    "indexed": true
+                }
+            ]
+        }
+    ],
+    "hasCallback": true,
+    "types": {
+        "Auction": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "auction_id",
+                    "type": "u64"
+                },
+                {
+                    "name": "creator",
+                    "type": "Address"
+                },
+                {
+                    "name": "token_identifier",
+                    "type": "EgldOrEsdtTokenIdentifier"
+                },
+                {
+                    "name": "nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "auction_start",
+                    "type": "u64"
+                },
+                {
+                    "name": "auction_end",
+                    "type": "u64"
+                },
+                {
+                    "name": "minimum_bid",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "AuctionItem": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "auction_id",
+                    "type": "u64"
+                },
+                {
+                    "name": "creator",
+                    "type": "Address"
+                },
+                {
+                    "name": "auction_start",
+                    "type": "u64"
+                },
+                {
+                    "name": "auction_end",
+                    "type": "u64"
+                },
+                {
+                    "name": "minimum_bid",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "highest_bid",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "highest_bidder",
+                    "type": "Option<Address>"
+                },
+                {
+                    "name": "nft_data",
+                    "type": "NftData"
+                }
+            ]
+        },
+        "DonationData": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "donation",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                }
+            ]
+        },
+        "DonationHistory": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "donation_data",
+                    "type": "DonationData"
+                },
+                {
+                    "name": "donation_type",
+                    "type": "DonationType"
+                }
+            ]
+        },
+        "DonationTier": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "minimum_required",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "donatiom_point_multiplier",
+                    "type": "u8"
+                }
+            ]
+        },
+        "DonationType": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "Deposit",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Withdraw",
+                    "discriminant": 1
+                },
+                {
+                    "name": "ReinvestRewards",
+                    "discriminant": 2
+                },
+                {
+                    "name": "WithdrawRewards",
+                    "discriminant": 3
+                },
+                {
+                    "name": "AuctionFee",
+                    "discriminant": 4
+                }
+            ]
+        },
+        "DonationsOverview": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "donators",
+                    "type": "u32"
+                },
+                {
+                    "name": "total_donated",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "open_donations",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "staked_donations",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "rewards_alltime",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "rewards_period",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "rewards_pending",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "rewards_withdraw_history",
+                    "type": "List<RewardsHistory>"
+                }
+            ]
+        },
+        "NftData": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "collection",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "royalties",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "uris",
+                    "type": "List<bytes>"
+                }
+            ]
+        },
+        "RewardsHistory": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "withdrawn_timestamp",
+                    "type": "u64"
+                }
+            ]
+        },
+        "UnbondingData": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                }
+            ]
+        },
+        "UserDonation": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "donator",
+                    "type": "Address"
+                },
+                {
+                    "name": "donations_permanent",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "donations_lended",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "withdrawal_requests",
+                    "type": "List<UnbondingData>"
+                }
+            ]
+        },
+        "UserOverview": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "my_donations",
+                    "type": "UserDonation"
+                },
+                {
+                    "name": "my_donation_points",
+                    "type": "u64"
+                }
+            ]
+        }
+    }
+}

@@ -1,10 +1,13 @@
 import { assert } from "chai";
 import { AsyncTimer } from "../asyncTimer";
+import { GasEstimator } from "../gasEstimator";
 import { INetworkConfig, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { createTestnetProvider, INetworkProvider } from "../testutils/networkProviders";
+import { TokenPayment } from "../tokenPayment";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
+import { TransfersFactory } from "../transfersFactory";
 import { TokenOperationsFactory } from "./tokenOperationsFactory";
 import { TokenOperationsFactoryConfig } from "./tokenOperationsFactoryConfig";
 import { TokenOperationsOutcomeParser } from "./tokenOperationsOutcomeParser";
@@ -16,6 +19,7 @@ describe("test factory on testnet", function () {
     let network: INetworkConfig;
     let factory: TokenOperationsFactory;
     let parser: TokenOperationsOutcomeParser;
+    let transfersFactory: TransfersFactory;
 
     before(async function () {
         console.log(`> ${this.currentTest?.title} ...`);
@@ -27,6 +31,7 @@ describe("test factory on testnet", function () {
         network = await provider.getNetworkConfig();
         factory = new TokenOperationsFactory(new TokenOperationsFactoryConfig(network.ChainID));
         parser = new TokenOperationsOutcomeParser();
+        transfersFactory = new TransfersFactory(new GasEstimator());
     });
 
     it("should issue fungible, mint, burn", async function () {
@@ -99,8 +104,8 @@ describe("test factory on testnet", function () {
         assert.equal(tx4Outcome.burntSupply, "50");
     });
 
-    it("should issue fungible, pause, unpause, freeze, unfreeze", async function () {
-        this.timeout(120000);
+    it("should issue fungible, pause, unpause", async function () {
+        this.timeout(240000);
         await frank.sync(provider);
 
         // Issue
@@ -148,8 +153,58 @@ describe("test factory on testnet", function () {
         const tx3OnNetwork = await processTransaction(frank, tx3, "tx3");
         const _tx3Outcome = parser.parseUnpause(tx3OnNetwork);
 
+        // Send some tokens to Grace
+        const tx4 = transfersFactory.createESDTTransfer({
+            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+            sender: frank.account.address,
+            receiver: grace.account.address,
+            chainID: network.ChainID,
+            nonce: frank.account.nonce
+        });
+
+        const _tx4OnNetwork = await processTransaction(frank, tx4, "tx4");
+    });
+
+    it("should issue fungible, freeze, unfreeze", async function () {
+        this.timeout(240000);
+        await frank.sync(provider);
+
+        // Issue
+        const tx1 = factory.issueFungible({
+            issuer: frank.address,
+            tokenName: "FRANK",
+            tokenTicker: "FRANK",
+            initialSupply: 100,
+            numDecimals: 0,
+            canFreeze: true,
+            canWipe: true,
+            canPause: true,
+            canMint: true,
+            canBurn: true,
+            canChangeOwner: true,
+            canUpgrade: true,
+            canAddSpecialRoles: true,
+            nonce: frank.account.nonce
+        });
+
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
+        const tx1Outcome = parser.parseIssueFungible(tx1OnNetwork);
+        const tokenIdentifier = tx1Outcome.tokenIdentifier;
+        assert.isTrue(tokenIdentifier.includes("FRANK"));
+
+        // Send some tokens to Grace
+        const tx2 = transfersFactory.createESDTTransfer({
+            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+            sender: frank.account.address,
+            receiver: grace.account.address,
+            chainID: network.ChainID,
+            nonce: frank.account.nonce
+        });
+
+        const _tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
+
         // Freeze
-        const tx4 = factory.freeze({
+        const tx3 = factory.freeze({
             freeze: true,
             manager: frank.address,
             user: grace.address,
@@ -157,8 +212,28 @@ describe("test factory on testnet", function () {
             nonce: frank.account.nonce
         });
 
+        const tx3OnNetwork = await processTransaction(frank, tx3, "tx3");
+        const tx3Outcome = parser.parseFreeze(tx3OnNetwork);
+        assert.equal(tx3Outcome.userAddress, grace.address.bech32());
+        assert.equal(tx3Outcome.tokenIdentifier, tokenIdentifier);
+        assert.equal(tx3Outcome.nonce, 0);
+        assert.equal(tx3Outcome.balance, "10");
+
+        // Unfreeze
+        const tx4 = factory.freeze({
+            unfreeze: true,
+            manager: frank.address,
+            user: grace.address,
+            tokenIdentifier: tokenIdentifier,
+            nonce: frank.account.nonce
+        });
+
         const tx4OnNetwork = await processTransaction(frank, tx4, "tx4");
-        // const _tx4Outcome = parser.parseFreeze(tx4OnNetwork);
+        const tx4Outcome = parser.parseUnfreeze(tx4OnNetwork);
+        assert.equal(tx4Outcome.userAddress, grace.address.bech32());
+        assert.equal(tx4Outcome.tokenIdentifier, tokenIdentifier);
+        assert.equal(tx4Outcome.nonce, 0);
+        assert.equal(tx4Outcome.balance, "10");
     });
 
     it("should issue and create NFT", async function () {

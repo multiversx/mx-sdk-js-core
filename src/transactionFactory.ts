@@ -128,6 +128,3 @@ export class TransactionFactory {
         });
     }
 }
-
-export class TransfersFactory extends TransactionFactory {
-}

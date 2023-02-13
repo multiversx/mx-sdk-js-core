@@ -1,3 +1,4 @@
+import { Address } from "../address";
 import { ErrCannotParseTransactionOutcome } from "../errors";
 import { IAddress } from "../interface";
 import { bufferToBigInt } from "./codec";
@@ -65,15 +66,12 @@ export interface IBurnOutcome {
 export interface IPausingOutcome {
 }
 
-// export interface IFreezingOutcome {
-//     userAddress: IAddress;
-//     tokenIdentifier: string;
-//     nonce: INonce;
-//     balance: string;
-// }
-
-// export interface IEmptyOutcome {
-// }
+export interface IFreezingOutcome {
+    userAddress: string;
+    tokenIdentifier: string;
+    nonce: number;
+    balance: string;
+}
 
 export class TokenOperationsOutcomeParser {
     parseIssueFungible(transaction: ITransactionOnNetwork): IESDTIssueOutcome {
@@ -154,29 +152,27 @@ export class TokenOperationsOutcomeParser {
         return {};
     }
 
+    parseFreeze(transaction: ITransactionOnNetwork): IFreezingOutcome {
+        this.ensureNoError(transaction);
 
-    // export class ESDTFreezingParser extends BaseParser<IFreezingOutcome> {
-    //     protected parseSuccessfulOutcome(events: ITransactionEvent[]): IFreezingOutcome | null {
-    //         for (const event of events) {
-    //             if (event.identifier == "ESDTFreeze" || event.identifier == "ESDTUnFreeze") {
-    //                 let balance = bufferToBigInt(event.topics[2].valueOf());
-    //                 if (balance.isNaN()) {
-    //                     balance = new BigNumber(0);
-    //                 }
+        const event = this.findSingleEventByIdentifier(transaction, "ESDTFreeze");
+        const tokenIdentifier = event.topics[0]?.valueOf().toString();
+        const nonce = bufferToBigInt(event.topics[1]?.valueOf()).toNumber() || 0;
+        const balance = bufferToBigInt(event.topics[2]?.valueOf()).toString();
+        const userAddress = Address.fromBuffer(event.topics[3]?.valueOf()).toString();
+        return { userAddress, tokenIdentifier, nonce, balance };
+    }
 
-    //                 return {
-    //                     userAddress: new Address(event.topics[3].valueOf()),
-    //                     tokenIdentifier: event.topics[0].valueOf().toString(),
-    //                     nonce: bufferToBigInt(event.topics[1].valueOf()).toNumber() || 0,
-    //                     balance: balance.toString()
-    //                 };
-    //             }
-    //         }
+    parseUnfreeze(transaction: ITransactionOnNetwork): IFreezingOutcome {
+        this.ensureNoError(transaction);
 
-    //         return null;
-    //     }
-    // }
-
+        const event = this.findSingleEventByIdentifier(transaction, "ESDTUnFreeze");
+        const tokenIdentifier = event.topics[0]?.valueOf().toString();
+        const nonce = bufferToBigInt(event.topics[1]?.valueOf()).toNumber() || 0;
+        const balance = bufferToBigInt(event.topics[2]?.valueOf()).toString();
+        const userAddress = Address.fromBuffer(event.topics[3]?.valueOf()).toString();
+        return { userAddress, tokenIdentifier, nonce, balance };
+    }
 
     private ensureNoError(transaction: ITransactionOnNetwork) {
         for (const event of transaction.logs.events) {

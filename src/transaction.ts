@@ -242,7 +242,7 @@ export class Transaction {
   static fromPlainObject(plainObjectTransaction: IPlainTransactionObject): Transaction {
     const tx = new Transaction({
       nonce: Number(plainObjectTransaction.nonce),
-      value: new BigNumber(plainObjectTransaction.value),
+      value: new BigNumber(plainObjectTransaction.value).toFixed(0),
       receiver: Address.fromString(plainObjectTransaction.receiver),
       sender: Address.fromString(plainObjectTransaction.sender),
       gasPrice: Number(plainObjectTransaction.gasPrice),

@@ -108,7 +108,7 @@ export class Transaction {
     options?: TransactionOptions;
   }) {
     this.nonce = nonce || 0;
-    this.value = value || 0;
+    this.value = value ? new BigNumber(value.toString()).toFixed(0) : 0;
     this.sender = sender;
     this.receiver = receiver;
     this.gasPrice = gasPrice || TRANSACTION_MIN_GAS_PRICE;
@@ -242,7 +242,7 @@ export class Transaction {
   static fromPlainObject(plainObjectTransaction: IPlainTransactionObject): Transaction {
     const tx = new Transaction({
       nonce: Number(plainObjectTransaction.nonce),
-      value: new BigNumber(plainObjectTransaction.value),
+      value: new BigNumber(plainObjectTransaction.value).toFixed(0),
       receiver: Address.fromString(plainObjectTransaction.receiver),
       sender: Address.fromString(plainObjectTransaction.sender),
       gasPrice: Number(plainObjectTransaction.gasPrice),

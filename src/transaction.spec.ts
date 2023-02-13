@@ -1,10 +1,10 @@
-import { assert } from "chai";
 import BigNumber from "bignumber.js";
-import { Transaction } from "./transaction";
+import { assert } from "chai";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
-import { TransactionPayload } from "./transactionPayload";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { TokenPayment } from "./tokenPayment";
+import { Transaction } from "./transaction";
+import { TransactionPayload } from "./transactionPayload";
 
 
 describe("test transaction construction", async () => {
@@ -187,8 +187,8 @@ describe("test transaction construction", async () => {
         const sender = wallets.alice.address;
         const transaction = new Transaction({
             nonce: 90,
-            value: new BigNumber("1000000000000000000"),
-            sender: wallets.alice.address,
+            value: "123456789000000000000000000000",
+            sender: sender,
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
             gasLimit: 80000,
@@ -199,5 +199,37 @@ describe("test transaction construction", async () => {
         const plainObject = transaction.toPlainObject(sender);
         const restoredTransaction = Transaction.fromPlainObject(plainObject);
         assert.deepEqual(restoredTransaction, transaction);
+    });
+
+    it("should handle large values", () => {
+        const tx1 = new Transaction({
+            value: "123456789000000000000000000000",
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasLimit: 50000,
+            chainID: "local-testnet"
+        });
+        assert.equal(tx1.getValue().toString(), "123456789000000000000000000000");
+
+        const tx2 = new Transaction({
+            value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasLimit: 50000,
+            chainID: "local-testnet"
+        });
+        assert.equal(tx2.getValue().toString(), "123456789000000000000000000000");
+
+        const tx3 = new Transaction({
+            // Passing a BigNumber is not recommended. 
+            // However, ITransactionValue interface is permissive, and developers may mistakenly pass such objects as values.
+            // TokenPayment objects or simple strings (see above) are preferred, instead.
+            value: new BigNumber("123456789000000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasLimit: 50000,
+            chainID: "local-testnet"
+        });
+        assert.equal(tx3.getValue().toString(), "123456789000000000000000000000");
     });
 });

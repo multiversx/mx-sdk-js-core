@@ -96,6 +96,10 @@ export class AbiRegistry {
             this.mapCustomTypeDepthFirst(type, this.customTypes, mapper, newCustomTypes);
         }
 
+        if (this.customTypes.length != newCustomTypes.length) {
+            throw new errors.ErrTypingSystem("Did not re-map all custom types");
+        }
+
         // Then, remap types of all endpoint parameters.
         // The mapper learned all necessary types in the previous step.
         for (const iface of this.interfaces) {

@@ -98,8 +98,8 @@ describe("test abi registry", () => {
         assert.equal(dummyType.getFieldDefinition("raw")!.type.getClassName(), ArrayVecType.ClassName);
     });
 
-    it("should load ABI when custom types are out of order (A)", async () => {
-        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-A.abi.json");
+    it("should load ABI when custom types are out of order (a)", async () => {
+        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-a.abi.json");
 
         assert.deepEqual(registry.getStruct("EsdtTokenPayment").getNamesOfDependencies(), ["EsdtTokenType", "TokenIdentifier", "u64", "BigUint"]);
         assert.deepEqual(registry.getEnum("EsdtTokenType").getNamesOfDependencies(), []);
@@ -108,8 +108,8 @@ describe("test abi registry", () => {
         assert.deepEqual(registry.getStruct("TypeC").getNamesOfDependencies(), ["u64"]);
     });
 
-    it("should load ABI when custom types are out of order (B)", async () => {
-        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-B.abi.json");
+    it("should load ABI when custom types are out of order (b)", async () => {
+        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-b.abi.json");
 
         assert.deepEqual(registry.getStruct("EsdtTokenPayment").getNamesOfDependencies(), ["EsdtTokenType", "TokenIdentifier", "u64", "BigUint"]);
         assert.deepEqual(registry.getEnum("EsdtTokenType").getNamesOfDependencies(), []);
@@ -118,11 +118,18 @@ describe("test abi registry", () => {
         assert.deepEqual(registry.getStruct("TypeC").getNamesOfDependencies(), ["u64"]);
     });
 
-    it("should load ABI when custom types are out of order (C, D)", async () => {
-        const c = await loadAbiRegistry("src/testdata/custom-types-out-of-order-C.abi.json");
-        assert.lengthOf(c.customTypes, 5);
+    it("should load ABI when custom types are out of order (community example: c)", async () => {
+        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-c.abi.json");
 
-        const d = await loadAbiRegistry("src/testdata/custom-types-out-of-order-D.abi.json");
-        assert.lengthOf(d.customTypes, 12);
+        assert.lengthOf(registry.customTypes, 5);
+        assert.deepEqual(registry.getStruct("LoanCreateOptions").getNamesOfDependencies(), ["BigUint", "Address", "TokenIdentifier", "Status", "bytes"]);
+
+    });
+
+    it("should load ABI when custom types are out of order (community example: d)", async () => {
+        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-d.abi.json");
+
+        assert.lengthOf(registry.customTypes, 12);
+        assert.deepEqual(registry.getStruct("AuctionItem").getNamesOfDependencies(), ["u64", "Address", "BigUint", "Option", "NftData", "bytes", "TokenIdentifier", "List"]);
     });
 });

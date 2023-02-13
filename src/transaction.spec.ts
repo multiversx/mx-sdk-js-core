@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { loadTestWallets, TestWallet } from "./testutils";
@@ -187,7 +188,7 @@ describe("test transaction construction", async () => {
         const transaction = new Transaction({
             nonce: 90,
             value: "123456789000000000000000000000",
-            sender: wallets.alice.address,
+            sender: sender,
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
             gasLimit: 80000,
@@ -199,4 +200,37 @@ describe("test transaction construction", async () => {
         const restoredTransaction = Transaction.fromPlainObject(plainObject);
         assert.deepEqual(restoredTransaction, transaction);
     });
+
+    it("should handle large values", () => {
+        const tx1 = new Transaction({
+            value: "123456789000000000000000000000",
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasLimit: 50000,
+            chainID: "local-testnet"
+        });
+        assert.equal(tx1.getValue().toString(), "123456789000000000000000000000");
+
+        const tx2 = new Transaction({
+            value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasLimit: 50000,
+            chainID: "local-testnet"
+        });
+        assert.equal(tx2.getValue().toString(), "123456789000000000000000000000");
+
+        const tx3 = new Transaction({
+            // Passing a BigNumber is not recommended. 
+            // However, ITransactionValue interface is permissive, and developers may mistakenly pass such objects as values.
+            // TokenPayment objects or simple strings (see above) are preferred, instead.
+            value: new BigNumber("123456789000000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasLimit: 50000,
+            chainID: "local-testnet"
+        });
+        assert.equal(tx3.getValue().toString(), "123456789000000000000000000000");
+    });
+
 });

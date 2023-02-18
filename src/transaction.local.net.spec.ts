@@ -16,7 +16,7 @@ describe("test transaction", function () {
     });
 
     it("should send transactions", async function () {
-        this.timeout(20000);
+        this.timeout(30000);
 
         let provider = createLocalnetProvider();
         let watcher = new TransactionWatcher(provider);

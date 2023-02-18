@@ -1,13 +1,13 @@
-import { Transaction } from "../transaction";
-import { Query } from "./query";
-import { ContractFunction } from "./function";
-import { Address } from "../address";
-import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
-import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
 import { Account } from "../account";
-import { CallArguments } from "./interface";
+import { Address, warnIfAddressIsNotSetOrZero } from "../address";
+import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenPayment, ITransactionValue } from "../interface";
+import { Transaction } from "../transaction";
+import { ContractFunction } from "./function";
 import { InteractionChecker } from "./interactionChecker";
+import { CallArguments } from "./interface";
+import { Query } from "./query";
+import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
 
 /**
  * Internal interface: the smart contract, as seen from the perspective of an {@link Interaction}.
@@ -34,6 +34,7 @@ export class Interaction {
     private gasLimit: IGasLimit = 0;
     private gasPrice: IGasPrice | undefined = undefined;
     private chainID: IChainID = "";
+    private caller: IAddress = new Address();
     private querent: IAddress = new Address();
     private explicitReceiver?: IAddress;
 
@@ -53,7 +54,7 @@ export class Interaction {
         this.args = args;
         this.tokenTransfers = new TokenTransfersWithinInteraction([], this);
     }
-    
+
     getContractAddress(): IAddress {
         return this.contract.getAddress();
     }
@@ -87,6 +88,8 @@ export class Interaction {
     }
 
     buildTransaction(): Transaction {
+        warnIfAddressIsNotSetOrZero(this.caller, "'interaction.caller' isn't set. Use 'interaction.withCaller()' to set it!");
+
         let receiver = this.explicitReceiver || this.contract.getAddress();
         let func: ContractFunction = this.function;
         let args = this.args;
@@ -107,6 +110,7 @@ export class Interaction {
         }
 
         let transaction = this.contract.call({
+            caller: this.caller,
             func: func,
             // GasLimit will be set using "withGasLimit()".
             gasLimit: this.gasLimit,
@@ -144,6 +148,7 @@ export class Interaction {
         return this;
     }
 
+    // TODO: in v12, remove "sender" (replaced by "caller")
     withSingleESDTNFTTransfer(transfer: ITokenPayment, sender: IAddress) {
         this.isWithSingleESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction([transfer], this);
@@ -151,10 +156,16 @@ export class Interaction {
         return this;
     }
 
+    // TODO: in v12, remove "sender" (replaced by "caller")
     withMultiESDTNFTTransfer(transfers: ITokenPayment[], sender: IAddress) {
         this.isWithMultiESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction(transfers, this);
         this.tokenTransfersSender = sender;
+        return this;
+    }
+
+    withCaller(caller: IAddress): Interaction {
+        this.caller = caller;
         return this;
     }
 
@@ -173,7 +184,7 @@ export class Interaction {
         return this;
     }
 
-    useThenIncrementNonceOf(account: Account) : Interaction {
+    useThenIncrementNonceOf(account: Account): Interaction {
         return this.withNonce(account.getNonceThenIncrement());
     }
 

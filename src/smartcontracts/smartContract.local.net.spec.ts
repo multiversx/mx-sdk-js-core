@@ -1,15 +1,15 @@
-import { SmartContract } from "./smartContract";
-import { TransactionWatcher } from "../transactionWatcher";
-import { ContractFunction } from "./function";
-import { loadTestWallets, TestWallet } from "../testutils/wallets";
-import { prepareDeployment } from "../testutils";
-import { Logger } from "../logger";
 import { assert } from "chai";
-import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
-import { decodeUnsignedNumber } from "./codec";
-import { BytesValue } from "./typesystem/bytes";
-import { ResultsParser } from "./resultsParser";
+import { Logger } from "../logger";
+import { prepareDeployment } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
+import { loadTestWallets, TestWallet } from "../testutils/wallets";
+import { TransactionWatcher } from "../transactionWatcher";
+import { decodeUnsignedNumber } from "./codec";
+import { ContractFunction } from "./function";
+import { ResultsParser } from "./resultsParser";
+import { SmartContract } from "./smartContract";
+import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
+import { BytesValue } from "./typesystem/bytes";
 
 describe("test on local testnet", function () {
     let provider = createLocalnetProvider();
@@ -32,7 +32,7 @@ describe("test on local testnet", function () {
 
         // Deploy
         let contract = new SmartContract({});
-        
+
         let transactionDeploy = await prepareDeployment({
             contract: contract,
             deployer: alice,
@@ -44,6 +44,7 @@ describe("test on local testnet", function () {
 
         // ++
         let transactionIncrement = contract.call({
+            caller: alice.account.address,
             func: new ContractFunction("increment"),
             gasLimit: 3000000,
             chainID: network.ChainID
@@ -56,12 +57,14 @@ describe("test on local testnet", function () {
 
         // Now, let's build a few transactions, to be simulated
         let simulateOne = contract.call({
+            caller: alice.account.address,
             func: new ContractFunction("increment"),
             gasLimit: 100000,
             chainID: network.ChainID
         });
 
         let simulateTwo = contract.call({
+            caller: alice.account.address,
             func: new ContractFunction("foobar"),
             gasLimit: 500000,
             chainID: network.ChainID
@@ -115,6 +118,7 @@ describe("test on local testnet", function () {
 
         // ++
         let transactionIncrementFirst = contract.call({
+            caller: alice.account.address,
             func: new ContractFunction("increment"),
             gasLimit: 2000000,
             chainID: network.ChainID
@@ -127,6 +131,7 @@ describe("test on local testnet", function () {
 
         // ++
         let transactionIncrementSecond = contract.call({
+            caller: alice.account.address,
             func: new ContractFunction("increment"),
             gasLimit: 2000000,
             chainID: network.ChainID
@@ -175,6 +180,7 @@ describe("test on local testnet", function () {
 
         // Minting
         let transactionMintBob = contract.call({
+            caller: alice.account.address,
             func: new ContractFunction("transferToken"),
             gasLimit: 9000000,
             args: [new AddressValue(bob.address), new U32Value(1000)],
@@ -182,6 +188,7 @@ describe("test on local testnet", function () {
         });
 
         let transactionMintCarol = contract.call({
+            caller: alice.account.address,
             func: new ContractFunction("transferToken"),
             gasLimit: 9000000,
             args: [new AddressValue(carol.address), new U32Value(1500)],
@@ -247,7 +254,7 @@ describe("test on local testnet", function () {
 
         // Deploy
         let contract = new SmartContract({});
-        
+
         let transactionDeploy = await prepareDeployment({
             contract: contract,
             deployer: alice,
@@ -259,6 +266,7 @@ describe("test on local testnet", function () {
 
         // Start
         let transactionStart = contract.call({
+            caller: alice.account.address,
             func: new ContractFunction("start"),
             gasLimit: 10000000,
             args: [

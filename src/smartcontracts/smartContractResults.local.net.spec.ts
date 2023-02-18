@@ -1,10 +1,10 @@
-import { loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
-import { TransactionWatcher } from "../transactionWatcher";
 import { assert } from "chai";
-import { SmartContract } from "./smartContract";
+import { loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
+import { createLocalnetProvider } from "../testutils/networkProviders";
+import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction } from "./function";
 import { ResultsParser } from "./resultsParser";
-import { createLocalnetProvider } from "../testutils/networkProviders";
+import { SmartContract } from "./smartContract";
 
 describe("fetch transactions from local testnet", function () {
     let provider = createLocalnetProvider();
@@ -39,6 +39,7 @@ describe("fetch transactions from local testnet", function () {
 
         // ++
         let transactionIncrement = contract.call({
+            caller: alice.address,
             func: new ContractFunction("increment"),
             gasLimit: 3000000,
             chainID: network.ChainID

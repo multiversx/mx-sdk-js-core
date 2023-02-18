@@ -1,21 +1,29 @@
 import { assert } from "chai";
 import { Address } from "./address";
 import { GasEstimator } from "./gasEstimator";
+import { loadTestWallets, TestWallet } from "./testutils";
 import { TokenPayment } from "./tokenPayment";
 import { TransactionFactory } from "./transactionFactory";
 import { TransactionPayload } from "./transactionPayload";
 
 describe("test transaction factory", () => {
     const factory = new TransactionFactory(new GasEstimator());
+    let wallets: Record<string, TestWallet>;
+
+    before(async function () {
+        wallets = await loadTestWallets();
+    });
 
     it("should create EGLD transfers", () => {
         const transactionWithData = factory.createEGLDTransfer({
+            sender: wallets.alice.address,
             value: TokenPayment.egldFromAmount(10.5),
             receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             data: new TransactionPayload("hello"),
             chainID: "D"
         });
 
+        assert.equal(transactionWithData.getSender().bech32(), wallets.alice.address.bech32());
         assert.equal(transactionWithData.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transactionWithData.getValue(), "10500000000000000000");
         assert.equal(transactionWithData.getGasLimit(), 50000 + 5 * 1500);
@@ -23,11 +31,13 @@ describe("test transaction factory", () => {
         assert.equal(transactionWithData.getChainID(), "D");
 
         const transactionWithoutData = factory.createEGLDTransfer({
+            sender: wallets.alice.address,
             value: TokenPayment.egldFromAmount(10.5),
             receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             chainID: "D"
         });
 
+        assert.equal(transactionWithoutData.getSender().bech32(), wallets.alice.address.bech32());
         assert.equal(transactionWithoutData.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transactionWithoutData.getValue(), "10500000000000000000");
         assert.equal(transactionWithoutData.getGasLimit(), 50000);
@@ -37,11 +47,13 @@ describe("test transaction factory", () => {
 
     it("should create ESDT transfers", () => {
         const transaction = factory.createESDTTransfer({
+            sender: wallets.alice.address,
             payment: TokenPayment.fungibleFromAmount("COUNTER-8b028f", "100.00", 0),
             receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             chainID: "D"
         });
 
+        assert.equal(transaction.getSender().bech32(), wallets.alice.address.bech32());
         assert.equal(transaction.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transaction.getValue(), "");
         assert.equal(transaction.getGasLimit(), 50000 + 44 * 1500 + 200000 + 100000);

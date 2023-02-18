@@ -1,7 +1,7 @@
+import { Address, warnIfAddressIsNotSetOrZero } from "./address";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenPayment, ITransactionPayload, ITransactionValue } from "./interface";
 import { ESDTNFTTransferPayloadBuilder, ESDTTransferPayloadBuilder, MultiESDTNFTTransferPayloadBuilder } from "./tokenTransferBuilders";
 import { Transaction } from "./transaction";
-import {Address} from "./address";
 
 interface IGasEstimator {
     forEGLDTransfer(dataLength: number): number;
@@ -27,6 +27,8 @@ export class TransactionFactory {
         data?: ITransactionPayload;
         chainID: IChainID;
     }) {
+        warnIfAddressIsNotSetOrZero(args.sender, "For 'createEGLDTransfer()', the 'sender' should be specified!");
+
         const dataLength = args.data?.length() || 0;
         const estimatedGasLimit = this.gasEstimator.forEGLDTransfer(dataLength);
 
@@ -34,7 +36,8 @@ export class TransactionFactory {
             nonce: args.nonce,
             value: args.value,
             receiver: args.receiver,
-            sender: args.sender || Address.Zero(),
+            // TODO: in v12, remove the "|| new Address()" part ()
+            sender: args.sender || new Address(),
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: args.data,
@@ -51,6 +54,8 @@ export class TransactionFactory {
         gasLimit?: IGasLimit;
         chainID: IChainID;
     }) {
+        warnIfAddressIsNotSetOrZero(args.sender, "For 'createESDTTransfer()', the 'sender' should be specified!");
+
         const transactionPayload = new ESDTTransferPayloadBuilder()
             .setPayment(args.payment)
             .build();
@@ -61,7 +66,8 @@ export class TransactionFactory {
         return new Transaction({
             nonce: args.nonce,
             receiver: args.receiver,
-            sender: args.sender || Address.Zero(),
+            // TODO: in v12, remove the "|| new Address()" part ()
+            sender: args.sender || new Address(),
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: transactionPayload,

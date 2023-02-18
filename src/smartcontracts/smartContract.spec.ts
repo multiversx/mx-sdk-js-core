@@ -35,6 +35,7 @@ describe("test contract", () => {
 
         let contract = new SmartContract({});
         let deployTransaction = contract.deploy({
+            owner: alice.address,
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
             gasLimit: 1000000,
             chainID: chainID
@@ -80,6 +81,7 @@ describe("test contract", () => {
         });
 
         let callTransactionOne = contract.call({
+            caller: alice.address,
             func: new ContractFunction("helloEarth"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
             gasLimit: 150000,
@@ -87,6 +89,7 @@ describe("test contract", () => {
         });
 
         let callTransactionTwo = contract.call({
+            caller: alice.address,
             func: new ContractFunction("helloMars"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
             gasLimit: 1500000,

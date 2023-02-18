@@ -1,20 +1,20 @@
-import { Address } from "../address";
+import BigNumber from "bignumber.js";
+import { Address, warnIfAddressIsNotSetOrZero } from "../address";
+import { ErrContractHasNoAddress } from "../errors";
+import { IAddress, INonce } from "../interface";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
-import { CodeMetadata } from "./codeMetadata";
-import { CallArguments, DeployArguments, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
-import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
-import { ContractFunction } from "./function";
-import { Query } from "./query";
-import { SmartContractAbi } from "./abi";
 import { guardValueIsSet } from "../utils";
-import { EndpointDefinition, TypedValue } from "./typesystem";
+import { SmartContractAbi } from "./abi";
 import { bigIntToBuffer } from "./codec/utils";
-import BigNumber from "bignumber.js";
+import { CodeMetadata } from "./codeMetadata";
+import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
+import { CallArguments, DeployArguments, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { NativeSerializer } from "./nativeSerializer";
-import { IAddress, INonce } from "../interface";
-import { ErrContractHasNoAddress } from "../errors";
+import { Query } from "./query";
+import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
+import { EndpointDefinition, TypedValue } from "./typesystem";
 const createKeccakHash = require("keccak");
 
 /**
@@ -107,7 +107,9 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
      */
-    deploy({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
+    deploy({ owner, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
+        warnIfAddressIsNotSetOrZero(owner, "For smartContract.deploy(), the 'owner' should be specified!");
+
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
         value = value || 0;
@@ -120,7 +122,8 @@ export class SmartContract implements ISmartContract {
 
         let transaction = new Transaction({
             receiver: Address.Zero(),
-            sender: Address.Zero(),
+            // TODO: in v12, remove the "|| new Address()" part ()
+            sender: owner || new Address(),
             value: value,
             gasLimit: gasLimit,
             gasPrice: gasPrice,
@@ -134,8 +137,10 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
-    upgrade({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
-        this.ensureHasAddress();
+    upgrade({ owner, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
+        warnIfAddressIsNotSetOrZero(owner, "For smartContract.upgrade(), the 'owner' should be specified!");
+
+        this.ensureHasAddress()
 
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
@@ -148,7 +153,8 @@ export class SmartContract implements ISmartContract {
             .build();
 
         let transaction = new Transaction({
-            sender: Address.Zero(),
+            // TODO: in v12, remove the "|| new Address()" part ()
+            sender: owner || new Address(),
             receiver: this.getAddress(),
             value: value,
             gasLimit: gasLimit,
@@ -163,7 +169,9 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
-    call({ func, args, value, gasLimit, receiver, gasPrice, chainID }: CallArguments): Transaction {
+    call({ caller, func, args, value, gasLimit, receiver, gasPrice, chainID }: CallArguments): Transaction {
+        warnIfAddressIsNotSetOrZero(caller, "For smartContract.call(), the 'caller' should be specified!");
+
         this.ensureHasAddress();
 
         args = args || [];
@@ -175,7 +183,8 @@ export class SmartContract implements ISmartContract {
             .build();
 
         let transaction = new Transaction({
-            sender: Address.Zero(),
+            // TODO: in v12, remove the "|| new Address()" part ()
+            sender: caller || new Address(),
             receiver: receiver ? receiver : this.getAddress(),
             value: value,
             gasLimit: gasLimit,

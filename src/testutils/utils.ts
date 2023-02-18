@@ -1,14 +1,14 @@
-import { PathLike } from "fs";
+import axios, { AxiosResponse } from "axios";
+import BigNumber from "bignumber.js";
 import * as fs from "fs";
-import { SmartContract } from "../smartcontracts/smartContract";
+import { PathLike } from "fs";
+import { IChainID, IGasLimit } from "../interface";
 import { Code } from "../smartcontracts/code";
+import { SmartContract } from "../smartcontracts/smartContract";
 import { AbiRegistry, TypedValue } from "../smartcontracts/typesystem";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
-import { IChainID, IGasLimit } from "../interface";
 import { TestWallet } from "./wallets";
-import axios, { AxiosResponse } from "axios";
-import BigNumber from "bignumber.js";
 
 export async function prepareDeployment(obj: {
     deployer: TestWallet,
@@ -22,6 +22,7 @@ export async function prepareDeployment(obj: {
     let deployer = obj.deployer;
 
     let transaction = obj.contract.deploy({
+        owner: deployer.address,
         code: await loadContractCode(obj.codePath),
         gasLimit: obj.gasLimit,
         initArguments: obj.initArguments,
@@ -33,7 +34,7 @@ export async function prepareDeployment(obj: {
     transaction.setNonce(nonce);
     contract.setAddress(contractAddress);
     await deployer.signer.sign(transaction);
-    
+
     return transaction;
 }
 
@@ -50,7 +51,7 @@ export async function loadContractCode(path: PathLike): Promise<Code> {
         let buffer = Buffer.from(response.data);
         return Code.fromBuffer(buffer);
     }
-    
+
     // Load from file.
     let buffer: Buffer = await fs.promises.readFile(path);
     return Code.fromBuffer(buffer);

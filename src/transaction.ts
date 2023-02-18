@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { Address } from "./address";
+import { Address, warnIfAddressIsNotSetOrZero } from "./address";
 import { TRANSACTION_MIN_GAS_PRICE } from "./constants";
 import * as errors from "./errors";
 import { Hash } from "./hash";
@@ -217,9 +217,10 @@ export class Transaction {
    * This function is called internally within the signing procedure.
    *
    * @param sender The address of the sender (will be provided when called within the signing procedure)
+   * TODO: in v12, remove the sender parameter (since it will be always provided in constructor).
    */
   toPlainObject(sender?: IAddress): IPlainTransactionObject {
-    return {
+    const plainObject = {
       nonce: this.nonce.valueOf(),
       value: this.value.toString(),
       receiver: this.receiver.bech32(),
@@ -232,6 +233,10 @@ export class Transaction {
       options: this.options.valueOf() == 0 ? undefined : this.options.valueOf(),
       signature: this.signature.hex() ? this.signature.hex() : undefined,
     };
+
+    warnIfAddressIsNotSetOrZero(new Address(plainObject.sender), "'transaction.sender' isn't properly set!");
+
+    return plainObject;
   }
 
   /**

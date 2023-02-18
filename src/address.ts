@@ -1,5 +1,6 @@
 import * as bech32 from "bech32";
 import * as errors from "./errors";
+import { IAddress } from "./interface";
 
 /**
  * The human-readable-part of the bech32 addresses.
@@ -194,5 +195,18 @@ export class Address {
 
     isContractAddress(): boolean {
         return this.hex().startsWith(SMART_CONTRACT_HEX_PUBKEY_PREFIX);
+    }
+}
+
+/**
+ * Temporary workaround to check if an address is set or not (especially for warning developers when 'transaction.sender' isn't set).
+ * Added in v11, to reduce mistakes when creating transactions. It's just a WARN, to avoid breaking changes for now.
+ * This function will be removed in v12, when the 'sender' field will be mandatory (on all components).
+ * 
+ * For internal use only.
+ */
+export function warnIfAddressIsNotSetOrZero(address: IAddress | undefined, message: string) {
+    if (!address || address.bech32() == "" || address.bech32() == Address.Zero().bech32()) {
+        console.warn(message);
     }
 }

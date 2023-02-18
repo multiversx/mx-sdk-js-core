@@ -29,6 +29,8 @@ export interface ISmartContract {
 }
 
 export interface DeployArguments {
+    // TODO: in v12, make "owner" required.
+    owner?: IAddress;
     code: ICode;
     codeMetadata?: ICodeMetadata;
     initArguments?: TypedValue[];
@@ -39,6 +41,8 @@ export interface DeployArguments {
 }
 
 export interface UpgradeArguments {
+    // TODO: in v12, make "owner" required.
+    owner?: IAddress;
     code: ICode;
     codeMetadata?: ICodeMetadata;
     initArguments?: TypedValue[];
@@ -49,6 +53,8 @@ export interface UpgradeArguments {
 }
 
 export interface CallArguments {
+    // TODO: in v12, make "caller" required.
+    caller?: IAddress;
     func: IContractFunction;
     args?: TypedValue[];
     value?: ITransactionValue;

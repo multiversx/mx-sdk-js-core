@@ -1,18 +1,18 @@
-import { ContractController } from "../testutils/contractController";
-import { SmartContract } from "./smartContract";
-import { prepareDeployment, loadAbiRegistry, loadTestWallets, TestWallet } from "../testutils";
-import { SmartContractAbi } from "./abi";
+import BigNumber from "bignumber.js";
 import { assert } from "chai";
+import { loadAbiRegistry, loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
+import { ContractController } from "../testutils/contractController";
+import { createLocalnetProvider } from "../testutils/networkProviders";
+import { SmartContractAbi } from "./abi";
 import { Interaction } from "./interaction";
 import { ReturnCode } from "./returnCode";
-import BigNumber from "bignumber.js";
-import { createLocalnetProvider } from "../testutils/networkProviders";
+import { SmartContract } from "./smartContract";
 
 
 describe("test smart contract interactor", function () {
     let provider = createLocalnetProvider();
     let alice: TestWallet;
-    
+
     before(async function () {
         ({ alice } = await loadTestWallets());
     });
@@ -42,6 +42,7 @@ describe("test smart contract interactor", function () {
         assert.isTrue(returnCode.isSuccess());
 
         let interaction = <Interaction>contract.methods.getUltimateAnswer()
+            .withCaller(alice.address)
             .withGasLimit(3000000)
             .withChainID(network.ChainID);
 
@@ -91,9 +92,11 @@ describe("test smart contract interactor", function () {
 
         let getInteraction = <Interaction>contract.methods.get();
         let incrementInteraction = (<Interaction>contract.methods.increment())
+            .withCaller(alice.account.address)
             .withGasLimit(3000000)
             .withChainID(network.ChainID);
         let decrementInteraction = (<Interaction>contract.methods.decrement())
+            .withCaller(alice.account.address)
             .withGasLimit(3000000)
             .withChainID(network.ChainID);
 
@@ -152,16 +155,19 @@ describe("test smart contract interactor", function () {
             null,
             null
         ])
-        .withGasLimit(30000000)
-        .withChainID(network.ChainID);
+            .withCaller(alice.account.address)
+            .withGasLimit(30000000)
+            .withChainID(network.ChainID);
 
         let lotteryStatusInteraction = <Interaction>contract.methods.status(["lucky"])
-        .withGasLimit(5000000)
-        .withChainID(network.ChainID);
+            .withCaller(alice.account.address)
+            .withGasLimit(5000000)
+            .withChainID(network.ChainID);
 
         let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo(["lucky"])
-        .withGasLimit(5000000)
-        .withChainID(network.ChainID);
+            .withCaller(alice.account.address)
+            .withGasLimit(5000000)
+            .withChainID(network.ChainID);
 
         // start()
         let startTransaction = startInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();

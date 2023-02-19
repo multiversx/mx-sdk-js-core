@@ -78,7 +78,7 @@ describe("test parsers", () => {
         });
 
         assert.equal(outcome.tokenIdentifier, "FOOBAR");
-        assert.equal(outcome.nonce, 0);
+        assert.equal(outcome.nonce, "0");
         assert.equal(outcome.mintedSupply, "200");
         assert.equal(outcome.userAddress, grace.address.toString());
     });
@@ -104,7 +104,7 @@ describe("test parsers", () => {
         });
 
         assert.equal(outcome.tokenIdentifier, "FOOBAR");
-        assert.equal(outcome.nonce, 42);
+        assert.equal(outcome.nonce, "42");
         assert.equal(outcome.initialQuantity, "1");
     });
 

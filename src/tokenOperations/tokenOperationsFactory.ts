@@ -5,7 +5,7 @@ import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITransactionValue } f
 import { TransactionOptions, TransactionVersion } from "../networkParams";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
-import { addressToHex, bigIntToHex, utf8ToHex } from "./codec";
+import { addressToHex, bigIntToHex, bufferToHex, utf8ToHex } from "./codec";
 
 interface IConfig {
     chainID: IChainID;
@@ -19,6 +19,9 @@ interface IConfig {
     gasLimitPausing: IGasLimit;
     gasLimitFreezing: IGasLimit;
     gasLimitESDTNFTCreate: IGasLimit;
+    gasLimitESDTNFTUpdateAttributes: IGasLimit;
+    gasLimitESDTNFTAddQuantity: IGasLimit;
+    gasLimitESDTNFTBurn: IGasLimit;
     gasLimitStorePerByte: IGasLimit;
     issueCost: BigNumber.Value;
     esdtContractAddress: IAddress;
@@ -96,25 +99,25 @@ interface INonFungibleSetSpecialRoleArgs extends IBaseArgs {
     addRoleESDTTransferRole: boolean;
 }
 
-interface IESDTNFTCreateArgs extends IBaseArgs {
+interface INFTCreateArgs extends IBaseArgs {
     creator: IAddress;
     tokenIdentifier: string;
     initialQuantity: number;
     name: string;
     royalties: number;
     hash: string;
-    attributes: string;
+    attributes: Buffer;
     uris: string[];
 }
 
-interface IESDTPausingArgs extends IBaseArgs {
+interface IPausingArgs extends IBaseArgs {
     manager: IAddress;
     tokenIdentifier: string;
     pause?: boolean;
     unpause?: boolean;
 }
 
-interface IESDTFreezingArgs extends IBaseArgs {
+interface IFreezingArgs extends IBaseArgs {
     manager: IAddress;
     user: IAddress;
     tokenIdentifier: string;
@@ -122,18 +125,39 @@ interface IESDTFreezingArgs extends IBaseArgs {
     unfreeze?: boolean;
 }
 
-interface IESDTLocalMintArgs extends IBaseArgs {
+interface ILocalMintArgs extends IBaseArgs {
     manager: IAddress;
     user: IAddress;
     tokenIdentifier: string;
     supplyToMint: BigNumber.Value
 }
 
-interface IESDTLocalBurnArgs extends IBaseArgs {
+interface ILocalBurnArgs extends IBaseArgs {
     manager: IAddress;
     user: IAddress;
     tokenIdentifier: string;
     supplyToBurn: BigNumber.Value
+}
+
+interface IUpdateAttributesArgs extends IBaseArgs {
+    manager: IAddress;
+    tokenIdentifier: string;
+    tokenNonce: BigNumber.Value;
+    attributes: Buffer;
+}
+
+interface IAddQuantityArgs extends IBaseArgs {
+    manager: IAddress;
+    tokenIdentifier: string;
+    tokenNonce: BigNumber.Value;
+    quantityToAdd: BigNumber.Value
+}
+
+interface IBurnQuantityArgs extends IBaseArgs {
+    manager: IAddress;
+    tokenIdentifier: string;
+    tokenNonce: BigNumber.Value;
+    quantityToBurn: BigNumber.Value
 }
 
 export class TokenOperationsFactory {
@@ -322,7 +346,7 @@ export class TokenOperationsFactory {
         });
     }
 
-    nftCreate(args: IESDTNFTCreateArgs): Transaction {
+    nftCreate(args: INFTCreateArgs): Transaction {
         const parts = [
             "ESDTNFTCreate",
             utf8ToHex(args.tokenIdentifier),
@@ -330,7 +354,7 @@ export class TokenOperationsFactory {
             utf8ToHex(args.name),
             bigIntToHex(args.royalties),
             utf8ToHex(args.hash),
-            utf8ToHex(args.attributes),
+            bufferToHex(args.attributes),
             ...args.uris.map(utf8ToHex),
         ];
 
@@ -349,7 +373,7 @@ export class TokenOperationsFactory {
         });
     }
 
-    pause(args: IESDTPausingArgs): Transaction {
+    pause(args: IPausingArgs): Transaction {
         if (args.pause == args.unpause) {
             throw new Err("Must set either 'pause' or 'unpause' (one and only one should be set).")
         }
@@ -370,7 +394,7 @@ export class TokenOperationsFactory {
         });
     }
 
-    freeze(args: IESDTFreezingArgs): Transaction {
+    freeze(args: IFreezingArgs): Transaction {
         if (args.freeze == args.unfreeze) {
             throw new Err("Must set either 'freeze' or 'unfreeze' (one and only one should be set).")
         }
@@ -392,7 +416,7 @@ export class TokenOperationsFactory {
         });
     }
 
-    localMint(args: IESDTLocalMintArgs): Transaction {
+    localMint(args: ILocalMintArgs): Transaction {
         const parts = [
             "ESDTLocalMint",
             utf8ToHex(args.tokenIdentifier),
@@ -410,7 +434,7 @@ export class TokenOperationsFactory {
         });
     }
 
-    localBurn(args: IESDTLocalBurnArgs): Transaction {
+    localBurn(args: ILocalBurnArgs): Transaction {
         const parts = [
             "ESDTLocalBurn",
             utf8ToHex(args.tokenIdentifier),
@@ -424,6 +448,63 @@ export class TokenOperationsFactory {
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTLocalBurn,
+            dataParts: parts
+        });
+    }
+
+    updateAttributes(args: IUpdateAttributesArgs): Transaction {
+        const parts = [
+            "ESDTNFTUpdateAttributes",
+            utf8ToHex(args.tokenIdentifier),
+            bigIntToHex(args.tokenNonce),
+            bufferToHex(args.attributes),
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: args.manager,
+            nonce: args.nonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitESDTNFTUpdateAttributes,
+            dataParts: parts
+        });
+    }
+
+    addQuantity(args: IAddQuantityArgs): Transaction {
+        const parts = [
+            "ESDTNFTAddQuantity",
+            utf8ToHex(args.tokenIdentifier),
+            bigIntToHex(args.tokenNonce),
+            bigIntToHex(args.quantityToAdd)
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: args.manager,
+            nonce: args.nonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitESDTNFTAddQuantity,
+            dataParts: parts
+        });
+    }
+
+    burnQuantity(args: IBurnQuantityArgs): Transaction {
+        const parts = [
+            "ESDTNFTBurn",
+            utf8ToHex(args.tokenIdentifier),
+            bigIntToHex(args.tokenNonce),
+            bigIntToHex(args.quantityToBurn)
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: args.manager,
+            nonce: args.nonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitESDTNFTBurn,
             dataParts: parts
         });
     }

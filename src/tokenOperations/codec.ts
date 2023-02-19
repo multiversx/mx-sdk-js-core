@@ -9,6 +9,10 @@ export function stringToBuffer(value: string): Buffer {
 }
 
 export function bufferToBigInt(buffer: Buffer): BigNumber {
+    if (buffer.length == 0) {
+        return new BigNumber(0);
+    }
+
     return contractsCodecUtils.bufferToBigInt(buffer);
 }
 

@@ -216,7 +216,7 @@ describe("test factory on testnet", function () {
         const tx3Outcome = parser.parseFreeze(tx3OnNetwork);
         assert.equal(tx3Outcome.userAddress, grace.address.bech32());
         assert.equal(tx3Outcome.tokenIdentifier, tokenIdentifier);
-        assert.equal(tx3Outcome.nonce, 0);
+        assert.equal(tx3Outcome.nonce, "0");
         assert.equal(tx3Outcome.balance, "10");
 
         // Unfreeze
@@ -232,11 +232,11 @@ describe("test factory on testnet", function () {
         const tx4Outcome = parser.parseUnfreeze(tx4OnNetwork);
         assert.equal(tx4Outcome.userAddress, grace.address.bech32());
         assert.equal(tx4Outcome.tokenIdentifier, tokenIdentifier);
-        assert.equal(tx4Outcome.nonce, 0);
+        assert.equal(tx4Outcome.nonce, "0");
         assert.equal(tx4Outcome.balance, "10");
     });
 
-    it("should issue and create NFT", async function () {
+    it("should issue and create NFT, then update attributes", async function () {
         this.timeout(180000);
         await frank.sync(provider);
         await grace.sync(provider);
@@ -279,26 +279,43 @@ describe("test factory on testnet", function () {
         assert.include(tx2Outcome.roles, "ESDTRoleNFTCreate");
         assert.include(tx2Outcome.roles, "ESDTRoleNFTUpdateAttributes");
 
-        // Create NFTs
-        for (let i = 1; i <= 3; i++) {
-            const tx = factory.nftCreate({
+        // Create NFTs, then update their attributes
+        for (let i = 1; i <= 2; i++) {
+            // Create
+            const txCreate = factory.nftCreate({
                 creator: grace.address,
                 tokenIdentifier: tokenIdentifier,
                 initialQuantity: 1,
                 name: `test-${i}`,
                 royalties: 1000,
                 hash: "abba",
-                attributes: "test",
+                attributes: Buffer.from("test"),
                 uris: ["a", "b"],
                 nonce: grace.account.nonce
             });
 
-            const txOnNetwork = await processTransaction(grace, tx, "tx");
-            const txOutcome = parser.parseNFTCreate(txOnNetwork);
+            const txCreateOnNetwork = await processTransaction(grace, txCreate, "txCreate");
+            const txCreateOutcome = parser.parseNFTCreate(txCreateOnNetwork);
 
-            assert.equal(txOutcome.tokenIdentifier, tokenIdentifier);
-            assert.equal(txOutcome.nonce, i);
-            assert.equal(txOutcome.initialQuantity, 1);
+            assert.equal(txCreateOutcome.tokenIdentifier, tokenIdentifier);
+            assert.equal(txCreateOutcome.nonce, i.toString());
+            assert.equal(txCreateOutcome.initialQuantity, "1");
+
+            // Update attributes
+            const txUpdate = factory.updateAttributes({
+                manager: grace.address,
+                tokenIdentifier: txCreateOutcome.tokenIdentifier,
+                tokenNonce: txCreateOutcome.nonce,
+                attributes: Buffer.from("updated"),
+                nonce: grace.account.nonce,
+            });
+
+            const txUpdateOnNetwork = await processTransaction(grace, txUpdate, "txUpdate");
+            const txUpdateOutcome = parser.parseUpdateAttributes(txUpdateOnNetwork);
+
+            assert.equal(txUpdateOutcome.tokenIdentifier, tokenIdentifier);
+            assert.equal(txUpdateOutcome.nonce, i.toString());
+            assert.deepEqual(txUpdateOutcome.attributes, Buffer.from("updated"));
         }
     });
 
@@ -353,7 +370,7 @@ describe("test factory on testnet", function () {
                 name: `test-${i}`,
                 royalties: 1000,
                 hash: "abba",
-                attributes: "test",
+                attributes: Buffer.from("test"),
                 uris: ["a", "b"],
                 nonce: grace.account.nonce
             });
@@ -362,8 +379,8 @@ describe("test factory on testnet", function () {
             const txOutcome = parser.parseNFTCreate(txOnNetwork);
 
             assert.equal(txOutcome.tokenIdentifier, tokenIdentifier);
-            assert.equal(txOutcome.nonce, i);
-            assert.equal(txOutcome.initialQuantity, i * 10);
+            assert.equal(txOutcome.nonce, i.toString());
+            assert.equal(txOutcome.initialQuantity, (i * 10).toString());
         }
     });
 
@@ -419,7 +436,7 @@ describe("test factory on testnet", function () {
                 name: `test-${i}`,
                 royalties: 1000,
                 hash: "abba",
-                attributes: "test",
+                attributes: Buffer.from("test"),
                 uris: ["a", "b"],
                 nonce: grace.account.nonce
             });
@@ -428,8 +445,8 @@ describe("test factory on testnet", function () {
             const txOutcome = parser.parseNFTCreate(txOnNetwork);
 
             assert.equal(txOutcome.tokenIdentifier, tokenIdentifier);
-            assert.equal(txOutcome.nonce, i);
-            assert.equal(txOutcome.initialQuantity, i * 10);
+            assert.equal(txOutcome.nonce, i.toString());
+            assert.equal(txOutcome.initialQuantity, (i * 10).toString());
         }
     });
 

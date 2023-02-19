@@ -45,21 +45,21 @@ export interface ISetSpecialRoleOutcome {
 
 export interface INFTCreateOutcome {
     tokenIdentifier: string;
-    nonce: number;
+    nonce: string;
     initialQuantity: string;
 }
 
 export interface IMintOutcome {
     userAddress: string;
     tokenIdentifier: string;
-    nonce: number;
+    nonce: string;
     mintedSupply: string;
 }
 
 export interface IBurnOutcome {
     userAddress: string;
     tokenIdentifier: string;
-    nonce: number;
+    nonce: string;
     burntSupply: string;
 }
 
@@ -69,8 +69,14 @@ export interface IPausingOutcome {
 export interface IFreezingOutcome {
     userAddress: string;
     tokenIdentifier: string;
-    nonce: number;
+    nonce: string;
     balance: string;
+}
+
+export interface IUpdateAttributesOutcome {
+    tokenIdentifier: string;
+    nonce: string;
+    attributes: Buffer;
 }
 
 export class TokenOperationsOutcomeParser {
@@ -182,6 +188,16 @@ export class TokenOperationsOutcomeParser {
         return { userAddress, tokenIdentifier, nonce, balance };
     }
 
+    parseUpdateAttributes(transaction: ITransactionOnNetwork): IUpdateAttributesOutcome {
+        this.ensureNoError(transaction);
+
+        const event = this.findSingleEventByIdentifier(transaction, "ESDTNFTUpdateAttributes");
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const attributes = event.topics[3]?.valueOf();
+        return { tokenIdentifier, nonce, attributes };
+    }
+
     private ensureNoError(transaction: ITransactionOnNetwork) {
         for (const event of transaction.logs.events) {
             if (event.identifier == "signalError") {
@@ -222,12 +238,12 @@ export class TokenOperationsOutcomeParser {
         return event.topics[0]?.valueOf().toString();
     }
 
-    private extractNonce(event: ITransactionEvent): number {
-        return bufferToBigInt(event.topics[1]?.valueOf()).toNumber() || 0;
+    private extractNonce(event: ITransactionEvent): string {
+        return bufferToBigInt(event.topics[1]?.valueOf()).toFixed(0);
     }
 
     private extractAmount(event: ITransactionEvent): string {
-        return bufferToBigInt(event.topics[2]?.valueOf()).toString();
+        return bufferToBigInt(event.topics[2]?.valueOf()).toFixed(0);
     }
 
     private extractAddress(event: ITransactionEvent): string {

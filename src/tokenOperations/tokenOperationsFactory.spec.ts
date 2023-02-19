@@ -127,7 +127,7 @@ describe("test factory", () => {
             name: `test`,
             royalties: 1000,
             hash: "abba",
-            attributes: "test",
+            attributes: Buffer.from("test"),
             uris: ["a", "b"],
             nonce: 42
         });

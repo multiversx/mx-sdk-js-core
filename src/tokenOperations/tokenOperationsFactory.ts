@@ -378,7 +378,7 @@ export class TokenOperationsFactory {
         }
 
         const parts = [
-            args.freeze ? "freeze" : "unfreeze",
+            args.freeze ? "freeze" : "unFreeze",
             utf8ToHex(args.tokenIdentifier),
             addressToHex(args.user)
         ];

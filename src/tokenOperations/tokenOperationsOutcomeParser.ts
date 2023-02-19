@@ -78,7 +78,7 @@ export class TokenOperationsOutcomeParser {
         this.ensureNoError(transaction);
 
         const event = this.findSingleEventByIdentifier(transaction, "issue");
-        const tokenIdentifier = event.topics[0]?.valueOf().toString();
+        const tokenIdentifier = this.extractTokenIdentifier(event);
         return { tokenIdentifier: tokenIdentifier };
     }
 
@@ -86,7 +86,7 @@ export class TokenOperationsOutcomeParser {
         this.ensureNoError(transaction);
 
         const event = this.findSingleEventByIdentifier(transaction, "issueNonFungible");
-        const tokenIdentifier = event.topics[0]?.valueOf().toString();
+        const tokenIdentifier = this.extractTokenIdentifier(event);
         return { tokenIdentifier: tokenIdentifier };
     }
 
@@ -94,7 +94,7 @@ export class TokenOperationsOutcomeParser {
         this.ensureNoError(transaction);
 
         const event = this.findSingleEventByIdentifier(transaction, "issueSemiFungible");
-        const tokenIdentifier = event.topics[0]?.valueOf().toString();
+        const tokenIdentifier = this.extractTokenIdentifier(event);
         return { tokenIdentifier: tokenIdentifier };
     }
 
@@ -103,7 +103,7 @@ export class TokenOperationsOutcomeParser {
 
         const event = this.findSingleEventByIdentifier(transaction, "ESDTSetRole");
         const userAddress = event.address.toString();
-        const tokenIdentifier = event.topics[0]?.valueOf().toString();
+        const tokenIdentifier = this.extractTokenIdentifier(event);
         const roles = event.topics.slice(3).map(topic => topic.valueOf().toString());
         return { userAddress, tokenIdentifier, roles };
     }
@@ -112,9 +112,9 @@ export class TokenOperationsOutcomeParser {
         this.ensureNoError(transaction);
 
         const event = this.findSingleEventByIdentifier(transaction, "ESDTNFTCreate");
-        const tokenIdentifier = event.topics[0]?.valueOf().toString();
-        const nonce = bufferToBigInt(event.topics[1]?.valueOf()).toNumber();
-        const initialQuantity = bufferToBigInt(event.topics[2]?.valueOf()).toNumber();
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const initialQuantity = parseInt(this.extractAmount(event));
         return { tokenIdentifier, nonce, initialQuantity };
     }
 
@@ -123,9 +123,9 @@ export class TokenOperationsOutcomeParser {
 
         const event = this.findSingleEventByIdentifier(transaction, "ESDTLocalMint");
         const userAddress = event.address.toString();
-        const tokenIdentifier = event.topics[0]?.valueOf().toString();
-        const nonce = bufferToBigInt(event.topics[1]?.valueOf()).toNumber();
-        const mintedSupply = bufferToBigInt(event.topics[2]?.valueOf()).toString();
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const mintedSupply = this.extractAmount(event);
         return { userAddress, tokenIdentifier, nonce, mintedSupply };
     }
 
@@ -134,9 +134,9 @@ export class TokenOperationsOutcomeParser {
 
         const event = this.findSingleEventByIdentifier(transaction, "ESDTLocalBurn");
         const userAddress = event.address.toString();
-        const tokenIdentifier = event.topics[0]?.valueOf().toString();
-        const nonce = bufferToBigInt(event.topics[1]?.valueOf()).toNumber();
-        const burntSupply = bufferToBigInt(event.topics[2]?.valueOf()).toString();
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const burntSupply = this.extractAmount(event);
         return { userAddress, tokenIdentifier, nonce, burntSupply };
     }
 
@@ -156,10 +156,10 @@ export class TokenOperationsOutcomeParser {
         this.ensureNoError(transaction);
 
         const event = this.findSingleEventByIdentifier(transaction, "ESDTFreeze");
-        const tokenIdentifier = event.topics[0]?.valueOf().toString();
-        const nonce = bufferToBigInt(event.topics[1]?.valueOf()).toNumber() || 0;
-        const balance = bufferToBigInt(event.topics[2]?.valueOf()).toString();
-        const userAddress = Address.fromBuffer(event.topics[3]?.valueOf()).toString();
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const balance = this.extractAmount(event);
+        const userAddress = this.extractAddress(event);
         return { userAddress, tokenIdentifier, nonce, balance };
     }
 
@@ -167,10 +167,10 @@ export class TokenOperationsOutcomeParser {
         this.ensureNoError(transaction);
 
         const event = this.findSingleEventByIdentifier(transaction, "ESDTUnFreeze");
-        const tokenIdentifier = event.topics[0]?.valueOf().toString();
-        const nonce = bufferToBigInt(event.topics[1]?.valueOf()).toNumber() || 0;
-        const balance = bufferToBigInt(event.topics[2]?.valueOf()).toString();
-        const userAddress = Address.fromBuffer(event.topics[3]?.valueOf()).toString();
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const balance = this.extractAmount(event);
+        const userAddress = this.extractAddress(event);
         return { userAddress, tokenIdentifier, nonce, balance };
     }
 
@@ -180,7 +180,7 @@ export class TokenOperationsOutcomeParser {
                 const data = Buffer.from(event.data.substring(1), "hex").toString();
                 const message = event.topics[1]?.valueOf().toString();
 
-                throw new ErrCannotParseTransactionOutcome(transaction.hash, `encountered error: ${message} (${data})`);
+                throw new ErrCannotParseTransactionOutcome(transaction.hash, `encountered signalError: ${message} (${data})`);
             }
         }
     }
@@ -208,6 +208,22 @@ export class TokenOperationsOutcomeParser {
         }
 
         return allEvents;
+    }
+
+    private extractTokenIdentifier(event: ITransactionEvent): string {
+        return event.topics[0]?.valueOf().toString();
+    }
+
+    private extractNonce(event: ITransactionEvent): number {
+        return bufferToBigInt(event.topics[1]?.valueOf()).toNumber() || 0;
+    }
+
+    private extractAmount(event: ITransactionEvent): string {
+        return bufferToBigInt(event.topics[2]?.valueOf()).toString();
+    }
+
+    private extractAddress(event: ITransactionEvent): string {
+        return Address.fromBuffer(event.topics[3]?.valueOf()).toString();
     }
 }
 

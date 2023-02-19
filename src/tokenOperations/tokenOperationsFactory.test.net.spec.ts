@@ -274,13 +274,7 @@ describe("test factory on testnet", function () {
             nonce: frank.account.nonce
         });
 
-        let tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
-
-        // For such transactions, the "isCompleted" field is somehow incorrect (false positive).
-        // Let's wait a bit more to have the outcome. 
-        await (new AsyncTimer("test")).start(1000);
-        tx2OnNetwork = await watcher.awaitCompleted(tx2);
-
+        const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
         const tx2Outcome = parser.parseSetSpecialRole(tx2OnNetwork);
         assert.include(tx2Outcome.roles, "ESDTRoleNFTCreate");
         assert.include(tx2Outcome.roles, "ESDTRoleNFTUpdateAttributes");
@@ -345,13 +339,7 @@ describe("test factory on testnet", function () {
             nonce: frank.account.nonce
         });
 
-        let tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
-
-        // For such transactions, the "isCompleted" field is somehow incorrect (false positive).
-        // Let's wait a bit more to have the outcome. 
-        await (new AsyncTimer("test")).start(1000);
-        tx2OnNetwork = await watcher.awaitCompleted(tx2);
-
+        const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
         const tx2Outcome = parser.parseSetSpecialRole(tx2OnNetwork);
         assert.include(tx2Outcome.roles, "ESDTRoleNFTCreate");
         assert.include(tx2Outcome.roles, "ESDTRoleNFTAddQuantity");
@@ -385,7 +373,13 @@ describe("test factory on testnet", function () {
         await provider.sendTransaction(transaction);
         console.log(`Sent transaction [${tag}]: ${transaction.getHash().hex()}`);
 
-        const transactionOnNetwork = await watcher.awaitCompleted(transaction);
+        let transactionOnNetwork = await watcher.awaitCompleted(transaction);
+
+        // For some transactions, the "isCompleted" field is somehow incorrect (false positive).
+        // Let's wait a bit more to have the outcome. 
+        await (new AsyncTimer("test")).start(1000);
+
+        transactionOnNetwork = await watcher.awaitCompleted(transaction);
         return transactionOnNetwork;
     }
 });

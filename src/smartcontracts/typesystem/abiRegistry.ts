@@ -1,11 +1,11 @@
 import * as errors from "../../errors";
 import { guardValueIsSetWithMessage } from "../../utils";
-import { StructType } from "./struct";
 import { ContractInterface } from "./contractInterface";
-import { CustomType } from "./types";
-import { EnumType } from "./enum";
-import { TypeMapper } from "./typeMapper";
 import { EndpointDefinition, EndpointParameterDefinition } from "./endpoint";
+import { EnumType } from "./enum";
+import { StructType } from "./struct";
+import { TypeMapper } from "./typeMapper";
+import { CustomType } from "./types";
 
 export class AbiRegistry {
     readonly interfaces: ContractInterface[] = [];
@@ -33,8 +33,6 @@ export class AbiRegistry {
             this.customTypes.push(customType);
         }
 
-        this.sortCustomTypesByDependencies();
-
         return this;
     }
 
@@ -46,40 +44,6 @@ export class AbiRegistry {
             return EnumType.fromJSON(json);
         }
         throw new errors.ErrTypingSystem(`Unknown type discriminant: ${typeDiscriminant}`);
-    }
-
-    private sortCustomTypesByDependencies() {
-        // Use of topological sort algorithm to sort custom types by dependencies.
-        let dependencies: { [key: string]: string[] } = {};
-        let visited: { [key: string]: boolean } = {};
-        this.customTypes.forEach((type: CustomType) => {
-            dependencies[type.getName()] = type.getNamesOfDependencies();
-            visited[type.getName()] = false;
-        });
-        let sortedArray = new Array<CustomType>();
-
-        const topologicalSortUtil = (name: string, visited: { [key: string]: boolean }, sortedArray: CustomType[]) => {
-            visited[name] = true;
-
-            for (const dependency of dependencies[name]) {
-                if (!this.customTypes.find((e) => e.getName() == dependency)) continue;
-                if (!visited[dependency]) {
-                    topologicalSortUtil(dependency, visited, sortedArray);
-                }
-            }
-            const type = this.customTypes.find((e) => e.getName() == name);
-            if (type) {
-                sortedArray.push(type);
-            }
-        };
-
-        for (const type of this.customTypes) {
-            if (!visited[type.getName()]) {
-                topologicalSortUtil(type.getName(), visited, sortedArray);
-            }
-        }
-
-        this.customTypes = sortedArray;
     }
 
     getInterface(name: string): ContractInterface {
@@ -129,13 +93,15 @@ export class AbiRegistry {
 
         // First, remap custom types (actually, under the hood, this will remap types of struct fields)
         for (const type of this.customTypes) {
-            const mappedTyped = mapper.mapType(type);
-            newCustomTypes.push(mappedTyped);
+            this.mapCustomTypeDepthFirst(type, this.customTypes, mapper, newCustomTypes);
+        }
+
+        if (this.customTypes.length != newCustomTypes.length) {
+            throw new errors.ErrTypingSystem("Did not re-map all custom types");
         }
 
         // Then, remap types of all endpoint parameters.
-        // But we'll use an enhanced mapper, that takes into account the results from the previous step.
-        mapper = new TypeMapper(newCustomTypes);
+        // The mapper learned all necessary types in the previous step.
         for (const iface of this.interfaces) {
             let newEndpoints: EndpointDefinition[] = [];
             for (const endpoint of iface.endpoints) {
@@ -151,6 +117,26 @@ export class AbiRegistry {
         newRegistry.interfaces.push(...newInterfaces);
 
         return newRegistry;
+    }
+
+    private mapCustomTypeDepthFirst(typeToMap: CustomType, allTypesToMap: CustomType[], mapper: TypeMapper, mappedTypes: CustomType[]) {
+        const hasBeenMapped = mappedTypes.findIndex(type => type.getName() == typeToMap.getName()) >= 0;
+        if (hasBeenMapped) {
+            return;
+        }
+
+        for (const typeName of typeToMap.getNamesOfDependencies()) {
+            const dependencyType = allTypesToMap.find(type => type.getName() == typeName);
+            if (!dependencyType) {
+                // It's a type that we don't have to map (e.g. could be a primitive type).
+                continue;
+            }
+
+            this.mapCustomTypeDepthFirst(dependencyType, allTypesToMap, mapper, mappedTypes)
+        }
+
+        const mappedType = mapper.mapType(typeToMap);
+        mappedTypes.push(mappedType);
     }
 }
 

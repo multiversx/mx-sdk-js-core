@@ -14,7 +14,7 @@ interface IContractResults {
     items: IContractResultItem[];
 }
 
-export interface IContractResultItem {
+interface IContractResultItem {
     logs: ITransactionLogs;
 }
 
@@ -22,14 +22,14 @@ interface ITransactionLogs {
     events: ITransactionEvent[];
 }
 
-export interface ITransactionEvent {
+interface ITransactionEvent {
     readonly address: IAddress;
     readonly identifier: string;
     readonly topics: ITransactionEventTopic[];
     readonly data: string;
 }
 
-export interface ITransactionEventTopic {
+interface ITransactionEventTopic {
     valueOf(): any;
 }
 

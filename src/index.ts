@@ -13,6 +13,7 @@ export * from "./relayedTransactionV1Builder";
 export * from "./relayedTransactionV2Builder";
 export * from "./signableMessage";
 export * from "./smartcontracts";
+export * from "./tokenOperations";
 export * from "./tokenPayment";
 export * from "./tokenTransferBuilders";
 export * from "./transaction";

@@ -35,9 +35,6 @@ export function bufferToHex(value: Buffer) {
 }
 
 export function addressToHex(address: IAddress): string {
-    return addressToBuffer(address).toString("hex");
-}
-
-export function addressToBuffer(address: IAddress): Buffer {
-    return Address.fromBech32(address.toString()).pubkey();
+    const buffer = Address.fromBech32(address.toString()).pubkey();
+    return buffer.toString("hex");
 }

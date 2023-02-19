@@ -138,28 +138,28 @@ interface IESDTLocalBurnArgs extends IBaseArgs {
 
 export class TokenOperationsFactory {
     private readonly config: IConfig;
+    private readonly trueAsHex;
 
     constructor(config: IConfig) {
         this.config = config;
+        this.trueAsHex = utf8ToHex("true");
     }
 
     issueFungible(args: IIssueFungibleArgs): Transaction {
-        const trueAsHex = utf8ToHex("true");
-
         const parts = [
             "issue",
             utf8ToHex(args.tokenName),
             utf8ToHex(args.tokenTicker),
             bigIntToHex(args.initialSupply),
             bigIntToHex(args.numDecimals),
-            ...(args.canFreeze ? [utf8ToHex("canFreeze"), trueAsHex] : []),
-            ...(args.canWipe ? [utf8ToHex("canWipe"), trueAsHex] : []),
-            ...(args.canPause ? [utf8ToHex("canPause"), trueAsHex] : []),
-            ...(args.canMint ? [utf8ToHex("canMint"), trueAsHex] : []),
-            ...(args.canBurn ? [utf8ToHex("canBurn"), trueAsHex] : []),
-            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), trueAsHex] : []),
-            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), trueAsHex] : []),
-            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), trueAsHex] : []),
+            ...(args.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
+            ...(args.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
+            ...(args.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
+            ...(args.canMint ? [utf8ToHex("canMint"), this.trueAsHex] : []),
+            ...(args.canBurn ? [utf8ToHex("canBurn"), this.trueAsHex] : []),
+            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
+            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
+            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
         ];
 
         return this.createTransaction({
@@ -175,19 +175,17 @@ export class TokenOperationsFactory {
     }
 
     issueSemiFungible(args: IIssueSemiFungibleArgs): Transaction {
-        const trueAsHex = utf8ToHex("true");
-
         const parts = [
             "issueSemiFungible",
             utf8ToHex(args.tokenName),
             utf8ToHex(args.tokenTicker),
-            ...(args.canFreeze ? [utf8ToHex("canFreeze"), trueAsHex] : []),
-            ...(args.canWipe ? [utf8ToHex("canWipe"), trueAsHex] : []),
-            ...(args.canPause ? [utf8ToHex("canPause"), trueAsHex] : []),
-            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), trueAsHex] : []),
-            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), trueAsHex] : []),
-            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), trueAsHex] : []),
-            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), trueAsHex] : []),
+            ...(args.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
+            ...(args.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
+            ...(args.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
+            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
+            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
+            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
+            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
         ];
 
         return this.createTransaction({
@@ -203,19 +201,17 @@ export class TokenOperationsFactory {
     }
 
     issueNonFungible(args: IIssueNonFungibleArgs): Transaction {
-        const trueAsHex = utf8ToHex("true");
-
         const parts = [
             "issueNonFungible",
             utf8ToHex(args.tokenName),
             utf8ToHex(args.tokenTicker),
-            ...(args.canFreeze ? [utf8ToHex("canFreeze"), trueAsHex] : []),
-            ...(args.canWipe ? [utf8ToHex("canWipe"), trueAsHex] : []),
-            ...(args.canPause ? [utf8ToHex("canPause"), trueAsHex] : []),
-            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), trueAsHex] : []),
-            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), trueAsHex] : []),
-            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), trueAsHex] : []),
-            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), trueAsHex] : []),
+            ...(args.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
+            ...(args.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
+            ...(args.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
+            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
+            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
+            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
+            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
         ];
 
         return this.createTransaction({
@@ -231,20 +227,18 @@ export class TokenOperationsFactory {
     }
 
     registerMetaESDT(args: IRegisterMetaESDT): Transaction {
-        const trueAsHex = utf8ToHex("true");
-
         const parts = [
             "registerMetaESDT",
             utf8ToHex(args.tokenName),
             utf8ToHex(args.tokenTicker),
             bigIntToHex(args.numDecimals),
-            ...(args.canFreeze ? [utf8ToHex("canFreeze"), trueAsHex] : []),
-            ...(args.canWipe ? [utf8ToHex("canWipe"), trueAsHex] : []),
-            ...(args.canPause ? [utf8ToHex("canPause"), trueAsHex] : []),
-            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), trueAsHex] : []),
-            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), trueAsHex] : []),
-            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), trueAsHex] : []),
-            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), trueAsHex] : []),
+            ...(args.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
+            ...(args.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
+            ...(args.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
+            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
+            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
+            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
+            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
         ];
 
         return this.createTransaction({

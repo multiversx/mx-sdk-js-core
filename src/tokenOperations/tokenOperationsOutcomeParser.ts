@@ -46,7 +46,7 @@ export interface ISetSpecialRoleOutcome {
 export interface INFTCreateOutcome {
     tokenIdentifier: string;
     nonce: number;
-    initialQuantity: number;
+    initialQuantity: string;
 }
 
 export interface IMintOutcome {
@@ -122,7 +122,7 @@ export class TokenOperationsOutcomeParser {
         const event = this.findSingleEventByIdentifier(transaction, "ESDTNFTCreate");
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const initialQuantity = parseInt(this.extractAmount(event));
+        const initialQuantity = this.extractAmount(event);
         return { tokenIdentifier, nonce, initialQuantity };
     }
 

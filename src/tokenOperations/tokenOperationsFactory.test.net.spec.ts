@@ -367,7 +367,7 @@ describe("test factory on testnet", function () {
         }
     });
 
-    it.only("should register and create Meta ESDT", async function () {
+    it("should register and create Meta ESDT", async function () {
         this.timeout(180000);
         await frank.sync(provider);
         await grace.sync(provider);

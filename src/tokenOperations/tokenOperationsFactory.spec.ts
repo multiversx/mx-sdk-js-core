@@ -78,6 +78,28 @@ describe("test factory", () => {
         assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
     });
 
+    it("should create <registerMetaESDT>", () => {
+        const transaction = factory.registerMetaESDT({
+            issuer: frank.address,
+            tokenName: "FRANK",
+            tokenTicker: "FRANK",
+            numDecimals: 10,
+            canFreeze: true,
+            canWipe: true,
+            canPause: true,
+            canTransferNFTCreateRole: true,
+            canChangeOwner: true,
+            canUpgrade: true,
+            canAddSpecialRoles: true,
+            nonce: 42
+        });
+
+        assert.equal(transaction.getData().toString(), "registerMetaESDT@4652414e4b@4652414e4b@0a@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565")
+        assert.equal(transaction.getNonce(), 42);
+        assert.equal(transaction.getSender().toString(), frank.address.toString());
+        assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
+    });
+
     it("should create <setSpecialRole>", () => {
         const transaction = factory.setSpecialRoleOnNonFungible({
             manager: frank.address,

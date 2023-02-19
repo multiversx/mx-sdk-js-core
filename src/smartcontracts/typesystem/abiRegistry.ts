@@ -9,7 +9,7 @@ import { CustomType } from "./types";
 
 export class AbiRegistry {
     readonly interfaces: ContractInterface[] = [];
-    private customTypes: CustomType[] = [];
+    readonly customTypes: CustomType[] = [];
 
     static create(json: { name: string; endpoints: any[]; types: Record<string, any> }): AbiRegistry {
         let registry = new AbiRegistry().extend(json);

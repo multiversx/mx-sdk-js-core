@@ -79,6 +79,18 @@ export interface IUpdateAttributesOutcome {
     attributes: Buffer;
 }
 
+export interface IAddQuantityOutcome {
+    tokenIdentifier: string;
+    nonce: string;
+    addedQuantity: string;
+}
+
+export interface IBurnQuantityOutcome {
+    tokenIdentifier: string;
+    nonce: string;
+    burntQuantity: string;
+}
+
 export class TokenOperationsOutcomeParser {
     parseIssueFungible(transaction: ITransactionOnNetwork): IESDTIssueOutcome {
         this.ensureNoError(transaction);
@@ -196,6 +208,26 @@ export class TokenOperationsOutcomeParser {
         const nonce = this.extractNonce(event);
         const attributes = event.topics[3]?.valueOf();
         return { tokenIdentifier, nonce, attributes };
+    }
+
+    parseAddQuantity(transaction: ITransactionOnNetwork): IAddQuantityOutcome {
+        this.ensureNoError(transaction);
+
+        const event = this.findSingleEventByIdentifier(transaction, "ESDTNFTAddQuantity");
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const addedQuantity = this.extractAmount(event);
+        return { tokenIdentifier, nonce, addedQuantity };
+    }
+
+    parseBurnQuantity(transaction: ITransactionOnNetwork): IBurnQuantityOutcome {
+        this.ensureNoError(transaction);
+
+        const event = this.findSingleEventByIdentifier(transaction, "ESDTNFTBurn");
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const burntQuantity = this.extractAmount(event);
+        return { tokenIdentifier, nonce, burntQuantity };
     }
 
     private ensureNoError(transaction: ITransactionOnNetwork) {

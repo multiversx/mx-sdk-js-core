@@ -319,8 +319,8 @@ describe("test factory on testnet", function () {
         }
     });
 
-    it("should issue and create SFT", async function () {
-        this.timeout(180000);
+    it("should issue and create SFT, add quantity, burn quantity", async function () {
+        this.timeout(200000);
         await frank.sync(provider);
         await grace.sync(provider);
 
@@ -361,9 +361,9 @@ describe("test factory on testnet", function () {
         assert.include(tx2Outcome.roles, "ESDTRoleNFTCreate");
         assert.include(tx2Outcome.roles, "ESDTRoleNFTAddQuantity");
 
-        // Create SFTs
-        for (let i = 1; i <= 3; i++) {
-            const tx = factory.nftCreate({
+        for (let i = 1; i <= 2; i++) {
+            // Create SFT
+            const txCreate = factory.nftCreate({
                 creator: grace.address,
                 tokenIdentifier: tokenIdentifier,
                 initialQuantity: i * 10,
@@ -375,12 +375,44 @@ describe("test factory on testnet", function () {
                 nonce: grace.account.nonce
             });
 
-            const txOnNetwork = await processTransaction(grace, tx, "tx");
-            const txOutcome = parser.parseNFTCreate(txOnNetwork);
+            const txCreateOnNetwork = await processTransaction(grace, txCreate, "txCreate");
+            const txCreateOutcome = parser.parseNFTCreate(txCreateOnNetwork);
 
-            assert.equal(txOutcome.tokenIdentifier, tokenIdentifier);
-            assert.equal(txOutcome.nonce, i.toString());
-            assert.equal(txOutcome.initialQuantity, (i * 10).toString());
+            assert.equal(txCreateOutcome.tokenIdentifier, tokenIdentifier);
+            assert.equal(txCreateOutcome.nonce, i.toString());
+            assert.equal(txCreateOutcome.initialQuantity, (i * 10).toString());
+
+            // Add quantity
+            const txAddQuantity = factory.addQuantity({
+                manager: grace.address,
+                tokenIdentifier: txCreateOutcome.tokenIdentifier,
+                tokenNonce: txCreateOutcome.nonce,
+                quantityToAdd: "3",
+                nonce: grace.account.nonce
+            });
+
+            const txAddQuantityOnNetwork = await processTransaction(grace, txAddQuantity, "txAddQuantity");
+            const txAddQuantityOutcome = parser.parseAddQuantity(txAddQuantityOnNetwork);
+
+            assert.equal(txAddQuantityOutcome.tokenIdentifier, tokenIdentifier);
+            assert.equal(txAddQuantityOutcome.nonce, i.toString());
+            assert.equal(txAddQuantityOutcome.addedQuantity, "3");
+
+            // Burn quantity
+            const txBurnQuantity = factory.burnQuantity({
+                manager: grace.address,
+                tokenIdentifier: txCreateOutcome.tokenIdentifier,
+                tokenNonce: txCreateOutcome.nonce,
+                quantityToBurn: "2",
+                nonce: grace.account.nonce
+            });
+
+            const txBurnQuantityOnNetwork = await processTransaction(grace, txBurnQuantity, "txBurnQuantity");
+            const txBurnQuantityOutcome = parser.parseBurnQuantity(txBurnQuantityOnNetwork);
+
+            assert.equal(txBurnQuantityOutcome.tokenIdentifier, tokenIdentifier);
+            assert.equal(txBurnQuantityOutcome.nonce, i.toString());
+            assert.equal(txBurnQuantityOutcome.burntQuantity, "2");
         }
     });
 

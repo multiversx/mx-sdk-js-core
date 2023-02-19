@@ -367,6 +367,72 @@ describe("test factory on testnet", function () {
         }
     });
 
+    it.only("should register and create Meta ESDT", async function () {
+        this.timeout(180000);
+        await frank.sync(provider);
+        await grace.sync(provider);
+
+        // Register Meta ESDT
+        const tx1 = factory.registerMetaESDT({
+            issuer: frank.address,
+            tokenName: "FRANK",
+            tokenTicker: "FRANK",
+            numDecimals: 10,
+            canFreeze: true,
+            canWipe: true,
+            canPause: true,
+            canTransferNFTCreateRole: true,
+            canChangeOwner: true,
+            canUpgrade: true,
+            canAddSpecialRoles: true,
+            nonce: frank.account.nonce
+        });
+
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
+        const tx1Outcome = parser.parseRegisterMetaESDT(tx1OnNetwork);
+        const tokenIdentifier = tx1Outcome.tokenIdentifier;
+        assert.isTrue(tokenIdentifier.includes("FRANK"));
+
+        // Set roles (give Grace the ability to create Meta ESDTs)
+        const tx2 = factory.setSpecialRoleOnMetaESDT({
+            manager: frank.address,
+            user: grace.address,
+            tokenIdentifier: tokenIdentifier,
+            addRoleNFTCreate: true,
+            addRoleNFTBurn: false,
+            addRoleNFTAddQuantity: true,
+            addRoleESDTTransferRole: false,
+            nonce: frank.account.nonce
+        });
+
+        const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
+        const tx2Outcome = parser.parseSetSpecialRole(tx2OnNetwork);
+        assert.include(tx2Outcome.roles, "ESDTRoleNFTCreate");
+        assert.include(tx2Outcome.roles, "ESDTRoleNFTAddQuantity");
+
+        // Create tokens
+        for (let i = 1; i <= 3; i++) {
+            const tx = factory.nftCreate({
+                creator: grace.address,
+                tokenIdentifier: tokenIdentifier,
+                initialQuantity: i * 10,
+                name: `test-${i}`,
+                royalties: 1000,
+                hash: "abba",
+                attributes: "test",
+                uris: ["a", "b"],
+                nonce: grace.account.nonce
+            });
+
+            const txOnNetwork = await processTransaction(grace, tx, "tx");
+            const txOutcome = parser.parseNFTCreate(txOnNetwork);
+
+            assert.equal(txOutcome.tokenIdentifier, tokenIdentifier);
+            assert.equal(txOutcome.nonce, i);
+            assert.equal(txOutcome.initialQuantity, i * 10);
+        }
+    });
+
     async function processTransaction(wallet: TestWallet, transaction: Transaction, tag: string): Promise<ITransactionOnNetwork> {
         wallet.account.incrementNonce();
         await wallet.signer.sign(transaction);

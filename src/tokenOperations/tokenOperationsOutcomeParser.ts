@@ -98,6 +98,14 @@ export class TokenOperationsOutcomeParser {
         return { tokenIdentifier: tokenIdentifier };
     }
 
+    parseRegisterMetaESDT(transaction: ITransactionOnNetwork): IESDTIssueOutcome {
+        this.ensureNoError(transaction);
+
+        const event = this.findSingleEventByIdentifier(transaction, "registerMetaESDT");
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        return { tokenIdentifier: tokenIdentifier };
+    }
+
     parseSetSpecialRole(transaction: ITransactionOnNetwork): ISetSpecialRoleOutcome {
         this.ensureNoError(transaction);
 

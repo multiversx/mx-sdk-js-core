@@ -301,6 +301,10 @@ export class TokenOperationsFactory {
         });
     }
 
+    setSpecialRoleOnMetaESDT(args: ISemiFungibleSetSpecialRoleArgs): Transaction {
+        return this.setSpecialRoleOnSemiFungible(args);
+    }
+
     setSpecialRoleOnNonFungible(args: INonFungibleSetSpecialRoleArgs): Transaction {
         const parts = [
             "setSpecialRole",

@@ -26,7 +26,7 @@ export class EndpointDefinition {
         mutability: string,
         payableInTokens: string[],
         inputs: any[],
-        outputs: []
+        outputs: any[]
     }): EndpointDefinition {
         json.name = json.name == null ? NamePlaceholder : json.name;
         json.payableInTokens = json.payableInTokens || [];

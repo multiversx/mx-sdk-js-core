@@ -28,7 +28,7 @@ interface IConfig {
 }
 
 interface IBaseArgs {
-    nonce?: INonce;
+    transactionNonce?: INonce;
     value?: ITransactionValue;
     gasPrice?: IGasPrice;
     gasLimit?: IGasLimit;
@@ -189,7 +189,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.issuer,
             receiver: this.config.esdtContractAddress,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             value: this.config.issueCost,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -215,7 +215,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.issuer,
             receiver: this.config.esdtContractAddress,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             value: this.config.issueCost,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -241,7 +241,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.issuer,
             receiver: this.config.esdtContractAddress,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             value: this.config.issueCost,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -268,7 +268,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.issuer,
             receiver: this.config.esdtContractAddress,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             value: this.config.issueCost,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -289,7 +289,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitSetSpecialRole,
@@ -311,7 +311,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitSetSpecialRole,
@@ -338,7 +338,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitSetSpecialRole,
@@ -365,7 +365,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.creator,
             receiver: args.creator,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTNFTCreate.valueOf() + storageGasLimit.valueOf(),
@@ -386,7 +386,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitPausing,
@@ -408,7 +408,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitFreezing,
@@ -426,7 +426,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: args.manager,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTLocalMint,
@@ -444,7 +444,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: args.manager,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTLocalBurn,
@@ -463,7 +463,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: args.manager,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTNFTUpdateAttributes,
@@ -482,7 +482,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: args.manager,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTNFTAddQuantity,
@@ -501,7 +501,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: args.manager,
-            nonce: args.nonce,
+            nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTNFTBurn,

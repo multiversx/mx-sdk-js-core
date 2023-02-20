@@ -54,7 +54,7 @@ describe("test factory on testnet", function () {
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
@@ -69,7 +69,7 @@ describe("test factory on testnet", function () {
             tokenIdentifier: tx1Outcome.tokenIdentifier,
             addRoleLocalMint: true,
             addRoleLocalBurn: true,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
@@ -83,7 +83,7 @@ describe("test factory on testnet", function () {
             user: grace.address,
             tokenIdentifier: tokenIdentifier,
             supplyToMint: 200,
-            nonce: grace.account.nonce
+            transactionNonce: grace.account.nonce
         });
 
         const tx3OnNetwork = await processTransaction(grace, tx3, "tx3");
@@ -96,7 +96,7 @@ describe("test factory on testnet", function () {
             user: grace.address,
             tokenIdentifier: tokenIdentifier,
             supplyToBurn: 50,
-            nonce: grace.account.nonce
+            transactionNonce: grace.account.nonce
         });
 
         const tx4OnNetwork = await processTransaction(grace, tx4, "tx4");
@@ -123,7 +123,7 @@ describe("test factory on testnet", function () {
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
@@ -136,7 +136,7 @@ describe("test factory on testnet", function () {
             pause: true,
             manager: frank.address,
             tokenIdentifier: tokenIdentifier,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
@@ -147,7 +147,7 @@ describe("test factory on testnet", function () {
             unpause: true,
             manager: frank.address,
             tokenIdentifier: tokenIdentifier,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx3OnNetwork = await processTransaction(frank, tx3, "tx3");
@@ -184,7 +184,7 @@ describe("test factory on testnet", function () {
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
@@ -209,7 +209,7 @@ describe("test factory on testnet", function () {
             manager: frank.address,
             user: grace.address,
             tokenIdentifier: tokenIdentifier,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx3OnNetwork = await processTransaction(frank, tx3, "tx3");
@@ -225,7 +225,7 @@ describe("test factory on testnet", function () {
             manager: frank.address,
             user: grace.address,
             tokenIdentifier: tokenIdentifier,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx4OnNetwork = await processTransaction(frank, tx4, "tx4");
@@ -253,7 +253,7 @@ describe("test factory on testnet", function () {
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
@@ -271,7 +271,7 @@ describe("test factory on testnet", function () {
             addRoleNFTUpdateAttributes: true,
             addRoleNFTAddURI: true,
             addRoleESDTTransferRole: false,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
@@ -291,7 +291,7 @@ describe("test factory on testnet", function () {
                 hash: "abba",
                 attributes: Buffer.from("test"),
                 uris: ["a", "b"],
-                nonce: grace.account.nonce
+                transactionNonce: grace.account.nonce
             });
 
             const txCreateOnNetwork = await processTransaction(grace, txCreate, "txCreate");
@@ -307,7 +307,7 @@ describe("test factory on testnet", function () {
                 tokenIdentifier: txCreateOutcome.tokenIdentifier,
                 tokenNonce: txCreateOutcome.nonce,
                 attributes: Buffer.from("updated"),
-                nonce: grace.account.nonce,
+                transactionNonce: grace.account.nonce,
             });
 
             const txUpdateOnNetwork = await processTransaction(grace, txUpdate, "txUpdate");
@@ -336,7 +336,7 @@ describe("test factory on testnet", function () {
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
@@ -353,7 +353,7 @@ describe("test factory on testnet", function () {
             addRoleNFTBurn: false,
             addRoleNFTAddQuantity: true,
             addRoleESDTTransferRole: false,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
@@ -372,7 +372,7 @@ describe("test factory on testnet", function () {
                 hash: "abba",
                 attributes: Buffer.from("test"),
                 uris: ["a", "b"],
-                nonce: grace.account.nonce
+                transactionNonce: grace.account.nonce
             });
 
             const txCreateOnNetwork = await processTransaction(grace, txCreate, "txCreate");
@@ -388,7 +388,7 @@ describe("test factory on testnet", function () {
                 tokenIdentifier: txCreateOutcome.tokenIdentifier,
                 tokenNonce: txCreateOutcome.nonce,
                 quantityToAdd: "3",
-                nonce: grace.account.nonce
+                transactionNonce: grace.account.nonce
             });
 
             const txAddQuantityOnNetwork = await processTransaction(grace, txAddQuantity, "txAddQuantity");
@@ -404,7 +404,7 @@ describe("test factory on testnet", function () {
                 tokenIdentifier: txCreateOutcome.tokenIdentifier,
                 tokenNonce: txCreateOutcome.nonce,
                 quantityToBurn: "2",
-                nonce: grace.account.nonce
+                transactionNonce: grace.account.nonce
             });
 
             const txBurnQuantityOnNetwork = await processTransaction(grace, txBurnQuantity, "txBurnQuantity");
@@ -434,7 +434,7 @@ describe("test factory on testnet", function () {
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
@@ -451,7 +451,7 @@ describe("test factory on testnet", function () {
             addRoleNFTBurn: false,
             addRoleNFTAddQuantity: true,
             addRoleESDTTransferRole: false,
-            nonce: frank.account.nonce
+            transactionNonce: frank.account.nonce
         });
 
         const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
@@ -470,7 +470,7 @@ describe("test factory on testnet", function () {
                 hash: "abba",
                 attributes: Buffer.from("test"),
                 uris: ["a", "b"],
-                nonce: grace.account.nonce
+                transactionNonce: grace.account.nonce
             });
 
             const txOnNetwork = await processTransaction(grace, tx, "tx");

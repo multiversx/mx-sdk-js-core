@@ -27,7 +27,7 @@ describe("test factory", () => {
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true,
-            nonce: 42
+            transactionNonce: 42
         });
 
         assert.equal(transaction.getData().toString(), "issue@4652414e4b@4652414e4b@64@00@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e4d696e74@74727565@63616e4275726e@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565")
@@ -48,7 +48,7 @@ describe("test factory", () => {
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true,
-            nonce: 42
+            transactionNonce: 42
         });
 
         assert.equal(transaction.getData().toString(), "issueSemiFungible@4652414e4b@4652414e4b@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565")
@@ -69,7 +69,7 @@ describe("test factory", () => {
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true,
-            nonce: 42
+            transactionNonce: 42
         });
 
         assert.equal(transaction.getData().toString(), "issueNonFungible@4652414e4b@4652414e4b@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565")
@@ -91,7 +91,7 @@ describe("test factory", () => {
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true,
-            nonce: 42
+            transactionNonce: 42
         });
 
         assert.equal(transaction.getData().toString(), "registerMetaESDT@4652414e4b@4652414e4b@0a@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565")
@@ -110,7 +110,7 @@ describe("test factory", () => {
             addRoleNFTUpdateAttributes: true,
             addRoleNFTAddURI: true,
             addRoleESDTTransferRole: false,
-            nonce: 42
+            transactionNonce: 42
         });
 
         assert.equal(transaction.getData().toString(), "setSpecialRole@4652414e4b2d313163653365@1e8a8b6b49de5b7be10aaa158a5a6a4abb4b56cc08f524bb5e6cd5f211ad3e13@45534454526f6c654e4654437265617465@45534454526f6c654e465455706461746541747472696275746573@45534454526f6c654e4654416464555249");
@@ -129,7 +129,7 @@ describe("test factory", () => {
             hash: "abba",
             attributes: Buffer.from("test"),
             uris: ["a", "b"],
-            nonce: 42
+            transactionNonce: 42
         });
 
         assert.equal(transaction.getData().toString(), "ESDTNFTCreate@4652414e4b2d616139653864@01@74657374@03e8@61626261@74657374@61@62");

@@ -103,10 +103,18 @@ export class TypeMapper {
         }
     }
 
+    /**
+     * Maps a "raw type" object to a "known (specific) type" object.
+     * In the process, it also learns the new type.
+     * Can only map types if their dependencies were previously learned (through mapping).
+     */
     mapType(type: Type): Type {
-        let mappedType = this.mapRecursiveType(type);
+        let mappedType = this.mapTypeRecursively(type);
         if (mappedType) {
-            // We do not learn generic types (that also have type parameters)
+            // We do not learn generic types (that also have type parameters),
+            // we only learn closed, non-generic types.
+            // Reason: in the ABI, generic types are unnamed.
+            // E.g.: two occurrences of List<Foobar> aren't recognized as a single type (simplification).
             if (!mappedType.isGenericType()) {
                 this.learnType(mappedType);
             }
@@ -117,7 +125,7 @@ export class TypeMapper {
         throw new errors.ErrTypingSystem(`Cannot map the type "${type.getName()}" to a known type`);
     }
 
-    mapRecursiveType(type: Type): Type | null {
+    private mapTypeRecursively(type: Type): Type | null {
         let isGeneric = type.isGenericType();
 
         let previouslyLearnedType = this.learnedTypesMap.get(type.getName());

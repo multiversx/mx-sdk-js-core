@@ -1,8 +1,6 @@
 name: Check package-lock.json
 
 on:
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:

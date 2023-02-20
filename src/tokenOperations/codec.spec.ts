@@ -3,7 +3,7 @@ import { assert } from "chai";
 import { bigIntToBuffer, bigIntToHex, bufferToBigInt, bufferToHex, stringToBuffer, utf8ToHex } from "./codec";
 
 describe("test codec", () => {
-    it.only("should properly encode and decode values", () => {
+    it("should properly encode and decode values", () => {
         assert.deepEqual(stringToBuffer("hello"), Buffer.from("hello"));
         assert.deepEqual(bufferToBigInt(Buffer.from("075bcd15", "hex")), new BigNumber("123456789"));
         assert.deepEqual(bufferToBigInt(Buffer.from([])), new BigNumber("0"));

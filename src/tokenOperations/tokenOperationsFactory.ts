@@ -358,8 +358,8 @@ export class TokenOperationsFactory {
             ...args.uris.map(utf8ToHex),
         ];
 
-        // Question for review: is this the one to be considered as "NFT data"?
-        const nftData = args.attributes + args.uris.join("");
+        // Note that the following is an approximation (a reasonable one):
+        const nftData = args.name + args.hash + args.attributes + args.uris.join("");
         const storageGasLimit = nftData.length * this.config.gasLimitStorePerByte.valueOf();
 
         return this.createTransaction({

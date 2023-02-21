@@ -8,3 +8,4 @@ export const ESDT_TRANSFER_FUNCTION_NAME = "ESDTTransfer";
 export const ESDTNFT_TRANSFER_FUNCTION_NAME = "ESDTNFTTransfer";
 export const MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME = "MultiESDTNFTTransfer";
 export const ESDT_TRANSFER_VALUE = "0";
+export const ARGUMENTS_SEPARATOR = "@";

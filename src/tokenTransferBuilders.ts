@@ -5,6 +5,9 @@ import { AddressValue, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value 
 import { TokenPayment } from "./tokenPayment";
 import { TransactionPayload } from "./transactionPayload";
 
+/**
+ * @deprecated Use {@link TransfersFactory} instead.
+ */
 export class ESDTTransferPayloadBuilder {
     payment: ITokenPayment = TokenPayment.fungibleFromAmount("", "0", 0);
 
@@ -27,6 +30,9 @@ export class ESDTTransferPayloadBuilder {
     }
 }
 
+/**
+ * @deprecated Use {@link TransfersFactory} instead.
+ */
 export class ESDTNFTTransferPayloadBuilder {
     payment: ITokenPayment = TokenPayment.nonFungible("", 0);
     destination: IAddress = new Address("");
@@ -59,6 +65,9 @@ export class ESDTNFTTransferPayloadBuilder {
     }
 }
 
+/**
+ * @deprecated Use {@link TransfersFactory} instead.
+ */
 export class MultiESDTNFTTransferPayloadBuilder {
     payments: ITokenPayment[] = [];
     destination: IAddress = new Address("");

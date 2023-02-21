@@ -73,6 +73,13 @@ export interface IFreezingOutcome {
     balance: string;
 }
 
+export interface IWipingOutcome {
+    userAddress: string;
+    tokenIdentifier: string;
+    nonce: string;
+    balance: string;
+}
+
 export interface IUpdateAttributesOutcome {
     tokenIdentifier: string;
     nonce: string;
@@ -193,6 +200,17 @@ export class TokenOperationsOutcomeParser {
         this.ensureNoError(transaction);
 
         const event = this.findSingleEventByIdentifier(transaction, "ESDTUnFreeze");
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const balance = this.extractAmount(event);
+        const userAddress = this.extractAddress(event);
+        return { userAddress, tokenIdentifier, nonce, balance };
+    }
+
+    parseWipe(transaction: ITransactionOnNetwork): IWipingOutcome {
+        this.ensureNoError(transaction);
+
+        const event = this.findSingleEventByIdentifier(transaction, "ESDTWipe");
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
         const balance = this.extractAmount(event);

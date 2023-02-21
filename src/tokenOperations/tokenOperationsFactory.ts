@@ -1,6 +1,5 @@
 import BigNumber from "bignumber.js";
 import { ARGUMENTS_SEPARATOR, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "../constants";
-import { Err } from "../errors";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITransactionValue } from "../interface";
 import { TransactionOptions, TransactionVersion } from "../networkParams";
 import { Transaction } from "../transaction";
@@ -18,6 +17,7 @@ interface IConfig {
     gasLimitSetSpecialRole: IGasLimit;
     gasLimitPausing: IGasLimit;
     gasLimitFreezing: IGasLimit;
+    gasLimitWiping: IGasLimit;
     gasLimitESDTNFTCreate: IGasLimit;
     gasLimitESDTNFTUpdateAttributes: IGasLimit;
     gasLimitESDTNFTAddQuantity: IGasLimit;
@@ -113,16 +113,18 @@ interface INFTCreateArgs extends IBaseArgs {
 interface IPausingArgs extends IBaseArgs {
     manager: IAddress;
     tokenIdentifier: string;
-    pause?: boolean;
-    unpause?: boolean;
 }
 
 interface IFreezingArgs extends IBaseArgs {
     manager: IAddress;
     user: IAddress;
     tokenIdentifier: string;
-    freeze?: boolean;
-    unfreeze?: boolean;
+}
+
+interface IWipingArgs extends IBaseArgs {
+    manager: IAddress;
+    user: IAddress;
+    tokenIdentifier: string;
 }
 
 interface ILocalMintArgs extends IBaseArgs {
@@ -374,12 +376,25 @@ export class TokenOperationsFactory {
     }
 
     pause(args: IPausingArgs): Transaction {
-        if (args.pause == args.unpause) {
-            throw new Err("Must set either 'pause' or 'unpause' (one and only one should be set).")
-        }
-
         const parts = [
-            args.pause ? "pause" : "unPause",
+            "pause",
+            utf8ToHex(args.tokenIdentifier)
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.transactionNonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitPausing,
+            dataParts: parts
+        });
+    }
+
+    unpause(args: IPausingArgs): Transaction {
+        const parts = [
+            "unPause",
             utf8ToHex(args.tokenIdentifier)
         ];
 
@@ -395,12 +410,8 @@ export class TokenOperationsFactory {
     }
 
     freeze(args: IFreezingArgs): Transaction {
-        if (args.freeze == args.unfreeze) {
-            throw new Err("Must set either 'freeze' or 'unfreeze' (one and only one should be set).")
-        }
-
         const parts = [
-            args.freeze ? "freeze" : "unFreeze",
+            "freeze",
             utf8ToHex(args.tokenIdentifier),
             addressToHex(args.user)
         ];
@@ -412,6 +423,42 @@ export class TokenOperationsFactory {
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitFreezing,
+            dataParts: parts
+        });
+    }
+
+    unfreeze(args: IFreezingArgs): Transaction {
+        const parts = [
+            "unFreeze",
+            utf8ToHex(args.tokenIdentifier),
+            addressToHex(args.user)
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.transactionNonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitFreezing,
+            dataParts: parts
+        });
+    }
+
+    wipe(args: IWipingArgs): Transaction {
+        const parts = [
+            "wipe",
+            utf8ToHex(args.tokenIdentifier),
+            addressToHex(args.user)
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.transactionNonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitWiping,
             dataParts: parts
         });
     }

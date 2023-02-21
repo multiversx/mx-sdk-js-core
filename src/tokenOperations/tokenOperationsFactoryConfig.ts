@@ -13,6 +13,7 @@ export class TokenOperationsFactoryConfig {
     gasLimitSetSpecialRole: IGasLimit = 60000000;
     gasLimitPausing: IGasLimit = 60000000;
     gasLimitFreezing: IGasLimit = 60000000;
+    gasLimitWiping: IGasLimit = 60000000;
     gasLimitESDTNFTCreate: IGasLimit = 3000000;
     gasLimitESDTNFTUpdateAttributes: IGasLimit = 1000000;
     gasLimitESDTNFTAddQuantity: IGasLimit = 1000000;

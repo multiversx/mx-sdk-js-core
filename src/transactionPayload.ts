@@ -66,21 +66,21 @@ export class TransactionPayload {
     }
 
     /**
-    * @deprecated Use {@link SmartContract} to create transactions related to smart contracts.
+    * @deprecated Use {@link SmartContract} to create smart contracts related transactions.
     */
     static contractDeploy(): ContractDeployPayloadBuilder {
         return new ContractDeployPayloadBuilder();
     }
 
     /**
-    * @deprecated Use {@link SmartContract} to create transactions related to smart contracts.
+    * @deprecated Use {@link SmartContract} to create smart contracts related transactions.
     */
     static contractUpgrade(): ContractUpgradePayloadBuilder {
         return new ContractUpgradePayloadBuilder();
     }
 
     /**
-    * @deprecated Use {@link SmartContract} to create transactions related to smart contracts.
+    * @deprecated Use {@link SmartContract} to create smart contracts related transactions.
     */
     static contractCall(): ContractCallPayloadBuilder {
         return new ContractCallPayloadBuilder();

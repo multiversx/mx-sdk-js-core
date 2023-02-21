@@ -133,7 +133,6 @@ describe("test factory on testnet", function () {
 
         // Pause
         const tx2 = factory.pause({
-            pause: true,
             manager: frank.address,
             tokenIdentifier: tokenIdentifier,
             transactionNonce: frank.account.nonce
@@ -143,8 +142,7 @@ describe("test factory on testnet", function () {
         const _tx2Outcome = parser.parsePause(tx2OnNetwork);
 
         // Unpause
-        const tx3 = factory.pause({
-            unpause: true,
+        const tx3 = factory.unpause({
             manager: frank.address,
             tokenIdentifier: tokenIdentifier,
             transactionNonce: frank.account.nonce
@@ -205,7 +203,6 @@ describe("test factory on testnet", function () {
 
         // Freeze
         const tx3 = factory.freeze({
-            freeze: true,
             manager: frank.address,
             user: grace.address,
             tokenIdentifier: tokenIdentifier,
@@ -220,8 +217,7 @@ describe("test factory on testnet", function () {
         assert.equal(tx3Outcome.balance, "10");
 
         // Unfreeze
-        const tx4 = factory.freeze({
-            unfreeze: true,
+        const tx4 = factory.unfreeze({
             manager: frank.address,
             user: grace.address,
             tokenIdentifier: tokenIdentifier,
@@ -230,6 +226,75 @@ describe("test factory on testnet", function () {
 
         const tx4OnNetwork = await processTransaction(frank, tx4, "tx4");
         const tx4Outcome = parser.parseUnfreeze(tx4OnNetwork);
+        assert.equal(tx4Outcome.userAddress, grace.address.bech32());
+        assert.equal(tx4Outcome.tokenIdentifier, tokenIdentifier);
+        assert.equal(tx4Outcome.nonce, "0");
+        assert.equal(tx4Outcome.balance, "10");
+    });
+
+    it("should issue fungible, freeze, wipe", async function () {
+        this.timeout(240000);
+        await frank.sync(provider);
+
+        // Issue
+        const tx1 = factory.issueFungible({
+            issuer: frank.address,
+            tokenName: "FRANK",
+            tokenTicker: "FRANK",
+            initialSupply: 100,
+            numDecimals: 0,
+            canFreeze: true,
+            canWipe: true,
+            canPause: true,
+            canMint: true,
+            canBurn: true,
+            canChangeOwner: true,
+            canUpgrade: true,
+            canAddSpecialRoles: true,
+            transactionNonce: frank.account.nonce
+        });
+
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
+        const tx1Outcome = parser.parseIssueFungible(tx1OnNetwork);
+        const tokenIdentifier = tx1Outcome.tokenIdentifier;
+        assert.isTrue(tokenIdentifier.includes("FRANK"));
+
+        // Send some tokens to Grace
+        const tx2 = transfersFactory.createESDTTransfer({
+            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+            sender: frank.account.address,
+            receiver: grace.account.address,
+            chainID: network.ChainID,
+            nonce: frank.account.nonce
+        });
+
+        const _tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
+
+        // Freeze
+        const tx3 = factory.freeze({
+            manager: frank.address,
+            user: grace.address,
+            tokenIdentifier: tokenIdentifier,
+            transactionNonce: frank.account.nonce
+        });
+
+        const tx3OnNetwork = await processTransaction(frank, tx3, "tx3");
+        const tx3Outcome = parser.parseFreeze(tx3OnNetwork);
+        assert.equal(tx3Outcome.userAddress, grace.address.bech32());
+        assert.equal(tx3Outcome.tokenIdentifier, tokenIdentifier);
+        assert.equal(tx3Outcome.nonce, "0");
+        assert.equal(tx3Outcome.balance, "10");
+
+        // Wipe
+        const tx4 = factory.wipe({
+            manager: frank.address,
+            user: grace.address,
+            tokenIdentifier: tokenIdentifier,
+            transactionNonce: frank.account.nonce
+        });
+
+        const tx4OnNetwork = await processTransaction(frank, tx4, "tx4");
+        const tx4Outcome = parser.parseWipe(tx4OnNetwork);
         assert.equal(tx4Outcome.userAddress, grace.address.bech32());
         assert.equal(tx4Outcome.tokenIdentifier, tokenIdentifier);
         assert.equal(tx4Outcome.nonce, "0");

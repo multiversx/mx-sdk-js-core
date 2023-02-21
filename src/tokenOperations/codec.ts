@@ -17,10 +17,18 @@ export function bufferToBigInt(buffer: Buffer): BigNumber {
 }
 
 export function bigIntToBuffer(value: BigNumber.Value): Buffer {
+    if (value == 0) {
+        return Buffer.from([]);
+    }
+
     return contractsCodecUtils.bigIntToBuffer(value);
 }
 
 export function bigIntToHex(value: BigNumber.Value): string {
+    if (value == 0) {
+        return "";
+    }
+
     return contractsCodecUtils.getHexMagnitudeOfBigInt(value);
 }
 

@@ -71,28 +71,32 @@ describe("test smart contract interactor", function () {
 
         // Meta ESDT (special SFT), single
         transaction = new Interaction(contract, dummyFunction, [])
-            .withSingleESDTNFTTransfer(LKMEX(123456, 123.456), alice)
+            .withSender(alice)
+            .withSingleESDTNFTTransfer(LKMEX(123456, 123.456))
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`);
 
         // NFT, single
         transaction = new Interaction(contract, dummyFunction, [])
-            .withSingleESDTNFTTransfer(Strămoși(1), alice)
+            .withSender(alice)
+            .withSingleESDTNFTTransfer(Strămoși(1))
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexStrămoși}@01@01@${hexContractAddress}@${hexDummyFunction}`);
 
         // ESDT, multiple
         transaction = new Interaction(contract, dummyFunction, [])
-            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)], alice)
+            .withSender(alice)
+            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)])
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexFoo}@@03@${hexBar}@@0c44@${hexDummyFunction}`);
 
         // NFT, multiple
         transaction = new Interaction(contract, dummyFunction, [])
-            .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)], alice)
+            .withSender(alice)
+            .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)])
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexStrămoși}@01@01@${hexStrămoși}@2a@01@${hexDummyFunction}`);

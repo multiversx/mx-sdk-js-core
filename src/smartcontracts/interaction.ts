@@ -42,7 +42,6 @@ export class Interaction {
     private isWithSingleESDTNFTTransfer: boolean = false;
     private isWithMultiESDTNFTTransfer: boolean = false;
     private tokenTransfers: TokenTransfersWithinInteraction;
-    private tokenTransfersSender: IAddress = new Address();
 
     constructor(
         contract: ISmartContractWithinInteraction,
@@ -97,12 +96,12 @@ export class Interaction {
             args = this.tokenTransfers.buildArgsForSingleESDTTransfer();
         } else if (this.isWithSingleESDTNFTTransfer) {
             // For NFT, SFT and MetaESDT, transaction.sender == transaction.receiver.
-            receiver = this.tokenTransfersSender;
+            receiver = this.sender;
             func = new ContractFunction(ESDTNFT_TRANSFER_FUNCTION_NAME);
             args = this.tokenTransfers.buildArgsForSingleESDTNFTTransfer();
         } else if (this.isWithMultiESDTNFTTransfer) {
             // For NFT, SFT and MetaESDT, transaction.sender == transaction.receiver.
-            receiver = this.tokenTransfersSender;
+            receiver = this.sender;
             func = new ContractFunction(MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME);
             args = this.tokenTransfers.buildArgsForMultiESDTNFTTransfer();
         }
@@ -147,17 +146,35 @@ export class Interaction {
         return this;
     }
 
-    withSingleESDTNFTTransfer(transfer: ITokenPayment, sender: IAddress) {
+    withSingleESDTNFTTransfer(transfer: ITokenPayment): Interaction;
+    /**
+     * @deprecated do not pass the "sender" parameter. Make sure to call "withSender()", instead.
+     */
+    withSingleESDTNFTTransfer(transfer: ITokenPayment, sender?: IAddress): Interaction;
+    withSingleESDTNFTTransfer(transfer: ITokenPayment, sender?: IAddress): Interaction {
         this.isWithSingleESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction([transfer], this);
-        this.tokenTransfersSender = sender;
+
+        if (sender) {
+            this.sender = sender;
+        }
+
         return this;
     }
 
-    withMultiESDTNFTTransfer(transfers: ITokenPayment[], sender: IAddress) {
+    withMultiESDTNFTTransfer(transfers: ITokenPayment[]): Interaction;
+    /**
+     * @deprecated do not pass the "sender" parameter. Make sure to call "withSender()", instead.
+     */
+    withMultiESDTNFTTransfer(transfers: ITokenPayment[], sender?: IAddress): Interaction;
+    withMultiESDTNFTTransfer(transfers: ITokenPayment[], sender?: IAddress): Interaction {
         this.isWithMultiESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction(transfers, this);
-        this.tokenTransfersSender = sender;
+
+        if (sender) {
+            this.sender = sender;
+        }
+
         return this;
     }
 

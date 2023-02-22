@@ -3,12 +3,19 @@ import { Address } from "./address";
 import { TRANSACTION_MIN_GAS_PRICE } from "./constants";
 import * as errors from "./errors";
 import { Hash } from "./hash";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionPayload, ITransactionValue } from "./interface";
-import { INetworkConfig } from "./interfaceOfNetwork";
 import {
-  TransactionOptions,
-  TransactionVersion
-} from "./networkParams";
+  IAddress,
+  IChainID,
+  IGasLimit,
+  IGasPrice,
+  INonce,
+  IPlainTransactionObject,
+  ISignature,
+  ITransactionPayload,
+  ITransactionValue,
+} from "./interface";
+import { INetworkConfig } from "./interfaceOfNetwork";
+import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
 import { Signature } from "./signature";
 import { TransactionPayload } from "./transactionPayload";
@@ -81,6 +88,8 @@ export class Transaction {
    */
   private hash: TransactionHash;
 
+  private guardian: IAddress | undefined;
+
   /**
    * Creates a new Transaction object.
    */
@@ -95,6 +104,7 @@ export class Transaction {
     chainID,
     version,
     options,
+    guardian,
   }: {
     nonce?: INonce;
     value?: ITransactionValue;
@@ -106,6 +116,7 @@ export class Transaction {
     chainID: IChainID;
     version?: TransactionVersion;
     options?: TransactionOptions;
+    guardian?: IAddress;
   }) {
     this.nonce = nonce || 0;
     this.value = value ? new BigNumber(value.toString()).toFixed(0) : 0;
@@ -117,7 +128,9 @@ export class Transaction {
     this.chainID = chainID;
     this.version = version || TransactionVersion.withDefaultVersion();
     this.options = options || TransactionOptions.withDefaultOptions();
-
+    if (guardian) {
+      this.guardian = guardian;
+    }
     this.signature = Signature.empty();
     this.hash = TransactionHash.empty();
   }
@@ -194,6 +207,10 @@ export class Transaction {
     return this.hash;
   }
 
+  getGuardian(): IAddress | undefined {
+    return this.guardian;
+  }
+
   /**
    * Serializes a transaction to a sequence of bytes, ready to be signed.
    * This function is called internally by signers.
@@ -219,7 +236,7 @@ export class Transaction {
    * @param sender The address of the sender (will be provided when called within the signing procedure)
    */
   toPlainObject(sender?: IAddress): IPlainTransactionObject {
-    return {
+    const result: any = {
       nonce: this.nonce.valueOf(),
       value: this.value.toString(),
       receiver: this.receiver.bech32(),
@@ -232,6 +249,11 @@ export class Transaction {
       options: this.options.valueOf() == 0 ? undefined : this.options.valueOf(),
       signature: this.signature.hex() ? this.signature.hex() : undefined,
     };
+
+    if (this.guardian) {
+      result.guardian = this.guardian.bech32();
+    }
+    return result;
   }
 
   /**
@@ -239,7 +261,9 @@ export class Transaction {
    *
    * @param plainObjectTransaction Raw data of a transaction, usually obtained by calling toPlainObject()
    */
-  static fromPlainObject(plainObjectTransaction: IPlainTransactionObject): Transaction {
+  static fromPlainObject(
+    plainObjectTransaction: IPlainTransactionObject
+  ): Transaction {
     const tx = new Transaction({
       nonce: Number(plainObjectTransaction.nonce),
       value: new BigNumber(plainObjectTransaction.value).toFixed(0),
@@ -247,10 +271,15 @@ export class Transaction {
       sender: Address.fromString(plainObjectTransaction.sender),
       gasPrice: Number(plainObjectTransaction.gasPrice),
       gasLimit: Number(plainObjectTransaction.gasLimit),
-      data: new TransactionPayload(Buffer.from(plainObjectTransaction.data || "", "base64")),
+      data: new TransactionPayload(
+        Buffer.from(plainObjectTransaction.data || "", "base64")
+      ),
       chainID: String(plainObjectTransaction.chainID),
       version: new TransactionVersion(plainObjectTransaction.version),
     });
+    if (plainObjectTransaction.guardian) {
+      tx.guardian = Address.fromString(plainObjectTransaction.guardian);
+    }
     if (plainObjectTransaction.signature) {
       tx.applySignature(
         new Signature(plainObjectTransaction.signature),
@@ -329,4 +358,3 @@ export class TransactionHash extends Hash {
     return new TransactionHash(hash);
   }
 }
-

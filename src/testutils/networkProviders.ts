@@ -1,4 +1,4 @@
-import { ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
+import { ApiNetworkProvider, ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
 import { IAddress } from "../interface";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
 import { Query } from "../smartcontracts/query";
@@ -6,6 +6,10 @@ import { Transaction } from "../transaction";
 
 export function createLocalnetProvider(): INetworkProvider {
     return new ProxyNetworkProvider("http://localhost:7950", { timeout: 5000 });
+}
+
+export function createTestnetProvider(): INetworkProvider {
+    return new ApiNetworkProvider("https://testnet-api.multiversx.com", { timeout: 5000 });
 }
 
 export interface INetworkProvider {

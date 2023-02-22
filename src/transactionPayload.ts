@@ -1,7 +1,7 @@
 import { ContractCallPayloadBuilder, ContractDeployPayloadBuilder, ContractUpgradePayloadBuilder } from "./smartcontracts/transactionPayloadBuilders";
 
 /**
- * The "data" field of a {@link Transaction}, as an immutable object.
+ * The "data" field of a Transaction, as an immutable object.
  */
 export class TransactionPayload {
     private readonly data: Buffer;
@@ -66,22 +66,22 @@ export class TransactionPayload {
     }
 
     /**
-     * Returns a new builder, to be used for contract deploy transactions.
-     */
+    * @deprecated Use {@link SmartContract} to create smart contracts related transactions.
+    */
     static contractDeploy(): ContractDeployPayloadBuilder {
         return new ContractDeployPayloadBuilder();
     }
 
     /**
-     * Returns a new builder, to be used for contract upgrade transactions.
-     */
+    * @deprecated Use {@link SmartContract} to create smart contracts related transactions.
+    */
     static contractUpgrade(): ContractUpgradePayloadBuilder {
         return new ContractUpgradePayloadBuilder();
     }
 
     /**
-     * Returns a new builder, to be used for contract call transactions.
-     */
+    * @deprecated Use {@link SmartContract} to create smart contracts related transactions.
+    */
     static contractCall(): ContractCallPayloadBuilder {
         return new ContractCallPayloadBuilder();
     }

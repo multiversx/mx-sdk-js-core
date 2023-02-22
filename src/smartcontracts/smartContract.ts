@@ -108,7 +108,7 @@ export class SmartContract implements ISmartContract {
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
      */
     deploy({ deployer, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
-        Compatibility.guardAddressIsNotSetOrZero(deployer, "'deployer' of SmartContract.deploy()", "pass the actual address to deploy()");
+        Compatibility.guardAddressIsSetAndNonZero(deployer, "'deployer' of SmartContract.deploy()", "pass the actual address to deploy()");
 
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
@@ -137,7 +137,7 @@ export class SmartContract implements ISmartContract {
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
     upgrade({ caller, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
-        Compatibility.guardAddressIsNotSetOrZero(caller, "'caller' of SmartContract.upgrade()", "pass the actual address to upgrade()");
+        Compatibility.guardAddressIsSetAndNonZero(caller, "'caller' of SmartContract.upgrade()", "pass the actual address to upgrade()");
 
         this.ensureHasAddress();
 
@@ -168,7 +168,7 @@ export class SmartContract implements ISmartContract {
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
     call({ func, args, value, gasLimit, receiver, gasPrice, chainID, caller }: CallArguments): Transaction {
-        Compatibility.guardAddressIsNotSetOrZero(caller, "'caller' of SmartContract.call()", "pass the actual address to call()");
+        Compatibility.guardAddressIsSetAndNonZero(caller, "'caller' of SmartContract.call()", "pass the actual address to call()");
 
         this.ensureHasAddress();
 

@@ -1,14 +1,14 @@
-import { Transaction } from "../transaction";
-import { Query } from "./query";
-import { ContractFunction } from "./function";
-import { Address } from "../address";
-import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
-import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
 import { Account } from "../account";
-import { CallArguments } from "./interface";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenPayment, ITransactionValue } from "../interface";
-import { InteractionChecker } from "./interactionChecker";
+import { Address } from "../address";
 import { Compatibility } from "../compatibility";
+import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenPayment, ITransactionValue } from "../interface";
+import { Transaction } from "../transaction";
+import { ContractFunction } from "./function";
+import { InteractionChecker } from "./interactionChecker";
+import { CallArguments } from "./interface";
+import { Query } from "./query";
+import { AddressValue, BigUIntValue, BytesValue, EndpointDefinition, TypedValue, U64Value, U8Value } from "./typesystem";
 
 /**
  * Internal interface: the smart contract, as seen from the perspective of an {@link Interaction}.
@@ -88,7 +88,7 @@ export class Interaction {
     }
 
     buildTransaction(): Transaction {
-        Compatibility.guardAddressIsNotSetOrZero(this.sender, "'sender' of interaction", "use interaction.withSender()");
+        Compatibility.guardAddressIsSetAndNonZero(this.sender, "'sender' of interaction", "use interaction.withSender()");
 
         let receiver = this.explicitReceiver || this.contract.getAddress();
         let func: ContractFunction = this.function;

@@ -10,7 +10,7 @@ export class Compatibility {
     /**
      * For internal use only.
      */
-    static guardAddressIsNotSetOrZero(address: IAddress | undefined, context: string, resolution: string) {
+    static guardAddressIsSetAndNonZero(address: IAddress | undefined, context: string, resolution: string) {
         if (!this.areWarningsEnabled) {
             return;
         }

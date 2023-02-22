@@ -1,16 +1,16 @@
 import { assert } from "chai";
-import { UserSecretKey } from "./userKeys";
-import { Mnemonic } from "./mnemonic";
-import { UserWallet } from "./userWallet";
 import { Randomness } from "./crypto";
+import { ErrInvariantFailed } from "./errors";
+import { Mnemonic } from "./mnemonic";
+import { TestMessage } from "./testutils/message";
+import { TestTransaction } from "./testutils/transaction";
+import { DummyMnemonic, DummyMnemonicOf12Words, DummyPassword, loadTestKeystore, loadTestWallet, TestWallet } from "./testutils/wallets";
 import { UserAddress } from "./userAddress";
+import { UserSecretKey } from "./userKeys";
 import { UserSigner } from "./userSigner";
 import { GuardianSigner } from "./guardianSigner"
 import { UserVerifier } from "./userVerifier";
-import { ErrInvariantFailed } from "./errors";
-import { TestMessage } from "./testutils/message";
-import { DummyMnemonic, DummyPassword, loadTestWallet, TestWallet } from "./testutils/wallets";
-import { TestTransaction } from "./testutils/transaction";
+import { UserWallet } from "./userWallet";
 
 describe("test user wallets", () => {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
@@ -34,6 +34,14 @@ describe("test user wallets", () => {
         assert.equal(mnemonic.deriveKey(0).hex(), alice.secretKeyHex);
         assert.equal(mnemonic.deriveKey(1).hex(), bob.secretKeyHex);
         assert.equal(mnemonic.deriveKey(2).hex(), carol.secretKeyHex);
+    });
+
+    it("should derive keys (12 words)", async () => {
+        const mnemonic = Mnemonic.fromString(DummyMnemonicOf12Words);
+
+        assert.equal(mnemonic.deriveKey(0).generatePublicKey().toAddress().bech32(), "erd1l8g9dk3gz035gkjhwegsjkqzdu3augrwhcfxrnucnyyrpc2220pqg4g7na");
+        assert.equal(mnemonic.deriveKey(1).generatePublicKey().toAddress().bech32(), "erd1fmhwg84rldg0xzngf53m0y607wvefvamh07n2mkypedx27lcqnts4zs09p");
+        assert.equal(mnemonic.deriveKey(2).generatePublicKey().toAddress().bech32(), "erd1tyuyemt4xz2yjvc7rxxp8kyfmk2n3h8gv3aavzd9ru4v2vhrkcksptewtj");
     });
 
     it("should create secret key", () => {
@@ -72,7 +80,7 @@ describe("test user wallets", () => {
         assert.equal(UserSecretKey.fromPem(carol.pemFileText).hex(), carol.secretKeyHex);
     });
 
-    it("should create and load encrypted files", function () {
+    it("should create and load keystore files (with secret keys)", function () {
         this.timeout(10000);
 
         let aliceSecretKey = UserSecretKey.fromString(alice.secretKeyHex);
@@ -80,9 +88,9 @@ describe("test user wallets", () => {
         let carolSecretKey = UserSecretKey.fromString(carol.secretKeyHex);
 
         console.time("encrypt");
-        let aliceKeyFile = new UserWallet(aliceSecretKey, password);
-        let bobKeyFile = new UserWallet(bobSecretKey, password);
-        let carolKeyFile = new UserWallet(carolSecretKey, password);
+        let aliceKeyFile = UserWallet.fromSecretKey({ secretKey: aliceSecretKey, password: password });
+        let bobKeyFile = UserWallet.fromSecretKey({ secretKey: bobSecretKey, password: password });
+        let carolKeyFile = UserWallet.fromSecretKey({ secretKey: carolSecretKey, password: password });
         console.timeEnd("encrypt");
 
         assert.equal(aliceKeyFile.toJSON().bech32, alice.address.bech32());
@@ -97,27 +105,79 @@ describe("test user wallets", () => {
 
         // With provided randomness, in order to reproduce our development wallets
 
-        aliceKeyFile = new UserWallet(aliceSecretKey, password, new Randomness({
-            id: alice.keyFileObject.id,
-            iv: Buffer.from(alice.keyFileObject.crypto.cipherparams.iv, "hex"),
-            salt: Buffer.from(alice.keyFileObject.crypto.kdfparams.salt, "hex")
-        }));
+        aliceKeyFile = UserWallet.fromSecretKey({
+            secretKey: aliceSecretKey,
+            password: password,
+            randomness: new Randomness({
+                id: alice.keyFileObject.id,
+                iv: Buffer.from(alice.keyFileObject.crypto.cipherparams.iv, "hex"),
+                salt: Buffer.from(alice.keyFileObject.crypto.kdfparams.salt, "hex")
+            })
+        });
 
-        bobKeyFile = new UserWallet(bobSecretKey, password, new Randomness({
-            id: bob.keyFileObject.id,
-            iv: Buffer.from(bob.keyFileObject.crypto.cipherparams.iv, "hex"),
-            salt: Buffer.from(bob.keyFileObject.crypto.kdfparams.salt, "hex")
-        }));
+        bobKeyFile = UserWallet.fromSecretKey({
+            secretKey: bobSecretKey,
+            password: password,
+            randomness: new Randomness({
+                id: bob.keyFileObject.id,
+                iv: Buffer.from(bob.keyFileObject.crypto.cipherparams.iv, "hex"),
+                salt: Buffer.from(bob.keyFileObject.crypto.kdfparams.salt, "hex")
+            })
+        });
 
-        carolKeyFile = new UserWallet(carolSecretKey, password, new Randomness({
-            id: carol.keyFileObject.id,
-            iv: Buffer.from(carol.keyFileObject.crypto.cipherparams.iv, "hex"),
-            salt: Buffer.from(carol.keyFileObject.crypto.kdfparams.salt, "hex")
-        }));
+        carolKeyFile = UserWallet.fromSecretKey({
+            secretKey: carolSecretKey,
+            password: password,
+            randomness: new Randomness({
+                id: carol.keyFileObject.id,
+                iv: Buffer.from(carol.keyFileObject.crypto.cipherparams.iv, "hex"),
+                salt: Buffer.from(carol.keyFileObject.crypto.kdfparams.salt, "hex")
+            })
+        });
 
         assert.deepEqual(aliceKeyFile.toJSON(), alice.keyFileObject);
         assert.deepEqual(bobKeyFile.toJSON(), bob.keyFileObject);
         assert.deepEqual(carolKeyFile.toJSON(), carol.keyFileObject);
+    });
+
+    it("should load keystore files (with secret keys, but without 'kind' field)", async function () {
+        const keyFileObject = await loadTestKeystore("withoutKind.json");
+        const secretKey = UserWallet.decryptSecretKey(keyFileObject, password);
+
+        assert.equal(secretKey.generatePublicKey().toAddress().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+    });
+
+    it("should create and load keystore files (with mnemonics)", async function () {
+        this.timeout(10000);
+
+        const wallet = UserWallet.fromMnemonic({ mnemonic: DummyMnemonic, password: password });
+        const json = wallet.toJSON();
+
+        assert.equal(json.version, 4);
+        assert.equal(json.kind, "mnemonic");
+        assert.isUndefined(json.bech32);
+
+        const mnemonic = UserWallet.decryptMnemonic(json, password);
+        const mnemonicText = mnemonic.toString();
+
+        assert.equal(mnemonicText, DummyMnemonic);
+        assert.equal(mnemonic.deriveKey(0).generatePublicKey().toAddress().bech32(), alice.address.bech32());
+        assert.equal(mnemonic.deriveKey(1).generatePublicKey().toAddress().bech32(), bob.address.bech32());
+        assert.equal(mnemonic.deriveKey(2).generatePublicKey().toAddress().bech32(), carol.address.bech32());
+
+        // With provided randomness, in order to reproduce our test wallets
+        const expectedDummyWallet = await loadTestKeystore("withDummyMnemonic.json");
+        const dummyWallet = UserWallet.fromMnemonic({
+            mnemonic: DummyMnemonic,
+            password: password,
+            randomness: new Randomness({
+                id: "5b448dbc-5c72-4d83-8038-938b1f8dff19",
+                iv: Buffer.from("2da5620906634972d9a623bc249d63d4", "hex"),
+                salt: Buffer.from("aa9e0ba6b188703071a582c10e5331f2756279feb0e2768f1ba0fd38ec77f035", "hex")
+            })
+        });
+
+        assert.deepEqual(dummyWallet.toJSON(), expectedDummyWallet);
     });
 
     it("should sign transactions", async () => {

@@ -1,7 +1,7 @@
-import { generateMnemonic, validateMnemonic, mnemonicToSeedSync } from "bip39";
-import { UserSecretKey } from "./userKeys";
+import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from "bip39";
 import { derivePath } from "ed25519-hd-key";
 import { ErrWrongMnemonic } from "./errors";
+import { UserSecretKey } from "./userKeys";
 
 const MNEMONIC_STRENGTH = 256;
 const BIP44_DERIVATION_PREFIX = "m/44'/508'/0'/0'";
@@ -20,12 +20,12 @@ export class Mnemonic {
 
     static fromString(text: string) {
         text = text.trim();
-        
+
         Mnemonic.assertTextIsValid(text);
         return new Mnemonic(text);
     }
 
-    private static assertTextIsValid(text: string) {
+    public static assertTextIsValid(text: string) {
         let isValid = validateMnemonic(text);
 
         if (!isValid) {

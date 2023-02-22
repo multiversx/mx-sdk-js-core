@@ -26,20 +26,10 @@ export class GuardianSigner extends UserSigner {
     }
 
     private tryGuard(signable: ISignable) {
-        const ownerSignature = signable.getSignature()
         const bufferToSign = signable.serializeForSigning();
         const guardianSignatureBuffer = this.secretKey.sign(bufferToSign);
         const guardianSignature = new Signature(guardianSignatureBuffer);
 
-        this.addOwnerSignature(signable, ownerSignature)
-        this.doApplySignature(signable, guardianSignature);
-    }
-
-    protected doApplySignature(signable: ISignable, guardianSignature: ISignature) {
         signable.applyGuardianSignature(guardianSignature);
-    }
-
-    private addOwnerSignature(signable: ISignable, ownerSignature: ISignature) {
-        signable.applySignature(ownerSignature);
     }
 }

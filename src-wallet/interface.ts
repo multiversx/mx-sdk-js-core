@@ -52,11 +52,6 @@ export interface ISignable {
     serializeForSigning(): Buffer;
 
     /**
-     * Returns the signature of the sender.
-     */
-    getSignature(): ISignature;
-
-    /**
      * Applies the computed signature on the object itself.
      *
      * @param signature The computed signature

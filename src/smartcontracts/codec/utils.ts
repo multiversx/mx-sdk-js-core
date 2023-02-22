@@ -34,13 +34,15 @@ export function bufferToBigInt(buffer: Buffer): BigNumber {
     return new BigNumber(`0x${hex}`, 16);
 }
 
-export function bigIntToBuffer(value: BigNumber): Buffer {
+export function bigIntToBuffer(value: BigNumber.Value): Buffer {
     // Currently, in JavaScript, this is the feasible way to achieve reliable, arbitrary-size BigInt to Buffer conversion.
     let hex = getHexMagnitudeOfBigInt(value);
     return Buffer.from(hex, "hex");
 }
 
-export function getHexMagnitudeOfBigInt(value: BigNumber): string {
+export function getHexMagnitudeOfBigInt(value: BigNumber.Value): string {
+    value = new BigNumber(value);
+
     if (!value) {
         return "";
     }

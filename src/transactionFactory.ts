@@ -1,7 +1,7 @@
+import { Address } from "./address";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenPayment, ITransactionPayload, ITransactionValue } from "./interface";
 import { ESDTNFTTransferPayloadBuilder, ESDTTransferPayloadBuilder, MultiESDTNFTTransferPayloadBuilder } from "./tokenTransferBuilders";
 import { Transaction } from "./transaction";
-import {Address} from "./address";
 
 interface IGasEstimator {
     forEGLDTransfer(dataLength: number): number;
@@ -10,6 +10,9 @@ interface IGasEstimator {
     forMultiESDTNFTTransfer(dataLength: number, numTransfers: number): number;
 }
 
+/**
+ * @deprecated Use {@link TransfersFactory} instead (same interface, different name).
+ */
 export class TransactionFactory {
     private readonly gasEstimator;
 

@@ -1,20 +1,19 @@
-import { Address } from "../address";
-import { Transaction } from "../transaction";
-import { TransactionPayload } from "../transactionPayload";
-import { CodeMetadata } from "./codeMetadata";
-import { CallArguments, DeployArguments, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
-import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
-import { ContractFunction } from "./function";
-import { Query } from "./query";
-import { SmartContractAbi } from "./abi";
-import { guardValueIsSet } from "../utils";
-import { EndpointDefinition, TypedValue } from "./typesystem";
-import { bigIntToBuffer } from "./codec/utils";
 import BigNumber from "bignumber.js";
-import { Interaction } from "./interaction";
-import { NativeSerializer } from "./nativeSerializer";
-import { IAddress, INonce } from "../interface";
+import { Address } from "../address";
 import { ErrContractHasNoAddress } from "../errors";
+import { IAddress, INonce } from "../interface";
+import { Transaction } from "../transaction";
+import { guardValueIsSet } from "../utils";
+import { SmartContractAbi } from "./abi";
+import { bigIntToBuffer } from "./codec/utils";
+import { CodeMetadata } from "./codeMetadata";
+import { ContractFunction } from "./function";
+import { Interaction } from "./interaction";
+import { CallArguments, DeployArguments, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
+import { NativeSerializer } from "./nativeSerializer";
+import { Query } from "./query";
+import { ArwenVirtualMachine, ContractCallPayloadBuilder, ContractDeployPayloadBuilder, ContractUpgradePayloadBuilder } from "./transactionPayloadBuilders";
+import { EndpointDefinition, TypedValue } from "./typesystem";
 const createKeccakHash = require("keccak");
 
 /**
@@ -112,7 +111,7 @@ export class SmartContract implements ISmartContract {
         initArguments = initArguments || [];
         value = value || 0;
 
-        let payload = TransactionPayload.contractDeploy()
+        let payload = new ContractDeployPayloadBuilder()
             .setCode(code)
             .setCodeMetadata(codeMetadata)
             .setInitArgs(initArguments)
@@ -141,7 +140,7 @@ export class SmartContract implements ISmartContract {
         initArguments = initArguments || [];
         value = value || 0;
 
-        let payload = TransactionPayload.contractUpgrade()
+        let payload = new ContractUpgradePayloadBuilder()
             .setCode(code)
             .setCodeMetadata(codeMetadata)
             .setInitArgs(initArguments)
@@ -169,7 +168,7 @@ export class SmartContract implements ISmartContract {
         args = args || [];
         value = value || 0;
 
-        let payload = TransactionPayload.contractCall()
+        let payload = new ContractCallPayloadBuilder()
             .setFunction(func)
             .setArgs(args)
             .build();

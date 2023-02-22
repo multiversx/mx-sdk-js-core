@@ -64,25 +64,4 @@ export class TransactionPayload {
     length(): number {
         return Buffer.from(this.data).length;
     }
-
-    /**
-    * @deprecated Use {@link SmartContract} to create smart contracts related transactions.
-    */
-    static contractDeploy(): ContractDeployPayloadBuilder {
-        return new ContractDeployPayloadBuilder();
-    }
-
-    /**
-    * @deprecated Use {@link SmartContract} to create smart contracts related transactions.
-    */
-    static contractUpgrade(): ContractUpgradePayloadBuilder {
-        return new ContractUpgradePayloadBuilder();
-    }
-
-    /**
-    * @deprecated Use {@link SmartContract} to create smart contracts related transactions.
-    */
-    static contractCall(): ContractCallPayloadBuilder {
-        return new ContractCallPayloadBuilder();
-    }
 }

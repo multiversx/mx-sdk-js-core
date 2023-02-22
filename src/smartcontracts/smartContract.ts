@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
+import { Compatibility } from "../compatibility";
 import { ErrContractHasNoAddress } from "../errors";
 import { IAddress, INonce } from "../interface";
 import { Transaction } from "../transaction";
@@ -106,7 +107,9 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
      */
-    deploy({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID, deployer }: DeployArguments): Transaction {
+    deploy({ deployer, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
+        Compatibility.guardAddressIsSetAndNonZero(deployer, "'deployer' of SmartContract.deploy()", "pass the actual address to deploy()");
+
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
         value = value || 0;
@@ -133,7 +136,9 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
-    upgrade({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID, caller }: UpgradeArguments): Transaction {
+    upgrade({ caller, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
+        Compatibility.guardAddressIsSetAndNonZero(caller, "'caller' of SmartContract.upgrade()", "pass the actual address to upgrade()");
+
         this.ensureHasAddress();
 
         codeMetadata = codeMetadata || new CodeMetadata();
@@ -162,7 +167,9 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
-    call({ func, args, value, gasLimit, receiver, gasPrice, chainID, caller: sender }: CallArguments): Transaction {
+    call({ func, args, value, gasLimit, receiver, gasPrice, chainID, caller }: CallArguments): Transaction {
+        Compatibility.guardAddressIsSetAndNonZero(caller, "'caller' of SmartContract.call()", "pass the actual address to call()");
+
         this.ensureHasAddress();
 
         args = args || [];
@@ -174,7 +181,7 @@ export class SmartContract implements ISmartContract {
             .build();
 
         let transaction = new Transaction({
-            sender: sender,
+            sender: caller,
             receiver: receiver ? receiver : this.getAddress(),
             value: value,
             gasLimit: gasLimit,

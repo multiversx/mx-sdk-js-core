@@ -1,12 +1,13 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
+import { Compatibility } from "./compatibility";
+import { TRANSACTION_MIN_GAS_PRICE } from "./constants";
 import * as errors from "./errors";
+import { Hash } from "./hash";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionPayload, ITransactionValue } from "./interface";
+import { INetworkConfig } from "./interfaceOfNetwork";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
-import { Hash } from "./hash";
-import { INetworkConfig } from "./interfaceOfNetwork";
-import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_GUARDED_MASK } from "./constants";
 import { Signature } from "./signature";
 import { TransactionPayload } from "./transactionPayload";
 import { guardNotEmpty } from "./utils";
@@ -260,7 +261,7 @@ export class Transaction {
    * This function is called internally within the signing procedure.
    */
   toPlainObject(): IPlainTransactionObject {
-    return {
+    const plainObject = {
       nonce: this.nonce.valueOf(),
       value: this.value.toString(),
       receiver: this.receiver.bech32(),
@@ -275,6 +276,10 @@ export class Transaction {
       signature: this.signature.hex() ? this.signature.hex() : undefined,
       guardianSignature: this.guardianSignature.hex() ? this.guardianSignature.hex() : undefined,
     };
+
+    Compatibility.guardAddressIsSetAndNonZero(new Address(plainObject.sender), "'sender' of transaction", "pass the actual sender to the Transaction constructor")
+
+    return plainObject;
   }
 
   /**

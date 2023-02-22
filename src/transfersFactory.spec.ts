@@ -2,11 +2,11 @@ import { assert } from "chai";
 import { Address } from "./address";
 import { GasEstimator } from "./gasEstimator";
 import { TokenPayment } from "./tokenPayment";
-import { TransactionFactory } from "./transactionFactory";
+import { TransfersFactory } from "./transfersFactory";
 import { TransactionPayload } from "./transactionPayload";
 
 describe("test transaction factory", () => {
-    const factory = new TransactionFactory(new GasEstimator());
+    const factory = new TransfersFactory(new GasEstimator());
 
     it("should create EGLD transfers", () => {
         const transactionWithData = factory.createEGLDTransfer({

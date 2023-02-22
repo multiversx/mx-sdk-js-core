@@ -15,17 +15,17 @@ export interface ISmartContract {
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
      */
-    deploy({ code, codeMetadata, initArguments, value, gasLimit, deployer }: DeployArguments): Transaction;
+    deploy({ deployer, code, codeMetadata, initArguments, value, gasLimit }: DeployArguments): Transaction;
 
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
-    upgrade({ code, codeMetadata, initArguments, value, gasLimit, caller }: UpgradeArguments): Transaction;
+    upgrade({ caller, code, codeMetadata, initArguments, value, gasLimit }: UpgradeArguments): Transaction;
 
     /**
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
-    call({ func, args, value, gasLimit, caller }: CallArguments): Transaction;
+    call({ caller, func, args, value, gasLimit }: CallArguments): Transaction;
 }
 
 export interface DeployArguments {

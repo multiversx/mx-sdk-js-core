@@ -8,6 +8,7 @@ import { Account } from "../account";
 import { CallArguments } from "./interface";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenPayment, ITransactionValue } from "../interface";
 import { InteractionChecker } from "./interactionChecker";
+import { Compatibility } from "../compatibility";
 
 /**
  * Internal interface: the smart contract, as seen from the perspective of an {@link Interaction}.
@@ -87,6 +88,8 @@ export class Interaction {
     }
 
     buildTransaction(): Transaction {
+        Compatibility.guardAddressIsNotSetOrZero(this.sender, "'sender' of interaction", "use interaction.withSender()");
+
         let receiver = this.explicitReceiver || this.contract.getAddress();
         let func: ContractFunction = this.function;
         let args = this.args;

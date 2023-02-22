@@ -99,12 +99,8 @@ export class RelayedTransactionV1Builder {
         }
 
         const serializedTransaction = this.prepareInnerTransaction();
-        const payload = TransactionPayload.contractCall()
-            .setFunction(new ContractFunction("relayedTx"))
-            .setArgs([
-                new StringValue(serializedTransaction),
-            ])
-            .build();
+        const data = `relayedTx@${Buffer.from(serializedTransaction).toString("hex")}`;
+        const payload = new TransactionPayload(data);
 
         const gasLimit = this.netConfig.MinGasLimit + this.netConfig.GasPerDataByte * payload.length() + this.innerTransaction.getGasLimit().valueOf();
         let relayedTransaction = new Transaction({

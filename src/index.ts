@@ -15,11 +15,9 @@ export * from "./signableMessage";
 export * from "./smartcontracts";
 export * from "./tokenOperations";
 export * from "./tokenPayment";
-export * from "./tokenTransferBuilders";
 export * from "./transaction";
-export * from "./transactionFactory";
+export * from "./transfersFactory";
 export * from "./transactionPayload";
 export * from "./transactionWatcher";
-export * from "./transfersFactory";
 export * from "./utils";
 

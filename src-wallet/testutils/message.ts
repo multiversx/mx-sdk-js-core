@@ -1,4 +1,4 @@
-import { IAddress, ISignable, ISignature, IVerifiable } from "../interface";
+import { ISignable, ISignature, IVerifiable } from "../interface";
 import { Signature } from "../signature";
 
 /**
@@ -26,10 +26,6 @@ export class TestMessage implements ISignable, IVerifiable {
 
     applySignature(signature: ISignature) {
         this.signature = signature.hex();
-    }
-
-    applyGuardianSignature(guardianSignature: ISignature) {
-        this.guardianSignature = guardianSignature.hex()
     }
 
     getSignature(): ISignature {

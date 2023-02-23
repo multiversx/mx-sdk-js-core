@@ -1,8 +1,7 @@
 import * as tweetnacl from "tweetnacl";
-import { UserAddress } from "./userAddress";
 import { guardLength } from "./assertions";
 import { parseUserKey } from "./pem";
-import { IAddress } from "./interface";
+import { UserAddress } from "./userAddress";
 
 export const USER_SEED_LENGTH = 32;
 export const USER_PUBKEY_LENGTH = 32;
@@ -57,7 +56,7 @@ export class UserPublicKey {
 
     constructor(buffer: Buffer) {
         guardLength(buffer, USER_PUBKEY_LENGTH);
-        
+
         this.buffer = buffer;
     }
 
@@ -76,7 +75,7 @@ export class UserPublicKey {
         return this.buffer.toString("hex");
     }
 
-    toAddress(): IAddress {
+    toAddress(): UserAddress {
         return new UserAddress(this.buffer);
     }
 

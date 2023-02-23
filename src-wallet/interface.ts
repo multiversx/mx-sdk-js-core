@@ -1,45 +1,5 @@
-export interface IAddress {
-    hex(): string;
-    bech32(): string;
-    pubkey(): Buffer;
-}
-
 export interface ISignature {
     hex(): string;
-}
-
-/**
- * An interface that defines a signing-capable object.
- */
-export interface ISigner {
-    /**
-     * Gets the {@link Address} of the signer.
-     */
-    getAddress(): IAddress;
-
-    /**
-     * Signs a message (e.g. a transaction).
-     */
-    sign(signable: ISignable): Promise<void>;
-}
-
-/**
- * An interface that defines a signing-capable object.
- */
-export interface IGuardianSigner {
-    /**
-     * Gets the {@link Address} of the signer.
-     */
-    getAddress(): IAddress;
-
-    /**
-     * Signs a message (e.g. a transaction).
-     */
-    guard(signable: IGuardableSignable): Promise<void>;
-}
-
-export interface IVerifier {
-    verify(message: IVerifiable): boolean;
 }
 
 /**
@@ -80,5 +40,5 @@ export interface IVerifiable {
     /**
      * Returns the signable object in its raw form - a sequence of bytes to be verified.
      */
-    serializeForSigning(signedBy?: IAddress): Buffer;
+    serializeForSigning(): Buffer;
 }

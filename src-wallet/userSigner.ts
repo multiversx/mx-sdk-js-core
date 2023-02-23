@@ -1,20 +1,21 @@
-import { IAddress, ISignable, ISignature, ISigner } from "./interface";
+import { ErrSignerCannotSign } from "./errors";
+import { ISignable } from "./interface";
 import { Signature } from "./signature";
+import { UserAddress } from "./userAddress";
 import { UserSecretKey } from "./userKeys";
 import { UserWallet } from "./userWallet";
-import { ErrSignerCannotSign } from "./errors";
 
 /**
  * ed25519 signer
  */
-export class UserSigner implements ISigner {
+export class UserSigner {
     protected readonly secretKey: UserSecretKey;
 
     constructor(secretKey: UserSecretKey) {
         this.secretKey = secretKey;
     }
 
-    static fromWallet(keyFileObject: any, password: string): ISigner {
+    static fromWallet(keyFileObject: any, password: string): UserSigner {
         let secretKey = UserWallet.decryptSecretKey(keyFileObject, password);
         return new UserSigner(secretKey);
     }
@@ -47,7 +48,7 @@ export class UserSigner implements ISigner {
     /**
      * Gets the address of the signer.
      */
-    getAddress(): IAddress {
+    getAddress(): UserAddress {
         return this.secretKey.generatePublicKey().toAddress();
     }
 }

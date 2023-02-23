@@ -1,4 +1,4 @@
-import { IAddress, ISignable, ISignature, IVerifiable } from "../interface";
+import { ISignable, ISignature, IVerifiable } from "../interface";
 import { Signature } from "../signature";
 
 /**

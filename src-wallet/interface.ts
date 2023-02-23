@@ -35,7 +35,7 @@ export interface IGuardianSigner {
     /**
      * Signs a message (e.g. a transaction).
      */
-    guard(signable: ISignable): Promise<void>;
+    guard(signable: IGuardableSignable): Promise<void>;
 }
 
 export interface IVerifier {
@@ -57,7 +57,9 @@ export interface ISignable {
      * @param signature The computed signature
     */
     applySignature(signature: ISignature): void;
+}
 
+export interface IGuardableSignable extends ISignable {
     /**
     * Applies the guardian signature on the transaction.
     *

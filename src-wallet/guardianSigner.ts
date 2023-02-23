@@ -1,8 +1,8 @@
-import { ISignable, ISignature } from "./interface";
+import { ErrSignerCannotSign } from "./errors";
+import { IGuardableSignable } from "./interface";
+import { Signature } from "./signature";
 import { UserSecretKey } from "./userKeys";
 import { UserSigner } from "./userSigner";
-import { Signature } from "./signature";
-import { ErrSignerCannotSign } from "./errors";
 
 /**
  * ed25519 signer
@@ -17,7 +17,7 @@ export class GuardianSigner extends UserSigner {
      * Signs a message.
      * @param signable the message to be signed (e.g. a {@link Transaction}).
      */
-    async guard(signable: ISignable): Promise<void> {
+    async guard(signable: IGuardableSignable): Promise<void> {
         try {
             this.tryGuard(signable);
         } catch (err: any) {
@@ -25,7 +25,7 @@ export class GuardianSigner extends UserSigner {
         }
     }
 
-    private tryGuard(signable: ISignable) {
+    private tryGuard(signable: IGuardableSignable) {
         const bufferToSign = signable.serializeForSigning();
         const guardianSignatureBuffer = this.secretKey.sign(bufferToSign);
         const guardianSignature = new Signature(guardianSignatureBuffer);

@@ -1,10 +1,9 @@
-import { IAddress, ISignable, ISignature, IVerifiable } from "../interface";
-import { Signature } from "../signature";
+import { IAddress, ISignature } from "../interface";
 
 /**
  * A dummy message used in tests.
  */
-export class TestMessage implements ISignable, IVerifiable {
+export class TestMessage {
     foo: string = "";
     bar: string = "";
     signature: string = "";
@@ -13,7 +12,7 @@ export class TestMessage implements ISignable, IVerifiable {
         Object.assign(this, init);
     }
 
-    serializeForSigning(_signedBy: IAddress): Buffer {
+    serializeForSigning(): Buffer {
         let plainObject = {
             foo: this.foo,
             bar: this.bar
@@ -25,9 +24,5 @@ export class TestMessage implements ISignable, IVerifiable {
 
     applySignature(signature: ISignature, _signedBy: IAddress): void {
         this.signature = signature.hex();
-    }
-
-    getSignature(): ISignature {
-        return new Signature(Buffer.from(this.signature, "hex"));
     }
 }

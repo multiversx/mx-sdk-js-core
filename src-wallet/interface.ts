@@ -23,10 +23,6 @@ export interface ISigner {
     sign(signable: ISignable): Promise<void>;
 }
 
-export interface IVerifier {
-    verify(message: IVerifiable): boolean;
-}
-
 /**
  * An interface that defines a signable object (e.g. a transaction).
  */
@@ -43,19 +39,4 @@ export interface ISignable {
      * @param signedBy The address of the {@link ISignature}
      */
     applySignature(signature: ISignature, signedBy: IAddress): void;
-}
-
-/**
- * Interface that defines a signed and verifiable object
- */
-export interface IVerifiable {
-    /**
-     * Returns the signature that should be verified
-     */
-    getSignature(): ISignature;
-
-    /**
-     * Returns the signable object in its raw form - a sequence of bytes to be verified.
-     */
-    serializeForSigning(signedBy?: IAddress): Buffer;
 }

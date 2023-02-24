@@ -31,8 +31,8 @@ export class TestTransaction {
             gasLimit: this.gasLimit,
             data: dataEncoded,
             chainID: this.chainID,
-            options: options,
-            version: this.version
+            version: this.version,
+            options: options
         };
 
         const serialized = JSON.stringify(plainObject);

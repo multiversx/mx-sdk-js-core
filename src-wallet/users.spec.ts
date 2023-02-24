@@ -200,7 +200,7 @@ describe("test user wallets", () => {
 
         assert.equal(serialized, `{"nonce":0,"value":"0","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"data":"Zm9v","chainID":"1","version":1}`);
         assert.equal(transaction.getSignature().hex(), "b5fddb8c16fa7f6123cb32edc854f1e760a3eb62c6dc420b5a4c0473c58befd45b621b31a448c5b59e21428f2bc128c80d0ee1caa4f2bf05a12be857ad451b00");
-        assert.isTrue(verifier.verify(transaction));
+        assert.isTrue(verifier.verify(Buffer.from(serialized), Buffer.from(transaction.signature, "hex")));
         // Without data field
         transaction = new TestTransaction({
             nonce: 8,
@@ -235,7 +235,7 @@ describe("test user wallets", () => {
         assert.equal(transaction.getSignature().hex(), "c0bd2b3b33a07b9cc5ee7435228acb0936b3829c7008aacabceea35163e555e19a34def2c03a895cf36b0bcec30a7e11215c11efc0da29294a11234eb2b3b906");
     });
 
-    it("signs a general message", function () {
+    it("signs a general message", async function () {
         let signer = new UserSigner(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf"));
         let verifier = new UserVerifier(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf").generatePublicKey());
         const message = new TestMessage({
@@ -243,8 +243,12 @@ describe("test user wallets", () => {
             bar: "world"
         });
 
-        signer.sign(message);
+        await signer.sign(message);
+
+        const serialized = message.serializeForSigning();
+        const signature = Buffer.from(message.signature, "hex");
+
         assert.isNotEmpty(message.signature);
-        assert.isTrue(verifier.verify(message));
+        assert.isTrue(verifier.verify(serialized, signature));
     });
 });

@@ -1,10 +1,10 @@
-import { IAddress, ISignable, ISignature, IVerifiable } from "../interface";
+import { IAddress, ISignature } from "../interface";
 import { Signature } from "../signature";
 
 /**
  * A dummy transaction used in tests.
  */
-export class TestTransaction implements ISignable, IVerifiable {
+export class TestTransaction {
     nonce: number = 0;
     value: string = "";
     receiver: string = "";

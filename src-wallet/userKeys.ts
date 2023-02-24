@@ -1,8 +1,8 @@
 import * as tweetnacl from "tweetnacl";
-import { UserAddress } from "./userAddress";
 import { guardLength } from "./assertions";
-import { parseUserKey } from "./pem";
 import { IAddress } from "./interface";
+import { parseUserKey } from "./pem";
+import { UserAddress } from "./userAddress";
 
 export const USER_SEED_LENGTH = 32;
 export const USER_PUBKEY_LENGTH = 32;
@@ -57,13 +57,13 @@ export class UserPublicKey {
 
     constructor(buffer: Buffer) {
         guardLength(buffer, USER_PUBKEY_LENGTH);
-        
+
         this.buffer = buffer;
     }
 
-    verify(message: Buffer, signature: Buffer): boolean {
+    verify(data: Buffer, signature: Buffer): boolean {
         try {
-            const unopenedMessage = Buffer.concat([signature, message]);
+            const unopenedMessage = Buffer.concat([signature, data]);
             const unsignedMessage = tweetnacl.sign.open(unopenedMessage, this.buffer);
             return unsignedMessage != null;
         } catch (err) {

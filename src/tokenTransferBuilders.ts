@@ -6,7 +6,7 @@ import { TokenPayment } from "./tokenPayment";
 import { TransactionPayload } from "./transactionPayload";
 
 /**
- * @deprecated Use {@link TransfersFactory} instead.
+ * @deprecated Use {@link TransferTransactionsFactory} instead.
  */
 export class ESDTTransferPayloadBuilder {
     payment: ITokenPayment = TokenPayment.fungibleFromAmount("", "0", 0);
@@ -31,7 +31,7 @@ export class ESDTTransferPayloadBuilder {
 }
 
 /**
- * @deprecated Use {@link TransfersFactory} instead.
+ * @deprecated Use {@link TransferTransactionsFactory} instead.
  */
 export class ESDTNFTTransferPayloadBuilder {
     payment: ITokenPayment = TokenPayment.nonFungible("", 0);
@@ -66,7 +66,7 @@ export class ESDTNFTTransferPayloadBuilder {
 }
 
 /**
- * @deprecated Use {@link TransfersFactory} instead.
+ * @deprecated Use {@link TransferTransactionsFactory} instead.
  */
 export class MultiESDTNFTTransferPayloadBuilder {
     payments: ITokenPayment[] = [];

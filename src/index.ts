@@ -16,8 +16,8 @@ export * from "./smartcontracts";
 export * from "./tokenOperations";
 export * from "./tokenPayment";
 export * from "./transaction";
-export * from "./transfersFactory";
 export * from "./transactionPayload";
 export * from "./transactionWatcher";
+export * from "./transferTransactionsFactory";
 export * from "./utils";
 

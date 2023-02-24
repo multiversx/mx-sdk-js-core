@@ -1,8 +1,8 @@
 import { Address } from "./address";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenPayment, ITransactionPayload, ITransactionValue } from "./interface";
-import { Transaction } from "./transaction";
-import { AddressValue, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "./smartcontracts/typesystem";
 import { ArgSerializer } from "./smartcontracts/argSerializer";
+import { AddressValue, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "./smartcontracts/typesystem";
+import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 
 interface IGasEstimator {
@@ -12,7 +12,7 @@ interface IGasEstimator {
     forMultiESDTNFTTransfer(dataLength: number, numTransfers: number): number;
 }
 
-export class TransfersFactory {
+export class TransferTransactionsFactory {
     private readonly gasEstimator;
 
     constructor(gasEstimator: IGasEstimator) {

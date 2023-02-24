@@ -5,7 +5,6 @@ import { Mnemonic } from "./mnemonic";
 import { TestMessage } from "./testutils/message";
 import { TestTransaction } from "./testutils/transaction";
 import { DummyMnemonic, DummyMnemonicOf12Words, DummyPassword, loadTestKeystore, loadTestWallet, TestWallet } from "./testutils/wallets";
-import { UserAddress } from "./userAddress";
 import { UserSecretKey } from "./userKeys";
 import { UserSigner } from "./userSigner";
 import { UserVerifier } from "./userVerifier";
@@ -182,7 +181,6 @@ describe("test user wallets", () => {
     it("should sign transactions", async () => {
         let signer = new UserSigner(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf"));
         let verifier = new UserVerifier(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf").generatePublicKey());
-        let sender = UserAddress.fromBech32("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz");
 
         // With data field
         let transaction = new TestTransaction({
@@ -192,15 +190,15 @@ describe("test user wallets", () => {
             gasPrice: 1000000000,
             gasLimit: 50000,
             data: "foo",
-            chainID: "1"
+            chainID: "1",
         });
 
-        let serialized = transaction.serializeForSigning(sender).toString();
-        await signer.sign(transaction);
+        let serialized = transaction.serializeForSigning();
+        let signature = await signer.sign(serialized);
 
-        assert.equal(serialized, `{"nonce":0,"value":"0","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"data":"Zm9v","chainID":"1","version":1}`);
-        assert.equal(transaction.getSignature().hex(), "b5fddb8c16fa7f6123cb32edc854f1e760a3eb62c6dc420b5a4c0473c58befd45b621b31a448c5b59e21428f2bc128c80d0ee1caa4f2bf05a12be857ad451b00");
-        assert.isTrue(verifier.verify(Buffer.from(serialized), Buffer.from(transaction.signature, "hex")));
+        assert.equal(serialized.toString(), `{"nonce":0,"value":"0","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"","gasPrice":1000000000,"gasLimit":50000,"data":"Zm9v","chainID":"1","version":1}`);
+        assert.equal(signature.toString("hex"), "a3b61a2fe461f3393c42e6cb0477a6b52ffd92168f10c111f6aa8d0a310ee0c314fae0670f8313f1ad992933ac637c61a8ff20cc20b6a8b2260a4af1a120a70d");
+        assert.isTrue(verifier.verify(serialized, signature));
         // Without data field
         transaction = new TestTransaction({
             nonce: 8,
@@ -211,17 +209,17 @@ describe("test user wallets", () => {
             chainID: "1"
         });
 
-        serialized = transaction.serializeForSigning(sender).toString();
-        await signer.sign(transaction);
+        serialized = transaction.serializeForSigning();
+        signature = await signer.sign(serialized);
 
-        assert.equal(serialized, `{"nonce":8,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"chainID":"1","version":1}`);
-        assert.equal(transaction.getSignature().hex(), "4a6d8186eae110894e7417af82c9bf9592696c0600faf110972e0e5310d8485efc656b867a2336acec2b4c1e5f76c9cc70ba1803c6a46455ed7f1e2989a90105");
+        assert.equal(serialized.toString(), `{"nonce":8,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"","gasPrice":1000000000,"gasLimit":50000,"chainID":"1","version":1}`);
+        assert.equal(signature.toString("hex"), "f136c901d37349a7da8cfe3ab5ec8ef333b0bc351517c0e9bef9eb9704aed3077bf222769cade5ff29dffe5f42e4f0c5e0b068bdba90cd2cb41da51fd45d5a03");
     });
 
     it("should sign transactions using PEM files", async () => {
-        let signer = UserSigner.fromPem(alice.pemFileText);
+        const signer = UserSigner.fromPem(alice.pemFileText);
 
-        let transaction = new TestTransaction({
+        const transaction = new TestTransaction({
             nonce: 0,
             value: "0",
             receiver: "erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r",
@@ -231,24 +229,23 @@ describe("test user wallets", () => {
             chainID: "1"
         });
 
-        await signer.sign(transaction);
-        assert.equal(transaction.getSignature().hex(), "c0bd2b3b33a07b9cc5ee7435228acb0936b3829c7008aacabceea35163e555e19a34def2c03a895cf36b0bcec30a7e11215c11efc0da29294a11234eb2b3b906");
+        const signature = await signer.sign(transaction.serializeForSigning());
+        assert.equal(signature.toString("hex"), "ba4fa95fea1402e4876abf1d5a510615aab374ee48bb76f5230798a7d3f2fcae6ba91ba56c6d62e6e7003ce531ff02f219cb7218dd00dd2ca650ba747f19640a");
     });
 
     it("signs a general message", async function () {
         let signer = new UserSigner(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf"));
         let verifier = new UserVerifier(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf").generatePublicKey());
+
         const message = new TestMessage({
             foo: "hello",
             bar: "world"
         });
 
-        await signer.sign(message);
+        const data = message.serializeForSigning();
+        const signature = await signer.sign(data);
 
-        const serialized = message.serializeForSigning();
-        const signature = Buffer.from(message.signature, "hex");
-
-        assert.isNotEmpty(message.signature);
-        assert.isTrue(verifier.verify(serialized, signature));
+        assert.isTrue(verifier.verify(data, signature));
+        assert.isFalse(verifier.verify(Buffer.from("hello"), signature));
     });
 });

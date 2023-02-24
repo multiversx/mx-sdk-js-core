@@ -1,12 +1,16 @@
-import { IAddress } from "./interface";
 import { UserPublicKey } from "./userKeys";
+
+interface IAddress {
+  pubkey(): Buffer;
+}
+
 
 /**
  * ed25519 signature verification
  */
 export class UserVerifier {
-
   publicKey: UserPublicKey;
+
   constructor(publicKey: UserPublicKey) {
     this.publicKey = publicKey;
   }

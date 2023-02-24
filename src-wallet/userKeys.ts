@@ -1,6 +1,5 @@
 import * as tweetnacl from "tweetnacl";
 import { guardLength } from "./assertions";
-import { IAddress } from "./interface";
 import { parseUserKey } from "./pem";
 import { UserAddress } from "./userAddress";
 
@@ -76,7 +75,7 @@ export class UserPublicKey {
         return this.buffer.toString("hex");
     }
 
-    toAddress(): IAddress {
+    toAddress(): UserAddress {
         return new UserAddress(this.buffer);
     }
 

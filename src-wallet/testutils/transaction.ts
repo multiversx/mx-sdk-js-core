@@ -1,6 +1,3 @@
-import { IAddress, ISignature } from "../interface";
-import { Signature } from "../signature";
-
 /**
  * A dummy transaction used in tests.
  */
@@ -16,22 +13,20 @@ export class TestTransaction {
     options: number = 0;
 
     sender: string = "";
-    signature: string = "";
 
     constructor(init?: Partial<TestTransaction>) {
         Object.assign(this, init);
     }
 
-    serializeForSigning(signedBy: IAddress): Buffer {
-        let sender = signedBy.bech32();
-        let dataEncoded = this.data ? Buffer.from(this.data).toString("base64") : undefined;
-        let options = this.options ? this.options : undefined;
+    serializeForSigning(): Buffer {
+        const dataEncoded = this.data ? Buffer.from(this.data).toString("base64") : undefined;
+        const options = this.options ? this.options : undefined;
 
-        let plainObject = {
+        const plainObject = {
             nonce: this.nonce,
             value: this.value,
             receiver: this.receiver,
-            sender: sender,
+            sender: this.sender,
             gasPrice: this.gasPrice,
             gasLimit: this.gasLimit,
             data: dataEncoded,
@@ -40,16 +35,7 @@ export class TestTransaction {
             options: options
         };
 
-        let serialized = JSON.stringify(plainObject);
+        const serialized = JSON.stringify(plainObject);
         return Buffer.from(serialized);
-    }
-
-    applySignature(signature: ISignature, signedBy: IAddress): void {
-        this.sender = signedBy.bech32();
-        this.signature = signature.hex();
-    }
-
-    getSignature(): ISignature {
-        return new Signature(Buffer.from(this.signature, "hex"));
     }
 }

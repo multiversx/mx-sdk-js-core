@@ -40,9 +40,14 @@ export interface ITransactionPayload {
     valueOf(): Buffer;
 }
 
-export interface ITokenPayment {
+export interface ITokenTransfer {
     readonly tokenIdentifier: string;
     readonly nonce: number;
     readonly amountAsBigInteger: BigNumber.Value;
     valueOf(): BigNumber.Value;
 }
+
+/**
+ * @deprecated Use {@link ITokenTransfer} instead.
+ */
+export type ITokenPayment = ITokenTransfer;

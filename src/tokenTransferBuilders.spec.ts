@@ -1,19 +1,19 @@
 import { assert } from "chai";
 import { Address } from "./address";
-import { TokenPayment } from "./tokenPayment";
+import { TokenTransfer } from "./tokenTransfer";
 import { ESDTNFTTransferPayloadBuilder, ESDTTransferPayloadBuilder, MultiESDTNFTTransferPayloadBuilder } from "./tokenTransferBuilders";
 
 describe("test token transfer builders", () => {
     it("should work with ESDT transfers", () => {
-        let payment = TokenPayment.fungibleFromAmount("COUNTER-8b028f", "100.00", 0);
-        let payload = new ESDTTransferPayloadBuilder().setPayment(payment).build();
+        let transfer = TokenTransfer.fungibleFromAmount("COUNTER-8b028f", "100.00", 0);
+        let payload = new ESDTTransferPayloadBuilder().setPayment(transfer).build();
         assert.equal(payload.toString(), "ESDTTransfer@434f554e5445522d386230323866@64");
     });
 
     it("should work with ESDTNFT transfers (NFT)", () => {
-        let payment = TokenPayment.nonFungible("ERDJS-38f249", 1);
+        let transfer = TokenTransfer.nonFungible("ERDJS-38f249", 1);
         let payload = new ESDTNFTTransferPayloadBuilder()
-            .setPayment(payment)
+            .setPayment(transfer)
             .setDestination(new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"))
             .build();
 
@@ -21,10 +21,10 @@ describe("test token transfer builders", () => {
     });
 
     it("should work with ESDTNFT transfers (SFT)", () => {
-        let payment = TokenPayment.semiFungible("SEMI-9efd0f", 1, 5);
+        let transfer = TokenTransfer.semiFungible("SEMI-9efd0f", 1, 5);
 
         let payload = new ESDTNFTTransferPayloadBuilder()
-            .setPayment(payment)
+            .setPayment(transfer)
             .setDestination(new Address("erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7"))
             .build();
 
@@ -32,10 +32,10 @@ describe("test token transfer builders", () => {
     });
 
     it("should work with Multi ESDTNFT transfers", () => {
-        let paymentOne = TokenPayment.nonFungible("ERDJS-38f249", 1);
-        let paymentTwo = TokenPayment.fungibleFromAmount("BAR-c80d29", "10.00", 18);
+        let transferOne = TokenTransfer.nonFungible("ERDJS-38f249", 1);
+        let transferTwo = TokenTransfer.fungibleFromAmount("BAR-c80d29", "10.00", 18);
         let payload = new MultiESDTNFTTransferPayloadBuilder()
-            .setPayments([paymentOne, paymentTwo])
+            .setPayments([transferOne, transferTwo])
             .setDestination(new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"))
             .build();
 

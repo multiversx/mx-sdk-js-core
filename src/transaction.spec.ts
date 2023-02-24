@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { loadTestWallets, TestWallet } from "./testutils";
-import { TokenPayment } from "./tokenPayment";
+import { TokenTransfer } from "./tokenTransfer";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 
@@ -70,7 +70,7 @@ describe("test transaction construction", async () => {
     it("with data, with value", async () => {
         let transaction = new Transaction({
             nonce: 91,
-            value: TokenPayment.egldFromAmount(10),
+            value: TokenTransfer.egldFromAmount(10),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
@@ -87,7 +87,7 @@ describe("test transaction construction", async () => {
     it("with data, with large value", async () => {
         let transaction = new Transaction({
             nonce: 92,
-            value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
+            value: TokenTransfer.egldFromBigInteger("123456789000000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             gasPrice: minGasPrice,
@@ -160,7 +160,7 @@ describe("test transaction construction", async () => {
     it("computes correct fee", () => {
         let transaction = new Transaction({
             nonce: 92,
-            value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
+            value: TokenTransfer.egldFromBigInteger("123456789000000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             gasPrice: 500,
@@ -182,7 +182,7 @@ describe("test transaction construction", async () => {
     it("computes correct fee with data field", () => {
         let transaction = new Transaction({
             nonce: 92,
-            value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
+            value: TokenTransfer.egldFromBigInteger("123456789000000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             data: new TransactionPayload("testdata"),
@@ -231,7 +231,7 @@ describe("test transaction construction", async () => {
         assert.equal(tx1.getValue().toString(), "123456789000000000000000000000");
 
         const tx2 = new Transaction({
-            value: TokenPayment.egldFromBigInteger("123456789000000000000000000000"),
+            value: TokenTransfer.egldFromBigInteger("123456789000000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             gasLimit: 50000,
@@ -242,7 +242,7 @@ describe("test transaction construction", async () => {
         const tx3 = new Transaction({
             // Passing a BigNumber is not recommended. 
             // However, ITransactionValue interface is permissive, and developers may mistakenly pass such objects as values.
-            // TokenPayment objects or simple strings (see above) are preferred, instead.
+            // TokenTransfer objects or simple strings (see above) are preferred, instead.
             value: new BigNumber("123456789000000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,

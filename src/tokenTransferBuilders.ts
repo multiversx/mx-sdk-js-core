@@ -1,17 +1,17 @@
 import { Address } from "./address";
-import { IAddress, ITokenPayment } from "./interface";
+import { IAddress, ITokenTransfer } from "./interface";
 import { ArgSerializer } from "./smartcontracts/argSerializer";
 import { AddressValue, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "./smartcontracts/typesystem";
-import { TokenPayment } from "./tokenPayment";
+import { TokenTransfer } from "./tokenTransfer";
 import { TransactionPayload } from "./transactionPayload";
 
 /**
  * @deprecated Use {@link TransferTransactionsFactory} instead.
  */
 export class ESDTTransferPayloadBuilder {
-    payment: ITokenPayment = TokenPayment.fungibleFromAmount("", "0", 0);
+    payment: ITokenTransfer = TokenTransfer.fungibleFromAmount("", "0", 0);
 
-    setPayment(payment: ITokenPayment): ESDTTransferPayloadBuilder {
+    setPayment(payment: ITokenTransfer): ESDTTransferPayloadBuilder {
         this.payment = payment;
         return this;
     }
@@ -34,10 +34,10 @@ export class ESDTTransferPayloadBuilder {
  * @deprecated Use {@link TransferTransactionsFactory} instead.
  */
 export class ESDTNFTTransferPayloadBuilder {
-    payment: ITokenPayment = TokenPayment.nonFungible("", 0);
+    payment: ITokenTransfer = TokenTransfer.nonFungible("", 0);
     destination: IAddress = new Address("");
 
-    setPayment(payment: ITokenPayment): ESDTNFTTransferPayloadBuilder {
+    setPayment(payment: ITokenTransfer): ESDTNFTTransferPayloadBuilder {
         this.payment = payment;
         return this;
     }
@@ -69,10 +69,10 @@ export class ESDTNFTTransferPayloadBuilder {
  * @deprecated Use {@link TransferTransactionsFactory} instead.
  */
 export class MultiESDTNFTTransferPayloadBuilder {
-    payments: ITokenPayment[] = [];
+    payments: ITokenTransfer[] = [];
     destination: IAddress = new Address("");
 
-    setPayments(payments: ITokenPayment[]): MultiESDTNFTTransferPayloadBuilder {
+    setPayments(payments: ITokenTransfer[]): MultiESDTNFTTransferPayloadBuilder {
         this.payments = payments;
         return this;
     }

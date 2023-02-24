@@ -14,7 +14,7 @@ export * from "./relayedTransactionV2Builder";
 export * from "./signableMessage";
 export * from "./smartcontracts";
 export * from "./tokenOperations";
-export * from "./tokenPayment";
+export * from "./tokenTransfer";
 export * from "./transaction";
 export * from "./transactionPayload";
 export * from "./transactionWatcher";

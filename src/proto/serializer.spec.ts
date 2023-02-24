@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { TransactionVersion } from "../networkParams";
 import { Signature } from "../signature";
 import { loadTestWallets, TestWallet } from "../testutils";
-import { TokenPayment } from "../tokenPayment";
+import { TokenTransfer } from "../tokenTransfer";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { ProtoSerializer } from "./serializer";
@@ -51,7 +51,7 @@ describe("serialize transactions", () => {
     it("with data, with value", async () => {
         let transaction = new Transaction({
             nonce: 91,
-            value: TokenPayment.egldFromAmount(10),
+            value: TokenTransfer.egldFromAmount(10),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             gasLimit: 100000,

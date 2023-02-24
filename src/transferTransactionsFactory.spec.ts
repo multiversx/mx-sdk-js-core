@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { Address } from "./address";
 import { GasEstimator } from "./gasEstimator";
-import { TokenPayment } from "./tokenPayment";
+import { TokenTransfer } from "./tokenTransfer";
 import { TransactionPayload } from "./transactionPayload";
 import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 
@@ -10,7 +10,7 @@ describe("test transaction factory", () => {
 
     it("should create EGLD transfers", () => {
         const transactionWithData = factory.createEGLDTransfer({
-            value: TokenPayment.egldFromAmount(10.5),
+            value: TokenTransfer.egldFromAmount(10.5),
             receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             data: new TransactionPayload("hello"),
             chainID: "D"
@@ -23,7 +23,7 @@ describe("test transaction factory", () => {
         assert.equal(transactionWithData.getChainID(), "D");
 
         const transactionWithoutData = factory.createEGLDTransfer({
-            value: TokenPayment.egldFromAmount(10.5),
+            value: TokenTransfer.egldFromAmount(10.5),
             receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             chainID: "D"
         });
@@ -37,7 +37,7 @@ describe("test transaction factory", () => {
 
     it("should create ESDT transfers", () => {
         const transaction = factory.createESDTTransfer({
-            payment: TokenPayment.fungibleFromAmount("TEST-8b028f", "100.00", 2),
+            tokenTransfer: TokenTransfer.fungibleFromAmount("TEST-8b028f", "100.00", 2),
             receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             chainID: "D"
         });
@@ -51,7 +51,7 @@ describe("test transaction factory", () => {
 
     it("should create ESDTNFT transfers", () => {
         const transaction = factory.createESDTNFTTransfer({
-            payment: TokenPayment.nonFungible("TEST-38f249", 1),
+            tokenTransfer: TokenTransfer.nonFungible("TEST-38f249", 1),
             destination: new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"),
             sender: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             chainID: "D"
@@ -67,9 +67,9 @@ describe("test transaction factory", () => {
 
     it("should create Multi ESDTNFT transfers", () => {
         const transaction = factory.createMultiESDTNFTTransfer({
-            payments: [
-                TokenPayment.nonFungible("FOO-38f249", 1),
-                TokenPayment.fungibleFromAmount("BAR-c80d29", "10.00", 18)
+            tokenTransfers: [
+                TokenTransfer.nonFungible("FOO-38f249", 1),
+                TokenTransfer.fungibleFromAmount("BAR-c80d29", "10.00", 18)
             ],
             destination: new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
             sender: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),

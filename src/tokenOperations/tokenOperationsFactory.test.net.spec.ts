@@ -4,7 +4,7 @@ import { GasEstimator } from "../gasEstimator";
 import { INetworkConfig, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { createTestnetProvider, INetworkProvider } from "../testutils/networkProviders";
-import { TokenPayment } from "../tokenPayment";
+import { TokenTransfer } from "../tokenTransfer";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
 import { TransferTransactionsFactory } from "../transferTransactionsFactory";
@@ -153,7 +153,7 @@ describe("test factory on testnet", function () {
 
         // Send some tokens to Grace
         const tx4 = transferTransactionsFactory.createESDTTransfer({
-            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+            tokenTransfer: TokenTransfer.fungibleFromBigInteger(tokenIdentifier, 10),
             sender: frank.account.address,
             receiver: grace.account.address,
             chainID: network.ChainID,
@@ -192,7 +192,7 @@ describe("test factory on testnet", function () {
 
         // Send some tokens to Grace
         const tx2 = transferTransactionsFactory.createESDTTransfer({
-            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+            tokenTransfer: TokenTransfer.fungibleFromBigInteger(tokenIdentifier, 10),
             sender: frank.account.address,
             receiver: grace.account.address,
             chainID: network.ChainID,
@@ -261,7 +261,7 @@ describe("test factory on testnet", function () {
 
         // Send some tokens to Grace
         const tx2 = transferTransactionsFactory.createESDTTransfer({
-            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+            tokenTransfer: TokenTransfer.fungibleFromBigInteger(tokenIdentifier, 10),
             sender: frank.account.address,
             receiver: grace.account.address,
             chainID: network.ChainID,

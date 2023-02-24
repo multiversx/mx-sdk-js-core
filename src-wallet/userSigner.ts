@@ -1,6 +1,4 @@
 import { ErrSignerCannotSign } from "./errors";
-import { ISignable } from "./interface";
-import { Signature } from "./signature";
 import { UserAddress } from "./userAddress";
 import { UserSecretKey } from "./userKeys";
 import { UserWallet } from "./userWallet";
@@ -25,24 +23,13 @@ export class UserSigner {
         return new UserSigner(secretKey);
     }
 
-    /**
-     * Signs a message.
-     * @param signable the message to be signed (e.g. a {@link Transaction}).
-     */
-    async sign(signable: ISignable): Promise<void> {
+    async sign(data: Buffer): Promise<Buffer> {
         try {
-            this.trySign(signable);
+            const signature = this.secretKey.sign(data);
+            return signature;
         } catch (err: any) {
             throw new ErrSignerCannotSign(err);
         }
-    }
-
-    private trySign(signable: ISignable) {
-        let bufferToSign = signable.serializeForSigning();
-        let signatureBuffer = this.secretKey.sign(bufferToSign);
-        let signature = new Signature(signatureBuffer);
-
-        signable.applySignature(signature);
     }
 
     /**

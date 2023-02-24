@@ -1,24 +1,18 @@
-import { ISignable, ISignature, IVerifiable } from "../interface";
-import { Signature } from "../signature";
-
 /**
  * A dummy transaction used in tests.
  */
-export class TestTransaction implements ISignable, IVerifiable {
+export class TestTransaction {
     nonce: number = 0;
     value: string = "";
     receiver: string = "";
+    sender: string = "";
+    guardian: string = "";
     gasPrice: number = 0;
     gasLimit: number = 0;
     data: string = "";
     chainID: string = "";
     version: number = 1;
     options: number = 0;
-
-    sender: string = "";
-    guardian: string = "";
-    guardianSignature: string = "";
-    signature: string = "";
 
     constructor(init?: Partial<TestTransaction>) {
         Object.assign(this, init);
@@ -45,21 +39,5 @@ export class TestTransaction implements ISignable, IVerifiable {
 
         const serialized = JSON.stringify(plainObject);
         return Buffer.from(serialized);
-    }
-
-    applySignature(signature: ISignature) {
-        this.signature = signature.hex();
-    }
-
-    applyGuardianSignature(guardianSignature: ISignature) {
-        this.guardianSignature = guardianSignature.hex()
-    }
-
-    getSignature(): ISignature {
-        return new Signature(Buffer.from(this.signature, "hex"));
-    }
-
-    getGuardianSignature(): ISignature {
-        return new Signature(Buffer.from(this.guardianSignature, "hex"));
     }
 }

@@ -1,4 +1,3 @@
-import { IVerifiable } from "./interface";
 import { UserPublicKey } from "./userKeys";
 
 interface IAddress {
@@ -21,12 +20,12 @@ export class UserVerifier {
   }
 
   /**
-   * Verify a message's signature.
-   * @param message the message to be verified.
+   * 
+   * @param data the raw data to be verified (e.g. an already-serialized enveloped message)
+   * @param signature the signature to be verified
+   * @returns true if the signature is valid, false otherwise
    */
-  verify(message: IVerifiable): boolean {
-    return this.publicKey.verify(
-      message.serializeForSigning(),
-      Buffer.from(message.getSignature().hex(), 'hex'));
+  verify(data: Buffer, signature: Buffer): boolean {
+    return this.publicKey.verify(data, signature);
   }
 }

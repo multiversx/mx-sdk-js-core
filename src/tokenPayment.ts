@@ -69,20 +69,19 @@ export class TokenPayment {
         return this.amountAsBigInteger;
     }
 
-    toPrettyString() {
-        return `${this.toRationalNumber()} ${this.tokenIdentifier}`;
+    toPrettyString(): string {
+        return `${this.toAmount()} ${this.tokenIdentifier}`;
     }
 
-    // TODO (breaking, next major version): rename to "toAmount()", make it private.
-    toRationalNumber() {
+    private toAmount(): string {
         return this.amountAsBigInteger.shiftedBy(-this.numDecimals).toFixed(this.numDecimals);
     }
 
-    isEgld() {
+    isEgld(): boolean {
         return this.tokenIdentifier == EGLDTokenIdentifier;
     }
 
-    isFungible() {
+    isFungible(): boolean {
         return this.nonce == 0;
     }
 }

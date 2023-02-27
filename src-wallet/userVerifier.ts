@@ -4,7 +4,6 @@ interface IAddress {
   pubkey(): Buffer;
 }
 
-
 /**
  * ed25519 signature verification
  */

@@ -1,11 +1,10 @@
 import BigNumber from "bignumber.js";
-import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, TokenIdentifierType, TokenIdentifierValue, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
-import { ArgumentErrorContext } from "./argumentErrorContext";
-import { Struct, Field, StructType, Tuple } from "./typesystem";
 import { Address } from "../address";
 import { ErrInvalidArgument, ErrTypeInferenceSystemRequiresRegularJavascriptObjects } from "../errors";
 import { IAddress } from "../interface";
 import { numberToPaddedHex } from "../utils.codec";
+import { ArgumentErrorContext } from "./argumentErrorContext";
+import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, Field, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, Struct, StructType, TokenIdentifierType, TokenIdentifierValue, Tuple, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
 
 export namespace NativeTypes {
     export type NativeBuffer = Buffer | string;
@@ -13,6 +12,7 @@ export namespace NativeTypes {
     export type NativeAddress = string | Buffer | IAddress | { getAddress(): IAddress };
 }
 
+// TODO: rename this.
 export namespace NativeSerializer {
     /**
      * Interprets a set of native javascript values into a set of typed values, given parameter definitions.
@@ -221,10 +221,10 @@ export namespace NativeSerializer {
         if (innerValue instanceof Buffer) {
             return new BytesValue(innerValue);
         }
-        if (typeof innerValue ===  "number") {
+        if (typeof innerValue === "number") {
             return BytesValue.fromHex(numberToPaddedHex(innerValue))
         }
-        
+
         errorContext.convertError(native, "BytesValue");
     }
 

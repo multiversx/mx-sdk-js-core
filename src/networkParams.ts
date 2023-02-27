@@ -1,9 +1,8 @@
-import * as errors from "./errors";
 import {
-    TRANSACTION_OPTIONS_DEFAULT,
-    TRANSACTION_OPTIONS_TX_HASH_SIGN,
-    TRANSACTION_VERSION_DEFAULT, TRANSACTION_VERSION_WITH_OPTIONS, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_GUARDED_MASK
+    TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_GUARDED_MASK, TRANSACTION_OPTIONS_TX_HASH_SIGN,
+    TRANSACTION_VERSION_DEFAULT, TRANSACTION_VERSION_WITH_OPTIONS
 } from "./constants";
+import * as errors from "./errors";
 
 export class TransactionVersion {
     /**
@@ -43,6 +42,7 @@ export class TransactionVersion {
     }
 }
 
+// TODO: Allow both flags set.
 export class TransactionOptions {
     /**
      * The actual numeric value.

@@ -241,7 +241,7 @@ describe("test factory on testnet", function () {
             issuer: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
-            initialSupply: 100,
+            initialSupply: "100",
             numDecimals: 0,
             canFreeze: true,
             canWipe: true,
@@ -350,7 +350,7 @@ describe("test factory on testnet", function () {
             const txCreate = factory.nftCreate({
                 creator: grace.address,
                 tokenIdentifier: tokenIdentifier,
-                initialQuantity: 1,
+                initialQuantity: "1",
                 name: `test-${i}`,
                 royalties: 1000,
                 hash: "abba",

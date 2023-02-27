@@ -38,7 +38,7 @@ interface IIssueFungibleArgs extends IBaseArgs {
     issuer: IAddress;
     tokenName: string;
     tokenTicker: string;
-    initialSupply: number;
+    initialSupply: BigNumber.Value;
     numDecimals: number;
     canFreeze: boolean;
     canWipe: boolean;
@@ -102,7 +102,7 @@ interface INonFungibleSetSpecialRoleArgs extends IBaseArgs {
 interface INFTCreateArgs extends IBaseArgs {
     creator: IAddress;
     tokenIdentifier: string;
-    initialQuantity: number;
+    initialQuantity: BigNumber.Value;
     name: string;
     royalties: number;
     hash: string;

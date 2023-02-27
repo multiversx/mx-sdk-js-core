@@ -27,8 +27,8 @@ describe("test token transfer", () => {
     });
 
     it("should work with USDC", () => {
-        let identifier = "USDC-c76f1f";
-        let numDecimals = 6;
+        const identifier = "USDC-c76f1f";
+        const numDecimals = 6;
 
         assert.equal(TokenTransfer.fungibleFromAmount(identifier, "1", numDecimals).toString(), "1000000");
         assert.equal(TokenTransfer.fungibleFromAmount(identifier, "0.1", numDecimals).toString(), "100000");
@@ -38,21 +38,21 @@ describe("test token transfer", () => {
     });
 
     it("should work with MetaESDT", () => {
-        let identifier = "MEXFARML-28d646";
-        let numDecimals = 18;
-        let nonce = 12345678;
+        const identifier = "MEXFARML-28d646";
+        const numDecimals = 18;
+        const nonce = 12345678;
+        const transfer = TokenTransfer.metaEsdtFromAmount(identifier, nonce, "0.1", numDecimals);
 
-        let transfer = TokenTransfer.metaEsdtFromAmount(identifier, nonce, "0.1", numDecimals)
         assert.equal(transfer.tokenIdentifier, identifier);
         assert.equal(transfer.nonce, nonce);
         assert.equal(transfer.toString(), "100000000000000000");
     });
 
     it("should work with NFTs", () => {
-        let identifier = "TEST-38f249";
-        let nonce = 1;
+        const identifier = "TEST-38f249";
+        const nonce = 1;
+        const transfer = TokenTransfer.nonFungible(identifier, nonce);
 
-        let transfer = TokenTransfer.nonFungible(identifier, nonce)
         assert.equal(transfer.tokenIdentifier, identifier);
         assert.equal(transfer.nonce, nonce);
         assert.equal(transfer.toPrettyString(), "1 TEST-38f249");

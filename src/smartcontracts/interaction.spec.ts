@@ -10,7 +10,7 @@ import {
     TestWallet
 } from "../testutils";
 import { ContractController } from "../testutils/contractController";
-import { TokenPayment } from "../tokenPayment";
+import { TokenTransfer } from "../tokenTransfer";
 import { SmartContractAbi } from "./abi";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
@@ -35,7 +35,7 @@ describe("test smart contract interactor", function () {
 
         let transaction = interaction
             .withNonce(7)
-            .withValue(TokenPayment.egldFromAmount(1))
+            .withValue(TokenTransfer.egldFromAmount(1))
             .withGasLimit(20000000)
             .buildTransaction();
 
@@ -50,10 +50,10 @@ describe("test smart contract interactor", function () {
         let dummyFunction = new ContractFunction("dummy");
         let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
-        const TokenFoo = (amount: BigNumber.Value) => TokenPayment.fungibleFromAmount("FOO-6ce17b", amount, 0);
-        const TokenBar = (amount: BigNumber.Value) => TokenPayment.fungibleFromAmount("BAR-5bc08f", amount, 3);
-        const LKMEX = (nonce: number, amount: BigNumber.Value) => TokenPayment.metaEsdtFromAmount("LKMEX-aab910", nonce, amount, 18);
-        const Strămoși = (nonce: number) => TokenPayment.nonFungible("MOS-b9b4b2", nonce);
+        const TokenFoo = (amount: BigNumber.Value) => TokenTransfer.fungibleFromAmount("FOO-6ce17b", amount, 0);
+        const TokenBar = (amount: BigNumber.Value) => TokenTransfer.fungibleFromAmount("BAR-5bc08f", amount, 3);
+        const LKMEX = (nonce: number, amount: BigNumber.Value) => TokenTransfer.metaEsdtFromAmount("LKMEX-aab910", nonce, amount, 18);
+        const Strămoși = (nonce: number) => TokenTransfer.nonFungible("MOS-b9b4b2", nonce);
 
         const hexFoo = "464f4f2d366365313762";
         const hexBar = "4241522d356263303866";

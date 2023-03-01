@@ -4,10 +4,10 @@ import { GasEstimator } from "../gasEstimator";
 import { INetworkConfig, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { createTestnetProvider, INetworkProvider } from "../testutils/networkProviders";
-import { TokenPayment } from "../tokenPayment";
+import { TokenTransfer } from "../tokenTransfer";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
-import { TransfersFactory } from "../transfersFactory";
+import { TransferTransactionsFactory } from "../transferTransactionsFactory";
 import { TokenOperationsFactory } from "./tokenOperationsFactory";
 import { TokenOperationsFactoryConfig } from "./tokenOperationsFactoryConfig";
 import { TokenOperationsOutcomeParser } from "./tokenOperationsOutcomeParser";
@@ -19,7 +19,7 @@ describe("test factory on testnet", function () {
     let network: INetworkConfig;
     let factory: TokenOperationsFactory;
     let parser: TokenOperationsOutcomeParser;
-    let transfersFactory: TransfersFactory;
+    let transferTransactionsFactory: TransferTransactionsFactory;
 
     before(async function () {
         console.log(`> ${this.currentTest?.title} ...`);
@@ -31,7 +31,7 @@ describe("test factory on testnet", function () {
         network = await provider.getNetworkConfig();
         factory = new TokenOperationsFactory(new TokenOperationsFactoryConfig(network.ChainID));
         parser = new TokenOperationsOutcomeParser();
-        transfersFactory = new TransfersFactory(new GasEstimator());
+        transferTransactionsFactory = new TransferTransactionsFactory(new GasEstimator());
     });
 
     it("should issue fungible, mint, burn", async function () {
@@ -152,8 +152,8 @@ describe("test factory on testnet", function () {
         const _tx3Outcome = parser.parseUnpause(tx3OnNetwork);
 
         // Send some tokens to Grace
-        const tx4 = transfersFactory.createESDTTransfer({
-            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+        const tx4 = transferTransactionsFactory.createESDTTransfer({
+            tokenTransfer: TokenTransfer.fungibleFromBigInteger(tokenIdentifier, 10),
             sender: frank.account.address,
             receiver: grace.account.address,
             chainID: network.ChainID,
@@ -191,8 +191,8 @@ describe("test factory on testnet", function () {
         assert.isTrue(tokenIdentifier.includes("FRANK"));
 
         // Send some tokens to Grace
-        const tx2 = transfersFactory.createESDTTransfer({
-            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+        const tx2 = transferTransactionsFactory.createESDTTransfer({
+            tokenTransfer: TokenTransfer.fungibleFromBigInteger(tokenIdentifier, 10),
             sender: frank.account.address,
             receiver: grace.account.address,
             chainID: network.ChainID,
@@ -260,8 +260,8 @@ describe("test factory on testnet", function () {
         assert.isTrue(tokenIdentifier.includes("FRANK"));
 
         // Send some tokens to Grace
-        const tx2 = transfersFactory.createESDTTransfer({
-            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+        const tx2 = transferTransactionsFactory.createESDTTransfer({
+            tokenTransfer: TokenTransfer.fungibleFromBigInteger(tokenIdentifier, 10),
             sender: frank.account.address,
             receiver: grace.account.address,
             chainID: network.ChainID,

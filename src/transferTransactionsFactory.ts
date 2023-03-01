@@ -1,8 +1,8 @@
 import { Address } from "./address";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenPayment, ITransactionPayload, ITransactionValue } from "./interface";
-import { Transaction } from "./transaction";
-import { AddressValue, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "./smartcontracts/typesystem";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenTransfer, ITransactionPayload, ITransactionValue } from "./interface";
 import { ArgSerializer } from "./smartcontracts/argSerializer";
+import { AddressValue, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "./smartcontracts/typesystem";
+import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 
 interface IGasEstimator {
@@ -12,7 +12,7 @@ interface IGasEstimator {
     forMultiESDTNFTTransfer(dataLength: number, numTransfers: number): number;
 }
 
-export class TransfersFactory {
+export class TransferTransactionsFactory {
     private readonly gasEstimator;
 
     constructor(gasEstimator: IGasEstimator) {
@@ -45,7 +45,7 @@ export class TransfersFactory {
     }
 
     createESDTTransfer(args: {
-        payment: ITokenPayment,
+        tokenTransfer: ITokenTransfer,
         nonce?: INonce;
         receiver: IAddress;
         sender?: IAddress;
@@ -55,9 +55,9 @@ export class TransfersFactory {
     }) {
         const { argumentsString } = new ArgSerializer().valuesToString([
             // The token identifier
-            BytesValue.fromUTF8(args.payment.tokenIdentifier),
+            BytesValue.fromUTF8(args.tokenTransfer.tokenIdentifier),
             // The transfered amount
-            new BigUIntValue(args.payment.valueOf()),
+            new BigUIntValue(args.tokenTransfer.valueOf()),
         ]);
 
         const data = `ESDTTransfer@${argumentsString}`;
@@ -77,7 +77,7 @@ export class TransfersFactory {
     }
 
     createESDTNFTTransfer(args: {
-        payment: ITokenPayment,
+        tokenTransfer: ITokenTransfer,
         nonce?: INonce;
         destination: IAddress;
         sender: IAddress;
@@ -87,11 +87,11 @@ export class TransfersFactory {
     }) {
         const { argumentsString } = new ArgSerializer().valuesToString([
             // The token identifier
-            BytesValue.fromUTF8(args.payment.tokenIdentifier),
+            BytesValue.fromUTF8(args.tokenTransfer.tokenIdentifier),
             // The nonce of the token
-            new U64Value(args.payment.nonce),
+            new U64Value(args.tokenTransfer.nonce),
             // The transferred quantity
-            new BigUIntValue(args.payment.valueOf()),
+            new BigUIntValue(args.tokenTransfer.valueOf()),
             // The destination address
             new AddressValue(args.destination)
         ]);
@@ -113,7 +113,7 @@ export class TransfersFactory {
     }
 
     createMultiESDTNFTTransfer(args: {
-        payments: ITokenPayment[],
+        tokenTransfers: ITokenTransfer[],
         nonce?: INonce;
         destination: IAddress;
         sender: IAddress;
@@ -125,10 +125,10 @@ export class TransfersFactory {
             // The destination address
             new AddressValue(args.destination),
             // Number of tokens
-            new U16Value(args.payments.length)
+            new U16Value(args.tokenTransfers.length)
         ];
 
-        for (const payment of args.payments) {
+        for (const payment of args.tokenTransfers) {
             parts.push(...[
                 // The token identifier
                 BytesValue.fromUTF8(payment.tokenIdentifier),
@@ -143,7 +143,7 @@ export class TransfersFactory {
         const data = `MultiESDTNFTTransfer@${argumentsString}`;
         const transactionPayload = new TransactionPayload(data);
         const dataLength = transactionPayload.length() || 0;
-        const estimatedGasLimit = this.gasEstimator.forMultiESDTNFTTransfer(dataLength, args.payments.length);
+        const estimatedGasLimit = this.gasEstimator.forMultiESDTNFTTransfer(dataLength, args.tokenTransfers.length);
 
         return new Transaction({
             nonce: args.nonce,

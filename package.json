@@ -36,7 +36,8 @@
   },
   "devDependencies": {
     "@multiversx/sdk-network-providers": "1.2.1",
-    "@multiversx/sdk-wallet": "2.1.1",
+    "@multiversx/sdk-wallet": "3.0.0",
+    "@multiversx/sdk-wallet-next": "git+https://github.com/multiversx/mx-sdk-js-wallet.git#next-13",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",
     "@types/mocha": "9.1.0",

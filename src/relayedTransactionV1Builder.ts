@@ -1,12 +1,11 @@
-import { Transaction } from "./transaction";
+import BigNumber from "bignumber.js";
+import { Address } from "./address";
+import { ErrInvalidRelayedV1BuilderArguments } from "./errors";
 import { IAddress, INonce } from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
-import { ErrInvalidRelayedV1BuilderArguments } from "./errors";
-import { TransactionPayload } from "./transactionPayload";
-import { ContractFunction, StringValue } from "./smartcontracts";
-import { Address } from "./address";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
-import BigNumber from "bignumber.js";
+import { Transaction } from "./transaction";
+import { TransactionPayload } from "./transactionPayload";
 
 export class RelayedTransactionV1Builder {
     innerTransaction: Transaction | undefined;
@@ -136,12 +135,12 @@ export class RelayedTransactionV1Builder {
             "gasPrice": this.innerTransaction.getGasPrice().valueOf(),
             "gasLimit": this.innerTransaction.getGasLimit().valueOf(),
             "data": this.innerTransaction.getData().valueOf().toString("base64"),
-            "signature": Buffer.from(this.innerTransaction.getSignature().hex(), 'hex').toString("base64"),
+            "signature": this.innerTransaction.getSignature().toString("base64"),
             "chainID": Buffer.from(this.innerTransaction.getChainID().valueOf()).toString("base64"),
             "version": this.innerTransaction.getVersion().valueOf(),
             "options": this.innerTransaction.getOptions().valueOf() == 0 ? undefined : this.innerTransaction.getOptions().valueOf(),
             "guardian": this.innerTransaction.getGuardian().bech32() ? new Address(this.innerTransaction.getGuardian().bech32()).pubkey().toString("base64") : undefined,
-            "guardianSignature": this.innerTransaction.getGuardianSignature().hex() ? Buffer.from(this.innerTransaction.getGuardianSignature().hex(), 'hex').toString("base64") : undefined,
+            "guardianSignature": this.innerTransaction.getGuardianSignature().toString("hex") ? this.innerTransaction.getGuardianSignature().toString("base64") : undefined,
         };
 
         return JSON.stringify(txObject);

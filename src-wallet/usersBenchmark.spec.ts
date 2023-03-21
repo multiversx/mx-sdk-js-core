@@ -22,6 +22,8 @@ describe("behchmark sign and verify", () => {
             messages.push(message);
         }
 
+        console.info(`N = ${n}`);
+
         console.time("sign");
 
         for (let i = 0; i < n; i++) {

@@ -3,13 +3,23 @@ import { UserAddress } from "./userAddress";
 import { UserSecretKey } from "./userKeys";
 import { UserWallet } from "./userWallet";
 
+interface IUserSecretKey {
+    sign(message: Buffer): Buffer;
+    generatePublicKey(): IUserPublicKey;
+}
+
+interface IUserPublicKey {
+    toAddress(): { bech32(): string; };
+}
+
+
 /**
  * ed25519 signer
  */
 export class UserSigner {
-    protected readonly secretKey: UserSecretKey;
+    protected readonly secretKey: IUserSecretKey;
 
-    constructor(secretKey: UserSecretKey) {
+    constructor(secretKey: IUserSecretKey) {
         this.secretKey = secretKey;
     }
 
@@ -36,6 +46,7 @@ export class UserSigner {
      * Gets the address of the signer.
      */
     getAddress(): UserAddress {
-        return this.secretKey.generatePublicKey().toAddress();
+        const bech32 = this.secretKey.generatePublicKey().toAddress().bech32();
+        return UserAddress.fromBech32(bech32);
     }
 }

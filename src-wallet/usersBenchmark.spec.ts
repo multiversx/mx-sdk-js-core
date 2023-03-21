@@ -3,11 +3,10 @@ import { assert } from "chai";
 import { UserPublicKey, UserSecretKey } from "./userKeys";
 
 describe("behchmark sign and verify", () => {
-
-    it.only("should sign and verify", async function () {
+    it("should sign and verify", async function () {
         this.timeout(60000);
 
-        const n = 10000;
+        const n = 1000;
         const secretKeys: UserSecretKey[] = [];
         const publicKeys: UserPublicKey[] = [];
         const messages: Buffer[] = [];

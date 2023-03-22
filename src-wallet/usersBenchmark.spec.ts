@@ -1,5 +1,5 @@
+import { utils } from "@noble/ed25519";
 import { assert } from "chai";
-import nacl from "tweetnacl";
 import { UserPublicKey, UserSecretKey } from "./userKeys";
 
 describe("behchmark sign and verify", () => {
@@ -13,9 +13,9 @@ describe("behchmark sign and verify", () => {
         const goodSignatures: Buffer[] = [];
 
         for (let i = 0; i < n; i++) {
-            const secretKey = new UserSecretKey(Buffer.from(nacl.randomBytes(32)));
+            const secretKey = new UserSecretKey(Buffer.from(utils.randomBytes(32)));
             const publicKey = secretKey.generatePublicKey();
-            const message = Buffer.from(nacl.randomBytes(256));
+            const message = Buffer.from(utils.randomBytes(256));
 
             secretKeys.push(secretKey);
             publicKeys.push(publicKey);
@@ -23,6 +23,7 @@ describe("behchmark sign and verify", () => {
         }
 
         console.info(`N = ${n}`);
+
         console.time("sign");
 
         for (let i = 0; i < n; i++) {

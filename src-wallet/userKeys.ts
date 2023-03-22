@@ -1,10 +1,15 @@
-import * as tweetnacl from "tweetnacl";
+import * as ed from "@noble/ed25519";
+import { sha512 } from "@noble/hashes/sha512";
 import { guardLength } from "./assertions";
 import { parseUserKey } from "./pem";
 import { UserAddress } from "./userAddress";
 
 export const USER_SEED_LENGTH = 32;
 export const USER_PUBKEY_LENGTH = 32;
+
+// See: https://github.com/paulmillr/noble-ed25519
+// In a future version of sdk-wallet, we'll switch to using the async functions of noble-ed25519.
+ed.utils.sha512Sync = (...m) => sha512(ed.utils.concatBytes(...m));
 
 export class UserSecretKey {
     private readonly buffer: Buffer;
@@ -27,18 +32,12 @@ export class UserSecretKey {
     }
 
     generatePublicKey(): UserPublicKey {
-        let keyPair = tweetnacl.sign.keyPair.fromSeed(new Uint8Array(this.buffer));
-        let buffer = Buffer.from(keyPair.publicKey);
+        const buffer = ed.sync.getPublicKey(this.buffer);
         return new UserPublicKey(buffer);
     }
 
     sign(message: Buffer): Buffer {
-        let pair = tweetnacl.sign.keyPair.fromSeed(new Uint8Array(this.buffer));
-        let signingKey = pair.secretKey;
-        let signature = tweetnacl.sign(new Uint8Array(message), signingKey);
-        // "tweetnacl.sign()" returns the concatenated [signature, message], therfore we remove the appended message:
-        signature = signature.slice(0, signature.length - message.length);
-
+        const signature = ed.sync.sign(message, this.buffer);
         return Buffer.from(signature);
     }
 
@@ -54,18 +53,17 @@ export class UserSecretKey {
 export class UserPublicKey {
     private readonly buffer: Buffer;
 
-    constructor(buffer: Buffer) {
+    constructor(buffer: Uint8Array) {
         guardLength(buffer, USER_PUBKEY_LENGTH);
 
-        this.buffer = buffer;
+        this.buffer = Buffer.from(buffer);
     }
 
     verify(data: Buffer, signature: Buffer): boolean {
         try {
-            const unopenedMessage = Buffer.concat([signature, data]);
-            const unsignedMessage = tweetnacl.sign.open(unopenedMessage, this.buffer);
-            return unsignedMessage != null;
-        } catch (err) {
+            const ok = ed.sync.verify(signature, data, this.buffer);
+            return ok;
+        } catch (err: any) {
             console.error(err);
             return false;
         }

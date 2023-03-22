@@ -7,7 +7,7 @@ import { X25519EncryptedData } from "./x25519EncryptedData";
 
 export class PubkeyEncryptor {
     static encrypt(data: Buffer, recipientPubKey: UserPublicKey, authSecretKey: UserSecretKey): X25519EncryptedData {
-        // create a new x225519 keypair that will be used for EDH
+        // create a new x25519 keypair that will be used for EDH
         const edhPair = nacl.sign.keyPair();
         const recipientDHPubKey = ed2curve.convertPublicKey(recipientPubKey.valueOf());
         if (recipientDHPubKey === null) {

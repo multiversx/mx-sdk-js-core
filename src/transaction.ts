@@ -267,8 +267,13 @@ export class Transaction {
    * @param signature The signature, as computed by a signer.
    * @param signedBy The address of the signer.
    */
-  applySignature(signature: ISignature, signedBy: IAddress) {
-    this.signature = signature;
+  applySignature(signature: ISignature | Buffer, signedBy: IAddress) {
+    if (signature instanceof Buffer) {
+      this.signature = new Signature(signature);
+    } else {
+      this.signature = signature;
+    }
+
     this.sender = signedBy;
     this.hash = TransactionHash.compute(this);
   }

@@ -1,20 +1,29 @@
-import { IAddress, ISignable, ISigner } from "./interface";
-import { Signature } from "./signature";
+import { ErrSignerCannotSign } from "./errors";
+import { UserAddress } from "./userAddress";
 import { UserSecretKey } from "./userKeys";
 import { UserWallet } from "./userWallet";
-import { ErrSignerCannotSign } from "./errors";
+
+interface IUserSecretKey {
+    sign(message: Buffer): Buffer;
+    generatePublicKey(): IUserPublicKey;
+}
+
+interface IUserPublicKey {
+    toAddress(): { bech32(): string; };
+}
+
 
 /**
  * ed25519 signer
  */
-export class UserSigner implements ISigner {
-    private readonly secretKey: UserSecretKey;
+export class UserSigner {
+    protected readonly secretKey: IUserSecretKey;
 
-    constructor(secretKey: UserSecretKey) {
+    constructor(secretKey: IUserSecretKey) {
         this.secretKey = secretKey;
     }
 
-    static fromWallet(keyFileObject: any, password: string): ISigner {
+    static fromWallet(keyFileObject: any, password: string): UserSigner {
         let secretKey = UserWallet.decryptSecretKey(keyFileObject, password);
         return new UserSigner(secretKey);
     }
@@ -23,32 +32,21 @@ export class UserSigner implements ISigner {
         let secretKey = UserSecretKey.fromPem(text, index);
         return new UserSigner(secretKey);
     }
-    
-    /**
-     * Signs a message.
-     * @param signable the message to be signed (e.g. a {@link Transaction}).
-     */
-    async sign(signable: ISignable): Promise<void> {
+
+    async sign(data: Buffer): Promise<Buffer> {
         try {
-            this.trySign(signable);
+            const signature = this.secretKey.sign(data);
+            return signature;
         } catch (err: any) {
             throw new ErrSignerCannotSign(err);
         }
     }
 
-    private trySign(signable: ISignable) {
-        let signedBy = this.getAddress();
-        let bufferToSign = signable.serializeForSigning(signedBy);
-        let signatureBuffer = this.secretKey.sign(bufferToSign);
-        let signature = new Signature(signatureBuffer);
-
-        signable.applySignature(signature, signedBy);
-    }
-
     /**
      * Gets the address of the signer.
      */
-    getAddress(): IAddress {
-        return this.secretKey.generatePublicKey().toAddress();
+    getAddress(): UserAddress {
+        const bech32 = this.secretKey.generatePublicKey().toAddress().bech32();
+        return UserAddress.fromBech32(bech32);
     }
 }

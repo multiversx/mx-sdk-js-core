@@ -321,20 +321,29 @@ export class Transaction {
    * Applies the signature on the transaction.
    *
    * @param signature The signature, as computed by a signer.
-   * @param signedBy The address of the signer.
    */
-  applySignature(signature: ISignature) {
-    this.signature = signature;
+  applySignature(signature: ISignature | Buffer) {
+    if (signature instanceof Buffer) {
+      this.signature = new Signature(signature);
+    } else {
+      this.signature = signature;
+    }
+
     this.hash = TransactionHash.compute(this);
   }
 
   /**
- * Applies the guardian signature on the transaction.
- *
- * @param guardianSignature The signature, as computed by a signer.
- */
-  applyGuardianSignature(guardianSignature: ISignature) {
-    this.guardianSignature = guardianSignature;
+  * Applies the guardian signature on the transaction.
+  *
+  * @param guardianSignature The signature, as computed by a signer.
+  */
+  applyGuardianSignature(guardianSignature: ISignature | Buffer) {
+    if (guardianSignature instanceof Buffer) {
+      this.guardianSignature = new Signature(guardianSignature);
+    } else {
+      this.guardianSignature = guardianSignature;
+    }
+
     this.hash = TransactionHash.compute(this);
   }
 

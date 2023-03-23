@@ -47,8 +47,8 @@ describe("test transaction", function () {
         alice.account.incrementNonce();
         transactionTwo.setNonce(alice.account.nonce);
 
-        await alice.signer.sign(transactionOne);
-        await alice.signer.sign(transactionTwo);
+        await signTransaction({ transaction: transactionOne, wallet: alice });
+        await signTransaction({ transaction: transactionTwo, wallet: alice });
 
         await provider.sendTransaction(transactionOne);
         await provider.sendTransaction(transactionTwo);
@@ -90,10 +90,19 @@ describe("test transaction", function () {
         transactionOne.setNonce(alice.account.nonce);
         transactionTwo.setNonce(alice.account.nonce);
 
-        await alice.signer.sign(transactionOne);
-        await alice.signer.sign(transactionTwo);
+        await signTransaction({ transaction: transactionOne, wallet: alice });
+        await signTransaction({ transaction: transactionTwo, wallet: alice });
 
         Logger.trace(JSON.stringify(await provider.simulateTransaction(transactionOne), null, 4));
         Logger.trace(JSON.stringify(await provider.simulateTransaction(transactionTwo), null, 4));
     });
+
+    async function signTransaction(options: { transaction: Transaction, wallet: TestWallet }) {
+        const transaction = options.transaction;
+        const wallet = options.wallet;
+
+        const serialized = transaction.serializeForSigning();
+        const signature = await wallet.signerNext.sign(serialized);
+        transaction.applySignature(signature);
+    }
 });

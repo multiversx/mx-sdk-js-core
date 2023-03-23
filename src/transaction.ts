@@ -321,7 +321,6 @@ export class Transaction {
    * Applies the signature on the transaction.
    *
    * @param signature The signature, as computed by a signer.
-   * @param signedBy The address of the signer.
    */
   applySignature(signature: ISignature | Buffer) {
     if (signature instanceof Buffer) {

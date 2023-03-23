@@ -101,8 +101,8 @@ describe("test transaction", function () {
         const transaction = options.transaction;
         const wallet = options.wallet;
 
-        const serialized = transaction.serializeForSigning(transaction.getSender());
+        const serialized = transaction.serializeForSigning();
         const signature = await wallet.signerNext.sign(serialized);
-        transaction.applySignature(signature, transaction.getSender());
+        transaction.applySignature(signature);
     }
 });

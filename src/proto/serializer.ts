@@ -1,11 +1,11 @@
 import BigNumber from "bignumber.js";
+import { Address } from "../address";
+import { TRANSACTION_OPTIONS_DEFAULT } from "../constants";
 import * as errors from "../errors";
+import { ITransactionValue } from "../interface";
 import { bigIntToBuffer } from "../smartcontracts/codec/utils";
 import { Transaction } from "../transaction";
 import { proto } from "./compiled";
-import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED } from "../constants";
-import { Address } from "../address";
-import { IAddress, ITransactionValue } from "../interface";
 /**
  * Hides away the serialization complexity, for each type of object (e.g. transactions).
  
@@ -32,7 +32,7 @@ export class ProtoSerializer {
             Data: transaction.getData().length() == 0 ? null : transaction.getData().valueOf(),
             ChainID: Buffer.from(transaction.getChainID().valueOf()),
             Version: transaction.getVersion().valueOf(),
-            Signature: Buffer.from(transaction.getSignature().hex(), "hex")
+            Signature: transaction.getSignature()
         });
 
         if (transaction.getOptions().valueOf() !== TRANSACTION_OPTIONS_DEFAULT) {
@@ -42,7 +42,7 @@ export class ProtoSerializer {
         if (transaction.isGuardedTransaction()) {
             const guardianAddress = transaction.getGuardian();
             protoTransaction.GuardAddr = new Address(guardianAddress.bech32()).pubkey();
-            protoTransaction.GuardSignature = Buffer.from(transaction.getGuardianSignature().hex(), "hex");
+            protoTransaction.GuardSignature = transaction.getGuardianSignature();
         }
 
         const encoded = proto.Transaction.encode(protoTransaction).finish();

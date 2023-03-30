@@ -1,9 +1,9 @@
-import { Transaction } from "./transaction";
-import { TransactionPayload } from "./transactionPayload";
-import { AddressValue, ArgSerializer, BytesValue, U64Value } from "./smartcontracts";
+import { ErrGasLimitShouldBe0ForInnerTransaction, ErrInvalidRelayedV2BuilderArguments } from "./errors";
 import { IAddress, IGasLimit, INonce } from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
-import { ErrGasLimitShouldBe0ForInnerTransaction, ErrInvalidRelayedV2BuilderArguments } from "./errors";
+import { AddressValue, ArgSerializer, BytesValue, U64Value } from "./smartcontracts";
+import { Transaction } from "./transaction";
+import { TransactionPayload } from "./transactionPayload";
 
 export class RelayedTransactionV2Builder {
     innerTransaction: Transaction | undefined;
@@ -84,7 +84,7 @@ export class RelayedTransactionV2Builder {
             new AddressValue(this.innerTransaction.getReceiver()),
             new U64Value(this.innerTransaction.getNonce().valueOf()),
             new BytesValue(this.innerTransaction.getData().valueOf()),
-            BytesValue.fromHex(this.innerTransaction.getSignature().hex())
+            new BytesValue(this.innerTransaction.getSignature())
         ]);
 
         const data = `relayedTxV2@${argumentsString}`;

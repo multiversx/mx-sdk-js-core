@@ -77,12 +77,12 @@ export class Transaction {
   /**
    * The signature.
    */
-  private signature: ISignature;
+  private signature: Buffer;
 
   /**
    * The signature of the guardian.
    */
-  private guardianSignature: ISignature;
+  private guardianSignature: Buffer;
 
   /**
    * The transaction hash, also used as a transaction identifier.
@@ -129,8 +129,8 @@ export class Transaction {
     this.options = options || TransactionOptions.withDefaultOptions();
     this.guardian = guardian || Address.empty();
 
-    this.signature = Signature.empty();
-    this.guardianSignature = Signature.empty();
+    this.signature = Buffer.from([]);
+    this.guardianSignature = Buffer.from([]);
     this.hash = TransactionHash.empty();
   }
 
@@ -201,11 +201,11 @@ export class Transaction {
     return this.options;
   }
 
-  getSignature(): ISignature {
+  getSignature(): Buffer {
     return this.signature;
   }
 
-  getGuardianSignature(): ISignature {
+  getGuardianSignature(): Buffer {
     return this.guardianSignature;
   }
 
@@ -251,9 +251,9 @@ export class Transaction {
    * Checks the integrity of the guarded transaction
    */
   isGuardedTransaction(): boolean {
-    const guardianComp = this.guardian.bech32() === (Address.empty().bech32());
-    const guardianSignature = this.guardianSignature.hex() === "";
-    return (this.getOptions().hasGuardedOption() && !guardianComp && !guardianSignature)
+    const hasGuardian = this.guardian.bech32().length > 0;
+    const hasGuardianSignature = this.guardianSignature.length > 0;
+    return this.getOptions().hasGuardedOption() && hasGuardian && hasGuardianSignature;
   }
 
   /**
@@ -273,8 +273,8 @@ export class Transaction {
       version: this.version.valueOf(),
       options: this.options.valueOf() == 0 ? undefined : this.options.valueOf(),
       guardian: this.guardian?.bech32() ? (this.guardian.bech32() == "" ? undefined : this.guardian.bech32()) : undefined,
-      signature: this.signature.hex() ? this.signature.hex() : undefined,
-      guardianSignature: this.guardianSignature.hex() ? this.guardianSignature.hex() : undefined,
+      signature: this.signature.toString("hex") ? this.signature.toString("hex") : undefined,
+      guardianSignature: this.guardianSignature.toString("hex") ? this.guardianSignature.toString("hex") : undefined,
     };
 
     Compatibility.guardAddressIsSetAndNonZero(new Address(plainObject.sender), "'sender' of transaction", "pass the actual sender to the Transaction constructor")
@@ -324,24 +324,24 @@ export class Transaction {
    */
   applySignature(signature: ISignature | Buffer) {
     if (signature instanceof Buffer) {
-      this.signature = new Signature(signature);
-    } else {
       this.signature = signature;
+    } else {
+      this.signature = Buffer.from(signature.hex(), "hex");
     }
 
     this.hash = TransactionHash.compute(this);
   }
 
   /**
-  * Applies the guardian signature on the transaction.
-  *
-  * @param guardianSignature The signature, as computed by a signer.
-  */
+ * Applies the guardian signature on the transaction.
+ *
+ * @param guardianSignature The signature, as computed by a signer.
+ */
   applyGuardianSignature(guardianSignature: ISignature | Buffer) {
     if (guardianSignature instanceof Buffer) {
-      this.guardianSignature = new Signature(guardianSignature);
-    } else {
       this.guardianSignature = guardianSignature;
+    } else {
+      this.guardianSignature = Buffer.from(guardianSignature.hex(), "hex");
     }
 
     this.hash = TransactionHash.compute(this);

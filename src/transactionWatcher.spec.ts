@@ -10,8 +10,8 @@ describe("test transactionWatcher", () => {
         let hash = new TransactionHash("abba");
         let provider = new MockProvider();
         let watcher = new TransactionWatcher(provider, {
-            pollingInterval: 42,
-            timeout: 42 * 42
+            pollingIntervalMilliseconds: 42,
+            timeoutMilliseconds: 42 * 42
         });
         let dummyTransaction = {
             getHash: () => hash

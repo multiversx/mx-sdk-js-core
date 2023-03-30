@@ -24,29 +24,30 @@ export class TransactionWatcher {
     static NoopOnStatusReceived = (_: ITransactionStatus) => { };
 
     protected readonly fetcher: ITransactionFetcher;
-    protected readonly pollingInterval: number;
-    protected readonly timeout: number;
-    protected readonly patience: number;
+    protected readonly pollingIntervalMilliseconds: number;
+    protected readonly timeoutMilliseconds: number;
+    protected readonly patienceMilliseconds: number;
 
     /**
+     * A transaction watcher (awaiter).
      * 
      * @param fetcher The transaction fetcher
      * @param options The options
-     * @param options.pollingInterval The polling interval, in milliseconds
-     * @param options.timeout The timeout, in milliseconds
-     * @param options.patience The patience: number of additional "polling intervals" to wait, after the transaction has reached its desired status. Currently there's a delay between the moment a transaction is marked as "completed" and the moment its outcome (contract results, events and logs) is available.
+     * @param options.pollingIntervalMilliseconds The polling interval, in milliseconds
+     * @param options.timeoutMilliseconds The timeout, in milliseconds
+     * @param options.patienceMilliseconds The patience: an extra time (in milliseconds) to wait, after the transaction has reached its desired status. Currently there's a delay between the moment a transaction is marked as "completed" and the moment its outcome (contract results, events and logs) is available.
      */
     constructor(
         fetcher: ITransactionFetcher,
         options: {
-            pollingInterval?: number,
-            timeout?: number,
-            patience?: number
+            pollingIntervalMilliseconds?: number,
+            timeoutMilliseconds?: number,
+            patienceMilliseconds?: number
         } = {}) {
         this.fetcher = new TransactionFetcherWithTracing(fetcher);
-        this.pollingInterval = options.pollingInterval || TransactionWatcher.DefaultPollingInterval;
-        this.timeout = options.timeout || TransactionWatcher.DefaultTimeout;
-        this.patience = options.patience || TransactionWatcher.DefaultPatience;
+        this.pollingIntervalMilliseconds = options.pollingIntervalMilliseconds || TransactionWatcher.DefaultPollingInterval;
+        this.timeoutMilliseconds = options.timeoutMilliseconds || TransactionWatcher.DefaultTimeout;
+        this.patienceMilliseconds = options.patienceMilliseconds || TransactionWatcher.DefaultPatience;
     }
 
     /**
@@ -137,13 +138,13 @@ export class TransactionWatcher {
         let fetchedData: TData | undefined = undefined;
         let satisfied: boolean = false;
 
-        timeoutTimer.start(this.timeout).finally(() => {
+        timeoutTimer.start(this.timeoutMilliseconds).finally(() => {
             timeoutTimer.stop();
             stop = true;
         });
 
         while (!stop) {
-            await periodicTimer.start(this.pollingInterval);
+            await periodicTimer.start(this.pollingIntervalMilliseconds);
 
             try {
                 fetchedData = await doFetch();
@@ -162,7 +163,7 @@ export class TransactionWatcher {
 
         // The patience timer isn't subject to the timeout constraints.
         if (satisfied) {
-            await patienceTimer.start(this.pollingInterval * this.patience);
+            await patienceTimer.start(this.patienceMilliseconds);
         }
 
         if (!timeoutTimer.isStopped()) {

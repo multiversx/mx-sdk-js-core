@@ -26,7 +26,7 @@ describe("test factory on testnet", function () {
         ({ frank, grace } = await loadTestWallets());
 
         provider = createTestnetProvider();
-        watcher = new TransactionWatcher(provider, { patience: 1 });
+        watcher = new TransactionWatcher(provider, { patienceMilliseconds: 8000 });
         network = await provider.getNetworkConfig();
         factory = new TokenOperationsFactory(new TokenOperationsFactoryConfig(network.ChainID));
         parser = new TokenOperationsOutcomeParser();

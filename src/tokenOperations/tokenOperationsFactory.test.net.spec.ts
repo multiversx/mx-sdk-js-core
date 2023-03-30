@@ -1,5 +1,4 @@
 import { assert } from "chai";
-import { AsyncTimer } from "../asyncTimer";
 import { GasEstimator } from "../gasEstimator";
 import { INetworkConfig, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { loadTestWallets, TestWallet } from "../testutils";
@@ -27,7 +26,7 @@ describe("test factory on testnet", function () {
         ({ frank, grace } = await loadTestWallets());
 
         provider = createTestnetProvider();
-        watcher = new TransactionWatcher(provider);
+        watcher = new TransactionWatcher(provider, { patience: 1 });
         network = await provider.getNetworkConfig();
         factory = new TokenOperationsFactory(new TokenOperationsFactoryConfig(network.ChainID));
         parser = new TokenOperationsOutcomeParser();
@@ -553,13 +552,7 @@ describe("test factory on testnet", function () {
         await provider.sendTransaction(transaction);
         console.log(`Sent transaction [${tag}]: ${transaction.getHash().hex()}`);
 
-        let transactionOnNetwork = await watcher.awaitCompleted(transaction);
-
-        // For some transactions, the "isCompleted" field is somehow incorrect (false positive).
-        // Let's wait a bit more to have the outcome. 
-        await (new AsyncTimer("test")).start(1000);
-
-        transactionOnNetwork = await watcher.awaitCompleted(transaction);
+        const transactionOnNetwork = await watcher.awaitCompleted(transaction);
         return transactionOnNetwork;
     }
 });

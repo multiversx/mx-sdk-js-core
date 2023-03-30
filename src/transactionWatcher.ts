@@ -19,7 +19,7 @@ interface ITransaction {
 export class TransactionWatcher {
     static DefaultPollingInterval: number = 6000;
     static DefaultTimeout: number = TransactionWatcher.DefaultPollingInterval * 15;
-    static DefaultPatience: number = 1;
+    static DefaultPatience: number = 0;
 
     static NoopOnStatusReceived = (_: ITransactionStatus) => { };
 
@@ -31,20 +31,22 @@ export class TransactionWatcher {
     /**
      * 
      * @param fetcher The transaction fetcher
-     * @param pollingInterval The polling interval, in milliseconds
-     * @param timeout The timeout, in milliseconds
-     * @param patience The patience: number of additional "polling intervals" to wait, after the transaction has reached its desired status. Currently there's a delay between the moment a transaction is marked as "completed" and the moment its outcome (contract results, events and logs) is available.
+     * @param options The options
+     * @param options.pollingInterval The polling interval, in milliseconds
+     * @param options.timeout The timeout, in milliseconds
+     * @param options.patience The patience: number of additional "polling intervals" to wait, after the transaction has reached its desired status. Currently there's a delay between the moment a transaction is marked as "completed" and the moment its outcome (contract results, events and logs) is available.
      */
     constructor(
         fetcher: ITransactionFetcher,
-        pollingInterval: number = TransactionWatcher.DefaultPollingInterval,
-        timeout: number = TransactionWatcher.DefaultTimeout,
-        patience: number = TransactionWatcher.DefaultPatience
-    ) {
+        options: {
+            pollingInterval?: number,
+            timeout?: number,
+            patience?: number
+        } = {}) {
         this.fetcher = new TransactionFetcherWithTracing(fetcher);
-        this.pollingInterval = pollingInterval;
-        this.timeout = timeout;
-        this.patience = patience;
+        this.pollingInterval = options.pollingInterval || TransactionWatcher.DefaultPollingInterval;
+        this.timeout = options.timeout || TransactionWatcher.DefaultTimeout;
+        this.patience = options.patience || TransactionWatcher.DefaultPatience;
     }
 
     /**

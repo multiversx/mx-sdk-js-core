@@ -1,14 +1,12 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
+import { Compatibility } from "./compatibility";
 import { TRANSACTION_MIN_GAS_PRICE } from "./constants";
 import * as errors from "./errors";
 import { Hash } from "./hash";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionPayload, ITransactionValue } from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
-import {
-  TransactionOptions,
-  TransactionVersion
-} from "./networkParams";
+import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
 import { Signature } from "./signature";
 import { TransactionPayload } from "./transactionPayload";
@@ -72,9 +70,19 @@ export class Transaction {
   options: TransactionOptions;
 
   /**
+   * The address of the guardian.
+   */
+  private guardian: IAddress;
+
+  /**
    * The signature.
    */
-  private signature: ISignature;
+  private signature: Buffer;
+
+  /**
+   * The signature of the guardian.
+   */
+  private guardianSignature: Buffer;
 
   /**
    * The transaction hash, also used as a transaction identifier.
@@ -95,6 +103,7 @@ export class Transaction {
     chainID,
     version,
     options,
+    guardian,
   }: {
     nonce?: INonce;
     value?: ITransactionValue;
@@ -106,6 +115,7 @@ export class Transaction {
     chainID: IChainID;
     version?: TransactionVersion;
     options?: TransactionOptions;
+    guardian?: IAddress;
   }) {
     this.nonce = nonce || 0;
     this.value = value ? new BigNumber(value.toString()).toFixed(0) : 0;
@@ -117,8 +127,10 @@ export class Transaction {
     this.chainID = chainID;
     this.version = version || TransactionVersion.withDefaultVersion();
     this.options = options || TransactionOptions.withDefaultOptions();
+    this.guardian = guardian || Address.empty();
 
-    this.signature = Signature.empty();
+    this.signature = Buffer.from([]);
+    this.guardianSignature = Buffer.from([]);
     this.hash = TransactionHash.empty();
   }
 
@@ -147,6 +159,10 @@ export class Transaction {
 
   getReceiver(): IAddress {
     return this.receiver;
+  }
+
+  getGuardian(): IAddress {
+    return this.guardian;
   }
 
   getGasPrice(): IGasPrice {
@@ -185,8 +201,20 @@ export class Transaction {
     return this.options;
   }
 
-  getSignature(): ISignature {
+  getSignature(): Buffer {
     return this.signature;
+  }
+
+  getGuardianSignature(): Buffer {
+    return this.guardianSignature;
+  }
+
+  setSender(sender: IAddress) {
+    this.sender = sender;
+  }
+
+  setGuardian(guardian: IAddress) {
+    this.guardian = guardian;
   }
 
   getHash(): TransactionHash {
@@ -197,41 +225,61 @@ export class Transaction {
   /**
    * Serializes a transaction to a sequence of bytes, ready to be signed.
    * This function is called internally by signers.
-   *
-   * @param signedBy The address of the future signer
    */
-  serializeForSigning(signedBy: IAddress): Buffer {
+  serializeForSigning(): Buffer {
     // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
-    let plain = this.toPlainObject(signedBy);
+    let plain = this.toPlainObject();
     // Make sure we never sign the transaction with another signature set up (useful when using the same method for verification)
     if (plain.signature) {
       delete plain.signature;
     }
+
+    if (plain.guardianSignature) {
+      delete plain.guardianSignature;
+    }
+
+    if (!plain.guardian) {
+      delete plain.guardian
+    }
+
     let serialized = JSON.stringify(plain);
 
     return Buffer.from(serialized);
   }
 
   /**
+   * Checks the integrity of the guarded transaction
+   */
+  isGuardedTransaction(): boolean {
+    const hasGuardian = this.guardian.bech32().length > 0;
+    const hasGuardianSignature = this.guardianSignature.length > 0;
+    return this.getOptions().hasGuardedOption() && hasGuardian && hasGuardianSignature;
+  }
+
+  /**
    * Converts the transaction object into a ready-to-serialize, plain JavaScript object.
    * This function is called internally within the signing procedure.
-   *
-   * @param sender The address of the sender (will be provided when called within the signing procedure)
    */
-  toPlainObject(sender?: IAddress): IPlainTransactionObject {
-    return {
+  toPlainObject(): IPlainTransactionObject {
+    const plainObject = {
       nonce: this.nonce.valueOf(),
       value: this.value.toString(),
       receiver: this.receiver.bech32(),
-      sender: sender ? sender.bech32() : this.sender.bech32(),
+      sender: this.sender.bech32(),
       gasPrice: this.gasPrice.valueOf(),
       gasLimit: this.gasLimit.valueOf(),
       data: this.data.length() == 0 ? undefined : this.data.encoded(),
       chainID: this.chainID.valueOf(),
       version: this.version.valueOf(),
       options: this.options.valueOf() == 0 ? undefined : this.options.valueOf(),
-      signature: this.signature.hex() ? this.signature.hex() : undefined,
+      guardian: this.guardian?.bech32() ? (this.guardian.bech32() == "" ? undefined : this.guardian.bech32()) : undefined,
+      signature: this.signature.toString("hex") ? this.signature.toString("hex") : undefined,
+      guardianSignature: this.guardianSignature.toString("hex") ? this.guardianSignature.toString("hex") : undefined,
     };
+
+    Compatibility.guardAddressIsSetAndNonZero(new Address(plainObject.sender), "'sender' of transaction", "pass the actual sender to the Transaction constructor")
+
+    return plainObject;
   }
 
   /**
@@ -245,16 +293,24 @@ export class Transaction {
       value: new BigNumber(plainObjectTransaction.value).toFixed(0),
       receiver: Address.fromString(plainObjectTransaction.receiver),
       sender: Address.fromString(plainObjectTransaction.sender),
+      guardian: plainObjectTransaction.guardian == undefined ? undefined : Address.fromString(plainObjectTransaction.guardian || ""),
       gasPrice: Number(plainObjectTransaction.gasPrice),
       gasLimit: Number(plainObjectTransaction.gasLimit),
       data: new TransactionPayload(Buffer.from(plainObjectTransaction.data || "", "base64")),
       chainID: String(plainObjectTransaction.chainID),
       version: new TransactionVersion(plainObjectTransaction.version),
+      options: plainObjectTransaction.options == undefined ? undefined : new TransactionOptions(plainObjectTransaction.options)
     });
+
     if (plainObjectTransaction.signature) {
       tx.applySignature(
         new Signature(plainObjectTransaction.signature),
-        Address.fromString(plainObjectTransaction.sender)
+      );
+    }
+
+    if (plainObjectTransaction.guardianSignature) {
+      tx.applyGuardianSignature(
+        new Signature(plainObjectTransaction.guardianSignature)
       );
     }
 
@@ -265,11 +321,29 @@ export class Transaction {
    * Applies the signature on the transaction.
    *
    * @param signature The signature, as computed by a signer.
-   * @param signedBy The address of the signer.
    */
-  applySignature(signature: ISignature, signedBy: IAddress) {
-    this.signature = signature;
-    this.sender = signedBy;
+  applySignature(signature: ISignature | Buffer) {
+    if (signature instanceof Buffer) {
+      this.signature = signature;
+    } else {
+      this.signature = Buffer.from(signature.hex(), "hex");
+    }
+
+    this.hash = TransactionHash.compute(this);
+  }
+
+  /**
+ * Applies the guardian signature on the transaction.
+ *
+ * @param guardianSignature The signature, as computed by a signer.
+ */
+  applyGuardianSignature(guardianSignature: ISignature | Buffer) {
+    if (guardianSignature instanceof Buffer) {
+      this.guardianSignature = guardianSignature;
+    } else {
+      this.guardianSignature = Buffer.from(guardianSignature.hex(), "hex");
+    }
+
     this.hash = TransactionHash.compute(this);
   }
 

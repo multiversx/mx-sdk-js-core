@@ -1,10 +1,10 @@
+import { ARGUMENTS_SEPARATOR } from "../constants";
 import { BinaryCodec } from "./codec";
 import { EndpointParameterDefinition, Type, TypedValue } from "./typesystem";
 import { OptionalType, OptionalValue } from "./typesystem/algebraic";
 import { CompositeType, CompositeValue } from "./typesystem/composite";
 import { VariadicType, VariadicValue } from "./typesystem/variadic";
 
-export const ArgumentsSeparator = "@";
 
 interface IArgSerializerOptions {
     codec: ICodec;
@@ -43,7 +43,7 @@ export class ArgSerializer {
      */
     stringToBuffers(joinedString: string): Buffer[] {
         // We also keep the zero-length buffers (they could encode missing options, Option<T>).
-        return joinedString.split(ArgumentsSeparator).map(item => Buffer.from(item, "hex"));
+        return joinedString.split(ARGUMENTS_SEPARATOR).map(item => Buffer.from(item, "hex"));
     }
 
     /**
@@ -119,7 +119,7 @@ export class ArgSerializer {
      */
     valuesToString(values: TypedValue[]): { argumentsString: string, count: number } {
         let strings = this.valuesToStrings(values);
-        let argumentsString = strings.join(ArgumentsSeparator);
+        let argumentsString = strings.join(ARGUMENTS_SEPARATOR);
         let count = strings.length;
         return { argumentsString, count };
     }

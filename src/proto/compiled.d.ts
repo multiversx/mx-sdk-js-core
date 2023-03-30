@@ -43,6 +43,12 @@ export namespace proto {
 
         /** Transaction Options */
         Options?: (number|null);
+
+        /** Transaction GuardAddr */
+        GuardAddr?: (Uint8Array|null);
+
+        /** Transaction GuardSignature */
+        GuardSignature?: (Uint8Array|null);
     }
 
     /** Represents a Transaction. */
@@ -92,6 +98,12 @@ export namespace proto {
 
         /** Transaction Options. */
         public Options: number;
+
+        /** Transaction GuardAddr. */
+        public GuardAddr: Uint8Array;
+
+        /** Transaction GuardSignature. */
+        public GuardSignature: Uint8Array;
 
         /**
          * Creates a new Transaction instance using the specified properties.

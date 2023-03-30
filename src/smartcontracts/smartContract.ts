@@ -1,20 +1,20 @@
-import { Address } from "../address";
-import { Transaction } from "../transaction";
-import { TransactionPayload } from "../transactionPayload";
-import { CodeMetadata } from "./codeMetadata";
-import { CallArguments, DeployArguments, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
-import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
-import { ContractFunction } from "./function";
-import { Query } from "./query";
-import { SmartContractAbi } from "./abi";
-import { guardValueIsSet } from "../utils";
-import { EndpointDefinition, TypedValue } from "./typesystem";
-import { bigIntToBuffer } from "./codec/utils";
 import BigNumber from "bignumber.js";
-import { Interaction } from "./interaction";
-import { NativeSerializer } from "./nativeSerializer";
-import { IAddress, INonce } from "../interface";
+import { Address } from "../address";
+import { Compatibility } from "../compatibility";
 import { ErrContractHasNoAddress } from "../errors";
+import { IAddress, INonce } from "../interface";
+import { Transaction } from "../transaction";
+import { guardValueIsSet } from "../utils";
+import { SmartContractAbi } from "./abi";
+import { bigIntToBuffer } from "./codec/utils";
+import { CodeMetadata } from "./codeMetadata";
+import { ContractFunction } from "./function";
+import { Interaction } from "./interaction";
+import { CallArguments, DeployArguments, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
+import { NativeSerializer } from "./nativeSerializer";
+import { Query } from "./query";
+import { ArwenVirtualMachine, ContractCallPayloadBuilder, ContractDeployPayloadBuilder, ContractUpgradePayloadBuilder } from "./transactionPayloadBuilders";
+import { EndpointDefinition, TypedValue } from "./typesystem";
 const createKeccakHash = require("keccak");
 
 /**
@@ -107,12 +107,14 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
      */
-    deploy({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
+    deploy({ deployer, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
+        Compatibility.guardAddressIsSetAndNonZero(deployer, "'deployer' of SmartContract.deploy()", "pass the actual address to deploy()");
+
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
         value = value || 0;
 
-        let payload = TransactionPayload.contractDeploy()
+        let payload = new ContractDeployPayloadBuilder()
             .setCode(code)
             .setCodeMetadata(codeMetadata)
             .setInitArgs(initArguments)
@@ -120,7 +122,7 @@ export class SmartContract implements ISmartContract {
 
         let transaction = new Transaction({
             receiver: Address.Zero(),
-            sender: Address.Zero(),
+            sender: deployer,
             value: value,
             gasLimit: gasLimit,
             gasPrice: gasPrice,
@@ -134,21 +136,23 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
-    upgrade({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
+    upgrade({ caller, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
+        Compatibility.guardAddressIsSetAndNonZero(caller, "'caller' of SmartContract.upgrade()", "pass the actual address to upgrade()");
+
         this.ensureHasAddress();
 
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
         value = value || 0;
 
-        let payload = TransactionPayload.contractUpgrade()
+        let payload = new ContractUpgradePayloadBuilder()
             .setCode(code)
             .setCodeMetadata(codeMetadata)
             .setInitArgs(initArguments)
             .build();
 
         let transaction = new Transaction({
-            sender: Address.Zero(),
+            sender: caller,
             receiver: this.getAddress(),
             value: value,
             gasLimit: gasLimit,
@@ -163,25 +167,27 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
-    call({ func, args, value, gasLimit, receiver, gasPrice, chainID }: CallArguments): Transaction {
+    call({ func, args, value, gasLimit, receiver, gasPrice, chainID, caller }: CallArguments): Transaction {
+        Compatibility.guardAddressIsSetAndNonZero(caller, "'caller' of SmartContract.call()", "pass the actual address to call()");
+
         this.ensureHasAddress();
 
         args = args || [];
         value = value || 0;
 
-        let payload = TransactionPayload.contractCall()
+        let payload = new ContractCallPayloadBuilder()
             .setFunction(func)
             .setArgs(args)
             .build();
 
         let transaction = new Transaction({
-            sender: Address.Zero(),
+            sender: caller,
             receiver: receiver ? receiver : this.getAddress(),
             value: value,
             gasLimit: gasLimit,
             gasPrice: gasPrice,
             data: payload,
-            chainID: chainID
+            chainID: chainID,
         });
 
         return transaction;

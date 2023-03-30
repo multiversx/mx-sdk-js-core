@@ -10,7 +10,7 @@ describe("test relayed v2 transaction builder", function () {
     let alice: TestWallet, bob: TestWallet;
 
     before(async function () {
-        ({alice, bob} = await loadTestWallets());
+        ({ alice, bob } = await loadTestWallets());
     });
 
     it("should throw exception if args were not set", async function () {
@@ -79,6 +79,8 @@ describe("test relayed v2 transaction builder", function () {
             .setNetworkConfig(networkConfig)
             .setRelayerAddress(alice.getAddress())
             .build();
+
+        relayedTxV2.setSender(alice.address);
         await alice.signer.sign(relayedTxV2);
 
         assert.equal(relayedTxV2.getNonce().valueOf(), 37);

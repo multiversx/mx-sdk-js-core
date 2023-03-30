@@ -277,6 +277,15 @@ export class ErrCannotParseContractResults extends Err {
 }
 
 /**
+ * Signals an error when parsing the outcome of a transaction (results and logs).
+ */
+export class ErrCannotParseTransactionOutcome extends Err {
+  public constructor(transactionHash: string, message: string) {
+    super(`cannot parse outcome of transaction ${transactionHash}: ${message}`);
+  }
+}
+
+/**
  * Signals a generic codec (encode / decode) error.
  */
 export class ErrCodec extends Err {

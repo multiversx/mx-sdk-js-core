@@ -10,7 +10,7 @@ import {
     TestWallet
 } from "../testutils";
 import { ContractController } from "../testutils/contractController";
-import { TokenPayment } from "../tokenPayment";
+import { TokenTransfer } from "../tokenTransfer";
 import { SmartContractAbi } from "./abi";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
@@ -35,7 +35,7 @@ describe("test smart contract interactor", function () {
 
         let transaction = interaction
             .withNonce(7)
-            .withValue(TokenPayment.egldFromAmount(1))
+            .withValue(TokenTransfer.egldFromAmount(1))
             .withGasLimit(20000000)
             .buildTransaction();
 
@@ -50,10 +50,10 @@ describe("test smart contract interactor", function () {
         let dummyFunction = new ContractFunction("dummy");
         let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
-        const TokenFoo = (amount: BigNumber.Value) => TokenPayment.fungibleFromAmount("FOO-6ce17b", amount, 0);
-        const TokenBar = (amount: BigNumber.Value) => TokenPayment.fungibleFromAmount("BAR-5bc08f", amount, 3);
-        const LKMEX = (nonce: number, amount: BigNumber.Value) => TokenPayment.metaEsdtFromAmount("LKMEX-aab910", nonce, amount, 18);
-        const Strămoși = (nonce: number) => TokenPayment.nonFungible("MOS-b9b4b2", nonce);
+        const TokenFoo = (amount: BigNumber.Value) => TokenTransfer.fungibleFromAmount("FOO-6ce17b", amount, 0);
+        const TokenBar = (amount: BigNumber.Value) => TokenTransfer.fungibleFromAmount("BAR-5bc08f", amount, 3);
+        const LKMEX = (nonce: number, amount: BigNumber.Value) => TokenTransfer.metaEsdtFromAmount("LKMEX-aab910", nonce, amount, 18);
+        const Strămoși = (nonce: number) => TokenTransfer.nonFungible("MOS-b9b4b2", nonce);
 
         const hexFoo = "464f4f2d366365313762";
         const hexBar = "4241522d356263303866";
@@ -71,28 +71,32 @@ describe("test smart contract interactor", function () {
 
         // Meta ESDT (special SFT), single
         transaction = new Interaction(contract, dummyFunction, [])
-            .withSingleESDTNFTTransfer(LKMEX(123456, 123.456), alice)
+            .withSender(alice)
+            .withSingleESDTNFTTransfer(LKMEX(123456, 123.456))
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`);
 
         // NFT, single
         transaction = new Interaction(contract, dummyFunction, [])
-            .withSingleESDTNFTTransfer(Strămoși(1), alice)
+            .withSender(alice)
+            .withSingleESDTNFTTransfer(Strămoși(1))
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexStrămoși}@01@01@${hexContractAddress}@${hexDummyFunction}`);
 
         // ESDT, multiple
         transaction = new Interaction(contract, dummyFunction, [])
-            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)], alice)
+            .withSender(alice)
+            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)])
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexFoo}@@03@${hexBar}@@0c44@${hexDummyFunction}`);
 
         // NFT, multiple
         transaction = new Interaction(contract, dummyFunction, [])
-            .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)], alice)
+            .withSender(alice)
+            .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)])
             .buildTransaction();
 
         assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexStrămoși}@01@01@${hexStrămoși}@2a@01@${hexDummyFunction}`);
@@ -131,6 +135,7 @@ describe("test smart contract interactor", function () {
 
         // Execute, do not wait for execution
         let transaction = interaction.withNonce(0).buildTransaction();
+        transaction.setSender(alice.address);
         await alice.signer.sign(transaction);
         await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce().valueOf(), 0);
@@ -141,6 +146,7 @@ describe("test smart contract interactor", function () {
         );
 
         transaction = interaction.withNonce(1).buildTransaction();
+        transaction.setSender(alice.address);
         await alice.signer.sign(transaction);
         await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce().valueOf(), 1);
@@ -151,6 +157,7 @@ describe("test smart contract interactor", function () {
 
         // Execute, and wait for execution
         transaction = interaction.withNonce(2).buildTransaction();
+        transaction.setSender(alice.address);
         await alice.signer.sign(transaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@2bs");
         let { bundle } = await controller.execute(interaction, transaction);

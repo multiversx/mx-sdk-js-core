@@ -13,6 +13,7 @@ export interface IPlainTransactionObject {
     value: string;
     receiver: string;
     sender: string;
+    guardian?: string;
     gasPrice: number;
     gasLimit: number;
     data?: string;
@@ -20,6 +21,7 @@ export interface IPlainTransactionObject {
     version: number;
     options?: number;
     signature?: string;
+    guardianSignature?: string;
 }
 
 export interface ISignature { hex(): string; }
@@ -38,9 +40,14 @@ export interface ITransactionPayload {
     valueOf(): Buffer;
 }
 
-export interface ITokenPayment {
+export interface ITokenTransfer {
     readonly tokenIdentifier: string;
     readonly nonce: number;
     readonly amountAsBigInteger: BigNumber.Value;
     valueOf(): BigNumber.Value;
 }
+
+/**
+ * @deprecated Use {@link ITokenTransfer} instead.
+ */
+export type ITokenPayment = ITokenTransfer;

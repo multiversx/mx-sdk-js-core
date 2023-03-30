@@ -15,17 +15,17 @@ export interface ISmartContract {
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
      */
-    deploy({ code, codeMetadata, initArguments, value, gasLimit }: DeployArguments): Transaction;
+    deploy({ deployer, code, codeMetadata, initArguments, value, gasLimit }: DeployArguments): Transaction;
 
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
-    upgrade({ code, codeMetadata, initArguments, value, gasLimit }: UpgradeArguments): Transaction;
+    upgrade({ caller, code, codeMetadata, initArguments, value, gasLimit }: UpgradeArguments): Transaction;
 
     /**
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
-    call({ func, args, value, gasLimit }: CallArguments): Transaction;
+    call({ caller, func, args, value, gasLimit }: CallArguments): Transaction;
 }
 
 export interface DeployArguments {
@@ -36,6 +36,7 @@ export interface DeployArguments {
     gasLimit: IGasLimit;
     gasPrice?: IGasPrice;
     chainID: IChainID;
+    deployer: IAddress;
 }
 
 export interface UpgradeArguments {
@@ -46,6 +47,7 @@ export interface UpgradeArguments {
     gasLimit: IGasLimit;
     gasPrice?: IGasPrice;
     chainID: IChainID;
+    caller: IAddress;
 }
 
 export interface CallArguments {
@@ -56,6 +58,7 @@ export interface CallArguments {
     receiver?: IAddress;
     gasPrice?: IGasPrice;
     chainID: IChainID;
+    caller: IAddress;
 }
 
 export interface QueryArguments {

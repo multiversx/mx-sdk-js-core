@@ -9,7 +9,10 @@ describe("test transactionWatcher", () => {
     it("should await status == executed", async () => {
         let hash = new TransactionHash("abba");
         let provider = new MockProvider();
-        let watcher = new TransactionWatcher(provider, 42, 42 * 42);
+        let watcher = new TransactionWatcher(provider, {
+            pollingIntervalMilliseconds: 42,
+            timeoutMilliseconds: 42 * 42
+        });
         let dummyTransaction = {
             getHash: () => hash
         }

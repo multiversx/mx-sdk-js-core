@@ -253,7 +253,7 @@ export class Transaction {
   isGuardedTransaction(): boolean {
     const hasGuardian = this.guardian.bech32().length > 0;
     const hasGuardianSignature = this.guardianSignature.length > 0;
-    return this.getOptions().hasGuardedOption() && hasGuardian && hasGuardianSignature;
+    return this.getOptions().isWithGuardian() && hasGuardian && hasGuardianSignature;
   }
 
   /**

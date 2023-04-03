@@ -145,6 +145,10 @@ export class Transaction {
     return this.sender;
   }
 
+  setSender(sender: IAddress) {
+    this.sender = sender;
+  }
+
   getReceiver(): IAddress {
     return this.receiver;
   }

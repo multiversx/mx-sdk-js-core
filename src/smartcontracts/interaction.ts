@@ -36,12 +36,12 @@ export class Interaction {
     private chainID: IChainID = "";
     private querent: IAddress = new Address();
     private explicitReceiver?: IAddress;
+    private sender: IAddress = new Address();
 
     private isWithSingleESDTTransfer: boolean = false;
     private isWithSingleESDTNFTTransfer: boolean = false;
     private isWithMultiESDTNFTTransfer: boolean = false;
     private tokenTransfers: TokenTransfersWithinInteraction;
-    private tokenTransfersSender: IAddress = new Address();
 
     constructor(
         contract: ISmartContractWithinInteraction,
@@ -96,12 +96,12 @@ export class Interaction {
             args = this.tokenTransfers.buildArgsForSingleESDTTransfer();
         } else if (this.isWithSingleESDTNFTTransfer) {
             // For NFT, SFT and MetaESDT, transaction.sender == transaction.receiver.
-            receiver = this.tokenTransfersSender;
+            receiver = this.sender;
             func = new ContractFunction(ESDTNFT_TRANSFER_FUNCTION_NAME);
             args = this.tokenTransfers.buildArgsForSingleESDTNFTTransfer();
         } else if (this.isWithMultiESDTNFTTransfer) {
             // For NFT, SFT and MetaESDT, transaction.sender == transaction.receiver.
-            receiver = this.tokenTransfersSender;
+            receiver = this.sender;
             func = new ContractFunction(MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME);
             args = this.tokenTransfers.buildArgsForMultiESDTNFTTransfer();
         }
@@ -118,6 +118,8 @@ export class Interaction {
             chainID: this.chainID
         });
 
+        // In v12, "sender" will be passed to "call()" (above).
+        transaction.setSender(this.sender);
         transaction.setNonce(this.nonce);
         return transaction;
     }
@@ -144,17 +146,25 @@ export class Interaction {
         return this;
     }
 
-    withSingleESDTNFTTransfer(transfer: ITokenPayment, sender: IAddress) {
+    withSingleESDTNFTTransfer(transfer: ITokenPayment, sender?: IAddress): Interaction {
         this.isWithSingleESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction([transfer], this);
-        this.tokenTransfersSender = sender;
+
+        if (sender) {
+            this.sender = sender;
+        }
+
         return this;
     }
 
-    withMultiESDTNFTTransfer(transfers: ITokenPayment[], sender: IAddress) {
+    withMultiESDTNFTTransfer(transfers: ITokenPayment[], sender?: IAddress): Interaction {
         this.isWithMultiESDTNFTTransfer = true;
         this.tokenTransfers = new TokenTransfersWithinInteraction(transfers, this);
-        this.tokenTransfersSender = sender;
+
+        if (sender) {
+            this.sender = sender;
+        }
+
         return this;
     }
 
@@ -179,6 +189,11 @@ export class Interaction {
 
     withChainID(chainID: IChainID): Interaction {
         this.chainID = chainID;
+        return this;
+    }
+
+    withSender(sender: IAddress): Interaction {
+        this.sender = sender;
         return this;
     }
 

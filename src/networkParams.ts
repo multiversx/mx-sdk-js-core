@@ -68,7 +68,7 @@ export class TransactionOptions {
     /**
      * Creates a TransactionOptions object from a set of options.
      */
-    public static fromOptions(options: {
+    public static withOptions(options: {
         withHashSign?: boolean,
         withGuardian?: boolean
     }): TransactionOptions {

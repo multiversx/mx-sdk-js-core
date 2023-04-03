@@ -45,22 +45,22 @@ describe("test transaction options", () => {
         assert.isFalse(optionsDefault.isWithHashSign());
         assert.isFalse(optionsDefault.isWithGuardian());
 
-        const optionsWithNoFlags = TransactionOptions.fromOptions({});
+        const optionsWithNoFlags = TransactionOptions.withOptions({});
         assert.equal(optionsWithNoFlags.valueOf(), TRANSACTION_OPTIONS_DEFAULT);
         assert.isFalse(optionsDefault.isWithHashSign());
         assert.isFalse(optionsDefault.isWithGuardian());
 
-        const optionsWithHashSign = TransactionOptions.fromOptions({ withHashSign: true });
+        const optionsWithHashSign = TransactionOptions.withOptions({ withHashSign: true });
         assert.equal(optionsWithHashSign.valueOf(), TRANSACTION_OPTIONS_TX_HASH_SIGN);
         assert.isTrue(optionsWithHashSign.isWithHashSign());
         assert.isFalse(optionsWithHashSign.isWithGuardian());
 
-        const optionsWithGuardian = TransactionOptions.fromOptions({ withGuardian: true });
+        const optionsWithGuardian = TransactionOptions.withOptions({ withGuardian: true });
         assert.equal(optionsWithGuardian.valueOf(), TRANSACTION_OPTIONS_TX_GUARDED);
         assert.isFalse(optionsWithGuardian.isWithHashSign());
         assert.isTrue(optionsWithGuardian.isWithGuardian());
 
-        const optionsWithHashSignAndGuardian = TransactionOptions.fromOptions({ withHashSign: true, withGuardian: true });
+        const optionsWithHashSignAndGuardian = TransactionOptions.withOptions({ withHashSign: true, withGuardian: true });
         assert.equal(optionsWithHashSignAndGuardian.valueOf(), TRANSACTION_OPTIONS_TX_HASH_SIGN | TRANSACTION_OPTIONS_TX_GUARDED);
         assert.isTrue(optionsWithHashSignAndGuardian.isWithHashSign());
         assert.isTrue(optionsWithHashSignAndGuardian.isWithGuardian());

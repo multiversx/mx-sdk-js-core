@@ -40,27 +40,27 @@ describe("test transaction options", () => {
     });
 
     it("should init TransactionOptions with correct numeric values based on static constructors", () => {
-        const optionsDefault = TransactionOptions.withDefaultFlags();
+        const optionsDefault = TransactionOptions.withDefaultOptions();
         assert.equal(optionsDefault.valueOf(), TRANSACTION_OPTIONS_DEFAULT);
         assert.isFalse(optionsDefault.isWithHashSign());
         assert.isFalse(optionsDefault.isWithGuardian());
 
-        const optionsWithNoFlags = TransactionOptions.fromFlags({});
+        const optionsWithNoFlags = TransactionOptions.fromOptions({});
         assert.equal(optionsWithNoFlags.valueOf(), TRANSACTION_OPTIONS_DEFAULT);
         assert.isFalse(optionsDefault.isWithHashSign());
         assert.isFalse(optionsDefault.isWithGuardian());
 
-        const optionsWithHashSign = TransactionOptions.fromFlags({ withHashSign: true });
+        const optionsWithHashSign = TransactionOptions.fromOptions({ withHashSign: true });
         assert.equal(optionsWithHashSign.valueOf(), TRANSACTION_OPTIONS_TX_HASH_SIGN);
         assert.isTrue(optionsWithHashSign.isWithHashSign());
         assert.isFalse(optionsWithHashSign.isWithGuardian());
 
-        const optionsWithGuardian = TransactionOptions.fromFlags({ withGuardian: true });
+        const optionsWithGuardian = TransactionOptions.fromOptions({ withGuardian: true });
         assert.equal(optionsWithGuardian.valueOf(), TRANSACTION_OPTIONS_TX_GUARDED);
         assert.isFalse(optionsWithGuardian.isWithHashSign());
         assert.isTrue(optionsWithGuardian.isWithGuardian());
 
-        const optionsWithHashSignAndGuardian = TransactionOptions.fromFlags({ withHashSign: true, withGuardian: true });
+        const optionsWithHashSignAndGuardian = TransactionOptions.fromOptions({ withHashSign: true, withGuardian: true });
         assert.equal(optionsWithHashSignAndGuardian.valueOf(), TRANSACTION_OPTIONS_TX_HASH_SIGN | TRANSACTION_OPTIONS_TX_GUARDED);
         assert.isTrue(optionsWithHashSignAndGuardian.isWithHashSign());
         assert.isTrue(optionsWithHashSignAndGuardian.isWithGuardian());

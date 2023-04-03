@@ -59,25 +59,25 @@ export class TransactionOptions {
     }
 
     /**
-     * Creates a TransactionOptions object with the default fl.
+     * Creates a TransactionOptions object with the default options.
      */
-    public static withDefaultFlags() {
+    static withDefaultOptions() {
         return new TransactionOptions(TRANSACTION_OPTIONS_DEFAULT);
     }
 
     /**
-     * Creates a TransactionOptions object from a set of flags.
+     * Creates a TransactionOptions object from a set of options.
      */
-    public static fromFlags(flags: {
+    public static fromOptions(options: {
         withHashSign?: boolean,
         withGuardian?: boolean
     }): TransactionOptions {
         let value = 0;
 
-        if (flags.withHashSign) {
+        if (options.withHashSign) {
             value |= TRANSACTION_OPTIONS_TX_HASH_SIGN;
         }
-        if (flags.withGuardian) {
+        if (options.withGuardian) {
             value |= TRANSACTION_OPTIONS_TX_GUARDED;
         }
 

@@ -126,7 +126,7 @@ export class Transaction {
     this.data = data || new TransactionPayload();
     this.chainID = chainID;
     this.version = version || TransactionVersion.withDefaultVersion();
-    this.options = options || TransactionOptions.withDefaultFlags();
+    this.options = options || TransactionOptions.withDefaultOptions();
     this.guardian = guardian || Address.empty();
 
     this.signature = Buffer.from([]);

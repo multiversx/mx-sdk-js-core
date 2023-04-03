@@ -69,15 +69,15 @@ export class TransactionOptions {
      * Creates a TransactionOptions object from a set of options.
      */
     public static withOptions(options: {
-        withHashSign?: boolean,
-        withGuardian?: boolean
+        hashSign?: boolean,
+        guarded?: boolean
     }): TransactionOptions {
         let value = 0;
 
-        if (options.withHashSign) {
+        if (options.hashSign) {
             value |= TRANSACTION_OPTIONS_TX_HASH_SIGN;
         }
-        if (options.withGuardian) {
+        if (options.guarded) {
             value |= TRANSACTION_OPTIONS_TX_GUARDED;
         }
 

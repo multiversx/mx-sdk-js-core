@@ -94,7 +94,7 @@ describe("test relayed v1 transaction builder", function () {
             data: new TransactionPayload("getContractConfig"),
             guardian: grace.address,
             version: TransactionVersion.withTxOptions(),
-            options: TransactionOptions.withOptions({ withGuardian: true })
+            options: TransactionOptions.withOptions({ guarded: true })
         });
 
         await bob.signer.sign(innerTx);
@@ -132,7 +132,7 @@ describe("test relayed v1 transaction builder", function () {
             data: new TransactionPayload("addNumber"),
             guardian: grace.address,
             version: TransactionVersion.withTxOptions(),
-            options: TransactionOptions.withOptions({ withGuardian: true })
+            options: TransactionOptions.withOptions({ guarded: true })
         });
 
         await bob.signer.sign(innerTx);
@@ -145,7 +145,7 @@ describe("test relayed v1 transaction builder", function () {
             .setNetworkConfig(networkConfig)
             .setRelayerAddress(alice.address)
             .setRelayedTransactionVersion(TransactionVersion.withTxOptions())
-            .setRelayedTransactionOptions(TransactionOptions.withOptions({ withGuardian: true }))
+            .setRelayedTransactionOptions(TransactionOptions.withOptions({ guarded: true }))
             .setRelayedTransactionGuardian(frank.address)
             .build();
 

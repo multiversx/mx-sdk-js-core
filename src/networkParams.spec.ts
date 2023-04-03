@@ -50,17 +50,17 @@ describe("test transaction options", () => {
         assert.isFalse(optionsDefault.isWithHashSign());
         assert.isFalse(optionsDefault.isWithGuardian());
 
-        const optionsWithHashSign = TransactionOptions.withOptions({ withHashSign: true });
+        const optionsWithHashSign = TransactionOptions.withOptions({ hashSign: true });
         assert.equal(optionsWithHashSign.valueOf(), TRANSACTION_OPTIONS_TX_HASH_SIGN);
         assert.isTrue(optionsWithHashSign.isWithHashSign());
         assert.isFalse(optionsWithHashSign.isWithGuardian());
 
-        const optionsWithGuardian = TransactionOptions.withOptions({ withGuardian: true });
+        const optionsWithGuardian = TransactionOptions.withOptions({ guarded: true });
         assert.equal(optionsWithGuardian.valueOf(), TRANSACTION_OPTIONS_TX_GUARDED);
         assert.isFalse(optionsWithGuardian.isWithHashSign());
         assert.isTrue(optionsWithGuardian.isWithGuardian());
 
-        const optionsWithHashSignAndGuardian = TransactionOptions.withOptions({ withHashSign: true, withGuardian: true });
+        const optionsWithHashSignAndGuardian = TransactionOptions.withOptions({ hashSign: true, guarded: true });
         assert.equal(optionsWithHashSignAndGuardian.valueOf(), TRANSACTION_OPTIONS_TX_HASH_SIGN | TRANSACTION_OPTIONS_TX_GUARDED);
         assert.isTrue(optionsWithHashSignAndGuardian.isWithHashSign());
         assert.isTrue(optionsWithHashSignAndGuardian.isWithGuardian());

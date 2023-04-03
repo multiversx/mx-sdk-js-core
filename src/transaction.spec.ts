@@ -277,7 +277,7 @@ describe("test transaction construction", async () => {
             data: new TransactionPayload("hello"),
             chainID: "local-testnet",
             version: new TransactionVersion(1),
-            options: TransactionOptions.withOptions({ withGuardian: true })
+            options: TransactionOptions.withOptions({ guarded: true })
         });
         assert.isFalse(transaction.isGuardedTransaction());
 
@@ -291,7 +291,7 @@ describe("test transaction construction", async () => {
             data: new TransactionPayload("hello"),
             chainID: "local-testnet",
             version: new TransactionVersion(2),
-            options: TransactionOptions.withOptions({ withGuardian: true })
+            options: TransactionOptions.withOptions({ guarded: true })
         });
         assert.isFalse(transaction.isGuardedTransaction());
 
@@ -305,22 +305,7 @@ describe("test transaction construction", async () => {
             data: new TransactionPayload("hello"),
             chainID: "local-testnet",
             version: new TransactionVersion(2),
-            options: TransactionOptions.withOptions({ withGuardian: true })
-        });
-        assert.isFalse(transaction.isGuardedTransaction());
-
-        transaction = new Transaction({
-            nonce: 90,
-            value: new BigNumber("1000000000000000000"),
-            sender: wallets.alice.address,
-            receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            guardian: wallets.bob.address,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
-            chainID: "local-testnet",
-            version: new TransactionVersion(2),
-            options: TransactionOptions.withOptions({ withGuardian: true })
+            options: TransactionOptions.withOptions({ guarded: true })
         });
         assert.isFalse(transaction.isGuardedTransaction());
 
@@ -335,7 +320,22 @@ describe("test transaction construction", async () => {
             data: new TransactionPayload("hello"),
             chainID: "local-testnet",
             version: new TransactionVersion(2),
-            options: TransactionOptions.withOptions({ withGuardian: true })
+            options: TransactionOptions.withOptions({ guarded: true })
+        });
+        assert.isFalse(transaction.isGuardedTransaction());
+
+        transaction = new Transaction({
+            nonce: 90,
+            value: new BigNumber("1000000000000000000"),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
+            gasPrice: minGasPrice,
+            guardian: wallets.bob.address,
+            gasLimit: 80000,
+            data: new TransactionPayload("hello"),
+            chainID: "local-testnet",
+            version: new TransactionVersion(2),
+            options: TransactionOptions.withOptions({ guarded: true })
         });
         await wallets.alice.signer.sign(transaction);
         transaction.applyGuardianSignature(transaction.getSignature());

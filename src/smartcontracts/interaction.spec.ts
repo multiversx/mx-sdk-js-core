@@ -74,6 +74,18 @@ describe("test smart contract interactor", function () {
             .withSingleESDTNFTTransfer(LKMEX(123456, 123.456), alice)
             .buildTransaction();
 
+        assert.equal(transaction.getSender().bech32(), alice.bech32());
+        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`);
+
+        // Meta ESDT (special SFT), single, but using "withSender()" (recommended)
+        transaction = new Interaction(contract, dummyFunction, [])
+            .withSingleESDTNFTTransfer(LKMEX(123456, 123.456))
+            .withSender(alice)
+            .buildTransaction();
+
+        assert.equal(transaction.getSender().bech32(), alice.bech32());
+        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
         assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`);
 
         // NFT, single
@@ -81,6 +93,18 @@ describe("test smart contract interactor", function () {
             .withSingleESDTNFTTransfer(Strămoși(1), alice)
             .buildTransaction();
 
+        assert.equal(transaction.getSender().bech32(), alice.bech32());
+        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexStrămoși}@01@01@${hexContractAddress}@${hexDummyFunction}`);
+
+        // NFT, single, but using "withSender()" (recommended)
+        transaction = new Interaction(contract, dummyFunction, [])
+            .withSingleESDTNFTTransfer(Strămoși(1))
+            .withSender(alice)
+            .buildTransaction();
+
+        assert.equal(transaction.getSender().bech32(), alice.bech32());
+        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
         assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexStrămoși}@01@01@${hexContractAddress}@${hexDummyFunction}`);
 
         // ESDT, multiple
@@ -88,6 +112,18 @@ describe("test smart contract interactor", function () {
             .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)], alice)
             .buildTransaction();
 
+        assert.equal(transaction.getSender().bech32(), alice.bech32());
+        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexFoo}@@03@${hexBar}@@0c44@${hexDummyFunction}`);
+
+        // ESDT, multiple, but using "withSender()" (recommended)
+        transaction = new Interaction(contract, dummyFunction, [])
+            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)])
+            .withSender(alice)
+            .buildTransaction();
+
+        assert.equal(transaction.getSender().bech32(), alice.bech32());
+        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
         assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexFoo}@@03@${hexBar}@@0c44@${hexDummyFunction}`);
 
         // NFT, multiple
@@ -95,6 +131,18 @@ describe("test smart contract interactor", function () {
             .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)], alice)
             .buildTransaction();
 
+        assert.equal(transaction.getSender().bech32(), alice.bech32());
+        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexStrămoși}@01@01@${hexStrămoși}@2a@01@${hexDummyFunction}`);
+
+        // NFT, multiple, but using "withSender()" (recommended)
+        transaction = new Interaction(contract, dummyFunction, [])
+            .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)])
+            .withSender(alice)
+            .buildTransaction();
+
+        assert.equal(transaction.getSender().bech32(), alice.bech32());
+        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
         assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexStrămoși}@01@01@${hexStrămoși}@2a@01@${hexDummyFunction}`);
     });
 

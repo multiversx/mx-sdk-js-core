@@ -126,7 +126,7 @@ export class Transaction {
     this.data = data || new TransactionPayload();
     this.chainID = chainID;
     this.version = version || TransactionVersion.withDefaultVersion();
-    this.options = options || TransactionOptions.withDefaultOptions();
+    this.options = options || TransactionOptions.withDefaultFlags();
     this.guardian = guardian || Address.empty();
 
     this.signature = Buffer.from([]);
@@ -253,7 +253,7 @@ export class Transaction {
   isGuardedTransaction(): boolean {
     const hasGuardian = this.guardian.bech32().length > 0;
     const hasGuardianSignature = this.guardianSignature.length > 0;
-    return this.getOptions().hasGuardedOption() && hasGuardian && hasGuardianSignature;
+    return this.getOptions().isWithGuardian() && hasGuardian && hasGuardianSignature;
   }
 
   /**

@@ -95,10 +95,6 @@ export class SmartContract implements ISmartContract {
         return this.address;
     }
 
-    setAbi(abi: IAbi) {
-        this.abi = abi;
-    }
-
     private getAbi(): IAbi {
         guardValueIsSet("abi", this.abi);
         return this.abi!;

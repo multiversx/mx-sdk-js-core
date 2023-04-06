@@ -61,13 +61,13 @@ export class Transaction {
 
   /**
    * The version, required by the Network in order to correctly interpret the contents of the transaction.
-   * @deprecated Use {setVersion()} instead.
+   * @deprecated Use getVersion() and setVersion() instead.
    */
   version: TransactionVersion;
 
   /**
    * The options field, useful for describing different settings available for transactions
-   * @deprecated Use {setOptions()} instead.
+   * @deprecated Use getOptions() and setOptions() instead.
    */
   options: TransactionOptions;
 

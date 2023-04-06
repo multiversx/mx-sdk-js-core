@@ -61,13 +61,15 @@ export class Transaction {
 
   /**
    * The version, required by the Network in order to correctly interpret the contents of the transaction.
+   * @deprecated Use {setVersion()} instead.
    */
-  private version: TransactionVersion;
+  version: TransactionVersion;
 
   /**
    * The options field, useful for describing different settings available for transactions
+   * @deprecated Use {setOptions()} instead.
    */
-  private options: TransactionOptions;
+  options: TransactionOptions;
 
   /**
    * The address of the guardian.
@@ -206,7 +208,10 @@ export class Transaction {
   }
 
   getOptions(): TransactionOptions {
-    return this.options;
+    // Make sure that "sdk-core v12" is compatible (for a while) with (older) libraries that were previously setting the (soon to be private) "options" field directly,
+    // instead of using the "setOptions()" method.
+    const options = new TransactionOptions(this.options.valueOf());
+    return options;
   }
 
   setOptions(options: ITransactionOptions) {

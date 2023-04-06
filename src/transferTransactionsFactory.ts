@@ -1,4 +1,3 @@
-import { Address } from "./address";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenTransfer, ITransactionPayload, ITransactionValue } from "./interface";
 import { ArgSerializer } from "./smartcontracts/argSerializer";
 import { AddressValue, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "./smartcontracts/typesystem";
@@ -23,7 +22,7 @@ export class TransferTransactionsFactory {
         nonce?: INonce;
         value: ITransactionValue;
         receiver: IAddress;
-        sender?: IAddress;
+        sender: IAddress;
         gasPrice?: IGasPrice;
         gasLimit?: IGasLimit;
         data?: ITransactionPayload;
@@ -36,7 +35,7 @@ export class TransferTransactionsFactory {
             nonce: args.nonce,
             value: args.value,
             receiver: args.receiver,
-            sender: args.sender || Address.Zero(),
+            sender: args.sender,
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: args.data,
@@ -48,7 +47,7 @@ export class TransferTransactionsFactory {
         tokenTransfer: ITokenTransfer,
         nonce?: INonce;
         receiver: IAddress;
-        sender?: IAddress;
+        sender: IAddress;
         gasPrice?: IGasPrice;
         gasLimit?: IGasLimit;
         chainID: IChainID;
@@ -68,7 +67,7 @@ export class TransferTransactionsFactory {
         return new Transaction({
             nonce: args.nonce,
             receiver: args.receiver,
-            sender: args.sender || Address.Zero(),
+            sender: args.sender,
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: transactionPayload,

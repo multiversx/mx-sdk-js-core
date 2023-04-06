@@ -42,11 +42,11 @@ export class SmartContract implements ISmartContract {
     /**
      * Create a SmartContract object by providing its address on the Network.
      */
-    constructor({ address, abi }: { address?: IAddress, abi?: SmartContractAbi }) {
-        this.address = address || new Address();
-        this.abi = abi;
+    constructor(options: { address?: IAddress, abi?: SmartContractAbi } = {}) {
+        this.address = options.address || new Address();
+        this.abi = options.abi;
 
-        if (abi) {
+        if (this.abi) {
             this.setupMethods();
         }
     }

@@ -32,6 +32,8 @@ export interface INonce { valueOf(): number; }
 export interface IChainID { valueOf(): string; }
 export interface IGasLimit { valueOf(): number; }
 export interface IGasPrice { valueOf(): number; }
+export interface ITransactionVersion { valueOf(): number; }
+export interface ITransactionOptions { valueOf(): number; }
 
 export interface ITransactionPayload {
     length(): number;

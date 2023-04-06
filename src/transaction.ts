@@ -4,7 +4,7 @@ import { Compatibility } from "./compatibility";
 import { TRANSACTION_MIN_GAS_PRICE } from "./constants";
 import * as errors from "./errors";
 import { Hash } from "./hash";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionPayload, ITransactionValue } from "./interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionOptions, ITransactionPayload, ITransactionValue, ITransactionVersion } from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
@@ -62,12 +62,12 @@ export class Transaction {
   /**
    * The version, required by the Network in order to correctly interpret the contents of the transaction.
    */
-  version: TransactionVersion;
+  private version: TransactionVersion;
 
   /**
    * The options field, useful for describing different settings available for transactions
    */
-  options: TransactionOptions;
+  private options: TransactionOptions;
 
   /**
    * The address of the guardian.
@@ -113,8 +113,8 @@ export class Transaction {
     gasLimit: IGasLimit;
     data?: ITransactionPayload;
     chainID: IChainID;
-    version?: TransactionVersion;
-    options?: TransactionOptions;
+    version?: ITransactionVersion;
+    options?: ITransactionOptions;
     guardian?: IAddress;
   }) {
     this.nonce = nonce || 0;
@@ -125,8 +125,8 @@ export class Transaction {
     this.gasLimit = gasLimit;
     this.data = data || new TransactionPayload();
     this.chainID = chainID;
-    this.version = version || TransactionVersion.withDefaultVersion();
-    this.options = options || TransactionOptions.withDefaultOptions();
+    this.version = version ? new TransactionVersion(version.valueOf()) : TransactionVersion.withDefaultVersion();
+    this.options = options ? new TransactionOptions(options.valueOf()) : TransactionOptions.withDefaultOptions();
     this.guardian = guardian || Address.empty();
 
     this.signature = Buffer.from([]);
@@ -201,8 +201,16 @@ export class Transaction {
     return this.version;
   }
 
+  setVersion(version: ITransactionVersion) {
+    this.version = new TransactionVersion(version.valueOf());
+  }
+
   getOptions(): TransactionOptions {
     return this.options;
+  }
+
+  setOptions(options: ITransactionOptions) {
+    this.options = new TransactionOptions(options.valueOf());
   }
 
   getSignature(): Buffer {

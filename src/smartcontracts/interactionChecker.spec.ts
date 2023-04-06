@@ -3,7 +3,6 @@ import { Address } from "../address";
 import * as errors from "../errors";
 import { loadAbiRegistry } from "../testutils";
 import { TokenTransfer } from "../tokenTransfer";
-import { SmartContractAbi } from "./abi";
 import { Interaction } from "./interaction";
 import { InteractionChecker } from "./interactionChecker";
 import { SmartContract } from "./smartContract";
@@ -16,9 +15,8 @@ describe("integration tests: test checker within interactor", function () {
 
     it("should detect errors for 'ultimate answer'", async function () {
         let abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["answer"]);
-        let contract = new SmartContract({ address: dummyAddress, abi: abi });
-        let endpoint = abi.getEndpoint("getUltimateAnswer");
+        let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
+        let endpoint = abiRegistry.getEndpoint("getUltimateAnswer");
 
         // Send value to non-payable
         assert.throw(() => {
@@ -34,9 +32,8 @@ describe("integration tests: test checker within interactor", function () {
 
     it("should detect errors for 'lottery'", async function () {
         let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
-        let contract = new SmartContract({ address: dummyAddress, abi: abi });
-        let endpoint = abi.getEndpoint("start");
+        let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
+        let endpoint = abiRegistry.getEndpoint("start");
 
         // Bad number of arguments
         assert.throw(() => {

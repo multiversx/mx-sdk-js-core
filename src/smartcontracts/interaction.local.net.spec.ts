@@ -4,7 +4,6 @@ import { loadAbiRegistry, loadTestWallets, prepareDeployment, TestWallet } from 
 import { ContractController } from "../testutils/contractController";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { Transaction } from "../transaction";
-import { SmartContractAbi } from "./abi";
 import { Interaction } from "./interaction";
 import { ReturnCode } from "./returnCode";
 import { SmartContract } from "./smartContract";
@@ -22,8 +21,7 @@ describe("test smart contract interactor", function () {
         this.timeout(80000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["answer"]);
-        let contract = new SmartContract({ abi: abi });
+        let contract = new SmartContract({ abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let network = await provider.getNetworkConfig();
@@ -80,8 +78,7 @@ describe("test smart contract interactor", function () {
         this.timeout(120000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/counter.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["counter"]);
-        let contract = new SmartContract({ abi: abi });
+        let contract = new SmartContract({ abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let network = await provider.getNetworkConfig();
@@ -135,8 +132,7 @@ describe("test smart contract interactor", function () {
         this.timeout(140000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
-        let contract = new SmartContract({ abi: abi });
+        let contract = new SmartContract({ abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let network = await provider.getNetworkConfig();

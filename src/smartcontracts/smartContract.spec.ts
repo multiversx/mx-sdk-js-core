@@ -33,7 +33,7 @@ describe("test contract", () => {
         setupUnitTestWatcherTimeouts();
         let watcher = new TransactionWatcher(provider);
 
-        let contract = new SmartContract({});
+        let contract = new SmartContract();
         let deployTransaction = contract.deploy({
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
             gasLimit: 1000000,

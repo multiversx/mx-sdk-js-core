@@ -11,11 +11,13 @@ describe("test transaction factory", () => {
     it("should create EGLD transfers", () => {
         const transactionWithData = factory.createEGLDTransfer({
             value: TokenTransfer.egldFromAmount(10.5),
+            sender: Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
             receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             data: new TransactionPayload("hello"),
             chainID: "D"
         });
 
+        assert.equal(transactionWithData.getSender().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transactionWithData.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transactionWithData.getValue(), "10500000000000000000");
         assert.equal(transactionWithData.getGasLimit(), 50000 + 5 * 1500);
@@ -24,10 +26,12 @@ describe("test transaction factory", () => {
 
         const transactionWithoutData = factory.createEGLDTransfer({
             value: TokenTransfer.egldFromAmount(10.5),
+            sender: Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
             receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             chainID: "D"
         });
 
+        assert.equal(transactionWithoutData.getSender().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transactionWithoutData.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transactionWithoutData.getValue(), "10500000000000000000");
         assert.equal(transactionWithoutData.getGasLimit(), 50000);
@@ -38,10 +42,12 @@ describe("test transaction factory", () => {
     it("should create ESDT transfers", () => {
         const transaction = factory.createESDTTransfer({
             tokenTransfer: TokenTransfer.fungibleFromAmount("TEST-8b028f", "100.00", 2),
-            receiver: new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
+            sender: Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            receiver: Address.fromBech32("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
             chainID: "D"
         });
 
+        assert.equal(transaction.getSender().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transaction.getReceiver().bech32(), "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha");
         assert.equal(transaction.getValue(), "");
         assert.equal(transaction.getGasLimit(), 50000 + 40 * 1500 + 200000 + 100000);

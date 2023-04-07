@@ -1,6 +1,5 @@
 import { assert } from "chai";
 import { SignableMessage } from "./signableMessage";
-import { Signature } from "./signature";
 import { loadTestWallets, TestWallet } from "./testutils";
 
 
@@ -13,7 +12,7 @@ describe("test signable message", () => {
         const sm = new SignableMessage({
             address: alice.address,
             message: Buffer.from("test message", "ascii"),
-            signature: new Signature(Buffer.from("a".repeat(128), "hex"),),
+            signature: Buffer.from("a".repeat(128), "hex"),
             signer: "ElrondWallet"
         });
 

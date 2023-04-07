@@ -1,18 +1,18 @@
-import { ContractController } from "../testutils/contractController";
-import { SmartContract } from "./smartContract";
-import { prepareDeployment, loadAbiRegistry, loadTestWallets, TestWallet } from "../testutils";
-import { SmartContractAbi } from "./abi";
+import BigNumber from "bignumber.js";
 import { assert } from "chai";
+import { loadAbiRegistry, loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
+import { ContractController } from "../testutils/contractController";
+import { createLocalnetProvider } from "../testutils/networkProviders";
+import { Transaction } from "../transaction";
 import { Interaction } from "./interaction";
 import { ReturnCode } from "./returnCode";
-import BigNumber from "bignumber.js";
-import { createLocalnetProvider } from "../testutils/networkProviders";
+import { SmartContract } from "./smartContract";
 
 
 describe("test smart contract interactor", function () {
     let provider = createLocalnetProvider();
     let alice: TestWallet;
-    
+
     before(async function () {
         ({ alice } = await loadTestWallets());
     });
@@ -21,8 +21,7 @@ describe("test smart contract interactor", function () {
         this.timeout(80000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["answer"]);
-        let contract = new SmartContract({ abi: abi });
+        let contract = new SmartContract({ abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let network = await provider.getNetworkConfig();
@@ -41,9 +40,10 @@ describe("test smart contract interactor", function () {
         let { bundle: { returnCode } } = await controller.deploy(deployTransaction);
         assert.isTrue(returnCode.isSuccess());
 
-        let interaction = <Interaction>contract.methods.getUltimateAnswer()
+        const interaction = <Interaction>contract.methods.getUltimateAnswer()
             .withGasLimit(3000000)
-            .withChainID(network.ChainID);
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
 
         // Query
         let queryResponseBundle = await controller.query(interaction);
@@ -52,12 +52,21 @@ describe("test smart contract interactor", function () {
         assert.isTrue(queryResponseBundle.returnCode.equals(ReturnCode.Ok));
 
         // Execute, do not wait for execution
-        let transaction = interaction.useThenIncrementNonceOf(alice.account).buildTransaction();
-        await alice.signer.sign(transaction);
+        let transaction = interaction
+            .withSender(alice.address)
+            .useThenIncrementNonceOf(alice.account)
+            .buildTransaction();
+
+        await signTransaction({ transaction: transaction, wallet: alice });
         await provider.sendTransaction(transaction);
+
         // Execute, and wait for execution
-        transaction = interaction.useThenIncrementNonceOf(alice.account).buildTransaction();
-        await alice.signer.sign(transaction);
+        transaction = interaction
+            .withSender(alice.address)
+            .useThenIncrementNonceOf(alice.account)
+            .buildTransaction();
+
+        await signTransaction({ transaction: transaction, wallet: alice });
         let { bundle: executionResultsBundle } = await controller.execute(interaction, transaction);
 
         assert.lengthOf(executionResultsBundle.values, 1);
@@ -69,8 +78,7 @@ describe("test smart contract interactor", function () {
         this.timeout(120000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/counter.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["counter"]);
-        let contract = new SmartContract({ abi: abi });
+        let contract = new SmartContract({ abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let network = await provider.getNetworkConfig();
@@ -92,10 +100,12 @@ describe("test smart contract interactor", function () {
         let getInteraction = <Interaction>contract.methods.get();
         let incrementInteraction = (<Interaction>contract.methods.increment())
             .withGasLimit(3000000)
-            .withChainID(network.ChainID);
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
         let decrementInteraction = (<Interaction>contract.methods.decrement())
             .withGasLimit(3000000)
-            .withChainID(network.ChainID);
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
 
         // Query "get()"
         let { firstValue: counterValue } = await controller.query(getInteraction);
@@ -103,17 +113,17 @@ describe("test smart contract interactor", function () {
 
         // Increment, wait for execution.
         let incrementTransaction = incrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
-        await alice.signer.sign(incrementTransaction);
+        await signTransaction({ transaction: incrementTransaction, wallet: alice });
         let { bundle: { firstValue: valueAfterIncrement } } = await controller.execute(incrementInteraction, incrementTransaction);
         assert.deepEqual(valueAfterIncrement!.valueOf(), new BigNumber(2));
 
         // Decrement twice. Wait for execution of the second transaction.
         let decrementTransaction = decrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
-        await alice.signer.sign(decrementTransaction);
+        await signTransaction({ transaction: decrementTransaction, wallet: alice });
         await provider.sendTransaction(decrementTransaction);
 
         decrementTransaction = decrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
-        await alice.signer.sign(decrementTransaction);
+        await signTransaction({ transaction: decrementTransaction, wallet: alice });
         let { bundle: { firstValue: valueAfterDecrement } } = await controller.execute(decrementInteraction, decrementTransaction);
         assert.deepEqual(valueAfterDecrement!.valueOf(), new BigNumber(0));
     });
@@ -122,8 +132,7 @@ describe("test smart contract interactor", function () {
         this.timeout(140000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
-        let contract = new SmartContract({ abi: abi });
+        let contract = new SmartContract({ abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let network = await provider.getNetworkConfig();
@@ -152,35 +161,50 @@ describe("test smart contract interactor", function () {
             null,
             null
         ])
-        .withGasLimit(30000000)
-        .withChainID(network.ChainID);
+            .withGasLimit(30000000)
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
 
         let lotteryStatusInteraction = <Interaction>contract.methods.status(["lucky"])
-        .withGasLimit(5000000)
-        .withChainID(network.ChainID);
+            .withGasLimit(5000000)
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
 
         let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo(["lucky"])
-        .withGasLimit(5000000)
-        .withChainID(network.ChainID);
+            .withGasLimit(5000000)
+            .withChainID(network.ChainID)
+            .withSender(alice.address);
 
         // start()
-        let startTransaction = startInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
-        await alice.signer.sign(startTransaction);
+        let startTransaction = startInteraction
+            .withSender(alice.address)
+            .useThenIncrementNonceOf(alice.account)
+            .buildTransaction();
+
+        await signTransaction({ transaction: startTransaction, wallet: alice });
         let { bundle: bundleStart } = await controller.execute(startInteraction, startTransaction);
         assert.isTrue(bundleStart.returnCode.equals(ReturnCode.Ok));
         assert.lengthOf(bundleStart.values, 0);
 
         // status()
-        let lotteryStatusTransaction = lotteryStatusInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
-        await alice.signer.sign(lotteryStatusTransaction);
+        let lotteryStatusTransaction = lotteryStatusInteraction
+            .withSender(alice.address)
+            .useThenIncrementNonceOf(alice.account)
+            .buildTransaction();
+
+        await signTransaction({ transaction: lotteryStatusTransaction, wallet: alice });
         let { bundle: bundleStatus } = await controller.execute(lotteryStatusInteraction, lotteryStatusTransaction);
         assert.isTrue(bundleStatus.returnCode.equals(ReturnCode.Ok));
         assert.lengthOf(bundleStatus.values, 1);
         assert.equal(bundleStatus.firstValue!.valueOf().name, "Running");
 
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
-        let lotteryInfoTransaction = getLotteryInfoInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
-        await alice.signer.sign(lotteryInfoTransaction);
+        let lotteryInfoTransaction = getLotteryInfoInteraction
+            .withSender(alice.address)
+            .useThenIncrementNonceOf(alice.account)
+            .buildTransaction();
+
+        await signTransaction({ transaction: lotteryInfoTransaction, wallet: alice });
         let { bundle: bundleLotteryInfo } = await controller.execute(getLotteryInfoInteraction, lotteryInfoTransaction);
         assert.isTrue(bundleLotteryInfo.returnCode.equals(ReturnCode.Ok));
         assert.lengthOf(bundleLotteryInfo.values, 1);
@@ -198,4 +222,13 @@ describe("test smart contract interactor", function () {
             prize_pool: new BigNumber("0")
         });
     });
+
+    async function signTransaction(options: { transaction: Transaction, wallet: TestWallet }) {
+        const transaction = options.transaction;
+        const wallet = options.wallet;
+
+        const serialized = transaction.serializeForSigning();
+        const signature = await wallet.signerNext.sign(serialized);
+        transaction.applySignature(signature);
+    }
 });

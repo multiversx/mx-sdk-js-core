@@ -6,7 +6,6 @@ import { ITransactionValue } from "../interface";
 import { bigIntToBuffer } from "../smartcontracts/codec/utils";
 import { Transaction } from "../transaction";
 import { proto } from "./compiled";
-
 /**
  * Hides away the serialization complexity, for each type of object (e.g. transactions).
  
@@ -17,8 +16,8 @@ export class ProtoSerializer {
      * Serializes a Transaction object to a Buffer. Handles low-level conversion logic and field-mappings as well.
      */
     serializeTransaction(transaction: Transaction): Buffer {
-        let receiverPubkey = new Address(transaction.getReceiver().bech32()).pubkey();
-        let senderPubkey = new Address(transaction.getSender().bech32()).pubkey();
+        const receiverPubkey = new Address(transaction.getReceiver().bech32()).pubkey();
+        const senderPubkey = new Address(transaction.getSender().bech32()).pubkey();
 
         let protoTransaction = new proto.Transaction({
             // mx-chain-go's serializer handles nonce == 0 differently, thus we treat 0 as "undefined".
@@ -33,15 +32,22 @@ export class ProtoSerializer {
             Data: transaction.getData().length() == 0 ? null : transaction.getData().valueOf(),
             ChainID: Buffer.from(transaction.getChainID().valueOf()),
             Version: transaction.getVersion().valueOf(),
-            Signature: Buffer.from(transaction.getSignature().hex(), "hex")
+            Signature: transaction.getSignature()
         });
 
         if (transaction.getOptions().valueOf() !== TRANSACTION_OPTIONS_DEFAULT) {
             protoTransaction.Options = transaction.getOptions().valueOf();
         }
 
-        let encoded = proto.Transaction.encode(protoTransaction).finish();
-        let buffer = Buffer.from(encoded);
+        if (transaction.isGuardedTransaction()) {
+            const guardianAddress = transaction.getGuardian();
+            protoTransaction.GuardAddr = new Address(guardianAddress.bech32()).pubkey();
+            protoTransaction.GuardSignature = transaction.getGuardianSignature();
+        }
+
+        const encoded = proto.Transaction.encode(protoTransaction).finish();
+        const buffer = Buffer.from(encoded);
+
         return buffer;
     }
 

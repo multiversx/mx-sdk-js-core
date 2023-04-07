@@ -91,6 +91,13 @@ export class Address {
     }
 
     /**
+     * Creates an empty address object
+     */
+    static empty(): Address {
+        return new Address();
+    }
+
+    /**
      * Creates an address object from a bech32-encoded string
      */
     static fromBech32(value: string): Address {

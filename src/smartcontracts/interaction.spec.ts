@@ -10,8 +10,7 @@ import {
     TestWallet
 } from "../testutils";
 import { ContractController } from "../testutils/contractController";
-import { TokenPayment } from "../tokenPayment";
-import { SmartContractAbi } from "./abi";
+import { TokenTransfer } from "../tokenTransfer";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { ReturnCode } from "./returnCode";
@@ -35,7 +34,7 @@ describe("test smart contract interactor", function () {
 
         let transaction = interaction
             .withNonce(7)
-            .withValue(TokenPayment.egldFromAmount(1))
+            .withValue(TokenTransfer.egldFromAmount(1))
             .withGasLimit(20000000)
             .buildTransaction();
 
@@ -50,10 +49,10 @@ describe("test smart contract interactor", function () {
         let dummyFunction = new ContractFunction("dummy");
         let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
-        const TokenFoo = (amount: BigNumber.Value) => TokenPayment.fungibleFromAmount("FOO-6ce17b", amount, 0);
-        const TokenBar = (amount: BigNumber.Value) => TokenPayment.fungibleFromAmount("BAR-5bc08f", amount, 3);
-        const LKMEX = (nonce: number, amount: BigNumber.Value) => TokenPayment.metaEsdtFromAmount("LKMEX-aab910", nonce, amount, 18);
-        const Strămoși = (nonce: number) => TokenPayment.nonFungible("MOS-b9b4b2", nonce);
+        const TokenFoo = (amount: BigNumber.Value) => TokenTransfer.fungibleFromAmount("FOO-6ce17b", amount, 0);
+        const TokenBar = (amount: BigNumber.Value) => TokenTransfer.fungibleFromAmount("BAR-5bc08f", amount, 3);
+        const LKMEX = (nonce: number, amount: BigNumber.Value) => TokenTransfer.metaEsdtFromAmount("LKMEX-aab910", nonce, amount, 18);
+        const Strămoși = (nonce: number) => TokenTransfer.nonFungible("MOS-b9b4b2", nonce);
 
         const hexFoo = "464f4f2d366365313762";
         const hexBar = "4241522d356263303866";
@@ -71,7 +70,8 @@ describe("test smart contract interactor", function () {
 
         // Meta ESDT (special SFT), single
         transaction = new Interaction(contract, dummyFunction, [])
-            .withSingleESDTNFTTransfer(LKMEX(123456, 123.456), alice)
+            .withSender(alice)
+            .withSingleESDTNFTTransfer(LKMEX(123456, 123.456))
             .buildTransaction();
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
@@ -90,7 +90,8 @@ describe("test smart contract interactor", function () {
 
         // NFT, single
         transaction = new Interaction(contract, dummyFunction, [])
-            .withSingleESDTNFTTransfer(Strămoși(1), alice)
+            .withSender(alice)
+            .withSingleESDTNFTTransfer(Strămoși(1))
             .buildTransaction();
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
@@ -109,7 +110,8 @@ describe("test smart contract interactor", function () {
 
         // ESDT, multiple
         transaction = new Interaction(contract, dummyFunction, [])
-            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)], alice)
+            .withSender(alice)
+            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)])
             .buildTransaction();
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
@@ -128,7 +130,8 @@ describe("test smart contract interactor", function () {
 
         // NFT, multiple
         transaction = new Interaction(contract, dummyFunction, [])
-            .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)], alice)
+            .withSender(alice)
+            .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)])
             .buildTransaction();
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
@@ -150,8 +153,7 @@ describe("test smart contract interactor", function () {
         setupUnitTestWatcherTimeouts();
 
         let abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["answer"]);
-        let contract = new SmartContract({ address: dummyAddress, abi: abi });
+        let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let interaction = <Interaction>contract.methods
@@ -179,6 +181,7 @@ describe("test smart contract interactor", function () {
 
         // Execute, do not wait for execution
         let transaction = interaction.withNonce(0).buildTransaction();
+        transaction.setSender(alice.address);
         await alice.signer.sign(transaction);
         await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce().valueOf(), 0);
@@ -189,6 +192,7 @@ describe("test smart contract interactor", function () {
         );
 
         transaction = interaction.withNonce(1).buildTransaction();
+        transaction.setSender(alice.address);
         await alice.signer.sign(transaction);
         await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce().valueOf(), 1);
@@ -199,6 +203,7 @@ describe("test smart contract interactor", function () {
 
         // Execute, and wait for execution
         transaction = interaction.withNonce(2).buildTransaction();
+        transaction.setSender(alice.address);
         await alice.signer.sign(transaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@2bs");
         let { bundle } = await controller.execute(interaction, transaction);
@@ -212,8 +217,7 @@ describe("test smart contract interactor", function () {
         setupUnitTestWatcherTimeouts();
 
         let abiRegistry = await loadAbiRegistry("src/testdata/counter.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["counter"]);
-        let contract = new SmartContract({ address: dummyAddress, abi: abi });
+        let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let getInteraction = <Interaction>contract.methodsExplicit.get().check();
@@ -259,8 +263,7 @@ describe("test smart contract interactor", function () {
         setupUnitTestWatcherTimeouts();
 
         let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
-        let contract = new SmartContract({ address: dummyAddress, abi: abi });
+        let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let startInteraction = <Interaction>(

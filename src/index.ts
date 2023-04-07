@@ -14,12 +14,10 @@ export * from "./relayedTransactionV2Builder";
 export * from "./signableMessage";
 export * from "./smartcontracts";
 export * from "./tokenOperations";
-export * from "./tokenPayment";
-export * from "./tokenTransferBuilders";
+export * from "./tokenTransfer";
 export * from "./transaction";
-export * from "./transactionFactory";
 export * from "./transactionPayload";
 export * from "./transactionWatcher";
-export * from "./transfersFactory";
+export * from "./transferTransactionsFactory";
 export * from "./utils";
 

@@ -1,8 +1,8 @@
-import { ITransactionFetcher } from "./interface";
 import { AsyncTimer } from "./asyncTimer";
-import { Logger } from "./logger";
 import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached } from "./errors";
+import { ITransactionFetcher } from "./interface";
 import { ITransactionEvent, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
+import { Logger } from "./logger";
 
 export type PredicateIsAwaitedStatus = (status: ITransactionStatus) => boolean;
 
@@ -19,27 +19,35 @@ interface ITransaction {
 export class TransactionWatcher {
     static DefaultPollingInterval: number = 6000;
     static DefaultTimeout: number = TransactionWatcher.DefaultPollingInterval * 15;
+    static DefaultPatience: number = 0;
 
     static NoopOnStatusReceived = (_: ITransactionStatus) => { };
 
     protected readonly fetcher: ITransactionFetcher;
-    protected readonly pollingInterval: number;
-    protected readonly timeout: number;
+    protected readonly pollingIntervalMilliseconds: number;
+    protected readonly timeoutMilliseconds: number;
+    protected readonly patienceMilliseconds: number;
 
     /**
+     * A transaction watcher (awaiter).
      * 
      * @param fetcher The transaction fetcher
-     * @param pollingInterval The polling interval, in milliseconds
-     * @param timeout The timeout, in milliseconds
+     * @param options The options
+     * @param options.pollingIntervalMilliseconds The polling interval, in milliseconds
+     * @param options.timeoutMilliseconds The timeout, in milliseconds
+     * @param options.patienceMilliseconds The patience: an extra time (in milliseconds) to wait, after the transaction has reached its desired status. Currently there's a delay between the moment a transaction is marked as "completed" and the moment its outcome (contract results, events and logs) is available.
      */
     constructor(
         fetcher: ITransactionFetcher,
-        pollingInterval: number = TransactionWatcher.DefaultPollingInterval,
-        timeout: number = TransactionWatcher.DefaultTimeout
-    ) {
+        options: {
+            pollingIntervalMilliseconds?: number,
+            timeoutMilliseconds?: number,
+            patienceMilliseconds?: number
+        } = {}) {
         this.fetcher = new TransactionFetcherWithTracing(fetcher);
-        this.pollingInterval = pollingInterval;
-        this.timeout = timeout;
+        this.pollingIntervalMilliseconds = options.pollingIntervalMilliseconds || TransactionWatcher.DefaultPollingInterval;
+        this.timeoutMilliseconds = options.timeoutMilliseconds || TransactionWatcher.DefaultTimeout;
+        this.patienceMilliseconds = options.patienceMilliseconds || TransactionWatcher.DefaultPatience;
     }
 
     /**
@@ -49,7 +57,7 @@ export class TransactionWatcher {
         const isPending = (transaction: ITransactionOnNetwork) => transaction.status.isPending();
         const doFetch = async () => await this.fetcher.getTransaction(transaction.getHash().hex());
         const errorProvider = () => new ErrExpectedTransactionStatusNotReached();
-        
+
         return this.awaitConditionally<ITransactionOnNetwork>(
             isPending,
             doFetch,
@@ -123,19 +131,20 @@ export class TransactionWatcher {
         createError: () => Err
     ): Promise<TData> {
         const periodicTimer = new AsyncTimer("watcher:periodic");
+        const patienceTimer = new AsyncTimer("watcher:patience");
         const timeoutTimer = new AsyncTimer("watcher:timeout");
 
         let stop = false;
         let fetchedData: TData | undefined = undefined;
         let satisfied: boolean = false;
 
-        timeoutTimer.start(this.timeout).finally(() => {
+        timeoutTimer.start(this.timeoutMilliseconds).finally(() => {
             timeoutTimer.stop();
             stop = true;
         });
 
         while (!stop) {
-            await periodicTimer.start(this.pollingInterval);
+            await periodicTimer.start(this.pollingIntervalMilliseconds);
 
             try {
                 fetchedData = await doFetch();
@@ -150,6 +159,11 @@ export class TransactionWatcher {
                     throw error;
                 }
             }
+        }
+
+        // The patience timer isn't subject to the timeout constraints.
+        if (satisfied) {
+            await patienceTimer.start(this.patienceMilliseconds);
         }
 
         if (!timeoutTimer.isStopped()) {

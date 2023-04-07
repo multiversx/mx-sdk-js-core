@@ -39,13 +39,4 @@ export class ContractFunction {
     valueOf(): string {
         return this.name;
     }
-
-    // TODO (breaking, next major version): remove function, not used.
-    equals(other: ContractFunction | null): boolean {
-        if (!other) {
-            return false;
-        }
-
-        return this.name == other.name;
-    }
 }

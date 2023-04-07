@@ -41,7 +41,8 @@ describe("fetch transactions from local testnet", function () {
         let transactionIncrement = contract.call({
             func: new ContractFunction("increment"),
             gasLimit: 3000000,
-            chainID: network.ChainID
+            chainID: network.ChainID,
+            caller: alice.address
         });
 
         transactionIncrement.setNonce(alice.account.nonce);

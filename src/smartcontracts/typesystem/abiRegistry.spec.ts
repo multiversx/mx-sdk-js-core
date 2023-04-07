@@ -15,22 +15,19 @@ describe("test abi registry", () => {
     it("load should also remap known to types", async () => {
         // Ultimate answer
         let registry = await loadAbiRegistry("src/testdata/answer.abi.json");
-        let answer = registry.getInterface("answer");
-        let getUltimateAnswer = answer.getEndpoint("getUltimateAnswer");
+        let getUltimateAnswer = registry.getEndpoint("getUltimateAnswer");
         assert.instanceOf(getUltimateAnswer.output[0].type, I64Type);
 
         // Counter
         registry = await loadAbiRegistry("src/testdata/counter.abi.json");
-        let counter = registry.getInterface("counter");
-        let getCounter = counter.getEndpoint("get");
+        let getCounter = registry.getEndpoint("get");
         assert.instanceOf(getCounter.output[0].type, I64Type);
 
         // Lottery
         registry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
-        let lottery = registry.getInterface("Lottery");
-        let start = lottery.getEndpoint("start");
-        let getStatus = lottery.getEndpoint("status");
-        let getLotteryInfo = lottery.getEndpoint("getLotteryInfo");
+        let start = registry.getEndpoint("start");
+        let getStatus = registry.getEndpoint("status");
+        let getLotteryInfo = registry.getEndpoint("getLotteryInfo");
 
         assert.isFalse(start.modifiers.isReadonly());
         assert.isTrue(getStatus.modifiers.isReadonly());
@@ -70,8 +67,7 @@ describe("test abi registry", () => {
         );
 
         let registry = await loadAbiRegistry("src/testdata/multisig.abi.json");
-        let multisig = registry.getInterface("Multisig");
-        let performAction = multisig.getEndpoint("getActionData");
+        let performAction = registry.getEndpoint("getActionData");
         assert.equal(performAction.output[0].type.getName(), "Action");
 
         let result = bc.decodeTopLevel(buff, performAction.output[0].type);
@@ -101,7 +97,7 @@ describe("test abi registry", () => {
     it("should load ABI when custom types are out of order (a)", async () => {
         const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-a.abi.json");
 
-        assert.deepEqual(registry.getStruct("EsdtTokenPayment").getNamesOfDependencies(), ["EsdtTokenType", "TokenIdentifier", "u64", "BigUint"]);
+        assert.deepEqual(registry.getStruct("EsdtTokenTransfer").getNamesOfDependencies(), ["EsdtTokenType", "TokenIdentifier", "u64", "BigUint"]);
         assert.deepEqual(registry.getEnum("EsdtTokenType").getNamesOfDependencies(), []);
         assert.deepEqual(registry.getStruct("TypeA").getNamesOfDependencies(), ["TypeB", "TypeC", "u64"]);
         assert.deepEqual(registry.getStruct("TypeB").getNamesOfDependencies(), ["TypeC", "u64"]);
@@ -111,7 +107,7 @@ describe("test abi registry", () => {
     it("should load ABI when custom types are out of order (b)", async () => {
         const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-b.abi.json");
 
-        assert.deepEqual(registry.getStruct("EsdtTokenPayment").getNamesOfDependencies(), ["EsdtTokenType", "TokenIdentifier", "u64", "BigUint"]);
+        assert.deepEqual(registry.getStruct("EsdtTokenTransfer").getNamesOfDependencies(), ["EsdtTokenType", "TokenIdentifier", "u64", "BigUint"]);
         assert.deepEqual(registry.getEnum("EsdtTokenType").getNamesOfDependencies(), []);
         assert.deepEqual(registry.getStruct("TypeA").getNamesOfDependencies(), ["TypeB", "TypeC", "u64"]);
         assert.deepEqual(registry.getStruct("TypeB").getNamesOfDependencies(), ["TypeC", "u64"]);

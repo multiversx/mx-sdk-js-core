@@ -1,13 +1,12 @@
 import { assert } from "chai";
-import { AsyncTimer } from "../asyncTimer";
 import { GasEstimator } from "../gasEstimator";
 import { INetworkConfig, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { createTestnetProvider, INetworkProvider } from "../testutils/networkProviders";
-import { TokenPayment } from "../tokenPayment";
+import { TokenTransfer } from "../tokenTransfer";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
-import { TransfersFactory } from "../transfersFactory";
+import { TransferTransactionsFactory } from "../transferTransactionsFactory";
 import { TokenOperationsFactory } from "./tokenOperationsFactory";
 import { TokenOperationsFactoryConfig } from "./tokenOperationsFactoryConfig";
 import { TokenOperationsOutcomeParser } from "./tokenOperationsOutcomeParser";
@@ -19,7 +18,7 @@ describe("test factory on testnet", function () {
     let network: INetworkConfig;
     let factory: TokenOperationsFactory;
     let parser: TokenOperationsOutcomeParser;
-    let transfersFactory: TransfersFactory;
+    let transferTransactionsFactory: TransferTransactionsFactory;
 
     before(async function () {
         console.log(`> ${this.currentTest?.title} ...`);
@@ -27,11 +26,11 @@ describe("test factory on testnet", function () {
         ({ frank, grace } = await loadTestWallets());
 
         provider = createTestnetProvider();
-        watcher = new TransactionWatcher(provider);
+        watcher = new TransactionWatcher(provider, { patienceMilliseconds: 8000 });
         network = await provider.getNetworkConfig();
         factory = new TokenOperationsFactory(new TokenOperationsFactoryConfig(network.ChainID));
         parser = new TokenOperationsOutcomeParser();
-        transfersFactory = new TransfersFactory(new GasEstimator());
+        transferTransactionsFactory = new TransferTransactionsFactory(new GasEstimator());
     });
 
     it("should issue fungible, mint, burn", async function () {
@@ -152,8 +151,8 @@ describe("test factory on testnet", function () {
         const _tx3Outcome = parser.parseUnpause(tx3OnNetwork);
 
         // Send some tokens to Grace
-        const tx4 = transfersFactory.createESDTTransfer({
-            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+        const tx4 = transferTransactionsFactory.createESDTTransfer({
+            tokenTransfer: TokenTransfer.fungibleFromBigInteger(tokenIdentifier, 10),
             sender: frank.account.address,
             receiver: grace.account.address,
             chainID: network.ChainID,
@@ -191,8 +190,8 @@ describe("test factory on testnet", function () {
         assert.isTrue(tokenIdentifier.includes("FRANK"));
 
         // Send some tokens to Grace
-        const tx2 = transfersFactory.createESDTTransfer({
-            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+        const tx2 = transferTransactionsFactory.createESDTTransfer({
+            tokenTransfer: TokenTransfer.fungibleFromBigInteger(tokenIdentifier, 10),
             sender: frank.account.address,
             receiver: grace.account.address,
             chainID: network.ChainID,
@@ -260,8 +259,8 @@ describe("test factory on testnet", function () {
         assert.isTrue(tokenIdentifier.includes("FRANK"));
 
         // Send some tokens to Grace
-        const tx2 = transfersFactory.createESDTTransfer({
-            payment: TokenPayment.fungibleFromBigInteger(tokenIdentifier, 10),
+        const tx2 = transferTransactionsFactory.createESDTTransfer({
+            tokenTransfer: TokenTransfer.fungibleFromBigInteger(tokenIdentifier, 10),
             sender: frank.account.address,
             receiver: grace.account.address,
             chainID: network.ChainID,
@@ -553,13 +552,7 @@ describe("test factory on testnet", function () {
         await provider.sendTransaction(transaction);
         console.log(`Sent transaction [${tag}]: ${transaction.getHash().hex()}`);
 
-        let transactionOnNetwork = await watcher.awaitCompleted(transaction);
-
-        // For some transactions, the "isCompleted" field is somehow incorrect (false positive).
-        // Let's wait a bit more to have the outcome. 
-        await (new AsyncTimer("test")).start(1000);
-
-        transactionOnNetwork = await watcher.awaitCompleted(transaction);
+        const transactionOnNetwork = await watcher.awaitCompleted(transaction);
         return transactionOnNetwork;
     }
 });

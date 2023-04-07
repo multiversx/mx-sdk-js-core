@@ -1,10 +1,10 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
+import { Compatibility } from "../compatibility";
 import { ErrContractHasNoAddress } from "../errors";
 import { IAddress, INonce } from "../interface";
 import { Transaction } from "../transaction";
 import { guardValueIsSet } from "../utils";
-import { SmartContractAbi } from "./abi";
 import { bigIntToBuffer } from "./codec/utils";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
@@ -16,12 +16,17 @@ import { ArwenVirtualMachine, ContractCallPayloadBuilder, ContractDeployPayloadB
 import { EndpointDefinition, TypedValue } from "./typesystem";
 const createKeccakHash = require("keccak");
 
+interface IAbi {
+    getEndpoints(): EndpointDefinition[];
+    getEndpoint(name: string | ContractFunction): EndpointDefinition;
+}
+
 /**
  * An abstraction for deploying and interacting with Smart Contracts.
  */
 export class SmartContract implements ISmartContract {
     private address: IAddress = new Address();
-    private abi?: SmartContractAbi;
+    private abi?: IAbi;
 
     /**
      * This object contains a function for each endpoint defined by the contract.
@@ -41,11 +46,11 @@ export class SmartContract implements ISmartContract {
     /**
      * Create a SmartContract object by providing its address on the Network.
      */
-    constructor({ address, abi }: { address?: IAddress, abi?: SmartContractAbi }) {
-        this.address = address || new Address();
-        this.abi = abi;
+    constructor(options: { address?: IAddress, abi?: IAbi } = {}) {
+        this.address = options.address || new Address();
+        this.abi = options.abi;
 
-        if (abi) {
+        if (this.abi) {
             this.setupMethods();
         }
     }
@@ -54,7 +59,7 @@ export class SmartContract implements ISmartContract {
         let contract = this;
         let abi = this.getAbi();
 
-        for (const definition of abi.getAllEndpoints()) {
+        for (const definition of abi.getEndpoints()) {
             let functionName = definition.name;
 
             // For each endpoint defined by the ABI, we attach a function to the "methods" and "methodsAuto" objects,
@@ -90,11 +95,7 @@ export class SmartContract implements ISmartContract {
         return this.address;
     }
 
-    setAbi(abi: SmartContractAbi) {
-        this.abi = abi;
-    }
-
-    getAbi(): SmartContractAbi {
+    private getAbi(): IAbi {
         guardValueIsSet("abi", this.abi);
         return this.abi!;
     }
@@ -106,7 +107,9 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
      */
-    deploy({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
+    deploy({ deployer, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
+        Compatibility.guardAddressIsSetAndNonZero(deployer, "'deployer' of SmartContract.deploy()", "pass the actual address to deploy()");
+
         codeMetadata = codeMetadata || new CodeMetadata();
         initArguments = initArguments || [];
         value = value || 0;
@@ -119,7 +122,7 @@ export class SmartContract implements ISmartContract {
 
         let transaction = new Transaction({
             receiver: Address.Zero(),
-            sender: Address.Zero(),
+            sender: deployer,
             value: value,
             gasLimit: gasLimit,
             gasPrice: gasPrice,
@@ -133,7 +136,9 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
-    upgrade({ code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
+    upgrade({ caller, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
+        Compatibility.guardAddressIsSetAndNonZero(caller, "'caller' of SmartContract.upgrade()", "pass the actual address to upgrade()");
+
         this.ensureHasAddress();
 
         codeMetadata = codeMetadata || new CodeMetadata();
@@ -147,7 +152,7 @@ export class SmartContract implements ISmartContract {
             .build();
 
         let transaction = new Transaction({
-            sender: Address.Zero(),
+            sender: caller,
             receiver: this.getAddress(),
             value: value,
             gasLimit: gasLimit,
@@ -162,7 +167,9 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
-    call({ func, args, value, gasLimit, receiver, gasPrice, chainID }: CallArguments): Transaction {
+    call({ func, args, value, gasLimit, receiver, gasPrice, chainID, caller }: CallArguments): Transaction {
+        Compatibility.guardAddressIsSetAndNonZero(caller, "'caller' of SmartContract.call()", "pass the actual address to call()");
+
         this.ensureHasAddress();
 
         args = args || [];
@@ -174,13 +181,13 @@ export class SmartContract implements ISmartContract {
             .build();
 
         let transaction = new Transaction({
-            sender: Address.Zero(),
+            sender: caller,
             receiver: receiver ? receiver : this.getAddress(),
             value: value,
             gasLimit: gasLimit,
             gasPrice: gasPrice,
             data: payload,
-            chainID: chainID
+            chainID: chainID,
         });
 
         return transaction;

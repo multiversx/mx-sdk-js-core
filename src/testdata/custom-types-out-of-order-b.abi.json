@@ -1,7 +1,7 @@
 {
     "name": "Sample",
     "types": {
-        "EsdtTokenPayment": {
+        "EsdtTokenTransfer": {
             "type": "struct",
             "fields": [
                 {

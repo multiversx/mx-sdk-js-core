@@ -1,63 +1,72 @@
 import * as errors from "../../errors";
 import { guardValueIsSetWithMessage } from "../../utils";
-import { ContractInterface } from "./contractInterface";
 import { EndpointDefinition, EndpointParameterDefinition } from "./endpoint";
 import { EnumType } from "./enum";
 import { StructType } from "./struct";
 import { TypeMapper } from "./typeMapper";
 import { CustomType } from "./types";
 
+const interfaceNamePlaceholder = "?";
+
 export class AbiRegistry {
-    readonly interfaces: ContractInterface[] = [];
+    readonly name: string;
+    readonly constructorDefinition: EndpointDefinition;
+    readonly endpoints: EndpointDefinition[] = [];
     readonly customTypes: CustomType[] = [];
 
-    static create(json: { name: string; endpoints: any[]; types: any }): AbiRegistry {
-        let registry = new AbiRegistry().extend(json);
-        let remappedRegistry = registry.remapToKnownTypes();
+    private constructor(options: {
+        name: string;
+        constructorDefinition: EndpointDefinition;
+        endpoints: EndpointDefinition[];
+        customTypes: CustomType[],
+    }) {
+        this.name = options.name;
+        this.constructorDefinition = options.constructorDefinition;
+        this.endpoints = options.endpoints;
+        this.customTypes = options.customTypes;
+    }
+
+    static create(options: {
+        name?: string;
+        constructor?: any,
+        endpoints?: any[];
+        types?: Record<string, any>
+    }): AbiRegistry {
+        const name = options.name || interfaceNamePlaceholder;
+        const constructor = options.constructor || {};
+        const endpoints = options.endpoints || [];
+        const types = options.types || {};
+
+        // Load arbitrary input parameters into properly-defined objects (e.g. EndpointDefinition and CustomType).
+        const constructorDefinition = EndpointDefinition.fromJSON({ name: "constructor", ...constructor });
+        const endpointDefinitions = endpoints.map(item => EndpointDefinition.fromJSON(item));
+        const customTypes: CustomType[] = [];
+
+        for (const customTypeName in types) {
+            const typeDefinition = types[customTypeName];
+
+            if (typeDefinition.type == "struct") {
+                customTypes.push(StructType.fromJSON({ name: customTypeName, fields: typeDefinition.fields }));
+            } else if (typeDefinition.type == "enum") {
+                customTypes.push(EnumType.fromJSON({ name: customTypeName, variants: typeDefinition.variants }));
+            } else {
+                throw new errors.ErrTypingSystem(`Cannot handle custom type: ${customTypeName}`);
+            }
+        }
+
+        const registry = new AbiRegistry({
+            name: name,
+            constructorDefinition: constructorDefinition,
+            endpoints: endpointDefinitions,
+            customTypes: customTypes,
+        });
+
+        const remappedRegistry = registry.remapToKnownTypes();
         return remappedRegistry;
     }
 
-    private extend(json: { name: string; endpoints: any[]; types: any }): AbiRegistry {
-        json.types = json.types || {};
-
-        // The "endpoints" collection is interpreted by "ContractInterface".
-        let iface = ContractInterface.fromJSON(json);
-        this.interfaces.push(iface);
-
-        for (const customTypeName in json.types) {
-            let itemJson = json.types[customTypeName];
-            let typeDiscriminant = itemJson.type;
-            // Workaround: set the "name" field, as required by "fromJSON()" below.
-            itemJson.name = customTypeName;
-            let customType = this.createCustomType(typeDiscriminant, itemJson);
-            this.customTypes.push(customType);
-        }
-
-        return this;
-    }
-
-    private createCustomType(typeDiscriminant: string, json: any): CustomType {
-        if (typeDiscriminant == "struct") {
-            return StructType.fromJSON(json);
-        }
-        if (typeDiscriminant == "enum") {
-            return EnumType.fromJSON(json);
-        }
-        throw new errors.ErrTypingSystem(`Unknown type discriminant: ${typeDiscriminant}`);
-    }
-
-    getInterface(name: string): ContractInterface {
-        let result = this.interfaces.find((e) => e.name == name);
-        guardValueIsSetWithMessage(`interface [${name}] not found`, result);
-        return result!;
-    }
-
-    getInterfaces(names: string[]): ContractInterface[] {
-        return names.map((name) => this.getInterface(name));
-    }
-
     getStruct(name: string): StructType {
-        let result = this.customTypes.find((e) => e.getName() == name && e.hasExactClass(StructType.ClassName));
+        const result = this.customTypes.find((e) => e.getName() == name && e.hasExactClass(StructType.ClassName));
         guardValueIsSetWithMessage(`struct [${name}] not found`, result);
         return <StructType>result!;
     }
@@ -67,13 +76,23 @@ export class AbiRegistry {
     }
 
     getEnum(name: string): EnumType {
-        let result = this.customTypes.find((e) => e.getName() == name && e.hasExactClass(EnumType.ClassName));
+        const result = this.customTypes.find((e) => e.getName() == name && e.hasExactClass(EnumType.ClassName));
         guardValueIsSetWithMessage(`enum [${name}] not found`, result);
         return <EnumType>result!;
     }
 
     getEnums(names: string[]): EnumType[] {
         return names.map((name) => this.getEnum(name));
+    }
+
+    getEndpoints(): EndpointDefinition[] {
+        return this.endpoints;
+    }
+
+    getEndpoint(name: string): EndpointDefinition {
+        const result = this.endpoints.find((e) => e.name == name);
+        guardValueIsSetWithMessage(`endpoint [${name}] not found`, result);
+        return result!;
     }
 
     /**
@@ -87,9 +106,8 @@ export class AbiRegistry {
      * The result is an equivalent, more explicit ABI registry.
      */
     remapToKnownTypes(): AbiRegistry {
-        let mapper = new TypeMapper([]);
-        let newCustomTypes: CustomType[] = [];
-        let newInterfaces: ContractInterface[] = [];
+        const mapper = new TypeMapper([]);
+        const newCustomTypes: CustomType[] = [];
 
         // First, remap custom types (actually, under the hood, this will remap types of struct fields)
         for (const type of this.customTypes) {
@@ -100,21 +118,24 @@ export class AbiRegistry {
             throw new errors.ErrTypingSystem("Did not re-map all custom types");
         }
 
+        // Let's remap the constructor:
+        const newConstructor = mapEndpoint(this.constructorDefinition, mapper);
+
         // Then, remap types of all endpoint parameters.
         // The mapper learned all necessary types in the previous step.
-        for (const iface of this.interfaces) {
-            let newEndpoints: EndpointDefinition[] = [];
-            for (const endpoint of iface.endpoints) {
-                newEndpoints.push(mapEndpoint(endpoint, mapper));
-            }
-            let newConstructor = iface.constructorDefinition ? mapEndpoint(iface.constructorDefinition, mapper) : null;
-            newInterfaces.push(new ContractInterface(iface.name, newConstructor, newEndpoints));
+        const newEndpoints: EndpointDefinition[] = [];
+
+        for (const endpoint of this.endpoints) {
+            newEndpoints.push(mapEndpoint(endpoint, mapper));
         }
 
         // Now return the new registry, with all types remapped to known types
-        let newRegistry = new AbiRegistry();
-        newRegistry.customTypes.push(...newCustomTypes);
-        newRegistry.interfaces.push(...newInterfaces);
+        const newRegistry = new AbiRegistry({
+            name: this.name,
+            constructorDefinition: newConstructor,
+            endpoints: newEndpoints,
+            customTypes: newCustomTypes,
+        });
 
         return newRegistry;
     }
@@ -141,11 +162,13 @@ export class AbiRegistry {
 }
 
 function mapEndpoint(endpoint: EndpointDefinition, mapper: TypeMapper): EndpointDefinition {
-    let newInput = endpoint.input.map(
+    const newInput = endpoint.input.map(
         (e) => new EndpointParameterDefinition(e.name, e.description, mapper.mapType(e.type))
     );
-    let newOutput = endpoint.output.map(
+
+    const newOutput = endpoint.output.map(
         (e) => new EndpointParameterDefinition(e.name, e.description, mapper.mapType(e.type))
     );
+
     return new EndpointDefinition(endpoint.name, newInput, newOutput, endpoint.modifiers);
 }

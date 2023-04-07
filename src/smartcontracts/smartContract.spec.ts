@@ -33,11 +33,12 @@ describe("test contract", () => {
         setupUnitTestWatcherTimeouts();
         let watcher = new TransactionWatcher(provider);
 
-        let contract = new SmartContract({});
+        let contract = new SmartContract();
         let deployTransaction = contract.deploy({
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
             gasLimit: 1000000,
-            chainID: chainID
+            chainID: chainID,
+            deployer: alice.address
         });
 
         provider.mockUpdateAccount(alice.address, account => {
@@ -83,14 +84,16 @@ describe("test contract", () => {
             func: new ContractFunction("helloEarth"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
             gasLimit: 150000,
-            chainID: chainID
+            chainID: chainID,
+            caller: alice.address
         });
 
         let callTransactionTwo = contract.call({
             func: new ContractFunction("helloMars"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
             gasLimit: 1500000,
-            chainID: chainID
+            chainID: chainID,
+            caller: alice.address
         });
 
         await alice.sync(provider);

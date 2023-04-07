@@ -1,4 +1,3 @@
-export * from "./abi";
 export * from "./argSerializer";
 export * from "./code";
 export * from "./codec";

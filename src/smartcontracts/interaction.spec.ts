@@ -11,7 +11,6 @@ import {
 } from "../testutils";
 import { ContractController } from "../testutils/contractController";
 import { TokenTransfer } from "../tokenTransfer";
-import { SmartContractAbi } from "./abi";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { ReturnCode } from "./returnCode";
@@ -154,8 +153,7 @@ describe("test smart contract interactor", function () {
         setupUnitTestWatcherTimeouts();
 
         let abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["answer"]);
-        let contract = new SmartContract({ address: dummyAddress, abi: abi });
+        let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let interaction = <Interaction>contract.methods
@@ -219,8 +217,7 @@ describe("test smart contract interactor", function () {
         setupUnitTestWatcherTimeouts();
 
         let abiRegistry = await loadAbiRegistry("src/testdata/counter.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["counter"]);
-        let contract = new SmartContract({ address: dummyAddress, abi: abi });
+        let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let getInteraction = <Interaction>contract.methodsExplicit.get().check();
@@ -266,8 +263,7 @@ describe("test smart contract interactor", function () {
         setupUnitTestWatcherTimeouts();
 
         let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
-        let abi = new SmartContractAbi(abiRegistry, ["Lottery"]);
-        let contract = new SmartContract({ address: dummyAddress, abi: abi });
+        let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new ContractController(provider);
 
         let startInteraction = <Interaction>(

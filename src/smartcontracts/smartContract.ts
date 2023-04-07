@@ -5,7 +5,6 @@ import { ErrContractHasNoAddress } from "../errors";
 import { IAddress, INonce } from "../interface";
 import { Transaction } from "../transaction";
 import { guardValueIsSet } from "../utils";
-import { SmartContractAbi } from "./abi";
 import { bigIntToBuffer } from "./codec/utils";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
@@ -17,12 +16,17 @@ import { ArwenVirtualMachine, ContractCallPayloadBuilder, ContractDeployPayloadB
 import { EndpointDefinition, TypedValue } from "./typesystem";
 const createKeccakHash = require("keccak");
 
+interface IAbi {
+    getEndpoints(): EndpointDefinition[];
+    getEndpoint(name: string | ContractFunction): EndpointDefinition;
+}
+
 /**
  * An abstraction for deploying and interacting with Smart Contracts.
  */
 export class SmartContract implements ISmartContract {
     private address: IAddress = new Address();
-    private abi?: SmartContractAbi;
+    private abi?: IAbi;
 
     /**
      * This object contains a function for each endpoint defined by the contract.
@@ -42,7 +46,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Create a SmartContract object by providing its address on the Network.
      */
-    constructor(options: { address?: IAddress, abi?: SmartContractAbi } = {}) {
+    constructor(options: { address?: IAddress, abi?: IAbi } = {}) {
         this.address = options.address || new Address();
         this.abi = options.abi;
 
@@ -55,7 +59,7 @@ export class SmartContract implements ISmartContract {
         let contract = this;
         let abi = this.getAbi();
 
-        for (const definition of abi.getAllEndpoints()) {
+        for (const definition of abi.getEndpoints()) {
             let functionName = definition.name;
 
             // For each endpoint defined by the ABI, we attach a function to the "methods" and "methodsAuto" objects,
@@ -91,11 +95,7 @@ export class SmartContract implements ISmartContract {
         return this.address;
     }
 
-    setAbi(abi: SmartContractAbi) {
-        this.abi = abi;
-    }
-
-    getAbi(): SmartContractAbi {
+    private getAbi(): IAbi {
         guardValueIsSet("abi", this.abi);
         return this.abi!;
     }

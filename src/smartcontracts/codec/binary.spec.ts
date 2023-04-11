@@ -144,11 +144,11 @@ describe("test binary codec (advanced)", () => {
 
         assert.throws(() => {
             codec.encodeNested(list);
-        }, errors.ErrCodec);
+        }, errors.ErrCodec, `List too large: ${numItems} > ${codec.constraints.maxListLength}`);
 
         assert.throws(() => {
             codec.encodeTopLevel(list);
-        }, errors.ErrCodec);
+        }, errors.ErrCodec, `List too large: ${numItems} > ${codec.constraints.maxListLength}`);
     });
 
     it("benchmark: should work well with large lists", async function () {

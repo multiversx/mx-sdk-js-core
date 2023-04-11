@@ -1,3 +1,4 @@
+import * as errors from "../../errors";
 import { assert } from "chai";
 import { BinaryCodec, BinaryCodecConstraints } from "./binary";
 import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue, ArrayVec, ArrayVecType, U16Value, TokenIdentifierType, TokenIdentifierValue, StringValue, StringType } from "../typesystem";
@@ -90,7 +91,7 @@ describe("test binary codec (basic)", () => {
 
         let length = [0x00, 0x00, 0x00, 0x04];
         let payload = [0x74, 0x65, 0x73, 0x74];
-        
+
         assert.deepEqual(codec.encodeNested(bytesValue), Buffer.from([...length, ...payload]));
         assert.deepEqual(codec.encodeTopLevel(bytesValue), Buffer.from(payload));
         assert.deepEqual(codec.decodeNested<BytesValue>(Buffer.from([...length, ...payload]), new BytesType()), [bytesValue, 8]);
@@ -127,6 +128,27 @@ describe("test binary codec (advanced)", () => {
 
         assert.deepEqual(decodedNested, list);
         assert.deepEqual(decodedTopLevel, list);
+    });
+
+    it("should fail with large lists using default constraints", async () => {
+        let numItems = 2 ** 17;
+        let codec = new BinaryCodec();
+
+        let items: TypedValue[] = [];
+
+        for (let i = 0; i < numItems; i++) {
+            items.push(new U32Value(i));
+        }
+
+        let list = new List(new ListType(new U32Type()), items);
+
+        assert.throws(() => {
+            codec.encodeNested(list);
+        }, errors.ErrCodec, `List too large: ${numItems} > ${codec.constraints.maxListLength}`);
+
+        assert.throws(() => {
+            codec.encodeTopLevel(list);
+        }, errors.ErrCodec, `List too large: ${numItems} > ${codec.constraints.maxListLength}`);
     });
 
     it("benchmark: should work well with large lists", async function () {

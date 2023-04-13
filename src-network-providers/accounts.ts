@@ -53,6 +53,14 @@ export class GuardianData {
 
         return result;
     }
+
+    getCurrentGuardianAddress(): IAddress | undefined {
+        if (!this.guarded) {
+            return undefined;
+        }
+
+        return this.activeGuardian?.address;
+    }
 }
 
 class Guardian {

@@ -32,6 +32,7 @@ interface IBaseArgs {
     value?: ITransactionValue;
     gasPrice?: IGasPrice;
     gasLimit?: IGasLimit;
+    guardian?: IAddress;
 }
 
 interface IIssueFungibleArgs extends IBaseArgs {
@@ -191,6 +192,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.issuer,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             value: this.config.issueCost,
             gasPrice: args.gasPrice,
@@ -217,6 +219,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.issuer,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             value: this.config.issueCost,
             gasPrice: args.gasPrice,
@@ -243,6 +246,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.issuer,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             value: this.config.issueCost,
             gasPrice: args.gasPrice,
@@ -270,6 +274,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.issuer,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             value: this.config.issueCost,
             gasPrice: args.gasPrice,
@@ -291,6 +296,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -313,6 +319,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -340,6 +347,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -367,6 +375,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.creator,
             receiver: args.creator,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -384,6 +393,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -401,6 +411,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -419,6 +430,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -437,6 +449,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -455,6 +468,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: this.config.esdtContractAddress,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -473,6 +487,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: args.manager,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -491,6 +506,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: args.manager,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -510,6 +526,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: args.manager,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -529,6 +546,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: args.manager,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -548,6 +566,7 @@ export class TokenOperationsFactory {
         return this.createTransaction({
             sender: args.manager,
             receiver: args.manager,
+            guardian: args.guardian,
             nonce: args.transactionNonce,
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
@@ -556,9 +575,10 @@ export class TokenOperationsFactory {
         });
     }
 
-    private createTransaction({ sender, receiver, nonce, value, gasPrice, gasLimitHint, executionGasLimit, dataParts }: {
+    private createTransaction({ sender, receiver, guardian, nonce, value, gasPrice, gasLimitHint, executionGasLimit, dataParts }: {
         sender: IAddress;
         receiver: IAddress;
+        guardian?: IAddress;
         nonce?: INonce;
         value?: ITransactionValue;
         gasPrice?: IGasPrice;
@@ -575,6 +595,7 @@ export class TokenOperationsFactory {
             chainID: this.config.chainID,
             sender: sender,
             receiver: receiver,
+            guardian: guardian,
             gasLimit: gasLimit,
             gasPrice: gasPrice,
             nonce: nonce || 0,

@@ -38,17 +38,17 @@ export class GuardianData {
         Object.assign(this, init);
     }
 
-    static fromHttpResponse(payload: any): GuardianData {
+    static fromHttpResponse(response: any): GuardianData {
         const result = new GuardianData();
 
-        result.guarded = payload["guarded"] || false;
+        result.guarded = response["guarded"] || false;
 
-        if (payload["activeGuardian"]) {
-            result.activeGuardian = Guardian.fromHttpResponse(payload["activeGuardian"]);
+        if (response["activeGuardian"]) {
+            result.activeGuardian = Guardian.fromHttpResponse(response["activeGuardian"]);
         }
 
-        if (payload["pendingGuardian"]) {
-            result.pendingGuardian = Guardian.fromHttpResponse(payload["pendingGuardian"]);
+        if (response["pendingGuardian"]) {
+            result.pendingGuardian = Guardian.fromHttpResponse(response["pendingGuardian"]);
         }
 
         return result;

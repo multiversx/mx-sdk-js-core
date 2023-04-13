@@ -5,7 +5,7 @@ import { Address } from "./primitives";
 /**
  * A plain view of an account, as queried from the Network.
  */
- export class AccountOnNetwork {
+export class AccountOnNetwork {
     address: IAddress = new Address("");
     nonce: number = 0;
     balance: BigNumber = new BigNumber(0);
@@ -29,3 +29,44 @@ import { Address } from "./primitives";
     }
 }
 
+export class GuardianData {
+    guarded: boolean = false;
+    activeGuardian?: Guardian;
+    pendingGuardian?: Guardian;
+
+    constructor(init?: Partial<GuardianData>) {
+        Object.assign(this, init);
+    }
+
+    static fromHttpResponse(payload: any): GuardianData {
+        const result = new GuardianData();
+
+        result.guarded = payload["guarded"] || false;
+
+        if (payload["activeGuardian"]) {
+            result.activeGuardian = Guardian.fromHttpResponse(payload["activeGuardian"]);
+        }
+
+        if (payload["pendingGuardian"]) {
+            result.pendingGuardian = Guardian.fromHttpResponse(payload["pendingGuardian"]);
+        }
+
+        return result;
+    }
+}
+
+class Guardian {
+    activationEpoch: number = 0;
+    address: IAddress = new Address("");
+    serviceUID: string = "";
+
+    static fromHttpResponse(responsePart: any): Guardian {
+        const result = new Guardian();
+
+        result.activationEpoch = Number(responsePart["activationEpoch"] || 0);
+        result.address = new Address(responsePart["address"] || "");
+        result.serviceUID = responsePart["serviceUID"] || "";
+
+        return result;
+    }
+}

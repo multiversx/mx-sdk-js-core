@@ -3,14 +3,16 @@ import { UserSigner as UserSignerNext } from "@multiversx/sdk-wallet-next";
 import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";
-import { Account } from "../account";
+import { AccountNonceHolder } from "../account";
 import { Address } from "../address";
-import { IAddress } from "../interface";
+import { IAccountBalance, IAddress, INonce } from "../interface";
 import { IAccountOnNetwork } from "../interfaceOfNetwork";
+import { IGuardianData } from "./networkProviders";
 import { isOnBrowserTests } from "./utils";
 
 interface IAccountFetcher {
     getAccount(address: IAddress): Promise<IAccountOnNetwork>;
+    getGuardianData(address: IAddress): Promise<IGuardianData>;
 }
 
 export async function loadAndSyncTestWallets(provider: IAccountFetcher): Promise<Record<string, TestWallet>> {
@@ -76,7 +78,10 @@ export class TestWallet {
     readonly signerNext: UserSignerNext;
     readonly keyFileObject: any;
     readonly pemFileText: any;
-    readonly account: Account;
+
+    private readonly nonceHolder: AccountNonceHolder;
+    private guardian: IAddress | undefined;
+    private balance: IAccountBalance = "0";
 
     constructor(address: Address, secretKeyHex: string, keyFileObject: any, pemFileText: any) {
         this.address = address;
@@ -86,16 +91,31 @@ export class TestWallet {
         this.signerNext = new UserSignerNext(UserSecretKey.fromString(secretKeyHex));
         this.keyFileObject = keyFileObject;
         this.pemFileText = pemFileText;
-        this.account = new Account(this.address);
-    }
-
-    getAddress(): Address {
-        return this.address;
+        this.nonceHolder = new AccountNonceHolder();
     }
 
     async sync(provider: IAccountFetcher) {
-        let accountOnNetwork = await provider.getAccount(this.address);
-        await this.account.update(accountOnNetwork);
-        return this;
+        const accountOnNetwork = await provider.getAccount(this.address);
+        const guardianData = await provider.getGuardianData(this.address);
+
+        this.balance = accountOnNetwork.balance;
+        this.nonceHolder.setNonce(accountOnNetwork.nonce);
+        this.guardian = guardianData.getCurrentGuardianAddress();
+    }
+
+    getNonce(): INonce {
+        return this.nonceHolder.getNonce();
+    }
+
+    getNonceThenIncrement(): INonce {
+        return this.nonceHolder.getNonceThenIncrement();
+    }
+
+    incrementNonce(): void {
+        this.nonceHolder.incrementNonce();
+    }
+
+    getBalance(): IAccountBalance {
+        return this.balance;
     }
 }

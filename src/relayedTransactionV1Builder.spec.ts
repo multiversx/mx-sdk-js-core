@@ -39,7 +39,7 @@ describe("test relayed v1 transaction builder", function () {
         builder.setNetworkConfig(networkConfig);
         assert.throw(() => builder.build(), errors.ErrInvalidRelayedV1BuilderArguments);
 
-        builder.setRelayerAddress(alice.getAddress());
+        builder.setRelayerAddress(alice.address);
         assert.doesNotThrow(() => builder.build());
     });
 

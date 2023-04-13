@@ -25,7 +25,7 @@ describe("test transaction", function () {
         await alice.sync(provider);
 
         await bob.sync(provider);
-        let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
+        let initialBalanceOfBob = new BigNumber(bob.getBalance().toString());
 
         let transactionOne = new Transaction({
             sender: alice.address,
@@ -43,9 +43,8 @@ describe("test transaction", function () {
             chainID: network.ChainID
         });
 
-        transactionOne.setNonce(alice.account.nonce);
-        alice.account.incrementNonce();
-        transactionTwo.setNonce(alice.account.nonce);
+        transactionOne.setNonce(alice.getNonceThenIncrement());
+        transactionTwo.setNonce(alice.getNonceThenIncrement());
 
         await signTransaction({ transaction: transactionOne, wallet: alice });
         await signTransaction({ transaction: transactionTwo, wallet: alice });
@@ -57,7 +56,7 @@ describe("test transaction", function () {
         await watcher.awaitCompleted(transactionTwo);
 
         await bob.sync(provider);
-        let newBalanceOfBob = new BigNumber(bob.account.balance.toString());
+        let newBalanceOfBob = new BigNumber(bob.getBalance().toString());
 
         assert.deepEqual(TokenTransfer.egldFromAmount(85).valueOf(), newBalanceOfBob.minus(initialBalanceOfBob));
     });
@@ -87,8 +86,8 @@ describe("test transaction", function () {
             chainID: network.ChainID
         });
 
-        transactionOne.setNonce(alice.account.nonce);
-        transactionTwo.setNonce(alice.account.nonce);
+        transactionOne.setNonce(alice.getNonce());
+        transactionTwo.setNonce(alice.getNonce());
 
         await signTransaction({ transaction: transactionOne, wallet: alice });
         await signTransaction({ transaction: transactionTwo, wallet: alice });

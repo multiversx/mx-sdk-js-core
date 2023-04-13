@@ -7,6 +7,7 @@ import { IAddress } from "../interface";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
 import { Query } from "../smartcontracts/query";
 import { Transaction, TransactionHash } from "../transaction";
+import { IGuardianData } from "./networkProviders";
 import { createAccountBalance } from "./utils";
 
 export class MockProvider {
@@ -109,6 +110,10 @@ export class MockProvider {
         }
 
         throw new ErrMock("Account not found")
+    }
+
+    async getGuardianData(_address: IAddress): Promise<IGuardianData> {
+        throw new ErrMock("Not implemented");
     }
 
     async sendTransaction(transaction: Transaction): Promise<string> {

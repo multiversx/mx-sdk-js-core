@@ -1,15 +1,15 @@
-import { SmartContract } from "./smartContract";
-import { TransactionWatcher } from "../transactionWatcher";
-import { ContractFunction } from "./function";
-import { loadTestWallets, TestWallet } from "../testutils/wallets";
-import { prepareDeployment } from "../testutils";
-import { Logger } from "../logger";
 import { assert } from "chai";
-import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
-import { decodeUnsignedNumber } from "./codec";
-import { BytesValue } from "./typesystem/bytes";
-import { ResultsParser } from "./resultsParser";
+import { Logger } from "../logger";
+import { prepareDeployment } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
+import { loadTestWallets, TestWallet } from "../testutils/wallets";
+import { TransactionWatcher } from "../transactionWatcher";
+import { decodeUnsignedNumber } from "./codec";
+import { ContractFunction } from "./function";
+import { ResultsParser } from "./resultsParser";
+import { SmartContract } from "./smartContract";
+import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
+import { BytesValue } from "./typesystem/bytes";
 
 describe("test on local testnet", function () {
     let provider = createLocalnetProvider();
@@ -49,10 +49,8 @@ describe("test on local testnet", function () {
             chainID: network.ChainID,
             caller: alice.address
         });
-        transactionIncrement.setNonce(alice.account.nonce);
+        transactionIncrement.setNonce(alice.getNonceThenIncrement());
         await alice.signer.sign(transactionIncrement);
-
-        alice.account.incrementNonce();
 
         // Now, let's build a few transactions, to be simulated
         let simulateOne = contract.call({
@@ -71,8 +69,8 @@ describe("test on local testnet", function () {
         });
         simulateTwo.setSender(alice.address);
 
-        simulateOne.setNonce(alice.account.nonce);
-        simulateTwo.setNonce(alice.account.nonce);
+        simulateOne.setNonce(alice.getNonce());
+        simulateTwo.setNonce(alice.getNonce());
 
         await alice.signer.sign(simulateOne);
         await alice.signer.sign(simulateTwo);
@@ -124,10 +122,8 @@ describe("test on local testnet", function () {
             chainID: network.ChainID,
             caller: alice.address
         });
-        transactionIncrementFirst.setNonce(alice.account.nonce);
+        transactionIncrementFirst.setNonce(alice.getNonceThenIncrement());
         await alice.signer.sign(transactionIncrementFirst);
-
-        alice.account.incrementNonce();
 
         // ++
         let transactionIncrementSecond = contract.call({
@@ -136,10 +132,8 @@ describe("test on local testnet", function () {
             chainID: network.ChainID,
             caller: alice.address
         });
-        transactionIncrementSecond.setNonce(alice.account.nonce);
+        transactionIncrementSecond.setNonce(alice.getNonceThenIncrement());
         await alice.signer.sign(transactionIncrementSecond);
-
-        alice.account.incrementNonce();
 
         // Broadcast & execute
         await provider.sendTransaction(transactionDeploy);
@@ -195,10 +189,8 @@ describe("test on local testnet", function () {
         });
 
         // Apply nonces and sign the remaining transactions
-        transactionMintBob.setNonce(alice.account.nonce);
-        alice.account.incrementNonce();
-        transactionMintCarol.setNonce(alice.account.nonce);
-        alice.account.incrementNonce();
+        transactionMintBob.setNonce(alice.getNonceThenIncrement());
+        transactionMintCarol.setNonce(alice.getNonceThenIncrement());
 
         await alice.signer.sign(transactionMintBob);
         await alice.signer.sign(transactionMintCarol);
@@ -282,7 +274,7 @@ describe("test on local testnet", function () {
             caller: alice.address,
         });
         // Apply nonces and sign the remaining transactions
-        transactionStart.setNonce(alice.account.nonce);
+        transactionStart.setNonce(alice.getNonce());
 
         await alice.signer.sign(transactionStart);
 

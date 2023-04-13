@@ -3,6 +3,7 @@ import { IAccountBalance, IAddress, INonce } from "./interface";
 
 /**
  * An abstraction representing an account (user or Smart Contract) on the Network.
+ * @deprecated Use {@link AccountNonceHolder} instead (or define your own utility class).
  */
 export class Account {
     /**
@@ -30,7 +31,7 @@ export class Account {
     /**
      * Updates account properties (such as nonce, balance).
      */
-    update(obj: { nonce: INonce, balance: IAccountBalance}) {
+    update(obj: { nonce: INonce, balance: IAccountBalance }) {
         this.nonce = obj.nonce;
         this.balance = obj.balance;
     }
@@ -60,5 +61,40 @@ export class Account {
             nonce: this.nonce.valueOf(),
             balance: this.balance.toString(),
         };
+    }
+}
+
+/**
+ * An simple utility class for holding and tracking the nonce of an account.
+ */
+export class AccountNonceHolder {
+    private nonce: INonce = 0;
+
+    constructor(initialNonce: INonce = 0) {
+        this.nonce = initialNonce;
+    }
+
+    getNonce(): INonce {
+        return this.nonce;
+    }
+
+    setNonce(nonce: INonce) {
+        this.nonce = nonce;
+    }
+
+    /**
+     * Gets then increments (locally) the nonce (the account sequence number).
+     */
+    getNonceThenIncrement(): INonce {
+        const nonce = this.nonce;
+        this.incrementNonce();
+        return nonce;
+    }
+
+    /**
+     * Increments (locally) the nonce (the account sequence number).
+     */
+    incrementNonce() {
+        this.nonce = this.nonce.valueOf() + 1;
     }
 }

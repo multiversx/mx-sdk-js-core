@@ -15,9 +15,14 @@ export function createTestnetProvider(): INetworkProvider {
 export interface INetworkProvider {
     getNetworkConfig(): Promise<INetworkConfig>;
     getAccount(address: IAddress): Promise<IAccountOnNetwork>;
+    getGuardianData(address: IAddress): Promise<IGuardianData>;
     getTransaction(txHash: string): Promise<ITransactionOnNetwork>;
     getTransactionStatus(txHash: string): Promise<ITransactionStatus>;
     sendTransaction(tx: Transaction): Promise<string>;
     simulateTransaction(tx: Transaction): Promise<any>;
     queryContract(query: Query): Promise<IContractQueryResponse>;
+}
+
+export interface IGuardianData {
+    getCurrentGuardianAddress(): IAddress | undefined;
 }

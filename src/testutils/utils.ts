@@ -1,14 +1,14 @@
-import { PathLike } from "fs";
+import axios, { AxiosResponse } from "axios";
+import BigNumber from "bignumber.js";
 import * as fs from "fs";
-import { SmartContract } from "../smartcontracts/smartContract";
+import { PathLike } from "fs";
+import { IChainID, IGasLimit } from "../interface";
 import { Code } from "../smartcontracts/code";
+import { SmartContract } from "../smartcontracts/smartContract";
 import { AbiRegistry, TypedValue } from "../smartcontracts/typesystem";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
-import { IChainID, IGasLimit } from "../interface";
 import { TestWallet } from "./wallets";
-import axios, { AxiosResponse } from "axios";
-import BigNumber from "bignumber.js";
 
 export async function prepareDeployment(obj: {
     deployer: TestWallet,
@@ -29,7 +29,7 @@ export async function prepareDeployment(obj: {
         deployer: deployer.address
     });
 
-    let nonce = deployer.account.getNonceThenIncrement();
+    let nonce = deployer.getNonceThenIncrement();
     let contractAddress = SmartContract.computeAddress(deployer.address, nonce);
     transaction.setNonce(nonce);
     transaction.setSender(deployer.address)

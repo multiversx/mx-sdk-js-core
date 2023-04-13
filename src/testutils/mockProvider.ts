@@ -113,7 +113,11 @@ export class MockProvider {
     }
 
     async getGuardianData(_address: IAddress): Promise<IGuardianData> {
-        throw new ErrMock("Not implemented");
+        return {
+            getCurrentGuardianAddress: () => {
+                return undefined;
+            }
+        }
     }
 
     async sendTransaction(transaction: Transaction): Promise<string> {

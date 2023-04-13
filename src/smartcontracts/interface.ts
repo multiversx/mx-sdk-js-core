@@ -37,6 +37,7 @@ export interface DeployArguments {
     gasPrice?: IGasPrice;
     chainID: IChainID;
     deployer: IAddress;
+    guardian?: IAddress;
 }
 
 export interface UpgradeArguments {
@@ -48,6 +49,7 @@ export interface UpgradeArguments {
     gasPrice?: IGasPrice;
     chainID: IChainID;
     caller: IAddress;
+    guardian?: IAddress;
 }
 
 export interface CallArguments {
@@ -59,6 +61,7 @@ export interface CallArguments {
     gasPrice?: IGasPrice;
     chainID: IChainID;
     caller: IAddress;
+    guardian?: IAddress;
 }
 
 export interface QueryArguments {

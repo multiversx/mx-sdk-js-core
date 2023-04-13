@@ -21,6 +21,7 @@ describe("test gas estimator", () => {
     it("should estimate gas limit (custom gas configuration)", () => {
         const estimator = new GasEstimator({
             minGasLimit: 10000,
+            extraGasLimitGuardedTransaction: 50000,
             gasPerDataByte: 3000,
             gasCostESDTTransfer: 200000,
             gasCostESDTNFTTransfer: 300000,

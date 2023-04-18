@@ -1,3 +1,5 @@
+import { DefaultTransactionsFactoryConfig } from "./defaultTransactionsFactoryConfig";
+
 interface IGasConfiguration {
     readonly minGasLimit: number;
     readonly extraGasLimitGuardedTransaction: number;
@@ -7,19 +9,15 @@ interface IGasConfiguration {
     readonly gasCostESDTNFTMultiTransfer: number;
 }
 
-/**
- * This is mirroring (on a best efforts basis) the network's gas configuration & gas schedule:
- *  - https://gateway.multiversx.com/network/config
- *  - https://github.com/multiversx/mx-chain-mainnet-config/tree/master/gasSchedules
- *  - https://github.com/multiversx/mx-chain-mainnet-config/blob/master/enableEpochs.toml#L200
- */
+const defaultConfig = new DefaultTransactionsFactoryConfig("");
+
 export const DefaultGasConfiguration: IGasConfiguration = {
-    minGasLimit: 50000,
-    extraGasLimitGuardedTransaction: 50000,
-    gasPerDataByte: 1500,
-    gasCostESDTTransfer: 200000,
-    gasCostESDTNFTTransfer: 200000,
-    gasCostESDTNFTMultiTransfer: 200000
+    minGasLimit: defaultConfig.minGasLimit,
+    extraGasLimitGuardedTransaction: defaultConfig.extraGasLimitGuardedTransaction.valueOf(),
+    gasPerDataByte: defaultConfig.gasLimitPerByte.valueOf(),
+    gasCostESDTTransfer: defaultConfig.gasLimitESDTTransfer.valueOf(),
+    gasCostESDTNFTTransfer: defaultConfig.gasLimitESDTNFTTransfer.valueOf(),
+    gasCostESDTNFTMultiTransfer: defaultConfig.gasLimitESDTNFTMultiTransfer.valueOf()
 };
 
 // Additional gas to account for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of the library).

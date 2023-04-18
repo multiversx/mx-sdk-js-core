@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { Address } from "./address";
-import { TRANSACTION_MIN_GAS_PRICE } from "./constants";
+import { DEFAULT_EXTRA_GAS_LIMIT_FOR_GUARDED_TRANSACTION, TRANSACTION_MIN_GAS_PRICE } from "./constants";
 import { IAddress, IChainID, IGasLimit, IGasPrice } from "./interface";
 
 /**
@@ -14,7 +14,7 @@ export class DefaultTransactionsFactoryConfig {
     minGasPrice: IGasPrice = TRANSACTION_MIN_GAS_PRICE;
     minGasLimit = 50000;
     gasLimitPerByte = 1500;
-    extraGasLimitGuardedTransaction: IGasLimit = 50000;
+    extraGasLimitGuardedTransaction: IGasLimit = DEFAULT_EXTRA_GAS_LIMIT_FOR_GUARDED_TRANSACTION;
 
     gasLimitESDTTransfer: IGasLimit = 200000;
     gasLimitESDTNFTTransfer: IGasLimit = 200000;

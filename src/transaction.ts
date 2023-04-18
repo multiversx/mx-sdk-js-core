@@ -129,9 +129,8 @@ export class Transaction {
     this.chainID = chainID;
     this.guardian = guardian || Address.empty();
 
-    const hasGuardian = guardian?.bech32() ? true : false;
     const defaultVersion = TransactionVersion.withDefaultVersion();
-    const defaultOptions = TransactionOptions.withOptions({ guarded: hasGuardian });
+    const defaultOptions = TransactionOptions.withDefaultOptions();
 
     this.setVersion(version || defaultVersion);
     this.setOptions(options || defaultOptions);

@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
-import { ARGUMENTS_SEPARATOR, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "../constants";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITransactionValue } from "../interface";
+import { ARGUMENTS_SEPARATOR, DEFAULT_EXTRA_GAS_LIMIT_FOR_GUARDED_TRANSACTION } from "../constants";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITransactionPayload, ITransactionValue } from "../interface";
 import { TransactionOptions, TransactionVersion } from "../networkParams";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
@@ -25,6 +25,11 @@ interface IConfig {
     gasLimitStorePerByte: IGasLimit;
     issueCost: BigNumber.Value;
     esdtContractAddress: IAddress;
+
+    /**
+     * TODO: In a future major release, make this required.
+     */
+    extraGasLimitGuardedTransaction?: IGasLimit;
 }
 
 interface IBaseArgs {
@@ -587,9 +592,10 @@ export class TokenOperationsFactory {
         dataParts: string[];
     }): Transaction {
         const payload = this.buildTransactionPayload(dataParts);
-        const gasLimit = gasLimitHint || this.computeGasLimit(payload, executionGasLimit);
-        const version = new TransactionVersion(TRANSACTION_VERSION_DEFAULT);
-        const options = new TransactionOptions(TRANSACTION_OPTIONS_DEFAULT);
+        const hasGuardian = guardian ? true : false;
+        const gasLimit = gasLimitHint || this.computeGasLimit({ payload, executionGasLimit, hasGuardian });
+        const version = TransactionVersion.withTxOptions();
+        const options = TransactionOptions.withOptions({ guarded: hasGuardian });
 
         return new Transaction({
             chainID: this.config.chainID,
@@ -611,8 +617,21 @@ export class TokenOperationsFactory {
         return new TransactionPayload(data);
     }
 
-    private computeGasLimit(payload: TransactionPayload, executionGas: IGasLimit): IGasLimit {
+    private computeGasLimit({ payload, executionGasLimit, hasGuardian }: {
+        payload: ITransactionPayload;
+        executionGasLimit: IGasLimit;
+        hasGuardian: boolean;
+    }): IGasLimit {
         const dataMovementGas = this.config.minGasLimit.valueOf() + this.config.gasLimitPerByte.valueOf() * payload.length();
-        return dataMovementGas + executionGas.valueOf();
+        const executionGas = executionGasLimit.valueOf();
+        const extraGasIfGuarded = this.config.extraGasLimitGuardedTransaction?.valueOf() || DEFAULT_EXTRA_GAS_LIMIT_FOR_GUARDED_TRANSACTION;
+
+        let gas = dataMovementGas + executionGas;
+
+        if (hasGuardian) {
+            gas += extraGasIfGuarded;
+        }
+
+        return gas;
     }
 }

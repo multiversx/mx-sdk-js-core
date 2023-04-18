@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { AccountOnNetwork } from "./accounts";
+import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig, defaultPagination } from "./config";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { ContractQueryResponse } from "./contractQueryResponse";
@@ -53,6 +53,10 @@ export class ApiNetworkProvider implements INetworkProvider {
         let response = await this.doGetGeneric(`accounts/${address.bech32()}`);
         let account = AccountOnNetwork.fromHttpResponse(response);
         return account;
+    }
+
+    async getGuardianData(address: IAddress): Promise<GuardianData> {
+        return await this.backingProxyNetworkProvider.getGuardianData(address);
     }
 
     async getFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]> {

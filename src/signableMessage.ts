@@ -1,6 +1,5 @@
-import { ISignature } from "./interface";
-import { Signature } from "./signature";
 import { Address } from "./address";
+import { ISignature } from "./interface";
 const createKeccakHash = require("keccak");
 
 export const MESSAGE_PREFIX = "\x17Elrond Signed Message:\n";
@@ -14,7 +13,7 @@ export class SignableMessage {
   /**
    * Signature obtained by a signer of type @param signer .
    */
-  signature: ISignature;
+  signature: Buffer;
 
   /**
    * Address of the wallet that performed the signing operation
@@ -33,7 +32,7 @@ export class SignableMessage {
 
   public constructor(init?: Partial<SignableMessage>) {
     this.message = Buffer.from([]);
-    this.signature = new Signature();
+    this.signature = Buffer.from([]);
     this.version = 1;
     this.signer = "ErdJS";
     this.address = new Address();
@@ -53,12 +52,16 @@ export class SignableMessage {
     return Buffer.concat([this.getMessageSize(), this.message]);
   }
 
-  getSignature(): ISignature {
+  getSignature(): Buffer {
     return this.signature;
   }
 
-  applySignature(signature: ISignature): void {
-    this.signature = signature;
+  applySignature(signature: ISignature | Buffer) {
+    if (signature instanceof Buffer) {
+      this.signature = signature;
+    } else {
+      this.signature = Buffer.from(signature.hex(), "hex");
+    }
   }
 
   getMessageSize(): Buffer {
@@ -71,8 +74,8 @@ export class SignableMessage {
   toJSON(): object {
     return {
       address: this.address.bech32(),
-      message: "0x" + this.message.toString('hex'),
-      signature: "0x" + this.signature.hex(),
+      message: "0x" + this.message.toString("hex"),
+      signature: "0x" + this.signature.toString("hex"),
       version: this.version,
       signer: this.signer,
     };

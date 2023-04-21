@@ -129,8 +129,13 @@ export class Transaction {
     this.chainID = chainID;
     this.guardian = guardian || Address.empty();
 
+    const hasGuardian = guardian?.bech32() ? true : false;
     const defaultVersion = TransactionVersion.withDefaultVersion();
-    const defaultOptions = TransactionOptions.withDefaultOptions();
+    // Theoretically, the transaction factories should be responsible with setting the correct options.
+    // However, for now, since we don't yet provide complete & uniform transaction construction facilities (i.e. factories),
+    // we'll handle the "guarded" option here.
+    // TODO: Remove this logic once we have complete & uniform transaction construction facilities (i.e. factories).
+    const defaultOptions = TransactionOptions.withOptions({ guarded: hasGuardian });
 
     this.setVersion(version || defaultVersion);
     this.setOptions(options || defaultOptions);

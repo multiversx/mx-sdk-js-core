@@ -9,6 +9,7 @@ interface IGasConfiguration {
     readonly gasCostESDTNFTMultiTransfer: number;
 }
 
+// TODO: Remove when removing GasEstimator.
 const defaultConfig = new DefaultTransactionsFactoryConfig("");
 
 export const DefaultGasConfiguration: IGasConfiguration = {
@@ -27,6 +28,7 @@ const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 // and for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of the library).
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
 
+// TODO: Remove (in a future major version) when replacing the existing TransferTransactionsFactory.
 export class GasEstimator {
     private readonly gasConfiguration: IGasConfiguration;
 

@@ -25,7 +25,6 @@ export namespace NativeSerializer {
 
         for (let i = 0; i < parameters.length; i++) {
             let parameter = parameters[i];
-
             let errorContext = new ArgumentErrorContext(endpoint.name, i, parameter);
             let value = convertToTypedValue(args[i], parameter.type, errorContext);
             values.push(value);

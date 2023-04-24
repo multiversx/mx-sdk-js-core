@@ -1,4 +1,3 @@
-import { ErrTypingSystem } from "../../errors";
 import { PrimitiveType, PrimitiveValue } from "./types";
 
 export class BooleanType extends PrimitiveType {
@@ -22,11 +21,6 @@ export class BooleanValue extends PrimitiveValue {
 
     constructor(value: boolean) {
         super(new BooleanType());
-
-        if (value !== true && value !== false) {
-            throw new ErrTypingSystem(`${BooleanValue.ClassName} must be either ${true} or ${false}`);
-        }
-
         this.value = value;
     }
 

@@ -51,9 +51,8 @@ export namespace NativeSerializer {
         }
 
         if (variadic) {
-            const lastArgIndex = parameters.length - 1;
-            const argAtIndex = args[lastArgIndex];
-            const argsAtIndexAndAfter = args.slice(lastArgIndex);
+            const lastEndpointParamIndex = parameters.length - 1;
+            const argAtIndex = args[lastEndpointParamIndex];
 
             if (argAtIndex.belongsToTypesystem) {
                 const isVariadicValue = argAtIndex.hasClassOrSuperclass(VariadicValue.ClassName);
@@ -63,7 +62,7 @@ export namespace NativeSerializer {
 
                 // Do not repack.
             } else {
-                args[lastArgIndex] = argsAtIndexAndAfter;
+                args[lastEndpointParamIndex] = args.slice(lastEndpointParamIndex);
             }
         }
 

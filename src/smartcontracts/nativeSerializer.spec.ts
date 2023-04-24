@@ -156,7 +156,8 @@ describe("test native serializer", () => {
         const compositeType = new CompositeType(new AddressType(), new U64Type());
         const optionalCompositeType = new OptionalType(compositeType);
         const addressBech32 = "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha";
-        const compositeValue = CompositeValue.fromItems(AddressValue.fromBech32(addressBech32), new U64Value(42));
+        const address = Address.fromBech32(addressBech32);
+        const compositeValue = CompositeValue.fromItems(new AddressValue(address), new U64Value(42));
         const optionalCompositeValue = new OptionalValue(optionalCompositeType, compositeValue);
 
         // Pass nothing
@@ -181,10 +182,7 @@ describe("test native serializer", () => {
 
         // Pass a mix of native and typed values
         typedValues = NativeSerializer.nativeToTypedValues([
-            [
-                AddressValue.fromBech32(addressBech32),
-                42
-            ]
+            [new AddressValue(address), 42]
         ], endpoint);
 
         assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
@@ -193,10 +191,7 @@ describe("test native serializer", () => {
 
         // Pass a mix of native and typed values
         typedValues = NativeSerializer.nativeToTypedValues([
-            [
-                addressBech32,
-                new U64Value(42)
-            ],
+            [addressBech32, new U64Value(42)],
         ], endpoint);
 
         assert.deepEqual(typedValues[0].getType(), optionalCompositeType);

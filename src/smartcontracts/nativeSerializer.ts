@@ -27,12 +27,6 @@ export namespace NativeSerializer {
             const arg = args[i];
             const parameter = parameters[i];
 
-            if (arg && arg.belongsToTypesystem) {
-                // Value is already typed, no need to convert it.
-                values.push(arg);
-                continue;
-            }
-
             let errorContext = new ArgumentErrorContext(endpoint.name, i, parameter);
             let value = convertToTypedValue(arg, parameter.type, errorContext);
             values.push(value);
@@ -69,7 +63,6 @@ export namespace NativeSerializer {
         return args;
     }
 
-
     // A function may have one of the following formats:
     // f(arg1, arg2, optional<arg3>, optional<arg4>) returns { min: 2, max: 4, variadic: false }
     // f(arg1, variadic<bytes>) returns { min: 1, max: Infinity, variadic: true }
@@ -92,30 +85,35 @@ export namespace NativeSerializer {
         return { min, max, variadic };
     }
 
-    function convertToTypedValue(native: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
+    function convertToTypedValue(value: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
+        if (value && value.belongsToTypesystem) {
+            // Value is already typed, no need to convert it.
+            return value;
+        }
+
         if (type instanceof OptionType) {
-            return toOptionValue(native, type, errorContext);
+            return toOptionValue(value, type, errorContext);
         }
         if (type instanceof OptionalType) {
-            return toOptionalValue(native, type, errorContext);
+            return toOptionalValue(value, type, errorContext);
         }
         if (type instanceof VariadicType) {
-            return toVariadicValue(native, type, errorContext);
+            return toVariadicValue(value, type, errorContext);
         }
         if (type instanceof CompositeType) {
-            return toCompositeValue(native, type, errorContext);
+            return toCompositeValue(value, type, errorContext);
         }
         if (type instanceof TupleType) {
-            return toTupleValue(native, type, errorContext);
+            return toTupleValue(value, type, errorContext);
         }
         if (type instanceof StructType) {
-            return toStructValue(native, type, errorContext);
+            return toStructValue(value, type, errorContext);
         }
         if (type instanceof ListType) {
-            return toListValue(native, type, errorContext);
+            return toListValue(value, type, errorContext);
         }
         if (type instanceof PrimitiveType) {
-            return toPrimitive(native, type, errorContext);
+            return toPrimitive(value, type, errorContext);
         }
         errorContext.throwError(`convertToTypedValue: unhandled type ${type}`);
     }
@@ -213,6 +211,7 @@ export namespace NativeSerializer {
         errorContext.throwError(`(function: toPrimitive) unsupported type ${type}`);
     }
 
+    // TODO: move logic to typesystem/bytes.ts
     function convertNativeToBytesValue(native: NativeTypes.NativeBytes, errorContext: ArgumentErrorContext) {
         const innerValue = native.valueOf();
 
@@ -235,6 +234,7 @@ export namespace NativeSerializer {
         errorContext.convertError(native, "BytesValue");
     }
 
+    // TODO: move logic to typesystem/string.ts
     function convertNativeToString(native: NativeTypes.NativeBuffer, errorContext: ArgumentErrorContext): string {
         if (native === undefined) {
             errorContext.convertError(native, "Buffer");
@@ -248,6 +248,7 @@ export namespace NativeSerializer {
         errorContext.convertError(native, "Buffer");
     }
 
+    // TODO: move logic to typesystem/address.ts
     export function convertNativeToAddress(native: NativeTypes.NativeAddress, errorContext: ArgumentErrorContext): IAddress {
         if ((<any>native).bech32) {
             return <IAddress>native;
@@ -265,6 +266,7 @@ export namespace NativeSerializer {
         }
     }
 
+    // TODO: move logic to typesystem/numerical.ts
     function convertNumericalType(number: BigNumber, type: Type, errorContext: ArgumentErrorContext): TypedValue {
         switch (type.constructor) {
             case U8Type:

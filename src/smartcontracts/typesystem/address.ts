@@ -26,6 +26,10 @@ export class AddressValue extends PrimitiveValue {
         this.value = new Address(value.bech32());
     }
 
+    static fromBech32(bech32: string): AddressValue {
+        return new AddressValue(Address.fromBech32(bech32));
+    }
+
     getClassName(): string {
         return AddressValue.ClassName;
     }

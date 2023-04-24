@@ -1,7 +1,8 @@
+import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
 import { NativeSerializer } from "./nativeSerializer";
-import { AbiRegistry, AddressType, BigUIntType, BooleanType, BooleanValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, ListType, NullType, OptionalType, OptionType, U32Type, VariadicType, VariadicValue } from "./typesystem";
+import { AbiRegistry, AddressType, AddressValue, BigUIntType, BooleanType, BooleanValue, CompositeType, CompositeValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, ListType, NullType, OptionalType, OptionalValue, OptionType, U32Type, U64Type, U64Value, VariadicType, VariadicValue } from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
 
 describe("test native serializer", () => {
@@ -44,6 +45,30 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[6].valueOf(), null);
     });
 
+    it("should should handle optionals in a strict manner (but it does not)", async () => {
+        const endpoint = AbiRegistry.create({
+            "endpoints": [
+                {
+                    "name": "foo",
+                    "inputs": [{
+                        "type": "optional<bool>"
+                    }],
+                    "outputs": []
+                }
+            ]
+        }).getEndpoint("foo");
+
+        let typedValues = NativeSerializer.nativeToTypedValues([
+            new OptionalValue(new BooleanType(), new BooleanValue(true))
+        ], endpoint);
+
+        // Isn't this a bug? Shouldn't it be be OptionalType(BooleanType()), instead?
+        assert.deepEqual(typedValues[0].getType(), new BooleanType());
+
+        // Isn't this a bug? Shouldn't it be OptionalValue(OptionalType(BooleanType()), BooleanValue(true)), instead?
+        assert.deepEqual(typedValues[0], new OptionalValue(new BooleanType(), new BooleanValue(true)));
+    });
+
     it("should accept a mix between typed values and regular JavaScript objects", async () => {
         let endpointModifiers = new EndpointModifiers("", []);
         let inputParameters = [
@@ -67,7 +92,7 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[2].valueOf(), c.valueOf());
     });
 
-    it("should accept a mix between typed values and regular JavaScript objects (variadic)", async () => {
+    it("should accept a mix between typed values and regular JavaScript objects (variadic, optionals)", async () => {
         const endpoint = AbiRegistry.create({
             "endpoints": [
                 {
@@ -113,5 +138,69 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[1].valueOf(), null);
         assert.deepEqual(typedValues[2].getType(), new VariadicType(new BooleanType()));
         assert.deepEqual(typedValues[2].valueOf(), [true, false, true]);
+    });
+
+    it("should accept a mix between typed values and regular JavaScript objects (composite, optionals)", async () => {
+        const endpoint = AbiRegistry.create({
+            "endpoints": [
+                {
+                    "name": "foo",
+                    "inputs": [{
+                        "type": "optional<multi<Address,u64>>",
+                    }],
+                    "outputs": []
+                }
+            ]
+        }).getEndpoint("foo");
+
+        const compositeType = new CompositeType(new AddressType(), new U64Type());
+        const optionalCompositeType = new OptionalType(compositeType);
+        const addressBech32 = "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha";
+        const compositeValue = CompositeValue.fromItems(AddressValue.fromBech32(addressBech32), new U64Value(42));
+        const optionalCompositeValue = new OptionalValue(optionalCompositeType, compositeValue);
+
+        // Pass nothing
+        let typedValues = NativeSerializer.nativeToTypedValues([null], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
+        assert.deepEqual(typedValues[0].valueOf(), null);
+
+        // Pass only native values
+        typedValues = NativeSerializer.nativeToTypedValues([[addressBech32, 42]], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
+        assert.deepEqual(typedValues[0], optionalCompositeValue);
+        assert.deepEqual(typedValues[0].valueOf(), [Address.fromBech32(addressBech32), new BigNumber(42)]);
+
+        // Pass only typed values
+        typedValues = NativeSerializer.nativeToTypedValues([new OptionalValue(optionalCompositeType, compositeValue)], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
+        assert.deepEqual(typedValues[0], optionalCompositeValue);
+        assert.deepEqual(typedValues[0].valueOf(), [Address.fromBech32(addressBech32), new BigNumber(42)]);
+
+        // Pass a mix of native and typed values
+        typedValues = NativeSerializer.nativeToTypedValues([
+            [
+                AddressValue.fromBech32(addressBech32),
+                42
+            ]
+        ], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
+        assert.deepEqual(typedValues[0], optionalCompositeValue);
+        assert.deepEqual(typedValues[0].valueOf(), [Address.fromBech32(addressBech32), new BigNumber(42)]);
+
+        // Pass a mix of native and typed values
+        typedValues = NativeSerializer.nativeToTypedValues([
+            [
+                addressBech32,
+                new U64Value(42)
+            ],
+        ], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
+        assert.deepEqual(typedValues[0], optionalCompositeValue);
+        assert.deepEqual(typedValues[0].valueOf(), [Address.fromBech32(addressBech32), new BigNumber(42)]);
     });
 });

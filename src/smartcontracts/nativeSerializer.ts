@@ -24,11 +24,10 @@ export namespace NativeSerializer {
         let values: TypedValue[] = [];
 
         for (let i = 0; i < parameters.length; i++) {
-            const arg = args[i];
-            const parameter = parameters[i];
+            let parameter = parameters[i];
 
             let errorContext = new ArgumentErrorContext(endpoint.name, i, parameter);
-            let value = convertToTypedValue(arg, parameter.type, errorContext);
+            let value = convertToTypedValue(args[i], parameter.type, errorContext);
             values.push(value);
         }
 

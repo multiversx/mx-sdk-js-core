@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { Address } from "../address";
 import { NativeSerializer } from "./nativeSerializer";
-import { AddressType, BigUIntType, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, ListType, NullType, OptionalType, OptionType, U32Type } from "./typesystem";
+import { AbiRegistry, AddressType, BigUIntType, BooleanType, BooleanValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, ListType, NullType, OptionalType, OptionType, U32Type, VariadicType, VariadicValue } from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
 
 describe("test native serializer", () => {
@@ -25,7 +25,7 @@ describe("test native serializer", () => {
         const p4 = null;
         const p5 = 7;
 
-        // Let's not provide "f"
+        // Let's not provide the last parameter
         const typedValues = NativeSerializer.nativeToTypedValues([p0, p1, p2, p3, p4, p5], endpoint);
 
         assert.deepEqual(typedValues[0].getType(), new BigUIntType());
@@ -65,5 +65,53 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[1].valueOf(), b);
         assert.deepEqual(typedValues[2].getType(), new BytesType());
         assert.deepEqual(typedValues[2].valueOf(), c.valueOf());
+    });
+
+    it("should accept a mix between typed values and regular JavaScript objects (variadic)", async () => {
+        const endpoint = AbiRegistry.create({
+            "endpoints": [
+                {
+                    "name": "foo",
+                    "inputs": [{
+                        "type": "bool"
+                    }, {
+                        "type": "optional<bool>"
+                    }, {
+                        "type": "variadic<bool>"
+                    }],
+                    "outputs": []
+                }
+            ]
+        }).getEndpoint("foo");
+
+        // Using only native JavaScript objects
+        let typedValues = NativeSerializer.nativeToTypedValues([
+            true,
+            null,
+            true,
+            false,
+            true
+        ], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), new BooleanType());
+        assert.deepEqual(typedValues[0].valueOf(), true);
+        assert.deepEqual(typedValues[1].getType(), new OptionalType(new BooleanType()));
+        assert.deepEqual(typedValues[1].valueOf(), null);
+        assert.deepEqual(typedValues[2].getType(), new VariadicType(new BooleanType()));
+        assert.deepEqual(typedValues[2].valueOf(), [true, false, true]);
+
+        // Using both native JavaScript objects and typed values
+        typedValues = NativeSerializer.nativeToTypedValues([
+            true,
+            null,
+            VariadicValue.fromItems(new BooleanValue(true), new BooleanValue(false), new BooleanValue(true)),
+        ], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), new BooleanType());
+        assert.deepEqual(typedValues[0].valueOf(), true);
+        assert.deepEqual(typedValues[1].getType(), new OptionalType(new BooleanType()));
+        assert.deepEqual(typedValues[1].valueOf(), null);
+        assert.deepEqual(typedValues[2].getType(), new VariadicType(new BooleanType()));
+        assert.deepEqual(typedValues[2].valueOf(), [true, false, true]);
     });
 });

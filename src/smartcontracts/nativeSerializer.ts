@@ -51,10 +51,22 @@ export namespace NativeSerializer {
         }
 
         if (variadic) {
-            let lastArgIndex = parameters.length - 1;
-            let lastArg = args.slice(lastArgIndex);
-            args[lastArgIndex] = lastArg;
+            const lastArgIndex = parameters.length - 1;
+            const argAtIndex = args[lastArgIndex];
+            const argsAtIndexAndAfter = args.slice(lastArgIndex);
+
+            if (argAtIndex.belongsToTypesystem) {
+                const isVariadicValue = argAtIndex.hasClassOrSuperclass(VariadicValue.ClassName);
+                if (!isVariadicValue) {
+                    throw new ErrInvalidArgument(`Wrong argument type for endpoint ${endpoint.name}: typed value provided; expected variadic type, have ${argAtIndex.getClassName()}`);
+                }
+
+                // Do not repack.
+            } else {
+                args[lastArgIndex] = argsAtIndexAndAfter;
+            }
         }
+
         return args;
     }
 

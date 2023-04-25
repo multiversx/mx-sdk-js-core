@@ -1,11 +1,10 @@
 import BigNumber from "bignumber.js";
-import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, TokenIdentifierType, TokenIdentifierValue, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
-import { ArgumentErrorContext } from "./argumentErrorContext";
-import { Struct, Field, StructType, Tuple } from "./typesystem";
 import { Address } from "../address";
-import { ErrInvalidArgument, ErrTypeInferenceSystemRequiresRegularJavascriptObjects } from "../errors";
+import { ErrInvalidArgument } from "../errors";
 import { IAddress } from "../interface";
 import { numberToPaddedHex } from "../utils.codec";
+import { ArgumentErrorContext } from "./argumentErrorContext";
+import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, Field, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, Struct, StructType, TokenIdentifierType, TokenIdentifierValue, Tuple, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
 
 export namespace NativeTypes {
     export type NativeBuffer = Buffer | string;
@@ -19,7 +18,6 @@ export namespace NativeSerializer {
      */
     export function nativeToTypedValues(args: any[], endpoint: EndpointDefinition): TypedValue[] {
         args = args || [];
-        assertNotTypedValues(args);
         args = handleVariadicArgsAndRePack(args, endpoint);
 
         let parameters = endpoint.input;
@@ -35,16 +33,6 @@ export namespace NativeSerializer {
         return values;
     }
 
-    function assertNotTypedValues(args: any[]) {
-        for (let i = 0; i < args.length; i++) {
-            let arg = args[i];
-
-            if (arg && arg.belongsToTypesystem) {
-                throw new ErrTypeInferenceSystemRequiresRegularJavascriptObjects(i);
-            }
-        }
-    }
-
     function handleVariadicArgsAndRePack(args: any[], endpoint: EndpointDefinition) {
         let parameters = endpoint.input;
 
@@ -55,13 +43,23 @@ export namespace NativeSerializer {
         }
 
         if (variadic) {
-            let lastArgIndex = parameters.length - 1;
-            let lastArg = args.slice(lastArgIndex);
-            args[lastArgIndex] = lastArg;
+            const lastEndpointParamIndex = parameters.length - 1;
+            const argAtIndex = args[lastEndpointParamIndex];
+
+            if (argAtIndex.belongsToTypesystem) {
+                const isVariadicValue = argAtIndex.hasClassOrSuperclass(VariadicValue.ClassName);
+                if (!isVariadicValue) {
+                    throw new ErrInvalidArgument(`Wrong argument type for endpoint ${endpoint.name}: typed value provided; expected variadic type, have ${argAtIndex.getClassName()}`);
+                }
+
+                // Do not repack.
+            } else {
+                args[lastEndpointParamIndex] = args.slice(lastEndpointParamIndex);
+            }
         }
+
         return args;
     }
-
 
     // A function may have one of the following formats:
     // f(arg1, arg2, optional<arg3>, optional<arg4>) returns { min: 2, max: 4, variadic: false }
@@ -85,30 +83,35 @@ export namespace NativeSerializer {
         return { min, max, variadic };
     }
 
-    function convertToTypedValue(native: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
+    function convertToTypedValue(value: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
+        if (value && value.belongsToTypesystem) {
+            // Value is already typed, no need to convert it.
+            return value;
+        }
+
         if (type instanceof OptionType) {
-            return toOptionValue(native, type, errorContext);
+            return toOptionValue(value, type, errorContext);
         }
         if (type instanceof OptionalType) {
-            return toOptionalValue(native, type, errorContext);
+            return toOptionalValue(value, type, errorContext);
         }
         if (type instanceof VariadicType) {
-            return toVariadicValue(native, type, errorContext);
+            return toVariadicValue(value, type, errorContext);
         }
         if (type instanceof CompositeType) {
-            return toCompositeValue(native, type, errorContext);
+            return toCompositeValue(value, type, errorContext);
         }
         if (type instanceof TupleType) {
-            return toTupleValue(native, type, errorContext);
+            return toTupleValue(value, type, errorContext);
         }
         if (type instanceof StructType) {
-            return toStructValue(native, type, errorContext);
+            return toStructValue(value, type, errorContext);
         }
         if (type instanceof ListType) {
-            return toListValue(native, type, errorContext);
+            return toListValue(value, type, errorContext);
         }
         if (type instanceof PrimitiveType) {
-            return toPrimitive(native, type, errorContext);
+            return toPrimitive(value, type, errorContext);
         }
         errorContext.throwError(`convertToTypedValue: unhandled type ${type}`);
     }
@@ -206,6 +209,7 @@ export namespace NativeSerializer {
         errorContext.throwError(`(function: toPrimitive) unsupported type ${type}`);
     }
 
+    // TODO: move logic to typesystem/bytes.ts
     function convertNativeToBytesValue(native: NativeTypes.NativeBytes, errorContext: ArgumentErrorContext) {
         const innerValue = native.valueOf();
 
@@ -221,13 +225,14 @@ export namespace NativeSerializer {
         if (innerValue instanceof Buffer) {
             return new BytesValue(innerValue);
         }
-        if (typeof innerValue ===  "number") {
+        if (typeof innerValue === "number") {
             return BytesValue.fromHex(numberToPaddedHex(innerValue))
         }
-        
+
         errorContext.convertError(native, "BytesValue");
     }
 
+    // TODO: move logic to typesystem/string.ts
     function convertNativeToString(native: NativeTypes.NativeBuffer, errorContext: ArgumentErrorContext): string {
         if (native === undefined) {
             errorContext.convertError(native, "Buffer");
@@ -241,6 +246,7 @@ export namespace NativeSerializer {
         errorContext.convertError(native, "Buffer");
     }
 
+    // TODO: move logic to typesystem/address.ts
     export function convertNativeToAddress(native: NativeTypes.NativeAddress, errorContext: ArgumentErrorContext): IAddress {
         if ((<any>native).bech32) {
             return <IAddress>native;
@@ -258,6 +264,7 @@ export namespace NativeSerializer {
         }
     }
 
+    // TODO: move logic to typesystem/numerical.ts
     function convertNumericalType(number: BigNumber, type: Type, errorContext: ArgumentErrorContext): TypedValue {
         switch (type.constructor) {
             case U8Type:

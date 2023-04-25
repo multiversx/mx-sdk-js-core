@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
 import { NativeSerializer } from "./nativeSerializer";
-import { AbiRegistry, AddressType, AddressValue, BigUIntType, BooleanType, BooleanValue, CompositeType, CompositeValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, ListType, NullType, OptionalType, OptionalValue, OptionType, U32Type, U64Type, U64Value, VariadicType, VariadicValue } from "./typesystem";
+import { AbiRegistry, AddressType, AddressValue, BigUIntType, BooleanType, BooleanValue, CompositeType, CompositeValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, ListType, NullType, OptionalType, OptionalValue, OptionType, OptionValue, TupleType, U32Type, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
 
 describe("test native serializer", () => {
@@ -171,14 +171,14 @@ describe("test native serializer", () => {
 
         assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
         assert.deepEqual(typedValues[0], optionalCompositeValue);
-        assert.deepEqual(typedValues[0].valueOf(), [Address.fromBech32(addressBech32), new BigNumber(42)]);
+        assert.deepEqual(typedValues[0].valueOf(), [address, new BigNumber(42)]);
 
         // Pass only typed values
         typedValues = NativeSerializer.nativeToTypedValues([new OptionalValue(optionalCompositeType, compositeValue)], endpoint);
 
         assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
         assert.deepEqual(typedValues[0], optionalCompositeValue);
-        assert.deepEqual(typedValues[0].valueOf(), [Address.fromBech32(addressBech32), new BigNumber(42)]);
+        assert.deepEqual(typedValues[0].valueOf(), [address, new BigNumber(42)]);
 
         // Pass a mix of native and typed values
         typedValues = NativeSerializer.nativeToTypedValues([
@@ -187,7 +187,7 @@ describe("test native serializer", () => {
 
         assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
         assert.deepEqual(typedValues[0], optionalCompositeValue);
-        assert.deepEqual(typedValues[0].valueOf(), [Address.fromBech32(addressBech32), new BigNumber(42)]);
+        assert.deepEqual(typedValues[0].valueOf(), [address, new BigNumber(42)]);
 
         // Pass a mix of native and typed values
         typedValues = NativeSerializer.nativeToTypedValues([
@@ -196,6 +196,56 @@ describe("test native serializer", () => {
 
         assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
         assert.deepEqual(typedValues[0], optionalCompositeValue);
-        assert.deepEqual(typedValues[0].valueOf(), [Address.fromBech32(addressBech32), new BigNumber(42)]);
+        assert.deepEqual(typedValues[0].valueOf(), [address, new BigNumber(42)]);
+    });
+
+    it("should accept a mix between typed values and regular JavaScript objects (tuples)", async () => {
+        const endpoint = AbiRegistry.create({
+            "endpoints": [
+                {
+                    "name": "foo",
+                    "inputs": [{
+                        "type": "tuple<u64,bool>",
+                    }, {
+                        "type": "tuple<u8,Option<bool>>",
+                    }, {
+                        "type": "List<tuple<u8,bool>>>",
+                    }, {
+                        "type": "u64"
+                    }],
+                    "outputs": []
+                }
+            ]
+        }).getEndpoint("foo");
+
+        // Pass only native values
+        let typedValues = NativeSerializer.nativeToTypedValues([
+            [42, true],
+            [43, false],
+            [[44, false], [45, true]],
+            46
+        ], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), new TupleType(new U64Type(), new BooleanType()));
+        assert.deepEqual(typedValues[0].valueOf(), { field0: new BigNumber(42), field1: true });
+        assert.deepEqual(typedValues[1].getType(), new TupleType(new U8Type(), new OptionType(new BooleanType())));
+        assert.deepEqual(typedValues[1].valueOf(), { field0: new BigNumber(43), field1: false });
+        assert.deepEqual(typedValues[2].getType(), new ListType(new TupleType(new U8Type(), new BooleanType())));
+        assert.deepEqual(typedValues[2].valueOf(), [{ field0: new BigNumber(44), field1: false }, { field0: new BigNumber(45), field1: true }]);
+
+        // Pass a mix of native and typed values
+        typedValues = NativeSerializer.nativeToTypedValues([
+            [new U64Value(42), true],
+            [43, OptionValue.newProvided(new BooleanValue(false))],
+            [[new U8Value(44), false], [45, new BooleanValue(true)]],
+            46
+        ], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), new TupleType(new U64Type(), new BooleanType()));
+        assert.deepEqual(typedValues[0].valueOf(), { field0: new BigNumber(42), field1: true });
+        assert.deepEqual(typedValues[1].getType(), new TupleType(new U8Type(), new OptionType(new BooleanType())));
+        assert.deepEqual(typedValues[1].valueOf(), { field0: new BigNumber(43), field1: false });
+        assert.deepEqual(typedValues[2].getType(), new ListType(new TupleType(new U8Type(), new BooleanType())));
+        assert.deepEqual(typedValues[2].valueOf(), [{ field0: new BigNumber(44), field1: false }, { field0: new BigNumber(45), field1: true }]);
     });
 });

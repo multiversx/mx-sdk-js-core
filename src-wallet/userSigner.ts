@@ -23,8 +23,8 @@ export class UserSigner {
         this.secretKey = secretKey;
     }
 
-    static fromWallet(keyFileObject: any, password: string): UserSigner {
-        let secretKey = UserWallet.decryptSecretKey(keyFileObject, password);
+    static fromWallet(keyFileObject: any, password: string, addressIndex?: number): UserSigner {
+        const secretKey = UserWallet.loadSecretKey(keyFileObject, password, addressIndex);
         return new UserSigner(secretKey);
     }
 

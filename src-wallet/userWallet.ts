@@ -65,6 +65,25 @@ export class UserWallet {
         });
     }
 
+    static loadSecretKey(keyFileObject: any, password: string, addressIndex?: number): UserSecretKey {
+        const kind = keyFileObject.kind || UserWalletKind.SecretKey;
+
+        if (kind == UserWalletKind.SecretKey) {
+            if (addressIndex !== undefined) {
+                throw new Err("addressIndex must not be provided when kind == 'secretKey'");
+            }
+
+            return UserWallet.decryptSecretKey(keyFileObject, password);
+        }
+
+        if (kind == UserWalletKind.Mnemonic) {
+            const mnemonic = this.decryptMnemonic(keyFileObject, password);
+            return mnemonic.deriveKey(addressIndex || 0);
+        }
+
+        throw new Err(`Unknown kind: ${kind}`);
+    }
+
     /**
      * Copied from: https://github.com/multiversx/mx-deprecated-core-js/blob/v1.28.0/src/account.js#L42
      * Notes: adjustements (code refactoring, no change in logic), in terms of: 

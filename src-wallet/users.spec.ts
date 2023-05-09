@@ -178,6 +178,27 @@ describe("test user wallets", () => {
         assert.deepEqual(dummyWallet.toJSON(), expectedDummyWallet);
     });
 
+    it("should loadSecretKey, but without 'kind' field", async function () {
+        const keyFileObject = await loadTestKeystore("withoutKind.json");
+        const secretKey = UserWallet.decrypt(keyFileObject, password);
+
+        assert.equal(secretKey.generatePublicKey().toAddress().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+    });
+
+    it("should throw when calling loadSecretKey with unecessary address index", async function () {
+        const keyFileObject = await loadTestKeystore("alice.json");
+
+        assert.throws(() => UserWallet.decrypt(keyFileObject, password, 42), "addressIndex must not be provided when kind == 'secretKey'");
+    });
+
+    it("should loadSecretKey with mnemonic", async function () {
+        const keyFileObject = await loadTestKeystore("withDummyMnemonic.json");
+
+        assert.equal(UserWallet.decrypt(keyFileObject, password, 0).generatePublicKey().toAddress().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(UserWallet.decrypt(keyFileObject, password, 1).generatePublicKey().toAddress().bech32(), "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+        assert.equal(UserWallet.decrypt(keyFileObject, password, 2).generatePublicKey().toAddress().bech32(), "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
+    });
+
     it("should sign transactions", async () => {
         let signer = new UserSigner(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf"));
         let verifier = new UserVerifier(UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf").generatePublicKey());
@@ -301,5 +322,16 @@ describe("test user wallets", () => {
 
         assert.isTrue(verifier.verify(data, signature));
         assert.isFalse(verifier.verify(Buffer.from("hello"), signature));
+    });
+
+    it("should create UserSigner from wallet", async function () {
+        const keyFileObjectWithoutKind = await loadTestKeystore("withoutKind.json");
+        const keyFileObjectWithMnemonic = await loadTestKeystore("withDummyMnemonic.json");
+
+        assert.equal(UserSigner.fromWallet(keyFileObjectWithoutKind, password).getAddress().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(UserSigner.fromWallet(keyFileObjectWithMnemonic, password).getAddress().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 0).getAddress().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 1).getAddress().bech32(), "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+        assert.equal(UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 2).getAddress().bech32(), "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
     });
 });

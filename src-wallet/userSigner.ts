@@ -24,7 +24,7 @@ export class UserSigner {
     }
 
     static fromWallet(keyFileObject: any, password: string, addressIndex?: number): UserSigner {
-        const secretKey = UserWallet.loadSecretKey(keyFileObject, password, addressIndex);
+        const secretKey = UserWallet.decrypt(keyFileObject, password, addressIndex);
         return new UserSigner(secretKey);
     }
 

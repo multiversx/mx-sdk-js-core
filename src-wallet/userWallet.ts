@@ -65,7 +65,7 @@ export class UserWallet {
         });
     }
 
-    static loadSecretKey(keyFileObject: any, password: string, addressIndex?: number): UserSecretKey {
+    static decrypt(keyFileObject: any, password: string, addressIndex?: number): UserSecretKey {
         const kind = keyFileObject.kind || UserWalletKind.SecretKey;
 
         if (kind == UserWalletKind.SecretKey) {

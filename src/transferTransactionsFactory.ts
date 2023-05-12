@@ -1,4 +1,5 @@
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenTransfer, ITransactionPayload, ITransactionValue } from "./interface";
+import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ArgSerializer } from "./smartcontracts/argSerializer";
 import { AddressValue, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "./smartcontracts/typesystem";
 import { Transaction } from "./transaction";
@@ -9,6 +10,11 @@ interface IGasEstimator {
     forESDTTransfer(dataLength: number): number;
     forESDTNFTTransfer(dataLength: number): number;
     forMultiESDTNFTTransfer(dataLength: number, numTransfers: number): number;
+
+    forGuardedEGLDTransfer(dataLength: number): number;
+    forGuardedESDTTransfer(dataLength: number): number;
+    forGuardedESDTNFTTransfer(dataLength: number): number;
+    forGuardedMultiESDTNFTTransfer(dataLength: number, numTransfers: number): number;
 }
 
 export class TransferTransactionsFactory {
@@ -23,23 +29,31 @@ export class TransferTransactionsFactory {
         value: ITransactionValue;
         receiver: IAddress;
         sender: IAddress;
+        guardian?: IAddress;
         gasPrice?: IGasPrice;
         gasLimit?: IGasLimit;
         data?: ITransactionPayload;
         chainID: IChainID;
     }) {
+        const hasGuardian = args.guardian ? true : false;
+
         const dataLength = args.data?.length() || 0;
-        const estimatedGasLimit = this.gasEstimator.forEGLDTransfer(dataLength);
+        const estimatedGasLimit = hasGuardian ?
+            this.gasEstimator.forGuardedEGLDTransfer(dataLength) :
+            this.gasEstimator.forEGLDTransfer(dataLength);
 
         return new Transaction({
             nonce: args.nonce,
             value: args.value,
             receiver: args.receiver,
             sender: args.sender,
+            guardian: args.guardian,
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: args.data,
-            chainID: args.chainID
+            chainID: args.chainID,
+            version: TransactionVersion.withTxOptions(),
+            options: TransactionOptions.withOptions({ guarded: hasGuardian })
         });
     }
 
@@ -48,10 +62,13 @@ export class TransferTransactionsFactory {
         nonce?: INonce;
         receiver: IAddress;
         sender: IAddress;
+        guardian?: IAddress;
         gasPrice?: IGasPrice;
         gasLimit?: IGasLimit;
         chainID: IChainID;
     }) {
+        const hasGuardian = args.guardian ? true : false;
+
         const { argumentsString } = new ArgSerializer().valuesToString([
             // The token identifier
             BytesValue.fromUTF8(args.tokenTransfer.tokenIdentifier),
@@ -62,16 +79,21 @@ export class TransferTransactionsFactory {
         const data = `ESDTTransfer@${argumentsString}`;
         const transactionPayload = new TransactionPayload(data);
         const dataLength = transactionPayload.length() || 0;
-        const estimatedGasLimit = this.gasEstimator.forESDTTransfer(dataLength);
+        const estimatedGasLimit = hasGuardian ?
+            this.gasEstimator.forGuardedESDTTransfer(dataLength) :
+            this.gasEstimator.forESDTTransfer(dataLength);
 
         return new Transaction({
             nonce: args.nonce,
             receiver: args.receiver,
             sender: args.sender,
+            guardian: args.guardian,
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: transactionPayload,
-            chainID: args.chainID
+            chainID: args.chainID,
+            version: TransactionVersion.withTxOptions(),
+            options: TransactionOptions.withOptions({ guarded: hasGuardian })
         });
     }
 
@@ -80,10 +102,13 @@ export class TransferTransactionsFactory {
         nonce?: INonce;
         destination: IAddress;
         sender: IAddress;
+        guardian?: IAddress;
         gasPrice?: IGasPrice;
         gasLimit?: IGasLimit;
         chainID: IChainID;
     }) {
+        const hasGuardian = args.guardian ? true : false;
+
         const { argumentsString } = new ArgSerializer().valuesToString([
             // The token identifier
             BytesValue.fromUTF8(args.tokenTransfer.tokenIdentifier),
@@ -98,16 +123,21 @@ export class TransferTransactionsFactory {
         const data = `ESDTNFTTransfer@${argumentsString}`;
         const transactionPayload = new TransactionPayload(data);
         const dataLength = transactionPayload.length() || 0;
-        const estimatedGasLimit = this.gasEstimator.forESDTNFTTransfer(dataLength);
+        const estimatedGasLimit = hasGuardian ?
+            this.gasEstimator.forGuardedESDTNFTTransfer(dataLength) :
+            this.gasEstimator.forESDTNFTTransfer(dataLength);
 
         return new Transaction({
             nonce: args.nonce,
             receiver: args.sender,
             sender: args.sender,
+            guardian: args.guardian,
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: transactionPayload,
-            chainID: args.chainID
+            chainID: args.chainID,
+            version: TransactionVersion.withTxOptions(),
+            options: TransactionOptions.withOptions({ guarded: hasGuardian })
         });
     }
 
@@ -116,10 +146,13 @@ export class TransferTransactionsFactory {
         nonce?: INonce;
         destination: IAddress;
         sender: IAddress;
+        guardian?: IAddress;
         gasPrice?: IGasPrice;
         gasLimit?: IGasLimit;
         chainID: IChainID;
     }) {
+        const hasGuardian = args.guardian ? true : false;
+
         const parts: TypedValue[] = [
             // The destination address
             new AddressValue(args.destination),
@@ -142,16 +175,21 @@ export class TransferTransactionsFactory {
         const data = `MultiESDTNFTTransfer@${argumentsString}`;
         const transactionPayload = new TransactionPayload(data);
         const dataLength = transactionPayload.length() || 0;
-        const estimatedGasLimit = this.gasEstimator.forMultiESDTNFTTransfer(dataLength, args.tokenTransfers.length);
+        const estimatedGasLimit = hasGuardian ?
+            this.gasEstimator.forGuardedMultiESDTNFTTransfer(dataLength, args.tokenTransfers.length) :
+            this.gasEstimator.forMultiESDTNFTTransfer(dataLength, args.tokenTransfers.length);
 
         return new Transaction({
             nonce: args.nonce,
             receiver: args.sender,
             sender: args.sender,
+            guardian: args.guardian,
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: transactionPayload,
-            chainID: args.chainID
+            chainID: args.chainID,
+            version: TransactionVersion.withTxOptions(),
+            options: TransactionOptions.withOptions({ guarded: hasGuardian })
         });
     }
 }

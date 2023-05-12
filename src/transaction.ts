@@ -63,13 +63,13 @@ export class Transaction {
    * The version, required by the Network in order to correctly interpret the contents of the transaction.
    * @deprecated Use getVersion() and setVersion() instead.
    */
-  version: TransactionVersion;
+  version: TransactionVersion = TransactionVersion.withDefaultVersion();
 
   /**
    * The options field, useful for describing different settings available for transactions
    * @deprecated Use getOptions() and setOptions() instead.
    */
-  options: TransactionOptions;
+  options: TransactionOptions = TransactionOptions.withDefaultOptions();
 
   /**
    * The address of the guardian.
@@ -127,9 +127,18 @@ export class Transaction {
     this.gasLimit = gasLimit;
     this.data = data || new TransactionPayload();
     this.chainID = chainID;
-    this.version = version ? new TransactionVersion(version.valueOf()) : TransactionVersion.withDefaultVersion();
-    this.options = options ? new TransactionOptions(options.valueOf()) : TransactionOptions.withDefaultOptions();
     this.guardian = guardian || Address.empty();
+
+    const hasGuardian = guardian?.bech32() ? true : false;
+    const defaultVersion = TransactionVersion.withDefaultVersion();
+    // Theoretically, the transaction factories should be responsible with setting the correct options.
+    // However, for now, since we don't yet provide complete & uniform transaction construction facilities (i.e. factories),
+    // we'll handle the "guarded" option here.
+    // TODO: Remove this logic once we have complete & uniform transaction construction facilities (i.e. factories).
+    const defaultOptions = TransactionOptions.withOptions({ guarded: hasGuardian });
+
+    this.setVersion(version || defaultVersion);
+    this.setOptions(options || defaultOptions);
 
     this.signature = Buffer.from([]);
     this.guardianSignature = Buffer.from([]);

@@ -1,10 +1,10 @@
-import { loadTestWallets, TestWallet } from "./testutils";
-import { RelayedTransactionV2Builder } from "./relayedTransactionV2Builder";
-import { Address } from "./address";
-import { TransactionPayload } from "./transactionPayload";
 import { assert } from "chai";
-import { Transaction } from "./transaction";
+import { Address } from "./address";
 import * as errors from "./errors";
+import { RelayedTransactionV2Builder } from "./relayedTransactionV2Builder";
+import { loadTestWallets, TestWallet } from "./testutils";
+import { Transaction } from "./transaction";
+import { TransactionPayload } from "./transactionPayload";
 
 describe("test relayed v2 transaction builder", function () {
     let alice: TestWallet, bob: TestWallet;
@@ -77,7 +77,7 @@ describe("test relayed v2 transaction builder", function () {
             .setInnerTransactionGasLimit(60_000_000)
             .setRelayerNonce(37)
             .setNetworkConfig(networkConfig)
-            .setRelayerAddress(alice.getAddress())
+            .setRelayerAddress(alice.address)
             .build();
 
         relayedTxV2.setSender(alice.address);

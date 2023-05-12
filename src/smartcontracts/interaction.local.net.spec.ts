@@ -54,7 +54,7 @@ describe("test smart contract interactor", function () {
         // Execute, do not wait for execution
         let transaction = interaction
             .withSender(alice.address)
-            .useThenIncrementNonceOf(alice.account)
+            .useThenIncrementNonceOf(alice)
             .buildTransaction();
 
         await signTransaction({ transaction: transaction, wallet: alice });
@@ -63,7 +63,7 @@ describe("test smart contract interactor", function () {
         // Execute, and wait for execution
         transaction = interaction
             .withSender(alice.address)
-            .useThenIncrementNonceOf(alice.account)
+            .useThenIncrementNonceOf(alice)
             .buildTransaction();
 
         await signTransaction({ transaction: transaction, wallet: alice });
@@ -112,17 +112,17 @@ describe("test smart contract interactor", function () {
         assert.deepEqual(counterValue!.valueOf(), new BigNumber(1));
 
         // Increment, wait for execution.
-        let incrementTransaction = incrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
+        let incrementTransaction = incrementInteraction.useThenIncrementNonceOf(alice).buildTransaction();
         await signTransaction({ transaction: incrementTransaction, wallet: alice });
         let { bundle: { firstValue: valueAfterIncrement } } = await controller.execute(incrementInteraction, incrementTransaction);
         assert.deepEqual(valueAfterIncrement!.valueOf(), new BigNumber(2));
 
         // Decrement twice. Wait for execution of the second transaction.
-        let decrementTransaction = decrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
+        let decrementTransaction = decrementInteraction.useThenIncrementNonceOf(alice).buildTransaction();
         await signTransaction({ transaction: decrementTransaction, wallet: alice });
         await provider.sendTransaction(decrementTransaction);
 
-        decrementTransaction = decrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
+        decrementTransaction = decrementInteraction.useThenIncrementNonceOf(alice).buildTransaction();
         await signTransaction({ transaction: decrementTransaction, wallet: alice });
         let { bundle: { firstValue: valueAfterDecrement } } = await controller.execute(decrementInteraction, decrementTransaction);
         assert.deepEqual(valueAfterDecrement!.valueOf(), new BigNumber(0));
@@ -178,7 +178,7 @@ describe("test smart contract interactor", function () {
         // start()
         let startTransaction = startInteraction
             .withSender(alice.address)
-            .useThenIncrementNonceOf(alice.account)
+            .useThenIncrementNonceOf(alice)
             .buildTransaction();
 
         await signTransaction({ transaction: startTransaction, wallet: alice });
@@ -189,7 +189,7 @@ describe("test smart contract interactor", function () {
         // status()
         let lotteryStatusTransaction = lotteryStatusInteraction
             .withSender(alice.address)
-            .useThenIncrementNonceOf(alice.account)
+            .useThenIncrementNonceOf(alice)
             .buildTransaction();
 
         await signTransaction({ transaction: lotteryStatusTransaction, wallet: alice });
@@ -201,7 +201,7 @@ describe("test smart contract interactor", function () {
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
         let lotteryInfoTransaction = getLotteryInfoInteraction
             .withSender(alice.address)
-            .useThenIncrementNonceOf(alice.account)
+            .useThenIncrementNonceOf(alice)
             .buildTransaction();
 
         await signTransaction({ transaction: lotteryInfoTransaction, wallet: alice });

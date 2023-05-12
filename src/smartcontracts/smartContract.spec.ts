@@ -46,7 +46,7 @@ describe("test contract", () => {
         });
 
         await alice.sync(provider);
-        deployTransaction.setNonce(alice.account.nonce);
+        deployTransaction.setNonce(alice.getNonce());
 
         assert.equal(deployTransaction.getData().valueOf().toString(), "01020304@0500@0100");
         assert.equal(deployTransaction.getGasLimit().valueOf(), 1000000);
@@ -97,9 +97,8 @@ describe("test contract", () => {
         });
 
         await alice.sync(provider);
-        callTransactionOne.setNonce(alice.account.nonce);
-        alice.account.incrementNonce();
-        callTransactionTwo.setNonce(alice.account.nonce);
+        callTransactionOne.setNonce(alice.getNonceThenIncrement());
+        callTransactionTwo.setNonce(alice.getNonceThenIncrement());
 
         assert.equal(callTransactionOne.getNonce().valueOf(), 42);
         assert.equal(callTransactionOne.getData().valueOf().toString(), "helloEarth@05@0123");

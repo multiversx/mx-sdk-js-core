@@ -1,23 +1,24 @@
+import { DefaultTransactionsFactoryConfig } from "./defaultTransactionsFactoryConfig";
+
 interface IGasConfiguration {
     readonly minGasLimit: number;
+    readonly extraGasLimitGuardedTransaction: number;
     readonly gasPerDataByte: number;
     readonly gasCostESDTTransfer: number;
     readonly gasCostESDTNFTTransfer: number;
     readonly gasCostESDTNFTMultiTransfer: number;
 }
 
-/**
- * This is mirroring (on a best efforts basis) the network's gas configuration & gas schedule:
- *  - https://gateway.multiversx.com/network/config
- *  - https://github.com/multiversx/mx-chain-mainnet-config/tree/master/gasSchedules
- *  - https://github.com/multiversx/mx-chain-mainnet-config/blob/master/enableEpochs.toml#L200
- */
+// TODO: Remove when removing GasEstimator.
+const defaultConfig = new DefaultTransactionsFactoryConfig("");
+
 export const DefaultGasConfiguration: IGasConfiguration = {
-    minGasLimit: 50000,
-    gasPerDataByte: 1500,
-    gasCostESDTTransfer: 200000,
-    gasCostESDTNFTTransfer: 200000,
-    gasCostESDTNFTMultiTransfer: 200000
+    minGasLimit: defaultConfig.minGasLimit,
+    extraGasLimitGuardedTransaction: defaultConfig.extraGasLimitGuardedTransaction.valueOf(),
+    gasPerDataByte: defaultConfig.gasLimitPerByte.valueOf(),
+    gasCostESDTTransfer: defaultConfig.gasLimitESDTTransfer.valueOf(),
+    gasCostESDTNFTTransfer: defaultConfig.gasLimitESDTNFTTransfer.valueOf(),
+    gasCostESDTNFTMultiTransfer: defaultConfig.gasLimitESDTNFTMultiTransfer.valueOf()
 };
 
 // Additional gas to account for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of the library).
@@ -27,6 +28,7 @@ const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 // and for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of the library).
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
 
+// TODO: Remove (in a future major version) when replacing the existing TransferTransactionsFactory.
 export class GasEstimator {
     private readonly gasConfiguration: IGasConfiguration;
 
@@ -42,6 +44,10 @@ export class GasEstimator {
         return gasLimit;
     }
 
+    forGuardedEGLDTransfer(dataLength: number) {
+        return this.forEGLDTransfer(dataLength) + this.gasConfiguration.extraGasLimitGuardedTransaction;
+    }
+
     forESDTTransfer(dataLength: number) {
         const gasLimit =
             this.gasConfiguration.minGasLimit +
@@ -50,6 +56,10 @@ export class GasEstimator {
             ADDITIONAL_GAS_FOR_ESDT_TRANSFER;
 
         return gasLimit;
+    }
+
+    forGuardedESDTTransfer(dataLength: number) {
+        return this.forESDTTransfer(dataLength) + this.gasConfiguration.extraGasLimitGuardedTransaction;
     }
 
     forESDTNFTTransfer(dataLength: number) {
@@ -62,6 +72,10 @@ export class GasEstimator {
         return gasLimit;
     }
 
+    forGuardedESDTNFTTransfer(dataLength: number) {
+        return this.forESDTNFTTransfer(dataLength) + this.gasConfiguration.extraGasLimitGuardedTransaction;
+    }
+
     forMultiESDTNFTTransfer(dataLength: number, numTransfers: number) {
         const gasLimit =
             this.gasConfiguration.minGasLimit +
@@ -69,5 +83,9 @@ export class GasEstimator {
             this.gasConfiguration.gasPerDataByte * dataLength;
 
         return gasLimit;
+    }
+
+    forGuardedMultiESDTNFTTransfer(dataLength: number, numTransfers: number) {
+        return this.forMultiESDTNFTTransfer(dataLength, numTransfers) + this.gasConfiguration.extraGasLimitGuardedTransaction;
     }
 }

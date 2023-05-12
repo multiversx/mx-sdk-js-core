@@ -3,6 +3,7 @@ require('./globals');
 export * from "./account";
 export * from "./address";
 export * from "./asyncTimer";
+export * from "./defaultTransactionsFactoryConfig";
 export * from "./errors";
 export * from "./gasEstimator";
 export * from "./interface";

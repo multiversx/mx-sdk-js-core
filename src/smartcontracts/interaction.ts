@@ -1,4 +1,3 @@
-import { Account } from "../account";
 import { Address } from "../address";
 import { Compatibility } from "../compatibility";
 import { ESDTNFT_TRANSFER_FUNCTION_NAME, ESDT_TRANSFER_FUNCTION_NAME, MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME } from "../constants";
@@ -17,6 +16,10 @@ interface ISmartContractWithinInteraction {
     call({ func, args, value, gasLimit, receiver }: CallArguments): Transaction;
     getAddress(): IAddress;
     getEndpoint(name: ContractFunction): EndpointDefinition;
+}
+
+interface IAccountNonceHolder {
+    getNonceThenIncrement(): INonce;
 }
 
 /**
@@ -196,8 +199,8 @@ export class Interaction {
         return this;
     }
 
-    useThenIncrementNonceOf(account: Account): Interaction {
-        return this.withNonce(account.getNonceThenIncrement());
+    useThenIncrementNonceOf(nonceHolder: IAccountNonceHolder): Interaction {
+        return this.withNonce(nonceHolder.getNonceThenIncrement());
     }
 
     withChainID(chainID: IChainID): Interaction {

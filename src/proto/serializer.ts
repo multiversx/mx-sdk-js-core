@@ -5,7 +5,7 @@ import * as errors from "../errors";
 import { ITransactionValue } from "../interface";
 import { bigIntToBuffer } from "../smartcontracts/codec/utils";
 import { Transaction } from "../transaction";
-import { proto } from "./compiled";
+
 /**
  * Hides away the serialization complexity, for each type of object (e.g. transactions).
  
@@ -16,6 +16,7 @@ export class ProtoSerializer {
      * Serializes a Transaction object to a Buffer. Handles low-level conversion logic and field-mappings as well.
      */
     serializeTransaction(transaction: Transaction): Buffer {
+        const proto = require("./compiled").proto;
         const receiverPubkey = new Address(transaction.getReceiver().bech32()).pubkey();
         const senderPubkey = new Address(transaction.getSender().bech32()).pubkey();
 

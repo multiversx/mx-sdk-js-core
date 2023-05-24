@@ -1,3 +1,5 @@
+require("./globals");
+
 export * from "./mnemonic";
 export * from "./pem";
 export * from "./userKeys";

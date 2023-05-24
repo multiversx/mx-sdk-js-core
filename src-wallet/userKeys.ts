@@ -32,7 +32,7 @@ export class UserSecretKey {
     }
 
     generatePublicKey(): UserPublicKey {
-        const buffer = ed.sync.getPublicKey(this.buffer);
+        const buffer = ed.sync.getPublicKey(new Uint8Array(this.buffer));
         return new UserPublicKey(buffer);
     }
 

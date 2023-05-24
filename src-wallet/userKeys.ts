@@ -12,9 +12,9 @@ export const USER_PUBKEY_LENGTH = 32;
 ed.utils.sha512Sync = (...m) => sha512(ed.utils.concatBytes(...m));
 
 export class UserSecretKey {
-    private readonly buffer: Buffer;
+    private readonly buffer: Uint8Array;
 
-    constructor(buffer: Buffer) {
+    constructor(buffer: Uint8Array) {
         guardLength(buffer, USER_SEED_LENGTH);
 
         this.buffer = buffer;
@@ -23,7 +23,7 @@ export class UserSecretKey {
     static fromString(value: string): UserSecretKey {
         guardLength(value, USER_SEED_LENGTH * 2);
 
-        let buffer = Buffer.from(value, "hex");
+        const buffer = Buffer.from(value, "hex");
         return new UserSecretKey(buffer);
     }
 
@@ -42,11 +42,11 @@ export class UserSecretKey {
     }
 
     hex(): string {
-        return this.buffer.toString("hex");
+        return Buffer.from(this.buffer).toString("hex");
     }
 
     valueOf(): Buffer {
-        return this.buffer;
+        return Buffer.from(this.buffer);
     }
 }
 

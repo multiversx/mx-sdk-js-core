@@ -14,16 +14,16 @@ ed.utils.sha512Sync = (...m) => sha512(ed.utils.concatBytes(...m));
 export class UserSecretKey {
     private readonly buffer: Buffer;
 
-    constructor(buffer: Buffer) {
+    constructor(buffer: Uint8Array) {
         guardLength(buffer, USER_SEED_LENGTH);
 
-        this.buffer = buffer;
+        this.buffer = Buffer.from(buffer);
     }
 
     static fromString(value: string): UserSecretKey {
         guardLength(value, USER_SEED_LENGTH * 2);
 
-        let buffer = Buffer.from(value, "hex");
+        const buffer = Buffer.from(value, "hex");
         return new UserSecretKey(buffer);
     }
 
@@ -32,12 +32,12 @@ export class UserSecretKey {
     }
 
     generatePublicKey(): UserPublicKey {
-        const buffer = ed.sync.getPublicKey(this.buffer);
+        const buffer = ed.sync.getPublicKey(new Uint8Array(this.buffer));
         return new UserPublicKey(buffer);
     }
 
     sign(message: Buffer): Buffer {
-        const signature = ed.sync.sign(message, this.buffer);
+        const signature = ed.sync.sign(new Uint8Array(message), new Uint8Array(this.buffer));
         return Buffer.from(signature);
     }
 
@@ -61,7 +61,7 @@ export class UserPublicKey {
 
     verify(data: Buffer, signature: Buffer): boolean {
         try {
-            const ok = ed.sync.verify(signature, data, this.buffer);
+            const ok = ed.sync.verify(new Uint8Array(signature), new Uint8Array(data), new Uint8Array(this.buffer));
             return ok;
         } catch (err: any) {
             console.error(err);

@@ -37,7 +37,7 @@ export class UserSecretKey {
     }
 
     sign(message: Buffer): Buffer {
-        const signature = ed.sync.sign(message, this.buffer);
+        const signature = ed.sync.sign(new Uint8Array(message), new Uint8Array(this.buffer));
         return Buffer.from(signature);
     }
 
@@ -61,7 +61,7 @@ export class UserPublicKey {
 
     verify(data: Buffer, signature: Buffer): boolean {
         try {
-            const ok = ed.sync.verify(signature, data, this.buffer);
+            const ok = ed.sync.verify(new Uint8Array(signature), new Uint8Array(data), new Uint8Array(this.buffer));
             return ok;
         } catch (err: any) {
             console.error(err);

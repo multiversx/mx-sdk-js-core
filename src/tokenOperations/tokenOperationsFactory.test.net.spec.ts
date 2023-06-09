@@ -1,8 +1,8 @@
 import { assert } from "chai";
 import { GasEstimator } from "../gasEstimator";
 import { INetworkConfig, ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { loadTestWallets, TestWallet } from "../testutils";
-import { createTestnetProvider, INetworkProvider } from "../testutils/networkProviders";
+import { TestWallet, loadTestWallets } from "../testutils";
+import { INetworkProvider, createTestnetProvider } from "../testutils/networkProviders";
 import { TokenTransfer } from "../tokenTransfer";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
@@ -31,6 +31,55 @@ describe("test factory on testnet", function () {
         factory = new TokenOperationsFactory(new TokenOperationsFactoryConfig(network.ChainID));
         parser = new TokenOperationsOutcomeParser();
         transferTransactionsFactory = new TransferTransactionsFactory(new GasEstimator());
+    });
+
+    it.only("should issue fungible, then toggle global burn", async function () {
+        this.timeout(180000);
+        await frank.sync(provider);
+        await grace.sync(provider);
+
+        // Issue
+        const tx1 = factory.issueFungible({
+            issuer: frank.address,
+            tokenName: "FRANK",
+            tokenTicker: "FRANK",
+            initialSupply: 100,
+            numDecimals: 0,
+            canFreeze: true,
+            canWipe: true,
+            canPause: true,
+            canMint: true,
+            canBurn: true,
+            canChangeOwner: true,
+            canUpgrade: true,
+            canAddSpecialRoles: true,
+            transactionNonce: frank.account.nonce
+        });
+
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
+        const tx1Outcome = parser.parseIssueFungible(tx1OnNetwork);
+        const tokenIdentifier = tx1Outcome.tokenIdentifier;
+        assert.isTrue(tokenIdentifier.includes("FRANK"));
+
+        // Unset global burn
+        const tx2 = factory.unsetBurnRoleGlobally({
+            manager: frank.address,
+            tokenIdentifier: tx1Outcome.tokenIdentifier,
+            transactionNonce: frank.account.nonce
+        });
+
+        const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
+        const _tx2Outcome = parser.parseToggleBurnRoleGlobally(tx2OnNetwork);
+
+        // Set global burn
+        const tx3 = factory.setBurnRoleGlobally({
+            manager: frank.address,
+            tokenIdentifier: tx1Outcome.tokenIdentifier,
+            transactionNonce: frank.account.nonce
+        });
+
+        const tx3OnNetwork = await processTransaction(frank, tx3, "tx3");
+        const _tx3Outcome = parser.parseToggleBurnRoleGlobally(tx3OnNetwork);
     });
 
     it("should issue fungible, mint, burn", async function () {

@@ -25,6 +25,8 @@ interface IConfig {
     gasLimitStorePerByte: IGasLimit;
     issueCost: BigNumber.Value;
     esdtContractAddress: IAddress;
+
+    gasLimitToggleBurnRoleGlobally: IGasLimit;
 }
 
 interface IBaseArgs {
@@ -68,6 +70,11 @@ interface IIssueNonFungibleArgs extends IIssueSemiFungibleArgs {
 
 interface IRegisterMetaESDT extends IIssueSemiFungibleArgs {
     numDecimals: number;
+}
+
+interface IToggleBurnRoleGloballyArgs extends IBaseArgs {
+    manager: IAddress;
+    tokenIdentifier: string;
 }
 
 interface IFungibleSetSpecialRoleArgs extends IBaseArgs {
@@ -275,6 +282,40 @@ export class TokenOperationsFactory {
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitIssue,
+            dataParts: parts
+        });
+    }
+
+    setBurnRoleGlobally(args: IToggleBurnRoleGloballyArgs): Transaction {
+        const parts = [
+            "setBurnRoleGlobally",
+            utf8ToHex(args.tokenIdentifier)
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.transactionNonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitToggleBurnRoleGlobally,
+            dataParts: parts
+        });
+    }
+
+    unsetBurnRoleGlobally(args: IToggleBurnRoleGloballyArgs): Transaction {
+        const parts = [
+            "unsetBurnRoleGlobally",
+            utf8ToHex(args.tokenIdentifier)
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.transactionNonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitToggleBurnRoleGlobally,
             dataParts: parts
         });
     }

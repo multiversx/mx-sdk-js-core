@@ -37,6 +37,9 @@ export interface IESDTIssueOutcome {
     tokenIdentifier: string;
 }
 
+export interface IToggleBurnRoleGloballyOutcome {
+}
+
 export interface ISetSpecialRoleOutcome {
     userAddress: string;
     tokenIdentifier: string;
@@ -129,6 +132,11 @@ export class TokenOperationsOutcomeParser {
         const event = this.findSingleEventByIdentifier(transaction, "registerMetaESDT");
         const tokenIdentifier = this.extractTokenIdentifier(event);
         return { tokenIdentifier: tokenIdentifier };
+    }
+
+    parseToggleBurnRoleGlobally(transaction: ITransactionOnNetwork): IToggleBurnRoleGloballyOutcome {
+        this.ensureNoError(transaction);
+        return {};
     }
 
     parseSetSpecialRole(transaction: ITransactionOnNetwork): ISetSpecialRoleOutcome {

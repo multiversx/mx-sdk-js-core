@@ -40,6 +40,16 @@ export class Transaction {
   private readonly receiver: IAddress;
 
   /**
+   * The username of the sender.
+   */
+  private senderUsername: string;
+
+  /** 
+   * The username of the receiver.
+   */
+  private receiverUsername: string;
+
+  /**
    * The gas price to be used.
    */
   private gasPrice: IGasPrice;
@@ -97,8 +107,10 @@ export class Transaction {
   public constructor({
     nonce,
     value,
-    receiver,
     sender,
+    receiver,
+    senderUsername,
+    receiverUsername,
     gasPrice,
     gasLimit,
     data,
@@ -109,8 +121,10 @@ export class Transaction {
   }: {
     nonce?: INonce;
     value?: ITransactionValue;
-    receiver: IAddress;
     sender: IAddress;
+    receiver: IAddress;
+    senderUsername?: string;
+    receiverUsername?: string;
     gasPrice?: IGasPrice;
     gasLimit: IGasLimit;
     data?: ITransactionPayload;
@@ -123,6 +137,8 @@ export class Transaction {
     this.value = value ? new BigNumber(value.toString()).toFixed(0) : 0;
     this.sender = sender;
     this.receiver = receiver;
+    this.senderUsername = senderUsername || "";
+    this.receiverUsername = receiverUsername || "";
     this.gasPrice = gasPrice || TRANSACTION_MIN_GAS_PRICE;
     this.gasLimit = gasLimit;
     this.data = data || new TransactionPayload();
@@ -165,6 +181,22 @@ export class Transaction {
 
   getReceiver(): IAddress {
     return this.receiver;
+  }
+
+  getSenderUsername(): string {
+    return this.senderUsername;
+  }
+
+  setSenderUsername(senderUsername: string) {
+    this.senderUsername = senderUsername;
+  }
+
+  getReceiverUsername(): string {
+    return this.receiverUsername;
+  }
+
+  setReceiverUsername(receiverUsername: string) {
+    this.receiverUsername = receiverUsername;
   }
 
   getGuardian(): IAddress {
@@ -274,11 +306,13 @@ export class Transaction {
    * This function is called internally within the signing procedure.
    */
   toPlainObject(): IPlainTransactionObject {
-    const plainObject = {
+    const plainObject: any = {
       nonce: this.nonce.valueOf(),
       value: this.value.toString(),
       receiver: this.receiver.bech32(),
       sender: this.sender.bech32(),
+      senderUsername: this.senderUsername ? Buffer.from(this.senderUsername).toString("base64") : undefined,
+      receiverUsername: this.receiverUsername ? Buffer.from(this.receiverUsername).toString("base64") : undefined,
       gasPrice: this.gasPrice.valueOf(),
       gasLimit: this.gasLimit.valueOf(),
       data: this.data.length() == 0 ? undefined : this.data.encoded(),
@@ -305,7 +339,9 @@ export class Transaction {
       nonce: Number(plainObjectTransaction.nonce),
       value: new BigNumber(plainObjectTransaction.value).toFixed(0),
       receiver: Address.fromString(plainObjectTransaction.receiver),
+      receiverUsername: plainObjectTransaction.receiverUsername == undefined ? undefined : Buffer.from(plainObjectTransaction.receiverUsername || "", "base64").toString(),
       sender: Address.fromString(plainObjectTransaction.sender),
+      senderUsername: plainObjectTransaction.senderUsername == undefined ? undefined : Buffer.from(plainObjectTransaction.senderUsername || "", "base64").toString(),
       guardian: plainObjectTransaction.guardian == undefined ? undefined : Address.fromString(plainObjectTransaction.guardian || ""),
       gasPrice: Number(plainObjectTransaction.gasPrice),
       gasLimit: Number(plainObjectTransaction.gasLimit),

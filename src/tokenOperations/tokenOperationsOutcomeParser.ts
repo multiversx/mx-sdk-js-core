@@ -134,7 +134,12 @@ export class TokenOperationsOutcomeParser {
         return { tokenIdentifier: tokenIdentifier };
     }
 
-    parseToggleBurnRoleGlobally(transaction: ITransactionOnNetwork): IToggleBurnRoleGloballyOutcome {
+    parseSetBurnRoleGlobally(transaction: ITransactionOnNetwork): IToggleBurnRoleGloballyOutcome {
+        this.ensureNoError(transaction);
+        return {};
+    }
+
+    parseUnsetBurnRoleGlobally(transaction: ITransactionOnNetwork): IToggleBurnRoleGloballyOutcome {
         this.ensureNoError(transaction);
         return {};
     }

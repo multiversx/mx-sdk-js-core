@@ -69,7 +69,7 @@ describe("test factory on testnet", function () {
         });
 
         const tx2OnNetwork = await processTransaction(frank, tx2, "tx2");
-        const _tx2Outcome = parser.parseToggleBurnRoleGlobally(tx2OnNetwork);
+        const _tx2Outcome = parser.parseUnsetBurnRoleGlobally(tx2OnNetwork);
 
         // Set global burn
         const tx3 = factory.setBurnRoleGlobally({
@@ -79,7 +79,7 @@ describe("test factory on testnet", function () {
         });
 
         const tx3OnNetwork = await processTransaction(frank, tx3, "tx3");
-        const _tx3Outcome = parser.parseToggleBurnRoleGlobally(tx3OnNetwork);
+        const _tx3Outcome = parser.parseSetBurnRoleGlobally(tx3OnNetwork);
     });
 
     it("should issue fungible, mint, burn", async function () {

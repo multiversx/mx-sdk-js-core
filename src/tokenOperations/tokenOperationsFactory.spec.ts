@@ -12,6 +12,22 @@ describe("test factory", () => {
         factory = new TokenOperationsFactory(new TokenOperationsFactoryConfig("T"));
     });
 
+    it("should create <registerAndSetAllRoles>", () => {
+        const transaction = factory.registerAndSetAllRoles({
+            issuer: frank.address,
+            tokenName: "TEST",
+            tokenTicker: "TEST",
+            tokenType: "FNG",
+            numDecimals: 2,
+            transactionNonce: 42
+        });
+
+        assert.equal(transaction.getData().toString(), "registerAndSetAllRoles@54455354@54455354@464e47@02")
+        assert.equal(transaction.getNonce(), 42);
+        assert.equal(transaction.getSender().toString(), frank.address.toString());
+        assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
+    });
+
     it("should create <issueFungible>", () => {
         const transaction = factory.issueFungible({
             issuer: frank.address,

@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
 import { ARGUMENTS_SEPARATOR, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "../constants";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITransactionValue } from "../interface";
+import { Logger } from "../logger";
 import { TransactionOptions, TransactionVersion } from "../networkParams";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
@@ -26,8 +27,6 @@ interface IConfig {
     gasLimitStorePerByte: IGasLimit;
     issueCost: BigNumber.Value;
     esdtContractAddress: IAddress;
-
-    shouldWarnAboutUnsettingBurnRoleGlobally: boolean;
 }
 
 interface IBaseArgs {
@@ -198,7 +197,7 @@ export class TokenOperationsFactory {
     }
 
     issueFungible(args: IIssueFungibleArgs): Transaction {
-        this.warnAboutUnsettingBurnRoleGloballyIfAppropriate();
+        this.notifyAboutUnsettingBurnRoleGlobally();
 
         const parts = [
             "issue",
@@ -226,12 +225,8 @@ export class TokenOperationsFactory {
         });
     }
 
-    private warnAboutUnsettingBurnRoleGloballyIfAppropriate() {
-        if (!this.config.shouldWarnAboutUnsettingBurnRoleGlobally) {
-            return;
-        }
-
-        console.warn(`
+    private notifyAboutUnsettingBurnRoleGlobally() {
+        Logger.info(`
 ==========
 IMPORTANT!
 ==========
@@ -240,7 +235,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
     }
 
     issueSemiFungible(args: IIssueSemiFungibleArgs): Transaction {
-        this.warnAboutUnsettingBurnRoleGloballyIfAppropriate();
+        this.notifyAboutUnsettingBurnRoleGlobally();
 
         const parts = [
             "issueSemiFungible",
@@ -268,7 +263,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
     }
 
     issueNonFungible(args: IIssueNonFungibleArgs): Transaction {
-        this.warnAboutUnsettingBurnRoleGloballyIfAppropriate();
+        this.notifyAboutUnsettingBurnRoleGlobally();
 
         const parts = [
             "issueNonFungible",
@@ -296,7 +291,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
     }
 
     registerMetaESDT(args: IRegisterMetaESDT): Transaction {
-        this.warnAboutUnsettingBurnRoleGloballyIfAppropriate();
+        this.notifyAboutUnsettingBurnRoleGlobally();
 
         const parts = [
             "registerMetaESDT",
@@ -325,7 +320,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
     }
 
     registerAndSetAllRoles(args: IRegisterAndSetAllRoles): Transaction {
-        this.warnAboutUnsettingBurnRoleGloballyIfAppropriate();
+        this.notifyAboutUnsettingBurnRoleGlobally();
 
         const parts = [
             "registerAndSetAllRoles",

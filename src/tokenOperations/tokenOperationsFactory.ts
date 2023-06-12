@@ -12,6 +12,7 @@ interface IConfig {
     minGasLimit: IGasLimit;
     gasLimitPerByte: IGasLimit;
     gasLimitIssue: IGasLimit;
+    gasLimitToggleBurnRoleGlobally: IGasLimit;
     gasLimitESDTLocalMint: IGasLimit;
     gasLimitESDTLocalBurn: IGasLimit;
     gasLimitSetSpecialRole: IGasLimit;
@@ -26,7 +27,7 @@ interface IConfig {
     issueCost: BigNumber.Value;
     esdtContractAddress: IAddress;
 
-    gasLimitToggleBurnRoleGlobally: IGasLimit;
+    shouldWarnAboutUnsettingBurnRoleGlobally: boolean;
 }
 
 interface IBaseArgs {
@@ -197,6 +198,8 @@ export class TokenOperationsFactory {
     }
 
     issueFungible(args: IIssueFungibleArgs): Transaction {
+        this.warnAboutUnsettingBurnRoleGloballyIfAppropriate();
+
         const parts = [
             "issue",
             utf8ToHex(args.tokenName),
@@ -223,7 +226,23 @@ export class TokenOperationsFactory {
         });
     }
 
+    private warnAboutUnsettingBurnRoleGloballyIfAppropriate() {
+        if (!this.config.shouldWarnAboutUnsettingBurnRoleGlobally) {
+            return;
+        }
+
+        console.warn(`
+==========
+IMPORTANT!
+==========
+You are about to issue (register) a new token. 
+By default, this will set the role "ESDTRoleBurnForAll" (globally).
+Once the token is registered, you can unset this role by calling "unsetBurnRoleGlobally" (in a separate transaction).`);
+    }
+
     issueSemiFungible(args: IIssueSemiFungibleArgs): Transaction {
+        this.warnAboutUnsettingBurnRoleGloballyIfAppropriate();
+
         const parts = [
             "issueSemiFungible",
             utf8ToHex(args.tokenName),
@@ -250,6 +269,8 @@ export class TokenOperationsFactory {
     }
 
     issueNonFungible(args: IIssueNonFungibleArgs): Transaction {
+        this.warnAboutUnsettingBurnRoleGloballyIfAppropriate();
+
         const parts = [
             "issueNonFungible",
             utf8ToHex(args.tokenName),
@@ -276,6 +297,8 @@ export class TokenOperationsFactory {
     }
 
     registerMetaESDT(args: IRegisterMetaESDT): Transaction {
+        this.warnAboutUnsettingBurnRoleGloballyIfAppropriate();
+
         const parts = [
             "registerMetaESDT",
             utf8ToHex(args.tokenName),
@@ -303,6 +326,8 @@ export class TokenOperationsFactory {
     }
 
     registerAndSetAllRoles(args: IRegisterAndSetAllRoles): Transaction {
+        this.warnAboutUnsettingBurnRoleGloballyIfAppropriate();
+
         const parts = [
             "registerAndSetAllRoles",
             utf8ToHex(args.tokenName),

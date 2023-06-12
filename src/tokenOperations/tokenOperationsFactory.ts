@@ -45,11 +45,19 @@ interface IIssueFungibleArgs extends IBaseArgs {
     canFreeze: boolean;
     canWipe: boolean;
     canPause: boolean;
-    canMint: boolean;
-    canBurn: boolean;
     canChangeOwner: boolean;
     canUpgrade: boolean;
     canAddSpecialRoles: boolean;
+
+    /**
+     * @deprecated (not used anymore)
+     */
+    canMint?: boolean;
+
+    /**
+     * @deprecated (not used anymore)
+     */
+    canBurn?: boolean;
 }
 
 interface IIssueSemiFungibleArgs extends IBaseArgs {
@@ -198,8 +206,6 @@ export class TokenOperationsFactory {
             ...(args.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
             ...(args.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
             ...(args.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
-            ...(args.canMint ? [utf8ToHex("canMint"), this.trueAsHex] : []),
-            ...(args.canBurn ? [utf8ToHex("canBurn"), this.trueAsHex] : []),
             ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
             ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
             ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),

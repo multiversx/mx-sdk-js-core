@@ -235,8 +235,7 @@ export class TokenOperationsFactory {
 ==========
 IMPORTANT!
 ==========
-You are about to issue (register) a new token. 
-By default, this will set the role "ESDTRoleBurnForAll" (globally).
+You are about to issue (register) a new token. This will set the role "ESDTRoleBurnForAll" (globally).
 Once the token is registered, you can unset this role by calling "unsetBurnRoleGlobally" (in a separate transaction).`);
     }
 

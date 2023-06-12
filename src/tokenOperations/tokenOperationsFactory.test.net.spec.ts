@@ -33,10 +33,97 @@ describe("test factory on testnet", function () {
         transferTransactionsFactory = new TransferTransactionsFactory(new GasEstimator());
     });
 
-    it.only("should issue fungible, then toggle global burn", async function () {
+    it("should register and set all roles (FNG)", async function () {
+        this.timeout(120000);
+        await frank.sync(provider);
+
+        const tx1 = factory.registerAndSetAllRoles({
+            issuer: frank.address,
+            tokenName: "TEST",
+            tokenTicker: "TEST",
+            tokenType: "FNG",
+            numDecimals: 2,
+            transactionNonce: frank.account.nonce
+        });
+
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
+        const tx1Outcome = parser.parseRegisterAndSetAllRoles(tx1OnNetwork);
+
+        assert.isTrue(tx1Outcome.tokenIdentifier.includes("TEST"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleLocalMint"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleLocalBurn"));
+    });
+
+    it("should register and set all roles (NFT)", async function () {
+        this.timeout(120000);
+        await frank.sync(provider);
+
+        const tx1 = factory.registerAndSetAllRoles({
+            issuer: frank.address,
+            tokenName: "TEST",
+            tokenTicker: "TEST",
+            tokenType: "NFT",
+            numDecimals: 0,
+            transactionNonce: frank.account.nonce
+        });
+
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
+        const tx1Outcome = parser.parseRegisterAndSetAllRoles(tx1OnNetwork);
+
+        assert.isTrue(tx1Outcome.tokenIdentifier.includes("TEST"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleNFTCreate"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleNFTBurn"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleNFTUpdateAttributes"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleNFTAddURI"));
+    });
+
+    it("should register and set all roles (SFT)", async function () {
+        this.timeout(120000);
+        await frank.sync(provider);
+
+        const tx1 = factory.registerAndSetAllRoles({
+            issuer: frank.address,
+            tokenName: "TEST",
+            tokenTicker: "TEST",
+            tokenType: "SFT",
+            numDecimals: 0,
+            transactionNonce: frank.account.nonce
+        });
+
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
+        const tx1Outcome = parser.parseRegisterAndSetAllRoles(tx1OnNetwork);
+
+        assert.isTrue(tx1Outcome.tokenIdentifier.includes("TEST"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleNFTCreate"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleNFTBurn"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleNFTAddQuantity"));
+    });
+
+    it("should register and set all roles (META)", async function () {
+        this.timeout(120000);
+        await frank.sync(provider);
+
+        const tx1 = factory.registerAndSetAllRoles({
+            issuer: frank.address,
+            tokenName: "TEST",
+            tokenTicker: "TEST",
+            tokenType: "META",
+            numDecimals: 2,
+            transactionNonce: frank.account.nonce
+        });
+
+        const tx1OnNetwork = await processTransaction(frank, tx1, "tx1");
+        const tx1Outcome = parser.parseRegisterAndSetAllRoles(tx1OnNetwork);
+
+        assert.isTrue(tx1Outcome.tokenIdentifier.includes("TEST"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleNFTCreate"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleNFTBurn"));
+        assert.isTrue(tx1Outcome.roles.includes("ESDTRoleNFTAddQuantity"));
+    });
+
+    it("should issue fungible, then toggle global burn", async function () {
         this.timeout(180000);
         await frank.sync(provider);
-        await grace.sync(provider);
 
         // Issue
         const tx1 = factory.issueFungible({

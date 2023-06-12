@@ -37,6 +37,11 @@ export interface IESDTIssueOutcome {
     tokenIdentifier: string;
 }
 
+export interface IRegisterAndSetAllRolesOutcome {
+    tokenIdentifier: string;
+    roles: string[];
+}
+
 export interface IToggleBurnRoleGloballyOutcome {
 }
 
@@ -132,6 +137,18 @@ export class TokenOperationsOutcomeParser {
         const event = this.findSingleEventByIdentifier(transaction, "registerMetaESDT");
         const tokenIdentifier = this.extractTokenIdentifier(event);
         return { tokenIdentifier: tokenIdentifier };
+    }
+
+    parseRegisterAndSetAllRoles(transaction: ITransactionOnNetwork): IRegisterAndSetAllRolesOutcome {
+        this.ensureNoError(transaction);
+
+        const eventRegister = this.findSingleEventByIdentifier(transaction, "registerAndSetAllRoles");
+        const tokenIdentifier = this.extractTokenIdentifier(eventRegister);
+
+        const eventSetRole = this.findSingleEventByIdentifier(transaction, "ESDTSetRole");
+        const roles = eventSetRole.topics.slice(3).map(topic => topic.valueOf().toString());
+
+        return { tokenIdentifier, roles };
     }
 
     parseSetBurnRoleGlobally(transaction: ITransactionOnNetwork): IToggleBurnRoleGloballyOutcome {

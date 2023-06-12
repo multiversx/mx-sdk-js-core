@@ -72,6 +72,16 @@ interface IRegisterMetaESDT extends IIssueSemiFungibleArgs {
     numDecimals: number;
 }
 
+interface IRegisterAndSetAllRoles extends IBaseArgs {
+    issuer: IAddress;
+    tokenName: string;
+    tokenTicker: string;
+    tokenType: RegisterAndSetAllRolesTokenType;
+    numDecimals: number;
+}
+
+type RegisterAndSetAllRolesTokenType = "NFT" | "SFT" | "META" | "FNG";
+
 interface IToggleBurnRoleGloballyArgs extends IBaseArgs {
     manager: IAddress;
     tokenIdentifier: string;
@@ -272,6 +282,27 @@ export class TokenOperationsFactory {
             ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
             ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
             ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
+        ];
+
+        return this.createTransaction({
+            sender: args.issuer,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.transactionNonce,
+            value: this.config.issueCost,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitIssue,
+            dataParts: parts
+        });
+    }
+
+    registerAndSetAllRoles(args: IRegisterAndSetAllRoles): Transaction {
+        const parts = [
+            "registerAndSetAllRoles",
+            utf8ToHex(args.tokenName),
+            utf8ToHex(args.tokenTicker),
+            utf8ToHex(args.tokenType),
+            bigIntToHex(args.numDecimals)
         ];
 
         return this.createTransaction({

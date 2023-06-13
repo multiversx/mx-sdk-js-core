@@ -306,7 +306,7 @@ export class Transaction {
    * This function is called internally within the signing procedure.
    */
   toPlainObject(): IPlainTransactionObject {
-    const plainObject: any = {
+    const plainObject = {
       nonce: this.nonce.valueOf(),
       value: this.value.toString(),
       receiver: this.receiver.bech32(),
@@ -317,8 +317,8 @@ export class Transaction {
       gasLimit: this.gasLimit.valueOf(),
       data: this.data.length() == 0 ? undefined : this.data.encoded(),
       chainID: this.chainID.valueOf(),
-      version: this.version.valueOf(),
-      options: this.options.valueOf() == 0 ? undefined : this.options.valueOf(),
+      version: this.getVersion().valueOf(),
+      options: this.getOptions().valueOf() == 0 ? undefined : this.getOptions().valueOf(),
       guardian: this.guardian?.bech32() ? (this.guardian.bech32() == "" ? undefined : this.guardian.bech32()) : undefined,
       signature: this.signature.toString("hex") ? this.signature.toString("hex") : undefined,
       guardianSignature: this.guardianSignature.toString("hex") ? this.guardianSignature.toString("hex") : undefined,
@@ -339,16 +339,16 @@ export class Transaction {
       nonce: Number(plainObjectTransaction.nonce),
       value: new BigNumber(plainObjectTransaction.value).toFixed(0),
       receiver: Address.fromString(plainObjectTransaction.receiver),
-      receiverUsername: plainObjectTransaction.receiverUsername == undefined ? undefined : Buffer.from(plainObjectTransaction.receiverUsername || "", "base64").toString(),
+      receiverUsername: !plainObjectTransaction.receiverUsername ? undefined : Buffer.from(plainObjectTransaction.receiverUsername || "", "base64").toString(),
       sender: Address.fromString(plainObjectTransaction.sender),
-      senderUsername: plainObjectTransaction.senderUsername == undefined ? undefined : Buffer.from(plainObjectTransaction.senderUsername || "", "base64").toString(),
-      guardian: plainObjectTransaction.guardian == undefined ? undefined : Address.fromString(plainObjectTransaction.guardian || ""),
+      senderUsername: !plainObjectTransaction.senderUsername ? undefined : Buffer.from(plainObjectTransaction.senderUsername || "", "base64").toString(),
+      guardian: !plainObjectTransaction.guardian ? undefined : Address.fromString(plainObjectTransaction.guardian || ""),
       gasPrice: Number(plainObjectTransaction.gasPrice),
       gasLimit: Number(plainObjectTransaction.gasLimit),
       data: new TransactionPayload(Buffer.from(plainObjectTransaction.data || "", "base64")),
       chainID: String(plainObjectTransaction.chainID),
       version: new TransactionVersion(plainObjectTransaction.version),
-      options: plainObjectTransaction.options == undefined ? undefined : new TransactionOptions(plainObjectTransaction.options)
+      options: plainObjectTransaction.options === undefined ? undefined : new TransactionOptions(plainObjectTransaction.options)
     });
 
     if (plainObjectTransaction.signature) {

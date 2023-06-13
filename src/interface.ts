@@ -13,6 +13,8 @@ export interface IPlainTransactionObject {
     value: string;
     receiver: string;
     sender: string;
+    receiverUsername?: string;
+    senderUsername?: string;
     guardian?: string;
     gasPrice: number;
     gasLimit: number;

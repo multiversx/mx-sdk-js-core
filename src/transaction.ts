@@ -40,6 +40,16 @@ export class Transaction {
   private readonly receiver: IAddress;
 
   /**
+   * The username of the sender.
+   */
+  private senderUsername: string;
+
+  /** 
+   * The username of the receiver.
+   */
+  private receiverUsername: string;
+
+  /**
    * The gas price to be used.
    */
   private gasPrice: IGasPrice;
@@ -97,8 +107,10 @@ export class Transaction {
   public constructor({
     nonce,
     value,
-    receiver,
     sender,
+    receiver,
+    senderUsername,
+    receiverUsername,
     gasPrice,
     gasLimit,
     data,
@@ -109,8 +121,10 @@ export class Transaction {
   }: {
     nonce?: INonce;
     value?: ITransactionValue;
-    receiver: IAddress;
     sender: IAddress;
+    receiver: IAddress;
+    senderUsername?: string;
+    receiverUsername?: string;
     gasPrice?: IGasPrice;
     gasLimit: IGasLimit;
     data?: ITransactionPayload;
@@ -123,6 +137,8 @@ export class Transaction {
     this.value = value ? new BigNumber(value.toString()).toFixed(0) : 0;
     this.sender = sender;
     this.receiver = receiver;
+    this.senderUsername = senderUsername || "";
+    this.receiverUsername = receiverUsername || "";
     this.gasPrice = gasPrice || TRANSACTION_MIN_GAS_PRICE;
     this.gasLimit = gasLimit;
     this.data = data || new TransactionPayload();
@@ -165,6 +181,22 @@ export class Transaction {
 
   getReceiver(): IAddress {
     return this.receiver;
+  }
+
+  getSenderUsername(): string {
+    return this.senderUsername;
+  }
+
+  setSenderUsername(senderUsername: string) {
+    this.senderUsername = senderUsername;
+  }
+
+  getReceiverUsername(): string {
+    return this.receiverUsername;
+  }
+
+  setReceiverUsername(receiverUsername: string) {
+    this.receiverUsername = receiverUsername;
   }
 
   getGuardian(): IAddress {
@@ -279,12 +311,14 @@ export class Transaction {
       value: this.value.toString(),
       receiver: this.receiver.bech32(),
       sender: this.sender.bech32(),
+      senderUsername: this.senderUsername ? Buffer.from(this.senderUsername).toString("base64") : undefined,
+      receiverUsername: this.receiverUsername ? Buffer.from(this.receiverUsername).toString("base64") : undefined,
       gasPrice: this.gasPrice.valueOf(),
       gasLimit: this.gasLimit.valueOf(),
       data: this.data.length() == 0 ? undefined : this.data.encoded(),
       chainID: this.chainID.valueOf(),
-      version: this.version.valueOf(),
-      options: this.options.valueOf() == 0 ? undefined : this.options.valueOf(),
+      version: this.getVersion().valueOf(),
+      options: this.getOptions().valueOf() == 0 ? undefined : this.getOptions().valueOf(),
       guardian: this.guardian?.bech32() ? (this.guardian.bech32() == "" ? undefined : this.guardian.bech32()) : undefined,
       signature: this.signature.toString("hex") ? this.signature.toString("hex") : undefined,
       guardianSignature: this.guardianSignature.toString("hex") ? this.guardianSignature.toString("hex") : undefined,
@@ -305,14 +339,16 @@ export class Transaction {
       nonce: Number(plainObjectTransaction.nonce),
       value: new BigNumber(plainObjectTransaction.value).toFixed(0),
       receiver: Address.fromString(plainObjectTransaction.receiver),
+      receiverUsername: plainObjectTransaction.receiverUsername ? Buffer.from(plainObjectTransaction.receiverUsername, "base64").toString() : undefined,
       sender: Address.fromString(plainObjectTransaction.sender),
-      guardian: plainObjectTransaction.guardian == undefined ? undefined : Address.fromString(plainObjectTransaction.guardian || ""),
+      senderUsername: plainObjectTransaction.senderUsername ? Buffer.from(plainObjectTransaction.senderUsername, "base64").toString() : undefined,
+      guardian: plainObjectTransaction.guardian ? Address.fromString(plainObjectTransaction.guardian) : undefined,
       gasPrice: Number(plainObjectTransaction.gasPrice),
       gasLimit: Number(plainObjectTransaction.gasLimit),
       data: new TransactionPayload(Buffer.from(plainObjectTransaction.data || "", "base64")),
       chainID: String(plainObjectTransaction.chainID),
       version: new TransactionVersion(plainObjectTransaction.version),
-      options: plainObjectTransaction.options == undefined ? undefined : new TransactionOptions(plainObjectTransaction.options)
+      options: plainObjectTransaction.options != null ? new TransactionOptions(plainObjectTransaction.options) : undefined
     });
 
     if (plainObjectTransaction.signature) {

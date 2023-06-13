@@ -339,16 +339,16 @@ export class Transaction {
       nonce: Number(plainObjectTransaction.nonce),
       value: new BigNumber(plainObjectTransaction.value).toFixed(0),
       receiver: Address.fromString(plainObjectTransaction.receiver),
-      receiverUsername: !plainObjectTransaction.receiverUsername ? undefined : Buffer.from(plainObjectTransaction.receiverUsername || "", "base64").toString(),
+      receiverUsername: plainObjectTransaction.receiverUsername ? Buffer.from(plainObjectTransaction.receiverUsername || "", "base64").toString() : undefined,
       sender: Address.fromString(plainObjectTransaction.sender),
-      senderUsername: !plainObjectTransaction.senderUsername ? undefined : Buffer.from(plainObjectTransaction.senderUsername || "", "base64").toString(),
-      guardian: !plainObjectTransaction.guardian ? undefined : Address.fromString(plainObjectTransaction.guardian || ""),
+      senderUsername: plainObjectTransaction.senderUsername ? Buffer.from(plainObjectTransaction.senderUsername || "", "base64").toString() : undefined,
+      guardian: plainObjectTransaction.guardian ? Address.fromString(plainObjectTransaction.guardian || "") : undefined,
       gasPrice: Number(plainObjectTransaction.gasPrice),
       gasLimit: Number(plainObjectTransaction.gasLimit),
       data: new TransactionPayload(Buffer.from(plainObjectTransaction.data || "", "base64")),
       chainID: String(plainObjectTransaction.chainID),
       version: new TransactionVersion(plainObjectTransaction.version),
-      options: plainObjectTransaction.options === undefined ? undefined : new TransactionOptions(plainObjectTransaction.options)
+      options: plainObjectTransaction.options !== undefined ? new TransactionOptions(plainObjectTransaction.options) : undefined
     });
 
     if (plainObjectTransaction.signature) {

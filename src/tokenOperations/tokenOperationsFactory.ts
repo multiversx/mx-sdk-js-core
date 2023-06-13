@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
 import { ARGUMENTS_SEPARATOR, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "../constants";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITransactionValue } from "../interface";
+import { Logger } from "../logger";
 import { TransactionOptions, TransactionVersion } from "../networkParams";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
@@ -12,6 +13,7 @@ interface IConfig {
     minGasLimit: IGasLimit;
     gasLimitPerByte: IGasLimit;
     gasLimitIssue: IGasLimit;
+    gasLimitToggleBurnRoleGlobally: IGasLimit;
     gasLimitESDTLocalMint: IGasLimit;
     gasLimitESDTLocalBurn: IGasLimit;
     gasLimitSetSpecialRole: IGasLimit;
@@ -43,11 +45,19 @@ interface IIssueFungibleArgs extends IBaseArgs {
     canFreeze: boolean;
     canWipe: boolean;
     canPause: boolean;
-    canMint: boolean;
-    canBurn: boolean;
     canChangeOwner: boolean;
     canUpgrade: boolean;
     canAddSpecialRoles: boolean;
+
+    /**
+     * @deprecated (not used anymore)
+     */
+    canMint?: boolean;
+
+    /**
+     * @deprecated (not used anymore)
+     */
+    canBurn?: boolean;
 }
 
 interface IIssueSemiFungibleArgs extends IBaseArgs {
@@ -68,6 +78,21 @@ interface IIssueNonFungibleArgs extends IIssueSemiFungibleArgs {
 
 interface IRegisterMetaESDT extends IIssueSemiFungibleArgs {
     numDecimals: number;
+}
+
+interface IRegisterAndSetAllRoles extends IBaseArgs {
+    issuer: IAddress;
+    tokenName: string;
+    tokenTicker: string;
+    tokenType: RegisterAndSetAllRolesTokenType;
+    numDecimals: number;
+}
+
+type RegisterAndSetAllRolesTokenType = "NFT" | "SFT" | "META" | "FNG";
+
+interface IToggleBurnRoleGloballyArgs extends IBaseArgs {
+    manager: IAddress;
+    tokenIdentifier: string;
 }
 
 interface IFungibleSetSpecialRoleArgs extends IBaseArgs {
@@ -172,6 +197,8 @@ export class TokenOperationsFactory {
     }
 
     issueFungible(args: IIssueFungibleArgs): Transaction {
+        this.notifyAboutUnsettingBurnRoleGlobally();
+
         const parts = [
             "issue",
             utf8ToHex(args.tokenName),
@@ -181,8 +208,6 @@ export class TokenOperationsFactory {
             ...(args.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
             ...(args.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
             ...(args.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
-            ...(args.canMint ? [utf8ToHex("canMint"), this.trueAsHex] : []),
-            ...(args.canBurn ? [utf8ToHex("canBurn"), this.trueAsHex] : []),
             ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
             ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
             ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
@@ -200,7 +225,18 @@ export class TokenOperationsFactory {
         });
     }
 
+    private notifyAboutUnsettingBurnRoleGlobally() {
+        Logger.info(`
+==========
+IMPORTANT!
+==========
+You are about to issue (register) a new token. This will set the role "ESDTRoleBurnForAll" (globally).
+Once the token is registered, you can unset this role by calling "unsetBurnRoleGlobally" (in a separate transaction).`);
+    }
+
     issueSemiFungible(args: IIssueSemiFungibleArgs): Transaction {
+        this.notifyAboutUnsettingBurnRoleGlobally();
+
         const parts = [
             "issueSemiFungible",
             utf8ToHex(args.tokenName),
@@ -227,6 +263,8 @@ export class TokenOperationsFactory {
     }
 
     issueNonFungible(args: IIssueNonFungibleArgs): Transaction {
+        this.notifyAboutUnsettingBurnRoleGlobally();
+
         const parts = [
             "issueNonFungible",
             utf8ToHex(args.tokenName),
@@ -253,6 +291,8 @@ export class TokenOperationsFactory {
     }
 
     registerMetaESDT(args: IRegisterMetaESDT): Transaction {
+        this.notifyAboutUnsettingBurnRoleGlobally();
+
         const parts = [
             "registerMetaESDT",
             utf8ToHex(args.tokenName),
@@ -275,6 +315,63 @@ export class TokenOperationsFactory {
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitIssue,
+            dataParts: parts
+        });
+    }
+
+    registerAndSetAllRoles(args: IRegisterAndSetAllRoles): Transaction {
+        this.notifyAboutUnsettingBurnRoleGlobally();
+
+        const parts = [
+            "registerAndSetAllRoles",
+            utf8ToHex(args.tokenName),
+            utf8ToHex(args.tokenTicker),
+            utf8ToHex(args.tokenType),
+            bigIntToHex(args.numDecimals)
+        ];
+
+        return this.createTransaction({
+            sender: args.issuer,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.transactionNonce,
+            value: this.config.issueCost,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitIssue,
+            dataParts: parts
+        });
+    }
+
+    setBurnRoleGlobally(args: IToggleBurnRoleGloballyArgs): Transaction {
+        const parts = [
+            "setBurnRoleGlobally",
+            utf8ToHex(args.tokenIdentifier)
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.transactionNonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitToggleBurnRoleGlobally,
+            dataParts: parts
+        });
+    }
+
+    unsetBurnRoleGlobally(args: IToggleBurnRoleGloballyArgs): Transaction {
+        const parts = [
+            "unsetBurnRoleGlobally",
+            utf8ToHex(args.tokenIdentifier)
+        ];
+
+        return this.createTransaction({
+            sender: args.manager,
+            receiver: this.config.esdtContractAddress,
+            nonce: args.transactionNonce,
+            gasPrice: args.gasPrice,
+            gasLimitHint: args.gasLimit,
+            executionGasLimit: this.config.gasLimitToggleBurnRoleGlobally,
             dataParts: parts
         });
     }

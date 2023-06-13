@@ -8,6 +8,7 @@ export class TokenOperationsFactoryConfig {
     minGasLimit = 50000;
     gasLimitPerByte = 1500;
     gasLimitIssue: IGasLimit = 60000000;
+    gasLimitToggleBurnRoleGlobally: IGasLimit = 60000000;
     gasLimitESDTLocalMint: IGasLimit = 300000;
     gasLimitESDTLocalBurn: IGasLimit = 300000;
     gasLimitSetSpecialRole: IGasLimit = 60000000;

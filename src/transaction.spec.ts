@@ -1,7 +1,8 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
+import { Address } from "./address";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
-import { loadTestWallets, TestWallet } from "./testutils";
+import { TestWallet, loadTestWallets } from "./testutils";
 import { TokenTransfer } from "./tokenTransfer";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
@@ -157,6 +158,23 @@ describe("test transaction construction", async () => {
         assert.isFalse(result.toString().includes("options"));
     });
 
+    it("with usernames", async () => {
+        const transaction = new Transaction({
+            nonce: 204,
+            value: "1000000000000000000",
+            sender: Address.fromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
+            receiver: Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            senderUsername: "carol",
+            receiverUsername: "alice",
+            gasLimit: 50000,
+            chainID: "T"
+        });
+
+        await wallets.carol.signer.sign(transaction);
+        assert.equal(transaction.getSignature().toString("hex"), "5966dd6b98fc5ecbcd203fa38fac7059ba5c17683099071883b0ad6697386769321d851388a99cb8b81aab625aa2d7e13621432dbd8ab334c5891cd7c7755200");
+        assert.equal(transaction.getHash().toString(), "5728fadbc6c1024c4a0d5552eca44e80c182dc9077e58e31d599cf9496c96d1e");
+    });
+
     it("computes correct fee", () => {
         let transaction = new Transaction({
             nonce: 92,
@@ -209,6 +227,8 @@ describe("test transaction construction", async () => {
             value: "123456789000000000000000000000",
             sender: sender,
             receiver: wallets.bob.address,
+            senderUsername: "alice",
+            receiverUsername: "bob",
             gasPrice: minGasPrice,
             gasLimit: 80000,
             data: new TransactionPayload("hello"),

@@ -12,6 +12,22 @@ describe("test factory", () => {
         factory = new TokenOperationsFactory(new TokenOperationsFactoryConfig("T"));
     });
 
+    it("should create <registerAndSetAllRoles>", () => {
+        const transaction = factory.registerAndSetAllRoles({
+            issuer: frank.address,
+            tokenName: "TEST",
+            tokenTicker: "TEST",
+            tokenType: "FNG",
+            numDecimals: 2,
+            transactionNonce: 42
+        });
+
+        assert.equal(transaction.getData().toString(), "registerAndSetAllRoles@54455354@54455354@464e47@02")
+        assert.equal(transaction.getNonce(), 42);
+        assert.equal(transaction.getSender().toString(), frank.address.toString());
+        assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
+    });
+
     it("should create <issueFungible>", () => {
         const transaction = factory.issueFungible({
             issuer: frank.address,
@@ -22,15 +38,13 @@ describe("test factory", () => {
             canFreeze: true,
             canWipe: true,
             canPause: true,
-            canMint: true,
-            canBurn: true,
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true,
             transactionNonce: 42
         });
 
-        assert.equal(transaction.getData().toString(), "issue@4652414e4b@4652414e4b@64@@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e4d696e74@74727565@63616e4275726e@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565")
+        assert.equal(transaction.getData().toString(), "issue@4652414e4b@4652414e4b@64@@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565")
         assert.equal(transaction.getNonce(), 42);
         assert.equal(transaction.getSender().toString(), frank.address.toString());
         assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");

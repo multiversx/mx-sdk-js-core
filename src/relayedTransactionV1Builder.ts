@@ -141,6 +141,8 @@ export class RelayedTransactionV1Builder {
             "options": this.innerTransaction.getOptions().valueOf() == 0 ? undefined : this.innerTransaction.getOptions().valueOf(),
             "guardian": this.innerTransaction.getGuardian().bech32() ? new Address(this.innerTransaction.getGuardian().bech32()).pubkey().toString("base64") : undefined,
             "guardianSignature": this.innerTransaction.getGuardianSignature().toString("hex") ? this.innerTransaction.getGuardianSignature().toString("base64") : undefined,
+            "sndUserName": this.innerTransaction.getSenderUsername() ? Buffer.from(this.innerTransaction.getSenderUsername()).toString("base64") : undefined,
+            "rcvUserName": this.innerTransaction.getReceiverUsername() ? Buffer.from(this.innerTransaction.getReceiverUsername()).toString("base64") : undefined,
         };
 
         return JSON.stringify(txObject);

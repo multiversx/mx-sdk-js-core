@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
 import { NativeSerializer } from "./nativeSerializer";
-import { AbiRegistry, AddressType, AddressValue, BigUIntType, BooleanType, BooleanValue, CompositeType, CompositeValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, ListType, NullType, OptionalType, OptionalValue, OptionType, OptionValue, TupleType, U32Type, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
+import { AbiRegistry, AddressType, AddressValue, BigUIntType, BooleanType, BooleanValue, CompositeType, CompositeValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, EnumType, ListType, NullType, OptionalType, OptionalValue, OptionType, OptionValue, TupleType, U32Type, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
 
 describe("test native serializer", () => {
@@ -247,5 +247,83 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[1].valueOf(), { field0: new BigNumber(43), field1: false });
         assert.deepEqual(typedValues[2].getType(), new ListType(new TupleType(new U8Type(), new BooleanType())));
         assert.deepEqual(typedValues[2].valueOf(), [{ field0: new BigNumber(44), field1: false }, { field0: new BigNumber(45), field1: true }]);
+    });
+
+    it("should perform type inference (enums)", async () => {
+        const abiRegistry = AbiRegistry.create({
+            "endpoints": [
+                {
+                    "name": "foo",
+                    "inputs": [{
+                        "type": "MyEnum",
+                    }, {
+                        "type": "MyEnum",
+                    }, {
+                        "type": "MyEnum",
+                    }, {
+                        "type": "MyEnum",
+                    }],
+                    "outputs": []
+                }
+            ],
+            "types": {
+                "MyEnum": {
+                    "type": "enum",
+                    "variants": [
+                        {
+                            "name": "Nothing",
+                            "discriminant": 0
+                        },
+                        {
+                            "name": "Something",
+                            "discriminant": 1,
+                            "fields": [
+                                {
+                                    "name": "0",
+                                    "type": "Address"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Else",
+                            "discriminant": 2,
+                            "fields": [
+                                {
+                                    "name": "x",
+                                    "type": "u64"
+                                },
+                                {
+                                    "name": "y",
+                                    "type": "u64"
+                                }
+                            ]
+                        }
+                    ]
+                },
+            }
+        });
+
+        const endpoint = abiRegistry.getEndpoint("foo");
+        const enumType = abiRegistry.getEnum("MyEnum");
+
+        // Simple enum by discriminant
+        const p0 = 0;
+        // Simple enum by name
+        const p1 = 'Nothing';
+        // Enum with a single field
+        const p2 = { name: 'Something', fields: { 0: 'erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha' } };
+        // Enum with multiple fields
+        const p3 = { name: 'Else', fields: { x: 42, y: 43 } };
+
+        const typedValues = NativeSerializer.nativeToTypedValues([p0, p1, p2, p3], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), enumType);
+        assert.deepEqual(typedValues[0].valueOf(), { name: "Nothing", fields: [] });
+        assert.deepEqual(typedValues[1].getType(), enumType);
+        assert.deepEqual(typedValues[1].valueOf(), { name: "Nothing", fields: [] });
+        assert.deepEqual(typedValues[2].getType(), enumType);
+        assert.deepEqual(typedValues[2].valueOf(), { name: 'Something', fields: [ new Address('erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha') ] });
+        assert.deepEqual(typedValues[3].getType(), enumType);
+        assert.deepEqual(typedValues[3].valueOf(), { name: 'Else', fields: [ new BigNumber(42), new BigNumber(43) ] });
     });
 });

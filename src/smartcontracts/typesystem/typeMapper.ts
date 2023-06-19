@@ -63,10 +63,14 @@ export class TypeMapper {
             ["tuple8", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
             // Known-length arrays.
             // TODO: Handle these in typeExpressionParser!
+            ["array8", (...typeParameters: Type[]) => new ArrayVecType(8, typeParameters[0])],
+            ["array16", (...typeParameters: Type[]) => new ArrayVecType(16, typeParameters[0])],
             ["array20", (...typeParameters: Type[]) => new ArrayVecType(20, typeParameters[0])],
             ["array32", (...typeParameters: Type[]) => new ArrayVecType(32, typeParameters[0])],
             ["array46", (...typeParameters: Type[]) => new ArrayVecType(46, typeParameters[0])],
             ["array64", (...typeParameters: Type[]) => new ArrayVecType(64, typeParameters[0])],
+            ["array128", (...typeParameters: Type[]) => new ArrayVecType(128, typeParameters[0])],
+            ["array256", (...typeParameters: Type[]) => new ArrayVecType(256, typeParameters[0])],
         ]);
 
         // For closed types, we hold actual type instances instead of type constructors / factories (no type parameters needed).

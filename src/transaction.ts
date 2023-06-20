@@ -371,9 +371,9 @@ export class Transaction {
    *
    * @param signature The signature, as computed by a signer.
    */
-  applySignature(signature: ISignature | Buffer) {
-    if (signature instanceof Buffer) {
-      this.signature = signature;
+  applySignature(signature: ISignature | Uint8Array) {
+    if (ArrayBuffer.isView(signature)) {
+      this.signature = Buffer.from(signature);
     } else {
       this.signature = Buffer.from(signature.hex(), "hex");
     }
@@ -386,9 +386,9 @@ export class Transaction {
  *
  * @param guardianSignature The signature, as computed by a signer.
  */
-  applyGuardianSignature(guardianSignature: ISignature | Buffer) {
-    if (guardianSignature instanceof Buffer) {
-      this.guardianSignature = guardianSignature;
+  applyGuardianSignature(guardianSignature: ISignature | Uint8Array) {
+    if (ArrayBuffer.isView(guardianSignature)) {
+      this.guardianSignature = Buffer.from(guardianSignature);
     } else {
       this.guardianSignature = Buffer.from(guardianSignature.hex(), "hex");
     }

@@ -265,7 +265,7 @@ export namespace NativeSerializer {
     }
 
     // TODO: move logic to typesystem/numerical.ts
-    function convertNumericalType(number: BigNumber, type: Type, errorContext: ArgumentErrorContext): TypedValue {
+    function convertNumericalType(number: BigNumber.Value, type: Type, errorContext: ArgumentErrorContext): TypedValue {
         switch (type.constructor) {
             case U8Type:
                 return new U8Value(number);

@@ -1,4 +1,4 @@
-import { AccountOnNetwork, ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "@multiversx/sdk-network-providers";
+import { ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "@multiversx/sdk-network-providers";
 import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
 import * as errors from "../errors";
@@ -26,15 +26,15 @@ export class MockProvider {
 
         this.accounts.set(
             MockProvider.AddressOfAlice.bech32(),
-            new AccountOnNetwork({ nonce: 0, balance: createAccountBalance(1000) })
+            { nonce: 0, balance: createAccountBalance(1000) }
         );
         this.accounts.set(
             MockProvider.AddressOfBob.bech32(),
-            new AccountOnNetwork({ nonce: 5, balance: createAccountBalance(500) })
+            { nonce: 5, balance: createAccountBalance(500) }
         );
         this.accounts.set(
             MockProvider.AddressOfCarol.bech32(),
-            new AccountOnNetwork({ nonce: 42, balance: createAccountBalance(300) })
+            { nonce: 42, balance: createAccountBalance(300) }
         );
     }
 

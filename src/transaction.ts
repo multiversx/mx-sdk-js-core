@@ -372,11 +372,11 @@ export class Transaction {
    * @param signature The signature, as computed by a signer.
    */
   applySignature(signature: ISignature | Uint8Array) {
-    this.signature = this.convertSignatureToBuffer(signature);
+    this.signature = this.interpretSignatureAsBuffer(signature);
     this.hash = TransactionHash.compute(this);
   }
 
-  private convertSignatureToBuffer(signature: ISignature | Uint8Array): Buffer {
+  private interpretSignatureAsBuffer(signature: ISignature | Uint8Array): Buffer {
     if (ArrayBuffer.isView(signature)) {
       return Buffer.from(signature);
     } else if ((<any>signature).hex != null) {
@@ -392,7 +392,7 @@ export class Transaction {
    * @param guardianSignature The signature, as computed by a signer.
    */
   applyGuardianSignature(guardianSignature: ISignature | Uint8Array) {
-    this.guardianSignature = this.convertSignatureToBuffer(guardianSignature);
+    this.guardianSignature = this.interpretSignatureAsBuffer(guardianSignature);
     this.hash = TransactionHash.compute(this);
   }
 

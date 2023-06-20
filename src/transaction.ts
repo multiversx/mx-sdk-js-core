@@ -372,27 +372,27 @@ export class Transaction {
    * @param signature The signature, as computed by a signer.
    */
   applySignature(signature: ISignature | Uint8Array) {
-    if (ArrayBuffer.isView(signature)) {
-      this.signature = Buffer.from(signature);
-    } else {
-      this.signature = Buffer.from(signature.hex(), "hex");
-    }
-
+    this.signature = this.convertSignatureToBuffer(signature);
     this.hash = TransactionHash.compute(this);
   }
 
-  /**
- * Applies the guardian signature on the transaction.
- *
- * @param guardianSignature The signature, as computed by a signer.
- */
-  applyGuardianSignature(guardianSignature: ISignature | Uint8Array) {
-    if (ArrayBuffer.isView(guardianSignature)) {
-      this.guardianSignature = Buffer.from(guardianSignature);
-    } else {
-      this.guardianSignature = Buffer.from(guardianSignature.hex(), "hex");
+  private convertSignatureToBuffer(signature: ISignature | Uint8Array): Buffer {
+    if (ArrayBuffer.isView(signature)) {
+      return Buffer.from(signature);
+    } else if ((<any>signature).hex != null) {
+      return Buffer.from(signature.hex(), "hex");
     }
 
+    throw new Error(`Object cannot be interpreted as a signature: ${signature}`);
+  }
+
+  /**
+   * Applies the guardian signature on the transaction.
+   *
+   * @param guardianSignature The signature, as computed by a signer.
+   */
+  applyGuardianSignature(guardianSignature: ISignature | Uint8Array) {
+    this.guardianSignature = this.convertSignatureToBuffer(guardianSignature);
     this.hash = TransactionHash.compute(this);
   }
 

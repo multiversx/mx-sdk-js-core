@@ -193,6 +193,26 @@ describe("test network providers on devnet: Proxy and API", function () {
         proxyResponse.hyperblockHash = "";
     }
 
+    it.only("should have the same response for transactions with events", async function () {
+        const hash = "c451566a6168e38d2980fcb83d4ea154f78d53f7abf3264dd51c2c7c585671aa";
+
+        let apiResponse = await apiProvider.getTransaction(hash);
+        let proxyResponse = await proxyProvider.getTransaction(hash);
+
+        assert.exists(apiResponse.logs);
+        assert.exists(proxyResponse.logs);
+        assert.exists(apiResponse.logs.events)
+        assert.exists(proxyResponse.logs.events)
+        assert.equal(apiResponse.logs.events[0].topics[0].hex(), "5745474c442d643763366262")
+        assert.equal(apiResponse.logs.events[0].topics[1].hex(), "")
+        assert.equal(apiResponse.logs.events[0].topics[2].hex(), "0de0b6b3a7640000")
+        assert.equal(apiResponse.logs.events[0].topics[3].hex(), "00000000000000000500e01285f90311fb5925a9623a1dc62eee41fa8c869a0d")
+        assert.equal(proxyResponse.logs.events[0].topics[0].hex(), "5745474c442d643763366262")
+        assert.equal(proxyResponse.logs.events[0].topics[1].hex(), "")
+        assert.equal(proxyResponse.logs.events[0].topics[2].hex(), "0de0b6b3a7640000")
+        assert.equal(proxyResponse.logs.events[0].topics[3].hex(), "00000000000000000500e01285f90311fb5925a9623a1dc62eee41fa8c869a0d")
+    });
+
     // TODO: Fix differences of "tx.status", then enable this test.
     it.skip("should have same response for getTransactionStatus()", async function () {
         this.timeout(20000);

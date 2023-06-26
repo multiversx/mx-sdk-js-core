@@ -249,7 +249,7 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[2].valueOf(), [{ field0: new BigNumber(44), field1: false }, { field0: new BigNumber(45), field1: true }]);
     });
 
-    it('should accept an empty value for variadic types', async () => {
+    it('should accept no value for variadic types', async () => {
         const endpoint = AbiRegistry.create({
           endpoints: [
             {
@@ -261,6 +261,7 @@ describe("test native serializer", () => {
                 {
                   name: 'features',
                   type: 'variadic<bytes>',
+                  multi_arg: true,
                 },
               ],
               outputs: [],
@@ -270,7 +271,7 @@ describe("test native serializer", () => {
 
         // Using both native JavaScript objects and typed values
         const typedValues = NativeSerializer.nativeToTypedValues(
-          [42, ...[]],
+          [42],
           endpoint
         );
 

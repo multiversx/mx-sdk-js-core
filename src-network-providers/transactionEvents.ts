@@ -5,7 +5,7 @@ export class TransactionEvent {
     address: IAddress = new Address("");
     identifier: string = "";
     topics: TransactionEventTopic[] = [];
-    data_payload: TransactionEventData = new TransactionEventData(Buffer.from("", "utf8"));
+    dataPayload: TransactionEventData = new TransactionEventData(Buffer.from("", "utf8"));
     data: string = "";
 
     constructor(init?: Partial<TransactionEvent>) {
@@ -24,7 +24,7 @@ export class TransactionEvent {
         result.topics = (responsePart.topics || []).map(topic => new TransactionEventTopic(topic));
 
         const raw_data = Buffer.from(responsePart.data || "", "base64")
-        result.data_payload = new TransactionEventData(raw_data);
+        result.dataPayload = new TransactionEventData(raw_data);
         result.data = raw_data.toString();
 
         return result;

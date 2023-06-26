@@ -5,6 +5,7 @@ export class TransactionEvent {
     address: IAddress = new Address("");
     identifier: string = "";
     topics: TransactionEventTopic[] = [];
+    dataPayload: TransactionEventData = new TransactionEventData(Buffer.from("", "utf8"));
     data: string = "";
 
     constructor(init?: Partial<TransactionEvent>) {
@@ -21,8 +22,11 @@ export class TransactionEvent {
         result.address = new Address(responsePart.address);
         result.identifier = responsePart.identifier || "";
         result.topics = (responsePart.topics || []).map(topic => new TransactionEventTopic(topic));
-        result.data = Buffer.from(responsePart.data || "", "base64").toString();
-        
+
+        const rawData = Buffer.from(responsePart.data || "", "base64")
+        result.dataPayload = new TransactionEventData(rawData);
+        result.data = rawData.toString();
+
         return result;
     }
 
@@ -32,6 +36,26 @@ export class TransactionEvent {
 
     getLastTopic(): TransactionEventTopic {
         return this.topics[this.topics.length - 1];
+    }
+}
+
+export class TransactionEventData {
+    private readonly raw: Buffer;
+
+    constructor(data: Buffer) {
+        this.raw = data;
+    }
+
+    toString(): string {
+        return this.raw.toString("utf8");
+    }
+
+    hex(): string {
+        return this.raw.toString("hex");
+    }
+
+    valueOf(): Buffer {
+        return this.raw;
     }
 }
 

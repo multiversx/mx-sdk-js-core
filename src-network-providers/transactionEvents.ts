@@ -23,9 +23,9 @@ export class TransactionEvent {
         result.identifier = responsePart.identifier || "";
         result.topics = (responsePart.topics || []).map(topic => new TransactionEventTopic(topic));
 
-        const raw_data = Buffer.from(responsePart.data || "", "base64")
-        result.dataPayload = new TransactionEventData(raw_data);
-        result.data = raw_data.toString();
+        const rawData = Buffer.from(responsePart.data || "", "base64")
+        result.dataPayload = new TransactionEventData(rawData);
+        result.data = rawData.toString();
 
         return result;
     }

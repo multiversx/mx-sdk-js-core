@@ -248,4 +248,36 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[2].getType(), new ListType(new TupleType(new U8Type(), new BooleanType())));
         assert.deepEqual(typedValues[2].valueOf(), [{ field0: new BigNumber(44), field1: false }, { field0: new BigNumber(45), field1: true }]);
     });
+
+    it('should accept no value for variadic types', async () => {
+        const endpoint = AbiRegistry.create({
+          endpoints: [
+            {
+              name: 'foo',
+              inputs: [
+                {
+                  type: 'u64',
+                },
+                {
+                  name: 'features',
+                  type: 'variadic<bytes>',
+                  multi_arg: true,
+                },
+              ],
+              outputs: [],
+            },
+          ],
+        }).getEndpoint('foo');
+
+        // Using both native JavaScript objects and typed values
+        const typedValues = NativeSerializer.nativeToTypedValues(
+          [42],
+          endpoint
+        );
+
+        assert.deepEqual(typedValues[0].getType(), new U64Type());
+        assert.deepEqual(typedValues[0].valueOf(), new BigNumber(42));
+        assert.deepEqual(typedValues[1].getType(), new VariadicType(new BytesType()));
+        assert.deepEqual(typedValues[1].valueOf(), []);
+      });
 });

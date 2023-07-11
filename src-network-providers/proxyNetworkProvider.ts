@@ -99,10 +99,10 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokenData;
     }
 
-    async getTransaction(txHash: string, with_process_status?: boolean): Promise<TransactionOnNetwork> {
+    async getTransaction(txHash: string, withProcessStatus?: boolean): Promise<TransactionOnNetwork> {
         let processStatusPromise: Promise<TransactionStatus> | undefined;
 
-        if (with_process_status === true) {
+        if (withProcessStatus === true) {
             processStatusPromise = this.getTransactionStatus(txHash);
         }
 

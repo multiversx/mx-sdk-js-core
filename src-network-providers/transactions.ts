@@ -34,12 +34,12 @@ export class TransactionOnNetwork {
         Object.assign(this, init);
     }
 
-    static fromProxyHttpResponse(txHash: string, response: any, process_status?: TransactionStatus | undefined): TransactionOnNetwork {
+    static fromProxyHttpResponse(txHash: string, response: any, processStatus?: TransactionStatus | undefined): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromProxyHttpResponse(response.smartContractResults || []);
 
-        if (process_status !== undefined) {
-            result.status = process_status;
+        if (processStatus !== undefined) {
+            result.status = processStatus;
 
             if (result.status.isSuccessful() || result.status.isFailed()) {
                 result.isCompleted = true;

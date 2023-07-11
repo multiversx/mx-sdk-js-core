@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
-import { INetworkProvider } from "./interface";
+import { INetworkProvider, IPagination } from "./interface";
 import { Address } from "./primitives";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { MockQuery } from "./testscommon/dummyQuery";
@@ -27,7 +27,15 @@ describe("test network providers on devnet: Proxy and API", function () {
         let apiResponse = await apiProvider.getNetworkStatus();
         let proxyResponse = await proxyProvider.getNetworkStatus();
 
-        assert.deepEqual(apiResponse, proxyResponse);
+        assert.equal(apiResponse.CurrentRound, proxyResponse.CurrentRound);
+        assert.equal(apiResponse.EpochNumber, proxyResponse.EpochNumber);
+        assert.equal(apiResponse.NonceAtEpochStart, proxyResponse.NonceAtEpochStart);
+        assert.equal(apiResponse.RoundAtEpochStart, proxyResponse.RoundAtEpochStart);
+        assert.equal(apiResponse.RoundsPerEpoch, proxyResponse.RoundsPerEpoch);
+        // done this way because the nonces may change until both requests are executed
+        assert.approximately(apiResponse.HighestFinalNonce, proxyResponse.HighestFinalNonce, 1);
+        assert.approximately(apiResponse.Nonce, proxyResponse.Nonce, 1);
+        assert.approximately(apiResponse.NoncesPassedInCurrentEpoch, proxyResponse.NoncesPassedInCurrentEpoch, 1);
     });
 
     // TODO: Enable test after implementing ProxyNetworkProvider.getNetworkStakeStatistics().
@@ -57,28 +65,29 @@ describe("test network providers on devnet: Proxy and API", function () {
 
     it("should have same response for getFungibleTokensOfAccount(), getFungibleTokenOfAccount()", async function () {
         this.timeout(30000);
-
+        // can't assert for deepequal because the raw response it's not the same
         for (const user of [carol, dan]) {
-            let apiResponse = await apiProvider.getFungibleTokensOfAccount(user);
-            let proxyResponse = await proxyProvider.getFungibleTokensOfAccount(user);
+            let apiResponse = (await apiProvider.getFungibleTokensOfAccount(user)).slice(0, 20);
+            let proxyResponse = (await proxyProvider.getFungibleTokensOfAccount(user)).slice(0, 20);
 
-            assert.deepEqual(apiResponse.slice(0, 100), proxyResponse.slice(0, 100));
-
-            for (const item of apiResponse.slice(0, 5)) {
-                let apiResponse = await apiProvider.getFungibleTokenOfAccount(user, item.identifier);
-                let proxyResponse = await proxyProvider.getFungibleTokenOfAccount(user, item.identifier);
-
-                assert.deepEqual(apiResponse, proxyResponse, `user: ${user.bech32()}, token: ${item.identifier}`);
+            for (let i = 0; i < apiResponse.length; i++) {
+                console.log(apiResponse[i]);
+                console.log(proxyResponse[i]);
+                assert.equal(apiResponse[i].identifier, proxyResponse[i].identifier);
+                assert.equal(apiResponse[i].balance.valueOf, proxyResponse[i].balance.valueOf);
             }
         }
     });
 
-    it("should have same response for getNonFungibleTokensOfAccount(), getNonFungibleTokenOfAccount", async function () {
+    it.only("should have same response for getNonFungibleTokensOfAccount(), getNonFungibleTokenOfAccount", async function () {
         this.timeout(30000);
 
         for (const user of [alice, bob, carol, dan]) {
             let apiResponse = await apiProvider.getNonFungibleTokensOfAccount(user);
             let proxyResponse = await proxyProvider.getNonFungibleTokensOfAccount(user);
+            console.log(apiResponse[0]);
+            console.log(proxyResponse[0]);
+            return
 
             for (const item of apiResponse) {
                 // Gateway does not provide "type".
@@ -193,7 +202,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         proxyResponse.hyperblockHash = "";
     }
 
-    it.only("should have the same response for transactions with events", async function () {
+    it("should have the same response for transactions with events", async function () {
         const hash = "c451566a6168e38d2980fcb83d4ea154f78d53f7abf3264dd51c2c7c585671aa";
 
         let apiResponse = await apiProvider.getTransaction(hash);

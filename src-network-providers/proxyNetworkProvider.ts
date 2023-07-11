@@ -99,15 +99,29 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokenData;
     }
 
-    async getTransaction(txHash: string): Promise<TransactionOnNetwork> {
+    async getTransaction(txHash: string, with_process_status?: boolean): Promise<TransactionOnNetwork> {
+        let processStatusPromise: Promise<TransactionStatus> | undefined;
+
+        if (with_process_status === true) {
+            processStatusPromise = this.getTransactionStatus(txHash);
+        }
+
         let url = this.buildUrlWithQueryParameters(`transaction/${txHash}`, { withResults: "true" });
         let response = await this.doGetGeneric(url);
-        let transaction = TransactionOnNetwork.fromProxyHttpResponse(txHash, response.transaction);
+
+        let transaction: TransactionOnNetwork;
+        if (processStatusPromise !== undefined) {
+            const processStatus = await processStatusPromise;
+            transaction = TransactionOnNetwork.fromProxyHttpResponse(txHash, response.transaction, processStatus);
+        }
+        else {
+            transaction = TransactionOnNetwork.fromProxyHttpResponse(txHash, response.transaction);
+        }
         return transaction;
     }
 
     async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
-        let response = await this.doGetGeneric(`transaction/${txHash}/status`);
+        let response = await this.doGetGeneric(`transaction/${txHash}/process-status`);
         let status = new TransactionStatus(response.status);
         return status;
     }

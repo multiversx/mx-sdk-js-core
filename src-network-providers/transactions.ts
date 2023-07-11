@@ -2,12 +2,11 @@ import { TransactionStatus } from "./transactionStatus";
 import { ContractResults } from "./contractResults";
 import { Address } from "./primitives";
 import { IAddress } from "./interface";
-import { TransactionCompletionStrategyOnAPI, TransactionCompletionStrategyOnProxy } from "./transactionCompletionStrategy";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
 
 export class TransactionOnNetwork {
-    isCompleted: boolean = false;
+    isCompleted?: boolean;
     hash: string = "";
     type: string = "";
     nonce: number = 0;
@@ -35,19 +34,28 @@ export class TransactionOnNetwork {
         Object.assign(this, init);
     }
 
-    static fromProxyHttpResponse(txHash: string, response: any): TransactionOnNetwork {
+    static fromProxyHttpResponse(txHash: string, response: any, process_status?: TransactionStatus | undefined): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromProxyHttpResponse(response.smartContractResults || []);
-        result.isCompleted = new TransactionCompletionStrategyOnProxy().isCompleted(result);
-        // TODO: uniformize transaction status.
+
+        if (process_status !== undefined) {
+            result.status = process_status;
+
+            if (result.status.isSuccessful() || result.status.isFailed()) {
+                result.isCompleted = true;
+            }
+            else {
+                result.isCompleted = false;
+            }
+        }
+
         return result;
     }
 
     static fromApiHttpResponse(txHash: string, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromApiHttpResponse(response.results || []);
-        result.isCompleted = new TransactionCompletionStrategyOnAPI().isCompleted(result);
-        // TODO: uniformize transaction status.
+        result.isCompleted = !result.status.isPending();
         return result;
     }
 

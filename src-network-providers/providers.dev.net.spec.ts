@@ -1,11 +1,11 @@
 import { assert } from "chai";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
-import { INetworkProvider, IPagination } from "./interface";
+import { INetworkProvider } from "./interface";
 import { Address } from "./primitives";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { MockQuery } from "./testscommon/dummyQuery";
 import { TransactionOnNetwork } from "./transactions";
-import { TransactionStatus } from "./transactionStatus";
+import { NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -55,7 +55,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     });
 
     it("should have same response for getAccount()", async function () {
-        for (const user of [bob, carol, dan]) {
+        for (const user of [alice, bob, carol, dan]) {
             let apiResponse = await apiProvider.getAccount(user);
             let proxyResponse = await proxyProvider.getAccount(user);
 
@@ -65,7 +65,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
     it("should have same response for getFungibleTokensOfAccount(), getFungibleTokenOfAccount()", async function () {
         this.timeout(30000);
-        // can't assert for deepequal because the raw response it's not the same
+
         for (const user of [carol, dan]) {
             let apiResponse = (await apiProvider.getFungibleTokensOfAccount(user)).slice(0, 20);
             let proxyResponse = (await proxyProvider.getFungibleTokensOfAccount(user)).slice(0, 20);
@@ -83,14 +83,10 @@ describe("test network providers on devnet: Proxy and API", function () {
         let apiResponse = (await apiProvider.getNonFungibleTokensOfAccount(dan)).slice(0, 20);
         let proxyResponse = (await proxyProvider.getNonFungibleTokensOfAccount(dan)).slice(0, 20);
 
-        // unset unconsistent fields
+        assert.equal(apiResponse.length, proxyResponse.length);
+
         for (let i = 0; i < apiResponse.length; i++) {
-            apiResponse[i].type = "";
-            proxyResponse[i].type = "";
-            apiResponse[i].name = "";
-            proxyResponse[i].name = "";
-            apiResponse[i].decimals = 0;
-            apiResponse[i].decimals = 0;
+            removeInconsistencyForNonFungibleTokenOfAccount(apiResponse[i], proxyResponse[i]);
         }
 
         assert.deepEqual(apiResponse, proxyResponse);
@@ -99,16 +95,20 @@ describe("test network providers on devnet: Proxy and API", function () {
         let apiItemResponse = await apiProvider.getNonFungibleTokenOfAccount(dan, item.collection, item.nonce);
         let proxyItemResponse = await proxyProvider.getNonFungibleTokenOfAccount(dan, item.collection, item.nonce);
 
-        // unset unconsistent fields
-        apiItemResponse.type = "";
-        proxyItemResponse.type = "";
-        apiItemResponse.name = "";
-        proxyItemResponse.name = "";
-        apiItemResponse.decimals = 0;
-        proxyItemResponse.decimals = 0;
-
+        removeInconsistencyForNonFungibleTokenOfAccount(apiItemResponse, proxyItemResponse);
         assert.deepEqual(apiResponse, proxyResponse, `user: ${dan.bech32()}, token: ${item.identifier}`);
     });
+
+    // TODO: Strive to have as little differences as possible between Proxy and API.
+    function removeInconsistencyForNonFungibleTokenOfAccount(apiResponse: NonFungibleTokenOfAccountOnNetwork, proxyResponse: NonFungibleTokenOfAccountOnNetwork) {
+        // unset unconsistent fields
+        apiResponse.type = "";
+        proxyResponse.type = "";
+        apiResponse.name = "";
+        proxyResponse.name = "";
+        apiResponse.decimals = 0;
+        apiResponse.decimals = 0;
+    }
 
     it("should be able to send transaction(s)", async function () {
         this.timeout(5000);
@@ -178,7 +178,7 @@ describe("test network providers on devnet: Proxy and API", function () {
             let apiResponse = await apiProvider.getTransaction(hash);
             let proxyResponse = await proxyProvider.getTransaction(hash, true);
 
-            ignoreKnownTransactionDifferencesBetweenProviders(apiResponse, proxyResponse);
+            ignoreKnownTransactionDifferencesBetweenProviders(proxyResponse);
             assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
 
             // Also assert completion
@@ -188,10 +188,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     });
 
     // TODO: Strive to have as little differences as possible between Proxy and API.
-    function ignoreKnownTransactionDifferencesBetweenProviders(apiResponse: TransactionOnNetwork, proxyResponse: TransactionOnNetwork) {
-        // TODO: Remove this once "tx.status" is uniformized.
-        apiResponse.status = proxyResponse.status = new TransactionStatus("ignore");
-
+    function ignoreKnownTransactionDifferencesBetweenProviders(proxyResponse: TransactionOnNetwork) {
         // Ignore fields which are not present on API response:
         proxyResponse.type = "";
         proxyResponse.epoch = 0;

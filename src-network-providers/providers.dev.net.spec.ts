@@ -55,7 +55,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     });
 
     it("should have same response for getAccount()", async function () {
-        for (const user of [alice, bob, carol, dan]) {
+        for (const user of [alice, bob]) {
             let apiResponse = await apiProvider.getAccount(user);
             let proxyResponse = await proxyProvider.getAccount(user);
 

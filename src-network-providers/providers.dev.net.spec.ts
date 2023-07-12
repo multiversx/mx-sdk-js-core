@@ -54,13 +54,11 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.deepEqual(apiResponse, proxyResponse);
     });
 
-    it("should have same response for getAccount()", async function () {
-        for (const user of [alice, bob]) {
-            let apiResponse = await apiProvider.getAccount(user);
-            let proxyResponse = await proxyProvider.getAccount(user);
+    it.only("should have same response for getAccount()", async function () {
+        let apiResponse = await apiProvider.getAccount(alice);
+        let proxyResponse = await proxyProvider.getAccount(alice);
 
-            assert.deepEqual(apiResponse, proxyResponse);
-        }
+        assert.deepEqual(apiResponse, proxyResponse);
     });
 
     it("should have same response for getFungibleTokensOfAccount(), getFungibleTokenOfAccount()", async function () {

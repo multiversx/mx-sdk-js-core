@@ -38,15 +38,10 @@ export class TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromProxyHttpResponse(response.smartContractResults || []);
 
-        if (processStatus !== undefined) {
+        if (processStatus) {
             result.status = processStatus;
 
-            if (result.status.isSuccessful() || result.status.isFailed()) {
-                result.isCompleted = true;
-            }
-            else {
-                result.isCompleted = false;
-            }
+            result.isCompleted = result.status.isSuccessful() || result.status.isFailed()
         }
 
         return result;

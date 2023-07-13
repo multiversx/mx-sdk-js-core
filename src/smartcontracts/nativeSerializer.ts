@@ -46,7 +46,7 @@ export namespace NativeSerializer {
             const lastEndpointParamIndex = parameters.length - 1;
             const argAtIndex = args[lastEndpointParamIndex];
 
-            if (argAtIndex.belongsToTypesystem) {
+            if (argAtIndex?.belongsToTypesystem) {
                 const isVariadicValue = argAtIndex.hasClassOrSuperclass(VariadicValue.ClassName);
                 if (!isVariadicValue) {
                     throw new ErrInvalidArgument(`Wrong argument type for endpoint ${endpoint.name}: typed value provided; expected variadic type, have ${argAtIndex.getClassName()}`);
@@ -296,7 +296,7 @@ export namespace NativeSerializer {
     }
 
     // TODO: move logic to typesystem/numerical.ts
-    function convertNumericalType(number: BigNumber, type: Type, errorContext: ArgumentErrorContext): TypedValue {
+    function convertNumericalType(number: BigNumber.Value, type: Type, errorContext: ArgumentErrorContext): TypedValue {
         switch (type.constructor) {
             case U8Type:
                 return new U8Value(number);

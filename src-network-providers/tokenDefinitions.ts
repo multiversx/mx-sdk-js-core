@@ -121,7 +121,7 @@ export class DefinitionOfTokenCollectionOnNetwork {
         result.name = tokenName.toString();
         result.ticker = collection;
         result.owner = Address.fromPubkey(owner);
-        result.decimals = properties.NumDecimals.toNumber() || 0;
+        result.decimals = properties.NumDecimals.toNumber() ?? 0;
         result.canPause = properties.CanPause || false;
         result.canFreeze = properties.CanFreeze || false;
         result.canWipe = properties.CanWipe || false;

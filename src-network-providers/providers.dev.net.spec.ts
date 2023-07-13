@@ -9,9 +9,9 @@ import { NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-    let bob = new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
     let carol = new Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
     let dan = new Address("erd1kyaqzaprcdnv4luvanah0gfxzzsnpaygsy6pytrexll2urtd05ts9vegu7");
+    const MAX_NUMBER_OF_ITEMS_BY_DEFAULT = 20;
 
     let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com", { timeout: 10000 });
     let proxyProvider: INetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", { timeout: 10000 });
@@ -54,7 +54,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.deepEqual(apiResponse, proxyResponse);
     });
 
-    it.only("should have same response for getAccount()", async function () {
+    it("should have same response for getAccount()", async function () {
         let apiResponse = await apiProvider.getAccount(alice);
         let proxyResponse = await proxyProvider.getAccount(alice);
 
@@ -65,8 +65,8 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(30000);
 
         for (const user of [carol, dan]) {
-            let apiResponse = (await apiProvider.getFungibleTokensOfAccount(user)).slice(0, 20);
-            let proxyResponse = (await proxyProvider.getFungibleTokensOfAccount(user)).slice(0, 20);
+            let apiResponse = (await apiProvider.getFungibleTokensOfAccount(user)).slice(0, MAX_NUMBER_OF_ITEMS_BY_DEFAULT);
+            let proxyResponse = (await proxyProvider.getFungibleTokensOfAccount(user)).slice(0, MAX_NUMBER_OF_ITEMS_BY_DEFAULT);
 
             for (let i = 0; i < apiResponse.length; i++) {
                 assert.equal(apiResponse[i].identifier, proxyResponse[i].identifier);
@@ -78,8 +78,8 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getNonFungibleTokensOfAccount(), getNonFungibleTokenOfAccount", async function () {
         this.timeout(30000);
 
-        let apiResponse = (await apiProvider.getNonFungibleTokensOfAccount(dan)).slice(0, 20);
-        let proxyResponse = (await proxyProvider.getNonFungibleTokensOfAccount(dan)).slice(0, 20);
+        let apiResponse = (await apiProvider.getNonFungibleTokensOfAccount(dan)).slice(0, MAX_NUMBER_OF_ITEMS_BY_DEFAULT);
+        let proxyResponse = (await proxyProvider.getNonFungibleTokensOfAccount(dan)).slice(0, MAX_NUMBER_OF_ITEMS_BY_DEFAULT);
 
         assert.equal(apiResponse.length, proxyResponse.length);
 
@@ -105,7 +105,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         apiResponse.name = "";
         proxyResponse.name = "";
         apiResponse.decimals = 0;
-        apiResponse.decimals = 0;
+        proxyResponse.decimals = 0;
     }
 
     it("should be able to send transaction(s)", async function () {

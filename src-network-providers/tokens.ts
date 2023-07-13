@@ -81,7 +81,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
         result.supply = new BigNumber(payload.balance || 1);
         result.royalties = new BigNumber(payload.royalties || 0);
         result.assets = payload.assets || [];
-        result.balance = new BigNumber(payload.balance || 0);
+        result.balance = new BigNumber(payload.balance || 1);
 
         return result;
     }

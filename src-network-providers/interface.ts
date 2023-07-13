@@ -61,7 +61,7 @@ export interface INetworkProvider {
     /**
      * Fetches the state of a transaction.
      */
-    getTransaction(txHash: string): Promise<TransactionOnNetwork>;
+    getTransaction(txHash: string, withProcessStatus?: boolean): Promise<TransactionOnNetwork>;
 
     /**
      * Queries the status of a transaction.

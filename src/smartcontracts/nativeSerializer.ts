@@ -4,7 +4,7 @@ import { ErrInvalidArgument } from "../errors";
 import { IAddress } from "../interface";
 import { numberToPaddedHex } from "../utils.codec";
 import { ArgumentErrorContext } from "./argumentErrorContext";
-import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, Field, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, Struct, StructType, TokenIdentifierType, TokenIdentifierValue, Tuple, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
+import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, EnumType, EnumValue, Field, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, Struct, StructType, TokenIdentifierType, TokenIdentifierValue, Tuple, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
 
 export namespace NativeTypes {
     export type NativeBuffer = Buffer | string;
@@ -113,6 +113,9 @@ export namespace NativeSerializer {
         if (type instanceof PrimitiveType) {
             return toPrimitive(value, type, errorContext);
         }
+        if (type instanceof EnumType) {
+            return toEnumValue(value, type, errorContext);
+        }
         errorContext.throwError(`convertToTypedValue: unhandled type ${type}`);
     }
 
@@ -207,6 +210,34 @@ export namespace NativeSerializer {
             return new TokenIdentifierValue(convertNativeToString(native, errorContext));
         }
         errorContext.throwError(`(function: toPrimitive) unsupported type ${type}`);
+    }
+
+    function toEnumValue(native: any, type: EnumType, errorContext: ArgumentErrorContext): TypedValue {
+        if (typeof native === "number") {
+            return EnumValue.fromDiscriminant(type, native);
+        }
+        if (typeof native === "string") {
+            return EnumValue.fromName(type, native);
+        }
+        if (typeof native === "object") {
+            errorContext.guardHasField(native, "name");
+            const variant = type.getVariantByName(native.name);
+            errorContext.guardHasField(native, "fields");
+            const nativeFields = native.fields;
+
+            const fieldValues = [];
+            const fields = variant.getFieldsDefinitions();
+            for (let i = 0; i < fields.length; i++) {
+                const fieldName = fields[i].name;
+                errorContext.guardHasField(nativeFields, fieldName);
+                const fieldNativeValue = nativeFields[fieldName];
+                const fieldTypedValue = convertToTypedValue(fieldNativeValue, fields[i].type, errorContext);
+                fieldValues.push(new Field(fieldTypedValue, fieldName));
+            }
+
+            return new EnumValue(type, variant, fieldValues);
+        }
+        errorContext.throwError(`(function: toEnumValue) unsupported native type ${typeof native}`);
     }
 
     // TODO: move logic to typesystem/bytes.ts

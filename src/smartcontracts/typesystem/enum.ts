@@ -149,7 +149,7 @@ export class EnumValue extends TypedValue {
     valueOf() {
         let result: any = { name: this.name, fields: [] };
 
-        this.fields.forEach((field) => (result.fields[field.name] = field.value.valueOf()));
+        this.fields.forEach((field, index) => (result.fields[index] = field.value.valueOf()));
 
         return result;
     }

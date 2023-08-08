@@ -9,6 +9,7 @@ import { VariadicType } from "./variadic";
 import { OptionalType } from "./algebraic";
 import { CompositeType } from "./composite";
 import { ListType, OptionType } from "./generic";
+import { ArrayVecType } from "./genericArray";
 import { TupleType } from "./tuple";
 import { TokenIdentifierType } from "./tokenIdentifier";
 
@@ -59,6 +60,21 @@ describe("test mapper", () => {
         //   new AddressType(),
         // ]);
     });
+
+    it("should map arrays", () => {
+        testArrayMapping("array2<BigUint>", 2, new BigUIntType());
+        testArrayMapping("array2<u32>", 2, new U32Type());
+        testArrayMapping("array8<BigUint>", 8, new BigUIntType());
+        testArrayMapping("array256<BigUint>", 256, new BigUIntType());
+    });
+
+    function testArrayMapping(expression: string, size: number, typeParameter: Type) {
+        let type = parser.parse(expression);
+        let mappedType = mapper.mapType(type);
+
+        assert.instanceOf(mappedType, ArrayVecType);
+        assert.deepEqual(mappedType, new ArrayVecType(size, typeParameter));
+    }
 
     function testMapping(expression: string, constructor: TypeConstructor, typeParameters: Type[] = []) {
         let type = parser.parse(expression);

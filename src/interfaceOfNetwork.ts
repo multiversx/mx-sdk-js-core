@@ -13,8 +13,8 @@ export interface INetworkConfig {
 }
 
 export interface ITransactionOnNetwork {
-    isCompleted: boolean;
-    
+    isCompleted?: boolean;
+
     hash: string;
     type: string;
     value: string;

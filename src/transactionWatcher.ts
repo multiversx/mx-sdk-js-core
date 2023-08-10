@@ -1,5 +1,5 @@
 import { AsyncTimer } from "./asyncTimer";
-import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached } from "./errors";
+import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached, ErrOptionalClassMemberIsUndefined } from "./errors";
 import { ITransactionFetcher } from "./interface";
 import { ITransactionEvent, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 import { Logger } from "./logger";
@@ -69,7 +69,13 @@ export class TransactionWatcher {
       * Waits until the transaction is completely processed.
       */
     public async awaitCompleted(transaction: ITransaction): Promise<ITransactionOnNetwork> {
-        const isCompleted = (transactionOnNetwork: ITransactionOnNetwork) => transactionOnNetwork.isCompleted;
+        const isCompleted = (transactionOnNetwork: ITransactionOnNetwork) => {
+            if (transactionOnNetwork.isCompleted === undefined) {
+                throw new ErrOptionalClassMemberIsUndefined("`isCompleted` is undefined. getTransaction() should be called using `withProcessStatus=true`.");
+            }
+            return transactionOnNetwork.isCompleted
+        };
+
         const doFetch = async () => await this.fetcher.getTransaction(transaction.getHash().hex());
         const errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 

@@ -325,12 +325,3 @@ export class ErrGasLimitShouldBe0ForInnerTransaction extends Err {
     super("gas limit must be 0 for the inner transaction for relayed v2");
   }
 }
-
-/**
- * Signals an optional class member is undefined
- */
-export class ErrOptionalClassMemberIsUndefined extends Err {
-  public constructor(message: string) {
-    super(message);
-  }
-}

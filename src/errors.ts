@@ -325,3 +325,9 @@ export class ErrGasLimitShouldBe0ForInnerTransaction extends Err {
     super("gas limit must be 0 for the inner transaction for relayed v2");
   }
 }
+
+export class ErrIsCompletedFieldIsMissingOnTransaction extends Err {
+  public constructor() {
+    super("The transaction watcher requires the isCompleted property to be defined on the transaction object. Perhaps you've used the sdk-network-provider's getTransaction() and in that case you should also pass `withProcessStatus=true`.")
+  }
+}

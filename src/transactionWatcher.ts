@@ -1,5 +1,5 @@
 import { AsyncTimer } from "./asyncTimer";
-import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached } from "./errors";
+import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached, ErrIsCompletedFieldIsMissingOnTransaction } from "./errors";
 import { ITransactionFetcher } from "./interface";
 import { ITransactionEvent, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 import { Logger } from "./logger";
@@ -71,7 +71,7 @@ export class TransactionWatcher {
     public async awaitCompleted(transaction: ITransaction): Promise<ITransactionOnNetwork> {
         const isCompleted = (transactionOnNetwork: ITransactionOnNetwork) => {
             if (transactionOnNetwork.isCompleted === undefined) {
-                throw new Err("The transaction watcher requires the isCompleted property to be defined on the transaction object. Perhaps you've used the sdk-network-provider's getTransaction() and in that case you should also pass `withProcessStatus=true`.");
+                throw new ErrIsCompletedFieldIsMissingOnTransaction();
             }
             return transactionOnNetwork.isCompleted
         };
@@ -160,6 +160,10 @@ export class TransactionWatcher {
                 }
             } catch (error) {
                 Logger.debug("TransactionWatcher.awaitConditionally(): cannot (yet) fetch data.");
+
+                if (error instanceof ErrIsCompletedFieldIsMissingOnTransaction) {
+                    throw error;
+                }
 
                 if (!(error instanceof Err)) {
                     throw error;

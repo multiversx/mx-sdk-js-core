@@ -127,6 +127,30 @@ describe("test parser", () => {
                 }
             ]
         });
+
+        type = parser.parse("variadic<multi<array32,u32,array64>>");
+        assert.deepEqual(type.toJSON(), {
+            "name": "variadic",
+            "typeParameters": [
+                {
+                    "name": "multi",
+                    "typeParameters": [
+                        {
+                            "name": "array32",
+                            "typeParameters": []
+                        },
+                        {
+                            "name": "u32",
+                            "typeParameters": []
+                        },
+                        {
+                            "name": "array64",
+                            "typeParameters": []
+                        }
+                    ]
+                }
+            ]
+        });
     });
 
     it("should parse expression: tuples", () => {

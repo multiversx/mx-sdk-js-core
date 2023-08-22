@@ -1,5 +1,5 @@
 import { AsyncTimer } from "./asyncTimer";
-import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached } from "./errors";
+import { Err, ErrExpectedTransactionEventsNotFound, ErrExpectedTransactionStatusNotReached, ErrIsCompletedFieldIsMissingOnTransaction } from "./errors";
 import { ITransactionFetcher } from "./interface";
 import { ITransactionEvent, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 import { Logger } from "./logger";
@@ -69,7 +69,13 @@ export class TransactionWatcher {
       * Waits until the transaction is completely processed.
       */
     public async awaitCompleted(transaction: ITransaction): Promise<ITransactionOnNetwork> {
-        const isCompleted = (transactionOnNetwork: ITransactionOnNetwork) => transactionOnNetwork.isCompleted;
+        const isCompleted = (transactionOnNetwork: ITransactionOnNetwork) => {
+            if (transactionOnNetwork.isCompleted === undefined) {
+                throw new ErrIsCompletedFieldIsMissingOnTransaction();
+            }
+            return transactionOnNetwork.isCompleted
+        };
+
         const doFetch = async () => await this.fetcher.getTransaction(transaction.getHash().hex());
         const errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 
@@ -154,6 +160,10 @@ export class TransactionWatcher {
                 }
             } catch (error) {
                 Logger.debug("TransactionWatcher.awaitConditionally(): cannot (yet) fetch data.");
+
+                if (error instanceof ErrIsCompletedFieldIsMissingOnTransaction) {
+                    throw error;
+                }
 
                 if (!(error instanceof Err)) {
                     throw error;

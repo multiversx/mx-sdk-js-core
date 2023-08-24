@@ -7,7 +7,7 @@ import { TokenTransfer } from "./tokenTransfer";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 import { TransactionWatcher } from "./transactionWatcher";
-import { ProxyNetworkProvider } from "@multiversx/sdk-network-providers-next";
+import { ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;

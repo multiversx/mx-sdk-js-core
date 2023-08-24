@@ -62,10 +62,10 @@ describe("test contract", () => {
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);
 
-        await Promise.resolve(
-            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()])
-        );
-        await watcher.awaitCompleted(deployTransaction);
+        await Promise.all([
+            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
+            watcher.awaitCompleted(deployTransaction)
+        ]);
 
         assert.isTrue((await provider.getTransactionStatus(hash)).isExecuted());
     });
@@ -117,10 +117,7 @@ describe("test contract", () => {
 
         await Promise.all([
             provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
-            provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()])
-        ]);
-
-        await Promise.all([
+            provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
             watcher.awaitCompleted(callTransactionOne),
             watcher.awaitCompleted(callTransactionTwo)
         ]);

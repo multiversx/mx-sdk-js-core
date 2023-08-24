@@ -53,6 +53,7 @@ export class MockProvider {
     }
 
     mockPutTransaction(hash: TransactionHash, item: ITransactionOnNetwork) {
+        item.isCompleted = false;
         this.transactions.set(hash.toString(), item);
     }
 
@@ -118,7 +119,7 @@ export class MockProvider {
                 sender: transaction.getSender(),
                 receiver: transaction.getReceiver(),
                 data: transaction.getData().valueOf(),
-                status: new TransactionStatus("pending"),
+                status: new TransactionStatus("pending")
             })
         );
 

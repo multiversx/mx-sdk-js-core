@@ -2,12 +2,11 @@ import { TransactionStatus } from "./transactionStatus";
 import { ContractResults } from "./contractResults";
 import { Address } from "./primitives";
 import { IAddress } from "./interface";
-import { TransactionCompletionStrategyOnAPI, TransactionCompletionStrategyOnProxy } from "./transactionCompletionStrategy";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
 
 export class TransactionOnNetwork {
-    isCompleted: boolean = false;
+    isCompleted?: boolean;
     hash: string = "";
     type: string = "";
     nonce: number = 0;
@@ -35,19 +34,22 @@ export class TransactionOnNetwork {
         Object.assign(this, init);
     }
 
-    static fromProxyHttpResponse(txHash: string, response: any): TransactionOnNetwork {
+    static fromProxyHttpResponse(txHash: string, response: any, processStatus?: TransactionStatus | undefined): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromProxyHttpResponse(response.smartContractResults || []);
-        result.isCompleted = new TransactionCompletionStrategyOnProxy().isCompleted(result);
-        // TODO: uniformize transaction status.
+
+        if (processStatus) {
+            result.status = processStatus;
+            result.isCompleted = result.status.isSuccessful() || result.status.isFailed()
+        }
+
         return result;
     }
 
     static fromApiHttpResponse(txHash: string, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromApiHttpResponse(response.results || []);
-        result.isCompleted = new TransactionCompletionStrategyOnAPI().isCompleted(result);
-        // TODO: uniformize transaction status.
+        result.isCompleted = !result.status.isPending();
         return result;
     }
 

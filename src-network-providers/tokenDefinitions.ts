@@ -99,6 +99,8 @@ export class DefinitionOfTokenCollectionOnNetwork {
         result.canPause = payload.canPause || false;
         result.canFreeze = payload.canFreeze || false;
         result.canWipe = payload.canWipe || false;
+        result.canUpgrade = payload.canUpgrade || false;
+        result.canAddSpecialRoles = payload.canAddSpecialRoles || false;
         result.canTransferNftCreateRole = payload.canTransferNftCreateRole || false;
 
         return result;
@@ -119,15 +121,15 @@ export class DefinitionOfTokenCollectionOnNetwork {
         result.name = tokenName.toString();
         result.ticker = collection;
         result.owner = Address.fromPubkey(owner);
-        result.decimals = properties.NumDecimals.toNumber();
-        result.canPause = properties.CanPause;
-        result.canFreeze = properties.CanFreeze;
-        result.canWipe = properties.CanWipe;
-        result.canUpgrade = properties.CanUpgrade;
-        result.canChangeOwner = properties.CanChangeOwner;
-        result.canAddSpecialRoles = properties.CanAddSpecialRoles;
-        result.canTransferNftCreateRole = properties.CanTransferNFTCreateRole;
-        result.canCreateMultiShard = properties.CanCreateMultiShard;
+        result.decimals = properties.NumDecimals.toNumber() ?? 0;
+        result.canPause = properties.CanPause || false;
+        result.canFreeze = properties.CanFreeze || false;
+        result.canWipe = properties.CanWipe || false;
+        result.canUpgrade = properties.CanUpgrade || false;
+        result.canChangeOwner = properties.CanChangeOwner || false;
+        result.canAddSpecialRoles = properties.CanAddSpecialRoles || false;
+        result.canTransferNftCreateRole = properties.CanTransferNFTCreateRole || false;
+        result.canCreateMultiShard = properties.CanCreateMultiShard || false;
 
         return result;
     }

@@ -1,0 +1,33 @@
+{
+    "endpoints": [
+        {
+            "name": "foo",
+            "inputs": [
+                {
+                    "type": "counted-variadic<Dummy>"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "bar",
+            "inputs": [
+                {
+                    "type": "counted-variadic<u32>"
+                }
+            ],
+            "outputs": []
+        }
+    ],
+    "types": {
+        "Dummy": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "a",
+                    "type": "u32"
+                }
+            ]
+        }
+    }
+}

@@ -135,7 +135,7 @@ export namespace NativeSerializer {
         return new OptionalValue(type, converted);
     }
 
-    function toVariadicValue(native: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
+    function toVariadicValue(native: any, type: VariadicType, errorContext: ArgumentErrorContext): TypedValue {
         if (native == null) {
             native = [];
         }

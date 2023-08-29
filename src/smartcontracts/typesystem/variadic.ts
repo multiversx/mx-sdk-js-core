@@ -2,6 +2,20 @@ import { Type, TypeCardinality, TypedValue, TypePlaceholder } from "./types";
 
 export class VariadicType extends Type {
     static ClassName = "VariadicType";
+    public readonly isCounted: boolean;
+
+    constructor(typeParameter: Type, isCounted: boolean = false) {
+        super("Variadic", [typeParameter], TypeCardinality.variable());
+        this.isCounted = isCounted;
+    }
+
+    getClassName(): string {
+        return VariadicType.ClassName;
+    }
+}
+
+export class CountedVariadicType extends Type {
+    static ClassName = "VariadicType";
 
     constructor(typeParameter: Type) {
         super("Variadic", [typeParameter], TypeCardinality.variable());
@@ -43,11 +57,11 @@ export class VariadicValue extends TypedValue {
         if (items.length == 0) {
             return new VariadicValue(new VariadicType(new TypePlaceholder()), []);
         }
-    
+
         let typeParameter = items[0].getType();
         return new VariadicValue(new VariadicType(typeParameter), items);
     }
-    
+
     getItems(): ReadonlyArray<TypedValue> {
         return this.items;
     }

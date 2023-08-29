@@ -1,6 +1,6 @@
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { BinaryCodec } from "./codec";
-import { EndpointParameterDefinition, Type, TypedValue } from "./typesystem";
+import { EndpointParameterDefinition, Type, TypedValue, U32Type, U32Value } from "./typesystem";
 import { OptionalType, OptionalValue } from "./typesystem/algebraic";
 import { CompositeType, CompositeValue } from "./typesystem/composite";
 import { VariadicType, VariadicValue } from "./typesystem/variadic";
@@ -74,13 +74,19 @@ export class ArgSerializer {
                 let typedValue = readValue(type.getFirstTypeParameter());
                 return new OptionalValue(type, typedValue);
             } else if (type.hasExactClass(VariadicType.ClassName)) {
+                let variadicType = <VariadicType>type;
                 let typedValues = [];
+
+                if (variadicType.isCounted) {
+                    // Read and discard the count (not used).
+                    readValue(new U32Type());
+                }
 
                 while (!hasReachedTheEnd()) {
                     typedValues.push(readValue(type.getFirstTypeParameter()));
                 }
 
-                return new VariadicValue(type, typedValues);
+                return new VariadicValue(variadicType, typedValues);
             } else if (type.hasExactClass(CompositeType.ClassName)) {
                 let typedValues = [];
 
@@ -158,6 +164,13 @@ export class ArgSerializer {
                 }
             } else if (value.hasExactClass(VariadicValue.ClassName)) {
                 let valueAsVariadic = <VariadicValue>value;
+                let variadicType = <VariadicType>valueAsVariadic.getType();
+
+                if (variadicType.isCounted) {
+                    const countValue = new U32Value(valueAsVariadic.getItems().length);
+                    buffers.push(self.codec.encodeTopLevel(countValue));
+                }
+
                 for (const item of valueAsVariadic.getItems()) {
                     handleValue(item);
                 }

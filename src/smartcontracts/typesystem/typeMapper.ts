@@ -45,6 +45,7 @@ export class TypeMapper {
             ["VarArgs", (...typeParameters: Type[]) => new VariadicType(typeParameters[0])],
             ["MultiResultVec", (...typeParameters: Type[]) => new VariadicType(typeParameters[0])],
             ["variadic", (...typeParameters: Type[]) => new VariadicType(typeParameters[0])],
+            ["counted-variadic", (...typeParameters: Type[]) => new VariadicType(typeParameters[0], true)],
             ["OptionalArg", (...typeParameters: Type[]) => new OptionalType(typeParameters[0])],
             ["optional", (...typeParameters: Type[]) => new OptionalType(typeParameters[0])],
             ["OptionalResult", (...typeParameters: Type[]) => new OptionalType(typeParameters[0])],

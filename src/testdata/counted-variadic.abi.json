@@ -14,9 +14,19 @@
             "inputs": [
                 {
                     "type": "counted-variadic<u32>"
+                },
+                {
+                    "type": "counted-variadic<bytes>"
                 }
             ],
-            "outputs": []
+            "outputs": [
+                {
+                    "type": "counted-variadic<u32>"
+                },
+                {
+                    "type": "counted-variadic<bytes>"
+                }
+            ]
         }
     ],
     "types": {

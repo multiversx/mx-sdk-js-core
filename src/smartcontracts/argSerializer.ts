@@ -78,12 +78,15 @@ export class ArgSerializer {
                 let typedValues = [];
 
                 if (variadicType.isCounted) {
-                    // Read and discard the count (not used).
-                    readValue(new U32Type());
-                }
+                    const count: number = readValue(new U32Type()).valueOf().toNumber();
 
-                while (!hasReachedTheEnd()) {
-                    typedValues.push(readValue(type.getFirstTypeParameter()));
+                    for (let i = 0; i < count; i++) {
+                        typedValues.push(readValue(type.getFirstTypeParameter()));
+                    }
+                } else {
+                    while (!hasReachedTheEnd()) {
+                        typedValues.push(readValue(type.getFirstTypeParameter()));
+                    }
                 }
 
                 return new VariadicValue(variadicType, typedValues);

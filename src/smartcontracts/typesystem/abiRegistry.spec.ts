@@ -136,5 +136,8 @@ describe("test abi registry", () => {
 
         assert.deepEqual(registry.getEndpoint("foo").input[0].type, new VariadicType(dummyType, true));
         assert.deepEqual(registry.getEndpoint("bar").input[0].type, new VariadicType(new U32Type(), true));
+        assert.deepEqual(registry.getEndpoint("bar").input[1].type, new VariadicType(new BytesType(), true));
+        assert.deepEqual(registry.getEndpoint("bar").output[0].type, new VariadicType(new U32Type(), true));
+        assert.deepEqual(registry.getEndpoint("bar").output[1].type, new VariadicType(new BytesType(), true));
     });
 });

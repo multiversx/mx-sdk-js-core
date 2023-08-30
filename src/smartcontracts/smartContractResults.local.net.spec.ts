@@ -1,19 +1,23 @@
-import { loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
-import { TransactionWatcher } from "../transactionWatcher";
 import { assert } from "chai";
-import { SmartContract } from "./smartContract";
+import { loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
+import { createLocalnetProvider } from "../testutils/networkProviders";
+import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction } from "./function";
 import { ResultsParser } from "./resultsParser";
-import { createLocalnetProvider } from "../testutils/networkProviders";
+import { SmartContract } from "./smartContract";
 
 describe("fetch transactions from local testnet", function () {
-    let provider = createLocalnetProvider();
-    let watcher = new TransactionWatcher(provider);
     let alice: TestWallet;
+    let provider = createLocalnetProvider();
+    let watcher: TransactionWatcher;
+
     let resultsParser = new ResultsParser();
 
     before(async function () {
         ({ alice } = await loadTestWallets());
+        watcher = new TransactionWatcher({
+            getTransaction: async (hash: string) => { return await provider.getTransaction(hash, true) }
+        });
     });
 
     it("counter smart contract", async function () {

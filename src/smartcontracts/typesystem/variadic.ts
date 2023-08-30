@@ -54,12 +54,20 @@ export class VariadicValue extends TypedValue {
     }
 
     static fromItems(...items: TypedValue[]): VariadicValue {
+        return this.createFromItems(items, false);
+    }
+
+    static fromItemsCounted(...items: TypedValue[]): VariadicValue {
+        return this.createFromItems(items, true);
+    }
+
+    private static createFromItems(items: TypedValue[], isCounted: boolean): VariadicValue {
         if (items.length == 0) {
-            return new VariadicValue(new VariadicType(new TypePlaceholder()), []);
+            return new VariadicValue(new VariadicType(new TypePlaceholder(), isCounted), []);
         }
 
-        let typeParameter = items[0].getType();
-        return new VariadicValue(new VariadicType(typeParameter), items);
+        const typeParameter = items[0].getType();
+        return new VariadicValue(new VariadicType(typeParameter, isCounted), items);
     }
 
     getItems(): ReadonlyArray<TypedValue> {

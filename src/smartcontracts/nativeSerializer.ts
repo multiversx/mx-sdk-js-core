@@ -159,7 +159,7 @@ export namespace NativeSerializer {
 
     function toVariadicValue(native: any, type: VariadicType, errorContext: ArgumentErrorContext): TypedValue {
         if (type.isCounted) {
-            throw new ErrInvalidArgument(`Counted variadic arguments must be explicitly typed. E.g. use "VariadicValue.fromItemsCounted()"`);
+            throw new ErrInvalidArgument(`Counted variadic arguments must be explicitly typed. E.g. use "VariadicValue.fromItemsCounted()" or "new VariadicValue()"`);
         }
 
         if (native == null) {

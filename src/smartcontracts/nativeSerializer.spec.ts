@@ -46,7 +46,7 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[6].valueOf(), null);
     });
 
-    it("should perform type inference (variadic arguments)", async () => {
+    it("should perform type inference (regular variadic arguments)", async () => {
         const endpointModifiers = new EndpointModifiers("", []);
         const inputParameters = [new EndpointParameterDefinition("", "", new VariadicType(new U32Type(), false))];
         const endpoint = new EndpointDefinition("foo", inputParameters, [], endpointModifiers);

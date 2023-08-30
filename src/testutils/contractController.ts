@@ -1,10 +1,10 @@
+import { ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { Logger } from "../logger";
 import { Interaction } from "../smartcontracts/interaction";
-import { Transaction } from "../transaction";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "../smartcontracts/interface";
 import { ResultsParser } from "../smartcontracts/resultsParser";
-import { Logger } from "../logger";
+import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { INetworkProvider } from "./networkProviders";
 
 export class ContractController {
@@ -15,7 +15,9 @@ export class ContractController {
     constructor(provider: INetworkProvider) {
         this.parser = new ResultsParser();
         this.provider = provider;
-        this.transactionCompletionAwaiter = new TransactionWatcher(provider);
+        this.transactionCompletionAwaiter = new TransactionWatcher({
+            getTransaction: async (hash: string) => { return await provider.getTransaction(hash, true) }
+        });
     }
 
     async deploy(transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }> {

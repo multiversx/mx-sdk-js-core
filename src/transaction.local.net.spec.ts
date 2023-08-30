@@ -7,7 +7,6 @@ import { TokenTransfer } from "./tokenTransfer";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 import { TransactionWatcher } from "./transactionWatcher";
-import { ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;
@@ -20,7 +19,9 @@ describe("test transaction", function () {
         this.timeout(70000);
 
         let provider = createLocalnetProvider();
-        let watcher = new TransactionWatcher(provider);
+        let watcher = new TransactionWatcher({
+            getTransaction: async (hash: string) => { return await provider.getTransaction(hash, true) }
+        });
         let network = await provider.getNetworkConfig();
 
         await alice.sync(provider);
@@ -67,9 +68,8 @@ describe("test transaction", function () {
         this.timeout(70000);
 
         let provider = createLocalnetProvider();
-        let newProvider = new ProxyNetworkProvider("http://localhost:7950", { timeout: 5000 });
         let watcher = new TransactionWatcher({
-            getTransaction: async (hash: string) => { return await newProvider.getTransaction(hash, true) }
+            getTransaction: async (hash: string) => { return await provider.getTransaction(hash, true) }
         });
 
         let network = await provider.getNetworkConfig();

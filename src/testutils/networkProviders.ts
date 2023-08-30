@@ -15,7 +15,7 @@ export function createTestnetProvider(): INetworkProvider {
 export interface INetworkProvider {
     getNetworkConfig(): Promise<INetworkConfig>;
     getAccount(address: IAddress): Promise<IAccountOnNetwork>;
-    getTransaction(txHash: string): Promise<ITransactionOnNetwork>;
+    getTransaction(txHash: string, withProcessStatus?: boolean): Promise<ITransactionOnNetwork>;
     getTransactionStatus(txHash: string): Promise<ITransactionStatus>;
     sendTransaction(tx: Transaction): Promise<string>;
     simulateTransaction(tx: Transaction): Promise<any>;

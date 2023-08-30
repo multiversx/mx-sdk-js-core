@@ -1,24 +1,28 @@
-import { SmartContract } from "./smartContract";
-import { TransactionWatcher } from "../transactionWatcher";
-import { ContractFunction } from "./function";
-import { loadTestWallets, TestWallet } from "../testutils/wallets";
-import { prepareDeployment } from "../testutils";
-import { Logger } from "../logger";
 import { assert } from "chai";
-import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
-import { decodeUnsignedNumber } from "./codec";
-import { BytesValue } from "./typesystem/bytes";
-import { ResultsParser } from "./resultsParser";
+import { Logger } from "../logger";
+import { prepareDeployment } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
+import { loadTestWallets, TestWallet } from "../testutils/wallets";
+import { TransactionWatcher } from "../transactionWatcher";
+import { decodeUnsignedNumber } from "./codec";
+import { ContractFunction } from "./function";
+import { ResultsParser } from "./resultsParser";
+import { SmartContract } from "./smartContract";
+import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
+import { BytesValue } from "./typesystem/bytes";
 
 describe("test on local testnet", function () {
-    let provider = createLocalnetProvider();
-    let watcher = new TransactionWatcher(provider);
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
+    let provider = createLocalnetProvider();
+    let watcher: TransactionWatcher;
     let resultsParser = new ResultsParser();
 
     before(async function () {
         ({ alice, bob, carol } = await loadTestWallets());
+
+        watcher = new TransactionWatcher({
+            getTransaction: async (hash: string) => { return await provider.getTransaction(hash, true) }
+        });
     });
 
     it("counter: should deploy, then simulate transactions", async function () {

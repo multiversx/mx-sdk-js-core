@@ -74,8 +74,8 @@ export class ArgSerializer {
                 let typedValue = readValue(type.getFirstTypeParameter());
                 return new OptionalValue(type, typedValue);
             } else if (type.hasExactClass(VariadicType.ClassName)) {
-                let variadicType = <VariadicType>type;
-                let typedValues = [];
+                const variadicType = <VariadicType>type;
+                const typedValues = [];
 
                 if (variadicType.isCounted) {
                     const count: number = readValue(new U32Type()).valueOf().toNumber();
@@ -166,8 +166,8 @@ export class ArgSerializer {
                     handleValue(valueAsOptional.getTypedValue());
                 }
             } else if (value.hasExactClass(VariadicValue.ClassName)) {
-                let valueAsVariadic = <VariadicValue>value;
-                let variadicType = <VariadicType>valueAsVariadic.getType();
+                const valueAsVariadic = <VariadicValue>value;
+                const variadicType = <VariadicType>valueAsVariadic.getType();
 
                 if (variadicType.isCounted) {
                     const countValue = new U32Value(valueAsVariadic.getItems().length);

@@ -4,11 +4,11 @@ import * as fs from "fs";
 import path from "path";
 import { Address } from "../address";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { Logger, LogLevel } from "../logger";
+import { LogLevel, Logger } from "../logger";
 import { ArgSerializer } from "./argSerializer";
 import { ResultsParser } from "./resultsParser";
 import { ReturnCode } from "./returnCode";
-import { BigUIntType, BigUIntValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, TypedValue, U64Type, U64Value } from "./typesystem";
+import { BigUIntType, BigUIntValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, StringType, StringValue, TypedValue, U32Type, U32Value, U64Type, U64Value, VariadicType, VariadicValue } from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
 
 const KnownReturnCodes: string[] = [
@@ -95,6 +95,65 @@ describe("test smart contract results parser", () => {
         assert.deepEqual(bundle.firstValue, new BigUIntValue(42));
         assert.deepEqual(bundle.secondValue, BytesValue.fromHex("abba"));
         assert.lengthOf(bundle.values, 2);
+    });
+
+    it("should parse query response (variadic arguments)", async () => {
+        const endpointModifiers = new EndpointModifiers("", []);
+        const outputParameters = [new EndpointParameterDefinition("a", "a", new VariadicType(new U32Type(), false))];
+        const endpoint = new EndpointDefinition("foo", [], outputParameters, endpointModifiers);
+        const queryResponse = new ContractQueryResponse({
+            returnData: [
+                Buffer.from([42]).toString("base64"),
+                Buffer.from([43]).toString("base64"),
+            ]
+        });
+
+        const bundle = parser.parseQueryResponse(queryResponse, endpoint);
+        assert.deepEqual(bundle.values[0], VariadicValue.fromItems(new U32Value(42), new U32Value(43)));
+    });
+
+    it("should parse query response (one counted-variadic arguments)", async () => {
+        const endpointModifiers = new EndpointModifiers("", []);
+        const outputParameters = [new EndpointParameterDefinition("a", "a", new VariadicType(new U32Type(), true))];
+        const endpoint = new EndpointDefinition("foo", [], outputParameters, endpointModifiers);
+        const queryResponse = new ContractQueryResponse({
+            returnData: [
+                Buffer.from([2]).toString("base64"),
+                Buffer.from([42]).toString("base64"),
+                Buffer.from([43]).toString("base64"),
+            ]
+        });
+
+        const bundle = parser.parseQueryResponse(queryResponse, endpoint);
+        assert.deepEqual(bundle.values[0], VariadicValue.fromItemsCounted(new U32Value(42), new U32Value(43)));
+    });
+
+    it("should parse query response (multiple counted-variadic arguments)", async () => {
+        const endpointModifiers = new EndpointModifiers("", []);
+        const outputParameters = [
+            new EndpointParameterDefinition("a", "a", new VariadicType(new U32Type(), true)),
+            new EndpointParameterDefinition("b", "b", new VariadicType(new StringType(), true)),
+            new EndpointParameterDefinition("c", "c", new BigUIntType()),
+
+        ];
+        const endpoint = new EndpointDefinition("foo", [], outputParameters, endpointModifiers);
+        const queryResponse = new ContractQueryResponse({
+            returnData: [
+                Buffer.from([2]).toString("base64"),
+                Buffer.from([42]).toString("base64"),
+                Buffer.from([43]).toString("base64"),
+                Buffer.from([3]).toString("base64"),
+                Buffer.from("a").toString("base64"),
+                Buffer.from("b").toString("base64"),
+                Buffer.from("c").toString("base64"),
+                Buffer.from([42]).toString("base64")
+            ]
+        });
+
+        const bundle = parser.parseQueryResponse(queryResponse, endpoint);
+        assert.deepEqual(bundle.values[0], VariadicValue.fromItemsCounted(new U32Value(42), new U32Value(43)));
+        assert.deepEqual(bundle.values[1], VariadicValue.fromItemsCounted(new StringValue("a"), new StringValue("b"), new StringValue("c")));
+        assert.deepEqual(bundle.values[2], new BigUIntValue(42));
     });
 
     it("should parse contract outcome", async () => {

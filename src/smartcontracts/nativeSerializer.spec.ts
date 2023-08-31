@@ -1,8 +1,9 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
+import { ErrInvalidArgument } from "../errors";
 import { NativeSerializer } from "./nativeSerializer";
-import { AbiRegistry, AddressType, AddressValue, BigUIntType, BooleanType, BooleanValue, CompositeType, CompositeValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, EnumType, ListType, NullType, OptionalType, OptionalValue, OptionType, OptionValue, TupleType, U32Type, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
+import { AbiRegistry, AddressType, AddressValue, BigUIntType, BooleanType, BooleanValue, CompositeType, CompositeValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, ListType, NullType, OptionalType, OptionalValue, OptionType, OptionValue, TupleType, TypePlaceholder, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
 
 describe("test native serializer", () => {
@@ -43,6 +44,87 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[5].valueOf().toNumber(), p5);
         assert.deepEqual(typedValues[6].getType(), new OptionalType(new BytesType()));
         assert.deepEqual(typedValues[6].valueOf(), null);
+    });
+
+    it("should perform type inference (regular variadic arguments)", async () => {
+        const endpointModifiers = new EndpointModifiers("", []);
+        const inputParameters = [new EndpointParameterDefinition("", "", new VariadicType(new U32Type(), false))];
+        const endpoint = new EndpointDefinition("foo", inputParameters, [], endpointModifiers);
+        const typedValues = NativeSerializer.nativeToTypedValues([8, 9, 10], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), new VariadicType(new U32Type(), false));
+        assert.deepEqual(typedValues[0].valueOf(), [new BigNumber(8), new BigNumber(9), new BigNumber(10)]);
+    });
+
+    it("should perform type inference (counted-variadic arguments)", async () => {
+        const endpointModifiers = new EndpointModifiers("", []);
+        const inputParameters = [
+            new EndpointParameterDefinition("", "", new VariadicType(new U32Type(), true)),
+            new EndpointParameterDefinition("", "", new VariadicType(new BytesType(), true))
+        ];
+        const endpoint = new EndpointDefinition("foo", inputParameters, [], endpointModifiers);
+
+        // Implicit counted-variadic (not supported).
+        assert.throws(() => NativeSerializer.nativeToTypedValues([8, 9, 10, "a", "b", "c"], endpoint), ErrInvalidArgument);
+
+        // Explicit, non-empty counted-variadic.
+        let typedValues = NativeSerializer.nativeToTypedValues([
+            VariadicValue.fromItemsCounted(new U32Value(8), new U32Value(9), new U32Value(10)),
+            VariadicValue.fromItemsCounted(BytesValue.fromUTF8("a"), BytesValue.fromUTF8("b"), BytesValue.fromUTF8("c"))
+        ], endpoint);
+
+        assert.lengthOf(typedValues, 2);
+        assert.deepEqual(typedValues[0].getType(), new VariadicType(new U32Type(), true));
+        assert.deepEqual(typedValues[0].valueOf(), [new BigNumber(8), new BigNumber(9), new BigNumber(10)]);
+        assert.deepEqual(typedValues[1].getType(), new VariadicType(new BytesType(), true));
+        assert.deepEqual(typedValues[1].valueOf(), [Buffer.from("a"), Buffer.from("b"), Buffer.from("c")]);
+
+        // Explicit, empty counted-variadic.
+        typedValues = NativeSerializer.nativeToTypedValues([
+            VariadicValue.fromItemsCounted(),
+            VariadicValue.fromItemsCounted()
+        ], endpoint);
+
+        assert.lengthOf(typedValues, 2);
+        assert.deepEqual(typedValues[0].getType(), new VariadicType(new TypePlaceholder(), true));
+        assert.deepEqual(typedValues[0].valueOf(), []);
+        assert.deepEqual(typedValues[1].getType(), new VariadicType(new TypePlaceholder(), true));
+        assert.deepEqual(typedValues[1].valueOf(), []);
+    });
+
+    it("should perform type inference (counted-variadic and regular variadic arguments)", async () => {
+        const endpointModifiers = new EndpointModifiers("", []);
+        const inputParameters = [
+            new EndpointParameterDefinition("", "", new VariadicType(new U32Type(), true)),
+            new EndpointParameterDefinition("", "", new VariadicType(new BytesType(), false))
+        ];
+        const endpoint = new EndpointDefinition("foo", inputParameters, [], endpointModifiers);
+
+        // Implicit counted-variadic (not supported).
+        assert.throws(() => NativeSerializer.nativeToTypedValues([8, 9, 10], endpoint), ErrInvalidArgument);
+
+        // Explicit counted-variadic, empty implicit regular variadic.
+        let typedValues = NativeSerializer.nativeToTypedValues([
+            VariadicValue.fromItemsCounted(new U32Value(8), new U32Value(9), new U32Value(10))
+        ], endpoint);
+
+        assert.lengthOf(typedValues, 2);
+        assert.deepEqual(typedValues[0].getType(), new VariadicType(new U32Type(), true));
+        assert.deepEqual(typedValues[0].valueOf(), [new BigNumber(8), new BigNumber(9), new BigNumber(10)]);
+        assert.deepEqual(typedValues[1].getType(), new VariadicType(new BytesType(), false));
+        assert.deepEqual(typedValues[1].valueOf(), []);
+
+        // Explicit counted-variadic, non-empty implicit regular variadic.
+        typedValues = NativeSerializer.nativeToTypedValues([
+            VariadicValue.fromItemsCounted(new U32Value(8), new U32Value(9), new U32Value(10)),
+            "a", "b", "c"
+        ], endpoint);
+
+        assert.lengthOf(typedValues, 2);
+        assert.deepEqual(typedValues[0].getType(), new VariadicType(new U32Type(), true));
+        assert.deepEqual(typedValues[0].valueOf(), [new BigNumber(8), new BigNumber(9), new BigNumber(10)]);
+        assert.deepEqual(typedValues[1].getType(), new VariadicType(new BytesType(), false));
+        assert.deepEqual(typedValues[1].valueOf(), [Buffer.from("a"), Buffer.from("b"), Buffer.from("c")]);
     });
 
     it("should should handle optionals in a strict manner (but it does not)", async () => {
@@ -279,7 +361,7 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[0].valueOf(), new BigNumber(42));
         assert.deepEqual(typedValues[1].getType(), new VariadicType(new BytesType()));
         assert.deepEqual(typedValues[1].valueOf(), []);
-      });
+    });
 
     it("should perform type inference (enums)", async () => {
         const abiRegistry = AbiRegistry.create({
@@ -354,8 +436,8 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[1].getType(), enumType);
         assert.deepEqual(typedValues[1].valueOf(), { name: "Nothing", fields: [] });
         assert.deepEqual(typedValues[2].getType(), enumType);
-        assert.deepEqual(typedValues[2].valueOf(), { name: 'Something', fields: [ new Address('erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha') ] });
+        assert.deepEqual(typedValues[2].valueOf(), { name: 'Something', fields: [new Address('erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha')] });
         assert.deepEqual(typedValues[3].getType(), enumType);
-        assert.deepEqual(typedValues[3].valueOf(), { name: 'Else', fields: [ new BigNumber(42), new BigNumber(43) ] });
+        assert.deepEqual(typedValues[3].valueOf(), { name: 'Else', fields: [new BigNumber(42), new BigNumber(43)] });
     });
 });

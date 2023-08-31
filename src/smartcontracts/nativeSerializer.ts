@@ -18,7 +18,14 @@ export namespace NativeSerializer {
      */
     export function nativeToTypedValues(args: any[], endpoint: EndpointDefinition): TypedValue[] {
         args = args || [];
-        args = handleVariadicArgsAndRePack(args, endpoint);
+
+        checkArgumentsCardinality(args, endpoint);
+
+        if (hasNonCountedVariadicParameter(endpoint)) {
+            args = repackNonCountedVariadicParameters(args, endpoint);
+        } else {
+            // Repacking makes sense (it's possible) only for regular, non-counted variadic parameters.
+        }
 
         let parameters = endpoint.input;
         let values: TypedValue[] = [];
@@ -33,29 +40,39 @@ export namespace NativeSerializer {
         return values;
     }
 
-    function handleVariadicArgsAndRePack(args: any[], endpoint: EndpointDefinition) {
-        let parameters = endpoint.input;
-
-        let { min, max, variadic } = getArgumentsCardinality(parameters);
+    function checkArgumentsCardinality(args: any[], endpoint: EndpointDefinition) {
+        // With respect to the notes of "repackNonCountedVariadicParameters", "getArgumentsCardinality" will not be needed anymore.
+        // Currently, it is used only for a arguments count check, which will become redundant.
+        const { min, max } = getArgumentsCardinality(endpoint.input);
 
         if (!(min <= args.length && args.length <= max)) {
             throw new ErrInvalidArgument(`Wrong number of arguments for endpoint ${endpoint.name}: expected between ${min} and ${max} arguments, have ${args.length}`);
         }
+    }
 
-        if (variadic) {
-            const lastEndpointParamIndex = parameters.length - 1;
-            const argAtIndex = args[lastEndpointParamIndex];
+    function hasNonCountedVariadicParameter(endpoint: EndpointDefinition): boolean {
+        const lastParameter = endpoint.input[endpoint.input.length - 1];
+        return lastParameter?.type instanceof VariadicType && !lastParameter.type.isCounted;
+    }
 
-            if (argAtIndex?.belongsToTypesystem) {
-                const isVariadicValue = argAtIndex.hasClassOrSuperclass(VariadicValue.ClassName);
-                if (!isVariadicValue) {
-                    throw new ErrInvalidArgument(`Wrong argument type for endpoint ${endpoint.name}: typed value provided; expected variadic type, have ${argAtIndex.getClassName()}`);
-                }
+    // In a future version of the type inference system, re-packing logic will be removed.
+    // The client code will be responsible for passing the correctly packed arguments (variadic arguments explicitly packed as arrays).
+    // For developers, calling `foo(["erd1", 42, [1, 2, 3]])` will be less ambiguous than `foo(["erd1", 42, 1, 2, 3])`.
+    // Furthermore, multiple counted-variadic arguments cannot be expressed in the current variant.
+    // E.g. now, it's unreasonable to decide that `foo([1, 2, 3, "a", "b", "c"])` calls `foo(counted-variadic<int>, counted-variadic<string>)`.
+    function repackNonCountedVariadicParameters(args: any[], endpoint: EndpointDefinition) {
+        const lastEndpointParamIndex = endpoint.input.length - 1;
+        const argAtIndex = args[lastEndpointParamIndex];
 
-                // Do not repack.
-            } else {
-                args[lastEndpointParamIndex] = args.slice(lastEndpointParamIndex);
+        if (argAtIndex?.belongsToTypesystem) {
+            const isVariadicValue = argAtIndex.hasClassOrSuperclass(VariadicValue.ClassName);
+            if (!isVariadicValue) {
+                throw new ErrInvalidArgument(`Wrong argument type for endpoint ${endpoint.name}: typed value provided; expected variadic type, have ${argAtIndex.getClassName()}`);
             }
+
+            // Do not repack.
+        } else {
+            args[lastEndpointParamIndex] = args.slice(lastEndpointParamIndex);
         }
 
         return args;
@@ -135,7 +152,11 @@ export namespace NativeSerializer {
         return new OptionalValue(type, converted);
     }
 
-    function toVariadicValue(native: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
+    function toVariadicValue(native: any, type: VariadicType, errorContext: ArgumentErrorContext): TypedValue {
+        if (type.isCounted) {
+            throw new ErrInvalidArgument(`Counted variadic arguments must be explicitly typed. E.g. use "VariadicValue.fromItemsCounted()" or "new VariadicValue()"`);
+        }
+
         if (native == null) {
             native = [];
         }

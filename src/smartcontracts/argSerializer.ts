@@ -1,6 +1,6 @@
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { BinaryCodec } from "./codec";
-import { EndpointParameterDefinition, Type, TypedValue } from "./typesystem";
+import { EndpointParameterDefinition, Type, TypedValue, U32Type, U32Value } from "./typesystem";
 import { OptionalType, OptionalValue } from "./typesystem/algebraic";
 import { CompositeType, CompositeValue } from "./typesystem/composite";
 import { VariadicType, VariadicValue } from "./typesystem/variadic";
@@ -68,33 +68,48 @@ export class ArgSerializer {
 
         // This is a recursive function.
         function readValue(type: Type): TypedValue {
-            // TODO: Use matchers.
-
             if (type.hasExactClass(OptionalType.ClassName)) {
-                let typedValue = readValue(type.getFirstTypeParameter());
+                const typedValue = readValue(type.getFirstTypeParameter());
                 return new OptionalValue(type, typedValue);
-            } else if (type.hasExactClass(VariadicType.ClassName)) {
-                let typedValues = [];
+            }
 
-                while (!hasReachedTheEnd()) {
-                    typedValues.push(readValue(type.getFirstTypeParameter()));
-                }
+            if (type.hasExactClass(VariadicType.ClassName)) {
+                return readVariadicValue(type);
+            }
 
-                return new VariadicValue(type, typedValues);
-            } else if (type.hasExactClass(CompositeType.ClassName)) {
-                let typedValues = [];
+            if (type.hasExactClass(CompositeType.ClassName)) {
+                const typedValues = [];
 
                 for (const typeParameter of type.getTypeParameters()) {
                     typedValues.push(readValue(typeParameter));
                 }
 
                 return new CompositeValue(type, typedValues);
-            } else {
-                // Non-composite (singular), non-variadic (fixed) type.
-                // The only branching without a recursive call.
-                let typedValue = decodeNextBuffer(type);
-                return typedValue!;
             }
+
+            // Non-composite (singular), non-variadic (fixed) type.
+            // The only branching without a recursive call.
+            const typedValue = decodeNextBuffer(type);
+            return typedValue!;
+        }
+
+        function readVariadicValue(type: Type): TypedValue {
+            const variadicType = <VariadicType>type;
+            const typedValues = [];
+
+            if (variadicType.isCounted) {
+                const count: number = readValue(new U32Type()).valueOf().toNumber();
+
+                for (let i = 0; i < count; i++) {
+                    typedValues.push(readValue(type.getFirstTypeParameter()));
+                }
+            } else {
+                while (!hasReachedTheEnd()) {
+                    typedValues.push(readValue(type.getFirstTypeParameter()));
+                }
+            }
+
+            return new VariadicValue(variadicType, typedValues);
         }
 
         function decodeNextBuffer(type: Type): TypedValue | null {
@@ -141,7 +156,7 @@ export class ArgSerializer {
         // TODO: Refactor, split (function is quite complex).
         const self = this;
 
-        let buffers: Buffer[] = [];
+        const buffers: Buffer[] = [];
 
         for (const value of values) {
             handleValue(value);
@@ -149,28 +164,47 @@ export class ArgSerializer {
 
         // This is a recursive function. It appends to the "buffers" variable.
         function handleValue(value: TypedValue): void {
-            // TODO: Use matchers.
-
             if (value.hasExactClass(OptionalValue.ClassName)) {
-                let valueAsOptional = <OptionalValue>value;
+                const valueAsOptional = <OptionalValue>value;
+
                 if (valueAsOptional.isSet()) {
                     handleValue(valueAsOptional.getTypedValue());
                 }
-            } else if (value.hasExactClass(VariadicValue.ClassName)) {
-                let valueAsVariadic = <VariadicValue>value;
-                for (const item of valueAsVariadic.getItems()) {
-                    handleValue(item);
-                }
-            } else if (value.hasExactClass(CompositeValue.ClassName)) {
-                let valueAsComposite = <CompositeValue>value;
+
+                return;
+            }
+
+            if (value.hasExactClass(VariadicValue.ClassName)) {
+                handleVariadicValue(<VariadicValue>value);
+                return;
+            }
+
+            if (value.hasExactClass(CompositeValue.ClassName)) {
+                const valueAsComposite = <CompositeValue>value;
+
                 for (const item of valueAsComposite.getItems()) {
                     handleValue(item);
                 }
-            } else {
-                // Non-composite (singular), non-variadic (fixed) type.
-                // The only branching without a recursive call.
-                let buffer: Buffer = self.codec.encodeTopLevel(value);
-                buffers.push(buffer);
+
+                return
+            }
+
+            // Non-composite (singular), non-variadic (fixed) type.
+            // The only branching without a recursive call.
+            const buffer: Buffer = self.codec.encodeTopLevel(value);
+            buffers.push(buffer);
+        }
+
+        function handleVariadicValue(value: VariadicValue): void {
+            const variadicType = <VariadicType>value.getType();
+
+            if (variadicType.isCounted) {
+                const countValue = new U32Value(value.getItems().length);
+                buffers.push(self.codec.encodeTopLevel(countValue));
+            }
+
+            for (const item of value.getItems()) {
+                handleValue(item);
             }
         }
 

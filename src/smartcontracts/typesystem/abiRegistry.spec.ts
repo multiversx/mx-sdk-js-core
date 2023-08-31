@@ -10,6 +10,7 @@ import { ArrayVecType } from "./genericArray";
 import { BigUIntType, I64Type, U32Type, U64Type } from "./numerical";
 import { StructType } from "./struct";
 import { TokenIdentifierType } from "./tokenIdentifier";
+import { VariadicType } from "./variadic";
 
 describe("test abi registry", () => {
     it("load should also remap known to types", async () => {
@@ -127,5 +128,16 @@ describe("test abi registry", () => {
 
         assert.lengthOf(registry.customTypes, 12);
         assert.deepEqual(registry.getStruct("AuctionItem").getNamesOfDependencies(), ["u64", "Address", "BigUint", "Option", "NftData", "bytes", "TokenIdentifier", "List"]);
+    });
+
+    it("should load ABI with counted-variadic", async () => {
+        const registry = await loadAbiRegistry("src/testdata/counted-variadic.abi.json");
+        const dummyType = registry.getStruct("Dummy");
+
+        assert.deepEqual(registry.getEndpoint("foo").input[0].type, new VariadicType(dummyType, true));
+        assert.deepEqual(registry.getEndpoint("bar").input[0].type, new VariadicType(new U32Type(), true));
+        assert.deepEqual(registry.getEndpoint("bar").input[1].type, new VariadicType(new BytesType(), true));
+        assert.deepEqual(registry.getEndpoint("bar").output[0].type, new VariadicType(new U32Type(), true));
+        assert.deepEqual(registry.getEndpoint("bar").output[1].type, new VariadicType(new BytesType(), true));
     });
 });

@@ -1,64 +1,62 @@
 import { assert } from "chai";
-import { Type } from "./types";
-import { TypeExpressionParser } from "./typeExpressionParser";
-import { TypeMapper } from "./typeMapper";
-import { BigUIntType, I32Type, U16Type, U32Type, U64Type, U8Type } from "./numerical";
-import { BytesType } from "./bytes";
 import { AddressType } from "./address";
-import { VariadicType } from "./variadic";
 import { OptionalType } from "./algebraic";
+import { BytesType } from "./bytes";
 import { CompositeType } from "./composite";
 import { ListType, OptionType } from "./generic";
 import { ArrayVecType } from "./genericArray";
-import { TupleType } from "./tuple";
+import { BigUIntType, I32Type, U16Type, U32Type, U64Type, U8Type } from "./numerical";
 import { TokenIdentifierType } from "./tokenIdentifier";
-
-type TypeConstructor = new (...typeParameters: Type[]) => Type;
+import { TupleType } from "./tuple";
+import { TypeExpressionParser } from "./typeExpressionParser";
+import { TypeMapper } from "./typeMapper";
+import { Type } from "./types";
+import { VariadicType } from "./variadic";
 
 describe("test mapper", () => {
     let parser = new TypeExpressionParser();
     let mapper = new TypeMapper();
 
     it("should map primitive types", () => {
-        testMapping("u8", U8Type);
-        testMapping("u16", U16Type);
-        testMapping("u32", U32Type);
-        testMapping("u64", U64Type);
-        testMapping("BigUint", BigUIntType);
-        testMapping("TokenIdentifier", TokenIdentifierType);
+        testMapping("u8", new U8Type());
+        testMapping("u16", new U16Type());
+        testMapping("u32", new U32Type());
+        testMapping("u64", new U64Type());
+        testMapping("BigUint", new BigUIntType());
+        testMapping("TokenIdentifier", new TokenIdentifierType());
     });
 
     it("should map generic types", () => {
-        testMapping("Option<u64>", OptionType, [new U64Type()]);
-        testMapping("List<u64>", ListType, [new U64Type()]);
+        testMapping("Option<u64>", new OptionType(new U64Type()));
+        testMapping("List<u64>", new ListType(new U64Type()));
     });
 
     it("should map variadic types", () => {
-        testMapping("VarArgs<u32>", VariadicType, [new U32Type()]);
-        testMapping("VarArgs<bytes>", VariadicType, [new BytesType()]);
-        testMapping("MultiResultVec<u32>", VariadicType, [new U32Type()]);
-        testMapping("MultiResultVec<Address>", VariadicType, [new AddressType()]);
+        testMapping("VarArgs<u32>", new VariadicType(new U32Type()));
+        testMapping("VarArgs<bytes>", new VariadicType(new BytesType()));
+        testMapping("MultiResultVec<u32>", new VariadicType(new U32Type()));
+        testMapping("MultiResultVec<Address>", new VariadicType(new AddressType()));
     });
 
     it("should map complex generic, composite, variadic types", () => {
-        testMapping("MultiResultVec<MultiResult<i32,bytes,>>", VariadicType, [
+        testMapping("MultiResultVec<MultiResult<i32,bytes,>>", new VariadicType(
             new CompositeType(new I32Type(), new BytesType()),
-        ]);
-        testMapping("VarArgs<MultiArg<i32,bytes,>>", VariadicType, [new CompositeType(new I32Type(), new BytesType())]);
-        testMapping("OptionalResult<Address>", OptionalType, [new AddressType()]);
+        ));
+        testMapping("VarArgs<MultiArg<i32,bytes,>>", new VariadicType(new CompositeType(new I32Type(), new BytesType())));
+        testMapping("OptionalResult<Address>", new OptionalType(new AddressType()));
     });
 
     it("should map tuples", () => {
-        testMapping("tuple2<u32,bytes>", TupleType, [new U32Type(), new BytesType()]);
-        testMapping("tuple2<Address,BigUint>", TupleType, [new AddressType(), new BigUIntType()]);
-        testMapping("tuple3<u32, bytes, u64>", TupleType, [new U32Type(), new BytesType(), new U64Type()]);
+        testMapping("tuple2<u32,bytes>", new TupleType(new U32Type(), new BytesType()));
+        testMapping("tuple2<Address,BigUint>", new TupleType(new AddressType(), new BigUIntType()));
+        testMapping("tuple3<u32, bytes, u64>", new TupleType(new U32Type(), new BytesType(), new U64Type()));
         //TODO: Rewrite serializer to map more complex objects
 
         // After improvement enable the following test
-        // testMapping("tuple2<tuple3<u32, bytes, u64>, Address>", TupleType, [
-        //   new TupleType(new Type("tuple3", [new U32Type(), new BytesType(), new U64Type()])),
-        //   new AddressType(),
-        // ]);
+        // testMapping("tuple2<tuple3<u32, bytes, u64>, Address>", new TupleType(
+        //     new TupleType(new Type("tuple3", [new U32Type(), new BytesType(), new U64Type()])),
+        //     new AddressType(),
+        // ));
     });
 
     it("should map arrays", () => {
@@ -76,11 +74,11 @@ describe("test mapper", () => {
         assert.deepEqual(mappedType, new ArrayVecType(size, typeParameter));
     }
 
-    function testMapping(expression: string, constructor: TypeConstructor, typeParameters: Type[] = []) {
+    function testMapping(expression: string, expectedType: Type) {
         let type = parser.parse(expression);
         let mappedType = mapper.mapType(type);
 
-        assert.instanceOf(mappedType, constructor);
-        assert.deepEqual(mappedType, new constructor(...typeParameters));
+        assert.instanceOf(mappedType, expectedType.constructor);
+        assert.deepEqual(mappedType, expectedType);
     }
 });

@@ -61,23 +61,18 @@ export namespace NativeSerializer {
     // Furthermore, multiple counted-variadic arguments cannot be expressed in the current variant.
     // E.g. now, it's unreasonable to decide that `foo([1, 2, 3, "a", "b", "c"])` calls `foo(counted-variadic<int>, counted-variadic<string>)`.
     function repackNonCountedVariadicParameters(args: any[], endpoint: EndpointDefinition) {
-        let parameters = endpoint.input;
+        const lastEndpointParamIndex = endpoint.input.length - 1;
+        const argAtIndex = args[lastEndpointParamIndex];
 
-        // TODO: Remove after first review. Temporarily left this way to make the review easier.
-        if (true) {
-            const lastEndpointParamIndex = parameters.length - 1;
-            const argAtIndex = args[lastEndpointParamIndex];
-
-            if (argAtIndex?.belongsToTypesystem) {
-                const isVariadicValue = argAtIndex.hasClassOrSuperclass(VariadicValue.ClassName);
-                if (!isVariadicValue) {
-                    throw new ErrInvalidArgument(`Wrong argument type for endpoint ${endpoint.name}: typed value provided; expected variadic type, have ${argAtIndex.getClassName()}`);
-                }
-
-                // Do not repack.
-            } else {
-                args[lastEndpointParamIndex] = args.slice(lastEndpointParamIndex);
+        if (argAtIndex?.belongsToTypesystem) {
+            const isVariadicValue = argAtIndex.hasClassOrSuperclass(VariadicValue.ClassName);
+            if (!isVariadicValue) {
+                throw new ErrInvalidArgument(`Wrong argument type for endpoint ${endpoint.name}: typed value provided; expected variadic type, have ${argAtIndex.getClassName()}`);
             }
+
+            // Do not repack.
+        } else {
+            args[lastEndpointParamIndex] = args.slice(lastEndpointParamIndex);
         }
 
         return args;

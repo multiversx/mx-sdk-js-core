@@ -20,3 +20,8 @@ export function zeroPadStringIfOddLength(input: string): string {
 
     return input;
 }
+
+export function utf8ToHex(value: string) {
+    const hex = Buffer.from(value).toString("hex");
+    return zeroPadStringIfOddLength(hex);
+}

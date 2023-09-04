@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { IAddress } from "../interface";
 import { TransactionIntent } from "../transactionIntent";
-import { AbiRegistry, ArgSerializer, CodeMetadata, TypedValue } from "../smartcontracts";
+import { AbiRegistry, ArgSerializer, CodeMetadata, EndpointDefinition, TypedValue } from "../smartcontracts";
 import { byteArrayToHex } from "../utils.codec";
 import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
@@ -29,10 +29,10 @@ export class SmartContractTransactionIntentsFactory {
         bytecode: Uint8Array,
         gasLimit: BigNumber.Value,
         args: any[],
-        isUpgradeable: boolean = true,
-        isReadable: boolean = true,
-        isPayable: boolean = false,
-        isPayableBySmartContract: boolean = true
+        isUpgradeable = true,
+        isReadable = true,
+        isPayable = false,
+        isPayableBySmartContract = true
     ): TransactionIntent {
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
         let parts = [
@@ -41,7 +41,14 @@ export class SmartContractTransactionIntentsFactory {
             metadata.toString()
         ];
 
-        parts = parts.concat(this.argsToStrings(args));
+        let preparedArgs: string[];
+        if (this.abiRegistry) {
+            preparedArgs = this.argsToStrings(args, this.abiRegistry.constructorDefinition)
+        }
+        else {
+            preparedArgs = this.argsToStrings(args)
+        }
+        parts = parts.concat(preparedArgs);
 
         return new TransactionIntentBuilder(
             this.config,
@@ -49,14 +56,77 @@ export class SmartContractTransactionIntentsFactory {
             Address.fromBech32(CONTRACT_DEPLOY_ADDRESS),
             parts,
             gasLimit
-        ).build()
+        ).build();
     }
 
-    private argsToStrings(args: any[]): string[] {
-        if (this.abiRegistry !== undefined) {
-            const constructorDefinition = this.abiRegistry.constructorDefinition
-            const typedArgs = NativeSerializer.nativeToTypedValues(args, constructorDefinition)
-            return new ArgSerializer().valuesToStrings(args);
+    createTransactionIntentForExecute(
+        sender: IAddress,
+        contractAddress: IAddress,
+        func: string,
+        gasLimit: BigNumber.Value,
+        args: any[] = []
+    ): TransactionIntent {
+        let parts: string[] = [func];
+
+        let preparedArgs: string[];
+        if (this.abiRegistry) {
+            preparedArgs = this.argsToStrings(args, this.abiRegistry.getEndpoint(func));
+        }
+        else {
+            preparedArgs = this.argsToStrings(args);
+        }
+        parts = parts.concat(preparedArgs);
+
+        return new TransactionIntentBuilder(
+            this.config,
+            sender,
+            contractAddress,
+            parts,
+            gasLimit
+        ).build();
+    }
+
+    createTransactionIntentForUpgrade(
+        sender: IAddress,
+        contract: IAddress,
+        bytecode: Uint8Array,
+        gasLimit: BigNumber.Value,
+        args: any[],
+        isUpgradeable = true,
+        isReadable = true,
+        isPayable = false,
+        isPayableBySmartContract = true
+    ): TransactionIntent {
+        const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
+
+        let parts = [
+            "upgradeContract",
+            byteArrayToHex(bytecode),
+            metadata.toString()
+        ];
+
+        let preparedArgs: string[];
+        if (this.abiRegistry) {
+            preparedArgs = this.argsToStrings(args, this.abiRegistry.constructorDefinition)
+        }
+        else {
+            preparedArgs = this.argsToStrings(args)
+        }
+        parts = parts.concat(preparedArgs);
+
+        return new TransactionIntentBuilder(
+            this.config,
+            sender,
+            contract,
+            parts,
+            gasLimit
+        ).build();
+    }
+
+    private argsToStrings(args: any[], endpoint?: EndpointDefinition): string[] {
+        if (endpoint) {
+            const typedArgs = NativeSerializer.nativeToTypedValues(args, endpoint)
+            return new ArgSerializer().valuesToStrings(typedArgs);
         }
 
         if (this.areArgsOfTypedValue(args)) {

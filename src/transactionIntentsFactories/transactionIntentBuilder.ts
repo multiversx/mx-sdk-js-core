@@ -32,15 +32,14 @@ export class TransactionIntentBuilder {
         return gasLimit;
     }
 
-    private buildTransactionPayload(dataParts: string[]): TransactionPayload {
-        const data = dataParts.join(ARGUMENTS_SEPARATOR);
+    private buildTransactionPayload(): TransactionPayload {
+        const data = this.dataParts.join(ARGUMENTS_SEPARATOR);
         return new TransactionPayload(data);
     }
 
     build(): TransactionIntent {
-        const data = this.buildTransactionPayload(this.dataParts)
+        const data = this.buildTransactionPayload()
         const gasLimit = this.computeGasLimit(data, this.executionGasLimit);
-
 
         return new TransactionIntent(
             this.sender.bech32(),

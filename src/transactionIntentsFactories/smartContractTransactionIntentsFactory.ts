@@ -2,7 +2,7 @@ import { BigNumber } from "bignumber.js";
 import { IAddress } from "../interface";
 import { TransactionIntent } from "../transactionIntent";
 import { AbiRegistry, ArgSerializer, CodeMetadata, TypedValue } from "../smartcontracts";
-import { utf8ToHex } from "../utils.codec";
+import { byteArrayToHex } from "../utils.codec";
 import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
 import { Err } from "../errors";
@@ -32,12 +32,12 @@ export class SmartContractTransactionIntentsFactory {
         isUpgradeable: boolean = true,
         isReadable: boolean = true,
         isPayable: boolean = false,
-        isPayableBySmartContract: boolean = false
+        isPayableBySmartContract: boolean = true
     ): TransactionIntent {
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
         let parts = [
-            utf8ToHex(bytecode.toString()),
-            utf8ToHex(VM_TYPE_WASM_VM.toString()),
+            byteArrayToHex(bytecode),
+            byteArrayToHex(VM_TYPE_WASM_VM),
             metadata.toString()
         ];
 
@@ -52,7 +52,7 @@ export class SmartContractTransactionIntentsFactory {
         ).build()
     }
 
-    private argsToStrings(args: any): string[] {
+    private argsToStrings(args: any[]): string[] {
         if (this.abiRegistry !== undefined) {
             const constructorDefinition = this.abiRegistry.constructorDefinition
             const typedArgs = NativeSerializer.nativeToTypedValues(args, constructorDefinition)

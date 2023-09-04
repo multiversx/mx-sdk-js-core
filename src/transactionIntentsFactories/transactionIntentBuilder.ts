@@ -27,12 +27,12 @@ export class TransactionIntentBuilder {
     }
 
     private computeGasLimit(payload: ITransactionPayload, executionGasLimit: BigNumber.Value): BigNumber.Value {
-        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).plus(new BigNumber(payload.length())));
+        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).multipliedBy(new BigNumber(payload.length())));
         const gasLimit = new BigNumber(dataMovementGas).plus(new BigNumber(executionGasLimit));
         return gasLimit;
     }
 
-    private buildTransactionPayload(dataParts: string[]): ITransactionPayload {
+    private buildTransactionPayload(dataParts: string[]): TransactionPayload {
         const data = dataParts.join(ARGUMENTS_SEPARATOR);
         return new TransactionPayload(data);
     }
@@ -46,7 +46,7 @@ export class TransactionIntentBuilder {
             this.sender.bech32(),
             this.receiver.bech32(),
             gasLimit,
-            this.value !== 0 ? this.value : 0,
+            this.value !== undefined ? this.value : 0,
             data.valueOf()
         )
     }

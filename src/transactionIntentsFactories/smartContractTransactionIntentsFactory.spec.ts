@@ -129,6 +129,7 @@ describe("test smart contract intents factory", function () {
             gasLimit: gasLimit,
             args: args
         });
+
         const abiDeployIntent = abiAwareFactory.createTransactionIntentForUpgrade({
             sender: sender,
             contract: contract,
@@ -140,7 +141,7 @@ describe("test smart contract intents factory", function () {
         assert.equal(deployIntent.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(deployIntent.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         assert.isDefined(deployIntent.data);
-        assert(checkIfByteArrayStartsWith(deployIntent.data!, "upgradeContract@"));
+        assert.isTrue(Buffer.from(deployIntent.data!).toString().startsWith("upgradeContract@"));
 
         const expectedGasLimit = 6000000 + 50000 + 1500 * deployIntent.data!.length;
         assert.equal(deployIntent.gasLimit.valueOf(), expectedGasLimit);
@@ -148,15 +149,4 @@ describe("test smart contract intents factory", function () {
 
         assert.deepEqual(deployIntent, abiDeployIntent);
     });
-
-    function checkIfByteArrayStartsWith(array: Uint8Array, sequence: string) {
-        const sequenceBytes = Buffer.from(sequence);
-
-        for (let i = 0; i < sequenceBytes.length; i++) {
-            if (sequenceBytes[i] !== array[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
 });

@@ -60,8 +60,7 @@ export class DelegationTransactionIntentsFactory {
         delegationContract: IAddress,
         publicKeys: ValidatorPublicKey[],
         signedMessages: Uint8Array[]
-    }
-    ): TransactionIntent {
+    }): TransactionIntent {
         if (options.publicKeys.length !== options.signedMessages.length) {
             throw new Err("The number of public keys should match the number of signed messages");
         }
@@ -92,8 +91,7 @@ export class DelegationTransactionIntentsFactory {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: ValidatorPublicKey[]
-    }
-    ): TransactionIntent {
+    }): TransactionIntent {
         let dataParts = ["removeNodes"];
 
         for (const key of options.publicKeys) {
@@ -115,8 +113,7 @@ export class DelegationTransactionIntentsFactory {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: ValidatorPublicKey[]
-    }
-    ): TransactionIntent {
+    }): TransactionIntent {
         let dataParts = ["stakeNodes"];
 
         for (const key of options.publicKeys) {
@@ -138,122 +135,122 @@ export class DelegationTransactionIntentsFactory {
         ).build();
     }
 
-    createTransactionIntentForUnbondingNodes(
+    createTransactionIntentForUnbondingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: ValidatorPublicKey[]
-    ): TransactionIntent {
+    }): TransactionIntent {
         let dataParts = ["unBondNodes"];
 
-        for (const key of publicKeys) {
+        for (const key of options.publicKeys) {
             dataParts = dataParts.concat(key.hex());
         }
 
-        const numNodes = publicKeys.length;
+        const numNodes = options.publicKeys.length;
         const executionGasLimit = new BigNumber(numNodes).multipliedBy(
-            new BigNumber(this.config.additionalGasLimitPerValidatorNode)).plus(
-                new BigNumber(this.config.gasLimitUnbond)
+            this.config.additionalGasLimitPerValidatorNode).plus(
+                this.config.gasLimitUnbond
             ).plus(this.config.gasLimitDelegationOperations);
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
             executionGasLimit
         ).build();
     }
 
-    createTransactionIntentForUnstakingNodes(
+    createTransactionIntentForUnstakingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: ValidatorPublicKey[]
-    ): TransactionIntent {
+    }): TransactionIntent {
         let dataParts = ["unStakeNodes"];
 
-        for (const key of publicKeys) {
+        for (const key of options.publicKeys) {
             dataParts = dataParts.concat(key.hex());
         }
 
-        const numNodes = publicKeys.length;
+        const numNodes = options.publicKeys.length;
         const executionGasLimit = new BigNumber(numNodes).multipliedBy(
-            new BigNumber(this.config.additionalGasLimitPerValidatorNode)).plus(
-                new BigNumber(this.config.gasLimitUnstake)
+            this.config.additionalGasLimitPerValidatorNode).plus(
+                this.config.gasLimitUnstake
             ).plus(this.config.gasLimitDelegationOperations);
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
             executionGasLimit
         ).build();
     }
 
-    createTransactionIntentForUnjailingNodes(
+    createTransactionIntentForUnjailingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: ValidatorPublicKey[]
-    ): TransactionIntent {
+    }): TransactionIntent {
         let dataParts = ["unJailNodes"];
 
-        for (const key of publicKeys) {
+        for (const key of options.publicKeys) {
             dataParts = dataParts.concat(key.hex());
         }
 
-        const numNodes = publicKeys.length;
+        const numNodes = options.publicKeys.length;
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
             this.computeExecutionGasLimitForNodesManagement(numNodes)
         ).build();
     }
 
-    createTransactionIntentForChangingServiceFee(
+    createTransactionIntentForChangingServiceFee(options: {
         sender: IAddress,
         delegationContract: IAddress,
         serviceFee: BigNumber.Value
-    ): TransactionIntent {
+    }): TransactionIntent {
         const dataParts = [
             "changeServiceFee",
-            numberToPaddedHex(serviceFee)
+            numberToPaddedHex(options.serviceFee)
         ];
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
-            new BigNumber(this.config.gasLimitDelegationOperations).plus(new BigNumber(this.config.additionalGasLimitForDelegationOperations))
+            new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
         ).build();
     }
 
-    createTransactionIntentForModifyingDelegationCap(
+    createTransactionIntentForModifyingDelegationCap(options: {
         sender: IAddress,
         delegationContract: IAddress,
         delegationCap: BigNumber.Value
-    ): TransactionIntent {
+    }): TransactionIntent {
         const dataParts = [
             "modifyTotalDelegationCap",
-            numberToPaddedHex(delegationCap)
+            numberToPaddedHex(options.delegationCap)
         ];
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
-            new BigNumber(this.config.gasLimitDelegationOperations).plus(new BigNumber(this.config.additionalGasLimitForDelegationOperations))
+            new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
         ).build();
     }
 
-    createTransactionIntentForSettingAutomaticActivation(
+    createTransactionIntentForSettingAutomaticActivation(options: {
         sender: IAddress,
         delegationContract: IAddress
-    ): TransactionIntent {
+    }): TransactionIntent {
         const dataParts = [
             "setAutomaticActivation",
             utf8ToHex("true")
@@ -261,17 +258,17 @@ export class DelegationTransactionIntentsFactory {
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
-            new BigNumber(this.config.gasLimitDelegationOperations).plus(new BigNumber(this.config.additionalGasLimitForDelegationOperations))
+            new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
         ).build();
     }
 
-    createTransactionIntentForUnsettingAutomaticActivation(
+    createTransactionIntentForUnsettingAutomaticActivation(options: {
         sender: IAddress,
         delegationContract: IAddress
-    ): TransactionIntent {
+    }): TransactionIntent {
         const dataParts = [
             "setAutomaticActivation",
             utf8ToHex("false")
@@ -279,17 +276,17 @@ export class DelegationTransactionIntentsFactory {
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
-            new BigNumber(this.config.gasLimitDelegationOperations).plus(new BigNumber(this.config.additionalGasLimitForDelegationOperations))
+            new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
         ).build();
     }
 
-    createTransactionIntentForSettingCapCheckOnRedelegateRewards(
+    createTransactionIntentForSettingCapCheckOnRedelegateRewards(options: {
         sender: IAddress,
         delegationContract: IAddress
-    ): TransactionIntent {
+    }): TransactionIntent {
         const dataParts = [
             "setCheckCapOnReDelegateRewards",
             utf8ToHex("true")
@@ -297,17 +294,17 @@ export class DelegationTransactionIntentsFactory {
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
-            new BigNumber(this.config.gasLimitDelegationOperations).plus(new BigNumber(this.config.additionalGasLimitForDelegationOperations))
+            new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
         ).build();
     }
 
-    createTransactionIntentForUnsettingCapCheckOnRedelegateRewards(
+    createTransactionIntentForUnsettingCapCheckOnRedelegateRewards(options: {
         sender: IAddress,
         delegationContract: IAddress
-    ): TransactionIntent {
+    }): TransactionIntent {
         const dataParts = [
             "setCheckCapOnReDelegateRewards",
             utf8ToHex("false")
@@ -315,33 +312,33 @@ export class DelegationTransactionIntentsFactory {
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
-            new BigNumber(this.config.gasLimitDelegationOperations).plus(new BigNumber(this.config.additionalGasLimitForDelegationOperations))
+            new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
         ).build();
     }
 
-    createTransactionIntentForSettingMetadata(
+    createTransactionIntentForSettingMetadata(options: {
         sender: IAddress,
         delegationContract: IAddress,
         name: string,
         website: string,
         identifier: string
-    ): TransactionIntent {
+    }): TransactionIntent {
         const dataParts = [
             "setMetaData",
-            utf8ToHex(name),
-            utf8ToHex(website),
-            utf8ToHex(identifier)
+            utf8ToHex(options.name),
+            utf8ToHex(options.website),
+            utf8ToHex(options.identifier)
         ];
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
-            new BigNumber(this.config.gasLimitDelegationOperations).plus(new BigNumber(this.config.additionalGasLimitForDelegationOperations))
+            new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
         ).build();
     }
 }

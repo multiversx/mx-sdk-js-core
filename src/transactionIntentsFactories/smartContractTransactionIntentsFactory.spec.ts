@@ -73,12 +73,10 @@ describe("test smart contract intents factory", function () {
         assert.equal(deployIntent.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(deployIntent.receiver, CONTRACT_DEPLOY_ADDRESS);
         assert.isDefined(deployIntent.data);
-        expect(deployIntent.data?.length).to.be.greaterThan(0);
+        expect(deployIntent.data!.length).to.be.greaterThan(0);
 
-        if (deployIntent.data) {
-            const expectedGasLimit = 6000000 + 50000 + 1500 * deployIntent.data.length;
-            assert.equal(deployIntent.gasLimit.valueOf(), expectedGasLimit);
-        }
+        const expectedGasLimit = 6000000 + 50000 + 1500 * deployIntent.data!.length;
+        assert.equal(deployIntent.gasLimit.valueOf(), expectedGasLimit);
         assert.equal(deployIntent.value, 0);
 
         assert.deepEqual(deployIntent, abiDeployIntent);
@@ -142,13 +140,10 @@ describe("test smart contract intents factory", function () {
         assert.equal(deployIntent.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(deployIntent.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         assert.isDefined(deployIntent.data);
+        assert(checkIfByteArrayStartsWith(deployIntent.data!, "upgradeContract@"));
 
-        if (deployIntent.data) {
-            assert(checkIfByteArrayStartsWith(deployIntent.data, "upgradeContract@"));
-
-            const expectedGasLimit = 6000000 + 50000 + 1500 * deployIntent.data.length;
-            assert.equal(deployIntent.gasLimit.valueOf(), expectedGasLimit);
-        }
+        const expectedGasLimit = 6000000 + 50000 + 1500 * deployIntent.data!.length;
+        assert.equal(deployIntent.gasLimit.valueOf(), expectedGasLimit);
         assert.equal(deployIntent.value, 0);
 
         assert.deepEqual(deployIntent, abiDeployIntent);

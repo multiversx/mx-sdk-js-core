@@ -7,11 +7,17 @@ export class TransactionIntent {
     public value?: BigNumber.Value;
     public data?: Uint8Array;
 
-    public constructor(sender: string, receiver: string, gasLimit: BigNumber.Value, value?: BigNumber.Value, data?: Uint8Array) {
-        this.sender = sender;
-        this.receiver = receiver;
-        this.gasLimit = gasLimit;
-        this.value = value;
-        this.data = data;
+    public constructor(options: {
+        sender: string,
+        receiver: string,
+        gasLimit: BigNumber.Value,
+        value?: BigNumber.Value,
+        data?: Uint8Array
+    }) {
+        this.sender = options.sender;
+        this.receiver = options.receiver;
+        this.gasLimit = options.gasLimit;
+        this.value = options.value;
+        this.data = options.data;
     }
 }

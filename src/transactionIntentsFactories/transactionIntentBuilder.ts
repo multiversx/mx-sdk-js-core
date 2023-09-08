@@ -17,18 +17,25 @@ export class TransactionIntentBuilder {
     private executionGasLimit: BigNumber.Value;
     private value?: BigNumber.Value;
 
-    constructor(config: Config, sender: IAddress, receiver: IAddress, dataParts: string[], executionGasLimit: BigNumber.Value, value?: BigNumber.Value) {
-        this.config = config;
-        this.sender = sender;
-        this.receiver = receiver;
-        this.dataParts = dataParts;
-        this.executionGasLimit = executionGasLimit;
-        this.value = value;
+    constructor(options: {
+        config: Config,
+        sender: IAddress,
+        receiver: IAddress,
+        dataParts: string[],
+        executionGasLimit: BigNumber.Value,
+        value?: BigNumber.Value
+    }) {
+        this.config = options.config;
+        this.sender = options.sender;
+        this.receiver = options.receiver;
+        this.dataParts = options.dataParts;
+        this.executionGasLimit = options.executionGasLimit;
+        this.value = options.value;
     }
 
     private computeGasLimit(payload: ITransactionPayload, executionGasLimit: BigNumber.Value): BigNumber.Value {
-        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).multipliedBy(new BigNumber(payload.length())));
-        const gasLimit = new BigNumber(dataMovementGas).plus(new BigNumber(executionGasLimit));
+        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()));
+        const gasLimit = dataMovementGas.plus(executionGasLimit);
         return gasLimit;
     }
 
@@ -41,12 +48,12 @@ export class TransactionIntentBuilder {
         const data = this.buildTransactionPayload()
         const gasLimit = this.computeGasLimit(data, this.executionGasLimit);
 
-        return new TransactionIntent(
-            this.sender.bech32(),
-            this.receiver.bech32(),
-            gasLimit,
-            this.value !== undefined ? this.value : 0,
-            data.valueOf()
-        )
+        return new TransactionIntent({
+            sender: this.sender.bech32(),
+            receiver: this.receiver.bech32(),
+            gasLimit: gasLimit,
+            value: this.value || 0,
+            data: data.valueOf()
+        })
     }
 }

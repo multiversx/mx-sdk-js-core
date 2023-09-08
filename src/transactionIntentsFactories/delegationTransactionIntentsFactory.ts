@@ -25,111 +25,114 @@ interface ValidatorPublicKey {
 }
 
 export class DelegationTransactionIntentsFactory {
-    private config: Config;
+    private readonly config: Config;
 
     constructor(config: Config) {
         this.config = config;
     }
 
-    createTransactionIntentForNewDelegationContract(
+    createTransactionIntentForNewDelegationContract(options: {
         sender: IAddress,
         totalDelegationCap: BigNumber.Value,
         serviceFee: BigNumber.Value,
         value: BigNumber.Value
-    ): TransactionIntent {
+    }): TransactionIntent {
         const dataParts = [
             "createNewDelegationContract",
-            numberToPaddedHex(totalDelegationCap.toString()),
-            numberToPaddedHex(serviceFee.toString())
+            numberToPaddedHex(options.totalDelegationCap.toString()),
+            numberToPaddedHex(options.serviceFee.toString())
         ];
 
-        const executionGasLimit = new BigNumber(this.config.gasLimitCreateDelegationContract).plus(new BigNumber(this.config.additionalGasLimitForDelegationOperations));
+        const executionGasLimit = new BigNumber(this.config.gasLimitCreateDelegationContract).plus(this.config.additionalGasLimitForDelegationOperations);
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
+            options.sender,
             Address.fromBech32(DELEGATION_MANAGER_SC_ADDRESS),
             dataParts,
             executionGasLimit,
-            value
+            options.value
         ).build();
     }
 
-    createTransactionIntentForAddingNodes(
+    createTransactionIntentForAddingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: ValidatorPublicKey[],
         signedMessages: Uint8Array[]
+    }
     ): TransactionIntent {
-        if (publicKeys.length !== signedMessages.length) {
+        if (options.publicKeys.length !== options.signedMessages.length) {
             throw new Err("The number of public keys should match the number of signed messages");
         }
 
-        const numNodes = publicKeys.length;
+        const numNodes = options.publicKeys.length;
 
         let dataParts = ["addNodes"];
         for (let i = 0; i < numNodes; i++) {
-            dataParts = dataParts.concat(publicKeys[i].hex());
-            dataParts = dataParts.concat(byteArrayToHex(signedMessages[i]));
+            dataParts = dataParts.concat(options.publicKeys[i].hex());
+            dataParts = dataParts.concat(byteArrayToHex(options.signedMessages[i]));
         }
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
             this.computeExecutionGasLimitForNodesManagement(numNodes)
         ).build();
     }
 
     private computeExecutionGasLimitForNodesManagement(numNodes: number): BigNumber.Value {
-        const additionalGasForAllNodes = new BigNumber(this.config.additionalGasLimitPerValidatorNode).multipliedBy(new BigNumber(numNodes));
+        const additionalGasForAllNodes = new BigNumber(this.config.additionalGasLimitPerValidatorNode).multipliedBy(numNodes);
         return new BigNumber(this.config.gasLimitDelegationOperations).plus(additionalGasForAllNodes);
     }
 
-    createTransactionIntentForRemovingNodes(
+    createTransactionIntentForRemovingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: ValidatorPublicKey[]
+    }
     ): TransactionIntent {
         let dataParts = ["removeNodes"];
 
-        for (const key of publicKeys) {
+        for (const key of options.publicKeys) {
             dataParts = dataParts.concat(key.hex());
         }
 
-        const numNodes = publicKeys.length;
+        const numNodes = options.publicKeys.length;
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
             this.computeExecutionGasLimitForNodesManagement(numNodes)
         ).build();
     }
 
-    createTransactionIntentForStakingNodes(
+    createTransactionIntentForStakingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: ValidatorPublicKey[]
+    }
     ): TransactionIntent {
         let dataParts = ["stakeNodes"];
 
-        for (const key of publicKeys) {
+        for (const key of options.publicKeys) {
             dataParts = dataParts.concat(key.hex());
         }
 
-        const numNodes = publicKeys.length;
+        const numNodes = options.publicKeys.length;
         const executionGasLimit = new BigNumber(numNodes).multipliedBy(
-            new BigNumber(this.config.additionalGasLimitPerValidatorNode)).plus(
-                new BigNumber(this.config.gasLimitStake)
+            this.config.additionalGasLimitPerValidatorNode).plus(
+                this.config.gasLimitStake
             ).plus(this.config.gasLimitDelegationOperations);
 
         return new TransactionIntentBuilder(
             this.config,
-            sender,
-            delegationContract,
+            options.sender,
+            options.delegationContract,
             dataParts,
             executionGasLimit
         ).build();

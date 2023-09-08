@@ -26,12 +26,12 @@ describe("test delegation intents factory", function () {
         const serviceFee = new BigNumber(10);
         const value = new BigNumber("1250000000000000000000");
 
-        const intent = delegationFactory.createTransactionIntentForNewDelegationContract(
-            sender,
-            delagationCap,
-            serviceFee,
-            value
-        );
+        const intent = delegationFactory.createTransactionIntentForNewDelegationContract({
+            sender: sender,
+            totalDelegationCap: delagationCap,
+            serviceFee: serviceFee,
+            value: value
+        });
 
         assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         assert.equal(intent.receiver, DELEGATION_MANAGER_SC_ADDRESS);
@@ -52,12 +52,12 @@ describe("test delegation intents factory", function () {
         const signedMessage = new SignableMessage();
         signedMessage.applySignature(Buffer.from("81109fa1c8d3dc7b6c2d6e65206cc0bc1a83c9b2d1eb91a601d66ad32def430827d5eb52917bd2b0d04ce195738db216", "hex"));
 
-        const intent = delegationFactory.createTransactionIntentForAddingNodes(
-            sender,
-            delegationContract,
-            [publicKey],
-            [signedMessage.getSignature()]
-        );
+        const intent = delegationFactory.createTransactionIntentForAddingNodes({
+            sender: sender,
+            delegationContract: delegationContract,
+            publicKeys: [publicKey],
+            signedMessages: [signedMessage.getSignature()]
+        });
 
         assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
@@ -79,11 +79,11 @@ describe("test delegation intents factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionIntentForRemovingNodes(
-            sender,
-            delegationContract,
-            [publicKey]
-        );
+        const intent = delegationFactory.createTransactionIntentForRemovingNodes({
+            sender: sender,
+            delegationContract: delegationContract,
+            publicKeys: [publicKey]
+        });
 
         assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
@@ -105,11 +105,11 @@ describe("test delegation intents factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionIntentForStakingNodes(
-            sender,
-            delegationContract,
-            [publicKey]
-        );
+        const intent = delegationFactory.createTransactionIntentForStakingNodes({
+            sender: sender,
+            delegationContract: delegationContract,
+            publicKeys: [publicKey]
+        });
 
         assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");

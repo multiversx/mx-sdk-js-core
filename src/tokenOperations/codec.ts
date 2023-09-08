@@ -32,10 +32,7 @@ export function bigIntToHex(value: BigNumber.Value): string {
     return contractsCodecUtils.getHexMagnitudeOfBigInt(value);
 }
 
-export function utf8ToHex(value: string) {
-    const hex = Buffer.from(value).toString("hex");
-    return codecUtils.zeroPadStringIfOddLength(hex);
-}
+export { utf8ToHex } from "../utils.codec";
 
 export function bufferToHex(value: Buffer) {
     const hex = value.toString("hex");

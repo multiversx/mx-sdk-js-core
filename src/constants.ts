@@ -10,3 +10,6 @@ export const ESDTNFT_TRANSFER_FUNCTION_NAME = "ESDTNFTTransfer";
 export const MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME = "MultiESDTNFTTransfer";
 export const ESDT_TRANSFER_VALUE = "0";
 export const ARGUMENTS_SEPARATOR = "@";
+export const VM_TYPE_WASM_VM = new Uint8Array([0x05, 0x00]);
+export const CONTRACT_DEPLOY_ADDRESS = "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu"
+

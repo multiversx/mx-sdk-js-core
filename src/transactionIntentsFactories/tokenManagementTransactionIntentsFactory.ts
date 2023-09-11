@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { TransactionIntent } from "../transactionIntent";
 import { TransactionIntentBuilder } from "./transactionIntentBuilder";
 import { IAddress } from "../interface";
-import { utf8ToHex, bigIntToHex, addressToHex } from "../utils.codec";
+import { utf8ToHex, bigIntToHex, addressToHex, byteArrayToHex } from "../utils.codec";
 import { ESDT_CONTRACT_ADDRESS } from "../constants";
 import { Address } from "../address";
 import { Logger } from "../logger";
@@ -76,15 +76,6 @@ export class TokenManagementTransactionIntentsFactory {
             executionGasLimit: this.config.gasLimitIssue,
             value: this.config.issueCost
         }).build();
-    }
-
-    private notifyAboutUnsettingBurnRoleGlobally() {
-        Logger.info(`
-==========
-IMPORTANT!
-==========
-You are about to issue (register) a new token. This will set the role "ESDTRoleBurnForAll" (globally).
-Once the token is registered, you can unset this role by calling "unsetBurnRoleGlobally" (in a separate transaction).`);
     }
 
     createTransactionIntentForIssuingSemiFungible(options: {
@@ -161,7 +152,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
         }).build();
     }
 
-    createTransactionIntentForRegisteringMetaEsdt(options: {
+    createTransactionIntentForRegisteringMetaESDT(options: {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
@@ -285,5 +276,320 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             dataParts: dataParts,
             executionGasLimit: this.config.gasLimitSetSpecialRole
         }).build();
+    }
+
+    createTransactionIntentForSettingSpecialRoleOnSemiFungibleToken(options: {
+        sender: IAddress;
+        user: IAddress;
+        tokenIdentifier: string;
+        addRoleNFTCreate: boolean;
+        addRoleNFTBurn: boolean;
+        addRoleNFTAddQuantity: boolean;
+        addRoleESDTTransferRole: boolean;
+    }): TransactionIntent {
+        const dataParts = [
+            "setSpecialRole",
+            utf8ToHex(options.tokenIdentifier),
+            addressToHex(options.user),
+            ...(options.addRoleNFTCreate ? [utf8ToHex("ESDTRoleNFTCreate")] : []),
+            ...(options.addRoleNFTBurn ? [utf8ToHex("ESDTRoleNFTBurn")] : []),
+            ...(options.addRoleNFTAddQuantity ? [utf8ToHex("ESDTRoleNFTAddQuantity")] : []),
+            ...(options.addRoleESDTTransferRole ? [utf8ToHex("ESDTTransferRole")] : []),
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitSetSpecialRole
+        }).build();
+    }
+
+    createTransactionIntentForSettingSpecialRoleOnMetaESDT(options: {
+        sender: IAddress;
+        user: IAddress;
+        tokenIdentifier: string;
+        addRoleNFTCreate: boolean;
+        addRoleNFTBurn: boolean;
+        addRoleNFTAddQuantity: boolean;
+        addRoleESDTTransferRole: boolean;
+    }): TransactionIntent {
+        return this.createTransactionIntentForSettingSpecialRoleOnSemiFungibleToken(options);
+    }
+
+    createTransactionIntentForSettingSpecialRoleOnNonFungibleToken(options: {
+        sender: IAddress;
+        user: IAddress;
+        tokenIdentifier: string;
+        addRoleNFTCreate: boolean;
+        addRoleNFTBurn: boolean;
+        addRoleNFTUpdateAttributes: boolean;
+        addRoleNFTAddURI: boolean;
+        addRoleESDTTransferRole: boolean;
+    }): TransactionIntent {
+        const dataParts = [
+            "setSpecialRole",
+            utf8ToHex(options.tokenIdentifier),
+            addressToHex(options.user),
+            ...(options.addRoleNFTCreate ? [utf8ToHex("ESDTRoleNFTCreate")] : []),
+            ...(options.addRoleNFTBurn ? [utf8ToHex("ESDTRoleNFTBurn")] : []),
+            ...(options.addRoleNFTUpdateAttributes ? [utf8ToHex("ESDTRoleNFTUpdateAttributes")] : []),
+            ...(options.addRoleNFTAddURI ? [utf8ToHex("ESDTRoleNFTAddURI")] : []),
+            ...(options.addRoleESDTTransferRole ? [utf8ToHex("ESDTTransferRole")] : []),
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitSetSpecialRole
+        }).build();
+    }
+
+    createTransactionIntentForCreatingNFT(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+        initialQuantity: BigNumber.Value;
+        name: string;
+        royalties: number;
+        hash: string;
+        attributes: Uint8Array;
+        uris: string[];
+    }): TransactionIntent {
+        const dataParts = [
+            "ESDTNFTCreate",
+            utf8ToHex(options.tokenIdentifier),
+            bigIntToHex(options.initialQuantity),
+            utf8ToHex(options.name),
+            bigIntToHex(options.royalties),
+            utf8ToHex(options.hash),
+            byteArrayToHex(options.attributes),
+            ...options.uris.map(utf8ToHex),
+        ];
+
+        // Note that the following is an approximation (a reasonable one):
+        const nftData = options.name + options.hash + options.attributes + options.uris.join("");
+        const storageGasLimit = new BigNumber(this.config.gasLimitPerByte).multipliedBy(nftData.length);
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            executionGasLimit: new BigNumber(this.config.gasLimitESDTNFTCreate).plus(storageGasLimit)
+        }).build();
+    }
+
+    createTransactionIntentForPausing(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+    }): TransactionIntent {
+        const dataParts = [
+            "pause",
+            utf8ToHex(options.tokenIdentifier)
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitPausing
+        }).build();
+    }
+
+    createTransactionIntentForUnpausing(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+    }): TransactionIntent {
+        const dataParts = [
+            "unPause",
+            utf8ToHex(options.tokenIdentifier)
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitPausing
+        }).build();
+    }
+
+    createTransactionIntentForFreezing(options: {
+        sender: IAddress;
+        user: IAddress;
+        tokenIdentifier: string;
+    }): TransactionIntent {
+        const dataParts = [
+            "freeze",
+            utf8ToHex(options.tokenIdentifier),
+            addressToHex(options.user)
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitFreezing
+        }).build();
+    }
+
+    createTransactionIntentForUnfreezing(options: {
+        sender: IAddress;
+        user: IAddress;
+        tokenIdentifier: string;
+    }): TransactionIntent {
+        const dataParts = [
+            "UnFreeze",
+            utf8ToHex(options.tokenIdentifier),
+            addressToHex(options.user)
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitFreezing
+        }).build();
+    }
+
+    createTransactionIntentForWiping(options: {
+        sender: IAddress;
+        user: IAddress;
+        tokenIdentifier: string;
+    }): TransactionIntent {
+        const dataParts = [
+            "wipe",
+            utf8ToHex(options.tokenIdentifier),
+            addressToHex(options.user)
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitWiping
+        }).build();
+    }
+
+    createTransactionIntentForLocalMint(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+        supplyToMint: BigNumber.Value;
+    }): TransactionIntent {
+        const dataParts = [
+            "ESDTLocalMint",
+            utf8ToHex(options.tokenIdentifier),
+            bigIntToHex(options.supplyToMint),
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitESDTLocalMint
+        }).build();
+    }
+
+    createTransactionIntentForLocalBurning(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+        supplyToMint: BigNumber.Value;
+    }): TransactionIntent {
+        const dataParts = [
+            "ESDTLocalBurn",
+            utf8ToHex(options.tokenIdentifier),
+            bigIntToHex(options.supplyToMint),
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitESDTLocalBurn
+        }).build();
+    }
+
+    createTransactionIntentForUpdatingAttributes(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+        tokenNonce: BigNumber.Value;
+        attributes: Uint8Array
+    }): TransactionIntent {
+        const dataParts = [
+            "ESDTNFTUpdateAttributes",
+            utf8ToHex(options.tokenIdentifier),
+            bigIntToHex(options.tokenNonce),
+            byteArrayToHex(options.attributes),
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitESDTNFTUpdateAttributes
+        }).build();
+    }
+
+    createTransactionIntentForAddingQuantity(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+        tokenNonce: BigNumber.Value;
+        quantityToAdd: BigNumber.Value
+    }): TransactionIntent {
+        const dataParts = [
+            "ESDTNFTAddQuantity",
+            utf8ToHex(options.tokenIdentifier),
+            bigIntToHex(options.tokenNonce),
+            bigIntToHex(options.quantityToAdd)
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitESDTNFTAddQuantity
+        }).build();
+    }
+
+    createTransactionIntentForBurningQuantity(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+        tokenNonce: BigNumber.Value;
+        quantityToBurn: BigNumber.Value
+    }): TransactionIntent {
+        const dataParts = [
+            "ESDTNFTBurn",
+            utf8ToHex(options.tokenIdentifier),
+            bigIntToHex(options.tokenNonce),
+            bigIntToHex(options.quantityToBurn)
+        ];
+
+        return new TransactionIntentBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            executionGasLimit: this.config.gasLimitESDTNFTBurn
+        }).build();
+    }
+
+    private notifyAboutUnsettingBurnRoleGlobally() {
+        Logger.info(`
+==========
+IMPORTANT!
+==========
+You are about to issue (register) a new token. This will set the role "ESDTRoleBurnForAll" (globally).
+Once the token is registered, you can unset this role by calling "unsetBurnRoleGlobally" (in a separate transaction).`);
     }
 }

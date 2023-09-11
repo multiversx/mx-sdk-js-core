@@ -30,7 +30,8 @@ export function utf8ToHex(value: string) {
 }
 
 export function byteArrayToHex(byteArray: Uint8Array): string {
-    return Buffer.from(byteArray).toString("hex");
+    const hexString = Buffer.from(byteArray).toString("hex");
+    return zeroPadStringIfOddLength(hexString);
 }
 
 export function bigIntToHex(value: BigNumber.Value): string {

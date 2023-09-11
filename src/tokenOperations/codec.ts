@@ -1,6 +1,4 @@
 import BigNumber from "bignumber.js";
-import { Address } from "../address";
-import { IAddress } from "../interface";
 import * as contractsCodecUtils from "../smartcontracts/codec/utils";
 import * as codecUtils from "../utils.codec";
 

@@ -24,22 +24,9 @@ export function bigIntToBuffer(value: BigNumber.Value): Buffer {
     return contractsCodecUtils.bigIntToBuffer(value);
 }
 
-export function bigIntToHex(value: BigNumber.Value): string {
-    if (value == 0) {
-        return "";
-    }
-
-    return contractsCodecUtils.getHexMagnitudeOfBigInt(value);
-}
-
-export { utf8ToHex } from "../utils.codec";
+export { utf8ToHex, bigIntToHex, addressToHex } from "../utils.codec";
 
 export function bufferToHex(value: Buffer) {
     const hex = value.toString("hex");
     return codecUtils.zeroPadStringIfOddLength(hex);
-}
-
-export function addressToHex(address: IAddress): string {
-    const buffer = Address.fromBech32(address.toString()).pubkey();
-    return buffer.toString("hex");
 }

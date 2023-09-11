@@ -7,8 +7,10 @@ import { U32Value } from "../smartcontracts";
 import { CONTRACT_DEPLOY_ADDRESS } from "../constants";
 import { loadContractCode, loadAbiRegistry } from "../testutils/utils";
 import { Err } from "../errors";
+import { TransactionIntentsFactoryConfig } from "./transactionIntentsFactoryConfig";
 
 describe("test smart contract intents factory", function () {
+    const config = new TransactionIntentsFactoryConfig("D");
     let factory: SmartContractTransactionIntentsFactory;
     let abiAwareFactory: SmartContractTransactionIntentsFactory;
     let adderByteCode: Code;
@@ -16,24 +18,14 @@ describe("test smart contract intents factory", function () {
 
     before(async function () {
         factory = new SmartContractTransactionIntentsFactory({
-            config:
-            {
-                chainID: "D",
-                minGasLimit: 50000,
-                gasLimitPerByte: 1500
-            }
+            config: config
         });
 
         adderByteCode = await loadContractCode("src/testdata/adder.wasm");
         abiRegistry = await loadAbiRegistry("src/testdata/adder.abi.json");
 
         abiAwareFactory = new SmartContractTransactionIntentsFactory({
-            config:
-            {
-                chainID: "D",
-                minGasLimit: 50000,
-                gasLimitPerByte: 1500
-            },
+            config: config,
             abi: abiRegistry
         },
         );
@@ -52,7 +44,7 @@ describe("test smart contract intents factory", function () {
         }), Err, "Can't convert args to TypedValues");
     });
 
-    it("should build intent for deploy", async function () {
+    it("should create intent for deploy", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const gasLimit = 6000000;
         const args = [new U32Value(0)];
@@ -82,7 +74,7 @@ describe("test smart contract intents factory", function () {
         assert.deepEqual(deployIntent, abiDeployIntent);
     });
 
-    it("should build intent for execute", async function () {
+    it("should create intent for execute", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const func = "add";
@@ -116,7 +108,7 @@ describe("test smart contract intents factory", function () {
         assert.deepEqual(deployIntent, abiDeployIntent);
     });
 
-    it("should build intent for upgrade", async function () {
+    it("should create intent for upgrade", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const gasLimit = 6000000;

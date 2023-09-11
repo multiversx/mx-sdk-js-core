@@ -20,7 +20,7 @@ interface Config {
     additionalGasLimitForDelegationOperations: BigNumber.Value;
 }
 
-interface ValidatorPublicKey {
+interface IValidatorPublicKey {
     hex(): string;
 }
 
@@ -58,7 +58,7 @@ export class DelegationTransactionIntentsFactory {
     createTransactionIntentForAddingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
-        publicKeys: ValidatorPublicKey[],
+        publicKeys: IValidatorPublicKey[],
         signedMessages: Uint8Array[]
     }): TransactionIntent {
         if (options.publicKeys.length !== options.signedMessages.length) {
@@ -67,10 +67,9 @@ export class DelegationTransactionIntentsFactory {
 
         const numNodes = options.publicKeys.length;
 
-        let dataParts = ["addNodes"];
+        const dataParts = ["addNodes"];
         for (let i = 0; i < numNodes; i++) {
-            dataParts = dataParts.concat(options.publicKeys[i].hex());
-            dataParts = dataParts.concat(byteArrayToHex(options.signedMessages[i]));
+            dataParts.push(...[options.publicKeys[i].hex(), byteArrayToHex(options.signedMessages[i])]);
         }
 
         return new TransactionIntentBuilder({
@@ -82,20 +81,15 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    private computeExecutionGasLimitForNodesManagement(numNodes: number): BigNumber.Value {
-        const additionalGasForAllNodes = new BigNumber(this.config.additionalGasLimitPerValidatorNode).multipliedBy(numNodes);
-        return new BigNumber(this.config.gasLimitDelegationOperations).plus(additionalGasForAllNodes);
-    }
-
     createTransactionIntentForRemovingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
-        publicKeys: ValidatorPublicKey[]
+        publicKeys: IValidatorPublicKey[]
     }): TransactionIntent {
-        let dataParts = ["removeNodes"];
+        const dataParts = ["removeNodes"];
 
         for (const key of options.publicKeys) {
-            dataParts = dataParts.concat(key.hex());
+            dataParts.push(key.hex());
         }
 
         const numNodes = options.publicKeys.length;
@@ -112,7 +106,7 @@ export class DelegationTransactionIntentsFactory {
     createTransactionIntentForStakingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
-        publicKeys: ValidatorPublicKey[]
+        publicKeys: IValidatorPublicKey[]
     }): TransactionIntent {
         let dataParts = ["stakeNodes"];
 
@@ -121,10 +115,10 @@ export class DelegationTransactionIntentsFactory {
         }
 
         const numNodes = options.publicKeys.length;
-        const executionGasLimit = new BigNumber(numNodes).multipliedBy(
-            this.config.additionalGasLimitPerValidatorNode).plus(
-                this.config.gasLimitStake
-            ).plus(this.config.gasLimitDelegationOperations);
+        const additionalGasForAllNodes = new BigNumber(numNodes).multipliedBy(this.config.additionalGasLimitPerValidatorNode);
+        const executionGasLimit = additionalGasForAllNodes.plus(this.config.gasLimitStake).plus(
+            this.config.gasLimitDelegationOperations
+        );
 
         return new TransactionIntentBuilder({
             config: this.config,
@@ -138,7 +132,7 @@ export class DelegationTransactionIntentsFactory {
     createTransactionIntentForUnbondingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
-        publicKeys: ValidatorPublicKey[]
+        publicKeys: IValidatorPublicKey[]
     }): TransactionIntent {
         let dataParts = ["unBondNodes"];
 
@@ -164,7 +158,7 @@ export class DelegationTransactionIntentsFactory {
     createTransactionIntentForUnstakingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
-        publicKeys: ValidatorPublicKey[]
+        publicKeys: IValidatorPublicKey[]
     }): TransactionIntent {
         let dataParts = ["unStakeNodes"];
 
@@ -190,12 +184,12 @@ export class DelegationTransactionIntentsFactory {
     createTransactionIntentForUnjailingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
-        publicKeys: ValidatorPublicKey[]
+        publicKeys: IValidatorPublicKey[]
     }): TransactionIntent {
-        let dataParts = ["unJailNodes"];
+        const dataParts = ["unJailNodes"];
 
         for (const key of options.publicKeys) {
-            dataParts = dataParts.concat(key.hex());
+            dataParts.push(key.hex());
         }
 
         const numNodes = options.publicKeys.length;
@@ -340,5 +334,10 @@ export class DelegationTransactionIntentsFactory {
             dataParts: dataParts,
             executionGasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
         }).build();
+    }
+
+    private computeExecutionGasLimitForNodesManagement(numNodes: number): BigNumber.Value {
+        const additionalGasForAllNodes = new BigNumber(this.config.additionalGasLimitPerValidatorNode).multipliedBy(numNodes);
+        return new BigNumber(this.config.gasLimitDelegationOperations).plus(additionalGasForAllNodes);
     }
 }

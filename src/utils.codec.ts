@@ -1,4 +1,7 @@
 import BigNumber from "bignumber.js";
+import * as contractsCodecUtils from "./smartcontracts/codec/utils";
+import { Address } from "./address";
+import { IAddress } from "./interface";
 
 export function numberToPaddedHex(value: BigNumber.Value) {
     let hex = new BigNumber(value).toString(16);
@@ -27,5 +30,19 @@ export function utf8ToHex(value: string) {
 }
 
 export function byteArrayToHex(byteArray: Uint8Array): string {
-    return Buffer.from(byteArray).toString("hex");
+    const hexString = Buffer.from(byteArray).toString("hex");
+    return zeroPadStringIfOddLength(hexString);
+}
+
+export function bigIntToHex(value: BigNumber.Value): string {
+    if (value == 0) {
+        return "";
+    }
+
+    return contractsCodecUtils.getHexMagnitudeOfBigInt(value);
+}
+
+export function addressToHex(address: IAddress): string {
+    const buffer = Address.fromBech32(address.toString()).pubkey();
+    return buffer.toString("hex");
 }

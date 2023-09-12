@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { IAddress } from "../interface";
 import { TransactionIntent } from "../transactionIntent";
-import { AbiRegistry, ArgSerializer, CodeMetadata, EndpointDefinition } from "../smartcontracts";
+import { AbiRegistry, ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { byteArrayToHex } from "../utils.codec";
 import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
@@ -15,16 +15,23 @@ interface Config {
     gasLimitPerByte: BigNumber.Value;
 }
 
+interface Abi {
+    constructorDefinition: EndpointDefinition;
+
+    getEndpoint(name: string | ContractFunction): EndpointDefinition;
+}
+
+
 export class SmartContractTransactionIntentsFactory {
     private readonly config: Config;
-    private readonly abiRegistry?: AbiRegistry;
+    private readonly abiRegistry?: Abi;
 
     constructor({
         config,
         abi
     }: {
         config: Config;
-        abi?: AbiRegistry;
+        abi?: Abi;
     }) {
         this.config = config;
         this.abiRegistry = abi;

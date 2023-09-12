@@ -13,19 +13,18 @@ interface Config {
     gasLimitPerByte: BigNumber.Value
     gasLimitIssue: BigNumber.Value
     gasLimitToggleBurnRoleGlobally: BigNumber.Value
-    gasLimitESDTLocalMint: BigNumber.Value
-    gasLimitESDTLocalBurn: BigNumber.Value
+    gasLimitEsdtLocalMint: BigNumber.Value
+    gasLimitEsdtLocalBurn: BigNumber.Value
     gasLimitSetSpecialRole: BigNumber.Value
     gasLimitPausing: BigNumber.Value
     gasLimitFreezing: BigNumber.Value
     gasLimitWiping: BigNumber.Value
-    gasLimitESDTNFTCreate: BigNumber.Value
-    gasLimitESDTNFTUpdateAttributes: BigNumber.Value
-    gasLimitESDTNFTAddQuantity: BigNumber.Value
-    gasLimitESDTNFTBurn: BigNumber.Value
+    gasLimitEsdtNftCreate: BigNumber.Value
+    gasLimitEsdtNftUpdateAttributes: BigNumber.Value
+    gasLimitEsdtNftAddQuantity: BigNumber.Value
+    gasLimitEsdtNftBurn: BigNumber.Value
     gasLimitStorePerByte: BigNumber.Value
     issueCost: BigNumber.Value
-    esdtContractAddress: IAddress
 }
 
 type RegisterAndSetAllRolesTokenType = "NFT" | "SFT" | "META" | "FNG";
@@ -378,7 +377,7 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: new BigNumber(this.config.gasLimitESDTNFTCreate).plus(storageGasLimit)
+            executionGasLimit: new BigNumber(this.config.gasLimitEsdtNftCreate).plus(storageGasLimit)
         }).build();
     }
 
@@ -494,7 +493,7 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitESDTLocalMint
+            executionGasLimit: this.config.gasLimitEsdtLocalMint
         }).build();
     }
 
@@ -514,7 +513,7 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitESDTLocalBurn
+            executionGasLimit: this.config.gasLimitEsdtLocalBurn
         }).build();
     }
 
@@ -536,7 +535,7 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitESDTNFTUpdateAttributes
+            executionGasLimit: this.config.gasLimitEsdtNftUpdateAttributes
         }).build();
     }
 
@@ -558,7 +557,7 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitESDTNFTAddQuantity
+            executionGasLimit: this.config.gasLimitEsdtNftAddQuantity
         }).build();
     }
 
@@ -580,7 +579,7 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitESDTNFTBurn
+            executionGasLimit: this.config.gasLimitEsdtNftBurn
         }).build();
     }
 

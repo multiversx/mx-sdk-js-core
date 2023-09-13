@@ -76,15 +76,15 @@ export class SmartContractTransactionIntentsFactory {
     createTransactionIntentForExecute(options: {
         sender: IAddress,
         contractAddress: IAddress,
-        func: string,
+        functionName: string,
         gasLimit: BigNumber.Value,
         args?: any[]
     }
     ): TransactionIntent {
         const args = options.args || [];
-        let parts: string[] = [options.func];
+        let parts: string[] = [options.functionName];
 
-        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition)
+        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName));
         parts = parts.concat(preparedArgs);
 
         return new TransactionIntentBuilder({

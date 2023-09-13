@@ -199,8 +199,8 @@ export class SmartContract implements ISmartContract {
         })
 
         return new Transaction({
-            receiver: Address.fromBech32(intent.receiver),
             sender: Address.fromBech32(intent.sender),
+            receiver: Address.fromBech32(intent.receiver),
             value: value,
             gasLimit: new BigNumber(intent.gasLimit).toNumber(),
             gasPrice: gasPrice,
@@ -217,25 +217,32 @@ export class SmartContract implements ISmartContract {
 
         this.ensureHasAddress();
 
+        const config = new TransactionIntentsFactoryConfig(chainID.valueOf());
+        const scIntentFactory = new SmartContractTransactionIntentsFactory({
+            config: config,
+            abi: this.abi
+        });
+
         args = args || [];
         value = value || 0;
 
-        let payload = new ContractCallPayloadBuilder()
-            .setFunction(func)
-            .setArgs(args)
-            .build();
-
-        let transaction = new Transaction({
+        const intent = scIntentFactory.createTransactionIntentForExecute({
             sender: caller,
-            receiver: receiver ? receiver : this.getAddress(),
-            value: value,
-            gasLimit: gasLimit,
-            gasPrice: gasPrice,
-            data: payload,
-            chainID: chainID,
-        });
+            contractAddress: receiver ? receiver : this.getAddress(),
+            functionName: func.toString(),
+            gasLimit: gasLimit.valueOf(),
+            args: args
+        })
 
-        return transaction;
+        return new Transaction({
+            sender: caller,
+            receiver: Address.fromBech32(intent.receiver),
+            value: value,
+            gasLimit: new BigNumber(intent.gasLimit).toNumber(),
+            gasPrice: gasPrice,
+            data: new TransactionPayload(Buffer.from(intent.data!)),
+            chainID: chainID
+        });
     }
 
     createQuery({ func, args, value, caller }: QueryArguments): Query {

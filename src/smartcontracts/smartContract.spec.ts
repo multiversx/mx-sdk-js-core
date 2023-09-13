@@ -103,10 +103,10 @@ describe("test contract", () => {
 
         assert.equal(callTransactionOne.getNonce().valueOf(), 42);
         assert.equal(callTransactionOne.getData().valueOf().toString(), "helloEarth@05@0123");
-        assert.equal(callTransactionOne.getGasLimit().valueOf(), 150000);
+        assert.equal(callTransactionOne.getGasLimit().valueOf(), 227000);
         assert.equal(callTransactionTwo.getNonce().valueOf(), 43);
         assert.equal(callTransactionTwo.getData().valueOf().toString(), "helloMars@05@0123");
-        assert.equal(callTransactionTwo.getGasLimit().valueOf(), 1500000);
+        assert.equal(callTransactionTwo.getGasLimit().valueOf(), 1575500);
 
         // Sign transactions, broadcast them
         alice.signer.sign(callTransactionOne);
@@ -126,7 +126,7 @@ describe("test contract", () => {
         assert.isTrue((await provider.getTransactionStatus(hashTwo)).isExecuted());
     });
 
-    it.only("should upgrade", async () => {
+    it("should upgrade", async () => {
         setupUnitTestWatcherTimeouts();
         let watcher = new TransactionWatcher(provider);
 

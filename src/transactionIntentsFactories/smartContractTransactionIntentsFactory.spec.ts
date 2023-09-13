@@ -84,14 +84,14 @@ describe("test smart contract intents factory", function () {
         const deployIntent = factory.createTransactionIntentForExecute({
             sender: sender,
             contractAddress: contract,
-            func: func,
+            functionName: func,
             gasLimit: gasLimit,
             args: args
         });
         const abiDeployIntent = abiAwareFactory.createTransactionIntentForExecute({
             sender: sender,
             contractAddress: contract,
-            func: func,
+            functionName: func,
             gasLimit: gasLimit,
             args: args
         });

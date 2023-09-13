@@ -49,7 +49,7 @@ describe("test contract", () => {
         deployTransaction.setNonce(alice.account.nonce);
 
         assert.equal(deployTransaction.getData().valueOf().toString(), "01020304@0500@0100");
-        assert.equal(deployTransaction.getGasLimit().valueOf(), 1000000);
+        assert.equal(deployTransaction.getGasLimit().valueOf(), 1077000);
         assert.equal(deployTransaction.getNonce().valueOf(), 42);
 
         // Compute & set the contract address

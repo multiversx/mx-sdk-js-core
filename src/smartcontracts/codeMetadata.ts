@@ -6,7 +6,7 @@ export class CodeMetadata {
     private readable: boolean;
     private payable: boolean;
     private payableBySc: boolean;
-    private static readonly lengthOfCodeMetadata = 2;
+    private static readonly codeMetadataLength = 2;
 
     /**
      * Creates a metadata object. By default, set the `upgradeable` attribute, and uset all others.
@@ -24,7 +24,7 @@ export class CodeMetadata {
     }
 
     static fromBytes(bytes: Uint8Array): CodeMetadata {
-        if (bytes.length !== this.lengthOfCodeMetadata) {
+        if (bytes.length !== this.codeMetadataLength) {
             return new CodeMetadata();
         }
 

@@ -108,10 +108,10 @@ export class SmartContractTransactionIntentsFactory {
         isPayableBySmartContract?: boolean
     }
     ): TransactionIntent {
-        const isUpgradeable = options.isUpgradeable || true;
-        const isReadable = options.isReadable || true;
-        const isPayable = options.isPayable || false;
-        const isPayableBySmartContract = options.isPayableBySmartContract || true;
+        const isUpgradeable = options.isUpgradeable ?? true;
+        const isReadable = options.isReadable ?? true;
+        const isPayable = options.isPayable ?? false;
+        const isPayableBySmartContract = options.isPayableBySmartContract ?? true;
 
         const args = options.args || [];
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);

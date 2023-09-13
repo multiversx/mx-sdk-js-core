@@ -125,4 +125,43 @@ describe("test contract", () => {
         assert.isTrue((await provider.getTransactionStatus(hashOne)).isExecuted());
         assert.isTrue((await provider.getTransactionStatus(hashTwo)).isExecuted());
     });
+
+    it.only("should upgrade", async () => {
+        setupUnitTestWatcherTimeouts();
+        let watcher = new TransactionWatcher(provider);
+
+        let contract = new SmartContract();
+        contract.setAddress(Address.fromBech32("erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q"))
+
+        let deployTransaction = contract.upgrade({
+            code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
+            gasLimit: 1000000,
+            chainID: chainID,
+            caller: alice.address
+        });
+
+        provider.mockUpdateAccount(alice.address, account => {
+            account.nonce = 42;
+        });
+
+        await alice.sync(provider);
+        deployTransaction.setNonce(alice.account.nonce);
+
+        assert.equal(deployTransaction.getData().valueOf().toString(), "upgradeContract@01020304@0100");
+        assert.equal(deployTransaction.getGasLimit().valueOf(), 1093500);
+        assert.equal(deployTransaction.getNonce().valueOf(), 42);
+
+        // Sign the transaction
+        alice.signer.sign(deployTransaction);
+
+        // Now let's broadcast the deploy transaction, and wait for its execution.
+        let hash = await provider.sendTransaction(deployTransaction);
+
+        await Promise.all([
+            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
+            watcher.awaitCompleted(deployTransaction)
+        ]);
+
+        assert.isTrue((await provider.getTransactionStatus(hash)).isExecuted());
+    });
 });

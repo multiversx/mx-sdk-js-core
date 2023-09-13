@@ -177,27 +177,36 @@ export class SmartContract implements ISmartContract {
 
         this.ensureHasAddress();
 
-        codeMetadata = codeMetadata || new CodeMetadata();
-        initArguments = initArguments || [];
-        value = value || 0;
-
-        let payload = new ContractUpgradePayloadBuilder()
-            .setCode(code)
-            .setCodeMetadata(codeMetadata)
-            .setInitArgs(initArguments)
-            .build();
-
-        let transaction = new Transaction({
-            sender: caller,
-            receiver: this.getAddress(),
-            value: value,
-            gasLimit: gasLimit,
-            gasPrice: gasPrice,
-            data: payload,
-            chainID: chainID
+        const config = new TransactionIntentsFactoryConfig(chainID.valueOf());
+        const scIntentFactory = new SmartContractTransactionIntentsFactory({
+            config: config,
+            abi: this.abi
         });
 
-        return transaction;
+        const bytecode = Uint8Array.from(Buffer.from(code.toString(), 'hex'));
+        const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
+
+        const intent = scIntentFactory.createTransactionIntentForUpgrade({
+            sender: caller,
+            contract: this.getAddress(),
+            bytecode: bytecode,
+            gasLimit: gasLimit.valueOf(),
+            args: initArguments,
+            isUpgradeable: metadataAsJson.upgradeable,
+            isReadable: metadataAsJson.readable,
+            isPayable: metadataAsJson.payable,
+            isPayableBySmartContract: metadataAsJson.payableBySc
+        })
+
+        return new Transaction({
+            receiver: Address.fromBech32(intent.receiver),
+            sender: Address.fromBech32(intent.sender),
+            value: value,
+            gasLimit: new BigNumber(intent.gasLimit).toNumber(),
+            gasPrice: gasPrice,
+            data: new TransactionPayload(Buffer.from(intent.data!)),
+            chainID: chainID
+        });
     }
 
     /**

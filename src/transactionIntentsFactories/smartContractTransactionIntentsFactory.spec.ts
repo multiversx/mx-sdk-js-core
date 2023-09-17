@@ -67,8 +67,7 @@ describe("test smart contract intents factory", function () {
         assert.isDefined(deployIntent.data);
         expect(deployIntent.data!.length).to.be.greaterThan(0);
 
-        const expectedGasLimit = 6000000 + 50000 + 1500 * deployIntent.data!.length;
-        assert.equal(deployIntent.gasLimit.valueOf(), expectedGasLimit);
+        assert.equal(deployIntent.gasLimit.valueOf(), gasLimit);
         assert.equal(deployIntent.value, 0);
 
         assert.deepEqual(deployIntent, abiDeployIntent);
@@ -102,7 +101,7 @@ describe("test smart contract intents factory", function () {
         assert.isDefined(deployIntent.data);
         assert.deepEqual(deployIntent.data, Buffer.from("add@07"));
 
-        assert.equal(deployIntent.gasLimit.valueOf(), 6059000);
+        assert.equal(deployIntent.gasLimit.valueOf(), gasLimit);
         assert.equal(deployIntent.value, 0);
 
         assert.deepEqual(deployIntent, abiDeployIntent);
@@ -135,8 +134,7 @@ describe("test smart contract intents factory", function () {
         assert.isDefined(deployIntent.data);
         assert.isTrue(Buffer.from(deployIntent.data!).toString().startsWith("upgradeContract@"));
 
-        const expectedGasLimit = 6000000 + 50000 + 1500 * deployIntent.data!.length;
-        assert.equal(deployIntent.gasLimit.valueOf(), expectedGasLimit);
+        assert.equal(deployIntent.gasLimit.valueOf(), gasLimit);
         assert.equal(deployIntent.value, 0);
 
         assert.deepEqual(deployIntent, abiDeployIntent);

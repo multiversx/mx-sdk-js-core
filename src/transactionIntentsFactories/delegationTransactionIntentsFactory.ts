@@ -50,7 +50,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(DELEGATION_MANAGER_SC_ADDRESS),
             dataParts: dataParts,
-            executionGasLimit: executionGasLimit,
+            gasLimit: executionGasLimit,
+            addDataMovementGas: true,
             value: options.value
         }).build();
     }
@@ -77,7 +78,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes)
+            gasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes),
+            addDataMovementGas: true
         }).build();
     }
 
@@ -99,7 +101,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes)
+            gasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes),
+            addDataMovementGas: true
         }).build();
     }
 
@@ -125,7 +128,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: executionGasLimit
+            gasLimit: executionGasLimit,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -151,7 +155,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: executionGasLimit
+            gasLimit: executionGasLimit,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -177,7 +182,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: executionGasLimit
+            gasLimit: executionGasLimit,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -199,7 +205,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes)
+            gasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes),
+            addDataMovementGas: true
         }).build();
     }
 
@@ -218,7 +225,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
+            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
+            addDataMovementGas: true
         }).build();
     }
 
@@ -237,7 +245,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
+            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
+            addDataMovementGas: true
         }).build();
     }
 
@@ -255,7 +264,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
+            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
+            addDataMovementGas: true
         }).build();
     }
 
@@ -273,7 +283,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
+            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
+            addDataMovementGas: true
         }).build();
     }
 
@@ -291,7 +302,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
+            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
+            addDataMovementGas: true
         }).build();
     }
 
@@ -309,7 +321,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
+            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
+            addDataMovementGas: true
         }).build();
     }
 
@@ -332,7 +345,8 @@ export class DelegationTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            executionGasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations)
+            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
+            addDataMovementGas: true
         }).build();
     }
 

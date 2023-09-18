@@ -62,7 +62,8 @@ export class SmartContractTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(CONTRACT_DEPLOY_ADDRESS),
             dataParts: parts,
-            executionGasLimit: options.gasLimit
+            gasLimit: options.gasLimit,
+            addDataMovementGas: false
         }).build();
     }
 
@@ -85,7 +86,8 @@ export class SmartContractTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.contractAddress,
             dataParts: parts,
-            executionGasLimit: options.gasLimit
+            gasLimit: options.gasLimit,
+            addDataMovementGas: false
         }).build();
     }
 
@@ -123,7 +125,8 @@ export class SmartContractTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.contract,
             dataParts: parts,
-            executionGasLimit: options.gasLimit
+            gasLimit: options.gasLimit,
+            addDataMovementGas: false
         }).build();
     }
 

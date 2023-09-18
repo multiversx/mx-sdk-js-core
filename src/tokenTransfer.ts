@@ -11,7 +11,7 @@ interface ITokenTransferOptions {
     tokenIdentifier: string;
     nonce: number;
     amountAsBigInteger: BigNumber.Value;
-    numDecimals: number;
+    numDecimals?: number;
 }
 
 export class TokenTransfer {
@@ -20,7 +20,7 @@ export class TokenTransfer {
     readonly amountAsBigInteger: BigNumber;
     readonly numDecimals: number;
 
-    protected constructor(options: ITokenTransferOptions) {
+    public constructor(options: ITokenTransferOptions) {
         const amount = new BigNumber(options.amountAsBigInteger);
         if (!amount.isInteger() || amount.isNegative()) {
             throw new ErrInvalidArgument(`bad amountAsBigInteger: ${options.amountAsBigInteger}`);
@@ -29,7 +29,7 @@ export class TokenTransfer {
         this.tokenIdentifier = options.tokenIdentifier;
         this.nonce = options.nonce;
         this.amountAsBigInteger = amount;
-        this.numDecimals = options.numDecimals;
+        this.numDecimals = options.numDecimals || 0;
     }
 
     static egldFromAmount(amount: BigNumber.Value) {

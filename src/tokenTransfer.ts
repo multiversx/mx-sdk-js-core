@@ -20,7 +20,7 @@ export class TokenTransfer {
     readonly amountAsBigInteger: BigNumber;
     readonly numDecimals: number;
 
-    protected constructor(options: ITokenTransferOptions) {
+    public constructor(options: ITokenTransferOptions) {
         const amount = new BigNumber(options.amountAsBigInteger);
         if (!amount.isInteger() || amount.isNegative()) {
             throw new ErrInvalidArgument(`bad amountAsBigInteger: ${options.amountAsBigInteger}`);

@@ -154,7 +154,7 @@ export class ContractCallPayloadBuilder {
     build(): TransactionPayload {
         guardValueIsSet("calledFunction", this.contractFunction);
 
-        let data = this.contractFunction!.name;
+        let data = this.contractFunction!.toString();
         data = appendArgumentsToString(data, this.arguments);
 
         return new TransactionPayload(data);

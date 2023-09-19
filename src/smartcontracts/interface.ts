@@ -93,6 +93,5 @@ export interface ICodeMetadata {
 }
 
 export interface IContractFunction {
-    name: string;
     toString(): string;
 }

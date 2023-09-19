@@ -58,7 +58,7 @@ export class MockProvider {
     }
 
     mockQueryContractOnFunction(functionName: string, response: IContractQueryResponse) {
-        let predicate = (query: Query) => query.func.name == functionName;
+        let predicate = (query: Query) => query.func.toString() == functionName;
         this.queryContractResponders.push(new QueryContractResponder(predicate, response));
     }
 

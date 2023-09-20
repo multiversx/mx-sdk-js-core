@@ -14,7 +14,8 @@ export class TransactionIntentBuilder {
     private sender: IAddress;
     private receiver: IAddress;
     private dataParts: string[];
-    private executionGasLimit: BigNumber.Value;
+    private providedGasLimit: BigNumber;
+    private addDataMovementGas: boolean;
     private value?: BigNumber.Value;
 
     constructor(options: {
@@ -22,20 +23,26 @@ export class TransactionIntentBuilder {
         sender: IAddress,
         receiver: IAddress,
         dataParts: string[],
-        executionGasLimit: BigNumber.Value,
+        gasLimit: BigNumber.Value,
+        addDataMovementGas: boolean,
         value?: BigNumber.Value
     }) {
         this.config = options.config;
         this.sender = options.sender;
         this.receiver = options.receiver;
         this.dataParts = options.dataParts;
-        this.executionGasLimit = options.executionGasLimit;
+        this.providedGasLimit = new BigNumber(options.gasLimit);
+        this.addDataMovementGas = options.addDataMovementGas;
         this.value = options.value;
     }
 
-    private computeGasLimit(payload: ITransactionPayload, executionGasLimit: BigNumber.Value): BigNumber.Value {
+    private computeGasLimit(payload: ITransactionPayload): BigNumber.Value {
+        if (!this.addDataMovementGas) {
+            return this.providedGasLimit;
+        }
+
         const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()));
-        const gasLimit = dataMovementGas.plus(executionGasLimit);
+        const gasLimit = dataMovementGas.plus(this.providedGasLimit);
         return gasLimit;
     }
 
@@ -46,7 +53,7 @@ export class TransactionIntentBuilder {
 
     build(): TransactionIntent {
         const data = this.buildTransactionPayload()
-        const gasLimit = this.computeGasLimit(data, this.executionGasLimit);
+        const gasLimit = this.computeGasLimit(data);
 
         return new TransactionIntent({
             sender: this.sender.bech32(),

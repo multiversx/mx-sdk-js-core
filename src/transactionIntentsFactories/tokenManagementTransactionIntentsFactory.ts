@@ -72,7 +72,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitIssue,
+            gasLimit: this.config.gasLimitIssue,
+            addDataMovementGas: true,
             value: this.config.issueCost
         }).build();
     }
@@ -109,7 +110,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitIssue,
+            gasLimit: this.config.gasLimitIssue,
+            addDataMovementGas: true,
             value: this.config.issueCost
         }).build();
     }
@@ -146,7 +148,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitIssue,
+            gasLimit: this.config.gasLimitIssue,
+            addDataMovementGas: true,
             value: this.config.issueCost
         }).build();
     }
@@ -185,7 +188,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitIssue,
+            gasLimit: this.config.gasLimitIssue,
+            addDataMovementGas: true,
             value: this.config.issueCost
         }).build();
     }
@@ -212,7 +216,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitIssue,
+            gasLimit: this.config.gasLimitIssue,
+            addDataMovementGas: true,
             value: this.config.issueCost
         }).build();
     }
@@ -231,7 +236,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitToggleBurnRoleGlobally
+            gasLimit: this.config.gasLimitToggleBurnRoleGlobally,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -249,7 +255,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitToggleBurnRoleGlobally
+            gasLimit: this.config.gasLimitToggleBurnRoleGlobally,
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -273,7 +280,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitSetSpecialRole
+            gasLimit: this.config.gasLimitSetSpecialRole,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -301,7 +309,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitSetSpecialRole
+            gasLimit: this.config.gasLimitSetSpecialRole,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -343,7 +352,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitSetSpecialRole
+            gasLimit: this.config.gasLimitSetSpecialRole,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -377,7 +387,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: new BigNumber(this.config.gasLimitEsdtNftCreate).plus(storageGasLimit)
+            gasLimit: new BigNumber(this.config.gasLimitEsdtNftCreate).plus(storageGasLimit),
+            addDataMovementGas: true
         }).build();
     }
 
@@ -395,7 +406,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitPausing
+            gasLimit: this.config.gasLimitPausing,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -413,7 +425,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitPausing
+            gasLimit: this.config.gasLimitPausing,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -433,7 +446,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitFreezing
+            gasLimit: this.config.gasLimitFreezing,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -453,7 +467,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitFreezing
+            gasLimit: this.config.gasLimitFreezing,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -473,7 +488,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitWiping
+            gasLimit: this.config.gasLimitWiping,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -493,7 +509,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitEsdtLocalMint
+            gasLimit: this.config.gasLimitEsdtLocalMint,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -513,7 +530,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitEsdtLocalBurn
+            gasLimit: this.config.gasLimitEsdtLocalBurn,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -535,7 +553,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitEsdtNftUpdateAttributes
+            gasLimit: this.config.gasLimitEsdtNftUpdateAttributes,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -557,7 +576,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitEsdtNftAddQuantity
+            gasLimit: this.config.gasLimitEsdtNftAddQuantity,
+            addDataMovementGas: true
         }).build();
     }
 
@@ -579,7 +599,8 @@ export class TokenManagementTransactionIntentsFactory {
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            executionGasLimit: this.config.gasLimitEsdtNftBurn
+            gasLimit: this.config.gasLimitEsdtNftBurn,
+            addDataMovementGas: true
         }).build();
     }
 

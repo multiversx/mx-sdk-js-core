@@ -41,7 +41,7 @@ describe("test smart contract interactor", function () {
         assert.deepEqual(transaction.getReceiver(), dummyAddress);
         assert.equal(transaction.getValue().toString(), "1000000000000000000");
         assert.equal(transaction.getNonce(), 7);
-        assert.equal(transaction.getGasLimit().valueOf(), 20057500);
+        assert.equal(transaction.getGasLimit().valueOf(), 20000000);
     });
 
     it("should set transfers (payments) on contract calls (transfer and execute)", async function () {
@@ -188,7 +188,7 @@ describe("test smart contract interactor", function () {
         assert.equal(transaction.getData().toString(), "getUltimateAnswer");
         assert.equal(
             transaction.getHash().toString(),
-            "3ff6309bfe87ecc4ab541db649d57187f3a012291570552ac003866f77212c19"
+            "60d0956a8902c1179dce92d91bd9670e31b9a9cd07c1d620edb7754a315b4818"
         );
 
         transaction = interaction.withNonce(1).buildTransaction();
@@ -198,7 +198,7 @@ describe("test smart contract interactor", function () {
         assert.equal(transaction.getNonce().valueOf(), 1);
         assert.equal(
             transaction.getHash().toString(),
-            "85a3044ba2e07317a7e5dd866a5e57f900f7e01d0802c8cd634f4a521261dadf"
+            "acd207c38f6c3341b18d8ef331fa07ba49615fa12d7610aad5d8495293049f24"
         );
 
         // Execute, and wait for execution

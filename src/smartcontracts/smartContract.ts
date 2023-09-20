@@ -121,7 +121,7 @@ export class SmartContract implements ISmartContract {
             abi: this.abi
         });
 
-        const bytecode = Uint8Array.from(Buffer.from(code.toString(), 'hex'));
+        const bytecode = Buffer.from(code.toString(), 'hex');
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
         const intent = scIntentFactory.createTransactionIntentForDeploy({

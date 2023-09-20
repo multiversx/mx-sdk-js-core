@@ -49,7 +49,7 @@ describe("test contract", () => {
         deployTransaction.setNonce(alice.account.nonce);
 
         assert.equal(deployTransaction.getData().valueOf().toString(), "01020304@0500@0100");
-        assert.equal(deployTransaction.getGasLimit().valueOf(), 1077000);
+        assert.equal(deployTransaction.getGasLimit().valueOf(), 1000000);
         assert.equal(deployTransaction.getNonce().valueOf(), 42);
 
         // Compute & set the contract address
@@ -103,10 +103,10 @@ describe("test contract", () => {
 
         assert.equal(callTransactionOne.getNonce().valueOf(), 42);
         assert.equal(callTransactionOne.getData().valueOf().toString(), "helloEarth@05@0123");
-        assert.equal(callTransactionOne.getGasLimit().valueOf(), 227000);
+        assert.equal(callTransactionOne.getGasLimit().valueOf(), 150000);
         assert.equal(callTransactionTwo.getNonce().valueOf(), 43);
         assert.equal(callTransactionTwo.getData().valueOf().toString(), "helloMars@05@0123");
-        assert.equal(callTransactionTwo.getGasLimit().valueOf(), 1575500);
+        assert.equal(callTransactionTwo.getGasLimit().valueOf(), 1500000);
 
         // Sign transactions, broadcast them
         alice.signer.sign(callTransactionOne);
@@ -148,7 +148,7 @@ describe("test contract", () => {
         deployTransaction.setNonce(alice.account.nonce);
 
         assert.equal(deployTransaction.getData().valueOf().toString(), "upgradeContract@01020304@0100");
-        assert.equal(deployTransaction.getGasLimit().valueOf(), 1093500);
+        assert.equal(deployTransaction.getGasLimit().valueOf(), 1000000);
         assert.equal(deployTransaction.getNonce().valueOf(), 42);
 
         // Sign the transaction

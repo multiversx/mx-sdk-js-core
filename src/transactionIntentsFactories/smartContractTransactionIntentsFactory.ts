@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { IAddress } from "../interface";
 import { TransactionIntent } from "../transactionIntent";
-import { AbiRegistry, ArgSerializer, CodeMetadata, EndpointDefinition } from "../smartcontracts";
+import { AbiRegistry, ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { byteArrayToHex } from "../utils.codec";
 import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
@@ -15,16 +15,23 @@ interface Config {
     gasLimitPerByte: BigNumber.Value;
 }
 
+interface Abi {
+    constructorDefinition: EndpointDefinition;
+
+    getEndpoint(name: string | ContractFunction): EndpointDefinition;
+}
+
+
 export class SmartContractTransactionIntentsFactory {
     private readonly config: Config;
-    private readonly abiRegistry?: AbiRegistry;
+    private readonly abiRegistry?: Abi;
 
     constructor({
         config,
         abi
     }: {
         config: Config;
-        abi?: AbiRegistry;
+        abi?: Abi;
     }) {
         this.config = config;
         this.abiRegistry = abi;
@@ -40,10 +47,10 @@ export class SmartContractTransactionIntentsFactory {
         isPayable?: boolean,
         isPayableBySmartContract?: boolean
     }): TransactionIntent {
-        const isUpgradeable = options.isUpgradeable || true;
-        const isReadable = options.isReadable || true;
-        const isPayable = options.isPayable || false;
-        const isPayableBySmartContract = options.isPayableBySmartContract || true;
+        const isUpgradeable = options.isUpgradeable ?? true;
+        const isReadable = options.isReadable ?? true;
+        const isPayable = options.isPayable ?? false;
+        const isPayableBySmartContract = options.isPayableBySmartContract ?? true;
 
         const args = options.args || [];
 
@@ -70,15 +77,15 @@ export class SmartContractTransactionIntentsFactory {
     createTransactionIntentForExecute(options: {
         sender: IAddress,
         contractAddress: IAddress,
-        func: string,
+        functionName: string,
         gasLimit: BigNumber.Value,
         args?: any[]
     }
     ): TransactionIntent {
         const args = options.args || [];
-        let parts: string[] = [options.func];
+        let parts: string[] = [options.functionName];
 
-        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition)
+        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName));
         parts = parts.concat(preparedArgs);
 
         return new TransactionIntentBuilder({
@@ -103,10 +110,10 @@ export class SmartContractTransactionIntentsFactory {
         isPayableBySmartContract?: boolean
     }
     ): TransactionIntent {
-        const isUpgradeable = options.isUpgradeable || true;
-        const isReadable = options.isReadable || true;
-        const isPayable = options.isPayable || false;
-        const isPayableBySmartContract = options.isPayableBySmartContract || true;
+        const isUpgradeable = options.isUpgradeable ?? true;
+        const isReadable = options.isReadable ?? true;
+        const isPayable = options.isPayable ?? false;
+        const isPayableBySmartContract = options.isPayableBySmartContract ?? true;
 
         const args = options.args || [];
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);

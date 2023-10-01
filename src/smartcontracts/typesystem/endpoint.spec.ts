@@ -3,7 +3,7 @@ import { EndpointDefinition } from "./endpoint";
 
 
 describe("test endpoint", () => {
-    it('should should handle an only-owner modifier', async () => {
+    it('should handle an only-owner modifier', async () => {
       const actual = EndpointDefinition.fromJSON({
         name: 'foo',
         ownerOnly: true,

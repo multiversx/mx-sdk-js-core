@@ -23,21 +23,21 @@ export class EndpointDefinition {
 
     static fromJSON(json: {
         name: string,
-        ownerOnly?: boolean
+        onlyOwner?: boolean
         mutability: string,
         payableInTokens: string[],
         inputs: any[],
         outputs: any[]
     }): EndpointDefinition {
         json.name = json.name == null ? NamePlaceholder : json.name;
-        json.ownerOnly = json.ownerOnly || false;
+        json.onlyOwner = json.onlyOwner || false;
         json.payableInTokens = json.payableInTokens || [];
         json.inputs = json.inputs || [];
         json.outputs = json.outputs || [];
 
         let input = json.inputs.map(param => EndpointParameterDefinition.fromJSON(param));
         let output = json.outputs.map(param => EndpointParameterDefinition.fromJSON(param));
-        let modifiers = new EndpointModifiers(json.mutability, json.payableInTokens, json.ownerOnly);
+        let modifiers = new EndpointModifiers(json.mutability, json.payableInTokens, json.onlyOwner);
 
         return new EndpointDefinition(json.name, input, output, modifiers);
     }
@@ -46,12 +46,12 @@ export class EndpointDefinition {
 export class EndpointModifiers {
     readonly mutability: string;
     readonly payableInTokens: string[];
-    readonly ownerOnly: boolean;
+    readonly onlyOwner: boolean;
 
-    constructor(mutability: string, payableInTokens: string[], ownerOnly?: boolean) {
+    constructor(mutability: string, payableInTokens: string[], onlyOwner?: boolean) {
         this.mutability = mutability || "";
         this.payableInTokens = payableInTokens || [];
-        this.ownerOnly = ownerOnly || false;
+        this.onlyOwner = onlyOwner || false;
     }
 
     isPayableInEGLD(): boolean {
@@ -82,8 +82,8 @@ export class EndpointModifiers {
         return this.mutability == "readonly";
     }
 
-    isOwnerOnly() {
-        return this.ownerOnly;
+    isOnlyOwner() {
+        return this.onlyOwner;
     }
 }
 

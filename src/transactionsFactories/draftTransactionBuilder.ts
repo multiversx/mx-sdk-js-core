@@ -2,14 +2,14 @@ import { BigNumber } from "bignumber.js";
 import { IAddress, ITransactionPayload } from "../interface";
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { TransactionPayload } from "../transactionPayload";
-import { TransactionIntent } from "../transactionIntent";
+import { DraftTransaction } from "../draftTransaction";
 
 interface Config {
     minGasLimit: BigNumber.Value;
     gasLimitPerByte: BigNumber.Value;
 }
 
-export class TransactionIntentBuilder {
+export class DraftTransactionBuilder {
     private config: Config;
     private sender: IAddress;
     private receiver: IAddress;
@@ -51,11 +51,11 @@ export class TransactionIntentBuilder {
         return new TransactionPayload(data);
     }
 
-    build(): TransactionIntent {
+    build(): DraftTransaction {
         const data = this.buildTransactionPayload()
         const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionIntent({
+        return new DraftTransaction({
             sender: this.sender.bech32(),
             receiver: this.receiver.bech32(),
             gasLimit: gasLimit,

@@ -1,6 +1,6 @@
 import { BigNumber } from "bignumber.js";
 
-export class TransactionIntent {
+export class DraftTransaction {
     public sender: string;
     public receiver: string;
     public gasLimit: BigNumber.Value;

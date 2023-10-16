@@ -1,13 +1,13 @@
 import { BigNumber } from "bignumber.js";
 import { IAddress } from "../interface";
-import { TransactionIntent } from "../transactionIntent";
+import { DraftTransaction } from "../draftTransaction";
 import { AbiRegistry, ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { byteArrayToHex } from "../utils.codec";
 import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
 import { Err } from "../errors";
 import { Address } from "../address";
-import { TransactionIntentBuilder } from "./transactionIntentBuilder";
+import { TransactionIntentBuilder } from "./draftTransactionBuilder";
 
 interface Config {
     chainID: string;

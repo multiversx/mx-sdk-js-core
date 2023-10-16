@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
-import { TransactionIntent } from "../transactionIntent";
-import { TransactionIntentBuilder } from "./transactionIntentBuilder";
+import { DraftTransaction } from "../draftTransaction";
+import { TransactionIntentBuilder } from "./draftTransactionBuilder";
 import { IAddress } from "../interface";
 import { utf8ToHex, bigIntToHex, addressToHex, byteArrayToHex } from "../utils.codec";
 import { ESDT_CONTRACT_ADDRESS } from "../constants";

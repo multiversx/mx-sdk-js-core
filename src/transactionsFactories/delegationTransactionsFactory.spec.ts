@@ -1,22 +1,22 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
-import { DelegationTransactionIntentsFactory } from "./delegationTransactionIntentsFactory";
+import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
 import { assert } from "chai";
 import { DELEGATION_MANAGER_SC_ADDRESS } from "../constants";
 import { ValidatorPublicKey } from "@multiversx/sdk-wallet-next";
 import { TransactionIntentsFactoryConfig } from "./transactionIntentsFactoryConfig";
 
-describe("test delegation intents factory", function () {
+describe("test delegation transactions factory", function () {
     const config = new TransactionIntentsFactoryConfig("D");
-    const delegationFactory = new DelegationTransactionIntentsFactory(config);
+    const delegationFactory = new DelegationTransactionsFactory(config);
 
-    it("should create intent for new delegation contract", async function () {
+    it("should create draft transaction for new delegation contract", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delagationCap = "5000000000000000000000";
         const serviceFee = 10;
         const value = new BigNumber("1250000000000000000000");
 
-        const intent = delegationFactory.createTransactionIntentForNewDelegationContract({
+        const intent = delegationFactory.createTransactionForNewDelegationContract({
             sender: sender,
             totalDelegationCap: delagationCap,
             serviceFee: serviceFee,
@@ -31,7 +31,7 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.value, value);
     });
 
-    it("should create intent for adding nodes", async function () {
+    it("should create draft transaction for adding nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         const publicKey = new ValidatorPublicKey(Buffer.from("e7beaa95b3877f47348df4dd1cb578a4f7cabf7a20bfeefe5cdd263878ff132b765e04fef6f40c93512b666c47ed7719b8902f6c922c04247989b7137e837cc81a62e54712471c97a2ddab75aa9c2f58f813ed4c0fa722bde0ab718bff382208", "hex"));
@@ -40,7 +40,7 @@ describe("test delegation intents factory", function () {
             getSignature: () => Buffer.from("81109fa1c8d3dc7b6c2d6e65206cc0bc1a83c9b2d1eb91a601d66ad32def430827d5eb52917bd2b0d04ce195738db216", "hex")
         }
 
-        const intent = delegationFactory.createTransactionIntentForAddingNodes({
+        const intent = delegationFactory.createTransactionForAddingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey],
@@ -54,7 +54,7 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.value, 0);
     });
 
-    it("should create intent for removing nodes", async function () {
+    it("should create draft transaction for removing nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -64,7 +64,7 @@ describe("test delegation intents factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionIntentForRemovingNodes({
+        const intent = delegationFactory.createTransactionForRemovingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey]
@@ -77,7 +77,7 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.value, 0);
     });
 
-    it("should create intent for staking nodes", async function () {
+    it("should create draft transaction for staking nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -87,7 +87,7 @@ describe("test delegation intents factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionIntentForStakingNodes({
+        const intent = delegationFactory.createTransactionForStakingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey]
@@ -100,7 +100,7 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.value, 0);
     });
 
-    it("should create intent for unbonding nodes", async function () {
+    it("should create draft transaction for unbonding nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -110,7 +110,7 @@ describe("test delegation intents factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionIntentForUnbondingNodes({
+        const intent = delegationFactory.createTransactionForUnbondingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey]
@@ -124,7 +124,7 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.gasLimit.valueOf(), 12080000);
     });
 
-    it("should create intent for unstaking nodes", async function () {
+    it("should create draft transaction for unstaking nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -134,7 +134,7 @@ describe("test delegation intents factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionIntentForUnstakingNodes({
+        const intent = delegationFactory.createTransactionForUnstakingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey]
@@ -148,7 +148,7 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.gasLimit.valueOf(), 12081500);
     });
 
-    it("should create intent for unjailing nodes", async function () {
+    it("should create draft transaction for unjailing nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -158,7 +158,7 @@ describe("test delegation intents factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionIntentForUnjailingNodes({
+        const intent = delegationFactory.createTransactionForUnjailingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey]
@@ -171,12 +171,12 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.value, 0);
     });
 
-    it("should create intent for changing service fee", async function () {
+    it("should create draft transaction for changing service fee", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         const serviceFee = new BigNumber(10);
 
-        const intent = delegationFactory.createTransactionIntentForChangingServiceFee({
+        const intent = delegationFactory.createTransactionForChangingServiceFee({
             sender: sender,
             delegationContract: delegationContract,
             serviceFee: serviceFee
@@ -189,12 +189,12 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.value, 0);
     });
 
-    it("should create intent for changing delegation cap", async function () {
+    it("should create draft transaction for changing delegation cap", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         const delegationCap = new BigNumber("5000000000000000000000");
 
-        const intent = delegationFactory.createTransactionIntentForModifyingDelegationCap({
+        const intent = delegationFactory.createTransactionForModifyingDelegationCap({
             sender: sender,
             delegationContract: delegationContract,
             delegationCap: delegationCap
@@ -207,11 +207,11 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.value, 0);
     });
 
-    it("should create intent for setting automatic activation", async function () {
+    it("should create draft transaction for setting automatic activation", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const intent = delegationFactory.createTransactionIntentForSettingAutomaticActivation({
+        const intent = delegationFactory.createTransactionForSettingAutomaticActivation({
             sender: sender,
             delegationContract: delegationContract
         });
@@ -223,11 +223,11 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.value, 0);
     });
 
-    it("should create intent for unsetting automatic activation", async function () {
+    it("should create draft transaction for unsetting automatic activation", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const intent = delegationFactory.createTransactionIntentForUnsettingAutomaticActivation({
+        const intent = delegationFactory.createTransactionForUnsettingAutomaticActivation({
             sender: sender,
             delegationContract: delegationContract
         });
@@ -239,11 +239,11 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.value, 0);
     });
 
-    it("should create intent for setting cap check on redelegate rewards", async function () {
+    it("should create draft transaction for setting cap check on redelegate rewards", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const intent = delegationFactory.createTransactionIntentForSettingCapCheckOnRedelegateRewards({
+        const intent = delegationFactory.createTransactionForSettingCapCheckOnRedelegateRewards({
             sender: sender,
             delegationContract: delegationContract
         });
@@ -255,11 +255,11 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.value, 0);
     });
 
-    it("should create intent for unsetting cap check on redelegate rewards", async function () {
+    it("should create draft transaction for unsetting cap check on redelegate rewards", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const intent = delegationFactory.createTransactionIntentForUnsettingCapCheckOnRedelegateRewards({
+        const intent = delegationFactory.createTransactionForUnsettingCapCheckOnRedelegateRewards({
             sender: sender,
             delegationContract: delegationContract
         });
@@ -271,11 +271,11 @@ describe("test delegation intents factory", function () {
         assert.equal(intent.value, 0);
     });
 
-    it("should create intent for setting metadata", async function () {
+    it("should create draft transaction for setting metadata", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const intent = delegationFactory.createTransactionIntentForSettingMetadata({
+        const intent = delegationFactory.createTransactionForSettingMetadata({
             sender: sender,
             delegationContract: delegationContract,
             name: "name",

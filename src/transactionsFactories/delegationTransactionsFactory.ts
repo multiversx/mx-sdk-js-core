@@ -1,8 +1,8 @@
 import { IAddress } from "../interface";
 import { BigNumber } from "bignumber.js";
 import { numberToPaddedHex, byteArrayToHex, utf8ToHex } from "../utils.codec";
-import { TransactionIntent } from "../transactionIntent";
-import { TransactionIntentBuilder } from "./transactionIntentBuilder";
+import { DraftTransaction } from "../draftTransaction";
+import { DraftTransactionBuilder } from "./draftTransactionBuilder";
 import { Address } from "../address";
 import { DELEGATION_MANAGER_SC_ADDRESS } from "../constants";
 import { Err } from "../errors";
@@ -24,19 +24,19 @@ interface IValidatorPublicKey {
     hex(): string;
 }
 
-export class DelegationTransactionIntentsFactory {
+export class DelegationTransactionsFactory {
     private readonly config: Config;
 
     constructor(config: Config) {
         this.config = config;
     }
 
-    createTransactionIntentForNewDelegationContract(options: {
+    createTransactionForNewDelegationContract(options: {
         sender: IAddress,
         totalDelegationCap: BigNumber.Value,
         serviceFee: BigNumber.Value,
         value: BigNumber.Value
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "createNewDelegationContract",
             numberToPaddedHex(options.totalDelegationCap.toString()),
@@ -45,7 +45,7 @@ export class DelegationTransactionIntentsFactory {
 
         const executionGasLimit = new BigNumber(this.config.gasLimitCreateDelegationContract).plus(this.config.additionalGasLimitForDelegationOperations);
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(DELEGATION_MANAGER_SC_ADDRESS),
@@ -56,12 +56,12 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForAddingNodes(options: {
+    createTransactionForAddingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: IValidatorPublicKey[],
         signedMessages: Uint8Array[]
-    }): TransactionIntent {
+    }): DraftTransaction {
         if (options.publicKeys.length !== options.signedMessages.length) {
             throw new Err("The number of public keys should match the number of signed messages");
         }
@@ -73,7 +73,7 @@ export class DelegationTransactionIntentsFactory {
             dataParts.push(...[options.publicKeys[i].hex(), byteArrayToHex(options.signedMessages[i])]);
         }
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -83,11 +83,11 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForRemovingNodes(options: {
+    createTransactionForRemovingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: IValidatorPublicKey[]
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = ["removeNodes"];
 
         for (const key of options.publicKeys) {
@@ -96,7 +96,7 @@ export class DelegationTransactionIntentsFactory {
 
         const numNodes = options.publicKeys.length;
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -106,11 +106,11 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForStakingNodes(options: {
+    createTransactionForStakingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: IValidatorPublicKey[]
-    }): TransactionIntent {
+    }): DraftTransaction {
         let dataParts = ["stakeNodes"];
 
         for (const key of options.publicKeys) {
@@ -123,7 +123,7 @@ export class DelegationTransactionIntentsFactory {
             this.config.gasLimitDelegationOperations
         );
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -133,11 +133,11 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForUnbondingNodes(options: {
+    createTransactionForUnbondingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: IValidatorPublicKey[]
-    }): TransactionIntent {
+    }): DraftTransaction {
         let dataParts = ["unBondNodes"];
 
         for (const key of options.publicKeys) {
@@ -150,7 +150,7 @@ export class DelegationTransactionIntentsFactory {
                 this.config.gasLimitUnbond
             ).plus(this.config.gasLimitDelegationOperations);
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -160,11 +160,11 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForUnstakingNodes(options: {
+    createTransactionForUnstakingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: IValidatorPublicKey[]
-    }): TransactionIntent {
+    }): DraftTransaction {
         let dataParts = ["unStakeNodes"];
 
         for (const key of options.publicKeys) {
@@ -177,7 +177,7 @@ export class DelegationTransactionIntentsFactory {
                 this.config.gasLimitUnstake
             ).plus(this.config.gasLimitDelegationOperations);
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -187,11 +187,11 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForUnjailingNodes(options: {
+    createTransactionForUnjailingNodes(options: {
         sender: IAddress,
         delegationContract: IAddress,
         publicKeys: IValidatorPublicKey[]
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = ["unJailNodes"];
 
         for (const key of options.publicKeys) {
@@ -200,7 +200,7 @@ export class DelegationTransactionIntentsFactory {
 
         const numNodes = options.publicKeys.length;
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -210,17 +210,17 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForChangingServiceFee(options: {
+    createTransactionForChangingServiceFee(options: {
         sender: IAddress,
         delegationContract: IAddress,
         serviceFee: BigNumber.Value
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "changeServiceFee",
             numberToPaddedHex(options.serviceFee)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -230,17 +230,17 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForModifyingDelegationCap(options: {
+    createTransactionForModifyingDelegationCap(options: {
         sender: IAddress,
         delegationContract: IAddress,
         delegationCap: BigNumber.Value
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "modifyTotalDelegationCap",
             numberToPaddedHex(options.delegationCap)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -250,16 +250,16 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForSettingAutomaticActivation(options: {
+    createTransactionForSettingAutomaticActivation(options: {
         sender: IAddress,
         delegationContract: IAddress
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "setAutomaticActivation",
             utf8ToHex("true")
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -269,16 +269,16 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForUnsettingAutomaticActivation(options: {
+    createTransactionForUnsettingAutomaticActivation(options: {
         sender: IAddress,
         delegationContract: IAddress
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "setAutomaticActivation",
             utf8ToHex("false")
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -288,16 +288,16 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForSettingCapCheckOnRedelegateRewards(options: {
+    createTransactionForSettingCapCheckOnRedelegateRewards(options: {
         sender: IAddress,
         delegationContract: IAddress
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "setCheckCapOnReDelegateRewards",
             utf8ToHex("true")
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -307,16 +307,16 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForUnsettingCapCheckOnRedelegateRewards(options: {
+    createTransactionForUnsettingCapCheckOnRedelegateRewards(options: {
         sender: IAddress,
         delegationContract: IAddress
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "setCheckCapOnReDelegateRewards",
             utf8ToHex("false")
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -326,13 +326,13 @@ export class DelegationTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForSettingMetadata(options: {
+    createTransactionForSettingMetadata(options: {
         sender: IAddress,
         delegationContract: IAddress,
         name: string,
         website: string,
         identifier: string
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "setMetaData",
             utf8ToHex(options.name),
@@ -340,7 +340,7 @@ export class DelegationTransactionIntentsFactory {
             utf8ToHex(options.identifier)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,

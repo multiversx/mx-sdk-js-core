@@ -1,13 +1,13 @@
 import { BigNumber } from "bignumber.js";
 import { IAddress } from "../interface";
 import { DraftTransaction } from "../draftTransaction";
-import { AbiRegistry, ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
+import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { byteArrayToHex } from "../utils.codec";
 import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
 import { Err } from "../errors";
 import { Address } from "../address";
-import { TransactionIntentBuilder } from "./draftTransactionBuilder";
+import { DraftTransactionBuilder } from "./draftTransactionBuilder";
 
 interface Config {
     chainID: string;
@@ -22,7 +22,7 @@ interface Abi {
 }
 
 
-export class SmartContractTransactionIntentsFactory {
+export class SmartContractTransactionsFactory {
     private readonly config: Config;
     private readonly abiRegistry?: Abi;
 
@@ -37,7 +37,7 @@ export class SmartContractTransactionIntentsFactory {
         this.abiRegistry = abi;
     }
 
-    createTransactionIntentForDeploy(options: {
+    createTransactionForDeploy(options: {
         sender: IAddress,
         bytecode: Uint8Array,
         gasLimit: BigNumber.Value,
@@ -46,7 +46,7 @@ export class SmartContractTransactionIntentsFactory {
         isReadable?: boolean,
         isPayable?: boolean,
         isPayableBySmartContract?: boolean
-    }): TransactionIntent {
+    }): DraftTransaction {
         const isUpgradeable = options.isUpgradeable ?? true;
         const isReadable = options.isReadable ?? true;
         const isPayable = options.isPayable ?? false;
@@ -64,7 +64,7 @@ export class SmartContractTransactionIntentsFactory {
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition)
         parts = parts.concat(preparedArgs);
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(CONTRACT_DEPLOY_ADDRESS),
@@ -74,21 +74,21 @@ export class SmartContractTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForExecute(options: {
+    createTransactionForExecute(options: {
         sender: IAddress,
         contractAddress: IAddress,
         functionName: string,
         gasLimit: BigNumber.Value,
         args?: any[]
     }
-    ): TransactionIntent {
+    ): DraftTransaction {
         const args = options.args || [];
         let parts: string[] = [options.functionName];
 
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName));
         parts = parts.concat(preparedArgs);
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.contractAddress,
@@ -98,7 +98,7 @@ export class SmartContractTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForUpgrade(options: {
+    createTransactionForUpgrade(options: {
         sender: IAddress,
         contract: IAddress,
         bytecode: Uint8Array,
@@ -109,7 +109,7 @@ export class SmartContractTransactionIntentsFactory {
         isPayable?: boolean,
         isPayableBySmartContract?: boolean
     }
-    ): TransactionIntent {
+    ): DraftTransaction {
         const isUpgradeable = options.isUpgradeable ?? true;
         const isReadable = options.isReadable ?? true;
         const isPayable = options.isPayable ?? false;
@@ -127,7 +127,7 @@ export class SmartContractTransactionIntentsFactory {
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition)
         parts = parts.concat(preparedArgs);
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.contract,

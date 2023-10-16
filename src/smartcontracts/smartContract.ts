@@ -14,8 +14,8 @@ import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
 import { ArwenVirtualMachine, ContractCallPayloadBuilder, ContractUpgradePayloadBuilder } from "./transactionPayloadBuilders";
 import { EndpointDefinition, TypedValue } from "./typesystem";
-import { SmartContractTransactionIntentsFactory } from "../transactionIntentsFactories/smartContractTransactionIntentsFactory";
-import { TransactionIntentsFactoryConfig } from "../transactionIntentsFactories/transactionIntentsFactoryConfig";
+import { SmartContractTransactionIntentsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
+import { TransactionIntentsFactoryConfig } from "../transactionsFactories/transactionIntentsFactoryConfig";
 import { TransactionPayload } from "../transactionPayload";
 const createKeccakHash = require("keccak");
 

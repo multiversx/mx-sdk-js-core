@@ -337,3 +337,9 @@ export class ErrInvalidTokenIdentifier extends Err {
     super(message);
   }
 }
+
+export class ErrBadUsage extends Err {
+  public constructor(message: string) {
+    super(message);
+  }
+}

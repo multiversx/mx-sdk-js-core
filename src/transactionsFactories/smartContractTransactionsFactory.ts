@@ -5,9 +5,10 @@ import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } fro
 import { byteArrayToHex } from "../utils.codec";
 import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
-import { Err } from "../errors";
+import { Err, ErrBadUsage } from "../errors";
 import { Address } from "../address";
 import { DraftTransactionBuilder } from "./draftTransactionBuilder";
+import { TokenTransfer } from "../tokenTransfer";
 
 interface Config {
     chainID: string;
@@ -83,9 +84,14 @@ export class SmartContractTransactionsFactory {
         contractAddress: IAddress,
         functionName: string,
         gasLimit: BigNumber.Value,
-        args?: any[]
-    }
-    ): DraftTransaction {
+        args?: any[],
+        nativeTokenTransfer?: BigNumber.Value,
+        tokenTransfers?: TokenTransfer[]
+    }): DraftTransaction {
+        if (options.nativeTokenTransfer && options.tokenTransfers?.length) {
+            throw new ErrBadUsage("Can't send both native token and ESDT/NFT tokens");
+        }
+
         const args = options.args || [];
         let parts: string[] = [options.functionName];
 
@@ -113,8 +119,7 @@ export class SmartContractTransactionsFactory {
         isReadable?: boolean,
         isPayable?: boolean,
         isPayableBySmartContract?: boolean
-    }
-    ): DraftTransaction {
+    }): DraftTransaction {
         const nativeTransferAmount = options.nativeTransferAmount ?? 0;
 
         const isUpgradeable = options.isUpgradeable ?? true;

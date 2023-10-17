@@ -14,8 +14,8 @@ import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
 import { ArwenVirtualMachine, ContractCallPayloadBuilder, ContractUpgradePayloadBuilder } from "./transactionPayloadBuilders";
 import { EndpointDefinition, TypedValue } from "./typesystem";
-import { SmartContractTransactionIntentsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
-import { TransactionIntentsFactoryConfig } from "../transactionsFactories/transactionIntentsFactoryConfig";
+import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
+import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { TransactionPayload } from "../transactionPayload";
 const createKeccakHash = require("keccak");
 
@@ -115,8 +115,8 @@ export class SmartContract implements ISmartContract {
     deploy({ deployer, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
         Compatibility.guardAddressIsSetAndNonZero(deployer, "'deployer' of SmartContract.deploy()", "pass the actual address to deploy()");
 
-        const config = new TransactionIntentsFactoryConfig(chainID.valueOf());
-        const scIntentFactory = new SmartContractTransactionIntentsFactory({
+        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const scIntentFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi
         });
@@ -124,7 +124,7 @@ export class SmartContract implements ISmartContract {
         const bytecode = Buffer.from(code.toString(), 'hex');
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const intent = scIntentFactory.createTransactionIntentForDeploy({
+        const intent = scIntentFactory.createTransactionForDeploy({
             sender: deployer,
             bytecode: bytecode,
             gasLimit: gasLimit.valueOf(),
@@ -177,8 +177,8 @@ export class SmartContract implements ISmartContract {
 
         this.ensureHasAddress();
 
-        const config = new TransactionIntentsFactoryConfig(chainID.valueOf());
-        const scIntentFactory = new SmartContractTransactionIntentsFactory({
+        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const scIntentFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi
         });
@@ -186,7 +186,7 @@ export class SmartContract implements ISmartContract {
         const bytecode = Uint8Array.from(Buffer.from(code.toString(), 'hex'));
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const intent = scIntentFactory.createTransactionIntentForUpgrade({
+        const intent = scIntentFactory.createTransactionForUpgrade({
             sender: caller,
             contract: this.getAddress(),
             bytecode: bytecode,
@@ -217,8 +217,8 @@ export class SmartContract implements ISmartContract {
 
         this.ensureHasAddress();
 
-        const config = new TransactionIntentsFactoryConfig(chainID.valueOf());
-        const scIntentFactory = new SmartContractTransactionIntentsFactory({
+        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const scIntentFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi
         });
@@ -226,7 +226,7 @@ export class SmartContract implements ISmartContract {
         args = args || [];
         value = value || 0;
 
-        const intent = scIntentFactory.createTransactionIntentForExecute({
+        const intent = scIntentFactory.createTransactionForExecute({
             sender: caller,
             contractAddress: receiver ? receiver : this.getAddress(),
             functionName: func.toString(),

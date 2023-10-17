@@ -16,7 +16,7 @@ export class DraftTransactionBuilder {
     private dataParts: string[];
     private providedGasLimit: BigNumber;
     private addDataMovementGas: boolean;
-    private value?: BigNumber.Value;
+    private amount?: BigNumber.Value;
 
     constructor(options: {
         config: Config,
@@ -25,7 +25,7 @@ export class DraftTransactionBuilder {
         dataParts: string[],
         gasLimit: BigNumber.Value,
         addDataMovementGas: boolean,
-        value?: BigNumber.Value
+        amount?: BigNumber.Value
     }) {
         this.config = options.config;
         this.sender = options.sender;
@@ -33,7 +33,7 @@ export class DraftTransactionBuilder {
         this.dataParts = options.dataParts;
         this.providedGasLimit = new BigNumber(options.gasLimit);
         this.addDataMovementGas = options.addDataMovementGas;
-        this.value = options.value;
+        this.amount = options.amount;
     }
 
     private computeGasLimit(payload: ITransactionPayload): BigNumber.Value {
@@ -59,7 +59,7 @@ export class DraftTransactionBuilder {
             sender: this.sender.bech32(),
             receiver: this.receiver.bech32(),
             gasLimit: gasLimit,
-            value: this.value || 0,
+            value: this.amount || 0,
             data: data.valueOf()
         })
     }

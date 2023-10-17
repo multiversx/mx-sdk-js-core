@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { DEFAULT_HRP } from "../constants";
 
-export class TransactionIntentsFactoryConfig {
+export class TransactionsFactoryConfig {
     chainID: string;
     addressHrp: string;
     minGasLimit: BigNumber.Value;

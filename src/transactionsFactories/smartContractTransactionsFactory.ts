@@ -42,11 +42,14 @@ export class SmartContractTransactionsFactory {
         bytecode: Uint8Array,
         gasLimit: BigNumber.Value,
         args?: any[],
+        nativeTransferAmount?: BigNumber.Value,
         isUpgradeable?: boolean,
         isReadable?: boolean,
         isPayable?: boolean,
         isPayableBySmartContract?: boolean
     }): DraftTransaction {
+        const nativeTransferAmount = options.nativeTransferAmount ?? 0;
+
         const isUpgradeable = options.isUpgradeable ?? true;
         const isReadable = options.isReadable ?? true;
         const isPayable = options.isPayable ?? false;
@@ -70,7 +73,8 @@ export class SmartContractTransactionsFactory {
             receiver: Address.fromBech32(CONTRACT_DEPLOY_ADDRESS),
             dataParts: parts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: false
+            addDataMovementGas: false,
+            amount: nativeTransferAmount
         }).build();
     }
 
@@ -104,12 +108,15 @@ export class SmartContractTransactionsFactory {
         bytecode: Uint8Array,
         gasLimit: BigNumber.Value,
         args?: any[],
+        nativeTransferAmount?: BigNumber.Value,
         isUpgradeable?: boolean,
         isReadable?: boolean,
         isPayable?: boolean,
         isPayableBySmartContract?: boolean
     }
     ): DraftTransaction {
+        const nativeTransferAmount = options.nativeTransferAmount ?? 0;
+
         const isUpgradeable = options.isUpgradeable ?? true;
         const isReadable = options.isReadable ?? true;
         const isPayable = options.isPayable ?? false;
@@ -133,7 +140,8 @@ export class SmartContractTransactionsFactory {
             receiver: options.contract,
             dataParts: parts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: false
+            addDataMovementGas: false,
+            amount: nativeTransferAmount
         }).build();
     }
 

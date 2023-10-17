@@ -4,10 +4,10 @@ import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
 import { assert } from "chai";
 import { DELEGATION_MANAGER_SC_ADDRESS } from "../constants";
 import { ValidatorPublicKey } from "@multiversx/sdk-wallet-next";
-import { TransactionIntentsFactoryConfig } from "./transactionIntentsFactoryConfig";
+import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test delegation transactions factory", function () {
-    const config = new TransactionIntentsFactoryConfig("D");
+    const config = new TransactionsFactoryConfig("D");
     const delegationFactory = new DelegationTransactionsFactory(config);
 
     it("should create draft transaction for new delegation contract", async function () {
@@ -20,7 +20,7 @@ describe("test delegation transactions factory", function () {
             sender: sender,
             totalDelegationCap: delagationCap,
             serviceFee: serviceFee,
-            value: value
+            amount: value
         });
 
         assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");

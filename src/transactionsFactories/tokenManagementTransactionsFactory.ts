@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { DraftTransaction } from "../draftTransaction";
-import { TransactionIntentBuilder } from "./draftTransactionBuilder";
+import { DraftTransactionBuilder } from "./draftTransactionBuilder";
 import { IAddress } from "../interface";
 import { utf8ToHex, bigIntToHex, addressToHex, byteArrayToHex } from "../utils.codec";
 import { ESDT_CONTRACT_ADDRESS } from "../constants";
@@ -29,7 +29,7 @@ interface Config {
 
 type RegisterAndSetAllRolesTokenType = "NFT" | "SFT" | "META" | "FNG";
 
-export class TokenManagementTransactionIntentsFactory {
+export class TokenManagementTransactionsFactory {
     private readonly config: Config;
     private readonly trueAsHex: string;
 
@@ -38,7 +38,7 @@ export class TokenManagementTransactionIntentsFactory {
         this.trueAsHex = utf8ToHex("true");
     }
 
-    createTransactionIntentForIssuingFungible(options: {
+    createTransactionForIssuingFungible(options: {
         sender: IAddress,
         tokenName: string,
         tokenTicker: string,
@@ -47,10 +47,11 @@ export class TokenManagementTransactionIntentsFactory {
         canFreeze: boolean,
         canWipe: boolean,
         canPause: boolean,
+        canTransferNFTCreateRole: boolean,
         canChangeOwner: boolean,
         canUpgrade: boolean,
         canAddSpecialRoles: boolean
-    }): TransactionIntent {
+    }): DraftTransaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const dataParts = [
@@ -62,23 +63,24 @@ export class TokenManagementTransactionIntentsFactory {
             ...(options.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
             ...(options.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
             ...(options.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
+            ...(options.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
             ...(options.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...(options.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
-            ...(options.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
+            ...[utf8ToHex("canUpgrade"), utf8ToHex(String(options.canUpgrade).toLowerCase())],
+            ...[utf8ToHex("canAddSpecialRoles"), utf8ToHex(String(options.canAddSpecialRoles).toLowerCase())]
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
-            value: this.config.issueCost
+            amount: this.config.issueCost
         }).build();
     }
 
-    createTransactionIntentForIssuingSemiFungible(options: {
+    createTransactionForIssuingSemiFungible(options: {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
@@ -89,7 +91,7 @@ export class TokenManagementTransactionIntentsFactory {
         canChangeOwner: boolean;
         canUpgrade: boolean;
         canAddSpecialRoles: boolean;
-    }): TransactionIntent {
+    }): DraftTransaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const dataParts = [
@@ -101,22 +103,22 @@ export class TokenManagementTransactionIntentsFactory {
             ...(options.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
             ...(options.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
             ...(options.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...(options.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
-            ...(options.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
+            ...[utf8ToHex("canUpgrade"), utf8ToHex(String(options.canUpgrade).toLowerCase())],
+            ...[utf8ToHex("canAddSpecialRoles"), utf8ToHex(String(options.canAddSpecialRoles).toLowerCase())]
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
-            value: this.config.issueCost
+            amount: this.config.issueCost
         }).build();
     }
 
-    createTransactionIntentForIssuingNonFungible(options: {
+    createTransactionForIssuingNonFungible(options: {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
@@ -127,7 +129,7 @@ export class TokenManagementTransactionIntentsFactory {
         canChangeOwner: boolean;
         canUpgrade: boolean;
         canAddSpecialRoles: boolean;
-    }): TransactionIntent {
+    }): DraftTransaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const dataParts = [
@@ -139,22 +141,22 @@ export class TokenManagementTransactionIntentsFactory {
             ...(options.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
             ...(options.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
             ...(options.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...(options.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
-            ...(options.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
+            ...[utf8ToHex("canUpgrade"), utf8ToHex(String(options.canUpgrade).toLowerCase())],
+            ...[utf8ToHex("canAddSpecialRoles"), utf8ToHex(String(options.canAddSpecialRoles).toLowerCase())]
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
-            value: this.config.issueCost
+            amount: this.config.issueCost
         }).build();
     }
 
-    createTransactionIntentForRegisteringMetaESDT(options: {
+    createTransactionForRegisteringMetaESDT(options: {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
@@ -166,7 +168,7 @@ export class TokenManagementTransactionIntentsFactory {
         canChangeOwner: boolean;
         canUpgrade: boolean;
         canAddSpecialRoles: boolean;
-    }): TransactionIntent {
+    }): DraftTransaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const dataParts = [
@@ -183,24 +185,24 @@ export class TokenManagementTransactionIntentsFactory {
             ...(options.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
-            value: this.config.issueCost
+            amount: this.config.issueCost
         }).build();
     }
 
-    createTransactionIntentForRegisteringAndSettingRoles(options: {
+    createTransactionForRegisteringAndSettingRoles(options: {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
         tokenType: RegisterAndSetAllRolesTokenType;
         numDecimals: BigNumber.Value;
-    }): TransactionIntent {
+    }): DraftTransaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const dataParts = [
@@ -211,27 +213,27 @@ export class TokenManagementTransactionIntentsFactory {
             bigIntToHex(options.numDecimals)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
-            value: this.config.issueCost
+            amount: this.config.issueCost
         }).build();
     }
 
-    createTransactionIntentForSettingBurnRoleGlobally(options: {
+    createTransactionForSettingBurnRoleGlobally(options: {
         sender: IAddress,
         tokenIdentifier: string
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "setBurnRoleGlobally",
             utf8ToHex(options.tokenIdentifier)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
@@ -241,16 +243,16 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForUnsettingBurnRoleGlobally(options: {
+    createTransactionForUnsettingBurnRoleGlobally(options: {
         sender: IAddress,
         tokenIdentifier: string
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "unsetBurnRoleGlobally",
             utf8ToHex(options.tokenIdentifier)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
@@ -260,13 +262,13 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForSettingSpecialRoleOnFungibleToken(options: {
+    createTransactionForSettingSpecialRoleOnFungibleToken(options: {
         sender: IAddress;
         user: IAddress;
         tokenIdentifier: string;
         addRoleLocalMint: boolean;
         addRoleLocalBurn: boolean;
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "setSpecialRole",
             utf8ToHex(options.tokenIdentifier),
@@ -275,7 +277,7 @@ export class TokenManagementTransactionIntentsFactory {
             ...(options.addRoleLocalBurn ? [utf8ToHex("ESDTRoleLocalBurn")] : []),
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
@@ -285,7 +287,7 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForSettingSpecialRoleOnSemiFungibleToken(options: {
+    createTransactionForSettingSpecialRoleOnSemiFungibleToken(options: {
         sender: IAddress;
         user: IAddress;
         tokenIdentifier: string;
@@ -293,7 +295,7 @@ export class TokenManagementTransactionIntentsFactory {
         addRoleNFTBurn: boolean;
         addRoleNFTAddQuantity: boolean;
         addRoleESDTTransferRole: boolean;
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "setSpecialRole",
             utf8ToHex(options.tokenIdentifier),
@@ -304,7 +306,7 @@ export class TokenManagementTransactionIntentsFactory {
             ...(options.addRoleESDTTransferRole ? [utf8ToHex("ESDTTransferRole")] : []),
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
@@ -314,7 +316,7 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForSettingSpecialRoleOnMetaESDT(options: {
+    createTransactionForSettingSpecialRoleOnMetaESDT(options: {
         sender: IAddress;
         user: IAddress;
         tokenIdentifier: string;
@@ -322,11 +324,11 @@ export class TokenManagementTransactionIntentsFactory {
         addRoleNFTBurn: boolean;
         addRoleNFTAddQuantity: boolean;
         addRoleESDTTransferRole: boolean;
-    }): TransactionIntent {
-        return this.createTransactionIntentForSettingSpecialRoleOnSemiFungibleToken(options);
+    }): DraftTransaction {
+        return this.createTransactionForSettingSpecialRoleOnSemiFungibleToken(options);
     }
 
-    createTransactionIntentForSettingSpecialRoleOnNonFungibleToken(options: {
+    createTransactionForSettingSpecialRoleOnNonFungibleToken(options: {
         sender: IAddress;
         user: IAddress;
         tokenIdentifier: string;
@@ -335,7 +337,7 @@ export class TokenManagementTransactionIntentsFactory {
         addRoleNFTUpdateAttributes: boolean;
         addRoleNFTAddURI: boolean;
         addRoleESDTTransferRole: boolean;
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "setSpecialRole",
             utf8ToHex(options.tokenIdentifier),
@@ -347,7 +349,7 @@ export class TokenManagementTransactionIntentsFactory {
             ...(options.addRoleESDTTransferRole ? [utf8ToHex("ESDTTransferRole")] : []),
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
@@ -357,7 +359,7 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForCreatingNFT(options: {
+    createTransactionForCreatingNFT(options: {
         sender: IAddress;
         tokenIdentifier: string;
         initialQuantity: BigNumber.Value;
@@ -366,7 +368,7 @@ export class TokenManagementTransactionIntentsFactory {
         hash: string;
         attributes: Uint8Array;
         uris: string[];
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "ESDTNFTCreate",
             utf8ToHex(options.tokenIdentifier),
@@ -382,7 +384,7 @@ export class TokenManagementTransactionIntentsFactory {
         const nftData = options.name + options.hash + options.attributes + options.uris.join("");
         const storageGasLimit = new BigNumber(this.config.gasLimitPerByte).multipliedBy(nftData.length);
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -392,16 +394,16 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForPausing(options: {
+    createTransactionForPausing(options: {
         sender: IAddress;
         tokenIdentifier: string;
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "pause",
             utf8ToHex(options.tokenIdentifier)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -411,16 +413,16 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForUnpausing(options: {
+    createTransactionForUnpausing(options: {
         sender: IAddress;
         tokenIdentifier: string;
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "unPause",
             utf8ToHex(options.tokenIdentifier)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -430,18 +432,18 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForFreezing(options: {
+    createTransactionForFreezing(options: {
         sender: IAddress;
         user: IAddress;
         tokenIdentifier: string;
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "freeze",
             utf8ToHex(options.tokenIdentifier),
             addressToHex(options.user)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -451,18 +453,18 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForUnfreezing(options: {
+    createTransactionForUnfreezing(options: {
         sender: IAddress;
         user: IAddress;
         tokenIdentifier: string;
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "UnFreeze",
             utf8ToHex(options.tokenIdentifier),
             addressToHex(options.user)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -472,18 +474,18 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForWiping(options: {
+    createTransactionForWiping(options: {
         sender: IAddress;
         user: IAddress;
         tokenIdentifier: string;
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "wipe",
             utf8ToHex(options.tokenIdentifier),
             addressToHex(options.user)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -493,18 +495,18 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForLocalMint(options: {
+    createTransactionForLocalMint(options: {
         sender: IAddress;
         tokenIdentifier: string;
         supplyToMint: BigNumber.Value;
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "ESDTLocalMint",
             utf8ToHex(options.tokenIdentifier),
             bigIntToHex(options.supplyToMint),
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -514,18 +516,18 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForLocalBurning(options: {
+    createTransactionForLocalBurning(options: {
         sender: IAddress;
         tokenIdentifier: string;
-        supplyToMint: BigNumber.Value;
-    }): TransactionIntent {
+        supplyToBurn: BigNumber.Value;
+    }): DraftTransaction {
         const dataParts = [
             "ESDTLocalBurn",
             utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(options.supplyToMint),
+            bigIntToHex(options.supplyToBurn),
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -535,12 +537,12 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForUpdatingAttributes(options: {
+    createTransactionForUpdatingAttributes(options: {
         sender: IAddress;
         tokenIdentifier: string;
         tokenNonce: BigNumber.Value;
         attributes: Uint8Array
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "ESDTNFTUpdateAttributes",
             utf8ToHex(options.tokenIdentifier),
@@ -548,7 +550,7 @@ export class TokenManagementTransactionIntentsFactory {
             byteArrayToHex(options.attributes),
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -558,12 +560,12 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForAddingQuantity(options: {
+    createTransactionForAddingQuantity(options: {
         sender: IAddress;
         tokenIdentifier: string;
         tokenNonce: BigNumber.Value;
         quantityToAdd: BigNumber.Value
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "ESDTNFTAddQuantity",
             utf8ToHex(options.tokenIdentifier),
@@ -571,7 +573,7 @@ export class TokenManagementTransactionIntentsFactory {
             bigIntToHex(options.quantityToAdd)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -581,12 +583,12 @@ export class TokenManagementTransactionIntentsFactory {
         }).build();
     }
 
-    createTransactionIntentForBurningQuantity(options: {
+    createTransactionForBurningQuantity(options: {
         sender: IAddress;
         tokenIdentifier: string;
         tokenNonce: BigNumber.Value;
         quantityToBurn: BigNumber.Value
-    }): TransactionIntent {
+    }): DraftTransaction {
         const dataParts = [
             "ESDTNFTBurn",
             utf8ToHex(options.tokenIdentifier),
@@ -594,7 +596,7 @@ export class TokenManagementTransactionIntentsFactory {
             bigIntToHex(options.quantityToBurn)
         ];
 
-        return new TransactionIntentBuilder({
+        return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,

@@ -35,7 +35,7 @@ export class DelegationTransactionsFactory {
         sender: IAddress,
         totalDelegationCap: BigNumber.Value,
         serviceFee: BigNumber.Value,
-        value: BigNumber.Value
+        amount: BigNumber.Value
     }): DraftTransaction {
         const dataParts = [
             "createNewDelegationContract",
@@ -52,7 +52,7 @@ export class DelegationTransactionsFactory {
             dataParts: dataParts,
             gasLimit: executionGasLimit,
             addDataMovementGas: true,
-            value: options.value
+            amount: options.amount
         }).build();
     }
 

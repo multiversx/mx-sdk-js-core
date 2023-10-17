@@ -1,23 +1,23 @@
 import { assert } from "chai";
 import { loadTestWallets, TestWallet } from "../testutils";
-import { TokenManagementTransactionIntentsFactory } from "./tokenManagementTransactionIntentsFactory";
-import { TransactionIntentsFactoryConfig } from "./transactionIntentsFactoryConfig";
+import { TokenManagementTransactionsFactory } from "./tokenManagementTransactionsFactory";
+import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 import BigNumber from "bignumber.js";
 import { ESDT_CONTRACT_ADDRESS } from "../constants";
 
-describe("test token management transaction intents factory", () => {
+describe("test token management transactions factory", () => {
     let frank: TestWallet, grace: TestWallet;
-    let factory: TokenManagementTransactionIntentsFactory;
-    let config: TransactionIntentsFactoryConfig;
+    let factory: TokenManagementTransactionsFactory;
+    let config: TransactionsFactoryConfig;
 
     before(async function () {
         ({ frank, grace } = await loadTestWallets());
-        config = new TransactionIntentsFactoryConfig("T");
-        factory = new TokenManagementTransactionIntentsFactory(config);
+        config = new TransactionsFactoryConfig("T");
+        factory = new TokenManagementTransactionsFactory(config);
     });
 
-    it("should create transaction intent for registering and setting roles", () => {
-        const intent = factory.createTransactionIntentForRegisteringAndSettingRoles({
+    it("should create draft transaction  for registering and setting roles", () => {
+        const intent = factory.createTransactionForRegisteringAndSettingRoles({
             sender: frank.address,
             tokenName: "TEST",
             tokenTicker: "TEST",
@@ -32,8 +32,8 @@ describe("test token management transaction intents factory", () => {
         assert.deepEqual(intent.gasLimit, new BigNumber("60125000"));
     });
 
-    it("should create transaction intent for issuing fungible token", () => {
-        const intent = factory.createTransactionIntentForIssuingFungible({
+    it("should create draft transaction  for issuing fungible token", () => {
+        const intent = factory.createTransactionForIssuingFungible({
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
@@ -42,6 +42,7 @@ describe("test token management transaction intents factory", () => {
             canFreeze: true,
             canWipe: true,
             canPause: true,
+            canTransferNFTCreateRole: false,
             canChangeOwner: true,
             canUpgrade: true,
             canAddSpecialRoles: true
@@ -53,8 +54,8 @@ describe("test token management transaction intents factory", () => {
         assert.deepEqual(intent.value, config.issueCost);
     });
 
-    it("should create transaction intent for issuing semi-fungible token", () => {
-        const intent = factory.createTransactionIntentForIssuingSemiFungible({
+    it("should create draft transaction  for issuing semi-fungible token", () => {
+        const intent = factory.createTransactionForIssuingSemiFungible({
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
@@ -73,8 +74,8 @@ describe("test token management transaction intents factory", () => {
         assert.deepEqual(intent.value, config.issueCost);
     });
 
-    it("should create transaction intent for issuing non-fungible token", () => {
-        const intent = factory.createTransactionIntentForIssuingNonFungible({
+    it("should create draft transaction  for issuing non-fungible token", () => {
+        const intent = factory.createTransactionForIssuingNonFungible({
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
@@ -93,8 +94,8 @@ describe("test token management transaction intents factory", () => {
         assert.deepEqual(intent.value, config.issueCost);
     });
 
-    it("should create transaction intent for registering metaEsdt", () => {
-        const intent = factory.createTransactionIntentForRegisteringMetaESDT({
+    it("should create draft transaction  for registering metaEsdt", () => {
+        const intent = factory.createTransactionForRegisteringMetaESDT({
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
@@ -114,8 +115,8 @@ describe("test token management transaction intents factory", () => {
         assert.deepEqual(intent.value, config.issueCost);
     });
 
-    it("should create transaction intent for setting spcial role on non-fungible token", () => {
-        const intent = factory.createTransactionIntentForSettingSpecialRoleOnNonFungibleToken({
+    it("should create draft transaction  for setting spcial role on non-fungible token", () => {
+        const intent = factory.createTransactionForSettingSpecialRoleOnNonFungibleToken({
             sender: frank.address,
             user: grace.address,
             tokenIdentifier: "FRANK-11ce3e",
@@ -132,8 +133,8 @@ describe("test token management transaction intents factory", () => {
         assert.equal(intent.value, 0);
     });
 
-    it("should create transaction intent for creating nft", () => {
-        const intent = factory.createTransactionIntentForCreatingNFT({
+    it("should create draft transaction  for creating nft", () => {
+        const intent = factory.createTransactionForCreatingNFT({
             sender: grace.address,
             tokenIdentifier: "FRANK-aa9e8d",
             initialQuantity: 1,

@@ -7,10 +7,10 @@ import { U32Value } from "../smartcontracts";
 import { CONTRACT_DEPLOY_ADDRESS } from "../constants";
 import { loadContractCode, loadAbiRegistry } from "../testutils/utils";
 import { Err } from "../errors";
-import { TransactionIntentsFactoryConfig } from "./transactionIntentsFactoryConfig";
+import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test smart contract transactions factory", function () {
-    const config = new TransactionIntentsFactoryConfig("D");
+    const config = new TransactionsFactoryConfig("D");
     let factory: SmartContractTransactionsFactory;
     let abiAwareFactory: SmartContractTransactionsFactory;
     let adderByteCode: Code;

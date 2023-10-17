@@ -331,3 +331,9 @@ export class ErrIsCompletedFieldIsMissingOnTransaction extends Err {
     super("The transaction watcher requires the `isCompleted` property to be defined on the transaction object. Perhaps you've used the sdk-network-provider's `ProxyNetworkProvider.getTransaction()` and in that case you should also pass `withProcessStatus=true`.")
   }
 }
+
+export class ErrInvalidTokenIdentifier extends Err {
+  public constructor(message: string) {
+    super(message);
+  }
+}

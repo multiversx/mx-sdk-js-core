@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { DraftTransaction } from "../draftTransaction";
 import { DraftTransactionBuilder } from "./draftTransactionBuilder";
 import { IAddress } from "../interface";
-import { utf8ToHex, bigIntToHex, addressToHex, byteArrayToHex } from "../utils.codec";
+import { utf8ToHex, boolToHex, bigIntToHex, addressToHex, byteArrayToHex } from "../utils.codec";
 import { ESDT_CONTRACT_ADDRESS } from "../constants";
 import { Address } from "../address";
 import { Logger } from "../logger";
@@ -65,8 +65,8 @@ export class TokenManagementTransactionsFactory {
             ...(options.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
             ...(options.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
             ...(options.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...[utf8ToHex("canUpgrade"), utf8ToHex(String(options.canUpgrade).toLowerCase())],
-            ...[utf8ToHex("canAddSpecialRoles"), utf8ToHex(String(options.canAddSpecialRoles).toLowerCase())]
+            ...[utf8ToHex("canUpgrade"), boolToHex(options.canUpgrade)],
+            ...[utf8ToHex("canAddSpecialRoles"), boolToHex(options.canAddSpecialRoles)]
         ];
 
         return new DraftTransactionBuilder({
@@ -103,8 +103,8 @@ export class TokenManagementTransactionsFactory {
             ...(options.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
             ...(options.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
             ...(options.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...[utf8ToHex("canUpgrade"), utf8ToHex(String(options.canUpgrade).toLowerCase())],
-            ...[utf8ToHex("canAddSpecialRoles"), utf8ToHex(String(options.canAddSpecialRoles).toLowerCase())]
+            ...[utf8ToHex("canUpgrade"), boolToHex(options.canUpgrade)],
+            ...[utf8ToHex("canAddSpecialRoles"), boolToHex(options.canAddSpecialRoles)]
         ];
 
         return new DraftTransactionBuilder({
@@ -141,8 +141,8 @@ export class TokenManagementTransactionsFactory {
             ...(options.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
             ...(options.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
             ...(options.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...[utf8ToHex("canUpgrade"), utf8ToHex(String(options.canUpgrade).toLowerCase())],
-            ...[utf8ToHex("canAddSpecialRoles"), utf8ToHex(String(options.canAddSpecialRoles).toLowerCase())]
+            ...[utf8ToHex("canUpgrade"), boolToHex(options.canUpgrade)],
+            ...[utf8ToHex("canAddSpecialRoles"), boolToHex(options.canAddSpecialRoles)]
         ];
 
         return new DraftTransactionBuilder({

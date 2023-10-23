@@ -7,6 +7,7 @@ import { TokenTransfer } from "./tokenTransfer";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 import { DraftTransaction } from "./draftTransaction";
+import { TRANSACTION_MIN_GAS_PRICE } from "./constants";
 
 
 describe("test transaction construction", async () => {
@@ -34,6 +35,9 @@ describe("test transaction construction", async () => {
         assert.equal(transaction.getValue().toString(), "1000000000000000000");
         assert.equal(transaction.getData().toString(), "test");
         assert.equal(transaction.getChainID().valueOf(), "");
+        assert.equal(transaction.getNonce().valueOf(), 0);
+        assert.equal(transaction.getGasPrice().valueOf(), TRANSACTION_MIN_GAS_PRICE);
+        assert.deepEqual(transaction.getSignature(), Buffer.from([]));
     });
 
     it("with no data, no value", async () => {

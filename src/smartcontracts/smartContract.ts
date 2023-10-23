@@ -136,7 +136,7 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc
         });
 
-        let transaction = Transaction.fromDraft(draftTx);
+        const transaction = Transaction.fromDraft(draftTx);
         transaction.setChainID(chainID);
         transaction.setValue(value ?? 0);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
@@ -196,7 +196,7 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc
         })
 
-        let transaction = Transaction.fromDraft(draftTx);
+        const transaction = Transaction.fromDraft(draftTx);
         transaction.setChainID(chainID);
         transaction.setValue(value ?? 0);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
@@ -229,7 +229,7 @@ export class SmartContract implements ISmartContract {
             args: args
         })
 
-        let transaction = Transaction.fromDraft(draftTx);
+        const transaction = Transaction.fromDraft(draftTx);
         transaction.setChainID(chainID);
         transaction.setValue(value);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)

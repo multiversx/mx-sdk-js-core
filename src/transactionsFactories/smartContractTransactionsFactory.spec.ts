@@ -1,5 +1,5 @@
 import { assert, expect } from "chai";
-import { SmartContractTransactionIntentsFactory } from "./smartContractTransactionIntentsFactory";
+import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
 import { Address } from "../address";
 import { Code } from "../smartcontracts/code";
 import { AbiRegistry } from "../smartcontracts/typesystem/abiRegistry";
@@ -7,24 +7,24 @@ import { U32Value } from "../smartcontracts";
 import { CONTRACT_DEPLOY_ADDRESS } from "../constants";
 import { loadContractCode, loadAbiRegistry } from "../testutils/utils";
 import { Err } from "../errors";
-import { TransactionIntentsFactoryConfig } from "./transactionIntentsFactoryConfig";
+import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
-describe("test smart contract intents factory", function () {
-    const config = new TransactionIntentsFactoryConfig("D");
-    let factory: SmartContractTransactionIntentsFactory;
-    let abiAwareFactory: SmartContractTransactionIntentsFactory;
+describe("test smart contract transactions factory", function () {
+    const config = new TransactionsFactoryConfig("D");
+    let factory: SmartContractTransactionsFactory;
+    let abiAwareFactory: SmartContractTransactionsFactory;
     let adderByteCode: Code;
     let abiRegistry: AbiRegistry;
 
     before(async function () {
-        factory = new SmartContractTransactionIntentsFactory({
+        factory = new SmartContractTransactionsFactory({
             config: config
         });
 
         adderByteCode = await loadContractCode("src/testdata/adder.wasm");
         abiRegistry = await loadAbiRegistry("src/testdata/adder.abi.json");
 
-        abiAwareFactory = new SmartContractTransactionIntentsFactory({
+        abiAwareFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: abiRegistry
         },
@@ -36,7 +36,7 @@ describe("test smart contract intents factory", function () {
         const gasLimit = 6000000;
         const args = [0];
 
-        assert.throws(() => factory.createTransactionIntentForDeploy({
+        assert.throws(() => factory.createTransactionForDeploy({
             sender: sender,
             bytecode: adderByteCode.valueOf(),
             gasLimit: gasLimit,
@@ -44,50 +44,50 @@ describe("test smart contract intents factory", function () {
         }), Err, "Can't convert args to TypedValues");
     });
 
-    it("should create intent for deploy", async function () {
+    it("should create draft transaction for deploy", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const gasLimit = 6000000;
         const args = [new U32Value(0)];
 
-        const deployIntent = factory.createTransactionIntentForDeploy({
+        const deployDraft = factory.createTransactionForDeploy({
             sender: sender,
             bytecode: adderByteCode.valueOf(),
             gasLimit: gasLimit,
             args: args
         });
-        const abiDeployIntent = abiAwareFactory.createTransactionIntentForDeploy({
+        const abiDeployDraft = abiAwareFactory.createTransactionForDeploy({
             sender: sender,
             bytecode: adderByteCode.valueOf(),
             gasLimit: gasLimit,
             args: args
         });
 
-        assert.equal(deployIntent.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(deployIntent.receiver, CONTRACT_DEPLOY_ADDRESS);
-        assert.isDefined(deployIntent.data);
-        expect(deployIntent.data!.length).to.be.greaterThan(0);
+        assert.equal(deployDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(deployDraft.receiver, CONTRACT_DEPLOY_ADDRESS);
+        assert.isDefined(deployDraft.data);
+        expect(deployDraft.data!.length).to.be.greaterThan(0);
 
-        assert.equal(deployIntent.gasLimit.valueOf(), gasLimit);
-        assert.equal(deployIntent.value, 0);
+        assert.equal(deployDraft.gasLimit.valueOf(), gasLimit);
+        assert.equal(deployDraft.value, 0);
 
-        assert.deepEqual(deployIntent, abiDeployIntent);
+        assert.deepEqual(deployDraft, abiDeployDraft);
     });
 
-    it("should create intent for execute", async function () {
+    it("should create draft transaction for execute", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const func = "add";
         const gasLimit = 6000000;
         const args = [new U32Value(7)];
 
-        const deployIntent = factory.createTransactionIntentForExecute({
+        const executeDraft = factory.createTransactionForExecute({
             sender: sender,
             contractAddress: contract,
             functionName: func,
             gasLimit: gasLimit,
             args: args
         });
-        const abiDeployIntent = abiAwareFactory.createTransactionIntentForExecute({
+        const abiExecuteDraft = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contractAddress: contract,
             functionName: func,
@@ -95,25 +95,25 @@ describe("test smart contract intents factory", function () {
             args: args
         });
 
-        assert.equal(deployIntent.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(deployIntent.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(executeDraft.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
 
-        assert.isDefined(deployIntent.data);
-        assert.deepEqual(deployIntent.data, Buffer.from("add@07"));
+        assert.isDefined(executeDraft.data);
+        assert.deepEqual(executeDraft.data, Buffer.from("add@07"));
 
-        assert.equal(deployIntent.gasLimit.valueOf(), gasLimit);
-        assert.equal(deployIntent.value, 0);
+        assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
+        assert.equal(executeDraft.value, 0);
 
-        assert.deepEqual(deployIntent, abiDeployIntent);
+        assert.deepEqual(executeDraft, abiExecuteDraft);
     });
 
-    it("should create intent for upgrade", async function () {
+    it("should create draft transaction for upgrade", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const gasLimit = 6000000;
         const args = [new U32Value(0)];
 
-        const deployIntent = factory.createTransactionIntentForUpgrade({
+        const upgradeDraft = factory.createTransactionForUpgrade({
             sender: sender,
             contract: contract,
             bytecode: adderByteCode.valueOf(),
@@ -121,7 +121,7 @@ describe("test smart contract intents factory", function () {
             args: args
         });
 
-        const abiDeployIntent = abiAwareFactory.createTransactionIntentForUpgrade({
+        const abiUpgradeDraft = abiAwareFactory.createTransactionForUpgrade({
             sender: sender,
             contract: contract,
             bytecode: adderByteCode.valueOf(),
@@ -129,14 +129,14 @@ describe("test smart contract intents factory", function () {
             args: args
         });
 
-        assert.equal(deployIntent.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(deployIntent.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        assert.isDefined(deployIntent.data);
-        assert.isTrue(Buffer.from(deployIntent.data!).toString().startsWith("upgradeContract@"));
+        assert.equal(upgradeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(upgradeDraft.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.isDefined(upgradeDraft.data);
+        assert.isTrue(Buffer.from(upgradeDraft.data!).toString().startsWith("upgradeContract@"));
 
-        assert.equal(deployIntent.gasLimit.valueOf(), gasLimit);
-        assert.equal(deployIntent.value, 0);
+        assert.equal(upgradeDraft.gasLimit.valueOf(), gasLimit);
+        assert.equal(upgradeDraft.value, 0);
 
-        assert.deepEqual(deployIntent, abiDeployIntent);
+        assert.deepEqual(upgradeDraft, abiUpgradeDraft);
     });
 });

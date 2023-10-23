@@ -6,6 +6,7 @@ import { TestWallet, loadTestWallets } from "./testutils";
 import { TokenTransfer } from "./tokenTransfer";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
+import { DraftTransaction } from "./draftTransaction";
 
 
 describe("test transaction construction", async () => {
@@ -15,6 +16,24 @@ describe("test transaction construction", async () => {
 
     before(async function () {
         wallets = await loadTestWallets();
+    });
+
+    it("create transaction from draft transaction", async () => {
+        const draftTransaction = new DraftTransaction({
+            sender: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+            receiver: "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+            gasLimit: 56000,
+            value: "1000000000000000000",
+            data: Buffer.from("test")
+        });
+
+        const transaction = Transaction.fromDraft(draftTransaction);
+        assert.deepEqual(transaction.getSender(), Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"));
+        assert.deepEqual(transaction.getReceiver(), Address.fromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"));
+        assert.equal(transaction.getGasLimit().valueOf(), 56000);
+        assert.equal(transaction.getValue().toString(), "1000000000000000000");
+        assert.equal(transaction.getData().toString(), "test");
+        assert.equal(transaction.getChainID().valueOf(), "");
     });
 
     it("with no data, no value", async () => {

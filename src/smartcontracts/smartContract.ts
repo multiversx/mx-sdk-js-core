@@ -14,9 +14,10 @@ import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
 import { ArwenVirtualMachine, ContractCallPayloadBuilder, ContractUpgradePayloadBuilder } from "./transactionPayloadBuilders";
 import { EndpointDefinition, TypedValue } from "./typesystem";
-import { SmartContractTransactionIntentsFactory } from "../transactionIntentsFactories/smartContractTransactionIntentsFactory";
-import { TransactionIntentsFactoryConfig } from "../transactionIntentsFactories/transactionIntentsFactoryConfig";
+import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
+import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { TransactionPayload } from "../transactionPayload";
+import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
 const createKeccakHash = require("keccak");
 
 interface IAbi {
@@ -115,8 +116,8 @@ export class SmartContract implements ISmartContract {
     deploy({ deployer, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
         Compatibility.guardAddressIsSetAndNonZero(deployer, "'deployer' of SmartContract.deploy()", "pass the actual address to deploy()");
 
-        const config = new TransactionIntentsFactoryConfig(chainID.valueOf());
-        const scIntentFactory = new SmartContractTransactionIntentsFactory({
+        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const scDraftTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi
         });
@@ -124,7 +125,7 @@ export class SmartContract implements ISmartContract {
         const bytecode = Buffer.from(code.toString(), 'hex');
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const intent = scIntentFactory.createTransactionIntentForDeploy({
+        const draftTx = scDraftTransactionFactory.createTransactionForDeploy({
             sender: deployer,
             bytecode: bytecode,
             gasLimit: gasLimit.valueOf(),
@@ -135,15 +136,12 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc
         });
 
-        return new Transaction({
-            receiver: Address.fromBech32(intent.receiver),
-            sender: Address.fromBech32(intent.sender),
-            value: value,
-            gasLimit: new BigNumber(intent.gasLimit).toNumber(),
-            gasPrice: gasPrice,
-            data: new TransactionPayload(Buffer.from(intent.data!)),
-            chainID: chainID
-        });
+        let transaction = Transaction.fromDraft(draftTx);
+        transaction.setChainID(chainID);
+        transaction.setValue(value ?? 0);
+        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
+
+        return transaction;
     }
 
     private getMetadataPropertiesAsObject(codeMetadata?: ICodeMetadata): {
@@ -177,8 +175,8 @@ export class SmartContract implements ISmartContract {
 
         this.ensureHasAddress();
 
-        const config = new TransactionIntentsFactoryConfig(chainID.valueOf());
-        const scIntentFactory = new SmartContractTransactionIntentsFactory({
+        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const scDraftTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi
         });
@@ -186,7 +184,7 @@ export class SmartContract implements ISmartContract {
         const bytecode = Uint8Array.from(Buffer.from(code.toString(), 'hex'));
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const intent = scIntentFactory.createTransactionIntentForUpgrade({
+        const draftTx = scDraftTransactionFactory.createTransactionForUpgrade({
             sender: caller,
             contract: this.getAddress(),
             bytecode: bytecode,
@@ -198,15 +196,12 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc
         })
 
-        return new Transaction({
-            sender: Address.fromBech32(intent.sender),
-            receiver: Address.fromBech32(intent.receiver),
-            value: value,
-            gasLimit: new BigNumber(intent.gasLimit).toNumber(),
-            gasPrice: gasPrice,
-            data: new TransactionPayload(Buffer.from(intent.data!)),
-            chainID: chainID
-        });
+        let transaction = Transaction.fromDraft(draftTx);
+        transaction.setChainID(chainID);
+        transaction.setValue(value ?? 0);
+        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
+
+        return transaction;
     }
 
     /**
@@ -217,8 +212,8 @@ export class SmartContract implements ISmartContract {
 
         this.ensureHasAddress();
 
-        const config = new TransactionIntentsFactoryConfig(chainID.valueOf());
-        const scIntentFactory = new SmartContractTransactionIntentsFactory({
+        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const scDraftTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi
         });
@@ -226,7 +221,7 @@ export class SmartContract implements ISmartContract {
         args = args || [];
         value = value || 0;
 
-        const intent = scIntentFactory.createTransactionIntentForExecute({
+        const draftTx = scDraftTransactionFactory.createTransactionForExecute({
             sender: caller,
             contractAddress: receiver ? receiver : this.getAddress(),
             functionName: func.toString(),
@@ -234,15 +229,12 @@ export class SmartContract implements ISmartContract {
             args: args
         })
 
-        return new Transaction({
-            sender: caller,
-            receiver: Address.fromBech32(intent.receiver),
-            value: value,
-            gasLimit: new BigNumber(intent.gasLimit).toNumber(),
-            gasPrice: gasPrice,
-            data: new TransactionPayload(Buffer.from(intent.data!)),
-            chainID: chainID
-        });
+        let transaction = Transaction.fromDraft(draftTx);
+        transaction.setChainID(chainID);
+        transaction.setValue(value);
+        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
+
+        return transaction;
     }
 
     createQuery({ func, args, value, caller }: QueryArguments): Query {

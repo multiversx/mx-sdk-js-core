@@ -16,19 +16,19 @@ describe("test delegation transactions factory", function () {
         const serviceFee = 10;
         const value = new BigNumber("1250000000000000000000");
 
-        const intent = delegationFactory.createTransactionForNewDelegationContract({
+        const draft = delegationFactory.createTransactionForNewDelegationContract({
             sender: sender,
             totalDelegationCap: delagationCap,
             serviceFee: serviceFee,
             amount: value
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, DELEGATION_MANAGER_SC_ADDRESS);
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("createNewDelegationContract@010f0cf064dd59200000@0a"));
-        assert.equal(intent.gasLimit.valueOf(), 60126500);
-        assert.equal(intent.value, value);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, DELEGATION_MANAGER_SC_ADDRESS);
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("createNewDelegationContract@010f0cf064dd59200000@0a"));
+        assert.equal(draft.gasLimit.valueOf(), 60126500);
+        assert.equal(draft.value, value);
     });
 
     it("should create draft transaction for adding nodes", async function () {
@@ -40,18 +40,18 @@ describe("test delegation transactions factory", function () {
             getSignature: () => Buffer.from("81109fa1c8d3dc7b6c2d6e65206cc0bc1a83c9b2d1eb91a601d66ad32def430827d5eb52917bd2b0d04ce195738db216", "hex")
         }
 
-        const intent = delegationFactory.createTransactionForAddingNodes({
+        const draft = delegationFactory.createTransactionForAddingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey],
             signedMessages: [mockMessage.getSignature()]
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("addNodes@e7beaa95b3877f47348df4dd1cb578a4f7cabf7a20bfeefe5cdd263878ff132b765e04fef6f40c93512b666c47ed7719b8902f6c922c04247989b7137e837cc81a62e54712471c97a2ddab75aa9c2f58f813ed4c0fa722bde0ab718bff382208@81109fa1c8d3dc7b6c2d6e65206cc0bc1a83c9b2d1eb91a601d66ad32def430827d5eb52917bd2b0d04ce195738db216"));
-        assert.equal(intent.value, 0);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("addNodes@e7beaa95b3877f47348df4dd1cb578a4f7cabf7a20bfeefe5cdd263878ff132b765e04fef6f40c93512b666c47ed7719b8902f6c922c04247989b7137e837cc81a62e54712471c97a2ddab75aa9c2f58f813ed4c0fa722bde0ab718bff382208@81109fa1c8d3dc7b6c2d6e65206cc0bc1a83c9b2d1eb91a601d66ad32def430827d5eb52917bd2b0d04ce195738db216"));
+        assert.equal(draft.value, 0);
     });
 
     it("should create draft transaction for removing nodes", async function () {
@@ -64,17 +64,17 @@ describe("test delegation transactions factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionForRemovingNodes({
+        const draft = delegationFactory.createTransactionForRemovingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey]
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("removeNodes@61626261"));
-        assert.equal(intent.value, 0);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("removeNodes@61626261"));
+        assert.equal(draft.value, 0);
     });
 
     it("should create draft transaction for staking nodes", async function () {
@@ -87,17 +87,17 @@ describe("test delegation transactions factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionForStakingNodes({
+        const draft = delegationFactory.createTransactionForStakingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey]
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("stakeNodes@61626261"));
-        assert.equal(intent.value, 0);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("stakeNodes@61626261"));
+        assert.equal(draft.value, 0);
     });
 
     it("should create draft transaction for unbonding nodes", async function () {
@@ -110,18 +110,18 @@ describe("test delegation transactions factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionForUnbondingNodes({
+        const draft = delegationFactory.createTransactionForUnbondingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey]
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("unBondNodes@61626261"));
-        assert.equal(intent.value, 0);
-        assert.equal(intent.gasLimit.valueOf(), 12080000);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("unBondNodes@61626261"));
+        assert.equal(draft.value, 0);
+        assert.equal(draft.gasLimit.valueOf(), 12080000);
     });
 
     it("should create draft transaction for unstaking nodes", async function () {
@@ -134,18 +134,18 @@ describe("test delegation transactions factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionForUnstakingNodes({
+        const draft = delegationFactory.createTransactionForUnstakingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey]
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("unStakeNodes@61626261"));
-        assert.equal(intent.value, 0);
-        assert.equal(intent.gasLimit.valueOf(), 12081500);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("unStakeNodes@61626261"));
+        assert.equal(draft.value, 0);
+        assert.equal(draft.gasLimit.valueOf(), 12081500);
     });
 
     it("should create draft transaction for unjailing nodes", async function () {
@@ -158,17 +158,17 @@ describe("test delegation transactions factory", function () {
             }
         };
 
-        const intent = delegationFactory.createTransactionForUnjailingNodes({
+        const draft = delegationFactory.createTransactionForUnjailingNodes({
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey]
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("unJailNodes@61626261"));
-        assert.equal(intent.value, 0);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("unJailNodes@61626261"));
+        assert.equal(draft.value, 0);
     });
 
     it("should create draft transaction for changing service fee", async function () {
@@ -176,17 +176,17 @@ describe("test delegation transactions factory", function () {
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         const serviceFee = new BigNumber(10);
 
-        const intent = delegationFactory.createTransactionForChangingServiceFee({
+        const draft = delegationFactory.createTransactionForChangingServiceFee({
             sender: sender,
             delegationContract: delegationContract,
             serviceFee: serviceFee
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("changeServiceFee@0a"));
-        assert.equal(intent.value, 0);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("changeServiceFee@0a"));
+        assert.equal(draft.value, 0);
     });
 
     it("should create draft transaction for changing delegation cap", async function () {
@@ -194,88 +194,88 @@ describe("test delegation transactions factory", function () {
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         const delegationCap = new BigNumber("5000000000000000000000");
 
-        const intent = delegationFactory.createTransactionForModifyingDelegationCap({
+        const draft = delegationFactory.createTransactionForModifyingDelegationCap({
             sender: sender,
             delegationContract: delegationContract,
             delegationCap: delegationCap
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("modifyTotalDelegationCap@010f0cf064dd59200000"));
-        assert.equal(intent.value, 0);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("modifyTotalDelegationCap@010f0cf064dd59200000"));
+        assert.equal(draft.value, 0);
     });
 
     it("should create draft transaction for setting automatic activation", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const intent = delegationFactory.createTransactionForSettingAutomaticActivation({
+        const draft = delegationFactory.createTransactionForSettingAutomaticActivation({
             sender: sender,
             delegationContract: delegationContract
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("setAutomaticActivation@74727565"));
-        assert.equal(intent.value, 0);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("setAutomaticActivation@74727565"));
+        assert.equal(draft.value, 0);
     });
 
     it("should create draft transaction for unsetting automatic activation", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const intent = delegationFactory.createTransactionForUnsettingAutomaticActivation({
+        const draft = delegationFactory.createTransactionForUnsettingAutomaticActivation({
             sender: sender,
             delegationContract: delegationContract
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("setAutomaticActivation@66616c7365"));
-        assert.equal(intent.value, 0);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("setAutomaticActivation@66616c7365"));
+        assert.equal(draft.value, 0);
     });
 
     it("should create draft transaction for setting cap check on redelegate rewards", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const intent = delegationFactory.createTransactionForSettingCapCheckOnRedelegateRewards({
+        const draft = delegationFactory.createTransactionForSettingCapCheckOnRedelegateRewards({
             sender: sender,
             delegationContract: delegationContract
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("setCheckCapOnReDelegateRewards@74727565"));
-        assert.equal(intent.value, 0);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("setCheckCapOnReDelegateRewards@74727565"));
+        assert.equal(draft.value, 0);
     });
 
     it("should create draft transaction for unsetting cap check on redelegate rewards", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const intent = delegationFactory.createTransactionForUnsettingCapCheckOnRedelegateRewards({
+        const draft = delegationFactory.createTransactionForUnsettingCapCheckOnRedelegateRewards({
             sender: sender,
             delegationContract: delegationContract
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("setCheckCapOnReDelegateRewards@66616c7365"));
-        assert.equal(intent.value, 0);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("setCheckCapOnReDelegateRewards@66616c7365"));
+        assert.equal(draft.value, 0);
     });
 
     it("should create draft transaction for setting metadata", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const intent = delegationFactory.createTransactionForSettingMetadata({
+        const draft = delegationFactory.createTransactionForSettingMetadata({
             sender: sender,
             delegationContract: delegationContract,
             name: "name",
@@ -283,10 +283,10 @@ describe("test delegation transactions factory", function () {
             identifier: "identifier"
         });
 
-        assert.equal(intent.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(intent.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        assert.isDefined(intent.data);
-        assert.deepEqual(intent.data, Buffer.from("setMetaData@6e616d65@77656273697465@6964656e746966696572"));
-        assert.equal(intent.value, 0);
+        assert.equal(draft.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(draft.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.isDefined(draft.data);
+        assert.deepEqual(draft.data, Buffer.from("setMetaData@6e616d65@77656273697465@6964656e746966696572"));
+        assert.equal(draft.value, 0);
     });
 });

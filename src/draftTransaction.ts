@@ -17,7 +17,7 @@ export class DraftTransaction {
         this.sender = options.sender;
         this.receiver = options.receiver;
         this.gasLimit = options.gasLimit;
-        this.value = options.value;
-        this.data = options.data;
+        this.value = options.value ?? 0;
+        this.data = options.data ?? new Uint8Array();
     }
 }

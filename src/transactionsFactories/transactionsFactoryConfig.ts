@@ -27,6 +27,9 @@ export class TransactionsFactoryConfig {
     gasLimitDelegationOperations: BigNumber.Value;
     additionalGasLimitPerValidatorNode: BigNumber.Value;
     additionalGasLimitForDelegationOperations: BigNumber.Value;
+    gasLimitESDTTransfer: BigNumber.Value;
+    gasLimitESDTNFTTransfer: BigNumber.Value;
+    gasLimitMultiESDTNFTTransfer: BigNumber.Value;
 
     constructor(chainId: string) {
         // General-purpose configuration
@@ -59,5 +62,10 @@ export class TransactionsFactoryConfig {
         this.gasLimitDelegationOperations = new BigNumber(1000000);
         this.additionalGasLimitPerValidatorNode = new BigNumber(6000000);
         this.additionalGasLimitForDelegationOperations = new BigNumber(10000000);
+
+        // Configuration for token transfers
+        this.gasLimitESDTTransfer = new BigNumber(200000);
+        this.gasLimitESDTNFTTransfer = new BigNumber(200000);
+        this.gasLimitMultiESDTNFTTransfer = new BigNumber(200000);
     }
 }

@@ -8,6 +8,8 @@ import { CONTRACT_DEPLOY_ADDRESS } from "../constants";
 import { loadContractCode, loadAbiRegistry } from "../testutils/utils";
 import { Err } from "../errors";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
+import BigNumber from "bignumber.js";
+import { Token, TokenTransfer } from "../tokens";
 
 describe("test smart contract transactions factory", function () {
     const config = new TransactionsFactoryConfig("D");
@@ -73,7 +75,7 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(deployDraft, abiDeployDraft);
     });
 
-    it("should create draft transaction for execute", async function () {
+    it("should create draft transaction for execute without transfer", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const func = "add";
@@ -82,14 +84,14 @@ describe("test smart contract transactions factory", function () {
 
         const executeDraft = factory.createTransactionForExecute({
             sender: sender,
-            contractAddress: contract,
+            contract: contract,
             functionName: func,
             gasLimit: gasLimit,
             args: args
         });
         const abiExecuteDraft = abiAwareFactory.createTransactionForExecute({
             sender: sender,
-            contractAddress: contract,
+            contract: contract,
             functionName: func,
             gasLimit: gasLimit,
             args: args
@@ -103,6 +105,202 @@ describe("test smart contract transactions factory", function () {
 
         assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
         assert.equal(executeDraft.value, 0);
+
+        assert.deepEqual(executeDraft, abiExecuteDraft);
+    });
+
+    it("should create draft transaction for execute and transfer native token", async function () {
+        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        const func = "add";
+        const gasLimit = 6000000;
+        const args = [new U32Value(7)];
+        const egldAmount = new BigNumber("1000000000000000000");
+
+        const executeDraft = factory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            functionName: func,
+            gasLimit: gasLimit,
+            args: args,
+            nativeTransferAmount: egldAmount
+        });
+        const abiExecuteDraft = abiAwareFactory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            functionName: func,
+            gasLimit: gasLimit,
+            args: args,
+            nativeTransferAmount: egldAmount
+        });
+
+        assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(executeDraft.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+
+        assert.isDefined(executeDraft.data);
+        assert.deepEqual(executeDraft.data, Buffer.from("add@07"));
+
+        assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
+        assert.equal(executeDraft.value.valueOf(), "1000000000000000000");
+
+        assert.deepEqual(executeDraft, abiExecuteDraft);
+    });
+
+    it("should create draft transaction for execute and transfer single esdt", async function () {
+        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        const func = "add";
+        const gasLimit = 6000000;
+        const args = [new U32Value(7)];
+        const token = new Token("FOO-6ce17b", 0);
+        const transfer = new TokenTransfer(token, 10);
+
+        const executeDraft = factory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            functionName: func,
+            gasLimit: gasLimit,
+            args: args,
+            tokenTransfers: [transfer]
+        });
+        const abiExecuteDraft = abiAwareFactory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            functionName: func,
+            gasLimit: gasLimit,
+            args: args,
+            tokenTransfers: [transfer]
+        });
+
+        assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(executeDraft.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+
+        assert.isDefined(executeDraft.data);
+        assert.deepEqual(executeDraft.data, Buffer.from("ESDTTransfer@464f4f2d366365313762@0a@616464@07"));
+
+        assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
+        assert.equal(executeDraft.value.valueOf(), "0");
+
+        assert.deepEqual(executeDraft, abiExecuteDraft);
+    });
+
+    it("should create draft transaction for execute and transfer multiple esdts", async function () {
+        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");
+        const func = "add";
+        const gasLimit = 6000000;
+        const args = [new U32Value(7)];
+
+        const fooToken = new Token("FOO-6ce17b", 0);
+        const fooTransfer = new TokenTransfer(fooToken, 10);
+        const barToken = new Token("BAR-5bc08f", 0);
+        const barTransfer = new TokenTransfer(barToken, 3140);
+
+        const executeDraft = factory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            functionName: func,
+            gasLimit: gasLimit,
+            args: args,
+            tokenTransfers: [fooTransfer, barTransfer]
+        });
+        const abiExecuteDraft = abiAwareFactory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            functionName: func,
+            gasLimit: gasLimit,
+            args: args,
+            tokenTransfers: [fooTransfer, barTransfer]
+        });
+
+        assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(executeDraft.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+
+        assert.isDefined(executeDraft.data);
+        assert.deepEqual(executeDraft.data, Buffer.from("MultiESDTNFTTransfer@00000000000000000500ed8e25a94efa837aae0e593112cfbb01b448755069e1@02@464f4f2d366365313762@00@0a@4241522d356263303866@00@0c44@616464@07"));
+
+        assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
+        assert.equal(executeDraft.value.valueOf(), "0");
+
+        assert.deepEqual(executeDraft, abiExecuteDraft);
+    });
+
+    it("should create draft transaction for execute and transfer single nft", async function () {
+        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        const func = "add";
+        const gasLimit = 6000000;
+        const args = [new U32Value(7)];
+
+        const token = new Token("NFT-123456", 1);
+        const transfer = new TokenTransfer(token, 1);
+
+        const executeDraft = factory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            functionName: func,
+            gasLimit: gasLimit,
+            args: args,
+            tokenTransfers: [transfer]
+        });
+        const abiExecuteDraft = abiAwareFactory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            functionName: func,
+            gasLimit: gasLimit,
+            args: args,
+            tokenTransfers: [transfer]
+        });
+
+        assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(executeDraft.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+
+        assert.isDefined(executeDraft.data);
+        assert.deepEqual(executeDraft.data, Buffer.from("ESDTNFTTransfer@4e46542d313233343536@01@01@00000000000000000500b9353fe8407f87310c87e12fa1ac807f0485da39d152@616464@07"));
+
+        assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
+        assert.equal(executeDraft.value.valueOf(), "0");
+
+        assert.deepEqual(executeDraft, abiExecuteDraft);
+    });
+
+    it("should create draft transaction for execute and transfer multiple nfts", async function () {
+        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        const func = "add";
+        const gasLimit = 6000000;
+        const args = [new U32Value(7)];
+
+        const firstToken = new Token("NFT-123456", 1);
+        const firstTransfer = new TokenTransfer(firstToken, 1);
+        const secondToken = new Token("NFT-123456", 42);
+        const secondTransfer = new TokenTransfer(secondToken, 1);
+
+        const executeDraft = factory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            functionName: func,
+            gasLimit: gasLimit,
+            args: args,
+            tokenTransfers: [firstTransfer, secondTransfer]
+        });
+        const abiExecuteDraft = abiAwareFactory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            functionName: func,
+            gasLimit: gasLimit,
+            args: args,
+            tokenTransfers: [firstTransfer, secondTransfer]
+        });
+
+        assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(executeDraft.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+
+        assert.isDefined(executeDraft.data);
+        assert.deepEqual(executeDraft.data, Buffer.from("MultiESDTNFTTransfer@00000000000000000500b9353fe8407f87310c87e12fa1ac807f0485da39d152@02@4e46542d313233343536@01@01@4e46542d313233343536@2a@01@616464@07"));
+
+        assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
+        assert.equal(executeDraft.value.valueOf(), "0");
 
         assert.deepEqual(executeDraft, abiExecuteDraft);
     });

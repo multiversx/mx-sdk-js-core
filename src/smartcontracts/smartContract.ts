@@ -12,11 +12,10 @@ import { Interaction } from "./interaction";
 import { CallArguments, DeployArguments, ICodeMetadata, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
-import { ArwenVirtualMachine, ContractCallPayloadBuilder, ContractUpgradePayloadBuilder } from "./transactionPayloadBuilders";
+import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
 import { EndpointDefinition, TypedValue } from "./typesystem";
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
 import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
-import { TransactionPayload } from "../transactionPayload";
 import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
 const createKeccakHash = require("keccak");
 
@@ -223,7 +222,7 @@ export class SmartContract implements ISmartContract {
 
         const draftTx = scDraftTransactionFactory.createTransactionForExecute({
             sender: caller,
-            contractAddress: receiver ? receiver : this.getAddress(),
+            contract: receiver ? receiver : this.getAddress(),
             functionName: func.toString(),
             gasLimit: gasLimit.valueOf(),
             args: args

@@ -2,13 +2,14 @@ import { BigNumber } from "bignumber.js";
 import { IAddress } from "../interface";
 import { DraftTransaction } from "../draftTransaction";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
-import { byteArrayToHex } from "../utils.codec";
+import { byteArrayToHex, utf8ToHex } from "../utils.codec";
 import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
 import { Err, ErrBadUsage } from "../errors";
 import { Address } from "../address";
 import { DraftTransactionBuilder } from "./draftTransactionBuilder";
-import { TokenTransfer } from "../tokenTransfer";
+import { TokenComputer, TokenTransfer } from "../tokens";
+import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
 
 interface Config {
     chainID: string;
@@ -26,6 +27,7 @@ interface Abi {
 export class SmartContractTransactionsFactory {
     private readonly config: Config;
     private readonly abiRegistry?: Abi;
+    private readonly dataArgsBuilder: TokenTransfersDataBuilder;
 
     constructor({
         config,
@@ -36,6 +38,7 @@ export class SmartContractTransactionsFactory {
     }) {
         this.config = config;
         this.abiRegistry = abi;
+        this.dataArgsBuilder = new TokenTransfersDataBuilder();
     }
 
     createTransactionForDeploy(options: {
@@ -81,30 +84,53 @@ export class SmartContractTransactionsFactory {
 
     createTransactionForExecute(options: {
         sender: IAddress,
-        contractAddress: IAddress,
+        contract: IAddress,
         functionName: string,
         gasLimit: BigNumber.Value,
         args?: any[],
-        nativeTokenTransfer?: BigNumber.Value,
+        nativeTransferAmount?: BigNumber.Value,
         tokenTransfers?: TokenTransfer[]
     }): DraftTransaction {
-        if (options.nativeTokenTransfer && options.tokenTransfers?.length) {
+        const args = options.args || [];
+        const tokenTransfer = options.tokenTransfers || [];
+        const nativeTransferAmount = options.nativeTransferAmount ?? 0;
+        const numberOfTokens = tokenTransfer.length;
+
+        if (nativeTransferAmount && numberOfTokens) {
             throw new ErrBadUsage("Can't send both native token and ESDT/NFT tokens");
         }
 
-        const args = options.args || [];
-        let parts: string[] = [options.functionName];
+        let receiver = options.contract;
+        const tokenComputer = new TokenComputer();
+        let transferArgs: string[] = [];
 
-        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName));
-        parts = parts.concat(preparedArgs);
+        if (numberOfTokens === 1) {
+            const transfer = tokenTransfer[0];
+
+            if (tokenComputer.isFungible(transfer.token)) {
+                transferArgs = this.dataArgsBuilder.buildArgsForESDTTransfer(transfer);
+            }
+            else {
+                transferArgs = this.dataArgsBuilder.buildArgsForSingleESDTNFTTransfer(transfer, receiver);
+                receiver = options.sender;
+            }
+        }
+        else if (numberOfTokens > 1) {
+            transferArgs = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(receiver, tokenTransfer)
+            receiver = options.sender;
+        }
+
+        transferArgs.push(transferArgs.length ? utf8ToHex(options.functionName) : options.functionName);
+        transferArgs = transferArgs.concat(this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName)));
 
         return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: options.contractAddress,
-            dataParts: parts,
+            receiver: receiver,
+            dataParts: transferArgs,
             gasLimit: options.gasLimit,
-            addDataMovementGas: false
+            addDataMovementGas: false,
+            amount: nativeTransferAmount
         }).build();
     }
 

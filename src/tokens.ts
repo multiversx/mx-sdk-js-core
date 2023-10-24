@@ -47,6 +47,15 @@ export class TokenComputer {
         return parts[0] + "-" + parts[1];
     }
 
+    ensureIdentifierHasCorrectStructure(identifier: string): string {
+        const isExtendedIdentifier = identifier.split("-").length === 3 ? true : false;
+        if (!isExtendedIdentifier) {
+            return identifier;
+        }
+
+        return this.extractIdentifierFromExtendedIdentifier(identifier);
+    }
+
     private checkIfExtendedIdentifierWasProvided(tokenParts: string[]): void {
         const EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 3;
 

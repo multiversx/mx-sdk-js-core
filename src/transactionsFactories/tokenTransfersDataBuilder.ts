@@ -19,7 +19,7 @@ export class TokenTransfersDataBuilder {
         let args = ["ESDTNFTTransfer"];
 
         const token = transfer.token;
-        const identifier = this.tokenComputer.ensureIdentifierHasCorrectStructure(token.identifier);
+        const identifier = this.tokenComputer.extractIdentifierFromExtendedIdentifier(token.identifier);
 
         args.push(...[utf8ToHex(identifier), numberToPaddedHex(token.nonce), numberToPaddedHex(transfer.amount), addressToHex(receiver)]);
         return args;
@@ -29,7 +29,7 @@ export class TokenTransfersDataBuilder {
         let args = ["MultiESDTNFTTransfer", addressToHex(receiver), numberToPaddedHex(transfers.length)];
 
         for (let transfer of transfers) {
-            const identifier = this.tokenComputer.ensureIdentifierHasCorrectStructure(transfer.token.identifier);
+            const identifier = this.tokenComputer.extractIdentifierFromExtendedIdentifier(transfer.token.identifier);
             args.push(...[utf8ToHex(identifier), numberToPaddedHex(transfer.token.nonce), numberToPaddedHex(transfer.amount)]);
         }
 

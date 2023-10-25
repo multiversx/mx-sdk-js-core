@@ -34,6 +34,11 @@ export class TokenComputer {
         this.checkIfExtendedIdentifierWasProvided(parts);
         this.checkLengthOfRandomSequence(parts[1]);
 
+        // in case the identifier of a fungible token is provided
+        if (parts.length == 2) {
+            return 0;
+        }
+
         const hexNonce = Buffer.from(parts[2], 'hex');
         return decodeUnsignedNumber(hexNonce);
     }
@@ -42,25 +47,20 @@ export class TokenComputer {
         const parts = identifier.split("-");
 
         this.checkIfExtendedIdentifierWasProvided(parts);
+        this.ensureTokenTickerValidity(parts[0]);
         this.checkLengthOfRandomSequence(parts[1]);
 
         return parts[0] + "-" + parts[1];
     }
 
-    ensureIdentifierHasCorrectStructure(identifier: string): string {
-        const isExtendedIdentifier = identifier.split("-").length === 3 ? true : false;
-        if (!isExtendedIdentifier) {
-            return identifier;
-        }
-
-        return this.extractIdentifierFromExtendedIdentifier(identifier);
-    }
-
     private checkIfExtendedIdentifierWasProvided(tokenParts: string[]): void {
-        const EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 3;
+        //  this is for the identifiers of fungible tokens
+        const MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 2
+        //  this is for the identifiers of nft, sft and meta-esdt
+        const MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 3
 
-        if (tokenParts.length !== EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED) {
-            throw new ErrInvalidTokenIdentifier("You have not provided the extended identifier");
+        if (tokenParts.length < MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED || tokenParts.length > MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED) {
+            throw new ErrInvalidTokenIdentifier("Invalid extended token identifier provided");
         }
     }
 
@@ -69,6 +69,23 @@ export class TokenComputer {
 
         if (randomSequence.length !== TOKEN_RANDOM_SEQUENCE_LENGTH) {
             throw new ErrInvalidTokenIdentifier("The identifier is not valid. The random sequence does not have the right length");
+        }
+    }
+
+    private ensureTokenTickerValidity(ticker: string) {
+        const MIN_TICKER_LENGTH = 3;
+        const MAX_TICKER_LENGTH = 10;
+
+        if (ticker.length < MIN_TICKER_LENGTH || ticker.length > MAX_TICKER_LENGTH) {
+            throw new ErrInvalidTokenIdentifier(`The token ticker should be between ${MIN_TICKER_LENGTH} and ${MAX_TICKER_LENGTH} characters`);
+        }
+
+        if (!ticker.match(/^[a-zA-Z0-9]+$/)) {
+            throw new ErrInvalidTokenIdentifier("The token ticker should only contain alphanumeric characters");
+        }
+
+        if (!(ticker == ticker.toUpperCase())) {
+            throw new ErrInvalidTokenIdentifier("The token ticker should be upper case");
         }
     }
 }

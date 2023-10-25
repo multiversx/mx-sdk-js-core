@@ -97,7 +97,7 @@ export class SmartContractTransactionsFactory {
         const numberOfTokens = tokenTransfer.length;
 
         if (nativeTransferAmount && numberOfTokens) {
-            throw new ErrBadUsage("Can't send both native token and ESDT/NFT tokens");
+            throw new ErrBadUsage("Can't send both native token and custom tokens(ESDT/NFT)");
         }
 
         let receiver = options.contract;

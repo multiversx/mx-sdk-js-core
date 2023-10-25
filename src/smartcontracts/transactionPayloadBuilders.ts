@@ -5,7 +5,12 @@ import { ArgSerializer } from "./argSerializer";
 import { ICode, ICodeMetadata, IContractFunction } from "./interface";
 import { TypedValue } from "./typesystem";
 
+
+/**
+ * @deprecated This constant should not be used. It should be replaced with "WasmVirtualMachine"
+ */
 export const ArwenVirtualMachine = "0500";
+export const WasmVirtualMachine = "0500";
 
 /**
  * A builder for {@link TransactionPayload} objects, to be used for Smart Contract deployment transactions.
@@ -55,7 +60,7 @@ export class ContractDeployPayloadBuilder {
 
         let code = this.code!.toString();
         let codeMetadata = this.codeMetadata.toString();
-        let data = `${code}@${ArwenVirtualMachine}@${codeMetadata}`;
+        let data = `${code}@${WasmVirtualMachine}@${codeMetadata}`;
         data = appendArgumentsToString(data, this.arguments);
 
         return new TransactionPayload(data);

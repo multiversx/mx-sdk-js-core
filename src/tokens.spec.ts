@@ -14,13 +14,21 @@ describe("test token computer", async () => {
 
     it("should extract nonce from extended identifier", async () => {
         const extendedIdentifier = "TEST-123456-0a";
-        const nonce = tokenComputer.extractNonceFromExtendedIdentifier(extendedIdentifier);
+        let nonce = tokenComputer.extractNonceFromExtendedIdentifier(extendedIdentifier);
         assert.equal(nonce, 10);
+
+        const fungibleTokenIdentifier = "FNG-123456";
+        nonce = tokenComputer.extractNonceFromExtendedIdentifier(fungibleTokenIdentifier);
+        assert.equal(nonce, 0);
     })
 
     it("should extract identifier from extended identifier", async () => {
         const extendedIdentifier = "TEST-123456-0a";
-        const identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(extendedIdentifier);
+        let identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(extendedIdentifier);
         assert.equal(identifier, "TEST-123456");
+
+        const fungibleTokenIdentifier = "FNG-123456";
+        identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(fungibleTokenIdentifier);
+        assert.equal(identifier, "FNG-123456");
     })
 });

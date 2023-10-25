@@ -12,7 +12,7 @@ import { Interaction } from "./interaction";
 import { CallArguments, DeployArguments, ICodeMetadata, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
-import { ArwenVirtualMachine } from "./transactionPayloadBuilders";
+import { WasmVirtualMachine } from "./transactionPayloadBuilders";
 import { EndpointDefinition, TypedValue } from "./typesystem";
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
 import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
@@ -273,7 +273,7 @@ export class SmartContract implements ISmartContract {
 
         let bytesToHash = Buffer.concat([ownerPubkey, ownerNonceBytes]);
         let hash = createKeccakHash("keccak256").update(bytesToHash).digest();
-        let vmTypeBytes = Buffer.from(ArwenVirtualMachine, "hex");
+        let vmTypeBytes = Buffer.from(WasmVirtualMachine, "hex");
         let addressBytes = Buffer.concat([
             initialPadding,
             vmTypeBytes,

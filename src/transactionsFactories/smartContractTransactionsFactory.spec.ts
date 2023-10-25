@@ -66,9 +66,7 @@ describe("test smart contract transactions factory", function () {
 
         assert.equal(deployDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(deployDraft.receiver, CONTRACT_DEPLOY_ADDRESS);
-        assert.isDefined(deployDraft.data);
-        expect(deployDraft.data!.length).to.be.greaterThan(0);
-
+        expect(deployDraft.data.length).to.be.greaterThan(0);
         assert.equal(deployDraft.gasLimit.valueOf(), gasLimit);
         assert.equal(deployDraft.value, 0);
 
@@ -99,10 +97,7 @@ describe("test smart contract transactions factory", function () {
 
         assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(executeDraft.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-
-        assert.isDefined(executeDraft.data);
         assert.deepEqual(executeDraft.data, Buffer.from("add@07"));
-
         assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
         assert.equal(executeDraft.value, 0);
 
@@ -136,10 +131,7 @@ describe("test smart contract transactions factory", function () {
 
         assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(executeDraft.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-
-        assert.isDefined(executeDraft.data);
         assert.deepEqual(executeDraft.data, Buffer.from("add@07"));
-
         assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
         assert.equal(executeDraft.value.valueOf(), "1000000000000000000");
 
@@ -174,10 +166,7 @@ describe("test smart contract transactions factory", function () {
 
         assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(executeDraft.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-
-        assert.isDefined(executeDraft.data);
         assert.deepEqual(executeDraft.data, Buffer.from("ESDTTransfer@464f4f2d366365313762@0a@616464@07"));
-
         assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
         assert.equal(executeDraft.value.valueOf(), "0");
 
@@ -215,10 +204,7 @@ describe("test smart contract transactions factory", function () {
 
         assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(executeDraft.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-
-        assert.isDefined(executeDraft.data);
         assert.deepEqual(executeDraft.data, Buffer.from("MultiESDTNFTTransfer@00000000000000000500ed8e25a94efa837aae0e593112cfbb01b448755069e1@02@464f4f2d366365313762@00@0a@4241522d356263303866@00@0c44@616464@07"));
-
         assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
         assert.equal(executeDraft.value.valueOf(), "0");
 
@@ -254,10 +240,7 @@ describe("test smart contract transactions factory", function () {
 
         assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(executeDraft.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-
-        assert.isDefined(executeDraft.data);
         assert.deepEqual(executeDraft.data, Buffer.from("ESDTNFTTransfer@4e46542d313233343536@01@01@00000000000000000500b9353fe8407f87310c87e12fa1ac807f0485da39d152@616464@07"));
-
         assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
         assert.equal(executeDraft.value.valueOf(), "0");
 
@@ -295,10 +278,7 @@ describe("test smart contract transactions factory", function () {
 
         assert.equal(executeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(executeDraft.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-
-        assert.isDefined(executeDraft.data);
         assert.deepEqual(executeDraft.data, Buffer.from("MultiESDTNFTTransfer@00000000000000000500b9353fe8407f87310c87e12fa1ac807f0485da39d152@02@4e46542d313233343536@01@01@4e46542d313233343536@2a@01@616464@07"));
-
         assert.equal(executeDraft.gasLimit.valueOf(), gasLimit);
         assert.equal(executeDraft.value.valueOf(), "0");
 
@@ -329,9 +309,7 @@ describe("test smart contract transactions factory", function () {
 
         assert.equal(upgradeDraft.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(upgradeDraft.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        assert.isDefined(upgradeDraft.data);
         assert.isTrue(Buffer.from(upgradeDraft.data!).toString().startsWith("upgradeContract@"));
-
         assert.equal(upgradeDraft.gasLimit.valueOf(), gasLimit);
         assert.equal(upgradeDraft.value, 0);
 

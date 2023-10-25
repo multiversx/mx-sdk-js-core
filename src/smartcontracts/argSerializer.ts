@@ -1,6 +1,6 @@
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { BinaryCodec } from "./codec";
-import { EndpointParameterDefinition, Type, TypedValue, U32Type, U32Value } from "./typesystem";
+import { Type, TypedValue, U32Type, U32Value } from "./typesystem";
 import { OptionalType, OptionalValue } from "./typesystem/algebraic";
 import { CompositeType, CompositeValue } from "./typesystem/composite";
 import { VariadicType, VariadicValue } from "./typesystem/variadic";
@@ -13,6 +13,10 @@ interface IArgSerializerOptions {
 interface ICodec {
     decodeTopLevel(buffer: Buffer, type: Type): TypedValue;
     encodeTopLevel(typedValue: TypedValue): Buffer;
+}
+
+interface IParameterDefinition {
+    type: Type;
 }
 
 // TODO: perhaps move default construction options to a factory (ArgSerializerFactory), instead of referencing them in the constructor
@@ -32,7 +36,7 @@ export class ArgSerializer {
     /**
      * Reads typed values from an arguments string (e.g. aa@bb@@cc), given parameter definitions.
      */
-    stringToValues(joinedString: string, parameters: EndpointParameterDefinition[]): TypedValue[] {
+    stringToValues(joinedString: string, parameters: IParameterDefinition[]): TypedValue[] {
         let buffers = this.stringToBuffers(joinedString);
         let values = this.buffersToValues(buffers, parameters);
         return values;
@@ -49,7 +53,7 @@ export class ArgSerializer {
     /**
      * Decodes a set of buffers into a set of typed values, given parameter definitions.
      */
-    buffersToValues(buffers: Buffer[], parameters: EndpointParameterDefinition[]): TypedValue[] {
+    buffersToValues(buffers: Buffer[], parameters: IParameterDefinition[]): TypedValue[] {
         // TODO: Refactor, split (function is quite complex).
         const self = this;
 

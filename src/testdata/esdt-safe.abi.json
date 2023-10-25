@@ -1,0 +1,725 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.75.0-nightly",
+            "commitHash": "42b1224e9eb37177f608d3f6a6f2be2ee13902e4",
+            "commitDate": "2023-10-15",
+            "channel": "Nightly",
+            "short": "rustc 1.75.0-nightly (42b1224e9 2023-10-15)"
+        },
+        "contractCrate": {
+            "name": "esdt-safe",
+            "version": "0.0.0"
+        },
+        "framework": {
+            "name": "multiversx-sc",
+            "version": "0.43.5"
+        }
+    },
+    "name": "EsdtSafe",
+    "constructor": {
+        "inputs": [
+            {
+                "name": "min_valid_signers",
+                "type": "u32"
+            },
+            {
+                "name": "signers",
+                "type": "variadic<Address>",
+                "multi_arg": true
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "upgrade",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "docs": [
+                "Create an Elrond -> Sovereign transaction."
+            ],
+            "name": "deposit",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "opt_transfer_data",
+                    "type": "optional<TransferData>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "docs": [
+                "Claim funds for failed Elrond -> Sovereign transactions.",
+                "These are not sent automatically to prevent the contract getting stuck.",
+                "For example, if the receiver is a SC, a frozen account, etc."
+            ],
+            "name": "claimRefund",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ]
+        },
+        {
+            "docs": [
+                "Sets the statuses for the transactions, after they were executed on the Sovereign side.",
+                "",
+                "Only TransactionStatus::Executed (3) and TransactionStatus::Rejected (4) values are allowed.",
+                "Number of provided statuses must be equal to number of transactions in the batch."
+            ],
+            "name": "setTransactionBatchStatus",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "batch_id",
+                    "type": "u64"
+                },
+                {
+                    "name": "signature",
+                    "type": "array48<u8>"
+                },
+                {
+                    "name": "tx_statuses",
+                    "type": "variadic<TransactionStatus>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setMinValidSigners",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "new_value",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "addSigners",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "signers",
+                    "type": "variadic<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "removeSigners",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "signers",
+                    "type": "variadic<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "registerToken",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "sov_token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_type",
+                    "type": "EsdtTokenType"
+                },
+                {
+                    "name": "token_display_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "token_ticker",
+                    "type": "bytes"
+                },
+                {
+                    "name": "num_decimals",
+                    "type": "u32"
+                },
+                {
+                    "name": "bls_multisig",
+                    "type": "array48<u8>"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "clearRegisteredToken",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "sov_token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "batchTransferEsdtToken",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "batch_id",
+                    "type": "u64"
+                },
+                {
+                    "name": "signature",
+                    "type": "array48<u8>"
+                },
+                {
+                    "name": "transfers",
+                    "type": "variadic<Transaction>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setMaxTxBatchSize",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "new_max_tx_batch_size",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setMaxTxBatchBlockDuration",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "new_max_tx_batch_block_duration",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getCurrentTxBatch",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "optional<multi<u64,variadic<multi<u64,u64,Address,Address,List<EsdtTokenPayment>,List<StolenFromFrameworkEsdtTokenData>,Option<TransferData>>>>>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getFirstBatchAnyStatus",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "optional<multi<u64,variadic<multi<u64,u64,Address,Address,List<EsdtTokenPayment>,List<StolenFromFrameworkEsdtTokenData>,Option<TransferData>>>>>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getBatch",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "batch_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "optional<multi<u64,variadic<multi<u64,u64,Address,Address,List<EsdtTokenPayment>,List<StolenFromFrameworkEsdtTokenData>,Option<TransferData>>>>>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getBatchStatus",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "batch_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BatchStatus"
+                }
+            ]
+        },
+        {
+            "name": "getFirstBatchId",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getLastBatchId",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "setMaxBridgedAmount",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "max_amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getMaxBridgedAmount",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "pause",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "unpause",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "isPaused",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        }
+    ],
+    "promisesCallbackNames": [
+        "transfer_callback"
+    ],
+    "events": [
+        {
+            "identifier": "deposit",
+            "inputs": [
+                {
+                    "name": "dest_address",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "tokens",
+                    "type": "List<EsdtTokenPayment>",
+                    "indexed": true
+                },
+                {
+                    "name": "event_data",
+                    "type": "DepositEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "setStatusEvent",
+            "inputs": [
+                {
+                    "name": "batch_id",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "tx_id",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "tx_status",
+                    "type": "TransactionStatus",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "addRefundTransactionEvent",
+            "inputs": [
+                {
+                    "name": "tx_id",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "original_tx_id",
+                    "type": "u64",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "transferPerformedEvent",
+            "inputs": [
+                {
+                    "name": "batch_id",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "tx_id",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "tx",
+                    "type": "Transaction"
+                }
+            ]
+        },
+        {
+            "identifier": "transferFailedInvalidToken",
+            "inputs": [
+                {
+                    "name": "batch_id",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "tx_id",
+                    "type": "u64",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "transferFailedFrozenDestinationAccount",
+            "inputs": [
+                {
+                    "name": "batch_id",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "tx_id",
+                    "type": "u64",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "transferOverMaxAmount",
+            "inputs": [
+                {
+                    "name": "batch_id",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "tx_id",
+                    "type": "u64",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "transferFailedExecutionFailed",
+            "inputs": [
+                {
+                    "name": "batch_id",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "tx_id",
+                    "type": "u64",
+                    "indexed": true
+                }
+            ]
+        }
+    ],
+    "hasCallback": true,
+    "types": {
+        "BatchStatus": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "AlreadyProcessed",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Empty",
+                    "discriminant": 1
+                },
+                {
+                    "name": "PartiallyFull",
+                    "discriminant": 2,
+                    "fields": [
+                        {
+                            "name": "end_block_nonce",
+                            "type": "u64"
+                        },
+                        {
+                            "name": "tx_ids",
+                            "type": "List<u64>"
+                        }
+                    ]
+                },
+                {
+                    "name": "Full",
+                    "discriminant": 3
+                },
+                {
+                    "name": "WaitingForSignatures",
+                    "discriminant": 4
+                }
+            ]
+        },
+        "DepositEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "tx_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "opt_function",
+                    "type": "Option<bytes>"
+                },
+                {
+                    "name": "opt_arguments",
+                    "type": "Option<List<bytes>>"
+                },
+                {
+                    "name": "opt_gas_limit",
+                    "type": "Option<u64>"
+                }
+            ]
+        },
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "EsdtTokenType": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "Fungible",
+                    "discriminant": 0
+                },
+                {
+                    "name": "NonFungible",
+                    "discriminant": 1
+                },
+                {
+                    "name": "SemiFungible",
+                    "discriminant": 2
+                },
+                {
+                    "name": "Meta",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Invalid",
+                    "discriminant": 4
+                }
+            ]
+        },
+        "StolenFromFrameworkEsdtTokenData": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_type",
+                    "type": "EsdtTokenType"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "frozen",
+                    "type": "bool"
+                },
+                {
+                    "name": "hash",
+                    "type": "bytes"
+                },
+                {
+                    "name": "name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "attributes",
+                    "type": "bytes"
+                },
+                {
+                    "name": "creator",
+                    "type": "Address"
+                },
+                {
+                    "name": "royalties",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "uris",
+                    "type": "List<bytes>"
+                }
+            ]
+        },
+        "Transaction": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "block_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "from",
+                    "type": "Address"
+                },
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "tokens",
+                    "type": "List<EsdtTokenPayment>"
+                },
+                {
+                    "name": "token_data",
+                    "type": "List<StolenFromFrameworkEsdtTokenData>"
+                },
+                {
+                    "name": "opt_transfer_data",
+                    "type": "Option<TransferData>"
+                },
+                {
+                    "name": "is_refund_tx",
+                    "type": "bool"
+                }
+            ]
+        },
+        "TransactionStatus": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "None",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Pending",
+                    "discriminant": 1
+                },
+                {
+                    "name": "InProgress",
+                    "discriminant": 2
+                },
+                {
+                    "name": "Executed",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Rejected",
+                    "discriminant": 4
+                }
+            ]
+        },
+        "TransferData": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "gas_limit",
+                    "type": "u64"
+                },
+                {
+                    "name": "function",
+                    "type": "bytes"
+                },
+                {
+                    "name": "args",
+                    "type": "List<bytes>"
+                }
+            ]
+        }
+    }
+}

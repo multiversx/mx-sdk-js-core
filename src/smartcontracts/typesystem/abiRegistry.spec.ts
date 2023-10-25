@@ -140,4 +140,20 @@ describe("test abi registry", () => {
         assert.deepEqual(registry.getEndpoint("bar").output[0].type, new VariadicType(new U32Type(), true));
         assert.deepEqual(registry.getEndpoint("bar").output[1].type, new VariadicType(new BytesType(), true));
     });
+
+    it("should load ABI wih events", async () => {
+        const registry = await loadAbiRegistry("src/testdata/esdt-safe.abi.json");
+
+        assert.lengthOf(registry.events, 8);
+
+        const depositEvent = registry.getEvent("deposit");
+        assert.deepEqual(depositEvent.inputs[0].type, new AddressType());
+        assert.deepEqual(depositEvent.inputs[1].type, new ListType(registry.getCustomType("EsdtTokenPayment")));
+        assert.deepEqual(depositEvent.inputs[2].type, registry.getCustomType("DepositEvent"));
+
+        const setStatusEvent = registry.getEvent("setStatusEvent");
+        assert.deepEqual(setStatusEvent.inputs[0].type, new U64Type());
+        assert.deepEqual(setStatusEvent.inputs[1].type, new U64Type());
+        assert.deepEqual(setStatusEvent.inputs[2].type, registry.getCustomType("TransactionStatus"));
+    });
 });

@@ -4,6 +4,7 @@ import { IAddress } from "../interface";
 import { DraftTransaction } from "../draftTransaction";
 import { DraftTransactionBuilder } from "./draftTransactionBuilder";
 import { TokenComputer, NextTokenTransfer } from "../tokens";
+import { ErrBadUsage } from "../errors";
 
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
@@ -56,7 +57,9 @@ export class TransferTransactionsFactory {
         let extraGasForTransfer = new BigNumber(0);
         const tokenComputer = new TokenComputer();
 
-        if (numberOfTransfers === 1) {
+        if (numberOfTransfers == 0) {
+            throw new ErrBadUsage("No token transfer has been provided");
+        } else if (numberOfTransfers == 1) {
             const transfer = options.tokenTransfers[0];
 
             if (tokenComputer.isFungible(transfer.token)) {
@@ -71,7 +74,7 @@ export class TransferTransactionsFactory {
                 );
                 receiver = options.sender;
             }
-        } else if (numberOfTransfers > 1) {
+        } else {
             transferArgs = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(receiver, options.tokenTransfers);
             extraGasForTransfer = new BigNumber(this.config.gasLimitMultiESDTNFTTransfer)
                 .multipliedBy(new BigNumber(numberOfTransfers))

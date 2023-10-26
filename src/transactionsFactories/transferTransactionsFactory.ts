@@ -66,18 +66,19 @@ export class TransferTransactionsFactory {
             return this.createSingleESDTTransferDraft(options);
         }
 
-        let receiver = options.receiver;
+        const transferArgs = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(
+            options.receiver,
+            options.tokenTransfers
+        );
 
-        const transferArgs = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(receiver, options.tokenTransfers);
         const extraGasForTransfer = new BigNumber(this.config.gasLimitMultiESDTNFTTransfer)
             .multipliedBy(new BigNumber(numberOfTransfers))
             .plus(new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER));
-        receiver = options.sender;
 
         return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: receiver,
+            receiver: options.sender,
             dataParts: transferArgs,
             gasLimit: extraGasForTransfer,
             addDataMovementGas: true,

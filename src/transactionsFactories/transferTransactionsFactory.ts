@@ -57,9 +57,11 @@ export class TransferTransactionsFactory {
         let extraGasForTransfer = new BigNumber(0);
         const tokenComputer = new TokenComputer();
 
-        if (numberOfTransfers == 0) {
+        if (numberOfTransfers === 0) {
             throw new ErrBadUsage("No token transfer has been provided");
-        } else if (numberOfTransfers == 1) {
+        }
+
+        if (numberOfTransfers === 1) {
             const transfer = options.tokenTransfers[0];
 
             if (tokenComputer.isFungible(transfer.token)) {

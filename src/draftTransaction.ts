@@ -4,8 +4,8 @@ export class DraftTransaction {
     public sender: string;
     public receiver: string;
     public gasLimit: BigNumber.Value;
-    public value?: BigNumber.Value;
-    public data?: Uint8Array;
+    public value: BigNumber.Value;
+    public data: Uint8Array;
 
     public constructor(options: {
         sender: string,

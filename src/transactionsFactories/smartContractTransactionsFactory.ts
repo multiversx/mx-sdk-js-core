@@ -2,12 +2,14 @@ import { BigNumber } from "bignumber.js";
 import { IAddress } from "../interface";
 import { DraftTransaction } from "../draftTransaction";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
-import { byteArrayToHex } from "../utils.codec";
+import { byteArrayToHex, utf8ToHex } from "../utils.codec";
 import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
-import { Err } from "../errors";
+import { Err, ErrBadUsage } from "../errors";
 import { Address } from "../address";
 import { DraftTransactionBuilder } from "./draftTransactionBuilder";
+import { Token, NextTokenTransfer } from "../tokens";
+import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
 
 interface Config {
     chainID: string;
@@ -21,32 +23,33 @@ interface Abi {
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
 }
 
+interface TokenComputer {
+    isFungible(token: Token): boolean;
+}
 
 export class SmartContractTransactionsFactory {
     private readonly config: Config;
     private readonly abiRegistry?: Abi;
+    private readonly tokenComputer: TokenComputer;
+    private readonly dataArgsBuilder: TokenTransfersDataBuilder;
 
-    constructor({
-        config,
-        abi
-    }: {
-        config: Config;
-        abi?: Abi;
-    }) {
+    constructor({ config, abi, tokenComputer }: { config: Config; abi?: Abi; tokenComputer: TokenComputer }) {
         this.config = config;
         this.abiRegistry = abi;
+        this.tokenComputer = tokenComputer;
+        this.dataArgsBuilder = new TokenTransfersDataBuilder();
     }
 
     createTransactionForDeploy(options: {
-        sender: IAddress,
-        bytecode: Uint8Array,
-        gasLimit: BigNumber.Value,
-        args?: any[],
-        nativeTransferAmount?: BigNumber.Value,
-        isUpgradeable?: boolean,
-        isReadable?: boolean,
-        isPayable?: boolean,
-        isPayableBySmartContract?: boolean
+        sender: IAddress;
+        bytecode: Uint8Array;
+        gasLimit: BigNumber.Value;
+        args?: any[];
+        nativeTransferAmount?: BigNumber.Value;
+        isUpgradeable?: boolean;
+        isReadable?: boolean;
+        isPayable?: boolean;
+        isPayableBySmartContract?: boolean;
     }): DraftTransaction {
         const nativeTransferAmount = options.nativeTransferAmount ?? 0;
 
@@ -58,13 +61,9 @@ export class SmartContractTransactionsFactory {
         const args = options.args || [];
 
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
-        let parts = [
-            byteArrayToHex(options.bytecode),
-            byteArrayToHex(VM_TYPE_WASM_VM),
-            metadata.toString()
-        ];
+        let parts = [byteArrayToHex(options.bytecode), byteArrayToHex(VM_TYPE_WASM_VM), metadata.toString()];
 
-        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition)
+        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
         parts = parts.concat(preparedArgs);
 
         return new DraftTransactionBuilder({
@@ -74,47 +73,71 @@ export class SmartContractTransactionsFactory {
             dataParts: parts,
             gasLimit: options.gasLimit,
             addDataMovementGas: false,
-            amount: nativeTransferAmount
+            amount: nativeTransferAmount,
         }).build();
     }
 
     createTransactionForExecute(options: {
-        sender: IAddress,
-        contractAddress: IAddress,
-        functionName: string,
-        gasLimit: BigNumber.Value,
-        args?: any[]
-    }
-    ): DraftTransaction {
+        sender: IAddress;
+        contract: IAddress;
+        functionName: string;
+        gasLimit: BigNumber.Value;
+        args?: any[];
+        nativeTransferAmount?: BigNumber.Value;
+        tokenTransfers?: NextTokenTransfer[];
+    }): DraftTransaction {
         const args = options.args || [];
-        let parts: string[] = [options.functionName];
+        const tokenTransfer = options.tokenTransfers || [];
+        const nativeTransferAmount = options.nativeTransferAmount ?? 0;
+        const numberOfTokens = tokenTransfer.length;
 
-        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName));
-        parts = parts.concat(preparedArgs);
+        if (nativeTransferAmount && numberOfTokens) {
+            throw new ErrBadUsage("Can't send both native tokens and custom tokens(ESDT/NFT)");
+        }
+
+        let receiver = options.contract;
+        let dataParts: string[] = [];
+
+        if (numberOfTokens === 1) {
+            const transfer = tokenTransfer[0];
+
+            if (this.tokenComputer.isFungible(transfer.token)) {
+                dataParts = this.dataArgsBuilder.buildArgsForESDTTransfer(transfer);
+            } else {
+                dataParts = this.dataArgsBuilder.buildArgsForSingleESDTNFTTransfer(transfer, receiver);
+                receiver = options.sender;
+            }
+        } else if (numberOfTokens > 1) {
+            dataParts = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(receiver, tokenTransfer);
+            receiver = options.sender;
+        }
+
+        dataParts.push(dataParts.length ? utf8ToHex(options.functionName) : options.functionName);
+        dataParts = dataParts.concat(this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName)));
 
         return new DraftTransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: options.contractAddress,
-            dataParts: parts,
+            receiver: receiver,
+            dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: false
+            addDataMovementGas: false,
+            amount: nativeTransferAmount,
         }).build();
     }
 
     createTransactionForUpgrade(options: {
-        sender: IAddress,
-        contract: IAddress,
-        bytecode: Uint8Array,
-        gasLimit: BigNumber.Value,
-        args?: any[],
-        nativeTransferAmount?: BigNumber.Value,
-        isUpgradeable?: boolean,
-        isReadable?: boolean,
-        isPayable?: boolean,
-        isPayableBySmartContract?: boolean
-    }
-    ): DraftTransaction {
+        sender: IAddress;
+        contract: IAddress;
+        bytecode: Uint8Array;
+        gasLimit: BigNumber.Value;
+        args?: any[];
+        nativeTransferAmount?: BigNumber.Value;
+        isUpgradeable?: boolean;
+        isReadable?: boolean;
+        isPayable?: boolean;
+        isPayableBySmartContract?: boolean;
+    }): DraftTransaction {
         const nativeTransferAmount = options.nativeTransferAmount ?? 0;
 
         const isUpgradeable = options.isUpgradeable ?? true;
@@ -125,13 +148,9 @@ export class SmartContractTransactionsFactory {
         const args = options.args || [];
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
 
-        let parts = [
-            "upgradeContract",
-            byteArrayToHex(options.bytecode),
-            metadata.toString()
-        ];
+        let parts = ["upgradeContract", byteArrayToHex(options.bytecode), metadata.toString()];
 
-        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition)
+        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
         parts = parts.concat(preparedArgs);
 
         return new DraftTransactionBuilder({
@@ -141,13 +160,13 @@ export class SmartContractTransactionsFactory {
             dataParts: parts,
             gasLimit: options.gasLimit,
             addDataMovementGas: false,
-            amount: nativeTransferAmount
+            amount: nativeTransferAmount,
         }).build();
     }
 
     private argsToDataParts(args: any[], endpoint?: EndpointDefinition): string[] {
         if (endpoint) {
-            const typedArgs = NativeSerializer.nativeToTypedValues(args, endpoint)
+            const typedArgs = NativeSerializer.nativeToTypedValues(args, endpoint);
             return new ArgSerializer().valuesToStrings(typedArgs);
         }
 
@@ -160,7 +179,7 @@ export class SmartContractTransactionsFactory {
 
     private areArgsOfTypedValue(args: any[]): boolean {
         for (const arg of args) {
-            if (!(arg.belongsToTypesystem)) {
+            if (!arg.belongsToTypesystem) {
                 return false;
             }
         }

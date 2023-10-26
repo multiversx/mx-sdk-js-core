@@ -12,12 +12,12 @@ import { Interaction } from "./interaction";
 import { CallArguments, DeployArguments, ICodeMetadata, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
-import { ArwenVirtualMachine, ContractCallPayloadBuilder, ContractUpgradePayloadBuilder } from "./transactionPayloadBuilders";
+import { WasmVirtualMachine } from "./transactionPayloadBuilders";
 import { EndpointDefinition, TypedValue } from "./typesystem";
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
 import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
-import { TransactionPayload } from "../transactionPayload";
 import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
+import { TokenComputer } from "../tokens";
 const createKeccakHash = require("keccak");
 
 interface IAbi {
@@ -119,7 +119,8 @@ export class SmartContract implements ISmartContract {
         const config = new TransactionsFactoryConfig(chainID.valueOf());
         const scDraftTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
-            abi: this.abi
+            abi: this.abi,
+            tokenComputer: new TokenComputer()
         });
 
         const bytecode = Buffer.from(code.toString(), 'hex');
@@ -136,7 +137,7 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc
         });
 
-        let transaction = Transaction.fromDraft(draftTx);
+        const transaction = Transaction.fromDraft(draftTx);
         transaction.setChainID(chainID);
         transaction.setValue(value ?? 0);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
@@ -178,7 +179,8 @@ export class SmartContract implements ISmartContract {
         const config = new TransactionsFactoryConfig(chainID.valueOf());
         const scDraftTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
-            abi: this.abi
+            abi: this.abi,
+            tokenComputer: new TokenComputer()
         });
 
         const bytecode = Uint8Array.from(Buffer.from(code.toString(), 'hex'));
@@ -196,7 +198,7 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc
         })
 
-        let transaction = Transaction.fromDraft(draftTx);
+        const transaction = Transaction.fromDraft(draftTx);
         transaction.setChainID(chainID);
         transaction.setValue(value ?? 0);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
@@ -215,7 +217,8 @@ export class SmartContract implements ISmartContract {
         const config = new TransactionsFactoryConfig(chainID.valueOf());
         const scDraftTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
-            abi: this.abi
+            abi: this.abi,
+            tokenComputer: new TokenComputer()
         });
 
         args = args || [];
@@ -223,13 +226,13 @@ export class SmartContract implements ISmartContract {
 
         const draftTx = scDraftTransactionFactory.createTransactionForExecute({
             sender: caller,
-            contractAddress: receiver ? receiver : this.getAddress(),
+            contract: receiver ? receiver : this.getAddress(),
             functionName: func.toString(),
             gasLimit: gasLimit.valueOf(),
             args: args
         })
 
-        let transaction = Transaction.fromDraft(draftTx);
+        const transaction = Transaction.fromDraft(draftTx);
         transaction.setChainID(chainID);
         transaction.setValue(value);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
@@ -274,7 +277,7 @@ export class SmartContract implements ISmartContract {
 
         let bytesToHash = Buffer.concat([ownerPubkey, ownerNonceBytes]);
         let hash = createKeccakHash("keccak256").update(bytesToHash).digest();
-        let vmTypeBytes = Buffer.from(ArwenVirtualMachine, "hex");
+        let vmTypeBytes = Buffer.from(WasmVirtualMachine, "hex");
         let addressBytes = Buffer.concat([
             initialPadding,
             vmTypeBytes,

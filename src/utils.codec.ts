@@ -29,6 +29,10 @@ export function utf8ToHex(value: string) {
     return zeroPadStringIfOddLength(hex);
 }
 
+export function boolToHex(value: boolean) {
+    return utf8ToHex(value.toString());
+}
+
 export function byteArrayToHex(byteArray: Uint8Array): string {
     const hexString = Buffer.from(byteArray).toString("hex");
     return zeroPadStringIfOddLength(hexString);

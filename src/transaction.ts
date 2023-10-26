@@ -154,16 +154,16 @@ export class Transaction {
   }
 
   /**
- * Creates a new Transaction object from a DraftTransaction.
- */
+   * Creates a new Transaction object from a DraftTransaction.
+   */
   static fromDraft(draft: DraftTransaction): Transaction {
     return new Transaction({
       sender: Address.fromBech32(draft.sender),
       receiver: Address.fromBech32(draft.receiver),
       gasLimit: new BigNumber(draft.gasLimit).toNumber(),
       chainID: "",
-      value: draft.value ?? 0,
-      data: draft.data ? new TransactionPayload(Buffer.from(draft.data)) : new TransactionPayload()
+      value: draft.value,
+      data: new TransactionPayload(Buffer.from(draft.data))
     })
   }
 

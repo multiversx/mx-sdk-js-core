@@ -17,6 +17,7 @@ import { EndpointDefinition, TypedValue } from "./typesystem";
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
 import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
+import { TokenComputer } from "../tokens";
 const createKeccakHash = require("keccak");
 
 interface IAbi {
@@ -118,7 +119,8 @@ export class SmartContract implements ISmartContract {
         const config = new TransactionsFactoryConfig(chainID.valueOf());
         const scDraftTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
-            abi: this.abi
+            abi: this.abi,
+            tokenComputer: new TokenComputer()
         });
 
         const bytecode = Buffer.from(code.toString(), 'hex');
@@ -177,7 +179,8 @@ export class SmartContract implements ISmartContract {
         const config = new TransactionsFactoryConfig(chainID.valueOf());
         const scDraftTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
-            abi: this.abi
+            abi: this.abi,
+            tokenComputer: new TokenComputer()
         });
 
         const bytecode = Uint8Array.from(Buffer.from(code.toString(), 'hex'));
@@ -214,7 +217,8 @@ export class SmartContract implements ISmartContract {
         const config = new TransactionsFactoryConfig(chainID.valueOf());
         const scDraftTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
-            abi: this.abi
+            abi: this.abi,
+            tokenComputer: new TokenComputer()
         });
 
         args = args || [];

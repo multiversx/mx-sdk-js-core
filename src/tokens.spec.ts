@@ -1,4 +1,4 @@
-import { Token, TokenTransfer, TokenComputer } from "./tokens";
+import { Token, TokenComputer } from "./tokens";
 import { assert } from "chai";
 
 describe("test token computer", async () => {
@@ -20,7 +20,7 @@ describe("test token computer", async () => {
         const fungibleTokenIdentifier = "FNG-123456";
         nonce = tokenComputer.extractNonceFromExtendedIdentifier(fungibleTokenIdentifier);
         assert.equal(nonce, 0);
-    })
+    });
 
     it("should extract identifier from extended identifier", async () => {
         const extendedIdentifier = "TEST-123456-0a";
@@ -30,5 +30,5 @@ describe("test token computer", async () => {
         const fungibleTokenIdentifier = "FNG-123456";
         identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(fungibleTokenIdentifier);
         assert.equal(identifier, "FNG-123456");
-    })
+    });
 });

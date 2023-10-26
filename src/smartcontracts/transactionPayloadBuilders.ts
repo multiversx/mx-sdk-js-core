@@ -1,13 +1,11 @@
-
 import { TransactionPayload } from "../transactionPayload";
 import { guardValueIsSet } from "../utils";
 import { ArgSerializer } from "./argSerializer";
 import { ICode, ICodeMetadata, IContractFunction } from "./interface";
 import { TypedValue } from "./typesystem";
 
-
 /**
- * @deprecated This constant should not be used. It should be replaced with "WasmVirtualMachine"
+ * @deprecated This constant should not be used. Use {@link WasmVirtualMachine} instead.
  */
 export const ArwenVirtualMachine = "0500";
 export const WasmVirtualMachine = "0500";

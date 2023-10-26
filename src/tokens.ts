@@ -11,9 +11,9 @@ export class Token {
     }
 }
 
-export class TokenTransfer {
+export class NextTokenTransfer {
     token: Token;
-    amount: BigNumber.Value
+    amount: BigNumber.Value;
 
     constructor(token: Token, amount: BigNumber.Value) {
         this.token = token;
@@ -22,7 +22,7 @@ export class TokenTransfer {
 }
 
 export class TokenComputer {
-    constructor() { }
+    constructor() {}
 
     isFungible(token: Token): boolean {
         return token.nonce === 0;
@@ -39,7 +39,7 @@ export class TokenComputer {
             return 0;
         }
 
-        const hexNonce = Buffer.from(parts[2], 'hex');
+        const hexNonce = Buffer.from(parts[2], "hex");
         return decodeUnsignedNumber(hexNonce);
     }
 
@@ -55,11 +55,14 @@ export class TokenComputer {
 
     private checkIfExtendedIdentifierWasProvided(tokenParts: string[]): void {
         //  this is for the identifiers of fungible tokens
-        const MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 2
+        const MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 2;
         //  this is for the identifiers of nft, sft and meta-esdt
-        const MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 3
+        const MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 3;
 
-        if (tokenParts.length < MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED || tokenParts.length > MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED) {
+        if (
+            tokenParts.length < MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED ||
+            tokenParts.length > MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED
+        ) {
             throw new ErrInvalidTokenIdentifier("Invalid extended token identifier provided");
         }
     }
@@ -68,7 +71,9 @@ export class TokenComputer {
         const TOKEN_RANDOM_SEQUENCE_LENGTH = 6;
 
         if (randomSequence.length !== TOKEN_RANDOM_SEQUENCE_LENGTH) {
-            throw new ErrInvalidTokenIdentifier("The identifier is not valid. The random sequence does not have the right length");
+            throw new ErrInvalidTokenIdentifier(
+                "The identifier is not valid. The random sequence does not have the right length"
+            );
         }
     }
 
@@ -77,7 +82,9 @@ export class TokenComputer {
         const MAX_TICKER_LENGTH = 10;
 
         if (ticker.length < MIN_TICKER_LENGTH || ticker.length > MAX_TICKER_LENGTH) {
-            throw new ErrInvalidTokenIdentifier(`The token ticker should be between ${MIN_TICKER_LENGTH} and ${MAX_TICKER_LENGTH} characters`);
+            throw new ErrInvalidTokenIdentifier(
+                `The token ticker should be between ${MIN_TICKER_LENGTH} and ${MAX_TICKER_LENGTH} characters`
+            );
         }
 
         if (!ticker.match(/^[a-zA-Z0-9]+$/)) {
@@ -93,4 +100,3 @@ export class TokenComputer {
 function decodeUnsignedNumber(arg: Buffer): number {
     return arg.readUIntBE(0, arg.length);
 }
-

@@ -1,13 +1,13 @@
 import { assert } from "chai";
 import { Address } from "../address";
-import { Token, NextTokenTransfer } from "../tokens";
+import { Token, NextTokenTransfer, TokenComputer } from "../tokens";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 import { ErrBadUsage } from "../errors";
 
 describe("test transfer transcations factory", function () {
     const config = new TransactionsFactoryConfig("D");
-    const factory = new TransferTransactionsFactory(config);
+    const factory = new TransferTransactionsFactory(config, new TokenComputer());
 
     const alice = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
     const bob = Address.fromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");

@@ -1,5 +1,5 @@
 import { IAddress } from "../interface";
-import { TokenTransfer, TokenComputer } from "../tokens";
+import { NewTokenTransfer, TokenComputer } from "../tokens";
 import { numberToPaddedHex, utf8ToHex, addressToHex } from "../utils.codec";
 
 export class TokenTransfersDataBuilder {
@@ -9,28 +9,37 @@ export class TokenTransfersDataBuilder {
         this.tokenComputer = new TokenComputer();
     }
 
-    buildArgsForESDTTransfer(transfer: TokenTransfer): string[] {
+    buildArgsForESDTTransfer(transfer: NewTokenTransfer.TokenTransfer): string[] {
         let args = ["ESDTTransfer"];
         args.push(...[utf8ToHex(transfer.token.identifier), numberToPaddedHex(transfer.amount)]);
         return args;
     }
 
-    buildArgsForSingleESDTNFTTransfer(transfer: TokenTransfer, receiver: IAddress) {
+    buildArgsForSingleESDTNFTTransfer(transfer: NewTokenTransfer.TokenTransfer, receiver: IAddress) {
         let args = ["ESDTNFTTransfer"];
 
         const token = transfer.token;
         const identifier = this.tokenComputer.extractIdentifierFromExtendedIdentifier(token.identifier);
 
-        args.push(...[utf8ToHex(identifier), numberToPaddedHex(token.nonce), numberToPaddedHex(transfer.amount), addressToHex(receiver)]);
+        args.push(
+            ...[
+                utf8ToHex(identifier),
+                numberToPaddedHex(token.nonce),
+                numberToPaddedHex(transfer.amount),
+                addressToHex(receiver),
+            ]
+        );
         return args;
     }
 
-    buildArgsForMultiESDTNFTTransfer(receiver: IAddress, transfers: TokenTransfer[]) {
+    buildArgsForMultiESDTNFTTransfer(receiver: IAddress, transfers: NewTokenTransfer.TokenTransfer[]) {
         let args = ["MultiESDTNFTTransfer", addressToHex(receiver), numberToPaddedHex(transfers.length)];
 
         for (let transfer of transfers) {
             const identifier = this.tokenComputer.extractIdentifierFromExtendedIdentifier(transfer.token.identifier);
-            args.push(...[utf8ToHex(identifier), numberToPaddedHex(transfer.token.nonce), numberToPaddedHex(transfer.amount)]);
+            args.push(
+                ...[utf8ToHex(identifier), numberToPaddedHex(transfer.token.nonce), numberToPaddedHex(transfer.amount)]
+            );
         }
 
         return args;

@@ -2,12 +2,12 @@ import { TransactionDecoder, TransactionMetadata } from "@multiversx/sdk-transac
 import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
 import { IAddress } from "../interface";
-import { IContractQueryResponse, IContractResults, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { IContractQueryResponse, IContractResults, ITransactionEvent, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { Logger } from "../logger";
 import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "./interface";
 import { ReturnCode } from "./returnCode";
-import { EndpointDefinition, EndpointParameterDefinition, TypedValue } from "./typesystem";
+import { Type, TypedValue } from "./typesystem";
 
 enum WellKnownEvents {
     OnTransactionCompleted = "completedTxEvent",
@@ -23,9 +23,19 @@ interface IResultsParserOptions {
     argsSerializer: IArgsSerializer;
 }
 
+interface IParameterDefinition {
+    type: Type;
+}
+
+interface IEventInputDefinition {
+    type: Type;
+    indexed: boolean;
+}
+
 interface IArgsSerializer {
-    buffersToValues(buffers: Buffer[], parameters: EndpointParameterDefinition[]): TypedValue[];
+    buffersToValues(buffers: Buffer[], parameters: IParameterDefinition[]): TypedValue[];
     stringToBuffers(joinedString: string): Buffer[];
+    stringToValues(joinedString: string, parameters: IParameterDefinition[]): TypedValue[];
 }
 
 // TODO: perhaps move default construction options to a factory (ResultsParserFactory), instead of referencing them in the constructor
@@ -46,7 +56,7 @@ export class ResultsParser {
         this.argsSerializer = options.argsSerializer;
     }
 
-    parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle {
+    parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: { output: IParameterDefinition[] }): TypedOutcomeBundle {
         let parts = queryResponse.getReturnDataParts();
         let values = this.argsSerializer.buffersToValues(parts, endpoint.output);
         let returnCode = new ReturnCode(queryResponse.returnCode.toString());
@@ -72,7 +82,7 @@ export class ResultsParser {
         };
     }
 
-    parseOutcome(transaction: ITransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle {
+    parseOutcome(transaction: ITransactionOnNetwork, endpoint: { output: IParameterDefinition[] }): TypedOutcomeBundle {
         let untypedBundle = this.parseUntypedOutcome(transaction);
         let values = this.argsSerializer.buffersToValues(untypedBundle.values, endpoint.output);
 
@@ -314,5 +324,26 @@ export class ResultsParser {
 
         let returnCode = ReturnCode.fromBuffer(returnCodePart);
         return { returnCode, returnDataParts };
+    }
+
+    parseEvent(transactionEvent: ITransactionEvent, eventDefinition: { inputs: IEventInputDefinition[] }): {
+        topics: TypedValue[],
+        dataParts: TypedValue[]
+    } {
+        const topics = transactionEvent.topics.map(topic => Buffer.from(topic.hex(), "hex"));
+        const data = transactionEvent.dataPayload?.valueOf() || Buffer.from([]);
+        const dataHex = data.toString("hex");
+
+        const indexedInputs = eventDefinition.inputs.filter(input => input.indexed);
+        const nonIndexedInputs = eventDefinition.inputs.filter(input => !input.indexed);
+
+        // We skip the first topic, because it's the event identifier.
+        const decodedTopics = this.argsSerializer.buffersToValues(topics.slice(1), indexedInputs);
+        const decodedDataParts = this.argsSerializer.stringToValues(dataHex, nonIndexedInputs);
+
+        return {
+            topics: decodedTopics,
+            dataParts: decodedDataParts
+        };
     }
 }

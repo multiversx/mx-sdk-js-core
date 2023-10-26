@@ -74,7 +74,12 @@ export interface ITransactionEvent {
     readonly address: IAddress;
     readonly identifier: string;
     readonly topics: ITransactionEventTopic[];
+
+    /**
+     * @deprecated Use dataPayload instead.
+     */
     readonly data: string;
+    readonly dataPayload?: { valueOf(): Uint8Array };
 
     findFirstOrNoneTopic(predicate: (topic: ITransactionEventTopic) => boolean): ITransactionEventTopic | undefined;
     getLastTopic(): ITransactionEventTopic;

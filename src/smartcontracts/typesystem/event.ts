@@ -27,14 +27,21 @@ export class EventDefinition {
 export class EventTopicDefinition {
     readonly name: string;
     readonly type: Type;
+    readonly indexed: boolean;
 
-    constructor(name: string, type: Type) {
-        this.name = name;
-        this.type = type;
+    constructor(options: { name: string, type: Type, indexed: boolean }) {
+        this.name = options.name;
+        this.type = options.type;
+        this.indexed = options.indexed;
     }
 
-    static fromJSON(json: { name?: string, type: string }): EventTopicDefinition {
-        let parsedType = new TypeExpressionParser().parse(json.type);
-        return new EventTopicDefinition(json.name || NamePlaceholder, parsedType);
+    static fromJSON(json: { name?: string, type: string, indexed: boolean }): EventTopicDefinition {
+        const parsedType = new TypeExpressionParser().parse(json.type);
+
+        return new EventTopicDefinition({
+            name: json.name || NamePlaceholder,
+            type: parsedType,
+            indexed: json.indexed
+        });
     }
 }

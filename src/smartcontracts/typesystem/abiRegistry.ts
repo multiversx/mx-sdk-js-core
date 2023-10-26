@@ -199,7 +199,11 @@ function mapEndpoint(endpoint: EndpointDefinition, mapper: TypeMapper): Endpoint
 
 function mapEvent(event: EventDefinition, mapper: TypeMapper): EventDefinition {
     const newInputs = event.inputs.map(
-        (e) => new EventTopicDefinition(e.name, mapper.mapType(e.type))
+        (e) => new EventTopicDefinition({
+            name: e.name,
+            type: mapper.mapType(e.type),
+            indexed: e.indexed
+        })
     );
 
     return new EventDefinition(event.identifier, newInputs);

@@ -3,13 +3,13 @@ import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
 import { IAddress } from "../interface";
 import { DraftTransaction } from "../draftTransaction";
 import { DraftTransactionBuilder } from "./draftTransactionBuilder";
-import { TokenComputer, TokenTransfer } from "../tokens";
+import { TokenComputer, NextTokenTransfer } from "../tokens";
 
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
 
 interface IConfig {
-    chainID: string
+    chainID: string;
     minGasLimit: BigNumber.Value;
     gasLimitPerByte: BigNumber.Value;
     gasLimitESDTTransfer: BigNumber.Value;
@@ -27,10 +27,10 @@ export class TransferTransactionsFactory {
     }
 
     createTransactionForNativeTokenTransfer(options: {
-        sender: IAddress,
-        receiver: IAddress,
-        nativeAmount: BigNumber.Value,
-        data?: string
+        sender: IAddress;
+        receiver: IAddress;
+        nativeAmount: BigNumber.Value;
+        data?: string;
     }): DraftTransaction {
         const data = options.data || "";
         return new DraftTransactionBuilder({
@@ -40,14 +40,14 @@ export class TransferTransactionsFactory {
             dataParts: [data],
             gasLimit: 0,
             addDataMovementGas: true,
-            amount: options.nativeAmount
+            amount: options.nativeAmount,
         }).build();
     }
 
     createTransactionForESDTTokenTransfer(options: {
-        sender: IAddress,
-        receiver: IAddress,
-        tokenTransfers: TokenTransfer[]
+        sender: IAddress;
+        receiver: IAddress;
+        tokenTransfers: NextTokenTransfer[];
     }): DraftTransaction {
         const numberOfTransfers = options.tokenTransfers.length;
         let receiver = options.receiver;
@@ -61,15 +61,17 @@ export class TransferTransactionsFactory {
 
             if (tokenComputer.isFungible(transfer.token)) {
                 transferArgs = this.dataArgsBuilder.buildArgsForESDTTransfer(transfer);
-                extraGasForTransfer = new BigNumber(this.config.gasLimitESDTTransfer).plus(new BigNumber(ADDITIONAL_GAS_FOR_ESDT_TRANSFER));
-            }
-            else {
+                extraGasForTransfer = new BigNumber(this.config.gasLimitESDTTransfer).plus(
+                    new BigNumber(ADDITIONAL_GAS_FOR_ESDT_TRANSFER)
+                );
+            } else {
                 transferArgs = this.dataArgsBuilder.buildArgsForSingleESDTNFTTransfer(transfer, receiver);
-                extraGasForTransfer = new BigNumber(this.config.gasLimitESDTNFTTransfer).plus(new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER));
+                extraGasForTransfer = new BigNumber(this.config.gasLimitESDTNFTTransfer).plus(
+                    new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER)
+                );
                 receiver = options.sender;
             }
-        }
-        else if (numberOfTransfers > 1) {
+        } else if (numberOfTransfers > 1) {
             transferArgs = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(receiver, options.tokenTransfers);
             extraGasForTransfer = new BigNumber(this.config.gasLimitMultiESDTNFTTransfer)
                 .multipliedBy(new BigNumber(numberOfTransfers))
@@ -83,7 +85,7 @@ export class TransferTransactionsFactory {
             receiver: receiver,
             dataParts: transferArgs,
             gasLimit: extraGasForTransfer,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 }

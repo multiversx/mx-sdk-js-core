@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { Address } from "../address";
-import { Token, TokenTransfer } from "../tokens";
+import { Token, NextTokenTransfer } from "../tokens";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 
@@ -15,7 +15,7 @@ describe("test transfer transcations factory", function () {
         const transaction = factory.createTransactionForNativeTokenTransfer({
             sender: alice,
             receiver: bob,
-            nativeAmount: "1000000000000000000"
+            nativeAmount: "1000000000000000000",
         });
 
         assert.equal(transaction.sender, alice.bech32());
@@ -30,7 +30,7 @@ describe("test transfer transcations factory", function () {
             sender: alice,
             receiver: bob,
             nativeAmount: "1000000000000000000",
-            data: "test data"
+            data: "test data",
         });
 
         assert.equal(transaction.sender, alice.bech32());
@@ -42,12 +42,12 @@ describe("test transfer transcations factory", function () {
 
     it("should create draft transaction for esdt transfer", async () => {
         const fooToken = new Token("FOO-123456", 0);
-        const transfer = new TokenTransfer(fooToken, 1000000);
+        const transfer = new NextTokenTransfer(fooToken, 1000000);
 
         const transaction = factory.createTransactionForESDTTokenTransfer({
             sender: alice,
             receiver: bob,
-            tokenTransfers: [transfer]
+            tokenTransfers: [transfer],
         });
 
         assert.equal(transaction.sender, alice.bech32());
@@ -59,39 +59,44 @@ describe("test transfer transcations factory", function () {
 
     it("should create draft transaction for nft transfer", async () => {
         const nft = new Token("NFT-123456", 10);
-        const transfer = new TokenTransfer(nft, 1);
+        const transfer = new NextTokenTransfer(nft, 1);
 
         const transaction = factory.createTransactionForESDTTokenTransfer({
             sender: alice,
             receiver: bob,
-            tokenTransfers: [transfer]
+            tokenTransfers: [transfer],
         });
 
         assert.equal(transaction.sender, alice.bech32());
         assert.equal(transaction.receiver, alice.bech32());
         assert.equal(transaction.value.valueOf(), "0");
         assert.equal(transaction.gasLimit.valueOf(), "1210500");
-        assert.deepEqual(transaction.data.toString(), "ESDTNFTTransfer@4e46542d313233343536@0a@01@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8");
+        assert.deepEqual(
+            transaction.data.toString(),
+            "ESDTNFTTransfer@4e46542d313233343536@0a@01@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8"
+        );
     });
 
     it("should create draft transaction for multiple nft transfers", async () => {
         const firstNft = new Token("NFT-123456", 10);
-        const firstTransfer = new TokenTransfer(firstNft, 1);
+        const firstTransfer = new NextTokenTransfer(firstNft, 1);
 
         const secondNft = new Token("TEST-987654", 1);
-        const secondTransfer = new TokenTransfer(secondNft, 1);
+        const secondTransfer = new NextTokenTransfer(secondNft, 1);
 
         const transaction = factory.createTransactionForESDTTokenTransfer({
             sender: alice,
             receiver: bob,
-            tokenTransfers: [firstTransfer, secondTransfer]
+            tokenTransfers: [firstTransfer, secondTransfer],
         });
 
         assert.equal(transaction.sender, alice.bech32());
         assert.equal(transaction.receiver, alice.bech32());
         assert.equal(transaction.value.valueOf(), "0");
         assert.equal(transaction.gasLimit.valueOf(), "1466000");
-        assert.deepEqual(transaction.data.toString(), "MultiESDTNFTTransfer@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@02@4e46542d313233343536@0a@01@544553542d393837363534@01@01");
+        assert.deepEqual(
+            transaction.data.toString(),
+            "MultiESDTNFTTransfer@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@02@4e46542d313233343536@0a@01@544553542d393837363534@01@01"
+        );
     });
-
 });

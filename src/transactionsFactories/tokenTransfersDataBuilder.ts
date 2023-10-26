@@ -36,7 +36,7 @@ export class TokenTransfersDataBuilder {
         let args = ["MultiESDTNFTTransfer", addressToHex(receiver), numberToPaddedHex(transfers.length)];
 
         for (let transfer of transfers) {
-            const identifier = this.tokenComputer.ensureIdentifierHasCorrectStructure(transfer.token.identifier);
+            const identifier = this.tokenComputer.extractIdentifierFromExtendedIdentifier(transfer.token.identifier);
             args.push(
                 ...[utf8ToHex(identifier), numberToPaddedHex(transfer.token.nonce), numberToPaddedHex(transfer.amount)]
             );

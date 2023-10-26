@@ -11,15 +11,13 @@ export class Token {
     }
 }
 
-export namespace NextTokenTransfer {
-    export class TokenTransfer {
-        token: Token;
-        amount: BigNumber.Value;
+export class NextTokenTransfer {
+    token: Token;
+    amount: BigNumber.Value;
 
-        constructor(token: Token, amount: BigNumber.Value) {
-            this.token = token;
-            this.amount = amount;
-        }
+    constructor(token: Token, amount: BigNumber.Value) {
+        this.token = token;
+        this.amount = amount;
     }
 }
 

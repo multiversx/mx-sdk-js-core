@@ -84,7 +84,7 @@ export class SmartContractTransactionsFactory {
         gasLimit: BigNumber.Value;
         args?: any[];
         nativeTransferAmount?: BigNumber.Value;
-        tokenTransfers?: NextTokenTransfer.TokenTransfer[];
+        tokenTransfers?: NextTokenTransfer[];
     }): DraftTransaction {
         const args = options.args || [];
         const tokenTransfer = options.tokenTransfers || [];

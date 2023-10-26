@@ -9,13 +9,13 @@ export class TokenTransfersDataBuilder {
         this.tokenComputer = new TokenComputer();
     }
 
-    buildArgsForESDTTransfer(transfer: NextTokenTransfer.TokenTransfer): string[] {
+    buildArgsForESDTTransfer(transfer: NextTokenTransfer): string[] {
         let args = ["ESDTTransfer"];
         args.push(...[utf8ToHex(transfer.token.identifier), numberToPaddedHex(transfer.amount)]);
         return args;
     }
 
-    buildArgsForSingleESDTNFTTransfer(transfer: NextTokenTransfer.TokenTransfer, receiver: IAddress) {
+    buildArgsForSingleESDTNFTTransfer(transfer: NextTokenTransfer, receiver: IAddress) {
         let args = ["ESDTNFTTransfer"];
 
         const token = transfer.token;
@@ -32,7 +32,7 @@ export class TokenTransfersDataBuilder {
         return args;
     }
 
-    buildArgsForMultiESDTNFTTransfer(receiver: IAddress, transfers: NextTokenTransfer.TokenTransfer[]) {
+    buildArgsForMultiESDTNFTTransfer(receiver: IAddress, transfers: NextTokenTransfer[]) {
         let args = ["MultiESDTNFTTransfer", addressToHex(receiver), numberToPaddedHex(transfers.length)];
 
         for (let transfer of transfers) {

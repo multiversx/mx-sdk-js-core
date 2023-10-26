@@ -9,7 +9,7 @@ import { loadContractCode, loadAbiRegistry } from "../testutils/utils";
 import { Err } from "../errors";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 import BigNumber from "bignumber.js";
-import { Token, NewTokenTransfer, TokenComputer } from "../tokens";
+import { Token, NextTokenTransfer, TokenComputer } from "../tokens";
 
 describe("test smart contract transactions factory", function () {
     const config = new TransactionsFactoryConfig("D");
@@ -150,7 +150,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000;
         const args = [new U32Value(7)];
         const token = new Token("FOO-6ce17b", 0);
-        const transfer = new NewTokenTransfer.TokenTransfer(token, 10);
+        const transfer = new NextTokenTransfer.TokenTransfer(token, 10);
 
         const executeDraft = factory.createTransactionForExecute({
             sender: sender,
@@ -186,9 +186,9 @@ describe("test smart contract transactions factory", function () {
         const args = [new U32Value(7)];
 
         const fooToken = new Token("FOO-6ce17b", 0);
-        const fooTransfer = new NewTokenTransfer.TokenTransfer(fooToken, 10);
+        const fooTransfer = new NextTokenTransfer.TokenTransfer(fooToken, 10);
         const barToken = new Token("BAR-5bc08f", 0);
-        const barTransfer = new NewTokenTransfer.TokenTransfer(barToken, 3140);
+        const barTransfer = new NextTokenTransfer.TokenTransfer(barToken, 3140);
 
         const executeDraft = factory.createTransactionForExecute({
             sender: sender,
@@ -229,7 +229,7 @@ describe("test smart contract transactions factory", function () {
         const args = [new U32Value(7)];
 
         const token = new Token("NFT-123456", 1);
-        const transfer = new NewTokenTransfer.TokenTransfer(token, 1);
+        const transfer = new NextTokenTransfer.TokenTransfer(token, 1);
 
         const executeDraft = factory.createTransactionForExecute({
             sender: sender,
@@ -270,9 +270,9 @@ describe("test smart contract transactions factory", function () {
         const args = [new U32Value(7)];
 
         const firstToken = new Token("NFT-123456", 1);
-        const firstTransfer = new NewTokenTransfer.TokenTransfer(firstToken, 1);
+        const firstTransfer = new NextTokenTransfer.TokenTransfer(firstToken, 1);
         const secondToken = new Token("NFT-123456", 42);
-        const secondTransfer = new NewTokenTransfer.TokenTransfer(secondToken, 1);
+        const secondTransfer = new NextTokenTransfer.TokenTransfer(secondToken, 1);
 
         const executeDraft = factory.createTransactionForExecute({
             sender: sender,

@@ -8,7 +8,7 @@ import { NativeSerializer } from "../smartcontracts/nativeSerializer";
 import { Err, ErrBadUsage } from "../errors";
 import { Address } from "../address";
 import { DraftTransactionBuilder } from "./draftTransactionBuilder";
-import { Token, NewTokenTransfer } from "../tokens";
+import { Token, NextTokenTransfer } from "../tokens";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
 
 interface Config {
@@ -84,7 +84,7 @@ export class SmartContractTransactionsFactory {
         gasLimit: BigNumber.Value;
         args?: any[];
         nativeTransferAmount?: BigNumber.Value;
-        tokenTransfers?: NewTokenTransfer.TokenTransfer[];
+        tokenTransfers?: NextTokenTransfer.TokenTransfer[];
     }): DraftTransaction {
         const args = options.args || [];
         const tokenTransfer = options.tokenTransfers || [];

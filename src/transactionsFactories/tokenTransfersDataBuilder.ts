@@ -1,5 +1,5 @@
 import { IAddress } from "../interface";
-import { NewTokenTransfer, TokenComputer } from "../tokens";
+import { NextTokenTransfer, TokenComputer } from "../tokens";
 import { numberToPaddedHex, utf8ToHex, addressToHex } from "../utils.codec";
 
 export class TokenTransfersDataBuilder {
@@ -9,13 +9,13 @@ export class TokenTransfersDataBuilder {
         this.tokenComputer = new TokenComputer();
     }
 
-    buildArgsForESDTTransfer(transfer: NewTokenTransfer.TokenTransfer): string[] {
+    buildArgsForESDTTransfer(transfer: NextTokenTransfer.TokenTransfer): string[] {
         let args = ["ESDTTransfer"];
         args.push(...[utf8ToHex(transfer.token.identifier), numberToPaddedHex(transfer.amount)]);
         return args;
     }
 
-    buildArgsForSingleESDTNFTTransfer(transfer: NewTokenTransfer.TokenTransfer, receiver: IAddress) {
+    buildArgsForSingleESDTNFTTransfer(transfer: NextTokenTransfer.TokenTransfer, receiver: IAddress) {
         let args = ["ESDTNFTTransfer"];
 
         const token = transfer.token;
@@ -32,7 +32,7 @@ export class TokenTransfersDataBuilder {
         return args;
     }
 
-    buildArgsForMultiESDTNFTTransfer(receiver: IAddress, transfers: NewTokenTransfer.TokenTransfer[]) {
+    buildArgsForMultiESDTNFTTransfer(receiver: IAddress, transfers: NextTokenTransfer.TokenTransfer[]) {
         let args = ["MultiESDTNFTTransfer", addressToHex(receiver), numberToPaddedHex(transfers.length)];
 
         for (let transfer of transfers) {

@@ -21,7 +21,7 @@ interface IParameterDefinition {
 
 // TODO: perhaps move default construction options to a factory (ArgSerializerFactory), instead of referencing them in the constructor
 // (postpone as much as possible, breaking change)
-const defaultArgSerializerrOptions: IArgSerializerOptions = {
+const defaultArgSerializerOptions: IArgSerializerOptions = {
     codec: new BinaryCodec()
 };
 
@@ -29,7 +29,7 @@ export class ArgSerializer {
     codec: ICodec;
 
     constructor(options?: IArgSerializerOptions) {
-        options = { ...defaultArgSerializerrOptions, ...options };
+        options = { ...defaultArgSerializerOptions, ...options };
         this.codec = options.codec;
     }
 

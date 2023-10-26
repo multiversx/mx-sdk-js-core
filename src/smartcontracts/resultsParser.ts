@@ -28,6 +28,7 @@ interface IParameterDefinition {
 }
 
 interface IEventInputDefinition {
+    name: string;
     type: Type;
     indexed: boolean;
 }
@@ -326,10 +327,8 @@ export class ResultsParser {
         return { returnCode, returnDataParts };
     }
 
-    parseEvent(transactionEvent: ITransactionEvent, eventDefinition: { inputs: IEventInputDefinition[] }): {
-        topics: TypedValue[],
-        dataParts: TypedValue[]
-    } {
+    parseEvent(transactionEvent: ITransactionEvent, eventDefinition: { inputs: IEventInputDefinition[] }): any {
+        const result: any = {};
         const topics = transactionEvent.topics.map(topic => Buffer.from(topic.hex(), "hex"));
         const data = transactionEvent.dataPayload?.valueOf() || Buffer.from([]);
         const dataHex = data.toString("hex");
@@ -341,9 +340,14 @@ export class ResultsParser {
         const decodedTopics = this.argsSerializer.buffersToValues(topics.slice(1), indexedInputs);
         const decodedDataParts = this.argsSerializer.stringToValues(dataHex, nonIndexedInputs);
 
-        return {
-            topics: decodedTopics,
-            dataParts: decodedDataParts
-        };
+        for (let i = 0; i < indexedInputs.length; i++) {
+            result[indexedInputs[i].name] = decodedTopics[i].valueOf();
+        }
+
+        for (let i = 0; i < nonIndexedInputs.length; i++) {
+            result[nonIndexedInputs[i].name] = decodedDataParts[i].valueOf();
+        }
+
+        return result;
     }
 }

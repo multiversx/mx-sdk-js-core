@@ -1,10 +1,14 @@
 import { ContractQueryResponse, ContractResultItem, ContractResults, TransactionEvent, TransactionEventTopic, TransactionLogs, TransactionOnNetwork } from "@multiversx/sdk-network-providers";
+import { TransactionEventData } from "@multiversx/sdk-network-providers/out/transactionEvents";
+import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import * as fs from "fs";
 import path from "path";
 import { Address } from "../address";
+import { IAddress } from "../interface";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { LogLevel, Logger } from "../logger";
+import { loadAbiRegistry } from "../testutils";
 import { ArgSerializer } from "./argSerializer";
 import { ResultsParser } from "./resultsParser";
 import { ReturnCode } from "./returnCode";
@@ -41,6 +45,9 @@ describe("test smart contract results parser", () => {
                 },
                 stringToBuffers(_joinedString) {
                     return []
+                },
+                stringToValues(_joinedString, _parameters) {
+                    return [new U64Value(42)];
                 }
             }
         });
@@ -233,6 +240,32 @@ describe("test smart contract results parser", () => {
         assert.deepEqual(bundle.returnCode, ReturnCode.Ok);
         assert.equal(bundle.returnMessage, "@too much gas provided for processing: gas provided = 596384500, gas used = 733010");
         assert.deepEqual(bundle.values, []);
+    });
+
+    it.only("should parse contract event", async () => {
+        const registry = await loadAbiRegistry("src/testdata/esdt-safe.abi.json");
+        const depositEvent = registry.getEvent("deposit");
+
+        const event = new TransactionEvent({
+            identifier: "deposit",
+            topics: [
+                new TransactionEventTopic("ZGVwb3NpdA=="),
+                new TransactionEventTopic("cmzC1LRt1r10pMhNAnFb+FyudjGMq4G8CefCYdQUmmc="),
+                new TransactionEventTopic("AAAADFdFR0xELTAxZTQ5ZAAAAAAAAAAAAAAAAWQ="),
+            ],
+            dataPayload: new TransactionEventData(Buffer.from("AAAAAAAAA9sAAAA=", "base64"))
+        });
+
+        const bundle = parser.parseEvent(event, depositEvent);
+
+        assert.equal((<IAddress>bundle.dest_address).bech32(), "erd1wfkv9495dhtt6a9yepxsyu2mlpw2ua333j4cr0qfulpxr4q5nfnshgyqun");
+        assert.equal(bundle.tokens[0].token_identifier, "WEGLD-01e49d");
+        assert.deepEqual(bundle.tokens[0].token_nonce, new BigNumber(0));
+        assert.deepEqual(bundle.tokens[0].amount, new BigNumber(100));
+        assert.deepEqual(bundle.event_data.tx_nonce, new BigNumber(987));
+        assert.isNull(bundle.event_data.opt_function);
+        assert.isNull(bundle.event_data.opt_arguments);
+        assert.isNull(bundle.event_data.opt_gas_limit);
     });
 
     // This test should be enabled manually and run against a set of sample transactions.

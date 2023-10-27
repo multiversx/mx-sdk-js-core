@@ -329,20 +329,23 @@ export class ResultsParser {
 
     parseEvent(transactionEvent: ITransactionEvent, eventDefinition: { inputs: IEventInputDefinition[] }): any {
         const result: any = {};
-        const topics = transactionEvent.topics.map(topic => Buffer.from(topic.hex(), "hex"));
+
+        // We skip the first topic, because that's the event identifier.
+        const topics = transactionEvent.topics.map(topic => Buffer.from(topic.hex(), "hex")).slice(1);
         const data = transactionEvent.dataPayload?.valueOf() || Buffer.from([]);
         const dataHex = data.toString("hex");
 
+        // "Indexed" ABI "event.inputs" correspond to "event.topics[1:]":
         const indexedInputs = eventDefinition.inputs.filter(input => input.indexed);
-        const nonIndexedInputs = eventDefinition.inputs.filter(input => !input.indexed);
-
-        // We skip the first topic, because it's the event identifier.
-        const decodedTopics = this.argsSerializer.buffersToValues(topics.slice(1), indexedInputs);
-        const decodedDataParts = this.argsSerializer.stringToValues(dataHex, nonIndexedInputs);
+        const decodedTopics = this.argsSerializer.buffersToValues(topics, indexedInputs);
 
         for (let i = 0; i < indexedInputs.length; i++) {
             result[indexedInputs[i].name] = decodedTopics[i].valueOf();
         }
+
+        // "Non-indexed" ABI "event.inputs" correspond to "event.data":
+        const nonIndexedInputs = eventDefinition.inputs.filter(input => !input.indexed);
+        const decodedDataParts = this.argsSerializer.stringToValues(dataHex, nonIndexedInputs);
 
         for (let i = 0; i < nonIndexedInputs.length; i++) {
             result[nonIndexedInputs[i].name] = decodedDataParts[i].valueOf();

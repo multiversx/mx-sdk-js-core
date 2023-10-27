@@ -12,7 +12,7 @@ import { loadAbiRegistry } from "../testutils";
 import { ArgSerializer } from "./argSerializer";
 import { ResultsParser } from "./resultsParser";
 import { ReturnCode } from "./returnCode";
-import { BigUIntType, BigUIntValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, StringType, StringValue, TypedValue, U32Type, U32Value, U64Type, U64Value, VariadicType, VariadicValue } from "./typesystem";
+import { AbiRegistry, BigUIntType, BigUIntValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, StringType, StringValue, TypedValue, U32Type, U32Value, U64Type, U64Value, VariadicType, VariadicValue } from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
 
 const KnownReturnCodes: string[] = [
@@ -242,12 +242,11 @@ describe("test smart contract results parser", () => {
         assert.deepEqual(bundle.values, []);
     });
 
-    it.only("should parse contract event", async () => {
-        const registry = await loadAbiRegistry("src/testdata/esdt-safe.abi.json");
-        const depositEvent = registry.getEvent("deposit");
+    it("should parse contract event", async () => {
+        const abiRegistry = await loadAbiRegistry("src/testdata/esdt-safe.abi.json");
+        const eventDefinition = abiRegistry.getEvent("deposit");
 
         const event = new TransactionEvent({
-            identifier: "deposit",
             topics: [
                 new TransactionEventTopic("ZGVwb3NpdA=="),
                 new TransactionEventTopic("cmzC1LRt1r10pMhNAnFb+FyudjGMq4G8CefCYdQUmmc="),
@@ -256,7 +255,7 @@ describe("test smart contract results parser", () => {
             dataPayload: new TransactionEventData(Buffer.from("AAAAAAAAA9sAAAA=", "base64"))
         });
 
-        const bundle = parser.parseEvent(event, depositEvent);
+        const bundle = parser.parseEvent(event, eventDefinition);
 
         assert.equal((<IAddress>bundle.dest_address).bech32(), "erd1wfkv9495dhtt6a9yepxsyu2mlpw2ua333j4cr0qfulpxr4q5nfnshgyqun");
         assert.equal(bundle.tokens[0].token_identifier, "WEGLD-01e49d");
@@ -266,6 +265,53 @@ describe("test smart contract results parser", () => {
         assert.isNull(bundle.event_data.opt_function);
         assert.isNull(bundle.event_data.opt_arguments);
         assert.isNull(bundle.event_data.opt_gas_limit);
+    });
+
+    it("should parse contract event (with multi-values)", async () => {
+        const abiRegistry = AbiRegistry.create({
+            "events": [
+                {
+                    "identifier": "foobar",
+                    "inputs": [
+                        {
+                            "name": "a",
+                            "type": "multi<u8, utf-8 string, u8, utf-8 string>",
+                            "indexed": true
+                        },
+                        {
+                            "name": "b",
+                            "type": "multi<utf-8 string, u8>",
+                            "indexed": true
+                        },
+                        {
+                            "name": "c",
+                            "type": "variadic<u8>",
+                            "indexed": false
+                        }
+                    ]
+                }
+            ]
+        });
+
+        const eventDefinition = abiRegistry.getEvent("foobar");
+
+        const event = new TransactionEvent({
+            topics: [
+                new TransactionEventTopic(Buffer.from("not used").toString("base64")),
+                new TransactionEventTopic(Buffer.from([42]).toString("base64")),
+                new TransactionEventTopic(Buffer.from("test").toString("base64")),
+                new TransactionEventTopic(Buffer.from([43]).toString("base64")),
+                new TransactionEventTopic(Buffer.from("test").toString("base64")),
+                new TransactionEventTopic(Buffer.from("test").toString("base64")),
+                new TransactionEventTopic(Buffer.from([44]).toString("base64")),
+            ],
+            dataPayload: new TransactionEventData(Buffer.from("01@02@03@04", "hex"))
+        });
+
+        const bundle = parser.parseEvent(event, eventDefinition);
+        assert.deepEqual(bundle.a, [new BigNumber(42), "test", new BigNumber(43), "test"]);
+        assert.deepEqual(bundle.b, ["test", new BigNumber(44)]);
+        assert.deepEqual(bundle.c, [new BigNumber(1), new BigNumber(2), new BigNumber(3), new BigNumber(4)]);
     });
 
     // This test should be enabled manually and run against a set of sample transactions.

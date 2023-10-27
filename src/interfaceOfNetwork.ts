@@ -66,7 +66,15 @@ export interface ITransactionLogs {
     events: ITransactionEvent[];
 
     findSingleOrNoneEvent(identifier: string, predicate?: (event: ITransactionEvent) => boolean): ITransactionEvent | undefined;
+
+    /**
+     * @deprecated Will be removed from the interface (with no replacement). Not used in "sdk-core".
+     */
     findFirstOrNoneEvent(identifier: string, predicate?: (event: ITransactionEvent) => boolean): ITransactionEvent | undefined;
+
+    /**
+     * @deprecated Will be removed from the interface (with no replacement). Not used in "sdk-core".
+     */
     findEvents(identifier: string, predicate?: (event: ITransactionEvent) => boolean): ITransactionEvent[];
 }
 

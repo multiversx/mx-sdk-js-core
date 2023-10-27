@@ -2,7 +2,7 @@ import { TransactionDecoder, TransactionMetadata } from "@multiversx/sdk-transac
 import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
 import { IAddress } from "../interface";
-import { IContractQueryResponse, IContractResults, ITransactionEvent, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { IContractQueryResponse, IContractResults, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { Logger } from "../logger";
 import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "./interface";
@@ -33,10 +33,15 @@ interface IEventInputDefinition {
     indexed: boolean;
 }
 
+interface ITransactionEvent {
+    readonly topics: { valueOf(): Uint8Array }[];
+    readonly dataPayload?: { valueOf(): Uint8Array };
+    readonly additionalData?: { valueOf(): Uint8Array }[];
+}
+
 interface IArgsSerializer {
     buffersToValues(buffers: Buffer[], parameters: IParameterDefinition[]): TypedValue[];
     stringToBuffers(joinedString: string): Buffer[];
-    stringToValues(joinedString: string, parameters: IParameterDefinition[]): TypedValue[];
 }
 
 // TODO: perhaps move default construction options to a factory (ResultsParserFactory), instead of referencing them in the constructor
@@ -331,9 +336,18 @@ export class ResultsParser {
         const result: any = {};
 
         // We skip the first topic, because that's the event identifier.
-        const topics = transactionEvent.topics.map(topic => Buffer.from(topic.hex(), "hex")).slice(1);
-        const data = transactionEvent.dataPayload?.valueOf() || Buffer.from([]);
-        const dataHex = data.toString("hex");
+        const topics = transactionEvent.topics.map(topic => Buffer.from(topic.valueOf())).slice(1);
+        // < Sirius.
+        const legacyData = transactionEvent.dataPayload?.valueOf() || Buffer.from([]);
+        // >= Sirius.
+        const additionalData = transactionEvent.additionalData?.map(data => Buffer.from(data.valueOf())) || [];
+
+        // < Sirius.
+        if (additionalData.length == 0) {
+            if (legacyData.length > 0) {
+                additionalData.push(Buffer.from(legacyData));
+            }
+        }
 
         // "Indexed" ABI "event.inputs" correspond to "event.topics[1:]":
         const indexedInputs = eventDefinition.inputs.filter(input => input.indexed);
@@ -345,7 +359,7 @@ export class ResultsParser {
 
         // "Non-indexed" ABI "event.inputs" correspond to "event.data":
         const nonIndexedInputs = eventDefinition.inputs.filter(input => !input.indexed);
-        const decodedDataParts = this.argsSerializer.stringToValues(dataHex, nonIndexedInputs);
+        const decodedDataParts = this.argsSerializer.buffersToValues(additionalData, nonIndexedInputs);
 
         for (let i = 0; i < nonIndexedInputs.length; i++) {
             result[nonIndexedInputs[i].name] = decodedDataParts[i].valueOf();

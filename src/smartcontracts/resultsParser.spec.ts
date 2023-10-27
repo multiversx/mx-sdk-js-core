@@ -45,9 +45,6 @@ describe("test smart contract results parser", () => {
                 },
                 stringToBuffers(_joinedString) {
                     return []
-                },
-                stringToValues(_joinedString, _parameters) {
-                    return [new U64Value(42)];
                 }
             }
         });
@@ -285,7 +282,7 @@ describe("test smart contract results parser", () => {
                         },
                         {
                             "name": "c",
-                            "type": "variadic<u8>",
+                            "type": "u8",
                             "indexed": false
                         }
                     ]
@@ -295,7 +292,7 @@ describe("test smart contract results parser", () => {
 
         const eventDefinition = abiRegistry.getEvent("foobar");
 
-        const event = new TransactionEvent({
+        const event = {
             topics: [
                 new TransactionEventTopic(Buffer.from("not used").toString("base64")),
                 new TransactionEventTopic(Buffer.from([42]).toString("base64")),
@@ -305,13 +302,60 @@ describe("test smart contract results parser", () => {
                 new TransactionEventTopic(Buffer.from("test").toString("base64")),
                 new TransactionEventTopic(Buffer.from([44]).toString("base64")),
             ],
-            dataPayload: new TransactionEventData(Buffer.from("01@02@03@04", "hex"))
-        });
+            dataPayload: new TransactionEventData(Buffer.from([42]))
+        };
 
         const bundle = parser.parseEvent(event, eventDefinition);
         assert.deepEqual(bundle.a, [new BigNumber(42), "test", new BigNumber(43), "test"]);
         assert.deepEqual(bundle.b, ["test", new BigNumber(44)]);
-        assert.deepEqual(bundle.c, [new BigNumber(1), new BigNumber(2), new BigNumber(3), new BigNumber(4)]);
+        assert.deepEqual(bundle.c, new BigNumber(42));
+    });
+
+    it("should parse contract event (Sirius)", async () => {
+        const abiRegistry = AbiRegistry.create({
+            "events": [
+                {
+                    "identifier": "foobar",
+                    "inputs": [
+                        {
+                            "name": "a",
+                            "type": "u8",
+                            "indexed": true
+                        },
+                        {
+                            "name": "b",
+                            "type": "u8",
+                            "indexed": false
+                        },
+                        {
+                            "name": "c",
+                            "type": "u8",
+                            "indexed": false
+                        }
+                    ]
+                }
+            ]
+        });
+
+        const eventDefinition = abiRegistry.getEvent("foobar");
+
+        const event = {
+            topics: [
+                new TransactionEventTopic(Buffer.from("not used").toString("base64")),
+                new TransactionEventTopic(Buffer.from([42]).toString("base64")),
+            ],
+            additionalData: [
+                new TransactionEventData(Buffer.from([43])),
+                new TransactionEventData(Buffer.from([44]))
+            ],
+            // Will be ignored.
+            dataPayload: new TransactionEventData(Buffer.from([43])),
+        };
+
+        const bundle = parser.parseEvent(event, eventDefinition);
+        assert.deepEqual(bundle.a, new BigNumber(42));
+        assert.deepEqual(bundle.b, new BigNumber(43));
+        assert.deepEqual(bundle.c, new BigNumber(44));
     });
 
     // This test should be enabled manually and run against a set of sample transactions.

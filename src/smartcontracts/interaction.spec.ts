@@ -33,6 +33,7 @@ describe("test smart contract interactor", function () {
         let interaction = new Interaction(contract, dummyFunction, []);
 
         let transaction = interaction
+            .withSender(alice.address)
             .withNonce(7)
             .withValue(TokenTransfer.egldFromAmount(1))
             .withGasLimit(20000000)
@@ -63,6 +64,7 @@ describe("test smart contract interactor", function () {
 
         // ESDT, single
         let transaction = new Interaction(contract, dummyFunction, [])
+            .withSender(alice)
             .withSingleESDTTransfer(TokenFoo(10))
             .buildTransaction();
 
@@ -180,7 +182,7 @@ describe("test smart contract interactor", function () {
         assert.isTrue(queryCode.equals(ReturnCode.Ok));
 
         // Execute, do not wait for execution
-        let transaction = interaction.withNonce(0).buildTransaction();
+        let transaction = interaction.withSender(alice.address).withNonce(0).buildTransaction();
         transaction.setSender(alice.address);
         await alice.signer.sign(transaction);
         await provider.sendTransaction(transaction);
@@ -235,7 +237,7 @@ describe("test smart contract interactor", function () {
 
         assert.deepEqual(counterValue!.valueOf(), new BigNumber(7));
 
-        let incrementTransaction = incrementInteraction.withNonce(14).buildTransaction();
+        let incrementTransaction = incrementInteraction.withSender(alice.address).withNonce(14).buildTransaction();
         await alice.signer.sign(incrementTransaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@08");
         let { bundle: { firstValue: valueAfterIncrement } } = await controller.execute(incrementInteraction, incrementTransaction);
@@ -243,7 +245,7 @@ describe("test smart contract interactor", function () {
 
         // Decrement three times (simulate three parallel broadcasts). Wait for execution of the latter (third transaction). Return fake "5".
         // Decrement #1
-        let decrementTransaction = decrementInteraction.withNonce(15).buildTransaction();
+        let decrementTransaction = decrementInteraction.withSender(alice.address).withNonce(15).buildTransaction();
         await alice.signer.sign(decrementTransaction);
         await provider.sendTransaction(decrementTransaction);
         // Decrement #2
@@ -292,7 +294,7 @@ describe("test smart contract interactor", function () {
         );
 
         // start()
-        let startTransaction = startInteraction.withNonce(14).buildTransaction();
+        let startTransaction = startInteraction.withSender(alice.address).withNonce(14).buildTransaction();
         await alice.signer.sign(startTransaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b");
         let { bundle: { returnCode: startReturnCode, values: startReturnValues } } = await controller.execute(startInteraction, startTransaction);
@@ -302,7 +304,7 @@ describe("test smart contract interactor", function () {
         assert.lengthOf(startReturnValues, 0);
 
         // status() (this is a view function, but for the sake of the test, we'll execute it)
-        let statusTransaction = statusInteraction.withNonce(15).buildTransaction();
+        let statusTransaction = statusInteraction.withSender(alice.address).withNonce(15).buildTransaction();
         await alice.signer.sign(statusTransaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@01");
         let { bundle: { returnCode: statusReturnCode, values: statusReturnValues, firstValue: statusFirstValue } } = await controller.execute(statusInteraction, statusTransaction);
@@ -313,7 +315,7 @@ describe("test smart contract interactor", function () {
         assert.deepEqual(statusFirstValue!.valueOf(), { name: "Running", fields: [] });
 
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
-        let getLotteryInfoTransaction = getLotteryInfoInteraction.withNonce(15).buildTransaction();
+        let getLotteryInfoTransaction = getLotteryInfoInteraction.withSender(alice.address).withNonce(15).buildTransaction();
         await alice.signer.sign(getLotteryInfoTransaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@0000000b6c75636b792d746f6b656e000000010100000000000000005fc2b9dbffffffff00000001640000000a140ec80fa7ee88000000");
         let { bundle: { returnCode: infoReturnCode, values: infoReturnValues, firstValue: infoFirstValue } } = await controller.execute(getLotteryInfoInteraction, getLotteryInfoTransaction);

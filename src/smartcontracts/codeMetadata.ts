@@ -6,6 +6,7 @@ export class CodeMetadata {
     private readable: boolean;
     private payable: boolean;
     private payableBySc: boolean;
+    private static readonly codeMetadataLength = 2;
 
     /**
      * Creates a metadata object. By default, set the `upgradeable` attribute, and uset all others.
@@ -20,6 +21,22 @@ export class CodeMetadata {
         this.readable = readable;
         this.payable = payable;
         this.payableBySc = payableBySc
+    }
+
+    static fromBytes(bytes: Uint8Array): CodeMetadata {
+        if (bytes.length !== this.codeMetadataLength) {
+            return new CodeMetadata();
+        }
+
+        const byteZero = bytes[0];
+        const byteOne = bytes[1];
+
+        const upgradeable = (byteZero & ByteZero.Upgradeable) !== 0;
+        const readable = (byteZero & ByteZero.Readable) !== 0;
+        const payable = (byteOne & ByteOne.Payable) !== 0;
+        const payableBySc = (byteOne & ByteOne.PayableBySc) !== 0;
+
+        return new CodeMetadata(upgradeable, readable, payable, payableBySc);
     }
 
     /**
@@ -49,7 +66,7 @@ export class CodeMetadata {
     togglePayableBySc(value: boolean) {
         this.payableBySc = value;
     }
-    
+
     /**
      * Converts the metadata to the protocol-friendly representation.
      */

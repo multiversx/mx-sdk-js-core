@@ -326,8 +326,29 @@ export class ErrGasLimitShouldBe0ForInnerTransaction extends Err {
   }
 }
 
+/**
+ * Signals that the `isCompleted` property is missing on the transaction obect and is needed for the Transaction Watcher
+ */
 export class ErrIsCompletedFieldIsMissingOnTransaction extends Err {
   public constructor() {
     super("The transaction watcher requires the `isCompleted` property to be defined on the transaction object. Perhaps you've used the sdk-network-provider's `ProxyNetworkProvider.getTransaction()` and in that case you should also pass `withProcessStatus=true`.")
+  }
+}
+
+/**
+ * Signals that the provided token identifier is not valid
+ */
+export class ErrInvalidTokenIdentifier extends Err {
+  public constructor(message: string) {
+    super(message);
+  }
+}
+
+/**
+ * Signals a generic bad usage error
+ */
+export class ErrBadUsage extends Err {
+  public constructor(message: string) {
+    super(message);
   }
 }

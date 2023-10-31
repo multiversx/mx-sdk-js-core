@@ -11,6 +11,7 @@ import { ProtoSerializer } from "./proto";
 import { Signature } from "./signature";
 import { TransactionPayload } from "./transactionPayload";
 import { guardNotEmpty } from "./utils";
+import { DraftTransaction } from "./draftTransaction";
 
 const createTransactionHasher = require("blake2b");
 const TRANSACTION_HASH_LENGTH = 32;
@@ -150,6 +151,20 @@ export class Transaction {
     this.signature = Buffer.from([]);
     this.guardianSignature = Buffer.from([]);
     this.hash = TransactionHash.empty();
+  }
+
+  /**
+   * Creates a new Transaction object from a DraftTransaction.
+   */
+  static fromDraft(draft: DraftTransaction): Transaction {
+    return new Transaction({
+      sender: Address.fromBech32(draft.sender),
+      receiver: Address.fromBech32(draft.receiver),
+      gasLimit: new BigNumber(draft.gasLimit).toNumber(),
+      chainID: "",
+      value: draft.value,
+      data: new TransactionPayload(Buffer.from(draft.data))
+    })
   }
 
   getNonce(): INonce {

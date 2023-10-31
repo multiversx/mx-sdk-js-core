@@ -9,14 +9,20 @@ import { bigIntToBuffer } from "./codec/utils";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
-import { CallArguments, DeployArguments, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
+import { CallArguments, DeployArguments, ICodeMetadata, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
-import { ArwenVirtualMachine, ContractCallPayloadBuilder, ContractDeployPayloadBuilder, ContractUpgradePayloadBuilder } from "./transactionPayloadBuilders";
+import { WasmVirtualMachine } from "./transactionPayloadBuilders";
 import { EndpointDefinition, TypedValue } from "./typesystem";
+import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
+import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
+import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
+import { TokenComputer } from "../tokens";
 const createKeccakHash = require("keccak");
 
 interface IAbi {
+    constructorDefinition: EndpointDefinition;
+
     getEndpoints(): EndpointDefinition[];
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
 }
@@ -110,27 +116,56 @@ export class SmartContract implements ISmartContract {
     deploy({ deployer, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
         Compatibility.guardAddressIsSetAndNonZero(deployer, "'deployer' of SmartContract.deploy()", "pass the actual address to deploy()");
 
-        codeMetadata = codeMetadata || new CodeMetadata();
-        initArguments = initArguments || [];
-        value = value || 0;
-
-        let payload = new ContractDeployPayloadBuilder()
-            .setCode(code)
-            .setCodeMetadata(codeMetadata)
-            .setInitArgs(initArguments)
-            .build();
-
-        let transaction = new Transaction({
-            receiver: Address.Zero(),
-            sender: deployer,
-            value: value,
-            gasLimit: gasLimit,
-            gasPrice: gasPrice,
-            data: payload,
-            chainID: chainID
+        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const scDraftTransactionFactory = new SmartContractTransactionsFactory({
+            config: config,
+            abi: this.abi,
+            tokenComputer: new TokenComputer()
         });
 
+        const bytecode = Buffer.from(code.toString(), 'hex');
+        const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
+
+        const draftTx = scDraftTransactionFactory.createTransactionForDeploy({
+            sender: deployer,
+            bytecode: bytecode,
+            gasLimit: gasLimit.valueOf(),
+            args: initArguments,
+            isUpgradeable: metadataAsJson.upgradeable,
+            isReadable: metadataAsJson.readable,
+            isPayable: metadataAsJson.payable,
+            isPayableBySmartContract: metadataAsJson.payableBySc
+        });
+
+        const transaction = Transaction.fromDraft(draftTx);
+        transaction.setChainID(chainID);
+        transaction.setValue(value ?? 0);
+        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
+
         return transaction;
+    }
+
+    private getMetadataPropertiesAsObject(codeMetadata?: ICodeMetadata): {
+        upgradeable: boolean,
+        readable: boolean,
+        payable: boolean,
+        payableBySc: boolean
+    } {
+        let metadata: CodeMetadata;
+        if (codeMetadata) {
+            metadata = CodeMetadata.fromBytes(Buffer.from(codeMetadata.toString(), "hex"));
+        }
+        else {
+            metadata = new CodeMetadata();
+        }
+        const metadataAsJson = metadata.toJSON() as {
+            upgradeable: boolean,
+            readable: boolean,
+            payable: boolean,
+            payableBySc: boolean
+        };
+
+        return metadataAsJson;
     }
 
     /**
@@ -141,25 +176,32 @@ export class SmartContract implements ISmartContract {
 
         this.ensureHasAddress();
 
-        codeMetadata = codeMetadata || new CodeMetadata();
-        initArguments = initArguments || [];
-        value = value || 0;
-
-        let payload = new ContractUpgradePayloadBuilder()
-            .setCode(code)
-            .setCodeMetadata(codeMetadata)
-            .setInitArgs(initArguments)
-            .build();
-
-        let transaction = new Transaction({
-            sender: caller,
-            receiver: this.getAddress(),
-            value: value,
-            gasLimit: gasLimit,
-            gasPrice: gasPrice,
-            data: payload,
-            chainID: chainID
+        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const scDraftTransactionFactory = new SmartContractTransactionsFactory({
+            config: config,
+            abi: this.abi,
+            tokenComputer: new TokenComputer()
         });
+
+        const bytecode = Uint8Array.from(Buffer.from(code.toString(), 'hex'));
+        const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
+
+        const draftTx = scDraftTransactionFactory.createTransactionForUpgrade({
+            sender: caller,
+            contract: this.getAddress(),
+            bytecode: bytecode,
+            gasLimit: gasLimit.valueOf(),
+            args: initArguments,
+            isUpgradeable: metadataAsJson.upgradeable,
+            isReadable: metadataAsJson.readable,
+            isPayable: metadataAsJson.payable,
+            isPayableBySmartContract: metadataAsJson.payableBySc
+        })
+
+        const transaction = Transaction.fromDraft(draftTx);
+        transaction.setChainID(chainID);
+        transaction.setValue(value ?? 0);
+        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
 
         return transaction;
     }
@@ -172,23 +214,28 @@ export class SmartContract implements ISmartContract {
 
         this.ensureHasAddress();
 
+        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const scDraftTransactionFactory = new SmartContractTransactionsFactory({
+            config: config,
+            abi: this.abi,
+            tokenComputer: new TokenComputer()
+        });
+
         args = args || [];
         value = value || 0;
 
-        let payload = new ContractCallPayloadBuilder()
-            .setFunction(func)
-            .setArgs(args)
-            .build();
-
-        let transaction = new Transaction({
+        const draftTx = scDraftTransactionFactory.createTransactionForExecute({
             sender: caller,
-            receiver: receiver ? receiver : this.getAddress(),
-            value: value,
-            gasLimit: gasLimit,
-            gasPrice: gasPrice,
-            data: payload,
-            chainID: chainID,
-        });
+            contract: receiver ? receiver : this.getAddress(),
+            functionName: func.toString(),
+            gasLimit: gasLimit.valueOf(),
+            args: args
+        })
+
+        const transaction = Transaction.fromDraft(draftTx);
+        transaction.setChainID(chainID);
+        transaction.setValue(value);
+        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
 
         return transaction;
     }
@@ -230,7 +277,7 @@ export class SmartContract implements ISmartContract {
 
         let bytesToHash = Buffer.concat([ownerPubkey, ownerNonceBytes]);
         let hash = createKeccakHash("keccak256").update(bytesToHash).digest();
-        let vmTypeBytes = Buffer.from(ArwenVirtualMachine, "hex");
+        let vmTypeBytes = Buffer.from(WasmVirtualMachine, "hex");
         let addressBytes = Buffer.concat([
             initialPadding,
             vmTypeBytes,

@@ -57,7 +57,7 @@ export class SignableMessage {
     return this.signature;
   }
 
-  applySignature(signature: ISignature | Buffer) {
+  applySignature(signature: ISignature | Uint8Array) {
     this.signature = interpretSignatureAsBuffer(signature);
   }
 

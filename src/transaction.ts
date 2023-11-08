@@ -8,7 +8,7 @@ import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObje
 import { INetworkConfig } from "./interfaceOfNetwork";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
-import { Signature } from "./signature";
+import { Signature, interpretSignatureAsBuffer } from "./signature";
 import { TransactionPayload } from "./transactionPayload";
 import { guardNotEmpty } from "./utils";
 
@@ -372,18 +372,8 @@ export class Transaction {
    * @param signature The signature, as computed by a signer.
    */
   applySignature(signature: ISignature | Uint8Array) {
-    this.signature = this.interpretSignatureAsBuffer(signature);
+    this.signature = interpretSignatureAsBuffer(signature);
     this.hash = TransactionHash.compute(this);
-  }
-
-  private interpretSignatureAsBuffer(signature: ISignature | Uint8Array): Buffer {
-    if (ArrayBuffer.isView(signature)) {
-      return Buffer.from(signature);
-    } else if ((<any>signature).hex != null) {
-      return Buffer.from(signature.hex(), "hex");
-    }
-
-    throw new Error(`Object cannot be interpreted as a signature: ${signature}`);
   }
 
   /**
@@ -392,7 +382,7 @@ export class Transaction {
    * @param guardianSignature The signature, as computed by a signer.
    */
   applyGuardianSignature(guardianSignature: ISignature | Uint8Array) {
-    this.guardianSignature = this.interpretSignatureAsBuffer(guardianSignature);
+    this.guardianSignature = interpretSignatureAsBuffer(guardianSignature);
     this.hash = TransactionHash.compute(this);
   }
 

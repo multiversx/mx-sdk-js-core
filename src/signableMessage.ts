@@ -1,5 +1,6 @@
 import { Address } from "./address";
 import { ISignature } from "./interface";
+import { interpretSignatureAsBuffer } from "./signature";
 const createKeccakHash = require("keccak");
 
 export const MESSAGE_PREFIX = "\x17Elrond Signed Message:\n";
@@ -57,11 +58,7 @@ export class SignableMessage {
   }
 
   applySignature(signature: ISignature | Buffer) {
-    if (signature instanceof Buffer) {
-      this.signature = signature;
-    } else {
-      this.signature = Buffer.from(signature.hex(), "hex");
-    }
+    this.signature = interpretSignatureAsBuffer(signature);
   }
 
   getMessageSize(): Buffer {

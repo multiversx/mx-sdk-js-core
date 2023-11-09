@@ -4,8 +4,9 @@ import { INetworkProvider } from "./interface";
 import { Address } from "./primitives";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { MockQuery } from "./testscommon/dummyQuery";
-import { TransactionOnNetwork } from "./transactions";
 import { NonFungibleTokenOfAccountOnNetwork } from "./tokens";
+import { TransactionEventData } from "./transactionEvents";
+import { TransactionOnNetwork } from "./transactions";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -81,6 +82,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         let apiResponse = (await apiProvider.getNonFungibleTokensOfAccount(dan)).slice(0, MAX_NUMBER_OF_ITEMS_BY_DEFAULT);
         let proxyResponse = (await proxyProvider.getNonFungibleTokensOfAccount(dan)).slice(0, MAX_NUMBER_OF_ITEMS_BY_DEFAULT);
 
+        assert.isTrue(apiResponse.length > 0, "For the sake of the test, there should be at least one item.");
         assert.equal(apiResponse.length, proxyResponse.length);
 
         for (let i = 0; i < apiResponse.length; i++) {
@@ -168,8 +170,8 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(20000);
 
         let hashes = [
-            "2e6bd2671dbb57f1f1013c89f044359c2465f1514e0ea718583900e43c1931fe",
-            "c451566a6168e38d2980fcb83d4ea154f78d53f7abf3264dd51c2c7c585671aa"
+            "08acf8cbd71306a56eb58f9593cb2e23f109c94e27acdd906c82a5c3a5f84d9d",
+            "410efb1db2ab86678b8dbc503beb695b5b7d52754fb0de86c09cbb433de5f6a8"
         ];
 
         for (const hash of hashes) {
@@ -196,7 +198,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     }
 
     it("should have the same response for transactions with events", async function () {
-        const hash = "c451566a6168e38d2980fcb83d4ea154f78d53f7abf3264dd51c2c7c585671aa";
+        const hash = "1b04eb849cf87f2d3086c77b4b825d126437b88014327bbf01437476751cb040";
 
         let apiResponse = await apiProvider.getTransaction(hash);
         let proxyResponse = await proxyProvider.getTransaction(hash);
@@ -205,23 +207,22 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.exists(proxyResponse.logs);
         assert.exists(apiResponse.logs.events)
         assert.exists(proxyResponse.logs.events)
-        assert.equal(apiResponse.logs.events[0].topics[0].hex(), "5745474c442d643763366262")
+        assert.equal(apiResponse.logs.events[0].topics[0].hex(), "414c4943452d353632376631")
         assert.equal(apiResponse.logs.events[0].topics[1].hex(), "")
-        assert.equal(apiResponse.logs.events[0].topics[2].hex(), "0de0b6b3a7640000")
-        assert.equal(apiResponse.logs.events[0].topics[3].hex(), "00000000000000000500e01285f90311fb5925a9623a1dc62eee41fa8c869a0d")
-        assert.equal(proxyResponse.logs.events[0].topics[0].hex(), "5745474c442d643763366262")
+        assert.equal(apiResponse.logs.events[0].topics[2].hex(), "01")
+        assert.equal(apiResponse.logs.events[0].topics[3].hex(), "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1")
+        assert.equal(proxyResponse.logs.events[0].topics[0].hex(), "414c4943452d353632376631")
         assert.equal(proxyResponse.logs.events[0].topics[1].hex(), "")
-        assert.equal(proxyResponse.logs.events[0].topics[2].hex(), "0de0b6b3a7640000")
-        assert.equal(proxyResponse.logs.events[0].topics[3].hex(), "00000000000000000500e01285f90311fb5925a9623a1dc62eee41fa8c869a0d")
+        assert.equal(proxyResponse.logs.events[0].topics[2].hex(), "01")
+        assert.equal(proxyResponse.logs.events[0].topics[3].hex(), "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1")
     });
 
     it("should have same response for getTransactionStatus()", async function () {
         this.timeout(20000);
 
         let hashes = [
-            "2e6bd2671dbb57f1f1013c89f044359c2465f1514e0ea718583900e43c1931fe",
-            "c451566a6168e38d2980fcb83d4ea154f78d53f7abf3264dd51c2c7c585671aa",
-            "cd2da63a51fd422c8b69a1b5ebcb9edbbf0eb9750c3fe8e199d39ed5d82000e9"
+            "08acf8cbd71306a56eb58f9593cb2e23f109c94e27acdd906c82a5c3a5f84d9d",
+            "410efb1db2ab86678b8dbc503beb695b5b7d52754fb0de86c09cbb433de5f6a8"
         ];
 
         for (const hash of hashes) {
@@ -235,7 +236,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getDefinitionOfFungibleToken()", async function () {
         this.timeout(10000);
 
-        let identifiers = ["FOO-b6f543", "BAR-c80d29", "COUNTER-b7401d"];
+        let identifiers = ["BEER-b16c6d", "CHOCOLATE-daf625"];
 
         for (const identifier of identifiers) {
             let apiResponse = await apiProvider.getDefinitionOfFungibleToken(identifier);
@@ -252,7 +253,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getDefinitionOfTokenCollection()", async function () {
         this.timeout(10000);
 
-        let collections = ["ERDJS-38f249"];
+        let collections = ["TEST-37adcf"];
 
         for (const collection of collections) {
             let apiResponse = await apiProvider.getDefinitionOfTokenCollection(collection);
@@ -266,7 +267,7 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getNonFungibleToken()", async function () {
         this.timeout(10000);
 
-        let tokens = [{ id: "ERDJS-38f249", nonce: 1 }];
+        let tokens = [{ id: "TEST-37adcf", nonce: 1 }];
 
         for (const token of tokens) {
             let apiResponse = await apiProvider.getNonFungibleToken(token.id, token.nonce);
@@ -284,7 +285,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         // Query: get sum (of adder contract)
         let query = new MockQuery({
-            address: new Address("erd1qqqqqqqqqqqqqpgquykqja5c4v33zdmnwglj3jphqwrelzdn396qlc9g33"),
+            address: new Address("erd1qqqqqqqqqqqqqpgqfzydqmdw7m2vazsp6u5p95yxz76t2p9rd8ss0zp9ts"),
             func: "getSum"
         });
 
@@ -297,46 +298,41 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         assert.deepEqual(apiResponse, proxyResponse);
         assert.deepEqual(apiResponse.getReturnDataParts(), proxyResponse.getReturnDataParts());
-
-        // Query: increment counter
-        query = new MockQuery({
-            address: new Address("erd1qqqqqqqqqqqqqpgqzeq07xvhs5g7cg4ama85upaqarrcgu49396q0gz4yf"),
-            func: "increment",
-            args: []
-        });
-
-        apiResponse = await apiProvider.queryContract(query);
-        proxyResponse = await proxyProvider.queryContract(query);
-
-        // Ignore "gasUsed" due to numerical imprecision (API).
-        apiResponse.gasUsed = 0;
-        proxyResponse.gasUsed = 0;
-
-        assert.deepEqual(apiResponse, proxyResponse);
-        assert.deepEqual(apiResponse.getReturnDataParts(), proxyResponse.getReturnDataParts());
     });
 
-    it.skip("should have same response for queryContract() (2)", async function () {
-        this.timeout(10000);
+    it("should handle events data on < Sirius and >= Sirius", async function () {
+        this.timeout(50000);
 
-        // Query: issue ESDT
-        let query = new MockQuery({
-            address: new Address("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
-            func: "issue",
-            value: "50000000000000000",
-            args: [
-                Buffer.from("HELLO").toString("hex"),
-                Buffer.from("WORLD").toString("hex"),
-                "0A", // Supply
-                "03" // Decimals
-            ]
-        });
+        const beforeSiriusApiProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com");
+        const beforeSiriusProxyProvider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
 
-        let apiResponse = await apiProvider.queryContract(query);
-        let proxyResponse = await proxyProvider.queryContract(query);
+        // We use the Testnet services, since they are backed by nodes with version >= Sirius (November 2023).
+        const afterSiriusApiProvider = new ApiNetworkProvider("https://testnet-api.multiversx.com");
+        const afterSiriusProxyProvider = new ProxyNetworkProvider("https://testnet-gateway.multiversx.com");
 
-        assert.deepEqual(apiResponse, proxyResponse);
-        assert.deepEqual(apiResponse.getReturnDataParts(), proxyResponse.getReturnDataParts());
+        const beforeSiriusApiResponse = await beforeSiriusApiProvider.getTransaction("51e53c6345c25fc4a454e64b96f43812e4a6cf3d01bbe4384da39e562b136aac");
+        const beforeSiriusProxyResponse = await beforeSiriusProxyProvider.getTransaction("51e53c6345c25fc4a454e64b96f43812e4a6cf3d01bbe4384da39e562b136aac");
+
+        const afterSiriusApiResponse = await afterSiriusApiProvider.getTransaction("532087e5021c9ab8be8a4db5ad843cfe0610761f6334d9693b3765992fd05f67");
+        // Contract result of "5320...5f67":
+        const afterSiriusProxyResponse = await afterSiriusProxyProvider.getTransaction("4bb22e85895b41bc3cd195079afa761cc4b430fb4ea19a6862f083de53f110ab");
+
+        // Before Sirius
+        assert.equal(beforeSiriusApiResponse.logs.events[0].data, "@6f7574206f662066756e6473");
+        assert.equal(beforeSiriusProxyResponse.logs.events[0].data, "@6f7574206f662066756e6473");
+
+        assert.deepEqual(beforeSiriusApiResponse.logs.events[0].dataPayload, TransactionEventData.fromBase64("QDZmNzU3NDIwNmY2NjIwNjY3NTZlNjQ3Mw=="));
+        assert.deepEqual(beforeSiriusProxyResponse.logs.events[0].dataPayload, TransactionEventData.fromBase64("QDZmNzU3NDIwNmY2NjIwNjY3NTZlNjQ3Mw=="));
+
+        // After Sirius
+        assert.equal(afterSiriusApiResponse.contractResults.items[0].logs.events[1].data, Buffer.from("AAAAAAAAA9sAAAA=", "base64").toString());
+        assert.equal(afterSiriusProxyResponse.logs.events[1].data, Buffer.from("AAAAAAAAA9sAAAA=", "base64").toString());
+
+        assert.deepEqual(afterSiriusApiResponse.contractResults.items[0].logs.events[1].dataPayload, TransactionEventData.fromBase64("AAAAAAAAA9sAAAA="));
+        assert.deepEqual(afterSiriusProxyResponse.logs.events[1].dataPayload, TransactionEventData.fromBase64("AAAAAAAAA9sAAAA="));
+
+        assert.deepEqual(afterSiriusApiResponse.contractResults.items[0].logs.events[1].additionalData, [TransactionEventData.fromBase64("AAAAAAAAA9sAAAA=")]);
+        assert.deepEqual(afterSiriusProxyResponse.logs.events[1].additionalData, [TransactionEventData.fromBase64("AAAAAAAAA9sAAAA=")]);
     });
 });
 

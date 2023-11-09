@@ -5,8 +5,13 @@ export class TransactionEvent {
     address: IAddress = new Address("");
     identifier: string = "";
     topics: TransactionEventTopic[] = [];
-    dataPayload: TransactionEventData = new TransactionEventData(Buffer.from("", "utf8"));
+
+    /**
+     * @deprecated Use "dataPayload" instead.
+     */
     data: string = "";
+    dataPayload: TransactionEventData = new TransactionEventData(Buffer.from("", "utf8"));
+    additionalData: TransactionEventData[] = [];
 
     constructor(init?: Partial<TransactionEvent>) {
         Object.assign(this, init);
@@ -16,16 +21,17 @@ export class TransactionEvent {
         address: string,
         identifier: string,
         topics: string[],
-        data: string
+        data: string,
+        additionalData?: string[]
     }): TransactionEvent {
         let result = new TransactionEvent();
         result.address = new Address(responsePart.address);
         result.identifier = responsePart.identifier || "";
         result.topics = (responsePart.topics || []).map(topic => new TransactionEventTopic(topic));
 
-        const rawData = Buffer.from(responsePart.data || "", "base64")
-        result.dataPayload = new TransactionEventData(rawData);
-        result.data = rawData.toString();
+        result.dataPayload = TransactionEventData.fromBase64(responsePart.data);
+        result.additionalData = (responsePart.additionalData || []).map(TransactionEventData.fromBase64);
+        result.data = result.dataPayload.toString();
 
         return result;
     }
@@ -44,6 +50,10 @@ export class TransactionEventData {
 
     constructor(data: Buffer) {
         this.raw = data;
+    }
+
+    static fromBase64(str: string): TransactionEventData {
+        return new TransactionEventData(Buffer.from(str || "", "base64"));
     }
 
     toString(): string {

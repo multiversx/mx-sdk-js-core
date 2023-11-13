@@ -2,6 +2,7 @@ import * as errors from "../../errors";
 import { guardValueIsSetWithMessage } from "../../utils";
 import { EndpointDefinition, EndpointParameterDefinition } from "./endpoint";
 import { EnumType } from "./enum";
+import { EventDefinition, EventTopicDefinition } from "./event";
 import { StructType } from "./struct";
 import { TypeMapper } from "./typeMapper";
 import { CustomType } from "./types";
@@ -13,17 +14,20 @@ export class AbiRegistry {
     readonly constructorDefinition: EndpointDefinition;
     readonly endpoints: EndpointDefinition[] = [];
     readonly customTypes: CustomType[] = [];
+    readonly events: EventDefinition[] = [];
 
     private constructor(options: {
         name: string;
         constructorDefinition: EndpointDefinition;
         endpoints: EndpointDefinition[];
         customTypes: CustomType[],
+        events?: EventDefinition[]
     }) {
         this.name = options.name;
         this.constructorDefinition = options.constructorDefinition;
         this.endpoints = options.endpoints;
         this.customTypes = options.customTypes;
+        this.events = options.events || [];
     }
 
     static create(options: {
@@ -31,11 +35,13 @@ export class AbiRegistry {
         constructor?: any,
         endpoints?: any[];
         types?: Record<string, any>
+        events?: any[]
     }): AbiRegistry {
         const name = options.name || interfaceNamePlaceholder;
         const constructor = options.constructor || {};
         const endpoints = options.endpoints || [];
         const types = options.types || {};
+        const events = options.events || [];
 
         // Load arbitrary input parameters into properly-defined objects (e.g. EndpointDefinition and CustomType).
         const constructorDefinition = EndpointDefinition.fromJSON({ name: "constructor", ...constructor });
@@ -54,15 +60,24 @@ export class AbiRegistry {
             }
         }
 
+        const eventDefinitions = events.map(item => EventDefinition.fromJSON(item));
+
         const registry = new AbiRegistry({
             name: name,
             constructorDefinition: constructorDefinition,
             endpoints: endpointDefinitions,
             customTypes: customTypes,
+            events: eventDefinitions
         });
 
         const remappedRegistry = registry.remapToKnownTypes();
         return remappedRegistry;
+    }
+
+    getCustomType(name: string): CustomType {
+        const result = this.customTypes.find((e) => e.getName() == name);
+        guardValueIsSetWithMessage(`custom type [${name}] not found`, result);
+        return result!;
     }
 
     getStruct(name: string): StructType {
@@ -92,6 +107,12 @@ export class AbiRegistry {
     getEndpoint(name: string): EndpointDefinition {
         const result = this.endpoints.find((e) => e.name == name);
         guardValueIsSetWithMessage(`endpoint [${name}] not found`, result);
+        return result!;
+    }
+
+    getEvent(name: string): EventDefinition {
+        const result = this.events.find((e) => e.identifier == name);
+        guardValueIsSetWithMessage(`event [${name}] not found`, result);
         return result!;
     }
 
@@ -129,12 +150,15 @@ export class AbiRegistry {
             newEndpoints.push(mapEndpoint(endpoint, mapper));
         }
 
+        const newEvents: EventDefinition[] = this.events.map((event) => mapEvent(event, mapper));
+
         // Now return the new registry, with all types remapped to known types
         const newRegistry = new AbiRegistry({
             name: this.name,
             constructorDefinition: newConstructor,
             endpoints: newEndpoints,
             customTypes: newCustomTypes,
+            events: newEvents
         });
 
         return newRegistry;
@@ -171,4 +195,16 @@ function mapEndpoint(endpoint: EndpointDefinition, mapper: TypeMapper): Endpoint
     );
 
     return new EndpointDefinition(endpoint.name, newInput, newOutput, endpoint.modifiers);
+}
+
+function mapEvent(event: EventDefinition, mapper: TypeMapper): EventDefinition {
+    const newInputs = event.inputs.map(
+        (e) => new EventTopicDefinition({
+            name: e.name,
+            type: mapper.mapType(e.type),
+            indexed: e.indexed
+        })
+    );
+
+    return new EventDefinition(event.identifier, newInputs);
 }

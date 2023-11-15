@@ -4,7 +4,7 @@ MultiversX SDK for JavaScript and TypeScript (written in TypeScript).
 
 ## Documentation
 
- - [Cookbook](https://docs.multiversx.com/sdk-and-tools/erdjs/erdjs-cookbook/)
+ - [Cookbook](https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook/)
 
 ## Distribution
 

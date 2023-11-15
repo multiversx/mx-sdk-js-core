@@ -7,7 +7,7 @@ import { Logger } from "../logger";
 import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "./interface";
 import { ReturnCode } from "./returnCode";
-import { EndpointDefinition, EndpointParameterDefinition, TypedValue } from "./typesystem";
+import { Type, TypedValue } from "./typesystem";
 
 enum WellKnownEvents {
     OnTransactionCompleted = "completedTxEvent",
@@ -23,8 +23,24 @@ interface IResultsParserOptions {
     argsSerializer: IArgsSerializer;
 }
 
+interface IParameterDefinition {
+    type: Type;
+}
+
+interface IEventInputDefinition {
+    name: string;
+    type: Type;
+    indexed: boolean;
+}
+
+interface ITransactionEvent {
+    readonly topics: { valueOf(): Uint8Array }[];
+    readonly dataPayload?: { valueOf(): Uint8Array };
+    readonly additionalData?: { valueOf(): Uint8Array }[];
+}
+
 interface IArgsSerializer {
-    buffersToValues(buffers: Buffer[], parameters: EndpointParameterDefinition[]): TypedValue[];
+    buffersToValues(buffers: Buffer[], parameters: IParameterDefinition[]): TypedValue[];
     stringToBuffers(joinedString: string): Buffer[];
 }
 
@@ -46,7 +62,7 @@ export class ResultsParser {
         this.argsSerializer = options.argsSerializer;
     }
 
-    parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: EndpointDefinition): TypedOutcomeBundle {
+    parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: { output: IParameterDefinition[] }): TypedOutcomeBundle {
         let parts = queryResponse.getReturnDataParts();
         let values = this.argsSerializer.buffersToValues(parts, endpoint.output);
         let returnCode = new ReturnCode(queryResponse.returnCode.toString());
@@ -72,7 +88,7 @@ export class ResultsParser {
         };
     }
 
-    parseOutcome(transaction: ITransactionOnNetwork, endpoint: EndpointDefinition): TypedOutcomeBundle {
+    parseOutcome(transaction: ITransactionOnNetwork, endpoint: { output: IParameterDefinition[] }): TypedOutcomeBundle {
         let untypedBundle = this.parseUntypedOutcome(transaction);
         let values = this.argsSerializer.buffersToValues(untypedBundle.values, endpoint.output);
 
@@ -314,5 +330,41 @@ export class ResultsParser {
 
         let returnCode = ReturnCode.fromBuffer(returnCodePart);
         return { returnCode, returnDataParts };
+    }
+
+    parseEvent(transactionEvent: ITransactionEvent, eventDefinition: { inputs: IEventInputDefinition[] }): any {
+        const result: any = {};
+
+        // We skip the first topic, because that's the event identifier.
+        const topics = transactionEvent.topics.map(topic => Buffer.from(topic.valueOf())).slice(1);
+        // < Sirius.
+        const legacyData = transactionEvent.dataPayload?.valueOf() || Buffer.from([]);
+        // >= Sirius.
+        const additionalData = transactionEvent.additionalData?.map(data => Buffer.from(data.valueOf())) || [];
+
+        // < Sirius.
+        if (additionalData.length == 0) {
+            if (legacyData.length > 0) {
+                additionalData.push(Buffer.from(legacyData));
+            }
+        }
+
+        // "Indexed" ABI "event.inputs" correspond to "event.topics[1:]":
+        const indexedInputs = eventDefinition.inputs.filter(input => input.indexed);
+        const decodedTopics = this.argsSerializer.buffersToValues(topics, indexedInputs);
+
+        for (let i = 0; i < indexedInputs.length; i++) {
+            result[indexedInputs[i].name] = decodedTopics[i].valueOf();
+        }
+
+        // "Non-indexed" ABI "event.inputs" correspond to "event.data":
+        const nonIndexedInputs = eventDefinition.inputs.filter(input => !input.indexed);
+        const decodedDataParts = this.argsSerializer.buffersToValues(additionalData, nonIndexedInputs);
+
+        for (let i = 0; i < nonIndexedInputs.length; i++) {
+            result[nonIndexedInputs[i].name] = decodedDataParts[i].valueOf();
+        }
+
+        return result;
     }
 }

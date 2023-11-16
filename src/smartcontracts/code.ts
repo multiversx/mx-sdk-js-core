@@ -1,3 +1,8 @@
+import { Hash } from "../hash";
+
+const createHasher = require('blake2b')
+const CODE_HASH_LENGTH = 32
+
 /**
  * Bytecode of a Smart Contract, as an abstraction.
  */
@@ -31,5 +36,13 @@ export class Code {
 
     valueOf(): Buffer {
         return Buffer.from(this.hex, "hex");
+    }
+
+    computeHash(): Hash {
+        const hash = createHasher(CODE_HASH_LENGTH)
+            .update(this.valueOf())
+            .digest('hex')
+
+        return new Hash(hash)
     }
 }

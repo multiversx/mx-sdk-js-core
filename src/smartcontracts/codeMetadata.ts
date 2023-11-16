@@ -23,6 +23,25 @@ export class CodeMetadata {
     }
 
     /**
+     * Creates a metadata object from a buffer.
+     */
+    static fromBuffer(buffer: Buffer): CodeMetadata {
+        if (buffer.length < 2) {
+            throw new Error('Buffer is too short.');
+        }
+
+        let byteZero = buffer[0];
+        let byteOne = buffer[1];
+
+        let upgradeable = (byteZero & ByteZero.Upgradeable) !== 0;
+        let readable = (byteZero & ByteZero.Readable) !== 0;
+        let payable = (byteOne & ByteOne.Payable) !== 0;
+        let payableBySc = (byteOne & ByteOne.PayableBySc) !== 0;
+
+        return new CodeMetadata(upgradeable, readable, payable, payableBySc);
+    }
+
+    /**
      * Adjust the metadata (the `upgradeable` attribute), when preparing the deployment transaction.
      */
     toggleUpgradeable(value: boolean) {

@@ -32,13 +32,23 @@ describe("CodeMetadata Class Tests", function() {
         assert.equal(buffer[1], ByteOne.Payable | ByteOne.PayableBySc);
     });
 
-    it("should create from buffer correctly", function() {
+    it("should create from buffer correctly when all flags are set", function() {
         const buffer = Buffer.from([ByteZero.Upgradeable | ByteZero.Readable, ByteOne.Payable | ByteOne.PayableBySc]);
         const metadata = CodeMetadata.fromBuffer(buffer);
 
         assert.isTrue(metadata.upgradeable);
         assert.isTrue(metadata.readable);
         assert.isTrue(metadata.payable);
+        assert.isTrue(metadata.payableBySc);
+    });
+
+    it.only("should create from buffer correctly when some flags are set", function() {
+        const buffer = Buffer.from([ByteZero.Upgradeable, ByteOne.PayableBySc]);
+        const metadata = CodeMetadata.fromBuffer(buffer);
+
+        assert.isTrue(metadata.upgradeable);
+        assert.isFalse(metadata.readable);
+        assert.isFalse(metadata.payable);
         assert.isTrue(metadata.payableBySc);
     });
 

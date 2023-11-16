@@ -16,6 +16,13 @@ export class Code {
     }
 
     /**
+     * Creates a Code object from a hex-encoded string.
+     */
+    static fromHex(hex: string): Code {
+        return new Code(hex)
+    }
+
+    /**
      * Returns the bytecode as a hex-encoded string.
      */
     toString(): string {

@@ -9,7 +9,7 @@ export class CodeMetadata {
 
     /**
      * Creates a metadata object. By default, set the `upgradeable` attribute, and uset all others.
-     * 
+     *
      * @param upgradeable Whether the contract is upgradeable
      * @param readable Whether other contracts can read this contract's data (without calling one of its pure functions)
      * @param payable Whether the contract is payable
@@ -30,13 +30,13 @@ export class CodeMetadata {
             throw new Error('Buffer is too short.');
         }
 
-        let byteZero = buffer[0];
-        let byteOne = buffer[1];
+        const byteZero = buffer[0];
+        const byteOne = buffer[1];
 
-        let upgradeable = (byteZero & ByteZero.Upgradeable) !== 0;
-        let readable = (byteZero & ByteZero.Readable) !== 0;
-        let payable = (byteOne & ByteOne.Payable) !== 0;
-        let payableBySc = (byteOne & ByteOne.PayableBySc) !== 0;
+        const upgradeable = (byteZero & ByteZero.Upgradeable) !== 0;
+        const readable = (byteZero & ByteZero.Readable) !== 0;
+        const payable = (byteOne & ByteOne.Payable) !== 0;
+        const payableBySc = (byteOne & ByteOne.PayableBySc) !== 0;
 
         return new CodeMetadata(upgradeable, readable, payable, payableBySc);
     }
@@ -68,7 +68,7 @@ export class CodeMetadata {
     togglePayableBySc(value: boolean) {
         this.payableBySc = value;
     }
-    
+
     /**
      * Converts the metadata to the protocol-friendly representation.
      */

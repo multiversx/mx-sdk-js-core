@@ -2,10 +2,10 @@
  * The metadata of a Smart Contract, as an abstraction.
  */
 export class CodeMetadata {
-    private upgradeable: boolean;
-    private readable: boolean;
-    private payable: boolean;
-    private payableBySc: boolean;
+    public upgradeable: boolean;
+    public readable: boolean;
+    public payable: boolean;
+    public payableBySc: boolean;
 
     /**
      * Creates a metadata object. By default, set the `upgradeable` attribute, and uset all others.

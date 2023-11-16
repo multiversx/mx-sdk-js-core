@@ -119,13 +119,13 @@ export class CodeMetadata {
     }
 }
 
-enum ByteZero {
+export enum ByteZero {
     Upgradeable = 1,
     Reserved2 = 2,
     Readable = 4
 }
 
-enum ByteOne {
+export enum ByteOne {
     Reserved1 = 1,
     Payable = 2,
     PayableBySc = 4

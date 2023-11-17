@@ -38,11 +38,11 @@ export class Code {
         return Buffer.from(this.hex, "hex");
     }
 
-    computeHash(): Hash {
+    computeHash(): Buffer {
         const hash = createHasher(CODE_HASH_LENGTH)
             .update(this.valueOf())
-            .digest('hex')
+            .digest();
 
-        return new Hash(hash)
+        return Buffer.from(hash)
     }
 }

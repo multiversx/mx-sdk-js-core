@@ -7,6 +7,18 @@ export class CodeMetadata {
     public payable: boolean;
     public payableBySc: boolean;
 
+    static ByteZero = {
+        Upgradeable: 1,
+        Reserved2: 2,
+        Readable: 4
+    };
+
+    static ByteOne = {
+        Reserved1: 1,
+        Payable: 2,
+        PayableBySc: 4
+    };
+
     /**
      * Creates a metadata object. By default, set the `upgradeable` attribute, and uset all others.
      *
@@ -33,10 +45,10 @@ export class CodeMetadata {
         const byteZero = buffer[0];
         const byteOne = buffer[1];
 
-        const upgradeable = (byteZero & ByteZero.Upgradeable) !== 0;
-        const readable = (byteZero & ByteZero.Readable) !== 0;
-        const payable = (byteOne & ByteOne.Payable) !== 0;
-        const payableBySc = (byteOne & ByteOne.PayableBySc) !== 0;
+        const upgradeable = (byteZero & CodeMetadata.ByteZero.Upgradeable) !== 0;
+        const readable = (byteZero & CodeMetadata.ByteZero.Readable) !== 0;
+        const payable = (byteOne & CodeMetadata.ByteOne.Payable) !== 0;
+        const payableBySc = (byteOne & CodeMetadata.ByteOne.PayableBySc) !== 0;
 
         return new CodeMetadata(upgradeable, readable, payable, payableBySc);
     }
@@ -77,16 +89,16 @@ export class CodeMetadata {
         let byteOne = 0;
 
         if (this.upgradeable) {
-            byteZero |= ByteZero.Upgradeable;
+            byteZero |= CodeMetadata.ByteZero.Upgradeable;
         }
         if (this.readable) {
-            byteZero |= ByteZero.Readable;
+            byteZero |= CodeMetadata.ByteZero.Readable;
         }
         if (this.payable) {
-            byteOne |= ByteOne.Payable;
+            byteOne |= CodeMetadata.ByteOne.Payable;
         }
         if (this.payableBySc) {
-            byteOne |= ByteOne.PayableBySc;
+            byteOne |= CodeMetadata.ByteOne.PayableBySc;
         }
 
         return Buffer.from([byteZero, byteOne]);
@@ -117,16 +129,4 @@ export class CodeMetadata {
             this.payable == other.payable &&
             this.payableBySc == other.payableBySc;
     }
-}
-
-export enum ByteZero {
-    Upgradeable = 1,
-    Reserved2 = 2,
-    Readable = 4
-}
-
-export enum ByteOne {
-    Reserved1 = 1,
-    Payable = 2,
-    PayableBySc = 4
 }

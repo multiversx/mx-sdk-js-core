@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { CodeMetadata, ByteZero, ByteOne } from "./codeMetadata";
+import { CodeMetadata } from "./codeMetadata";
 
 describe("CodeMetadata Class Tests", function() {
     it("should create a default CodeMetadata instance", function() {
@@ -28,12 +28,15 @@ describe("CodeMetadata Class Tests", function() {
         const buffer = metadata.toBuffer();
 
         assert.equal(buffer.length, 2);
-        assert.equal(buffer[0], ByteZero.Upgradeable | ByteZero.Readable);
-        assert.equal(buffer[1], ByteOne.Payable | ByteOne.PayableBySc);
+        assert.equal(buffer[0], CodeMetadata.ByteZero.Upgradeable | CodeMetadata.ByteZero.Readable);
+        assert.equal(buffer[1], CodeMetadata.ByteOne.Payable | CodeMetadata.ByteOne.PayableBySc);
     });
 
     it("should create from buffer correctly when all flags are set", function() {
-        const buffer = Buffer.from([ByteZero.Upgradeable | ByteZero.Readable, ByteOne.Payable | ByteOne.PayableBySc]);
+        const buffer = Buffer.from([
+            CodeMetadata.ByteZero.Upgradeable | CodeMetadata.ByteZero.Readable,
+            CodeMetadata.ByteOne.Payable | CodeMetadata.ByteOne.PayableBySc,
+        ]);
         const metadata = CodeMetadata.fromBuffer(buffer);
 
         assert.isTrue(metadata.upgradeable);
@@ -43,7 +46,7 @@ describe("CodeMetadata Class Tests", function() {
     });
 
     it.only("should create from buffer correctly when some flags are set", function() {
-        const buffer = Buffer.from([ByteZero.Upgradeable, ByteOne.PayableBySc]);
+        const buffer = Buffer.from([CodeMetadata.ByteZero.Upgradeable, CodeMetadata.ByteOne.PayableBySc]);
         const metadata = CodeMetadata.fromBuffer(buffer);
 
         assert.isTrue(metadata.upgradeable);
@@ -53,7 +56,7 @@ describe("CodeMetadata Class Tests", function() {
     });
 
     it("should handle buffer too short error", function() {
-        const buffer = Buffer.from([ByteZero.Upgradeable]);
+        const buffer = Buffer.from([CodeMetadata.ByteZero.Upgradeable]);
 
         assert.throws(() => {
             CodeMetadata.fromBuffer(buffer);

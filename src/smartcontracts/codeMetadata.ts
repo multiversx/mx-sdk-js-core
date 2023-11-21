@@ -2,14 +2,26 @@
  * The metadata of a Smart Contract, as an abstraction.
  */
 export class CodeMetadata {
-    private upgradeable: boolean;
-    private readable: boolean;
-    private payable: boolean;
-    private payableBySc: boolean;
+    public upgradeable: boolean;
+    public readable: boolean;
+    public payable: boolean;
+    public payableBySc: boolean;
+
+    static ByteZero = {
+        Upgradeable: 1,
+        Reserved2: 2,
+        Readable: 4
+    };
+
+    static ByteOne = {
+        Reserved1: 1,
+        Payable: 2,
+        PayableBySc: 4
+    };
 
     /**
      * Creates a metadata object. By default, set the `upgradeable` attribute, and uset all others.
-     * 
+     *
      * @param upgradeable Whether the contract is upgradeable
      * @param readable Whether other contracts can read this contract's data (without calling one of its pure functions)
      * @param payable Whether the contract is payable
@@ -20,6 +32,25 @@ export class CodeMetadata {
         this.readable = readable;
         this.payable = payable;
         this.payableBySc = payableBySc
+    }
+
+    /**
+     * Creates a metadata object from a buffer.
+     */
+    static fromBuffer(buffer: Buffer): CodeMetadata {
+        if (buffer.length < 2) {
+            throw new Error('Buffer is too short.');
+        }
+
+        const byteZero = buffer[0];
+        const byteOne = buffer[1];
+
+        const upgradeable = (byteZero & CodeMetadata.ByteZero.Upgradeable) !== 0;
+        const readable = (byteZero & CodeMetadata.ByteZero.Readable) !== 0;
+        const payable = (byteOne & CodeMetadata.ByteOne.Payable) !== 0;
+        const payableBySc = (byteOne & CodeMetadata.ByteOne.PayableBySc) !== 0;
+
+        return new CodeMetadata(upgradeable, readable, payable, payableBySc);
     }
 
     /**
@@ -49,7 +80,7 @@ export class CodeMetadata {
     togglePayableBySc(value: boolean) {
         this.payableBySc = value;
     }
-    
+
     /**
      * Converts the metadata to the protocol-friendly representation.
      */
@@ -58,16 +89,16 @@ export class CodeMetadata {
         let byteOne = 0;
 
         if (this.upgradeable) {
-            byteZero |= ByteZero.Upgradeable;
+            byteZero |= CodeMetadata.ByteZero.Upgradeable;
         }
         if (this.readable) {
-            byteZero |= ByteZero.Readable;
+            byteZero |= CodeMetadata.ByteZero.Readable;
         }
         if (this.payable) {
-            byteOne |= ByteOne.Payable;
+            byteOne |= CodeMetadata.ByteOne.Payable;
         }
         if (this.payableBySc) {
-            byteOne |= ByteOne.PayableBySc;
+            byteOne |= CodeMetadata.ByteOne.PayableBySc;
         }
 
         return Buffer.from([byteZero, byteOne]);
@@ -98,16 +129,4 @@ export class CodeMetadata {
             this.payable == other.payable &&
             this.payableBySc == other.payableBySc;
     }
-}
-
-enum ByteZero {
-    Upgradeable = 1,
-    Reserved2 = 2,
-    Readable = 4
-}
-
-enum ByteOne {
-    Reserved1 = 1,
-    Payable = 2,
-    PayableBySc = 4
 }

@@ -45,7 +45,7 @@ describe("CodeMetadata Class Tests", function() {
         assert.isTrue(metadata.payableBySc);
     });
 
-    it.only("should create from buffer correctly when some flags are set", function() {
+    it("should create from buffer correctly when some flags are set", function() {
         const buffer = Buffer.from([CodeMetadata.ByteZero.Upgradeable, CodeMetadata.ByteOne.PayableBySc]);
         const metadata = CodeMetadata.fromBuffer(buffer);
 

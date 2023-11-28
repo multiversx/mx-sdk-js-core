@@ -1,6 +1,6 @@
 {
   "name": "@multiversx/sdk-core",
-  "version": "13.0.0-alpha.1",
+  "version": "12.15.0",
   "description": "MultiversX SDK for JavaScript and TypeScript",
   "main": "out/index.js",
   "types": "out/index.d.js",
@@ -35,7 +35,7 @@
     "protobufjs": "7.2.4"
   },
   "devDependencies": {
-    "@multiversx/sdk-network-providers": "2.0.0",
+    "@multiversx/sdk-network-providers": "2.2.0",
     "@multiversx/sdk-wallet": "3.0.0",
     "@multiversx/sdk-wallet-next": "npm:@multiversx/sdk-wallet@4.0.0",
     "@types/assert": "1.4.6",
@@ -43,7 +43,7 @@
     "@types/mocha": "9.1.0",
     "@types/node": "13.13.2",
     "assert": "2.0.0",
-    "axios": "0.24.0",
+    "axios": "1.6.2",
     "browserify": "17.0.0",
     "chai": "4.2.0",
     "esmify": "2.1.1",

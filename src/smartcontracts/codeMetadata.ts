@@ -6,6 +6,7 @@ export class CodeMetadata {
     public readable: boolean;
     public payable: boolean;
     public payableBySc: boolean;
+    private static readonly codeMetadataLength = 2;
 
     static ByteZero = {
         Upgradeable: 1,
@@ -35,26 +36,14 @@ export class CodeMetadata {
     }
 
     static fromBytes(bytes: Uint8Array): CodeMetadata {
-        if (bytes.length !== this.codeMetadataLength) {
-            return new CodeMetadata();
-        }
-
-        const byteZero = bytes[0];
-        const byteOne = bytes[1];
-
-        const upgradeable = (byteZero & ByteZero.Upgradeable) !== 0;
-        const readable = (byteZero & ByteZero.Readable) !== 0;
-        const payable = (byteOne & ByteOne.Payable) !== 0;
-        const payableBySc = (byteOne & ByteOne.PayableBySc) !== 0;
-
-        return new CodeMetadata(upgradeable, readable, payable, payableBySc);
+        return CodeMetadata.fromBuffer(Buffer.from(bytes));
     }
 
     /**
      * Creates a metadata object from a buffer.
      */
     static fromBuffer(buffer: Buffer): CodeMetadata {
-        if (buffer.length < 2) {
+        if (buffer.length < this.codeMetadataLength) {
             throw new Error('Buffer is too short.');
         }
 

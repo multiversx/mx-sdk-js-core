@@ -1,3 +1,5 @@
+import { assert } from "chai";
+import { CodeMetadata } from "./codeMetadata";
 
 describe("CodeMetadata Class Tests", function () {
     it("should create a default CodeMetadata instance", function () {

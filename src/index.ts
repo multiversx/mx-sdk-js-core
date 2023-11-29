@@ -15,6 +15,7 @@ export * from "./signableMessage";
 export * from "./smartcontracts";
 export * from "./tokenOperations";
 export * from "./tokenTransfer";
+export * from "./tokens";
 export * from "./transaction";
 export * from "./transactionPayload";
 export * from "./transactionWatcher";

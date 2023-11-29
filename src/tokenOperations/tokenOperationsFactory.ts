@@ -48,16 +48,6 @@ interface IIssueFungibleArgs extends IBaseArgs {
     canChangeOwner: boolean;
     canUpgrade: boolean;
     canAddSpecialRoles: boolean;
-
-    /**
-     * @deprecated (not used anymore)
-     */
-    canMint?: boolean;
-
-    /**
-     * @deprecated (not used anymore)
-     */
-    canBurn?: boolean;
 }
 
 interface IIssueSemiFungibleArgs extends IBaseArgs {

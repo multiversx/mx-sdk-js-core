@@ -334,4 +334,16 @@ describe("test user wallets", () => {
         assert.equal(UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 1).getAddress().bech32(), "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         assert.equal(UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 2).getAddress().bech32(), "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
     });
+
+    it.only("should throw error when decrypting secret key with keystore-mnemonic file", async function () {
+        const userWallet = UserWallet.fromMnemonic({
+            mnemonic: DummyMnemonic,
+            password: ``
+        });
+        const keystoreMnemonic = userWallet.toJSON();
+
+        assert.throws(() => {
+            UserWallet.decryptSecretKey(keystoreMnemonic, ``)
+        }, `Expected kind to be secretKey, but it was mnemonic.`);
+    });
 });

@@ -346,6 +346,6 @@ describe("test user wallets", () => {
 
         assert.throws(() => {
             UserWallet.decryptSecretKey(keystoreMnemonic, ``)
-        }, `Expected kind to be secretKey, but it was mnemonic.`);
+        }, `Expected keystore kind to be secretKey, but it was mnemonic.`);
     });
 });

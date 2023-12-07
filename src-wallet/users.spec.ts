@@ -327,11 +327,25 @@ describe("test user wallets", () => {
     it("should create UserSigner from wallet", async function () {
         const keyFileObjectWithoutKind = await loadTestKeystore("withoutKind.json");
         const keyFileObjectWithMnemonic = await loadTestKeystore("withDummyMnemonic.json");
+        const keyFileObjectWithSecretKey = await loadTestKeystore("withDummySecretKey.json");
 
         assert.equal(UserSigner.fromWallet(keyFileObjectWithoutKind, password).getAddress().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(UserSigner.fromWallet(keyFileObjectWithMnemonic, password).getAddress().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(UserSigner.fromWallet(keyFileObjectWithSecretKey, password).getAddress().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 0).getAddress().bech32(), "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 1).getAddress().bech32(), "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         assert.equal(UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 2).getAddress().bech32(), "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
+    });
+
+    it("should throw error when decrypting secret key with keystore-mnemonic file", async function () {
+        const userWallet = UserWallet.fromMnemonic({
+            mnemonic: DummyMnemonic,
+            password: ``
+        });
+        const keystoreMnemonic = userWallet.toJSON();
+
+        assert.throws(() => {
+            UserWallet.decryptSecretKey(keystoreMnemonic, ``)
+        }, `Expected keystore kind to be secretKey, but it was mnemonic.`);
     });
 });

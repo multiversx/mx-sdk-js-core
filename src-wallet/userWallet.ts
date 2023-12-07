@@ -95,7 +95,11 @@ export class UserWallet {
      * From an encrypted keyfile, given the password, loads the secret key and the public key.
      */
     static decryptSecretKey(keyFileObject: any, password: string): UserSecretKey {
-        // Here, we do not check the "kind" field. Older keystore files (holding only secret keys) do not have this field.
+        // Here, we check the "kind" field only for files that have it. Older keystore files (holding only secret keys) do not have this field.
+        const kind = keyFileObject.kind;
+        if (kind && kind !== UserWalletKind.SecretKey){
+            throw new Err(`Expected keystore kind to be ${UserWalletKind.SecretKey}, but it was ${kind}.`);
+        }
 
         const encryptedData = UserWallet.edFromJSON(keyFileObject);
 
@@ -111,7 +115,7 @@ export class UserWallet {
 
     static decryptMnemonic(keyFileObject: any, password: string): Mnemonic {
         if (keyFileObject.kind != UserWalletKind.Mnemonic) {
-            throw new Err(`Expected kind to be ${UserWalletKind.Mnemonic}, but it was ${keyFileObject.kind}.`);
+            throw new Err(`Expected keystore kind to be ${UserWalletKind.Mnemonic}, but it was ${keyFileObject.kind}.`);
         }
 
         const encryptedData = UserWallet.edFromJSON(keyFileObject);

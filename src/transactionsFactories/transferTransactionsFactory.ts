@@ -22,7 +22,7 @@ interface TokenComputer {
     isFungible(token: Token): boolean;
 }
 
-export class TransferTransactionsFactory {
+export class NextTransferTransactionsFactory {
     private readonly config: IConfig;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
     private readonly tokenComputer: TokenComputer;

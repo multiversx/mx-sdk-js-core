@@ -63,8 +63,7 @@ interface IIssueSemiFungibleArgs extends IBaseArgs {
     canAddSpecialRoles: boolean;
 }
 
-interface IIssueNonFungibleArgs extends IIssueSemiFungibleArgs {
-}
+interface IIssueNonFungibleArgs extends IIssueSemiFungibleArgs {}
 
 interface IRegisterMetaESDT extends IIssueSemiFungibleArgs {
     numDecimals: number;
@@ -146,14 +145,14 @@ interface ILocalMintArgs extends IBaseArgs {
     manager: IAddress;
     user: IAddress;
     tokenIdentifier: string;
-    supplyToMint: BigNumber.Value
+    supplyToMint: BigNumber.Value;
 }
 
 interface ILocalBurnArgs extends IBaseArgs {
     manager: IAddress;
     user: IAddress;
     tokenIdentifier: string;
-    supplyToBurn: BigNumber.Value
+    supplyToBurn: BigNumber.Value;
 }
 
 interface IUpdateAttributesArgs extends IBaseArgs {
@@ -167,16 +166,19 @@ interface IAddQuantityArgs extends IBaseArgs {
     manager: IAddress;
     tokenIdentifier: string;
     tokenNonce: BigNumber.Value;
-    quantityToAdd: BigNumber.Value
+    quantityToAdd: BigNumber.Value;
 }
 
 interface IBurnQuantityArgs extends IBaseArgs {
     manager: IAddress;
     tokenIdentifier: string;
     tokenNonce: BigNumber.Value;
-    quantityToBurn: BigNumber.Value
+    quantityToBurn: BigNumber.Value;
 }
 
+/**
+ * @deprecated Use {@link TokenManagementTransactionsFactory} instead.
+ */
 export class TokenOperationsFactory {
     private readonly config: IConfig;
     private readonly trueAsHex;
@@ -211,7 +213,7 @@ export class TokenOperationsFactory {
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitIssue,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -248,7 +250,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitIssue,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -276,7 +278,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitIssue,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -305,7 +307,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitIssue,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -317,7 +319,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             utf8ToHex(args.tokenName),
             utf8ToHex(args.tokenTicker),
             utf8ToHex(args.tokenType),
-            bigIntToHex(args.numDecimals)
+            bigIntToHex(args.numDecimals),
         ];
 
         return this.createTransaction({
@@ -328,15 +330,12 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitIssue,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
     setBurnRoleGlobally(args: IToggleBurnRoleGloballyArgs): Transaction {
-        const parts = [
-            "setBurnRoleGlobally",
-            utf8ToHex(args.tokenIdentifier)
-        ];
+        const parts = ["setBurnRoleGlobally", utf8ToHex(args.tokenIdentifier)];
 
         return this.createTransaction({
             sender: args.manager,
@@ -345,15 +344,12 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitToggleBurnRoleGlobally,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
     unsetBurnRoleGlobally(args: IToggleBurnRoleGloballyArgs): Transaction {
-        const parts = [
-            "unsetBurnRoleGlobally",
-            utf8ToHex(args.tokenIdentifier)
-        ];
+        const parts = ["unsetBurnRoleGlobally", utf8ToHex(args.tokenIdentifier)];
 
         return this.createTransaction({
             sender: args.manager,
@@ -362,7 +358,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitToggleBurnRoleGlobally,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -382,7 +378,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitSetSpecialRole,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -404,7 +400,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitSetSpecialRole,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -431,7 +427,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitSetSpecialRole,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -458,15 +454,12 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTNFTCreate.valueOf() + storageGasLimit.valueOf(),
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
     pause(args: IPausingArgs): Transaction {
-        const parts = [
-            "pause",
-            utf8ToHex(args.tokenIdentifier)
-        ];
+        const parts = ["pause", utf8ToHex(args.tokenIdentifier)];
 
         return this.createTransaction({
             sender: args.manager,
@@ -475,15 +468,12 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitPausing,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
     unpause(args: IPausingArgs): Transaction {
-        const parts = [
-            "unPause",
-            utf8ToHex(args.tokenIdentifier)
-        ];
+        const parts = ["unPause", utf8ToHex(args.tokenIdentifier)];
 
         return this.createTransaction({
             sender: args.manager,
@@ -492,16 +482,12 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitPausing,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
     freeze(args: IFreezingArgs): Transaction {
-        const parts = [
-            "freeze",
-            utf8ToHex(args.tokenIdentifier),
-            addressToHex(args.user)
-        ];
+        const parts = ["freeze", utf8ToHex(args.tokenIdentifier), addressToHex(args.user)];
 
         return this.createTransaction({
             sender: args.manager,
@@ -510,7 +496,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitFreezing,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -528,7 +514,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitFreezing,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -546,7 +532,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitWiping,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -564,16 +550,12 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTLocalMint,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
     localBurn(args: ILocalBurnArgs): Transaction {
-        const parts = [
-            "ESDTLocalBurn",
-            utf8ToHex(args.tokenIdentifier),
-            bigIntToHex(args.supplyToBurn),
-        ];
+        const parts = ["ESDTLocalBurn", utf8ToHex(args.tokenIdentifier), bigIntToHex(args.supplyToBurn)];
 
         return this.createTransaction({
             sender: args.manager,
@@ -582,7 +564,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTLocalBurn,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -601,7 +583,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTNFTUpdateAttributes,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -610,7 +592,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             "ESDTNFTAddQuantity",
             utf8ToHex(args.tokenIdentifier),
             bigIntToHex(args.tokenNonce),
-            bigIntToHex(args.quantityToAdd)
+            bigIntToHex(args.quantityToAdd),
         ];
 
         return this.createTransaction({
@@ -620,7 +602,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTNFTAddQuantity,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
@@ -629,7 +611,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             "ESDTNFTBurn",
             utf8ToHex(args.tokenIdentifier),
             bigIntToHex(args.tokenNonce),
-            bigIntToHex(args.quantityToBurn)
+            bigIntToHex(args.quantityToBurn),
         ];
 
         return this.createTransaction({
@@ -639,11 +621,20 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             gasPrice: args.gasPrice,
             gasLimitHint: args.gasLimit,
             executionGasLimit: this.config.gasLimitESDTNFTBurn,
-            dataParts: parts
+            dataParts: parts,
         });
     }
 
-    private createTransaction({ sender, receiver, nonce, value, gasPrice, gasLimitHint, executionGasLimit, dataParts }: {
+    private createTransaction({
+        sender,
+        receiver,
+        nonce,
+        value,
+        gasPrice,
+        gasLimitHint,
+        executionGasLimit,
+        dataParts,
+    }: {
         sender: IAddress;
         receiver: IAddress;
         nonce?: INonce;
@@ -668,7 +659,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             value: value || 0,
             data: payload,
             version: version,
-            options: options
+            options: options,
         });
     }
 

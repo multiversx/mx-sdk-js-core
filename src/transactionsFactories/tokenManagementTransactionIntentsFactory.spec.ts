@@ -42,13 +42,12 @@ describe("test token management transactions factory", () => {
             canFreeze: true,
             canWipe: true,
             canPause: true,
-            canTransferNFTCreateRole: false,
             canChangeOwner: true,
-            canUpgrade: true,
-            canAddSpecialRoles: true
+            canUpgrade: false,
+            canAddSpecialRoles: false
         });
 
-        assert.deepEqual(draft.data, Buffer.from("issue@4652414e4b@4652414e4b@64@@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565"));
+        assert.deepEqual(draft.data, Buffer.from("issue@4652414e4b@4652414e4b@64@@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@66616c7365@63616e4164645370656369616c526f6c6573@66616c7365"));
         assert.equal(draft.sender, frank.address.toString());
         assert.equal(draft.receiver, ESDT_CONTRACT_ADDRESS);
         assert.deepEqual(draft.value, config.issueCost);
@@ -64,11 +63,11 @@ describe("test token management transactions factory", () => {
             canPause: true,
             canTransferNFTCreateRole: true,
             canChangeOwner: true,
-            canUpgrade: true,
-            canAddSpecialRoles: true
+            canUpgrade: false,
+            canAddSpecialRoles: false
         });
 
-        assert.deepEqual(draft.data, Buffer.from("issueSemiFungible@4652414e4b@4652414e4b@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565"));
+        assert.deepEqual(draft.data, Buffer.from("issueSemiFungible@4652414e4b@4652414e4b@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@66616c7365@63616e4164645370656369616c526f6c6573@66616c7365"));
         assert.equal(draft.sender, frank.address.toString());
         assert.equal(draft.receiver, ESDT_CONTRACT_ADDRESS);
         assert.deepEqual(draft.value, config.issueCost);
@@ -84,11 +83,11 @@ describe("test token management transactions factory", () => {
             canPause: true,
             canTransferNFTCreateRole: true,
             canChangeOwner: true,
-            canUpgrade: true,
-            canAddSpecialRoles: true
+            canUpgrade: false,
+            canAddSpecialRoles: false
         });
 
-        assert.deepEqual(draft.data, Buffer.from("issueNonFungible@4652414e4b@4652414e4b@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565"));
+        assert.deepEqual(draft.data, Buffer.from("issueNonFungible@4652414e4b@4652414e4b@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@66616c7365@63616e4164645370656369616c526f6c6573@66616c7365"));
         assert.equal(draft.sender, frank.address.toString());
         assert.equal(draft.receiver, ESDT_CONTRACT_ADDRESS);
         assert.deepEqual(draft.value, config.issueCost);
@@ -105,11 +104,11 @@ describe("test token management transactions factory", () => {
             canPause: true,
             canTransferNFTCreateRole: true,
             canChangeOwner: true,
-            canUpgrade: true,
-            canAddSpecialRoles: true
+            canUpgrade: false,
+            canAddSpecialRoles: false
         });
 
-        assert.deepEqual(draft.data, Buffer.from("registerMetaESDT@4652414e4b@4652414e4b@0a@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565"));
+        assert.deepEqual(draft.data, Buffer.from("registerMetaESDT@4652414e4b@4652414e4b@0a@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@66616c7365@63616e4164645370656369616c526f6c6573@66616c7365"));
         assert.equal(draft.sender, frank.address.toString());
         assert.equal(draft.receiver, ESDT_CONTRACT_ADDRESS);
         assert.deepEqual(draft.value, config.issueCost);

@@ -8,23 +8,23 @@ import { Address } from "../address";
 import { Logger } from "../logger";
 
 interface Config {
-    chainID: string
-    minGasLimit: BigNumber.Value
-    gasLimitPerByte: BigNumber.Value
-    gasLimitIssue: BigNumber.Value
-    gasLimitToggleBurnRoleGlobally: BigNumber.Value
-    gasLimitEsdtLocalMint: BigNumber.Value
-    gasLimitEsdtLocalBurn: BigNumber.Value
-    gasLimitSetSpecialRole: BigNumber.Value
-    gasLimitPausing: BigNumber.Value
-    gasLimitFreezing: BigNumber.Value
-    gasLimitWiping: BigNumber.Value
-    gasLimitEsdtNftCreate: BigNumber.Value
-    gasLimitEsdtNftUpdateAttributes: BigNumber.Value
-    gasLimitEsdtNftAddQuantity: BigNumber.Value
-    gasLimitEsdtNftBurn: BigNumber.Value
-    gasLimitStorePerByte: BigNumber.Value
-    issueCost: BigNumber.Value
+    chainID: string;
+    minGasLimit: BigNumber.Value;
+    gasLimitPerByte: BigNumber.Value;
+    gasLimitIssue: BigNumber.Value;
+    gasLimitToggleBurnRoleGlobally: BigNumber.Value;
+    gasLimitEsdtLocalMint: BigNumber.Value;
+    gasLimitEsdtLocalBurn: BigNumber.Value;
+    gasLimitSetSpecialRole: BigNumber.Value;
+    gasLimitPausing: BigNumber.Value;
+    gasLimitFreezing: BigNumber.Value;
+    gasLimitWiping: BigNumber.Value;
+    gasLimitEsdtNftCreate: BigNumber.Value;
+    gasLimitEsdtNftUpdateAttributes: BigNumber.Value;
+    gasLimitEsdtNftAddQuantity: BigNumber.Value;
+    gasLimitEsdtNftBurn: BigNumber.Value;
+    gasLimitStorePerByte: BigNumber.Value;
+    issueCost: BigNumber.Value;
 }
 
 type RegisterAndSetAllRolesTokenType = "NFT" | "SFT" | "META" | "FNG";
@@ -32,25 +32,26 @@ type RegisterAndSetAllRolesTokenType = "NFT" | "SFT" | "META" | "FNG";
 export class TokenManagementTransactionsFactory {
     private readonly config: Config;
     private readonly trueAsHex: string;
+    private readonly falseAsHex: string;
 
     constructor(config: Config) {
         this.config = config;
         this.trueAsHex = utf8ToHex("true");
+        this.falseAsHex = utf8ToHex("false");
     }
 
     createTransactionForIssuingFungible(options: {
-        sender: IAddress,
-        tokenName: string,
-        tokenTicker: string,
-        initialSupply: BigNumber.Value,
-        numDecimals: BigNumber.Value,
-        canFreeze: boolean,
-        canWipe: boolean,
-        canPause: boolean,
-        canTransferNFTCreateRole: boolean,
-        canChangeOwner: boolean,
-        canUpgrade: boolean,
-        canAddSpecialRoles: boolean
+        sender: IAddress;
+        tokenName: string;
+        tokenTicker: string;
+        initialSupply: BigNumber.Value;
+        numDecimals: BigNumber.Value;
+        canFreeze: boolean;
+        canWipe: boolean;
+        canPause: boolean;
+        canChangeOwner: boolean;
+        canUpgrade: boolean;
+        canAddSpecialRoles: boolean;
     }): DraftTransaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
@@ -60,13 +61,18 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex(options.tokenTicker),
             bigIntToHex(options.initialSupply),
             bigIntToHex(options.numDecimals),
-            ...(options.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
-            ...(options.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
-            ...(options.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
-            ...(options.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
-            ...(options.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...[utf8ToHex("canUpgrade"), boolToHex(options.canUpgrade)],
-            ...[utf8ToHex("canAddSpecialRoles"), boolToHex(options.canAddSpecialRoles)]
+            utf8ToHex("canFreeze"),
+            options.canFreeze ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canWipe"),
+            options.canWipe ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canPause"),
+            options.canPause ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canChangeOwner"),
+            options.canChangeOwner ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canUpgrade"),
+            options.canUpgrade ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canAddSpecialRoles"),
+            options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return new DraftTransactionBuilder({
@@ -76,7 +82,7 @@ export class TokenManagementTransactionsFactory {
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
-            amount: this.config.issueCost
+            amount: this.config.issueCost,
         }).build();
     }
 
@@ -98,13 +104,20 @@ export class TokenManagementTransactionsFactory {
             "issueSemiFungible",
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
-            ...(options.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
-            ...(options.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
-            ...(options.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
-            ...(options.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
-            ...(options.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...[utf8ToHex("canUpgrade"), boolToHex(options.canUpgrade)],
-            ...[utf8ToHex("canAddSpecialRoles"), boolToHex(options.canAddSpecialRoles)]
+            utf8ToHex("canFreeze"),
+            options.canFreeze ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canWipe"),
+            options.canWipe ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canPause"),
+            options.canPause ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canTransferNFTCreateRole"),
+            options.canTransferNFTCreateRole ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canChangeOwner"),
+            options.canChangeOwner ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canUpgrade"),
+            options.canUpgrade ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canAddSpecialRoles"),
+            options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return new DraftTransactionBuilder({
@@ -114,7 +127,7 @@ export class TokenManagementTransactionsFactory {
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
-            amount: this.config.issueCost
+            amount: this.config.issueCost,
         }).build();
     }
 
@@ -136,13 +149,20 @@ export class TokenManagementTransactionsFactory {
             "issueNonFungible",
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
-            ...(options.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
-            ...(options.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
-            ...(options.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
-            ...(options.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
-            ...(options.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...[utf8ToHex("canUpgrade"), boolToHex(options.canUpgrade)],
-            ...[utf8ToHex("canAddSpecialRoles"), boolToHex(options.canAddSpecialRoles)]
+            utf8ToHex("canFreeze"),
+            options.canFreeze ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canWipe"),
+            options.canWipe ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canPause"),
+            options.canPause ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canTransferNFTCreateRole"),
+            options.canTransferNFTCreateRole ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canChangeOwner"),
+            options.canChangeOwner ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canUpgrade"),
+            options.canUpgrade ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canAddSpecialRoles"),
+            options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return new DraftTransactionBuilder({
@@ -152,7 +172,7 @@ export class TokenManagementTransactionsFactory {
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
-            amount: this.config.issueCost
+            amount: this.config.issueCost,
         }).build();
     }
 
@@ -160,7 +180,7 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
-        numDecimals: BigNumber.Value,
+        numDecimals: BigNumber.Value;
         canFreeze: boolean;
         canWipe: boolean;
         canPause: boolean;
@@ -176,13 +196,20 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
             bigIntToHex(options.numDecimals),
-            ...(options.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
-            ...(options.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
-            ...(options.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
-            ...(options.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
-            ...(options.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...(options.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
-            ...(options.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
+            utf8ToHex("canFreeze"),
+            options.canFreeze ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canWipe"),
+            options.canWipe ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canPause"),
+            options.canPause ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canTransferNFTCreateRole"),
+            options.canTransferNFTCreateRole ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canChangeOwner"),
+            options.canChangeOwner ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canUpgrade"),
+            options.canUpgrade ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canAddSpecialRoles"),
+            options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return new DraftTransactionBuilder({
@@ -192,7 +219,7 @@ export class TokenManagementTransactionsFactory {
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
-            amount: this.config.issueCost
+            amount: this.config.issueCost,
         }).build();
     }
 
@@ -210,7 +237,7 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
             utf8ToHex(options.tokenType),
-            bigIntToHex(options.numDecimals)
+            bigIntToHex(options.numDecimals),
         ];
 
         return new DraftTransactionBuilder({
@@ -220,18 +247,15 @@ export class TokenManagementTransactionsFactory {
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
-            amount: this.config.issueCost
+            amount: this.config.issueCost,
         }).build();
     }
 
     createTransactionForSettingBurnRoleGlobally(options: {
-        sender: IAddress,
-        tokenIdentifier: string
+        sender: IAddress;
+        tokenIdentifier: string;
     }): DraftTransaction {
-        const dataParts = [
-            "setBurnRoleGlobally",
-            utf8ToHex(options.tokenIdentifier)
-        ];
+        const dataParts = ["setBurnRoleGlobally", utf8ToHex(options.tokenIdentifier)];
 
         return new DraftTransactionBuilder({
             config: this.config,
@@ -239,18 +263,15 @@ export class TokenManagementTransactionsFactory {
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
             gasLimit: this.config.gasLimitToggleBurnRoleGlobally,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
     createTransactionForUnsettingBurnRoleGlobally(options: {
-        sender: IAddress,
-        tokenIdentifier: string
+        sender: IAddress;
+        tokenIdentifier: string;
     }): DraftTransaction {
-        const dataParts = [
-            "unsetBurnRoleGlobally",
-            utf8ToHex(options.tokenIdentifier)
-        ];
+        const dataParts = ["unsetBurnRoleGlobally", utf8ToHex(options.tokenIdentifier)];
 
         return new DraftTransactionBuilder({
             config: this.config,
@@ -283,7 +304,7 @@ export class TokenManagementTransactionsFactory {
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
             gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -312,7 +333,7 @@ export class TokenManagementTransactionsFactory {
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
             gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -355,7 +376,7 @@ export class TokenManagementTransactionsFactory {
             receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
             dataParts: dataParts,
             gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -390,18 +411,12 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: new BigNumber(this.config.gasLimitEsdtNftCreate).plus(storageGasLimit),
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
-    createTransactionForPausing(options: {
-        sender: IAddress;
-        tokenIdentifier: string;
-    }): DraftTransaction {
-        const dataParts = [
-            "pause",
-            utf8ToHex(options.tokenIdentifier)
-        ];
+    createTransactionForPausing(options: { sender: IAddress; tokenIdentifier: string }): DraftTransaction {
+        const dataParts = ["pause", utf8ToHex(options.tokenIdentifier)];
 
         return new DraftTransactionBuilder({
             config: this.config,
@@ -409,18 +424,12 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitPausing,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
-    createTransactionForUnpausing(options: {
-        sender: IAddress;
-        tokenIdentifier: string;
-    }): DraftTransaction {
-        const dataParts = [
-            "unPause",
-            utf8ToHex(options.tokenIdentifier)
-        ];
+    createTransactionForUnpausing(options: { sender: IAddress; tokenIdentifier: string }): DraftTransaction {
+        const dataParts = ["unPause", utf8ToHex(options.tokenIdentifier)];
 
         return new DraftTransactionBuilder({
             config: this.config,
@@ -428,7 +437,7 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitPausing,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -437,11 +446,7 @@ export class TokenManagementTransactionsFactory {
         user: IAddress;
         tokenIdentifier: string;
     }): DraftTransaction {
-        const dataParts = [
-            "freeze",
-            utf8ToHex(options.tokenIdentifier),
-            addressToHex(options.user)
-        ];
+        const dataParts = ["freeze", utf8ToHex(options.tokenIdentifier), addressToHex(options.user)];
 
         return new DraftTransactionBuilder({
             config: this.config,
@@ -449,7 +454,7 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitFreezing,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -458,11 +463,7 @@ export class TokenManagementTransactionsFactory {
         user: IAddress;
         tokenIdentifier: string;
     }): DraftTransaction {
-        const dataParts = [
-            "UnFreeze",
-            utf8ToHex(options.tokenIdentifier),
-            addressToHex(options.user)
-        ];
+        const dataParts = ["UnFreeze", utf8ToHex(options.tokenIdentifier), addressToHex(options.user)];
 
         return new DraftTransactionBuilder({
             config: this.config,
@@ -470,7 +471,7 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitFreezing,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -479,11 +480,7 @@ export class TokenManagementTransactionsFactory {
         user: IAddress;
         tokenIdentifier: string;
     }): DraftTransaction {
-        const dataParts = [
-            "wipe",
-            utf8ToHex(options.tokenIdentifier),
-            addressToHex(options.user)
-        ];
+        const dataParts = ["wipe", utf8ToHex(options.tokenIdentifier), addressToHex(options.user)];
 
         return new DraftTransactionBuilder({
             config: this.config,
@@ -491,7 +488,7 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitWiping,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -500,11 +497,7 @@ export class TokenManagementTransactionsFactory {
         tokenIdentifier: string;
         supplyToMint: BigNumber.Value;
     }): DraftTransaction {
-        const dataParts = [
-            "ESDTLocalMint",
-            utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(options.supplyToMint),
-        ];
+        const dataParts = ["ESDTLocalMint", utf8ToHex(options.tokenIdentifier), bigIntToHex(options.supplyToMint)];
 
         return new DraftTransactionBuilder({
             config: this.config,
@@ -512,7 +505,7 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitEsdtLocalMint,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -521,11 +514,7 @@ export class TokenManagementTransactionsFactory {
         tokenIdentifier: string;
         supplyToBurn: BigNumber.Value;
     }): DraftTransaction {
-        const dataParts = [
-            "ESDTLocalBurn",
-            utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(options.supplyToBurn),
-        ];
+        const dataParts = ["ESDTLocalBurn", utf8ToHex(options.tokenIdentifier), bigIntToHex(options.supplyToBurn)];
 
         return new DraftTransactionBuilder({
             config: this.config,
@@ -533,7 +522,7 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitEsdtLocalBurn,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -541,7 +530,7 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenIdentifier: string;
         tokenNonce: BigNumber.Value;
-        attributes: Uint8Array
+        attributes: Uint8Array;
     }): DraftTransaction {
         const dataParts = [
             "ESDTNFTUpdateAttributes",
@@ -556,7 +545,7 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitEsdtNftUpdateAttributes,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -564,13 +553,13 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenIdentifier: string;
         tokenNonce: BigNumber.Value;
-        quantityToAdd: BigNumber.Value
+        quantityToAdd: BigNumber.Value;
     }): DraftTransaction {
         const dataParts = [
             "ESDTNFTAddQuantity",
             utf8ToHex(options.tokenIdentifier),
             bigIntToHex(options.tokenNonce),
-            bigIntToHex(options.quantityToAdd)
+            bigIntToHex(options.quantityToAdd),
         ];
 
         return new DraftTransactionBuilder({
@@ -579,7 +568,7 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitEsdtNftAddQuantity,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 
@@ -587,13 +576,13 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenIdentifier: string;
         tokenNonce: BigNumber.Value;
-        quantityToBurn: BigNumber.Value
+        quantityToBurn: BigNumber.Value;
     }): DraftTransaction {
         const dataParts = [
             "ESDTNFTBurn",
             utf8ToHex(options.tokenIdentifier),
             bigIntToHex(options.tokenNonce),
-            bigIntToHex(options.quantityToBurn)
+            bigIntToHex(options.quantityToBurn),
         ];
 
         return new DraftTransactionBuilder({
@@ -602,7 +591,7 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitEsdtNftBurn,
-            addDataMovementGas: true
+            addDataMovementGas: true,
         }).build();
     }
 

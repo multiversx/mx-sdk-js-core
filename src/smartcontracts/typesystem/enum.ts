@@ -19,8 +19,8 @@ export class EnumType extends CustomType {
     }
 
     static fromJSON(json: { name: string; variants: any[] }): EnumType {
-        const rawVariants = EnumType.assignMissingDiscriminants(json.variants);
-        const variants = (rawVariants || []).map((variant) => EnumVariantDefinition.fromJSON(variant));
+        const rawVariants = EnumType.assignMissingDiscriminants(json.variants || []);
+        const variants = rawVariants.map((variant) => EnumVariantDefinition.fromJSON(variant));
         return new EnumType(json.name, variants);
     }
 

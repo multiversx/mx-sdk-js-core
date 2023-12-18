@@ -156,4 +156,16 @@ describe("test abi registry", () => {
         assert.deepEqual(setStatusEvent.inputs[1].type, new U64Type());
         assert.deepEqual(setStatusEvent.inputs[2].type, registry.getCustomType("TransactionStatus"));
     });
+
+    it("should load ABI explicit-enum", async () => {
+        const registry = await loadAbiRegistry("src/testdata/explicit-enum.abi.json");
+
+        const enumType = registry.getEnum("OperationCompletionStatus");
+
+        assert.deepEqual(enumType.variants[0].name, "completed");
+        assert.deepEqual(enumType.variants[0].discriminant, 0);
+
+        assert.deepEqual(enumType.variants[1].name, "interrupted");
+        assert.deepEqual(enumType.variants[1].discriminant, 1);
+    });
 });

@@ -19,8 +19,25 @@ export class EnumType extends CustomType {
     }
 
     static fromJSON(json: { name: string; variants: any[] }): EnumType {
-        let variants = (json.variants || []).map((variant) => EnumVariantDefinition.fromJSON(variant));
+        const rawVariants = EnumType.assignMissingDiscriminants(json.variants || []);
+        const variants = rawVariants.map((variant) => EnumVariantDefinition.fromJSON(variant));
         return new EnumType(json.name, variants);
+    }
+
+    // For some enums (e.g. some "explicit-enum" types), the discriminants are missing.
+    private static assignMissingDiscriminants(variants: any[]): any[] {
+        const allDiscriminantsAreMissing = variants.every((variant) => variant.discriminant == undefined);
+        if (!allDiscriminantsAreMissing) {
+            // We only assign discriminants if all of them are missing.
+            return variants;
+        }
+
+        return variants.map((variant, index) => {
+            return {
+                ...variant,
+                discriminant: index
+            }
+        });
     }
 
     getVariantByDiscriminant(discriminant: number): EnumVariantDefinition {

@@ -53,7 +53,7 @@ export class AbiRegistry {
 
             if (typeDefinition.type == "struct") {
                 customTypes.push(StructType.fromJSON({ name: customTypeName, fields: typeDefinition.fields }));
-            } else if (typeDefinition.type == "enum") {
+            } else if (typeDefinition.type == "enum" || typeDefinition.type == "explicit-enum") {
                 customTypes.push(EnumType.fromJSON({ name: customTypeName, variants: typeDefinition.variants }));
             } else {
                 throw new errors.ErrTypingSystem(`Cannot handle custom type: ${customTypeName}`);

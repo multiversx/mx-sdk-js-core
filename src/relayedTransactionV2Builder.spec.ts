@@ -69,7 +69,7 @@ describe("test relayed v2 transaction builder", function () {
             data: new TransactionPayload("getContractConfig"),
         });
 
-        await bob.signer.sign(innerTx);
+        innerTx.applySignature(await bob.signer.sign(innerTx.serializeForSigning()));
 
         const builder = new RelayedTransactionV2Builder();
         const relayedTxV2 = builder
@@ -81,7 +81,7 @@ describe("test relayed v2 transaction builder", function () {
             .build();
 
         relayedTxV2.setSender(alice.address);
-        await alice.signer.sign(relayedTxV2);
+        relayedTxV2.applySignature(await alice.signer.sign(relayedTxV2.serializeForSigning()));
 
         assert.equal(relayedTxV2.getNonce().valueOf(), 37);
         assert.equal(

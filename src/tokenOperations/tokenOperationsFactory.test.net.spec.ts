@@ -674,7 +674,7 @@ describe("test factory on testnet", function () {
 
     async function processTransaction(wallet: TestWallet, transaction: Transaction, tag: string): Promise<ITransactionOnNetwork> {
         wallet.account.incrementNonce();
-        await wallet.signer.sign(transaction);
+        transaction.applySignature(await wallet.signer.sign(transaction.serializeForSigning()));
         await provider.sendTransaction(transaction);
         console.log(`Sent transaction [${tag}]: ${transaction.getHash().hex()}`);
 

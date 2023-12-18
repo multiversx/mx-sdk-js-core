@@ -34,7 +34,7 @@ export async function prepareDeployment(obj: {
     transaction.setNonce(nonce);
     transaction.setSender(deployer.address)
     contract.setAddress(contractAddress);
-    await deployer.signer.sign(transaction);
+    transaction.applySignature(await deployer.signer.sign(transaction.serializeForSigning()));
 
     return transaction;
 }

@@ -54,7 +54,7 @@ describe("test on local testnet", function () {
             caller: alice.address
         });
         transactionIncrement.setNonce(alice.account.nonce);
-        await alice.signer.sign(transactionIncrement);
+        transactionIncrement.applySignature(await alice.signer.sign(transactionIncrement.serializeForSigning()));
 
         alice.account.incrementNonce();
 
@@ -78,8 +78,8 @@ describe("test on local testnet", function () {
         simulateOne.setNonce(alice.account.nonce);
         simulateTwo.setNonce(alice.account.nonce);
 
-        await alice.signer.sign(simulateOne);
-        await alice.signer.sign(simulateTwo);
+        simulateOne.applySignature(await alice.signer.sign(simulateOne.serializeForSigning()));
+        simulateTwo.applySignature(await alice.signer.sign(simulateTwo.serializeForSigning()));
 
         // Broadcast & execute
         await provider.sendTransaction(transactionDeploy);
@@ -129,7 +129,7 @@ describe("test on local testnet", function () {
             caller: alice.address
         });
         transactionIncrementFirst.setNonce(alice.account.nonce);
-        await alice.signer.sign(transactionIncrementFirst);
+        transactionIncrementFirst.applySignature(await alice.signer.sign(transactionIncrementFirst.serializeForSigning()));
 
         alice.account.incrementNonce();
 
@@ -141,7 +141,7 @@ describe("test on local testnet", function () {
             caller: alice.address
         });
         transactionIncrementSecond.setNonce(alice.account.nonce);
-        await alice.signer.sign(transactionIncrementSecond);
+        transactionIncrementSecond.applySignature(await alice.signer.sign(transactionIncrementSecond.serializeForSigning()));
 
         alice.account.incrementNonce();
 
@@ -204,8 +204,8 @@ describe("test on local testnet", function () {
         transactionMintCarol.setNonce(alice.account.nonce);
         alice.account.incrementNonce();
 
-        await alice.signer.sign(transactionMintBob);
-        await alice.signer.sign(transactionMintCarol);
+        transactionMintBob.applySignature(await alice.signer.sign(transactionMintBob.serializeForSigning()));
+        transactionMintCarol.applySignature(await alice.signer.sign(transactionMintCarol.serializeForSigning()));
 
         // Broadcast & execute
         await provider.sendTransaction(transactionDeploy);
@@ -288,7 +288,7 @@ describe("test on local testnet", function () {
         // Apply nonces and sign the remaining transactions
         transactionStart.setNonce(alice.account.nonce);
 
-        await alice.signer.sign(transactionStart);
+        transactionStart.applySignature(await alice.signer.sign(transactionStart.serializeForSigning()));
 
         // Broadcast & execute
         await provider.sendTransaction(transactionDeploy);

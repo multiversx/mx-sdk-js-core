@@ -72,7 +72,6 @@ export class TestWallet {
     readonly secretKeyHex: string;
     readonly secretKey: Buffer;
     readonly signer: UserSigner;
-    readonly signerNext: UserSigner;
     readonly keyFileObject: any;
     readonly pemFileText: any;
     readonly account: Account;
@@ -82,7 +81,6 @@ export class TestWallet {
         this.secretKeyHex = secretKeyHex;
         this.secretKey = Buffer.from(secretKeyHex, "hex");
         this.signer = new UserSigner(UserSecretKey.fromString(secretKeyHex));
-        this.signerNext = new UserSigner(UserSecretKey.fromString(secretKeyHex));
         this.keyFileObject = keyFileObject;
         this.pemFileText = pemFileText;
         this.account = new Account(this.address);

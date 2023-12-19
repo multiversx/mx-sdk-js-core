@@ -57,7 +57,7 @@ describe("test contract", () => {
         assert.equal(contract.getAddress().bech32(), "erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q");
 
         // Sign the transaction
-        alice.signer.sign(deployTransaction);
+        deployTransaction.applySignature(await alice.signer.sign(deployTransaction.serializeForSigning()));
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);
@@ -109,8 +109,8 @@ describe("test contract", () => {
         assert.equal(callTransactionTwo.getGasLimit().valueOf(), 1500000);
 
         // Sign transactions, broadcast them
-        alice.signer.sign(callTransactionOne);
-        alice.signer.sign(callTransactionTwo);
+        callTransactionOne.applySignature(await alice.signer.sign(callTransactionOne.serializeForSigning()));
+        callTransactionTwo.applySignature(await alice.signer.sign(callTransactionTwo.serializeForSigning()));
 
         let hashOne = await provider.sendTransaction(callTransactionOne);
         let hashTwo = await provider.sendTransaction(callTransactionTwo);
@@ -152,7 +152,7 @@ describe("test contract", () => {
         assert.equal(deployTransaction.getNonce().valueOf(), 42);
 
         // Sign the transaction
-        alice.signer.sign(deployTransaction);
+        deployTransaction.applySignature(await alice.signer.sign(deployTransaction.serializeForSigning()));
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);

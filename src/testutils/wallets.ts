@@ -1,5 +1,4 @@
 import { UserSecretKey, UserSigner } from "@multiversx/sdk-wallet";
-import { UserSigner as UserSignerNext } from "@multiversx/sdk-wallet-next";
 import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";
@@ -73,7 +72,6 @@ export class TestWallet {
     readonly secretKeyHex: string;
     readonly secretKey: Buffer;
     readonly signer: UserSigner;
-    readonly signerNext: UserSignerNext;
     readonly keyFileObject: any;
     readonly pemFileText: any;
     readonly account: Account;
@@ -83,7 +81,6 @@ export class TestWallet {
         this.secretKeyHex = secretKeyHex;
         this.secretKey = Buffer.from(secretKeyHex, "hex");
         this.signer = new UserSigner(UserSecretKey.fromString(secretKeyHex));
-        this.signerNext = new UserSignerNext(UserSecretKey.fromString(secretKeyHex));
         this.keyFileObject = keyFileObject;
         this.pemFileText = pemFileText;
         this.account = new Account(this.address);

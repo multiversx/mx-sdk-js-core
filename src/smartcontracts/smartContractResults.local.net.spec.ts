@@ -50,7 +50,7 @@ describe("fetch transactions from local testnet", function () {
         });
 
         transactionIncrement.setNonce(alice.account.nonce);
-        await alice.signer.sign(transactionIncrement);
+        transactionIncrement.applySignature(await alice.signer.sign(transactionIncrement.serializeForSigning()));
 
         alice.account.incrementNonce();
 

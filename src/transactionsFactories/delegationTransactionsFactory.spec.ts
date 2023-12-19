@@ -3,7 +3,7 @@ import { Address } from "../address";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
 import { assert } from "chai";
 import { DELEGATION_MANAGER_SC_ADDRESS } from "../constants";
-import { ValidatorPublicKey } from "@multiversx/sdk-wallet-next";
+import { ValidatorPublicKey } from "@multiversx/sdk-wallet";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test delegation transactions factory", function () {

@@ -92,7 +92,7 @@ export class TestWallet {
 
     async sync(provider: IAccountFetcher) {
         let accountOnNetwork = await provider.getAccount(this.address);
-        await this.account.update(accountOnNetwork);
+        this.account.update(accountOnNetwork);
         return this;
     }
 }

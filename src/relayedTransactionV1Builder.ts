@@ -7,6 +7,9 @@ import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 
+/**
+ * @deprecated Use {@link RelayedTransactionsFactory} instead.
+ */
 export class RelayedTransactionV1Builder {
     innerTransaction: Transaction | undefined;
     relayerAddress: IAddress | undefined;

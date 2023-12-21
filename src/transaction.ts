@@ -11,6 +11,7 @@ import { ProtoSerializer } from "./proto";
 import { Signature, interpretSignatureAsBuffer } from "./signature";
 import { TransactionPayload } from "./transactionPayload";
 import { guardNotEmpty } from "./utils";
+import { DraftTransaction } from "./draftTransaction";
 
 const createTransactionHasher = require("blake2b");
 const TRANSACTION_HASH_LENGTH = 32;
@@ -422,6 +423,20 @@ export class Transaction {
   }
 
   /**
+   * Creates a new Transaction object from a DraftTransaction.
+   */
+  static fromDraft(draft: DraftTransaction): Transaction {
+    return new Transaction({
+      sender: Address.fromBech32(draft.sender),
+      receiver: Address.fromBech32(draft.receiver),
+      gasLimit: new BigNumber(draft.gasLimit).toNumber(),
+      chainID: "",
+      value: draft.value,
+      data: new TransactionPayload(Buffer.from(draft.data))
+    })
+  }
+
+  /**
    * Creates a new Transaction object from a TransactionNext object.
    */
   static fromTransactionNext(transaction: ITransactionNext): Transaction {
@@ -437,11 +452,20 @@ export class Transaction {
       receiverUsername: transaction.receiverUsername,
       senderUsername: transaction.senderUsername,
       options: transaction.options,
-      version: transaction.version,
-      guardian: Address.fromBech32(transaction.guardian)
+      version: transaction.version
     });
-    tx.applySignature(transaction.signature);
-    tx.applyGuardianSignature(transaction.guardianSignature);
+
+    if (transaction.guardian) {
+      tx.guardian = Address.fromBech32(transaction.guardian)
+    }
+
+    if (transaction.signature.length) {
+      tx.applySignature(transaction.signature);
+    }
+    
+    if (transaction.guardianSignature) {
+      tx.applyGuardianSignature(transaction.guardianSignature);
+    }
 
     return tx;
   }
@@ -605,23 +629,22 @@ export class TransactionNext{
 export class TransactionComputer {
   constructor() {}
 
-  computeTrnsactionFee(transaction: ITransactionNext, networkConfig: INetworkConfig): BigNumber{
-    let moveBalanceGas =
-      networkConfig.MinGasLimit.valueOf() +
-      transaction.data.length * networkConfig.GasPerDataByte.valueOf();
-    if (new BigNumber(moveBalanceGas) > transaction.gasLimit) {
+  computeTransactionFee(transaction: ITransactionNext, networkConfig: INetworkConfig): BigNumber{
+    let moveBalanceGas = new BigNumber(
+      networkConfig.MinGasLimit + transaction.data.length * networkConfig.GasPerDataByte);
+    if (moveBalanceGas > transaction.gasLimit) {
       throw new errors.ErrNotEnoughGas(parseInt(transaction.gasLimit.toString(), 10));
     }
 
     let gasPrice = new BigNumber(transaction.gasPrice);
-    let feeForMove = new BigNumber(moveBalanceGas).multipliedBy(gasPrice);
-    if (moveBalanceGas === transaction.gasLimit.valueOf()) {
+    let feeForMove = moveBalanceGas.multipliedBy(gasPrice);
+    if (moveBalanceGas === transaction.gasLimit) {
       return feeForMove;
     }
 
-    let diff = new BigNumber(transaction.gasLimit).minus(new BigNumber(moveBalanceGas));
+    let diff = new BigNumber(transaction.gasLimit).minus(moveBalanceGas);
     let modifiedGasPrice = gasPrice.multipliedBy(
-      new BigNumber(networkConfig.GasPriceModifier.valueOf())
+      new BigNumber(networkConfig.GasPriceModifier)
     );
     let processingFee = diff.multipliedBy(modifiedGasPrice);
 
@@ -643,9 +666,9 @@ export class TransactionComputer {
       delete plainTransaction.guardian
     }
 
-    let serialized = JSON.stringify(plainTransaction);
+    const serialized = JSON.stringify(plainTransaction);
 
-    return new Uint8Array(Buffer.from(serialized).buffer);
+    return new Uint8Array(Buffer.from(serialized));
   }
 
   computeTransactionHash(transaction: ITransactionNext): Uint8Array{

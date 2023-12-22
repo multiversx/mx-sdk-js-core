@@ -109,8 +109,11 @@ describe("test transaction next", async () => {
             "hex"
         );
 
-        const hash: any = transactionComputer.computeTransactionHash(transaction);
-        assert.equal(hash.digest("hex"), "169b76b752b220a76a93aeebc462a1192db1dc2ec9d17e6b4d7b0dcc91792f03");
+        const hash = transactionComputer.computeTransactionHash(transaction);
+        assert.equal(
+            Buffer.from(hash).toString("hex"),
+            "169b76b752b220a76a93aeebc462a1192db1dc2ec9d17e6b4d7b0dcc91792f03"
+        );
     });
 
     it("should compute transaction hash with usernames", async () => {
@@ -131,8 +134,11 @@ describe("test transaction next", async () => {
             "hex"
         );
 
-        const hash: any = transactionComputer.computeTransactionHash(transaction);
-        assert.equal(hash.digest("hex"), "41b5acf7ebaf4a9165a64206b6ebc02021b3adda55ffb2a2698aac2e7004dc29");
+        const hash = transactionComputer.computeTransactionHash(transaction);
+        assert.equal(
+            Buffer.from(hash).toString("hex"),
+            "41b5acf7ebaf4a9165a64206b6ebc02021b3adda55ffb2a2698aac2e7004dc29"
+        );
     });
 
     it("should throw `NotEnoughGas` error", async () => {
@@ -178,7 +184,7 @@ describe("test transaction next", async () => {
         assert.equal(gasLimit.toString(), "6005000");
     });
 
-    it.only("should compute guarded transaction", async () => {
+    it("should compute guarded transaction", async () => {
         const alice = wallets.alice;
 
         const transaction = new TransactionNext({
@@ -187,7 +193,7 @@ describe("test transaction next", async () => {
             receiver: wallets.bob.address.bech32(),
             gasLimit: 150000,
             gasPrice: 1000000000,
-            data: Buffer.from("test data field"),
+            data: new Uint8Array(Buffer.from("test data field")),
             version: 2,
             options: 2,
             nonce: 92,

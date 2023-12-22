@@ -445,7 +445,7 @@ export class Transaction {
       receiver: Address.fromBech32(transaction.receiver),
       gasLimit: new BigNumber(transaction.gasLimit).toNumber(),
       chainID: transaction.chainID,
-      value: transaction.value,
+      value: new BigNumber(transaction.value).toFixed(0),
       data: new TransactionPayload(Buffer.from(transaction.data)),
       nonce: Number(transaction.nonce),
       gasPrice: Number(transaction.gasPrice),
@@ -677,15 +677,16 @@ export class TransactionComputer {
     const tx = Transaction.fromTransactionNext(transaction);
     let buffer = serializer.serializeTransaction(tx);
     let hash = createTransactionHasher(TRANSACTION_HASH_LENGTH)
-      .update(buffer);
+      .update(buffer)
+      .digest("hex");
     
-    return hash;
+    return new Uint8Array(Buffer.from(hash, "hex"));
   }
 
   private toPlainObject(transaction: ITransactionNext) {
     return {
       nonce: Number(transaction.nonce),
-      value: transaction.value.toString(),
+      value: new BigNumber(transaction.value).toFixed(0),
       receiver: transaction.receiver,
       sender: transaction.sender,
       senderUsername: transaction.senderUsername ? Buffer.from(transaction.senderUsername).toString("base64") : undefined,

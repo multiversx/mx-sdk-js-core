@@ -190,7 +190,7 @@ describe("test smart contract interactor", function () {
         assert.equal(transaction.getData().toString(), "getUltimateAnswer");
         assert.equal(
             transaction.getHash().toString(),
-            "60d0956a8902c1179dce92d91bd9670e31b9a9cd07c1d620edb7754a315b4818"
+            "3579ad09099feb9755c860ddd225251170806d833342e912fccdfe2ed5c3a364"
         );
 
         transaction = interaction.withNonce(1).buildTransaction();
@@ -200,7 +200,7 @@ describe("test smart contract interactor", function () {
         assert.equal(transaction.getNonce().valueOf(), 1);
         assert.equal(
             transaction.getHash().toString(),
-            "acd207c38f6c3341b18d8ef331fa07ba49615fa12d7610aad5d8495293049f24"
+            "ad513ce7c5d371d30e48f073326899766736eac1ac231d847d45bc3facbcb496"
         );
 
         // Execute, and wait for execution

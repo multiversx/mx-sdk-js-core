@@ -52,8 +52,8 @@ describe("test transaction construction", async () => {
         });
 
         transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
-        assert.equal("b56769014f2bdc5cf9fc4a05356807d71fcf8775c819b0f1b0964625b679c918ffa64862313bfef86f99b38cb84fcdb16fa33ad6eb565276616723405cd8f109", transaction.getSignature().toString("hex"));
-        assert.equal(transaction.getHash().toString(), "eb30c50c8831885ebcfac986d27e949ec02cf25676e22a009b7a486e5431ec2e");
+        assert.equal(transaction.getSignature().toString("hex"), "3f08a1dd64fbb627d10b048e0b45b1390f29bb0e457762a2ccb710b029f299022a67a4b8e45cf62f4314afec2e56b5574c71e38df96cc41fae757b7ee5062503");
+        assert.equal(transaction.getHash().toString(), "1359fb9d5b0b47ca9f3b4adce6e4a524fa74099dd4732743b9226774a4cb0ad8");
     });
 
     it("with data, no value", async () => {
@@ -69,8 +69,8 @@ describe("test transaction construction", async () => {
         });
 
         transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
-        assert.equal("e47fd437fc17ac9a69f7bf5f85bafa9e7628d851c4f69bd9fedc7e36029708b2e6d168d5cd652ea78beedd06d4440974ca46c403b14071a1a148d4188f6f2c0d", transaction.getSignature().toString("hex"));
-        assert.equal(transaction.getHash().toString(), "95ed9ac933712d7d77721d75eecfc7896873bb0d746417153812132521636872");
+        assert.equal(transaction.getSignature().toString("hex"), "f9e8c1caf7f36b99e7e76ee1118bf71b55cde11a2356e2b3adf15f4ad711d2e1982469cbba7eb0afbf74e8a8f78e549b9410cd86eeaa88fcba62611ac9f6e30e");
+        assert.equal(transaction.getHash().toString(), "10a2bd6f9c358d2c9645368081999efd2a4cc7f24bdfdd75e8f57485fd702001");
     });
 
     it("with data, with opaque, unused options (the protocol ignores the options when version == 1)", async () => {
@@ -104,8 +104,8 @@ describe("test transaction construction", async () => {
         });
 
         transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
-        assert.equal("9074789e0b4f9b2ac24b1fd351a4dd840afcfeb427b0f93e2a2d429c28c65ee9f4c288ca4dbde79de0e5bcf8c1a5d26e1b1c86203faea923e0edefb0b5099b0c", transaction.getSignature().toString("hex"));
-        assert.equal(transaction.getHash().toString(), "af53e0fc86612d5068862716b5169effdf554951ecc89849b0e836eb0b63fa3e");
+        assert.equal(transaction.getSignature().toString("hex"), "b45f22e9f57a6df22670fcc3566723a0711a05ac2547456de59fd222a54940e4a1d99bd414897ccbf5c02a842ad86e638989b7f4d30edd26c99a8cd1eb092304");
+        assert.equal(transaction.getHash().toString(), "84125d7154d81a723642100bdf74e6df99f7c069c016d1e6bbeb408fd4e961bf");
     });
 
     it("with data, with large value", async () => {
@@ -121,8 +121,8 @@ describe("test transaction construction", async () => {
         });
 
         transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
-        assert.equal("39938d15812708475dfc8125b5d41dbcea0b2e3e7aabbbfceb6ce4f070de3033676a218b73facd88b1432d7d4accab89c6130b3abe5cc7bbbb5146e61d355b03", transaction.getSignature().toString("hex"));
-        assert.equal(transaction.getHash().toString(), "e4a6048d92409cfe50f12e81218cb92f39966c618979a693b8d16320a06061c1");
+        assert.equal(transaction.getSignature().toString("hex"), "01f05aa8cb0614e12a94ab9dcbde5e78370a4e05d23ef25a1fb9d5fcf1cb3b1f33b919cd8dafb1704efb18fa233a8aa0d3344fb6ee9b613a7d7a403786ffbd0a");
+        assert.equal(transaction.getHash().toString(), "321e1f1a0e3d06edade34fd0fdf3b4859e4328a73706a442c2439968a074113c");
     });
 
     it("with nonce = 0", async () => {
@@ -139,7 +139,7 @@ describe("test transaction construction", async () => {
         });
 
         transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
-        assert.equal("dfa3e9f2fdec60dcb353bac3b3435b4a2ff251e7e98eaf8620f46c731fc70c8ba5615fd4e208b05e75fe0f7dc44b7a99567e29f94fcd91efac7e67b182cd2a04", transaction.getSignature().toString("hex"));
+        assert.equal(transaction.getSignature().toString("hex"), "dfa3e9f2fdec60dcb353bac3b3435b4a2ff251e7e98eaf8620f46c731fc70c8ba5615fd4e208b05e75fe0f7dc44b7a99567e29f94fcd91efac7e67b182cd2a04");
         assert.equal(transaction.getHash().toString(), "6ffa1a75f98aaf336bfb87ef13b9b5a477a017158285d34ee2a503668767e69e");
     });
 
@@ -155,8 +155,8 @@ describe("test transaction construction", async () => {
         });
 
         transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
-        assert.equal("b56769014f2bdc5cf9fc4a05356807d71fcf8775c819b0f1b0964625b679c918ffa64862313bfef86f99b38cb84fcdb16fa33ad6eb565276616723405cd8f109", transaction.getSignature().toString("hex"));
-        assert.equal(transaction.getHash().toString(), "eb30c50c8831885ebcfac986d27e949ec02cf25676e22a009b7a486e5431ec2e");
+        assert.equal(transaction.getSignature().toString("hex"), "3f08a1dd64fbb627d10b048e0b45b1390f29bb0e457762a2ccb710b029f299022a67a4b8e45cf62f4314afec2e56b5574c71e38df96cc41fae757b7ee5062503");
+        assert.equal(transaction.getHash().toString(), "1359fb9d5b0b47ca9f3b4adce6e4a524fa74099dd4732743b9226774a4cb0ad8");
 
         let result = transaction.serializeForSigning();
         assert.isFalse(result.toString().includes("options"));
@@ -174,8 +174,8 @@ describe("test transaction construction", async () => {
         });
 
         transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
-        assert.equal("b56769014f2bdc5cf9fc4a05356807d71fcf8775c819b0f1b0964625b679c918ffa64862313bfef86f99b38cb84fcdb16fa33ad6eb565276616723405cd8f109", transaction.getSignature().toString("hex"));
-        assert.equal(transaction.getHash().toString(), "eb30c50c8831885ebcfac986d27e949ec02cf25676e22a009b7a486e5431ec2e");
+        assert.equal(transaction.getSignature().toString("hex"), "3f08a1dd64fbb627d10b048e0b45b1390f29bb0e457762a2ccb710b029f299022a67a4b8e45cf62f4314afec2e56b5574c71e38df96cc41fae757b7ee5062503");
+        assert.equal(transaction.getHash().toString(), "1359fb9d5b0b47ca9f3b4adce6e4a524fa74099dd4732743b9226774a4cb0ad8");
 
         let result = transaction.serializeForSigning();
         assert.isFalse(result.toString().includes("options"));
@@ -194,8 +194,8 @@ describe("test transaction construction", async () => {
         });
 
         transaction.applySignature(await wallets.carol.signer.sign(transaction.serializeForSigning()));
-        assert.equal(transaction.getSignature().toString("hex"), "5966dd6b98fc5ecbcd203fa38fac7059ba5c17683099071883b0ad6697386769321d851388a99cb8b81aab625aa2d7e13621432dbd8ab334c5891cd7c7755200");
-        assert.equal(transaction.getHash().toString(), "5728fadbc6c1024c4a0d5552eca44e80c182dc9077e58e31d599cf9496c96d1e");
+        assert.equal(transaction.getSignature().toString("hex"), "51e6cd78fb3ab4b53ff7ad6864df27cb4a56d70603332869d47a5cf6ea977c30e696103e41e8dddf2582996ad335229fdf4acb726564dbc1a0bc9e705b511f06");
+        assert.equal(transaction.getHash().toString(), "edc84d776bfd655ddbd6fce24a83e379496ac47890d00be9c8bb2c6666fa3fd8");
     });
 
     it("computes correct fee", () => {
@@ -213,7 +213,7 @@ describe("test transaction construction", async () => {
             MinGasLimit: 10,
             GasPerDataByte: 1500,
             GasPriceModifier: 0.01,
-            ChainID: "T"
+            ChainID: "local-testnet"
         };
 
         let fee = transaction.computeFee(networkConfig);

@@ -41,22 +41,23 @@ describe("test transaction construction", async () => {
     });
 
     it("create transaction from transaction next", async () => {
-        const nextTransaction = new TransactionNext({
+        const plainTransactionNextObject = {
             sender: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
             receiver: "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
             gasLimit: 56000,
             value: "1000000000000000000",
             data: Buffer.from("test"),
             chainID: "T"
-        });
+        };
+        const nextTransaction = new TransactionNext(plainTransactionNextObject);
 
         const transaction = Transaction.fromTransactionNext(nextTransaction);
-        assert.deepEqual(transaction.getSender(), Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"));
-        assert.deepEqual(transaction.getReceiver(), Address.fromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"));
-        assert.equal(transaction.getGasLimit().valueOf(), 56000);
-        assert.equal(transaction.getValue().toString(), "1000000000000000000");
-        assert.equal(transaction.getData().toString(), "test");
-        assert.equal(transaction.getChainID().valueOf(), "T");
+        assert.deepEqual(transaction.getSender(), Address.fromBech32(plainTransactionNextObject.sender));
+        assert.deepEqual(transaction.getReceiver(), Address.fromBech32(plainTransactionNextObject.receiver));
+        assert.equal(transaction.getGasLimit().valueOf(), plainTransactionNextObject.gasLimit);
+        assert.equal(transaction.getValue().toString(), plainTransactionNextObject.value);
+        assert.equal(transaction.getData().toString(), plainTransactionNextObject.data.toString());
+        assert.equal(transaction.getChainID().valueOf(), plainTransactionNextObject.chainID);
         assert.equal(transaction.getNonce().valueOf(), 0);
         assert.equal(transaction.getGasPrice().valueOf(), TRANSACTION_MIN_GAS_PRICE);
         assert.deepEqual(transaction.getSignature(), Buffer.from([]));

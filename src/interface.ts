@@ -55,3 +55,21 @@ export interface ITokenTransfer {
  * @deprecated Use {@link ITokenTransfer} instead.
  */
 export type ITokenPayment = ITokenTransfer;
+
+export interface ITransactionNext {
+    sender: string;
+    receiver: string;
+    gasLimit: BigNumber.Value;
+    chainID: string;
+    nonce: BigNumber.Value;
+    value: BigNumber.Value;
+    senderUsername: string;
+    receiverUsername: string;
+    gasPrice: BigNumber.Value;
+    data: Uint8Array;
+    version: number;
+    options: number;
+    guardian: string;
+    signature: Uint8Array;
+    guardianSignature: Uint8Array;
+  }

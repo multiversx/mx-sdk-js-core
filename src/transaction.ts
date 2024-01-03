@@ -1,10 +1,10 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
 import { Compatibility } from "./compatibility";
-import { TRANSACTION_MIN_GAS_PRICE } from "./constants";
+import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT } from "./constants";
 import * as errors from "./errors";
 import { Hash } from "./hash";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionOptions, ITransactionPayload, ITransactionValue, ITransactionVersion } from "./interface";
+import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionNext, ITransactionOptions, ITransactionPayload, ITransactionValue, ITransactionVersion } from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
@@ -151,20 +151,6 @@ export class Transaction {
     this.signature = Buffer.from([]);
     this.guardianSignature = Buffer.from([]);
     this.hash = TransactionHash.empty();
-  }
-
-  /**
-   * Creates a new Transaction object from a DraftTransaction.
-   */
-  static fromDraft(draft: DraftTransaction): Transaction {
-    return new Transaction({
-      sender: Address.fromBech32(draft.sender),
-      receiver: Address.fromBech32(draft.receiver),
-      gasLimit: new BigNumber(draft.gasLimit).toNumber(),
-      chainID: "",
-      value: draft.value,
-      data: new TransactionPayload(Buffer.from(draft.data))
-    })
   }
 
   getNonce(): INonce {
@@ -435,6 +421,54 @@ export class Transaction {
 
     return feeForMove.plus(processingFee);
   }
+
+  /**
+   * Creates a new Transaction object from a DraftTransaction.
+   */
+  static fromDraft(draft: DraftTransaction): Transaction {
+    return new Transaction({
+      sender: Address.fromBech32(draft.sender),
+      receiver: Address.fromBech32(draft.receiver),
+      gasLimit: new BigNumber(draft.gasLimit).toNumber(),
+      chainID: "",
+      value: draft.value,
+      data: new TransactionPayload(Buffer.from(draft.data))
+    })
+  }
+
+  /**
+   * Creates a new Transaction object from a TransactionNext object.
+   */
+  static fromTransactionNext(transaction: ITransactionNext): Transaction {
+    const tx =  new Transaction({
+      sender: Address.fromBech32(transaction.sender),
+      receiver: Address.fromBech32(transaction.receiver),
+      gasLimit: new BigNumber(transaction.gasLimit).toNumber(),
+      chainID: transaction.chainID,
+      value: new BigNumber(transaction.value).toFixed(0),
+      data: new TransactionPayload(Buffer.from(transaction.data)),
+      nonce: Number(transaction.nonce),
+      gasPrice: Number(transaction.gasPrice),
+      receiverUsername: transaction.receiverUsername,
+      senderUsername: transaction.senderUsername,
+      options: transaction.options,
+      version: transaction.version
+    });
+
+    if (transaction.guardian) {
+      tx.guardian = Address.fromBech32(transaction.guardian)
+    }
+
+    if (transaction.signature.length) {
+      tx.applySignature(transaction.signature);
+    }
+    
+    if (transaction.guardianSignature) {
+      tx.applyGuardianSignature(transaction.guardianSignature);
+    }
+
+    return tx;
+  }
 }
 
 /**
@@ -458,3 +492,215 @@ export class TransactionHash extends Hash {
   }
 }
 
+/**
+ * An abstraction for creating, signing and broadcasting transactions.
+ * Will replace the {@link Transaction} class in the future.
+ */
+export class TransactionNext{
+  /**
+   * The nonce of the transaction (the account sequence number of the sender).
+   */
+  public nonce: BigNumber.Value;
+
+  /**
+   * The value to transfer.
+   */
+  public value: BigNumber.Value;
+
+  /**
+   * The address of the sender.
+   */
+  public sender: string;
+
+  /**
+   * The address of the receiver.
+   */
+  public receiver: string;
+
+  /**
+   * The username of the sender.
+   */
+  public senderUsername: string;
+
+  /** 
+   * The username of the receiver.
+   */
+  public receiverUsername: string;
+
+  /**
+   * The gas price to be used.
+   */
+  public gasPrice: BigNumber.Value;
+
+  /**
+   * The maximum amount of gas to be consumed when processing the transaction.
+   */
+  public gasLimit: BigNumber.Value;
+
+  /**
+   * The payload of the transaction.
+   */
+  public data: Uint8Array;
+
+  /**
+   * The chain ID of the Network (e.g. "1" for Mainnet).
+   */
+  public chainID: string;
+
+  /**
+   * The version, required by the Network in order to correctly interpret the contents of the transaction.
+   */
+  public version: number;
+
+  /**
+   * The options field of the transactions.
+   */
+  public options: number;
+
+  /**
+   * The address of the guardian.
+   */
+  public guardian: string;
+
+  /**
+   * The signature.
+   */
+  public signature: Uint8Array;
+
+  /**
+   * The signature of the guardian.
+   */
+  public guardianSignature: Uint8Array;
+
+  /**
+   * Creates a new Transaction object.
+   */
+    public constructor({
+      sender,
+      receiver,
+      gasLimit,
+      chainID,
+      nonce,
+      value,
+      senderUsername,
+      receiverUsername,
+      gasPrice,
+      data,
+      version,
+      options,
+      guardian,
+    }: {
+      nonce?: BigNumber.Value;
+      value?: BigNumber.Value;
+      sender: string;
+      receiver: string;
+      senderUsername?: string;
+      receiverUsername?: string;
+      gasPrice?: BigNumber.Value;
+      gasLimit: BigNumber.Value;
+      data?: Uint8Array;
+      chainID: string;
+      version?: number;
+      options?: number;
+      guardian?: string;
+    }) {
+      this.nonce = nonce || 0;
+      this.value = value || new BigNumber(0);
+      this.sender = sender;
+      this.receiver = receiver;
+      this.senderUsername = senderUsername || "";
+      this.receiverUsername = receiverUsername || "";
+      this.gasPrice = gasPrice || new BigNumber(TRANSACTION_MIN_GAS_PRICE);
+      this.gasLimit = gasLimit;
+      this.data = data || new Uint8Array();
+      this.chainID = chainID;
+      this.version = version || TRANSACTION_OPTIONS_DEFAULT;
+      this.options = options || TRANSACTION_OPTIONS_DEFAULT;
+      this.guardian = guardian || "";
+  
+      this.signature = new Uint8Array();
+      this.guardianSignature = new Uint8Array();
+    }
+}
+
+/**
+ * An utilitary class meant to work together with the {@link TransactionNext} class.
+ */
+export class TransactionComputer {
+  constructor() {}
+
+  computeTransactionFee(transaction: ITransactionNext, networkConfig: INetworkConfig): BigNumber{
+    let moveBalanceGas = new BigNumber(
+      networkConfig.MinGasLimit + transaction.data.length * networkConfig.GasPerDataByte);
+    if (moveBalanceGas > transaction.gasLimit) {
+      throw new errors.ErrNotEnoughGas(parseInt(transaction.gasLimit.toString(), 10));
+    }
+
+    let gasPrice = new BigNumber(transaction.gasPrice);
+    let feeForMove = moveBalanceGas.multipliedBy(gasPrice);
+    if (moveBalanceGas === transaction.gasLimit) {
+      return feeForMove;
+    }
+
+    let diff = new BigNumber(transaction.gasLimit).minus(moveBalanceGas);
+    let modifiedGasPrice = gasPrice.multipliedBy(
+      new BigNumber(networkConfig.GasPriceModifier)
+    );
+    let processingFee = diff.multipliedBy(modifiedGasPrice);
+
+    return feeForMove.plus(processingFee);
+  }
+
+  computeBytesForSigning(transaction: ITransactionNext): Uint8Array{
+    let plainTransaction = this.toPlainObject(transaction);
+
+    if (plainTransaction.signature) {
+      delete plainTransaction.signature;
+    }
+
+    if (plainTransaction.guardianSignature) {
+      delete plainTransaction.guardianSignature;
+    }
+
+    if (!plainTransaction.guardian) {
+      delete plainTransaction.guardian
+    }
+
+    const serialized = JSON.stringify(plainTransaction);
+
+    return new Uint8Array(Buffer.from(serialized));
+  }
+
+  computeTransactionHash(transaction: ITransactionNext): Uint8Array{
+    let serializer = new ProtoSerializer();
+
+    const tx = Transaction.fromTransactionNext(transaction);
+    let buffer = serializer.serializeTransaction(tx);
+    let hash = createTransactionHasher(TRANSACTION_HASH_LENGTH)
+      .update(buffer)
+      .digest("hex");
+    
+    return new Uint8Array(Buffer.from(hash, "hex"));
+  }
+
+  private toPlainObject(transaction: ITransactionNext) {
+    return {
+      nonce: Number(transaction.nonce),
+      value: new BigNumber(transaction.value).toFixed(0),
+      receiver: transaction.receiver,
+      sender: transaction.sender,
+      senderUsername: transaction.senderUsername ? Buffer.from(transaction.senderUsername).toString("base64") : undefined,
+      receiverUsername: transaction.receiverUsername ? Buffer.from(transaction.receiverUsername).toString("base64") : undefined,
+      gasPrice: Number(transaction.gasPrice),
+      gasLimit: Number(transaction.gasLimit),
+      data: transaction.data.length == 0 ? undefined : Buffer.from(transaction.data).toString("base64"),
+      chainID: transaction.chainID,
+      version: transaction.version,
+      options: transaction.options == 0 ? undefined : transaction.options,
+      guardian: transaction.guardian == "" ? undefined : transaction.guardian,
+      signature: transaction.signature.length == 0 ? undefined : Buffer.from(transaction.signature).toString("hex"),
+      guardianSignature: transaction.guardianSignature.length == 0 ? undefined : Buffer.from(transaction.guardianSignature).toString("hex")
+    }
+  }
+
+}

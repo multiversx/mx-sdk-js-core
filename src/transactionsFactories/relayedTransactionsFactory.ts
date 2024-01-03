@@ -1,8 +1,9 @@
 import BigNumber from "bignumber.js";
 import { TransactionNext } from "../transaction";
-import { IAddress } from "../interface";
+import { IAddress, ITransactionNext } from "../interface";
 import { ErrInvalidInnerTransaction } from "../errors";
 import { Address } from "../address";
+import { AddressValue, ArgSerializer, BytesValue, U64Value } from "../smartcontracts";
 
 interface IConfig {
     chainID: string;
@@ -18,7 +19,7 @@ export class RelayedTransactionsFactory {
     }
 
     createRelayedV1Transaction(options: {
-        innerTransaction: TransactionNext;
+        innerTransaction: ITransactionNext;
         relayerAddress: IAddress;
     }): TransactionNext {
         if (!options.innerTransaction.gasLimit) {
@@ -32,9 +33,11 @@ export class RelayedTransactionsFactory {
         const serializedTransaction = this.prepareInnerTransactionForRelayedV1(options.innerTransaction);
         const data = `relayedTx@${Buffer.from(serializedTransaction).toString("hex")}`;
 
-        const gasForDataLength = new BigNumber(this.config.gasLimitPerByte).multipliedBy(new BigNumber(data.length));
+        const additionalGasForDataLength = new BigNumber(this.config.gasLimitPerByte).multipliedBy(
+            new BigNumber(data.length)
+        );
         const gasLimit = new BigNumber(this.config.minGasLimit)
-            .plus(gasForDataLength)
+            .plus(additionalGasForDataLength)
             .plus(new BigNumber(options.innerTransaction.gasLimit));
 
         return new TransactionNext({
@@ -43,6 +46,47 @@ export class RelayedTransactionsFactory {
             receiver: options.innerTransaction.sender,
             gasLimit: gasLimit,
             data: Buffer.from(data),
+        });
+    }
+
+    createRelayedV2Transaction(options: {
+        innerTransaction: ITransactionNext;
+        innerTransactionGasLimit: BigNumber.Value;
+        relayerAddress: IAddress;
+    }): TransactionNext {
+        if (options.innerTransaction.gasLimit) {
+            throw new ErrInvalidInnerTransaction("The gas limit should not be set for the inner transaction");
+        }
+
+        if (!options.innerTransaction.signature.length) {
+            throw new ErrInvalidInnerTransaction("The inner transaction is not signed");
+        }
+
+        const { argumentsString } = new ArgSerializer().valuesToString([
+            new AddressValue(Address.fromBech32(options.innerTransaction.receiver)),
+            new U64Value(options.innerTransaction.nonce),
+            new BytesValue(Buffer.from(options.innerTransaction.data)),
+            new BytesValue(Buffer.from(options.innerTransaction.signature)),
+        ]);
+
+        const data = `relayedTxV2@${argumentsString}`;
+
+        const additionalGasForDataLength = new BigNumber(this.config.gasLimitPerByte).multipliedBy(
+            new BigNumber(data.length)
+        );
+        const gasLimit = new BigNumber(options.innerTransaction.gasLimit)
+            .plus(new BigNumber(this.config.minGasLimit))
+            .plus(additionalGasForDataLength);
+
+        return new TransactionNext({
+            sender: options.relayerAddress.bech32(),
+            receiver: options.innerTransaction.sender,
+            value: 0,
+            gasLimit: gasLimit,
+            chainID: this.config.chainID,
+            data: Buffer.from(data),
+            version: options.innerTransaction.version,
+            options: options.innerTransaction.options,
         });
     }
 

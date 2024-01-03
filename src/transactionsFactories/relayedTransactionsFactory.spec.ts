@@ -178,4 +178,66 @@ describe("test relayed v1 transaction builder", function () {
             "8ede1bbeed96b102344dffeac12c2592c62b7313cdeb132e8c8bf11d2b1d3bb8189d257a6dbcc99e222393d9b9ec77656c349dae97a32e68bdebd636066bf706"
         );
     });
+
+    it("should throw exception when creating relayed v2 transaction with invalid inner transaction", async function () {
+        let innerTransaction = new TransactionNext({
+            sender: bob.address.bech32(),
+            receiver: bob.address.bech32(),
+            gasLimit: 50000,
+            chainID: config.chainID,
+        });
+
+        assert.throws(() => {
+            factory.createRelayedV2Transaction({
+                innerTransaction: innerTransaction,
+                innerTransactionGasLimit: 50000,
+                relayerAddress: carol.address,
+            }),
+                "The gas limit should not be set for the inner transaction";
+        });
+
+        innerTransaction.gasLimit = 0;
+
+        assert.throws(() => {
+            factory.createRelayedV2Transaction({
+                innerTransaction: innerTransaction,
+                innerTransactionGasLimit: 50000,
+                relayerAddress: carol.address,
+            }),
+                "The inner transaction is not signed";
+        });
+    });
+
+    it("should create relayed v2 transaction", async function () {
+        let innerTransaction = new TransactionNext({
+            sender: bob.address.bech32(),
+            receiver: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+            gasLimit: 0,
+            chainID: config.chainID,
+            data: Buffer.from("getContractConfig"),
+            nonce: 15,
+            version: 2,
+            options: 0,
+        });
+
+        const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
+        innerTransaction.signature = await bob.signer.sign(Buffer.from(serializedInnerTransaction));
+
+        const relayedTransaction = factory.createRelayedV2Transaction({
+            innerTransaction: innerTransaction,
+            innerTransactionGasLimit: new BigNumber("60000000"),
+            relayerAddress: alice.address,
+        });
+        relayedTransaction.nonce = 37;
+
+        const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
+        relayedTransaction.signature = await alice.signer.sign(Buffer.from(serializedRelayedTransaction));
+
+        assert.equal(relayedTransaction.version, 2);
+        assert.equal(relayedTransaction.options, 0);
+        assert.equal(
+            Buffer.from(relayedTransaction.data).toString(),
+            "relayedTxV2@000000000000000000010000000000000000000000000000000000000002ffff@0f@676574436f6e7472616374436f6e666967@fc3ed87a51ee659f937c1a1ed11c1ae677e99629fae9cc289461f033e6514d1a8cfad1144ae9c1b70f28554d196bd6ba1604240c1c1dc19c959e96c1c3b62d0c"
+        );
+    });
 });

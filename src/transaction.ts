@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
 import { Compatibility } from "./compatibility";
-import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT } from "./constants";
+import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
 import * as errors from "./errors";
 import { Hash } from "./hash";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionNext, ITransactionOptions, ITransactionPayload, ITransactionValue, ITransactionVersion } from "./interface";
@@ -614,7 +614,7 @@ export class TransactionNext{
       this.gasLimit = gasLimit;
       this.data = data || new Uint8Array();
       this.chainID = chainID;
-      this.version = version || TRANSACTION_OPTIONS_DEFAULT;
+      this.version = version || TRANSACTION_VERSION_DEFAULT;
       this.options = options || TRANSACTION_OPTIONS_DEFAULT;
       this.guardian = guardian || "";
   

@@ -1,4 +1,4 @@
-import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_HASH_SIGN, TRANSACTION_VERSION_DEFAULT, TRANSACTION_VERSION_WITH_OPTIONS } from "./constants";
+import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_HASH_SIGN, TRANSACTION_VERSION_DEFAULT } from "./constants";
 import * as errors from "./errors";
 
 export class TransactionVersion {
@@ -31,7 +31,7 @@ export class TransactionVersion {
      * Creates a TransactionVersion object with the VERSION setting for enabling options
      */
     static withTxOptions(): TransactionVersion {
-        return new TransactionVersion(TRANSACTION_VERSION_WITH_OPTIONS);
+        return new TransactionVersion(TRANSACTION_VERSION_DEFAULT);
     }
 
     valueOf(): number {

@@ -463,7 +463,7 @@ export class Transaction {
       tx.applySignature(transaction.signature);
     }
     
-    if (transaction.guardianSignature) {
+    if (transaction.guardianSignature.length) {
       tx.applyGuardianSignature(transaction.guardianSignature);
     }
 
@@ -630,29 +630,29 @@ export class TransactionComputer {
   constructor() {}
 
   computeTransactionFee(transaction: ITransactionNext, networkConfig: INetworkConfig): BigNumber{
-    let moveBalanceGas = new BigNumber(
+    const moveBalanceGas = new BigNumber(
       networkConfig.MinGasLimit + transaction.data.length * networkConfig.GasPerDataByte);
     if (moveBalanceGas > transaction.gasLimit) {
       throw new errors.ErrNotEnoughGas(parseInt(transaction.gasLimit.toString(), 10));
     }
 
-    let gasPrice = new BigNumber(transaction.gasPrice);
-    let feeForMove = moveBalanceGas.multipliedBy(gasPrice);
+    const gasPrice = new BigNumber(transaction.gasPrice);
+    const feeForMove = moveBalanceGas.multipliedBy(gasPrice);
     if (moveBalanceGas === transaction.gasLimit) {
       return feeForMove;
     }
 
-    let diff = new BigNumber(transaction.gasLimit).minus(moveBalanceGas);
-    let modifiedGasPrice = gasPrice.multipliedBy(
+    const diff = new BigNumber(transaction.gasLimit).minus(moveBalanceGas);
+    const modifiedGasPrice = gasPrice.multipliedBy(
       new BigNumber(networkConfig.GasPriceModifier)
     );
-    let processingFee = diff.multipliedBy(modifiedGasPrice);
+    const processingFee = diff.multipliedBy(modifiedGasPrice);
 
     return feeForMove.plus(processingFee);
   }
 
   computeBytesForSigning(transaction: ITransactionNext): Uint8Array{
-    let plainTransaction = this.toPlainObject(transaction);
+    const plainTransaction = this.toPlainObject(transaction);
 
     if (plainTransaction.signature) {
       delete plainTransaction.signature;
@@ -675,12 +675,12 @@ export class TransactionComputer {
     let serializer = new ProtoSerializer();
 
     const tx = Transaction.fromTransactionNext(transaction);
-    let buffer = serializer.serializeTransaction(tx);
-    let hash = createTransactionHasher(TRANSACTION_HASH_LENGTH)
+    const buffer = serializer.serializeTransaction(tx);
+    const hash = createTransactionHasher(TRANSACTION_HASH_LENGTH)
       .update(buffer)
       .digest("hex");
     
-    return new Uint8Array(Buffer.from(hash, "hex"));
+    return Buffer.from(hash, "hex");
   }
 
   private toPlainObject(transaction: ITransactionNext) {
@@ -693,11 +693,11 @@ export class TransactionComputer {
       receiverUsername: transaction.receiverUsername ? Buffer.from(transaction.receiverUsername).toString("base64") : undefined,
       gasPrice: Number(transaction.gasPrice),
       gasLimit: Number(transaction.gasLimit),
-      data: transaction.data.length == 0 ? undefined : Buffer.from(transaction.data).toString("base64"),
+      data: transaction.data && transaction.data.length === 0 ? undefined : Buffer.from(transaction.data).toString("base64"),
       chainID: transaction.chainID,
       version: transaction.version,
-      options: transaction.options == 0 ? undefined : transaction.options,
-      guardian: transaction.guardian == "" ? undefined : transaction.guardian,
+      options: transaction.options ? transaction.options : undefined,
+      guardian: transaction.guardian ? transaction.guardian : undefined,
       signature: transaction.signature.length == 0 ? undefined : Buffer.from(transaction.signature).toString("hex"),
       guardianSignature: transaction.guardianSignature.length == 0 ? undefined : Buffer.from(transaction.guardianSignature).toString("hex")
     }

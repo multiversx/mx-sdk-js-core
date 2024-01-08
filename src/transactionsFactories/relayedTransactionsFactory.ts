@@ -74,7 +74,7 @@ export class RelayedTransactionsFactory {
         const additionalGasForDataLength = new BigNumber(this.config.gasLimitPerByte).multipliedBy(
             new BigNumber(data.length)
         );
-        const gasLimit = new BigNumber(options.innerTransaction.gasLimit)
+        const gasLimit = new BigNumber(options.innerTransactionGasLimit)
             .plus(new BigNumber(this.config.minGasLimit))
             .plus(additionalGasForDataLength);
 

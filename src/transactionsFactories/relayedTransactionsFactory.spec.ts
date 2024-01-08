@@ -235,6 +235,7 @@ describe("test relayed v1 transaction builder", function () {
 
         assert.equal(relayedTransaction.version, 2);
         assert.equal(relayedTransaction.options, 0);
+        assert.equal(relayedTransaction.gasLimit.toString(), "60414500");
         assert.equal(
             Buffer.from(relayedTransaction.data).toString(),
             "relayedTxV2@000000000000000000010000000000000000000000000000000000000002ffff@0f@676574436f6e7472616374436f6e666967@fc3ed87a51ee659f937c1a1ed11c1ae677e99629fae9cc289461f033e6514d1a8cfad1144ae9c1b70f28554d196bd6ba1604240c1c1dc19c959e96c1c3b62d0c"

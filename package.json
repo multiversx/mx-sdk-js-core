@@ -1,6 +1,6 @@
 {
   "name": "@multiversx/sdk-core",
-  "version": "12.17.0",
+  "version": "12.18.0",
   "description": "MultiversX SDK for JavaScript and TypeScript",
   "main": "out/index.js",
   "types": "out/index.d.js",
@@ -43,7 +43,7 @@
     "@types/mocha": "9.1.0",
     "@types/node": "13.13.2",
     "assert": "2.0.0",
-    "axios": "1.6.2",
+    "axios": "1.6.5",
     "browserify": "17.0.0",
     "chai": "4.2.0",
     "esmify": "2.1.1",

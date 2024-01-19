@@ -9,6 +9,9 @@ export const WasmVirtualMachine = "0500";
 /**
  * A builder for {@link TransactionPayload} objects, to be used for Smart Contract deployment transactions.
  */
+/**
+ * @deprecated Use {@link SmartContractTransactionsFactory} instead.
+ */
 export class ContractDeployPayloadBuilder {
     private code: ICode | null = null;
     private codeMetadata: ICodeMetadata = "";

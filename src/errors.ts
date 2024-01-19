@@ -352,3 +352,12 @@ export class ErrBadUsage extends Err {
     super(message);
   }
 }
+
+/**
+ * Signals an invalid inner transaction for relayed transactions
+ */
+export class ErrInvalidInnerTransaction extends Err{
+  public constructor(message: string){
+    super(message);
+  }
+}

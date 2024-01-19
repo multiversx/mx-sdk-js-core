@@ -5,6 +5,8 @@ import { ErrInvalidInnerTransaction } from "../errors";
 import { Address } from "../address";
 import { AddressValue, ArgSerializer, BytesValue, U64Value } from "../smartcontracts";
 
+const JSONbig = require("json-bigint");
+
 interface IConfig {
     chainID: string;
     minGasLimit: BigNumber.Value;
@@ -92,12 +94,12 @@ export class RelayedTransactionsFactory {
 
     private prepareInnerTransactionForRelayedV1(innerTransaction: TransactionNext): string {
         const txObject = {
-            nonce: new BigNumber(innerTransaction.nonce.toString(), 10).toNumber(),
+            nonce: new BigNumber(innerTransaction.nonce).toNumber(),
             sender: Address.fromBech32(innerTransaction.sender).pubkey().toString("base64"),
             receiver: Address.fromBech32(innerTransaction.receiver).pubkey().toString("base64"),
-            value: new BigNumber(innerTransaction.value.toString(), 10).toNumber(),
-            gasPrice: new BigNumber(innerTransaction.gasPrice.toString(), 10).toNumber(),
-            gasLimit: new BigNumber(innerTransaction.gasLimit.toString(), 10).toNumber(),
+            value: BigInt(new BigNumber(innerTransaction.value).toFixed(0)),
+            gasPrice: new BigNumber(innerTransaction.gasPrice).toNumber(),
+            gasLimit: new BigNumber(innerTransaction.gasLimit).toNumber(),
             data: Buffer.from(innerTransaction.data).toString("base64"),
             signature: Buffer.from(innerTransaction.signature).toString("base64"),
             chainID: Buffer.from(innerTransaction.chainID).toString("base64"),
@@ -117,6 +119,6 @@ export class RelayedTransactionsFactory {
                 : undefined,
         };
 
-        return JSON.stringify(txObject);
+        return JSONbig.stringify(txObject);
     }
 }

@@ -104,6 +104,40 @@ describe("test relayed v1 transaction builder", function () {
         );
     });
 
+    it("should create relayed v1 transaction with big value", async function () {
+        let innerTransaction = new TransactionNext({
+            sender: carol.address.bech32(),
+            receiver: alice.address.bech32(),
+            gasLimit: 50000,
+            chainID: config.chainID,
+            nonce: 208,
+            senderUsername: "carol",
+            receiverUsername: "alice",
+            value: new BigNumber("1999999000000000000000000"),
+        });
+
+        const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
+        innerTransaction.signature = await carol.signer.sign(Buffer.from(serializedInnerTransaction));
+
+        const relayedTransaction = factory.createRelayedV1Transaction({
+            innerTransaction: innerTransaction,
+            relayerAddress: frank.address,
+        });
+        relayedTransaction.nonce = 715;
+
+        const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
+        relayedTransaction.signature = await frank.signer.sign(Buffer.from(serializedRelayedTransaction));
+
+        assert.equal(
+            Buffer.from(relayedTransaction.data).toString(),
+            "relayedTx@7b226e6f6e6365223a3230382c2273656e646572223a227371455656633553486b6c45344a717864556e59573068397a536249533141586f3534786f32634969626f3d222c227265636569766572223a2241546c484c76396f686e63616d433877673970645168386b77704742356a6949496f3349484b594e6165453d222c2276616c7565223a313939393939393030303030303030303030303030303030302c226761735072696365223a313030303030303030302c226761734c696d6974223a35303030302c2264617461223a22222c227369676e6174757265223a22594661677972512f726d614c7333766e7159307657553858415a7939354b4e31725738347a4f764b62376c7a3773576e2f566a546d68704378774d682b7261314e444832574d6f3965507648304f79427453776a44773d3d222c22636861696e4944223a2256413d3d222c2276657273696f6e223a322c22736e64557365724e616d65223a22593246796232773d222c22726376557365724e616d65223a22595778705932553d227d"
+        );
+        assert.equal(
+            Buffer.from(relayedTransaction.signature).toString("hex"),
+            "c0fb5cf8c0a413d6988ba35dc279c63f8849572c5f23b1cab36dcc50952dc3ed9da01068d6ac0cbde7e14167bfc2eca5164d5c2154c89eb313c9c596e3f8b801"
+        );
+    });
+
     it("should create relayed v1 transaction with guarded inner transaction", async function () {
         let innerTransaction = new TransactionNext({
             sender: bob.address.bech32(),

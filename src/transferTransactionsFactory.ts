@@ -58,7 +58,7 @@ export class TransferTransactionsFactory {
         const { argumentsString } = new ArgSerializer().valuesToString([
             // The token identifier
             BytesValue.fromUTF8(args.tokenTransfer.tokenIdentifier),
-            // The transfered amount
+            // The transferred amount
             new BigUIntValue(args.tokenTransfer.valueOf()),
         ]);
 

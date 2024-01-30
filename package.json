@@ -19,6 +19,7 @@
     "compile-proto": "npx pbjs -t static-module -w commonjs -o src/proto/compiled.js src/proto/transaction.proto && npx pbts -o src/proto/compiled.d.ts src/proto/compiled.js",
     "browser-tests": "make clean && make browser-tests && http-server --port=9876 -o browser-tests/index.html",
     "lint": "eslint .",
+    "pretty": "prettier --write ./src/**/*.{js,ts}",
     "pretest": "npm run compile",
     "prepare": "npm run compile"
   },

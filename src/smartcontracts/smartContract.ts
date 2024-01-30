@@ -1,12 +1,16 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
 import { Compatibility } from "../compatibility";
+import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
 import { ErrContractHasNoAddress } from "../errors";
 import { IAddress, INonce } from "../interface";
+import { TokenComputer } from "../tokens";
 import { Transaction } from "../transaction";
+import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
+import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { guardValueIsSet } from "../utils";
-import { bigIntToBuffer } from "./codec/utils";
 import { CodeMetadata } from "./codeMetadata";
+import { bigIntToBuffer } from "./codec/utils";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { CallArguments, DeployArguments, ICodeMetadata, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
@@ -14,10 +18,6 @@ import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
 import { WasmVirtualMachine } from "./transactionPayloadBuilders";
 import { EndpointDefinition, TypedValue } from "./typesystem";
-import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
-import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
-import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
-import { TokenComputer } from "../tokens";
 const createKeccakHash = require("keccak");
 
 interface IAbi {
@@ -62,6 +62,7 @@ export class SmartContract implements ISmartContract {
     }
 
     private setupMethods() {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let contract = this;
         let abi = this.getAbi();
 

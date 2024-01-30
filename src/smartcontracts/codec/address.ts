@@ -21,7 +21,7 @@ export class AddressBinaryCodec {
      * @param buffer the input buffer
      */
     decodeTopLevel(buffer: Buffer): AddressValue {
-        let [decoded, length] = this.decodeNested(buffer);
+        let [decoded, _length] = this.decodeNested(buffer);
         return decoded;
     }
 

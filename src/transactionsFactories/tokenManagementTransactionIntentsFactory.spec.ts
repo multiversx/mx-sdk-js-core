@@ -1,9 +1,9 @@
+import BigNumber from "bignumber.js";
 import { assert } from "chai";
+import { ESDT_CONTRACT_ADDRESS } from "../constants";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { TokenManagementTransactionsFactory } from "./tokenManagementTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
-import BigNumber from "bignumber.js";
-import { ESDT_CONTRACT_ADDRESS } from "../constants";
 
 describe("test token management transactions factory", () => {
     let frank: TestWallet, grace: TestWallet;
@@ -137,7 +137,7 @@ describe("test token management transactions factory", () => {
             sender: grace.address,
             tokenIdentifier: "FRANK-aa9e8d",
             initialQuantity: 1,
-            name: `test`,
+            name: "test",
             royalties: 1000,
             hash: "abba",
             attributes: Buffer.from("test"),

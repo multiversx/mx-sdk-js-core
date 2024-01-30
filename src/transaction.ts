@@ -2,6 +2,7 @@ import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
 import { Compatibility } from "./compatibility";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
+import { DraftTransaction } from "./draftTransaction";
 import * as errors from "./errors";
 import { Hash } from "./hash";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionNext, ITransactionOptions, ITransactionPayload, ITransactionValue, ITransactionVersion } from "./interface";
@@ -11,7 +12,6 @@ import { ProtoSerializer } from "./proto";
 import { Signature, interpretSignatureAsBuffer } from "./signature";
 import { TransactionPayload } from "./transactionPayload";
 import { guardNotEmpty } from "./utils";
-import { DraftTransaction } from "./draftTransaction";
 
 const createTransactionHasher = require("blake2b");
 const TRANSACTION_HASH_LENGTH = 32;
@@ -440,7 +440,7 @@ export class Transaction {
    * Creates a new Transaction object from a TransactionNext object.
    */
   static fromTransactionNext(transaction: ITransactionNext): Transaction {
-    const tx =  new Transaction({
+    const tx = new Transaction({
       sender: Address.fromBech32(transaction.sender),
       receiver: Address.fromBech32(transaction.receiver),
       gasLimit: new BigNumber(transaction.gasLimit).toNumber(),
@@ -462,7 +462,7 @@ export class Transaction {
     if (transaction.signature.length) {
       tx.applySignature(transaction.signature);
     }
-    
+
     if (transaction.guardianSignature.length) {
       tx.applyGuardianSignature(transaction.guardianSignature);
     }
@@ -496,7 +496,7 @@ export class TransactionHash extends Hash {
  * An abstraction for creating, signing and broadcasting transactions.
  * Will replace the {@link Transaction} class in the future.
  */
-export class TransactionNext{
+export class TransactionNext {
   /**
    * The nonce of the transaction (the account sequence number of the sender).
    */
@@ -627,9 +627,9 @@ export class TransactionNext{
  * An utilitary class meant to work together with the {@link TransactionNext} class.
  */
 export class TransactionComputer {
-  constructor() {}
+  constructor() { }
 
-  computeTransactionFee(transaction: ITransactionNext, networkConfig: INetworkConfig): BigNumber{
+  computeTransactionFee(transaction: ITransactionNext, networkConfig: INetworkConfig): BigNumber {
     const moveBalanceGas = new BigNumber(
       networkConfig.MinGasLimit + transaction.data.length * networkConfig.GasPerDataByte);
     if (moveBalanceGas > transaction.gasLimit) {
@@ -651,7 +651,7 @@ export class TransactionComputer {
     return feeForMove.plus(processingFee);
   }
 
-  computeBytesForSigning(transaction: ITransactionNext): Uint8Array{
+  computeBytesForSigning(transaction: ITransactionNext): Uint8Array {
     const plainTransaction = this.toPlainObject(transaction);
 
     if (plainTransaction.signature) {
@@ -671,7 +671,7 @@ export class TransactionComputer {
     return new Uint8Array(Buffer.from(serialized));
   }
 
-  computeTransactionHash(transaction: ITransactionNext): Uint8Array{
+  computeTransactionHash(transaction: ITransactionNext): Uint8Array {
     let serializer = new ProtoSerializer();
 
     const tx = Transaction.fromTransactionNext(transaction);
@@ -679,7 +679,7 @@ export class TransactionComputer {
     const hash = createTransactionHasher(TRANSACTION_HASH_LENGTH)
       .update(buffer)
       .digest("hex");
-    
+
     return Buffer.from(hash, "hex");
   }
 

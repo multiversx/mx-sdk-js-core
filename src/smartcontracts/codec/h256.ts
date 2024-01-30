@@ -18,7 +18,7 @@ export class H256BinaryCodec {
      * @param buffer the input buffer
      */
     decodeTopLevel(buffer: Buffer): H256Value {
-        let [decoded, length] = this.decodeNested(buffer);
+        let [decoded, _length] = this.decodeNested(buffer);
         return decoded;
     }
 

@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { Address } from "./address";
 import { ErrInvalidRelayedV1BuilderArguments } from "./errors";
 import { IAddress, INonce } from "./interface";

@@ -123,6 +123,23 @@ export class Address {
     }
 
     /**
+     * Performs address validation without throwing errors
+     */
+    static isValid(value: string): boolean {
+        const decoded = bech32.decodeUnsafe(value);
+        const prefix = decoded?.prefix;
+        const pubkey = decoded
+            ? Buffer.from(bech32.fromWords(decoded.words))
+            : undefined;
+
+        if (prefix !== HRP || pubkey?.length !== PUBKEY_LENGTH) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
      * Returns the hex representation of the address (pubkey)
      */
     hex(): string {

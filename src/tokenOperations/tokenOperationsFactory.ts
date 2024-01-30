@@ -63,7 +63,7 @@ interface IIssueSemiFungibleArgs extends IBaseArgs {
     canAddSpecialRoles: boolean;
 }
 
-interface IIssueNonFungibleArgs extends IIssueSemiFungibleArgs {}
+interface IIssueNonFungibleArgs extends IIssueSemiFungibleArgs { }
 
 interface IRegisterMetaESDT extends IIssueSemiFungibleArgs {
     numDecimals: number;
@@ -182,10 +182,12 @@ interface IBurnQuantityArgs extends IBaseArgs {
 export class TokenOperationsFactory {
     private readonly config: IConfig;
     private readonly trueAsHex;
+    private readonly falseAsHex;
 
     constructor(config: IConfig) {
         this.config = config;
         this.trueAsHex = utf8ToHex("true");
+        this.falseAsHex = utf8ToHex("false");
     }
 
     issueFungible(args: IIssueFungibleArgs): Transaction {
@@ -197,12 +199,18 @@ export class TokenOperationsFactory {
             utf8ToHex(args.tokenTicker),
             bigIntToHex(args.initialSupply),
             bigIntToHex(args.numDecimals),
-            ...(args.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
-            ...(args.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
-            ...(args.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
-            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
-            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
+            utf8ToHex("canFreeze"),
+            args.canFreeze ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canWipe"),
+            args.canWipe ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canPause"),
+            args.canPause ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canChangeOwner"),
+            args.canChangeOwner ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canUpgrade"),
+            args.canUpgrade ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canAddSpecialRoles"),
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
         ];
 
         return this.createTransaction({
@@ -233,13 +241,20 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             "issueSemiFungible",
             utf8ToHex(args.tokenName),
             utf8ToHex(args.tokenTicker),
-            ...(args.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
-            ...(args.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
-            ...(args.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
-            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
-            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
-            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
+            utf8ToHex("canFreeze"),
+            args.canFreeze ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canWipe"),
+            args.canWipe ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canPause"),
+            args.canPause ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canTransferNFTCreateRole"),
+            args.canTransferNFTCreateRole ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canChangeOwner"),
+            args.canChangeOwner ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canUpgrade"),
+            args.canUpgrade ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canAddSpecialRoles"),
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
         ];
 
         return this.createTransaction({
@@ -261,13 +276,20 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             "issueNonFungible",
             utf8ToHex(args.tokenName),
             utf8ToHex(args.tokenTicker),
-            ...(args.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
-            ...(args.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
-            ...(args.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
-            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
-            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
-            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
+            utf8ToHex("canFreeze"),
+            args.canFreeze ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canWipe"),
+            args.canWipe ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canPause"),
+            args.canPause ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canTransferNFTCreateRole"),
+            args.canTransferNFTCreateRole ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canChangeOwner"),
+            args.canChangeOwner ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canUpgrade"),
+            args.canUpgrade ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canAddSpecialRoles"),
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
         ];
 
         return this.createTransaction({
@@ -290,13 +312,20 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             utf8ToHex(args.tokenName),
             utf8ToHex(args.tokenTicker),
             bigIntToHex(args.numDecimals),
-            ...(args.canFreeze ? [utf8ToHex("canFreeze"), this.trueAsHex] : []),
-            ...(args.canWipe ? [utf8ToHex("canWipe"), this.trueAsHex] : []),
-            ...(args.canPause ? [utf8ToHex("canPause"), this.trueAsHex] : []),
-            ...(args.canTransferNFTCreateRole ? [utf8ToHex("canTransferNFTCreateRole"), this.trueAsHex] : []),
-            ...(args.canChangeOwner ? [utf8ToHex("canChangeOwner"), this.trueAsHex] : []),
-            ...(args.canUpgrade ? [utf8ToHex("canUpgrade"), this.trueAsHex] : []),
-            ...(args.canAddSpecialRoles ? [utf8ToHex("canAddSpecialRoles"), this.trueAsHex] : []),
+            utf8ToHex("canFreeze"),
+            args.canFreeze ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canWipe"),
+            args.canWipe ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canPause"),
+            args.canPause ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canTransferNFTCreateRole"),
+            args.canTransferNFTCreateRole ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canChangeOwner"),
+            args.canChangeOwner ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canUpgrade"),
+            args.canUpgrade ? this.trueAsHex : this.falseAsHex,
+            utf8ToHex("canAddSpecialRoles"),
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
         ];
 
         return this.createTransaction({
@@ -501,11 +530,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
     }
 
     unfreeze(args: IFreezingArgs): Transaction {
-        const parts = [
-            "unFreeze",
-            utf8ToHex(args.tokenIdentifier),
-            addressToHex(args.user)
-        ];
+        const parts = ["unFreeze", utf8ToHex(args.tokenIdentifier), addressToHex(args.user)];
 
         return this.createTransaction({
             sender: args.manager,
@@ -519,11 +544,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
     }
 
     wipe(args: IWipingArgs): Transaction {
-        const parts = [
-            "wipe",
-            utf8ToHex(args.tokenIdentifier),
-            addressToHex(args.user)
-        ];
+        const parts = ["wipe", utf8ToHex(args.tokenIdentifier), addressToHex(args.user)];
 
         return this.createTransaction({
             sender: args.manager,
@@ -537,11 +558,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
     }
 
     localMint(args: ILocalMintArgs): Transaction {
-        const parts = [
-            "ESDTLocalMint",
-            utf8ToHex(args.tokenIdentifier),
-            bigIntToHex(args.supplyToMint),
-        ];
+        const parts = ["ESDTLocalMint", utf8ToHex(args.tokenIdentifier), bigIntToHex(args.supplyToMint)];
 
         return this.createTransaction({
             sender: args.manager,
@@ -669,7 +686,8 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
     }
 
     private computeGasLimit(payload: TransactionPayload, executionGas: IGasLimit): IGasLimit {
-        const dataMovementGas = this.config.minGasLimit.valueOf() + this.config.gasLimitPerByte.valueOf() * payload.length();
+        const dataMovementGas =
+            this.config.minGasLimit.valueOf() + this.config.gasLimitPerByte.valueOf() * payload.length();
         return dataMovementGas + executionGas.valueOf();
     }
 }

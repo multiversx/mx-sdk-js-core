@@ -39,12 +39,12 @@ describe("test factory", () => {
             canWipe: true,
             canPause: true,
             canChangeOwner: true,
-            canUpgrade: true,
-            canAddSpecialRoles: true,
+            canUpgrade: false,
+            canAddSpecialRoles: false,
             transactionNonce: 42
         });
 
-        assert.equal(transaction.getData().toString(), "issue@4652414e4b@4652414e4b@64@@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565")
+        assert.equal(transaction.getData().toString(), "issue@4652414e4b@4652414e4b@64@@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@66616c7365@63616e4164645370656369616c526f6c6573@66616c7365")
         assert.equal(transaction.getNonce(), 42);
         assert.equal(transaction.getSender().toString(), frank.address.toString());
         assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
@@ -60,12 +60,12 @@ describe("test factory", () => {
             canPause: true,
             canTransferNFTCreateRole: true,
             canChangeOwner: true,
-            canUpgrade: true,
-            canAddSpecialRoles: true,
+            canUpgrade: false,
+            canAddSpecialRoles: false,
             transactionNonce: 42
         });
 
-        assert.equal(transaction.getData().toString(), "issueSemiFungible@4652414e4b@4652414e4b@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565")
+        assert.equal(transaction.getData().toString(), "issueSemiFungible@4652414e4b@4652414e4b@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@66616c7365@63616e4164645370656369616c526f6c6573@66616c7365")
         assert.equal(transaction.getNonce(), 42);
         assert.equal(transaction.getSender().toString(), frank.address.toString());
         assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
@@ -81,12 +81,12 @@ describe("test factory", () => {
             canPause: true,
             canTransferNFTCreateRole: true,
             canChangeOwner: true,
-            canUpgrade: true,
-            canAddSpecialRoles: true,
+            canUpgrade: false,
+            canAddSpecialRoles: false,
             transactionNonce: 42
         });
 
-        assert.equal(transaction.getData().toString(), "issueNonFungible@4652414e4b@4652414e4b@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565")
+        assert.equal(transaction.getData().toString(), "issueNonFungible@4652414e4b@4652414e4b@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@66616c7365@63616e4164645370656369616c526f6c6573@66616c7365")
         assert.equal(transaction.getNonce(), 42);
         assert.equal(transaction.getSender().toString(), frank.address.toString());
         assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
@@ -103,12 +103,12 @@ describe("test factory", () => {
             canPause: true,
             canTransferNFTCreateRole: true,
             canChangeOwner: true,
-            canUpgrade: true,
-            canAddSpecialRoles: true,
+            canUpgrade: false,
+            canAddSpecialRoles: false,
             transactionNonce: 42
         });
 
-        assert.equal(transaction.getData().toString(), "registerMetaESDT@4652414e4b@4652414e4b@0a@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565")
+        assert.equal(transaction.getData().toString(), "registerMetaESDT@4652414e4b@4652414e4b@0a@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e5472616e736665724e4654437265617465526f6c65@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@66616c7365@63616e4164645370656369616c526f6c6573@66616c7365")
         assert.equal(transaction.getNonce(), 42);
         assert.equal(transaction.getSender().toString(), frank.address.toString());
         assert.equal(transaction.getReceiver().toString(), "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");

@@ -23,12 +23,10 @@
         "src/**/*",
     ],
     "exclude": [
-		"node_modules",
+        "node_modules",
         "out",
         "out-tests",
         "out-browser",
-        "out-browser-tests",
-        "src/examples",
-        "src/_docs"
+        "out-browser-tests"
     ]
 }

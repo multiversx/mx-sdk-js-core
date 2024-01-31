@@ -3,7 +3,6 @@ import { Address } from "./address";
 import * as errors from "./errors";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { RelayedTransactionV1Builder } from "./relayedTransactionV1Builder";
-import { Signature } from "./signature";
 import { TestWallet, loadTestWallets } from "./testutils";
 import { TokenTransfer } from "./tokenTransfer";
 import { Transaction } from "./transaction";

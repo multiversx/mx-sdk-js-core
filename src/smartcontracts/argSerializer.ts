@@ -55,6 +55,7 @@ export class ArgSerializer {
      */
     buffersToValues(buffers: Buffer[], parameters: IParameterDefinition[]): TypedValue[] {
         // TODO: Refactor, split (function is quite complex).
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
 
         buffers = buffers || [];
@@ -158,6 +159,7 @@ export class ArgSerializer {
      */
     valuesToBuffers(values: TypedValue[]): Buffer[] {
         // TODO: Refactor, split (function is quite complex).
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
 
         const buffers: Buffer[] = [];

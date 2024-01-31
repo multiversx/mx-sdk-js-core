@@ -1,5 +1,3 @@
-import { Hash } from "../hash";
-
 const createHasher = require('blake2b')
 const CODE_HASH_LENGTH = 32
 

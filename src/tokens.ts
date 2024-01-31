@@ -22,7 +22,7 @@ export class NextTokenTransfer {
 }
 
 export class TokenComputer {
-    constructor() {}
+    constructor() { }
 
     isFungible(token: Token): boolean {
         return token.nonce === 0;

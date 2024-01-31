@@ -1,5 +1,5 @@
-import { ErrMissingFieldOnStruct, ErrTypingSystem } from "../../errors";
-import { FieldDefinition, Field, Fields } from "./fields";
+import { ErrMissingFieldOnStruct } from "../../errors";
+import { Field, FieldDefinition, Fields } from "./fields";
 import { CustomType, TypedValue } from "./types";
 
 export class StructType extends CustomType {
@@ -81,7 +81,7 @@ export class Struct extends TypedValue {
 
         return result;
     }
-    
+
     equals(other: Struct): boolean {
         if (!this.getType().equals(other.getType())) {
             return false;

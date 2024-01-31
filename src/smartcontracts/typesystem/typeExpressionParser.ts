@@ -1,6 +1,6 @@
 import * as errors from "../../errors";
 import { Type } from "./types";
-var jsonHandler = require("json-duplicate-key-handle");
+const jsonHandler = require("json-duplicate-key-handle");
 
 export class TypeExpressionParser {
     parse(expression: string): Type {
@@ -41,7 +41,7 @@ export class TypeExpressionParser {
     private getJsonedString(expression: string) {
         let jsoned = "";
 
-        for (var i = 0; i < expression.length; i++) {
+        for (let i = 0; i < expression.length; i++) {
             let char = expression.charAt(i);
             let previousChar = expression.charAt(i - 1);
             let nextChar = expression.charAt(i + 1);

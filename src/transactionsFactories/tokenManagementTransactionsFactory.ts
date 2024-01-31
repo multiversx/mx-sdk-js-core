@@ -1,11 +1,11 @@
 import BigNumber from "bignumber.js";
-import { DraftTransaction } from "../draftTransaction";
-import { DraftTransactionBuilder } from "./draftTransactionBuilder";
-import { IAddress } from "../interface";
-import { utf8ToHex, boolToHex, bigIntToHex, addressToHex, byteArrayToHex } from "../utils.codec";
-import { ESDT_CONTRACT_ADDRESS } from "../constants";
 import { Address } from "../address";
+import { ESDT_CONTRACT_ADDRESS } from "../constants";
+import { DraftTransaction } from "../draftTransaction";
+import { IAddress } from "../interface";
 import { Logger } from "../logger";
+import { addressToHex, bigIntToHex, byteArrayToHex, utf8ToHex } from "../utils.codec";
+import { DraftTransactionBuilder } from "./draftTransactionBuilder";
 
 interface Config {
     chainID: string;

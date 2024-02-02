@@ -63,7 +63,7 @@ interface IIssueSemiFungibleArgs extends IBaseArgs {
     canAddSpecialRoles: boolean;
 }
 
-interface IIssueNonFungibleArgs extends IIssueSemiFungibleArgs { }
+interface IIssueNonFungibleArgs extends IIssueSemiFungibleArgs {}
 
 interface IRegisterMetaESDT extends IIssueSemiFungibleArgs {
     numDecimals: number;
@@ -210,7 +210,7 @@ export class TokenOperationsFactory {
             utf8ToHex("canUpgrade"),
             args.canUpgrade ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canAddSpecialRoles"),
-            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return this.createTransaction({
@@ -254,7 +254,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             utf8ToHex("canUpgrade"),
             args.canUpgrade ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canAddSpecialRoles"),
-            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return this.createTransaction({
@@ -289,7 +289,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             utf8ToHex("canUpgrade"),
             args.canUpgrade ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canAddSpecialRoles"),
-            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return this.createTransaction({
@@ -325,7 +325,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             utf8ToHex("canUpgrade"),
             args.canUpgrade ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canAddSpecialRoles"),
-            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return this.createTransaction({

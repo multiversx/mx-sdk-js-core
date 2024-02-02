@@ -16,9 +16,13 @@ export class Compatibility {
         }
 
         if (!address || address.bech32() == "") {
-            console.warn(`${context}: address should be set; ${resolution}. In the future, this will throw an exception instead of emitting a WARN.`);
+            console.warn(
+                `${context}: address should be set; ${resolution}. In the future, this will throw an exception instead of emitting a WARN.`,
+            );
         } else if (address.bech32() == Address.Zero().bech32()) {
-            console.warn(`${context}: address should not be the 'zero' address (also known as the 'contracts deployment address'); ${resolution}. In the future, this will throw an exception instead of emitting a WARN.`);
+            console.warn(
+                `${context}: address should not be the 'zero' address (also known as the 'contracts deployment address'); ${resolution}. In the future, this will throw an exception instead of emitting a WARN.`,
+            );
         }
     }
 }

@@ -1,4 +1,4 @@
-require('./globals');
+require("./globals");
 
 export * from "./account";
 export * from "./address";
@@ -21,4 +21,3 @@ export * from "./transactionPayload";
 export * from "./transactionWatcher";
 export * from "./transferTransactionsFactory";
 export * from "./utils";
-

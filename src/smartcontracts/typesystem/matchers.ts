@@ -27,7 +27,7 @@ export function onTypeSelect<TResult>(
         onTuple: () => TResult;
         onEnum: () => TResult;
         onOther?: () => TResult;
-    }
+    },
 ): TResult {
     if (type.hasExactClass(OptionType.ClassName)) {
         return selectors.onOption();
@@ -69,7 +69,7 @@ export function onTypedValueSelect<TResult>(
         onTuple: () => TResult;
         onEnum: () => TResult;
         onOther?: () => TResult;
-    }
+    },
 ): TResult {
     if (value.hasClassOrSuperclass(PrimitiveValue.ClassName)) {
         return selectors.onPrimitive();
@@ -112,7 +112,7 @@ export function onPrimitiveValueSelect<TResult>(
         onTypeIdentifier: () => TResult;
         onNothing: () => TResult;
         onOther?: () => TResult;
-    }
+    },
 ): TResult {
     if (value.hasExactClass(BooleanValue.ClassName)) {
         return selectors.onBoolean();
@@ -157,7 +157,7 @@ export function onPrimitiveTypeSelect<TResult>(
         onTokenIndetifier: () => TResult;
         onNothing: () => TResult;
         onOther?: () => TResult;
-    }
+    },
 ): TResult {
     if (type.hasExactClass(BooleanType.ClassName)) {
         return selectors.onBoolean();

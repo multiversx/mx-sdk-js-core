@@ -22,7 +22,7 @@ export class NextTokenTransfer {
 }
 
 export class TokenComputer {
-    constructor() { }
+    constructor() {}
 
     isFungible(token: Token): boolean {
         return token.nonce === 0;
@@ -72,7 +72,7 @@ export class TokenComputer {
 
         if (randomSequence.length !== TOKEN_RANDOM_SEQUENCE_LENGTH) {
             throw new ErrInvalidTokenIdentifier(
-                "The identifier is not valid. The random sequence does not have the right length"
+                "The identifier is not valid. The random sequence does not have the right length",
             );
         }
     }
@@ -83,7 +83,7 @@ export class TokenComputer {
 
         if (ticker.length < MIN_TICKER_LENGTH || ticker.length > MAX_TICKER_LENGTH) {
             throw new ErrInvalidTokenIdentifier(
-                `The token ticker should be between ${MIN_TICKER_LENGTH} and ${MAX_TICKER_LENGTH} characters`
+                `The token ticker should be between ${MIN_TICKER_LENGTH} and ${MAX_TICKER_LENGTH} characters`,
             );
         }
 

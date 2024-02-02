@@ -1,6 +1,12 @@
 import { ApiNetworkProvider, ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
 import { IAddress } from "../interface";
-import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
+import {
+    IAccountOnNetwork,
+    IContractQueryResponse,
+    INetworkConfig,
+    ITransactionOnNetwork,
+    ITransactionStatus,
+} from "../interfaceOfNetwork";
 import { Query } from "../smartcontracts/query";
 import { Transaction } from "../transaction";
 

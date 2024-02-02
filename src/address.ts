@@ -128,14 +128,12 @@ export class Address {
     static isValid(value: string): boolean {
         const decoded = bech32.decodeUnsafe(value);
         const prefix = decoded?.prefix;
-        const pubkey = decoded
-            ? Buffer.from(bech32.fromWords(decoded.words))
-            : undefined;
+        const pubkey = decoded ? Buffer.from(bech32.fromWords(decoded.words)) : undefined;
 
         if (prefix !== HRP || pubkey?.length !== PUBKEY_LENGTH) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -205,7 +203,7 @@ export class Address {
     toJSON(): object {
         return {
             bech32: this.bech32(),
-            pubkey: this.hex()
+            pubkey: this.hex(),
         };
     }
 

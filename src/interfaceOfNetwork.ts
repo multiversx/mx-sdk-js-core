@@ -65,7 +65,10 @@ export interface IContractReturnCode {
 export interface ITransactionLogs {
     events: ITransactionEvent[];
 
-    findSingleOrNoneEvent(identifier: string, predicate?: (event: ITransactionEvent) => boolean): ITransactionEvent | undefined;
+    findSingleOrNoneEvent(
+        identifier: string,
+        predicate?: (event: ITransactionEvent) => boolean,
+    ): ITransactionEvent | undefined;
 }
 
 export interface ITransactionEvent {

@@ -12,7 +12,11 @@ export class Type {
     private readonly typeParameters: Type[];
     protected readonly cardinality: TypeCardinality;
 
-    public constructor(name: string, typeParameters: Type[] = [], cardinality: TypeCardinality = TypeCardinality.fixed(1)) {
+    public constructor(
+        name: string,
+        typeParameters: Type[] = [],
+        cardinality: TypeCardinality = TypeCardinality.fixed(1),
+    ) {
         guardValueIsSet("name", name);
 
         this.name = name;
@@ -29,8 +33,8 @@ export class Type {
     }
 
     getClassHierarchy(): string[] {
-        let prototypes = getJavascriptPrototypesInHierarchy(this, prototype => prototype.belongsToTypesystem);
-        let classNames = prototypes.map(prototype => (<Type>prototype).getClassName()).reverse();
+        let prototypes = getJavascriptPrototypesInHierarchy(this, (prototype) => prototype.belongsToTypesystem);
+        let classNames = prototypes.map((prototype) => (<Type>prototype).getClassName()).reverse();
         return classNames;
     }
 
@@ -38,11 +42,13 @@ export class Type {
      * Gets the fully qualified name of the type, to allow for better (efficient and non-ambiguous) type comparison within the custom typesystem.
      */
     getFullyQualifiedName(): string {
-        let joinedTypeParameters = this.getTypeParameters().map(type => type.getFullyQualifiedName()).join(", ");
+        let joinedTypeParameters = this.getTypeParameters()
+            .map((type) => type.getFullyQualifiedName())
+            .join(", ");
 
-        return this.isGenericType() ?
-            `multiversx:types:${this.getName()}<${joinedTypeParameters}>` :
-            `multiversx:types:${this.getName()}`;
+        return this.isGenericType()
+            ? `multiversx:types:${this.getName()}<${joinedTypeParameters}>`
+            : `multiversx:types:${this.getName()}`;
     }
 
     hasExactClass(className: string): boolean {
@@ -68,10 +74,12 @@ export class Type {
     }
 
     /**
-     * Generates type expressions similar to mx-sdk-rs. 
+     * Generates type expressions similar to mx-sdk-rs.
      */
     toString() {
-        let typeParameters: string = this.getTypeParameters().map(type => type.toString()).join(", ");
+        let typeParameters: string = this.getTypeParameters()
+            .map((type) => type.toString())
+            .join(", ");
         let typeParametersExpression = typeParameters ? `<${typeParameters}>` : "";
         return `${this.name}${typeParametersExpression}`;
     }
@@ -103,11 +111,11 @@ export class Type {
     /**
      * Inspired from: https://docs.microsoft.com/en-us/dotnet/api/system.type.isassignablefrom
      * For (most) generics, type invariance is expected (assumed) - neither covariance, nor contravariance are supported yet (will be supported in a next release).
-     * 
+     *
      * One exception though: for {@link OptionType}, we simulate covariance for missing (not provided) values.
      * For example, Option<u32> is assignable from Option<?>.
      * For more details, see the implementation of {@link OptionType} and @{@link OptionalType}.
-     * 
+     *
      * Also see:
      *  - https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)
      *  - https://docs.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance
@@ -128,8 +136,8 @@ export class Type {
     }
 
     private static getFullyQualifiedNamesInHierarchy(type: Type): string[] {
-        let prototypes: any[] = getJavascriptPrototypesInHierarchy(type, prototype => prototype.belongsToTypesystem);
-        let fullyQualifiedNames = prototypes.map(prototype => prototype.getFullyQualifiedName.call(type));
+        let prototypes: any[] = getJavascriptPrototypesInHierarchy(type, (prototype) => prototype.belongsToTypesystem);
+        let fullyQualifiedNames = prototypes.map((prototype) => prototype.getFullyQualifiedName.call(type));
         return fullyQualifiedNames;
     }
 
@@ -150,7 +158,7 @@ export class Type {
     toJSON(): any {
         return {
             name: this.name,
-            typeParameters: this.typeParameters.map(item => item.toJSON())
+            typeParameters: this.typeParameters.map((item) => item.toJSON()),
         };
     }
 
@@ -161,14 +169,14 @@ export class Type {
     /**
      * A special marker for types within the custom typesystem.
      */
-    belongsToTypesystem() { }
+    belongsToTypesystem() {}
 }
 
 /**
  * TODO: Simplify this class, keep only what is needed.
- * 
+ *
  * An abstraction for defining and operating with the cardinality of a (composite or simple) type.
- * 
+ *
  * Simple types (the ones that are directly encodable) have a fixed cardinality: [lower = 1, upper = 1].
  * Composite types (not directly encodable) do not follow this constraint. For example:
  *  - VarArgs: [lower = 0, upper = *]
@@ -254,8 +262,8 @@ export abstract class TypedValue {
     }
 
     getClassHierarchy(): string[] {
-        let prototypes = getJavascriptPrototypesInHierarchy(this, prototype => prototype.belongsToTypesystem);
-        let classNames = prototypes.map(prototype => (<TypedValue>prototype).getClassName()).reverse();
+        let prototypes = getJavascriptPrototypesInHierarchy(this, (prototype) => prototype.belongsToTypesystem);
+        let classNames = prototypes.map((prototype) => (<TypedValue>prototype).getClassName()).reverse();
         return classNames;
     }
 
@@ -278,7 +286,7 @@ export abstract class TypedValue {
     /**
      * A special marker for values within the custom typesystem.
      */
-    belongsToTypesystem() { }
+    belongsToTypesystem() {}
 }
 
 export abstract class PrimitiveValue extends TypedValue {
@@ -308,7 +316,6 @@ export class TypePlaceholder extends Type {
         return TypePlaceholder.ClassName;
     }
 }
-
 
 export class NullType extends Type {
     static ClassName = "NullType";

@@ -4,7 +4,7 @@ import { AddressValue } from "../typesystem";
 export class AddressBinaryCodec {
     /**
      * Reads and decodes an AddressValue from a given buffer.
-     * 
+     *
      * @param buffer the input buffer
      */
     decodeNested(buffer: Buffer): [AddressValue, number] {
@@ -17,7 +17,7 @@ export class AddressBinaryCodec {
 
     /**
      * Reads and decodes an AddressValue from a given buffer.
-     * 
+     *
      * @param buffer the input buffer
      */
     decodeTopLevel(buffer: Buffer): AddressValue {

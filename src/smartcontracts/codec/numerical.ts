@@ -1,7 +1,15 @@
 import BigNumber from "bignumber.js";
 import { NumericalType, NumericalValue } from "../typesystem";
 import { SizeOfU32 } from "./constants";
-import { bigIntToBuffer, bufferToBigInt, cloneBuffer, flipBufferBitsInPlace, isMsbOne, isMsbZero, prependByteToBuffer } from "./utils";
+import {
+    bigIntToBuffer,
+    bufferToBigInt,
+    cloneBuffer,
+    flipBufferBitsInPlace,
+    isMsbOne,
+    isMsbZero,
+    prependByteToBuffer,
+} from "./utils";
 
 /**
  * Encodes and decodes "NumericalValue" objects.
@@ -91,7 +99,7 @@ export class NumericalBinaryCodec {
 
         // Fix ambiguity if any
         if (isMsbZero(buffer)) {
-            buffer = prependByteToBuffer(buffer, 0xFF);
+            buffer = prependByteToBuffer(buffer, 0xff);
         }
 
         const paddingBytes = Buffer.alloc(size - buffer.length, 0xff);
@@ -135,7 +143,7 @@ export class NumericalBinaryCodec {
 
         // Fix ambiguity if any
         if (isMsbZero(buffer)) {
-            buffer = prependByteToBuffer(buffer, 0xFF);
+            buffer = prependByteToBuffer(buffer, 0xff);
         }
 
         return buffer;

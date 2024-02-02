@@ -32,6 +32,6 @@ describe("Code Class Tests", function () {
         const hash = code.computeHash();
 
         assert.instanceOf(hash, Buffer);
-        assert.equal(hash.toString('hex'), 'ac86b78afd9bdda3641a47a4aff2a7ee26acd40cc534d63655e9dfbf3f890a02')
+        assert.equal(hash.toString("hex"), "ac86b78afd9bdda3641a47a4aff2a7ee26acd40cc534d63655e9dfbf3f890a02");
     });
 });

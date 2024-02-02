@@ -58,9 +58,13 @@ describe("CodeMetadata Class Tests", function () {
     it("should handle buffer too short error", function () {
         const buffer = Buffer.from([CodeMetadata.ByteZero.Upgradeable]);
 
-        assert.throws(() => {
-            CodeMetadata.fromBuffer(buffer);
-        }, Error, "Buffer is too short.");
+        assert.throws(
+            () => {
+                CodeMetadata.fromBuffer(buffer);
+            },
+            Error,
+            "Buffer is too short.",
+        );
     });
 
     it("should test code metadata from bytes", () => {
@@ -72,7 +76,7 @@ describe("CodeMetadata Class Tests", function () {
             upgradeable: true,
             readable: false,
             payable: false,
-            payableBySc: false
+            payableBySc: false,
         });
     });
 });

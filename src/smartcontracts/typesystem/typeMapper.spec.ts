@@ -39,10 +39,14 @@ describe("test mapper", () => {
     });
 
     it("should map complex generic, composite, variadic types", () => {
-        testMapping("MultiResultVec<MultiResult<i32,bytes,>>", new VariadicType(
-            new CompositeType(new I32Type(), new BytesType()),
-        ));
-        testMapping("VarArgs<MultiArg<i32,bytes,>>", new VariadicType(new CompositeType(new I32Type(), new BytesType())));
+        testMapping(
+            "MultiResultVec<MultiResult<i32,bytes,>>",
+            new VariadicType(new CompositeType(new I32Type(), new BytesType())),
+        );
+        testMapping(
+            "VarArgs<MultiArg<i32,bytes,>>",
+            new VariadicType(new CompositeType(new I32Type(), new BytesType())),
+        );
         testMapping("OptionalResult<Address>", new OptionalType(new AddressType()));
     });
 

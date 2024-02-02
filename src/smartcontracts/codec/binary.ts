@@ -80,13 +80,7 @@ export class BinaryCodec {
     }
 
     encodeNested(typedValue: TypedValue): Buffer {
-        guardTrue(
-            typedValue
-                .getType()
-                .getCardinality()
-                .isSingular(),
-            "singular cardinality, thus encodable type"
-        );
+        guardTrue(typedValue.getType().getCardinality().isSingular(), "singular cardinality, thus encodable type");
 
         return onTypedValueSelect(typedValue, {
             onPrimitive: () => this.primitiveCodec.encodeNested(<PrimitiveValue>typedValue),
@@ -100,13 +94,7 @@ export class BinaryCodec {
     }
 
     encodeTopLevel(typedValue: TypedValue): Buffer {
-        guardTrue(
-            typedValue
-                .getType()
-                .getCardinality()
-                .isSingular(),
-            "singular cardinality, thus encodable type"
-        );
+        guardTrue(typedValue.getType().getCardinality().isSingular(), "singular cardinality, thus encodable type");
 
         return onTypedValueSelect(typedValue, {
             onPrimitive: () => this.primitiveCodec.encodeTopLevel(<PrimitiveValue>typedValue),

@@ -29,7 +29,7 @@ describe("test serializer", () => {
         serializeThenDeserialize(
             ["u32", "i64", "bytes"],
             [new U32Value(100), new I64Value(new BigNumber("-1")), new BytesValue(Buffer.from("abba", "hex"))],
-            "64@ff@abba"
+            "64@ff@abba",
         );
 
         serializeThenDeserialize(
@@ -39,7 +39,7 @@ describe("test serializer", () => {
                 OptionValue.newMissing(),
                 CompositeValue.fromItems(new U8Value(3), new BytesValue(Buffer.from("abba", "hex"))),
             ],
-            "0100000064@@03@abba"
+            "0100000064@@03@abba",
         );
 
         serializeThenDeserialize(
@@ -49,19 +49,26 @@ describe("test serializer", () => {
                 VariadicValue.fromItems(
                     new BytesValue(Buffer.from("abba", "hex")),
                     new BytesValue(Buffer.from("abba", "hex")),
-                    new BytesValue(Buffer.from("abba", "hex"))
+                    new BytesValue(Buffer.from("abba", "hex")),
                 ),
             ],
-            "00080009@abba@abba@abba"
+            "00080009@abba@abba@abba",
         );
 
         serializeThenDeserialize(
             ["MultiArg<Option<u8>, List<u16>>", "VarArgs<bytes>"],
             [
-                CompositeValue.fromItems(OptionValue.newProvided(new U8Value(7)), List.fromItems([new U16Value(8), new U16Value(9)])),
-                VariadicValue.fromItems(new BytesValue(Buffer.from("abba", "hex")), new BytesValue(Buffer.from("abba", "hex")), new BytesValue(Buffer.from("abba", "hex")))
+                CompositeValue.fromItems(
+                    OptionValue.newProvided(new U8Value(7)),
+                    List.fromItems([new U16Value(8), new U16Value(9)]),
+                ),
+                VariadicValue.fromItems(
+                    new BytesValue(Buffer.from("abba", "hex")),
+                    new BytesValue(Buffer.from("abba", "hex")),
+                    new BytesValue(Buffer.from("abba", "hex")),
+                ),
             ],
-            "0107@00080009@abba@abba@abba"
+            "0107@00080009@abba@abba@abba",
         );
     });
 
@@ -69,7 +76,7 @@ describe("test serializer", () => {
         serializeThenDeserialize(
             ["tuple2<i32, i16>"],
             [Tuple.fromItems([new I32Value(100), new I16Value(10)])],
-            "00000064000a"
+            "00000064000a",
         );
     });
 

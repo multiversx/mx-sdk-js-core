@@ -19,19 +19,19 @@ describe("test types", () => {
     });
 
     it("should be assignable from", () => {
-        assert.isTrue((new Type("Type")).isAssignableFrom(new PrimitiveType("PrimitiveType")));
-        assert.isTrue((new Type("Type")).isAssignableFrom(new BooleanType()));
-        assert.isTrue((new Type("Type")).isAssignableFrom(new AddressType()));
-        assert.isTrue((new Type("Type")).isAssignableFrom(new U32Type()));
+        assert.isTrue(new Type("Type").isAssignableFrom(new PrimitiveType("PrimitiveType")));
+        assert.isTrue(new Type("Type").isAssignableFrom(new BooleanType()));
+        assert.isTrue(new Type("Type").isAssignableFrom(new AddressType()));
+        assert.isTrue(new Type("Type").isAssignableFrom(new U32Type()));
 
-        assert.isTrue((new PrimitiveType("PrimitiveType")).isAssignableFrom(new BooleanType()));
-        assert.isTrue((new PrimitiveType("PrimitiveType")).isAssignableFrom(new AddressType()));
-        assert.isTrue((new PrimitiveType("PrimitiveType")).isAssignableFrom(new U32Type()));
+        assert.isTrue(new PrimitiveType("PrimitiveType").isAssignableFrom(new BooleanType()));
+        assert.isTrue(new PrimitiveType("PrimitiveType").isAssignableFrom(new AddressType()));
+        assert.isTrue(new PrimitiveType("PrimitiveType").isAssignableFrom(new U32Type()));
 
-        assert.isTrue((new AddressType()).isAssignableFrom(new AddressType()));
-        assert.isFalse((new AddressType()).isAssignableFrom(new BooleanType()));
-        assert.isFalse((new U32Type()).isAssignableFrom(new BooleanType()));
-        assert.isFalse((new U32Type()).isAssignableFrom(new PrimitiveType("PrimitiveType")));
+        assert.isTrue(new AddressType().isAssignableFrom(new AddressType()));
+        assert.isFalse(new AddressType().isAssignableFrom(new BooleanType()));
+        assert.isFalse(new U32Type().isAssignableFrom(new BooleanType()));
+        assert.isFalse(new U32Type().isAssignableFrom(new PrimitiveType("PrimitiveType")));
 
         assert.isTrue(new BytesType().isAssignableFrom(new BytesType()));
         assert.isTrue(new U32Type().isAssignableFrom(parser.parse("u32")));
@@ -54,17 +54,32 @@ describe("test types", () => {
     it("should get fully qualified name", () => {
         assert.equal(new Type("foo").getFullyQualifiedName(), "multiversx:types:foo");
         assert.equal(new U32Type().getFullyQualifiedName(), "multiversx:types:u32");
-        assert.equal(parser.parse("MultiResultVec<u32>").getFullyQualifiedName(), "multiversx:types:MultiResultVec<multiversx:types:u32>");
+        assert.equal(
+            parser.parse("MultiResultVec<u32>").getFullyQualifiedName(),
+            "multiversx:types:MultiResultVec<multiversx:types:u32>",
+        );
         assert.equal(parser.parse("utf-8 string").getFullyQualifiedName(), "multiversx:types:utf-8 string");
-        assert.equal(parser.parse("Option<u32>").getFullyQualifiedName(), "multiversx:types:Option<multiversx:types:u32>");
+        assert.equal(
+            parser.parse("Option<u32>").getFullyQualifiedName(),
+            "multiversx:types:Option<multiversx:types:u32>",
+        );
     });
 
     it("types and values should have correct JavaScript class hierarchy", () => {
         assert.deepEqual(new U32Type().getClassHierarchy(), ["Type", "PrimitiveType", "NumericalType", "U32Type"]);
-        assert.deepEqual(new U32Value(42).getClassHierarchy(), ["TypedValue", "PrimitiveValue", "NumericalValue", "U32Value"]);
+        assert.deepEqual(new U32Value(42).getClassHierarchy(), [
+            "TypedValue",
+            "PrimitiveValue",
+            "NumericalValue",
+            "U32Value",
+        ]);
 
         assert.deepEqual(new BytesType().getClassHierarchy(), ["Type", "PrimitiveType", "BytesType"]);
-        assert.deepEqual(new BytesValue(Buffer.from("foobar")).getClassHierarchy(), ["TypedValue", "PrimitiveValue", "BytesValue"]);
+        assert.deepEqual(new BytesValue(Buffer.from("foobar")).getClassHierarchy(), [
+            "TypedValue",
+            "PrimitiveValue",
+            "BytesValue",
+        ]);
     });
 
     it("should report type dependencies", () => {

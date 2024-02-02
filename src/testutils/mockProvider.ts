@@ -1,10 +1,21 @@
-import { ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "@multiversx/sdk-network-providers";
+import {
+    ContractResultItem,
+    ContractResults,
+    TransactionOnNetwork,
+    TransactionStatus,
+} from "@multiversx/sdk-network-providers";
 import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
 import * as errors from "../errors";
 import { ErrMock } from "../errors";
 import { IAddress } from "../interface";
-import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionOnNetwork, ITransactionStatus } from "../interfaceOfNetwork";
+import {
+    IAccountOnNetwork,
+    IContractQueryResponse,
+    INetworkConfig,
+    ITransactionOnNetwork,
+    ITransactionStatus,
+} from "../interfaceOfNetwork";
 import { Query } from "../smartcontracts/query";
 import { Transaction, TransactionHash } from "../transaction";
 import { createAccountBalance } from "./utils";
@@ -24,18 +35,9 @@ export class MockProvider {
         this.transactions = new Map<string, ITransactionOnNetwork>();
         this.accounts = new Map<string, IAccountOnNetwork>();
 
-        this.accounts.set(
-            MockProvider.AddressOfAlice.bech32(),
-            { nonce: 0, balance: createAccountBalance(1000) }
-        );
-        this.accounts.set(
-            MockProvider.AddressOfBob.bech32(),
-            { nonce: 5, balance: createAccountBalance(500) }
-        );
-        this.accounts.set(
-            MockProvider.AddressOfCarol.bech32(),
-            { nonce: 42, balance: createAccountBalance(300) }
-        );
+        this.accounts.set(MockProvider.AddressOfAlice.bech32(), { nonce: 0, balance: createAccountBalance(1000) });
+        this.accounts.set(MockProvider.AddressOfBob.bech32(), { nonce: 5, balance: createAccountBalance(500) });
+        this.accounts.set(MockProvider.AddressOfCarol.bech32(), { nonce: 42, balance: createAccountBalance(300) });
     }
 
     mockUpdateAccount(address: Address, mutate: (item: IAccountOnNetwork) => void) {
@@ -69,7 +71,7 @@ export class MockProvider {
         let response = new TransactionOnNetwork({
             status: new TransactionStatus("executed"),
             contractResults: new ContractResults([contractResult]),
-            isCompleted: true
+            isCompleted: true,
         });
 
         this.getTransactionResponders.unshift(new GetTransactionResponder(predicate, response));
@@ -109,7 +111,7 @@ export class MockProvider {
             return account;
         }
 
-        throw new ErrMock("Account not found")
+        throw new ErrMock("Account not found");
     }
 
     async sendTransaction(transaction: Transaction): Promise<string> {
@@ -119,8 +121,8 @@ export class MockProvider {
                 sender: transaction.getSender(),
                 receiver: transaction.getReceiver(),
                 data: transaction.getData().valueOf(),
-                status: new TransactionStatus("pending")
-            })
+                status: new TransactionStatus("pending"),
+            }),
         );
 
         this.mockTransactionTimeline(transaction, this.nextTransactionTimelinePoints);
@@ -176,7 +178,7 @@ export class Wait {
     }
 }
 
-export class MarkCompleted { }
+export class MarkCompleted {}
 
 class QueryContractResponder {
     readonly matches: (query: Query) => boolean;

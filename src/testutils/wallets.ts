@@ -23,8 +23,21 @@ export async function syncTestWallets(wallets: Record<string, TestWallet>, provi
 }
 
 export async function loadTestWallets(): Promise<Record<string, TestWallet>> {
-    let walletNames = ["alice", "bob", "carol", "dan", "eve", "frank", "grace", "heidi", "ivan", "judy", "mallory", "mike"];
-    let wallets = await Promise.all(walletNames.map(async name => await loadTestWallet(name)));
+    let walletNames = [
+        "alice",
+        "bob",
+        "carol",
+        "dan",
+        "eve",
+        "frank",
+        "grace",
+        "heidi",
+        "ivan",
+        "judy",
+        "mallory",
+        "mike",
+    ];
+    let wallets = await Promise.all(walletNames.map(async (name) => await loadTestWallet(name)));
     let walletMap: Record<string, TestWallet> = {};
     for (let i in walletNames) {
         walletMap[walletNames[i]] = wallets[i];
@@ -44,11 +57,7 @@ export async function loadTestWallet(name: string): Promise<TestWallet> {
     let jsonContents = JSON.parse(await readTestWalletFileContents(name + ".json"));
     let pemContents = await readTestWalletFileContents(name + ".pem");
     let pemKey = UserSecretKey.fromPem(pemContents);
-    return new TestWallet(
-        new Address(jsonContents.address),
-        pemKey.hex(),
-        jsonContents,
-        pemContents);
+    return new TestWallet(new Address(jsonContents.address), pemKey.hex(), jsonContents, pemContents);
 }
 
 async function readTestWalletFileContents(name: string): Promise<string> {

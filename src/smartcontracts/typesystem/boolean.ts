@@ -30,7 +30,7 @@ export class BooleanValue extends PrimitiveValue {
 
     /**
      * Returns whether two objects have the same value.
-     * 
+     *
      * @param other another BooleanValue
      */
     equals(other: BooleanValue): boolean {

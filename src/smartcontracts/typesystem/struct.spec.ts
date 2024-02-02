@@ -8,15 +8,12 @@ import { TokenIdentifierType, TokenIdentifierValue } from "./tokenIdentifier";
 
 describe("test structs", () => {
     it("should get fields", () => {
-        let fooType = new StructType(
-            "Foo",
-            [
-                new FieldDefinition("a", "", new TokenIdentifierType()),
-                new FieldDefinition("b", "", new BigUIntType()),
-                new FieldDefinition("c", "", new U32Type()),
-                new FieldDefinition("d", "", new BytesType()),
-            ]
-        );
+        let fooType = new StructType("Foo", [
+            new FieldDefinition("a", "", new TokenIdentifierType()),
+            new FieldDefinition("b", "", new BigUIntType()),
+            new FieldDefinition("c", "", new U32Type()),
+            new FieldDefinition("d", "", new BytesType()),
+        ]);
 
         let fooStruct = new Struct(fooType, [
             new Field(new TokenIdentifierValue("lucky-token"), "a"),

@@ -51,7 +51,11 @@ export class TokenTransfer {
         return this.fungibleFromBigInteger(tokenIdentifier, amountAsBigInteger, numDecimals);
     }
 
-    static fungibleFromBigInteger(tokenIdentifier: string, amountAsBigInteger: BigNumber.Value, numDecimals: number = 0) {
+    static fungibleFromBigInteger(
+        tokenIdentifier: string,
+        amountAsBigInteger: BigNumber.Value,
+        numDecimals: number = 0,
+    ) {
         return new TokenTransfer({
             tokenIdentifier,
             nonce: 0,
@@ -83,7 +87,12 @@ export class TokenTransfer {
         return this.metaEsdtFromBigInteger(tokenIdentifier, nonce, amountAsBigInteger, numDecimals);
     }
 
-    static metaEsdtFromBigInteger(tokenIdentifier: string, nonce: number, amountAsBigInteger: BigNumber.Value, numDecimals = 0) {
+    static metaEsdtFromBigInteger(
+        tokenIdentifier: string,
+        nonce: number,
+        amountAsBigInteger: BigNumber.Value,
+        numDecimals = 0,
+    ) {
         return new TokenTransfer({
             tokenIdentifier,
             nonce,
@@ -129,4 +138,4 @@ export class TokenPayment extends TokenTransfer {
             numDecimals,
         });
     }
-};
+}

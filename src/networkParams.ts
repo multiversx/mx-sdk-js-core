@@ -1,4 +1,9 @@
-import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_HASH_SIGN, TRANSACTION_VERSION_DEFAULT } from "./constants";
+import {
+    TRANSACTION_OPTIONS_DEFAULT,
+    TRANSACTION_OPTIONS_TX_GUARDED,
+    TRANSACTION_OPTIONS_TX_HASH_SIGN,
+    TRANSACTION_VERSION_DEFAULT,
+} from "./constants";
 import * as errors from "./errors";
 
 export class TransactionVersion {
@@ -68,10 +73,7 @@ export class TransactionOptions {
     /**
      * Creates a TransactionOptions object from a set of options.
      */
-    public static withOptions(options: {
-        hashSign?: boolean,
-        guarded?: boolean
-    }): TransactionOptions {
+    public static withOptions(options: { hashSign?: boolean; guarded?: boolean }): TransactionOptions {
         let value = 0;
 
         if (options.hashSign) {

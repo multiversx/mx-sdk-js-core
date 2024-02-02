@@ -20,8 +20,8 @@ export class AbiRegistry {
         name: string;
         constructorDefinition: EndpointDefinition;
         endpoints: EndpointDefinition[];
-        customTypes: CustomType[],
-        events?: EventDefinition[]
+        customTypes: CustomType[];
+        events?: EventDefinition[];
     }) {
         this.name = options.name;
         this.constructorDefinition = options.constructorDefinition;
@@ -32,10 +32,10 @@ export class AbiRegistry {
 
     static create(options: {
         name?: string;
-        constructor?: any,
+        constructor?: any;
         endpoints?: any[];
-        types?: Record<string, any>
-        events?: any[]
+        types?: Record<string, any>;
+        events?: any[];
     }): AbiRegistry {
         const name = options.name || interfaceNamePlaceholder;
         const constructor = options.constructor || {};
@@ -45,7 +45,7 @@ export class AbiRegistry {
 
         // Load arbitrary input parameters into properly-defined objects (e.g. EndpointDefinition and CustomType).
         const constructorDefinition = EndpointDefinition.fromJSON({ name: "constructor", ...constructor });
-        const endpointDefinitions = endpoints.map(item => EndpointDefinition.fromJSON(item));
+        const endpointDefinitions = endpoints.map((item) => EndpointDefinition.fromJSON(item));
         const customTypes: CustomType[] = [];
 
         for (const customTypeName in types) {
@@ -60,14 +60,14 @@ export class AbiRegistry {
             }
         }
 
-        const eventDefinitions = events.map(item => EventDefinition.fromJSON(item));
+        const eventDefinitions = events.map((item) => EventDefinition.fromJSON(item));
 
         const registry = new AbiRegistry({
             name: name,
             constructorDefinition: constructorDefinition,
             endpoints: endpointDefinitions,
             customTypes: customTypes,
-            events: eventDefinitions
+            events: eventDefinitions,
         });
 
         const remappedRegistry = registry.remapToKnownTypes();
@@ -158,26 +158,31 @@ export class AbiRegistry {
             constructorDefinition: newConstructor,
             endpoints: newEndpoints,
             customTypes: newCustomTypes,
-            events: newEvents
+            events: newEvents,
         });
 
         return newRegistry;
     }
 
-    private mapCustomTypeDepthFirst(typeToMap: CustomType, allTypesToMap: CustomType[], mapper: TypeMapper, mappedTypes: CustomType[]) {
-        const hasBeenMapped = mappedTypes.findIndex(type => type.getName() == typeToMap.getName()) >= 0;
+    private mapCustomTypeDepthFirst(
+        typeToMap: CustomType,
+        allTypesToMap: CustomType[],
+        mapper: TypeMapper,
+        mappedTypes: CustomType[],
+    ) {
+        const hasBeenMapped = mappedTypes.findIndex((type) => type.getName() == typeToMap.getName()) >= 0;
         if (hasBeenMapped) {
             return;
         }
 
         for (const typeName of typeToMap.getNamesOfDependencies()) {
-            const dependencyType = allTypesToMap.find(type => type.getName() == typeName);
+            const dependencyType = allTypesToMap.find((type) => type.getName() == typeName);
             if (!dependencyType) {
                 // It's a type that we don't have to map (e.g. could be a primitive type).
                 continue;
             }
 
-            this.mapCustomTypeDepthFirst(dependencyType, allTypesToMap, mapper, mappedTypes)
+            this.mapCustomTypeDepthFirst(dependencyType, allTypesToMap, mapper, mappedTypes);
         }
 
         const mappedType = mapper.mapType(typeToMap);
@@ -187,11 +192,11 @@ export class AbiRegistry {
 
 function mapEndpoint(endpoint: EndpointDefinition, mapper: TypeMapper): EndpointDefinition {
     const newInput = endpoint.input.map(
-        (e) => new EndpointParameterDefinition(e.name, e.description, mapper.mapType(e.type))
+        (e) => new EndpointParameterDefinition(e.name, e.description, mapper.mapType(e.type)),
     );
 
     const newOutput = endpoint.output.map(
-        (e) => new EndpointParameterDefinition(e.name, e.description, mapper.mapType(e.type))
+        (e) => new EndpointParameterDefinition(e.name, e.description, mapper.mapType(e.type)),
     );
 
     return new EndpointDefinition(endpoint.name, newInput, newOutput, endpoint.modifiers);
@@ -199,11 +204,12 @@ function mapEndpoint(endpoint: EndpointDefinition, mapper: TypeMapper): Endpoint
 
 function mapEvent(event: EventDefinition, mapper: TypeMapper): EventDefinition {
     const newInputs = event.inputs.map(
-        (e) => new EventTopicDefinition({
-            name: e.name,
-            type: mapper.mapType(e.type),
-            indexed: e.indexed
-        })
+        (e) =>
+            new EventTopicDefinition({
+                name: e.name,
+                type: mapper.mapType(e.type),
+                indexed: e.indexed,
+            }),
     );
 
     return new EventDefinition(event.identifier, newInputs);

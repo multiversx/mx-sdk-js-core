@@ -1,6 +1,5 @@
 import * as errors from "./errors";
 
-
 const SIGNATURE_LENGTH = 64;
 
 /**
@@ -59,7 +58,7 @@ export class Signature {
     }
 }
 
-export function interpretSignatureAsBuffer(signature: { hex(): string; } | Uint8Array): Buffer {
+export function interpretSignatureAsBuffer(signature: { hex(): string } | Uint8Array): Buffer {
     if (ArrayBuffer.isView(signature)) {
         return Buffer.from(signature);
     } else if ((<any>signature).hex != null) {

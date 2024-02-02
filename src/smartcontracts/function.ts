@@ -11,7 +11,7 @@ export class ContractFunction {
 
     /**
      * Creates a ContractFunction object, given its name.
-     * 
+     *
      * @param name the name of the function
      */
     constructor(name: string) {

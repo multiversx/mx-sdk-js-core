@@ -52,7 +52,6 @@ export class DelegationTransactionsFactory {
             dataParts: dataParts,
             gasLimit: executionGasLimit,
             addDataMovementGas: true,
-            chainID: this.config.chainID,
             amount: options.amount
         }).build();
     }
@@ -79,7 +78,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes),
             addDataMovementGas: true
         }).build();
@@ -103,7 +101,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes),
             addDataMovementGas: true
         }).build();
@@ -131,7 +128,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: executionGasLimit,
             addDataMovementGas: true
         }).build();
@@ -159,7 +155,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: executionGasLimit,
             addDataMovementGas: true
         }).build();
@@ -187,7 +182,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: executionGasLimit,
             addDataMovementGas: true
         }).build();
@@ -211,7 +205,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes),
             addDataMovementGas: true
         }).build();
@@ -232,7 +225,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
             addDataMovementGas: true
         }).build();
@@ -253,7 +245,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
             addDataMovementGas: true
         }).build();
@@ -273,7 +264,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
             addDataMovementGas: true
         }).build();
@@ -293,7 +283,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
             addDataMovementGas: true
         }).build();
@@ -313,7 +302,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
             addDataMovementGas: true
         }).build();
@@ -333,7 +321,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
             addDataMovementGas: true
         }).build();
@@ -358,7 +345,6 @@ export class DelegationTransactionsFactory {
             sender: options.sender,
             receiver: options.delegationContract,
             dataParts: dataParts,
-            chainID: this.config.chainID,
             gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
             addDataMovementGas: true
         }).build();

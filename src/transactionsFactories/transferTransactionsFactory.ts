@@ -1,10 +1,10 @@
 import BigNumber from "bignumber.js";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
 import { IAddress } from "../interface";
-import { DraftTransaction } from "../draftTransaction";
-import { DraftTransactionBuilder } from "./draftTransactionBuilder";
 import { NextTokenTransfer, Token } from "../tokens";
 import { ErrBadUsage } from "../errors";
+import { TransactionNextBuilder } from "./transactionNextBuilder";
+import { TransactionNext } from "../transaction";
 
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
@@ -38,9 +38,9 @@ export class NextTransferTransactionsFactory {
         receiver: IAddress;
         nativeAmount: BigNumber.Value;
         data?: string;
-    }): DraftTransaction {
+    }): TransactionNext {
         const data = options.data || "";
-        return new DraftTransactionBuilder({
+        return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.receiver,
@@ -55,7 +55,7 @@ export class NextTransferTransactionsFactory {
         sender: IAddress;
         receiver: IAddress;
         tokenTransfers: NextTokenTransfer[];
-    }): DraftTransaction {
+    }): TransactionNext {
         const numberOfTransfers = options.tokenTransfers.length;
 
         if (numberOfTransfers === 0) {
@@ -75,7 +75,7 @@ export class NextTransferTransactionsFactory {
             .multipliedBy(new BigNumber(numberOfTransfers))
             .plus(new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER));
 
-        return new DraftTransactionBuilder({
+        return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -89,7 +89,7 @@ export class NextTransferTransactionsFactory {
         sender: IAddress;
         receiver: IAddress;
         tokenTransfers: NextTokenTransfer[];
-    }): DraftTransaction {
+    }): TransactionNext {
         let transferArgs: string[] = [];
         const transfer = options.tokenTransfers[0];
         let extraGasForTransfer = new BigNumber(0);
@@ -108,7 +108,7 @@ export class NextTransferTransactionsFactory {
             receiver = options.sender;
         }
 
-        return new DraftTransactionBuilder({
+        return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
             receiver: receiver,

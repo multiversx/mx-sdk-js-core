@@ -5,6 +5,7 @@ import { TransactionPayload } from "../transactionPayload";
 import { TransactionNext } from "../transaction";
 
 interface Config {
+    chainID: string;
     minGasLimit: BigNumber.Value;
     gasLimitPerByte: BigNumber.Value;
 }
@@ -17,7 +18,6 @@ export class TransactionNextBuilder {
     private providedGasLimit: BigNumber;
     private addDataMovementGas: boolean;
     private amount?: BigNumber.Value;
-    private chainID: string;
 
     constructor(options: {
         config: Config,
@@ -27,7 +27,6 @@ export class TransactionNextBuilder {
         gasLimit: BigNumber.Value,
         addDataMovementGas: boolean,
         amount?: BigNumber.Value,
-        chainID: string;
     }) {
         this.config = options.config;
         this.sender = options.sender;
@@ -36,7 +35,6 @@ export class TransactionNextBuilder {
         this.providedGasLimit = new BigNumber(options.gasLimit);
         this.addDataMovementGas = options.addDataMovementGas;
         this.amount = options.amount;
-        this.chainID = options.chainID;
     }
 
     private computeGasLimit(payload: ITransactionPayload): BigNumber.Value {
@@ -64,7 +62,7 @@ export class TransactionNextBuilder {
             gasLimit: gasLimit,
             value: this.amount || 0,
             data: data.valueOf(),
-            chainID: this.chainID
+            chainID: this.config.toString()
         })
     }
 }

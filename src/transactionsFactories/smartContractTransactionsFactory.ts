@@ -1,15 +1,15 @@
 import { BigNumber } from "bignumber.js";
 import { IAddress } from "../interface";
-import { DraftTransaction } from "../draftTransaction";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { byteArrayToHex, utf8ToHex } from "../utils.codec";
 import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
 import { Err, ErrBadUsage } from "../errors";
 import { Address } from "../address";
-import { DraftTransactionBuilder } from "./draftTransactionBuilder";
+import { TransactionNextBuilder } from "./transactionNextBuilder";
 import { Token, NextTokenTransfer } from "../tokens";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
+import { TransactionNext } from "../transaction";
 
 interface Config {
     chainID: string;
@@ -50,7 +50,7 @@ export class SmartContractTransactionsFactory {
         isReadable?: boolean;
         isPayable?: boolean;
         isPayableBySmartContract?: boolean;
-    }): DraftTransaction {
+    }): TransactionNext {
         const nativeTransferAmount = options.nativeTransferAmount ?? 0;
 
         const isUpgradeable = options.isUpgradeable ?? true;
@@ -66,7 +66,7 @@ export class SmartContractTransactionsFactory {
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
         parts = parts.concat(preparedArgs);
 
-        return new DraftTransactionBuilder({
+        return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(CONTRACT_DEPLOY_ADDRESS),
@@ -85,7 +85,7 @@ export class SmartContractTransactionsFactory {
         args?: any[];
         nativeTransferAmount?: BigNumber.Value;
         tokenTransfers?: NextTokenTransfer[];
-    }): DraftTransaction {
+    }): TransactionNext {
         const args = options.args || [];
         const tokenTransfer = options.tokenTransfers || [];
         const nativeTransferAmount = options.nativeTransferAmount ?? 0;
@@ -115,7 +115,7 @@ export class SmartContractTransactionsFactory {
         dataParts.push(dataParts.length ? utf8ToHex(options.functionName) : options.functionName);
         dataParts = dataParts.concat(this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName)));
 
-        return new DraftTransactionBuilder({
+        return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
             receiver: receiver,
@@ -137,7 +137,7 @@ export class SmartContractTransactionsFactory {
         isReadable?: boolean;
         isPayable?: boolean;
         isPayableBySmartContract?: boolean;
-    }): DraftTransaction {
+    }): TransactionNext {
         const nativeTransferAmount = options.nativeTransferAmount ?? 0;
 
         const isUpgradeable = options.isUpgradeable ?? true;
@@ -153,7 +153,7 @@ export class SmartContractTransactionsFactory {
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
         parts = parts.concat(preparedArgs);
 
-        return new DraftTransactionBuilder({
+        return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.contract,

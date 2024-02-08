@@ -1,11 +1,11 @@
-import { IAddress } from "../interface";
+import { IAddress, ITransactionPayload } from "../interface";
 import { BigNumber } from "bignumber.js";
 import { numberToPaddedHex, byteArrayToHex, utf8ToHex } from "../utils.codec";
-import { TransactionNextBuilder } from "./transactionNextBuilder";
 import { Address } from "../address";
-import { DELEGATION_MANAGER_SC_ADDRESS } from "../constants";
+import { ARGUMENTS_SEPARATOR, DELEGATION_MANAGER_SC_ADDRESS } from "../constants";
 import { Err } from "../errors";
 import { TransactionNext } from "../transaction";
+import { TransactionPayload } from "../transactionPayload";
 
 interface Config {
     chainID: string;
@@ -26,6 +26,9 @@ interface IValidatorPublicKey {
 
 export class DelegationTransactionsFactory {
     private readonly config: Config;
+    private dataParts!: string[];
+    private addDataMovementGas!: boolean;
+    private providedGasLimit!: BigNumber;
 
     constructor(config: Config) {
         this.config = config;
@@ -37,23 +40,26 @@ export class DelegationTransactionsFactory {
         serviceFee: BigNumber.Value,
         amount: BigNumber.Value
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "createNewDelegationContract",
             numberToPaddedHex(options.totalDelegationCap.toString()),
             numberToPaddedHex(options.serviceFee.toString())
         ];
 
-        const executionGasLimit = new BigNumber(this.config.gasLimitCreateDelegationContract).plus(this.config.additionalGasLimitForDelegationOperations);
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitCreateDelegationContract).plus(this.config.additionalGasLimitForDelegationOperations);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: Address.fromBech32(DELEGATION_MANAGER_SC_ADDRESS),
-            dataParts: dataParts,
-            gasLimit: executionGasLimit,
-            addDataMovementGas: true,
-            amount: options.amount
-        }).build();
+
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: Address.fromBech32(DELEGATION_MANAGER_SC_ADDRESS).bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            value: options.amount,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForAddingNodes(options: {
@@ -68,19 +74,22 @@ export class DelegationTransactionsFactory {
 
         const numNodes = options.publicKeys.length;
 
-        const dataParts = ["addNodes"];
+        this.dataParts = ["addNodes"];
         for (let i = 0; i < numNodes; i++) {
-            dataParts.push(...[options.publicKeys[i].hex(), byteArrayToHex(options.signedMessages[i])]);
+            this.dataParts.push(...[options.publicKeys[i].hex(), byteArrayToHex(options.signedMessages[i])]);
         }
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.computeExecutionGasLimitForNodesManagement(numNodes));
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes),
-            addDataMovementGas: true
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForRemovingNodes(options: {
@@ -88,22 +97,25 @@ export class DelegationTransactionsFactory {
         delegationContract: IAddress,
         publicKeys: IValidatorPublicKey[]
     }): TransactionNext {
-        const dataParts = ["removeNodes"];
+        this.dataParts = ["removeNodes"];
 
         for (const key of options.publicKeys) {
-            dataParts.push(key.hex());
+            this.dataParts.push(key.hex());
         }
 
+        const data = this.buildTransactionPayload();
         const numNodes = options.publicKeys.length;
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.computeExecutionGasLimitForNodesManagement(numNodes));
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes),
-            addDataMovementGas: true
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForStakingNodes(options: {
@@ -111,26 +123,28 @@ export class DelegationTransactionsFactory {
         delegationContract: IAddress,
         publicKeys: IValidatorPublicKey[]
     }): TransactionNext {
-        let dataParts = ["stakeNodes"];
+        this.dataParts = ["stakeNodes"];
 
         for (const key of options.publicKeys) {
-            dataParts = dataParts.concat(key.hex());
+            this.dataParts = this.dataParts.concat(key.hex());
         }
 
+        const data = this.buildTransactionPayload();
         const numNodes = options.publicKeys.length;
         const additionalGasForAllNodes = new BigNumber(numNodes).multipliedBy(this.config.additionalGasLimitPerValidatorNode);
-        const executionGasLimit = additionalGasForAllNodes.plus(this.config.gasLimitStake).plus(
+        this.addDataMovementGas = true;
+        this.providedGasLimit = additionalGasForAllNodes.plus(this.config.gasLimitStake).plus(
             this.config.gasLimitDelegationOperations
         );
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: executionGasLimit,
-            addDataMovementGas: true
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForUnbondingNodes(options: {
@@ -138,26 +152,28 @@ export class DelegationTransactionsFactory {
         delegationContract: IAddress,
         publicKeys: IValidatorPublicKey[]
     }): TransactionNext {
-        let dataParts = ["unBondNodes"];
+        this.dataParts = ["unBondNodes"];
 
         for (const key of options.publicKeys) {
-            dataParts = dataParts.concat(key.hex());
+            this.dataParts = this.dataParts.concat(key.hex());
         }
 
+        const data = this.buildTransactionPayload();
         const numNodes = options.publicKeys.length;
-        const executionGasLimit = new BigNumber(numNodes).multipliedBy(
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(numNodes).multipliedBy(
             this.config.additionalGasLimitPerValidatorNode).plus(
                 this.config.gasLimitUnbond
             ).plus(this.config.gasLimitDelegationOperations);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: executionGasLimit,
-            addDataMovementGas: true
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForUnstakingNodes(options: {
@@ -165,26 +181,28 @@ export class DelegationTransactionsFactory {
         delegationContract: IAddress,
         publicKeys: IValidatorPublicKey[]
     }): TransactionNext {
-        let dataParts = ["unStakeNodes"];
+        this.dataParts = ["unStakeNodes"];
 
         for (const key of options.publicKeys) {
-            dataParts = dataParts.concat(key.hex());
+            this.dataParts = this.dataParts.concat(key.hex());
         }
 
+        const data = this.buildTransactionPayload();
         const numNodes = options.publicKeys.length;
-        const executionGasLimit = new BigNumber(numNodes).multipliedBy(
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(numNodes).multipliedBy(
             this.config.additionalGasLimitPerValidatorNode).plus(
                 this.config.gasLimitUnstake
             ).plus(this.config.gasLimitDelegationOperations);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: executionGasLimit,
-            addDataMovementGas: true
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForUnjailingNodes(options: {
@@ -192,22 +210,25 @@ export class DelegationTransactionsFactory {
         delegationContract: IAddress,
         publicKeys: IValidatorPublicKey[]
     }): TransactionNext {
-        const dataParts = ["unJailNodes"];
+        this.dataParts = ["unJailNodes"];
 
         for (const key of options.publicKeys) {
-            dataParts.push(key.hex());
+            this.dataParts.push(key.hex());
         }
 
         const numNodes = options.publicKeys.length;
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.computeExecutionGasLimitForNodesManagement(numNodes));
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes),
-            addDataMovementGas: true
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForChangingServiceFee(options: {
@@ -215,19 +236,23 @@ export class DelegationTransactionsFactory {
         delegationContract: IAddress,
         serviceFee: BigNumber.Value
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "changeServiceFee",
             numberToPaddedHex(options.serviceFee)
         ];
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
-            addDataMovementGas: true
-        }).build();
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations);
+        const gasLimit = this.computeGasLimit(data);
+
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForModifyingDelegationCap(options: {
@@ -235,95 +260,115 @@ export class DelegationTransactionsFactory {
         delegationContract: IAddress,
         delegationCap: BigNumber.Value
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "modifyTotalDelegationCap",
             numberToPaddedHex(options.delegationCap)
         ];
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
-            addDataMovementGas: true
-        }).build();
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations);
+        const gasLimit = this.computeGasLimit(data);
+
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForSettingAutomaticActivation(options: {
         sender: IAddress,
         delegationContract: IAddress
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "setAutomaticActivation",
             utf8ToHex("true")
         ];
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
-            addDataMovementGas: true
-        }).build();
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations);
+        const gasLimit = this.computeGasLimit(data);
+
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForUnsettingAutomaticActivation(options: {
         sender: IAddress,
         delegationContract: IAddress
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "setAutomaticActivation",
             utf8ToHex("false")
         ];
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
-            addDataMovementGas: true
-        }).build();
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations);
+        const gasLimit = this.computeGasLimit(data);
+
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForSettingCapCheckOnRedelegateRewards(options: {
         sender: IAddress,
         delegationContract: IAddress
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "setCheckCapOnReDelegateRewards",
             utf8ToHex("true")
         ];
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
-            addDataMovementGas: true
-        }).build();
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations);
+        const gasLimit = this.computeGasLimit(data);
+
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForUnsettingCapCheckOnRedelegateRewards(options: {
         sender: IAddress,
         delegationContract: IAddress
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "setCheckCapOnReDelegateRewards",
             utf8ToHex("false")
         ];
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
-            addDataMovementGas: true
-        }).build();
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations);
+        const gasLimit = this.computeGasLimit(data);
+
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForSettingMetadata(options: {
@@ -333,25 +378,44 @@ export class DelegationTransactionsFactory {
         website: string,
         identifier: string
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "setMetaData",
             utf8ToHex(options.name),
             utf8ToHex(options.website),
             utf8ToHex(options.identifier)
         ];
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.delegationContract,
-            dataParts: dataParts,
-            gasLimit: new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations),
-            addDataMovementGas: true
-        }).build();
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitDelegationOperations).plus(this.config.additionalGasLimitForDelegationOperations);
+        const gasLimit = this.computeGasLimit(data);
+
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.delegationContract.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     private computeExecutionGasLimitForNodesManagement(numNodes: number): BigNumber.Value {
         const additionalGasForAllNodes = new BigNumber(this.config.additionalGasLimitPerValidatorNode).multipliedBy(numNodes);
         return new BigNumber(this.config.gasLimitDelegationOperations).plus(additionalGasForAllNodes);
+    }
+
+    private buildTransactionPayload(): TransactionPayload {
+        const data = this.dataParts.join(ARGUMENTS_SEPARATOR);
+        return new TransactionPayload(data);
+    }
+    
+    private computeGasLimit(payload: ITransactionPayload): BigNumber.Value {
+        if (!this.addDataMovementGas) {
+            return this.providedGasLimit;
+        }
+
+        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()));
+        const gasLimit = dataMovementGas.plus(this.providedGasLimit);
+        return gasLimit;
     }
 }

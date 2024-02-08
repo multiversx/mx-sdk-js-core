@@ -62,8 +62,7 @@ export class SmartContractTransactionsFactory {
         let parts = [byteArrayToHex(options.bytecode), byteArrayToHex(VM_TYPE_WASM_VM), metadata.toString()];
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
         this.dataParts = parts.concat(preparedArgs);
-
-        const data = this.buildTransactionPayload()
+        const data = this.buildTransactionPayload();
 
         return new TransactionNext({
             sender: options.sender.bech32(),
@@ -112,11 +111,11 @@ export class SmartContractTransactionsFactory {
 
         dataParts.push(dataParts.length ? utf8ToHex(options.functionName) : options.functionName);
         this.dataParts = dataParts.concat(this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName)));
-        const data = this.buildTransactionPayload()
+        const data = this.buildTransactionPayload();
 
         return new TransactionNext({
             sender: options.sender.bech32(),
-            receiver: Address.fromBech32(CONTRACT_DEPLOY_ADDRESS).bech32(),
+            receiver: receiver.bech32(),
             data: data.valueOf(),
             gasLimit: options.gasLimit,
             value: nativeTransferAmount,
@@ -151,12 +150,11 @@ export class SmartContractTransactionsFactory {
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
         parts = parts.concat(preparedArgs);
         this.dataParts = parts.concat(preparedArgs);
-
-        const data = this.buildTransactionPayload()
+        const data = this.buildTransactionPayload();
 
         return new TransactionNext({
             sender: options.sender.bech32(),
-            receiver: Address.fromBech32(CONTRACT_DEPLOY_ADDRESS).bech32(),
+            receiver: options.contract.bech32(),
             data: data.valueOf(),
             gasLimit: options.gasLimit,
             value: nativeTransferAmount,

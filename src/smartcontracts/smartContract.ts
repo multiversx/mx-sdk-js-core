@@ -118,7 +118,7 @@ export class SmartContract implements ISmartContract {
         Compatibility.guardAddressIsSetAndNonZero(deployer, "'deployer' of SmartContract.deploy()", "pass the actual address to deploy()");
 
         const config = new TransactionsFactoryConfig(chainID.valueOf());
-        const scDraftTransactionFactory = new SmartContractTransactionsFactory({
+        const scNextTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi,
             tokenComputer: new TokenComputer()
@@ -127,7 +127,7 @@ export class SmartContract implements ISmartContract {
         const bytecode = Buffer.from(code.toString(), 'hex');
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const draftTx = scDraftTransactionFactory.createTransactionForDeploy({
+        const nextTx = scNextTransactionFactory.createTransactionForDeploy({
             sender: deployer,
             bytecode: bytecode,
             gasLimit: gasLimit.valueOf(),
@@ -138,7 +138,7 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc
         });
 
-        const transaction = Transaction.fromDraft(draftTx);
+        const transaction = Transaction.fromTransactionNext(nextTx);
         transaction.setChainID(chainID);
         transaction.setValue(value ?? 0);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
@@ -178,7 +178,7 @@ export class SmartContract implements ISmartContract {
         this.ensureHasAddress();
 
         const config = new TransactionsFactoryConfig(chainID.valueOf());
-        const scDraftTransactionFactory = new SmartContractTransactionsFactory({
+        const scNextTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi,
             tokenComputer: new TokenComputer()
@@ -187,7 +187,7 @@ export class SmartContract implements ISmartContract {
         const bytecode = Uint8Array.from(Buffer.from(code.toString(), 'hex'));
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const draftTx = scDraftTransactionFactory.createTransactionForUpgrade({
+        const nextTx = scNextTransactionFactory.createTransactionForUpgrade({
             sender: caller,
             contract: this.getAddress(),
             bytecode: bytecode,
@@ -199,7 +199,7 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc
         })
 
-        const transaction = Transaction.fromDraft(draftTx);
+        const transaction = Transaction.fromTransactionNext(nextTx);
         transaction.setChainID(chainID);
         transaction.setValue(value ?? 0);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
@@ -216,7 +216,7 @@ export class SmartContract implements ISmartContract {
         this.ensureHasAddress();
 
         const config = new TransactionsFactoryConfig(chainID.valueOf());
-        const scDraftTransactionFactory = new SmartContractTransactionsFactory({
+        const scNextTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi,
             tokenComputer: new TokenComputer()
@@ -225,7 +225,7 @@ export class SmartContract implements ISmartContract {
         args = args || [];
         value = value || 0;
 
-        const draftTx = scDraftTransactionFactory.createTransactionForExecute({
+        const nextTx = scNextTransactionFactory.createTransactionForExecute({
             sender: caller,
             contract: receiver ? receiver : this.getAddress(),
             functionName: func.toString(),
@@ -233,7 +233,7 @@ export class SmartContract implements ISmartContract {
             args: args
         })
 
-        const transaction = Transaction.fromDraft(draftTx);
+        const transaction = Transaction.fromTransactionNext(nextTx);
         transaction.setChainID(chainID);
         transaction.setValue(value);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)

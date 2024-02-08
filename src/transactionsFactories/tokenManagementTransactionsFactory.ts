@@ -1,11 +1,11 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
-import { ESDT_CONTRACT_ADDRESS } from "../constants";
-import { IAddress } from "../interface";
+import { ARGUMENTS_SEPARATOR, ESDT_CONTRACT_ADDRESS } from "../constants";
+import { IAddress, ITransactionPayload } from "../interface";
 import { Logger } from "../logger";
 import { addressToHex, bigIntToHex, byteArrayToHex, utf8ToHex } from "../utils.codec";
-import { TransactionNextBuilder } from "./transactionNextBuilder";
 import { TransactionNext } from "../transaction";
+import { TransactionPayload } from "../transactionPayload";
 
 interface Config {
     chainID: string;
@@ -33,6 +33,9 @@ export class TokenManagementTransactionsFactory {
     private readonly config: Config;
     private readonly trueAsHex: string;
     private readonly falseAsHex: string;
+    private dataParts!: string[];
+    private addDataMovementGas!: boolean;
+    private providedGasLimit!: BigNumber;
 
     constructor(config: Config) {
         this.config = config;
@@ -55,7 +58,7 @@ export class TokenManagementTransactionsFactory {
     }): TransactionNext {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
-        const dataParts = [
+        this.dataParts = [
             "issue",
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
@@ -74,16 +77,19 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex("canAddSpecialRoles"),
             options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitIssue);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitIssue,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS).bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            value: this.config.issueCost,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForIssuingSemiFungible(options: {
@@ -100,7 +106,7 @@ export class TokenManagementTransactionsFactory {
     }): TransactionNext {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
-        const dataParts = [
+        this.dataParts = [
             "issueSemiFungible",
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
@@ -119,16 +125,19 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex("canAddSpecialRoles"),
             options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitIssue);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitIssue,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS).bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            value: this.config.issueCost,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForIssuingNonFungible(options: {
@@ -145,7 +154,7 @@ export class TokenManagementTransactionsFactory {
     }): TransactionNext {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
-        const dataParts = [
+        this.dataParts = [
             "issueNonFungible",
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
@@ -164,16 +173,19 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex("canAddSpecialRoles"),
             options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitIssue);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitIssue,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS).bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            value: this.config.issueCost,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForRegisteringMetaESDT(options: {
@@ -191,7 +203,7 @@ export class TokenManagementTransactionsFactory {
     }): TransactionNext {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
-        const dataParts = [
+        this.dataParts = [
             "registerMetaESDT",
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
@@ -211,16 +223,19 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex("canAddSpecialRoles"),
             options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitIssue);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitIssue,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS).bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            value: this.config.issueCost,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForRegisteringAndSettingRoles(options: {
@@ -232,55 +247,64 @@ export class TokenManagementTransactionsFactory {
     }): TransactionNext {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
-        const dataParts = [
+        this.dataParts = [
             "registerAndSetAllRoles",
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
             utf8ToHex(options.tokenType),
             bigIntToHex(options.numDecimals),
         ];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitIssue);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitIssue,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS).bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            value: this.config.issueCost,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForSettingBurnRoleGlobally(options: {
         sender: IAddress;
         tokenIdentifier: string;
     }): TransactionNext {
-        const dataParts = ["setBurnRoleGlobally", utf8ToHex(options.tokenIdentifier)];
+        this.dataParts = ["setBurnRoleGlobally", utf8ToHex(options.tokenIdentifier)];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitToggleBurnRoleGlobally);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitToggleBurnRoleGlobally,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS).bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForUnsettingBurnRoleGlobally(options: {
         sender: IAddress;
         tokenIdentifier: string;
     }): TransactionNext {
-        const dataParts = ["unsetBurnRoleGlobally", utf8ToHex(options.tokenIdentifier)];
+        this.dataParts = ["unsetBurnRoleGlobally", utf8ToHex(options.tokenIdentifier)];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitToggleBurnRoleGlobally);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitToggleBurnRoleGlobally,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS).bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForSettingSpecialRoleOnFungibleToken(options: {
@@ -290,22 +314,25 @@ export class TokenManagementTransactionsFactory {
         addRoleLocalMint: boolean;
         addRoleLocalBurn: boolean;
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "setSpecialRole",
             utf8ToHex(options.tokenIdentifier),
             addressToHex(options.user),
             ...(options.addRoleLocalMint ? [utf8ToHex("ESDTRoleLocalMint")] : []),
             ...(options.addRoleLocalBurn ? [utf8ToHex("ESDTRoleLocalBurn")] : []),
         ];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitSetSpecialRole);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS).bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForSettingSpecialRoleOnSemiFungibleToken(options: {
@@ -317,7 +344,7 @@ export class TokenManagementTransactionsFactory {
         addRoleNFTAddQuantity: boolean;
         addRoleESDTTransferRole: boolean;
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "setSpecialRole",
             utf8ToHex(options.tokenIdentifier),
             addressToHex(options.user),
@@ -326,15 +353,18 @@ export class TokenManagementTransactionsFactory {
             ...(options.addRoleNFTAddQuantity ? [utf8ToHex("ESDTRoleNFTAddQuantity")] : []),
             ...(options.addRoleESDTTransferRole ? [utf8ToHex("ESDTTransferRole")] : []),
         ];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitSetSpecialRole);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS).bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForSettingSpecialRoleOnMetaESDT(options: {
@@ -359,7 +389,7 @@ export class TokenManagementTransactionsFactory {
         addRoleNFTAddURI: boolean;
         addRoleESDTTransferRole: boolean;
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "setSpecialRole",
             utf8ToHex(options.tokenIdentifier),
             addressToHex(options.user),
@@ -369,15 +399,18 @@ export class TokenManagementTransactionsFactory {
             ...(options.addRoleNFTAddURI ? [utf8ToHex("ESDTRoleNFTAddURI")] : []),
             ...(options.addRoleESDTTransferRole ? [utf8ToHex("ESDTTransferRole")] : []),
         ];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitSetSpecialRole);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS).bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForCreatingNFT(options: {
@@ -390,7 +423,7 @@ export class TokenManagementTransactionsFactory {
         attributes: Uint8Array;
         uris: string[];
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "ESDTNFTCreate",
             utf8ToHex(options.tokenIdentifier),
             bigIntToHex(options.initialQuantity),
@@ -400,51 +433,60 @@ export class TokenManagementTransactionsFactory {
             byteArrayToHex(options.attributes),
             ...options.uris.map(utf8ToHex),
         ];
+        const data = this.buildTransactionPayload();
 
         // Note that the following is an approximation (a reasonable one):
         const nftData = options.name + options.hash + options.attributes + options.uris.join("");
         const storageGasLimit = new BigNumber(this.config.gasLimitPerByte).multipliedBy(nftData.length);
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitEsdtNftCreate).plus(storageGasLimit);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: new BigNumber(this.config.gasLimitEsdtNftCreate).plus(storageGasLimit),
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.sender.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForPausing(options: { 
         sender: IAddress; 
         tokenIdentifier: string 
     }): TransactionNext {
-        const dataParts = ["pause", utf8ToHex(options.tokenIdentifier)];
+        this.dataParts = ["pause", utf8ToHex(options.tokenIdentifier)];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitPausing);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitPausing,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.sender.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForUnpausing(options: {
         sender: IAddress; 
         tokenIdentifier: string 
     }): TransactionNext {
-        const dataParts = ["unPause", utf8ToHex(options.tokenIdentifier)];
+        this.dataParts = ["unPause", utf8ToHex(options.tokenIdentifier)];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitPausing);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitPausing,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.sender.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForFreezing(options: {
@@ -452,16 +494,19 @@ export class TokenManagementTransactionsFactory {
         user: IAddress;
         tokenIdentifier: string;
     }): TransactionNext {
-        const dataParts = ["freeze", utf8ToHex(options.tokenIdentifier), addressToHex(options.user)];
+        this.dataParts = ["freeze", utf8ToHex(options.tokenIdentifier), addressToHex(options.user)];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitFreezing);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitFreezing,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.sender.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForUnfreezing(options: {
@@ -469,16 +514,19 @@ export class TokenManagementTransactionsFactory {
         user: IAddress;
         tokenIdentifier: string;
     }): TransactionNext {
-        const dataParts = ["UnFreeze", utf8ToHex(options.tokenIdentifier), addressToHex(options.user)];
+        this.dataParts = ["UnFreeze", utf8ToHex(options.tokenIdentifier), addressToHex(options.user)];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitFreezing);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitFreezing,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.sender.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForWiping(options: {
@@ -486,16 +534,19 @@ export class TokenManagementTransactionsFactory {
         user: IAddress;
         tokenIdentifier: string;
     }): TransactionNext {
-        const dataParts = ["wipe", utf8ToHex(options.tokenIdentifier), addressToHex(options.user)];
+        this.dataParts = ["wipe", utf8ToHex(options.tokenIdentifier), addressToHex(options.user)];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitWiping);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitWiping,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.sender.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForLocalMint(options: {
@@ -503,16 +554,19 @@ export class TokenManagementTransactionsFactory {
         tokenIdentifier: string;
         supplyToMint: BigNumber.Value;
     }): TransactionNext {
-        const dataParts = ["ESDTLocalMint", utf8ToHex(options.tokenIdentifier), bigIntToHex(options.supplyToMint)];
+        this.dataParts = ["ESDTLocalMint", utf8ToHex(options.tokenIdentifier), bigIntToHex(options.supplyToMint)];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitEsdtLocalMint);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtLocalMint,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.sender.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForLocalBurning(options: {
@@ -520,16 +574,19 @@ export class TokenManagementTransactionsFactory {
         tokenIdentifier: string;
         supplyToBurn: BigNumber.Value;
     }): TransactionNext {
-        const dataParts = ["ESDTLocalBurn", utf8ToHex(options.tokenIdentifier), bigIntToHex(options.supplyToBurn)];
+        this.dataParts = ["ESDTLocalBurn", utf8ToHex(options.tokenIdentifier), bigIntToHex(options.supplyToBurn)];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitEsdtLocalBurn);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtLocalBurn,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.sender.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForUpdatingAttributes(options: {
@@ -538,21 +595,24 @@ export class TokenManagementTransactionsFactory {
         tokenNonce: BigNumber.Value;
         attributes: Uint8Array;
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "ESDTNFTUpdateAttributes",
             utf8ToHex(options.tokenIdentifier),
             bigIntToHex(options.tokenNonce),
             byteArrayToHex(options.attributes),
         ];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitEsdtNftUpdateAttributes);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtNftUpdateAttributes,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.sender.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForAddingQuantity(options: {
@@ -561,21 +621,24 @@ export class TokenManagementTransactionsFactory {
         tokenNonce: BigNumber.Value;
         quantityToAdd: BigNumber.Value;
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "ESDTNFTAddQuantity",
             utf8ToHex(options.tokenIdentifier),
             bigIntToHex(options.tokenNonce),
             bigIntToHex(options.quantityToAdd),
         ];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitEsdtNftAddQuantity);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtNftAddQuantity,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.sender.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     createTransactionForBurningQuantity(options: {
@@ -584,21 +647,24 @@ export class TokenManagementTransactionsFactory {
         tokenNonce: BigNumber.Value;
         quantityToBurn: BigNumber.Value;
     }): TransactionNext {
-        const dataParts = [
+        this.dataParts = [
             "ESDTNFTBurn",
             utf8ToHex(options.tokenIdentifier),
             bigIntToHex(options.tokenNonce),
             bigIntToHex(options.quantityToBurn),
         ];
+        const data = this.buildTransactionPayload();
+        this.addDataMovementGas = true;
+        this.providedGasLimit = new BigNumber(this.config.gasLimitEsdtNftBurn);
+        const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNextBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtNftBurn,
-            addDataMovementGas: true,
-        }).build();
+        return new TransactionNext({
+            sender: options.sender.bech32(),
+            receiver: options.sender.bech32(),
+            data: data.valueOf(),
+            gasLimit: gasLimit,
+            chainID: this.config.chainID
+        });
     }
 
     private notifyAboutUnsettingBurnRoleGlobally() {
@@ -608,5 +674,20 @@ IMPORTANT!
 ==========
 You are about to issue (register) a new token. This will set the role "ESDTRoleBurnForAll" (globally).
 Once the token is registered, you can unset this role by calling "unsetBurnRoleGlobally" (in a separate transaction).`);
+    }
+
+    private buildTransactionPayload(): TransactionPayload {
+        const data = this.dataParts.join(ARGUMENTS_SEPARATOR);
+        return new TransactionPayload(data);
+    }
+
+    private computeGasLimit(payload: ITransactionPayload): BigNumber.Value {
+        if (!this.addDataMovementGas) {
+            return this.providedGasLimit;
+        }
+
+        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()));
+        const gasLimit = dataMovementGas.plus(this.providedGasLimit);
+        return gasLimit;
     }
 }

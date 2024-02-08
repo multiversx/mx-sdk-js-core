@@ -32,7 +32,7 @@ export class SmartContractTransactionsFactory {
     private readonly abiRegistry?: Abi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
-    private dataParts!: string[];
+    //private dataParts!: string[];
 
     constructor({ config, abi, tokenComputer }: { config: Config; abi?: Abi; tokenComputer: TokenComputer }) {
         this.config = config;
@@ -61,8 +61,8 @@ export class SmartContractTransactionsFactory {
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
         let parts = [byteArrayToHex(options.bytecode), byteArrayToHex(VM_TYPE_WASM_VM), metadata.toString()];
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
-        this.dataParts = parts.concat(preparedArgs);
-        const data = this.buildTransactionPayload();
+        let dataParts: string[] = parts.concat(preparedArgs);
+        const data = this.buildTransactionPayload(dataParts);
 
         return new TransactionNext({
             sender: options.sender.bech32(),
@@ -110,8 +110,8 @@ export class SmartContractTransactionsFactory {
         }
 
         dataParts.push(dataParts.length ? utf8ToHex(options.functionName) : options.functionName);
-        this.dataParts = dataParts.concat(this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName)));
-        const data = this.buildTransactionPayload();
+        dataParts = dataParts.concat(this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName)));
+        const data = this.buildTransactionPayload(dataParts);
 
         return new TransactionNext({
             sender: options.sender.bech32(),
@@ -149,8 +149,8 @@ export class SmartContractTransactionsFactory {
 
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
         parts = parts.concat(preparedArgs);
-        this.dataParts = parts.concat(preparedArgs);
-        const data = this.buildTransactionPayload();
+        let dataParts: string[] = parts.concat(preparedArgs);
+        const data = this.buildTransactionPayload(dataParts);
 
         return new TransactionNext({
             sender: options.sender.bech32(),
@@ -184,8 +184,8 @@ export class SmartContractTransactionsFactory {
         return true;
     }
 
-    private buildTransactionPayload(): TransactionPayload {
-        const data = this.dataParts.join(ARGUMENTS_SEPARATOR);
+    private buildTransactionPayload(dataParts: string[]): TransactionPayload {
+        const data = dataParts.join(ARGUMENTS_SEPARATOR);
         return new TransactionPayload(data);
     }
 }

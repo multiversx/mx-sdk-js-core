@@ -27,9 +27,6 @@ export class NextTransferTransactionsFactory {
     private readonly config: IConfig;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
     private readonly tokenComputer: TokenComputer;
-    private dataParts!: string[];
-    private addDataMovementGas!: boolean;
-    private providedGasLimit!: BigNumber;
 
     constructor(config: IConfig, tokenComputer: TokenComputer) {
         this.config = config;
@@ -44,11 +41,11 @@ export class NextTransferTransactionsFactory {
         data?: string;
     }): TransactionNext {
         const d = options.data || "";
-        this.dataParts = [d];
-        const data = this.buildTransactionPayload();
-        this.addDataMovementGas = true;
-        this.providedGasLimit = new BigNumber(0);
-        const gasLimit = this.computeGasLimit(data);
+        let dataParts: string[] = [d];
+        const data = this.buildTransactionPayload(dataParts);
+        const addDataMovementGas: boolean = true;
+        const providedGasLimit: BigNumber = new BigNumber(0);
+        const gasLimit = this.computeGasLimit(addDataMovementGas, providedGasLimit, data);
 
 
         return new TransactionNext({
@@ -76,17 +73,16 @@ export class NextTransferTransactionsFactory {
             return this.createSingleESDTTransferNext(options);
         }
 
-        this.dataParts = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(
+        let dataParts: string[] = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(
             options.receiver,
             options.tokenTransfers
         );
-        const data = this.buildTransactionPayload();
-
-        this.providedGasLimit = new BigNumber(this.config.gasLimitMultiESDTNFTTransfer)
+        const data = this.buildTransactionPayload(dataParts);
+        const addDataMovementGas: boolean = true;
+        const providedGasLimit: BigNumber = new BigNumber(this.config.gasLimitMultiESDTNFTTransfer)
             .multipliedBy(new BigNumber(numberOfTransfers))
             .plus(new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER));
-        this.addDataMovementGas = true;
-        const gasLimit = this.computeGasLimit(data);
+            const gasLimit = this.computeGasLimit(addDataMovementGas, providedGasLimit, data);
 
         return new TransactionNext({
             sender: options.sender.bech32(),
@@ -105,24 +101,25 @@ export class NextTransferTransactionsFactory {
         let transferArgs: string[] = [];
         const transfer = options.tokenTransfers[0];
         let receiver = options.receiver;
+        const addDataMovementGas: boolean = true;
+        let providedGasLimit: BigNumber = new BigNumber(0);
+        
 
         if (this.tokenComputer.isFungible(transfer.token)) {
             transferArgs = this.dataArgsBuilder.buildArgsForESDTTransfer(transfer);
-            this.providedGasLimit = new BigNumber(this.config.gasLimitESDTTransfer).plus(
+            providedGasLimit = new BigNumber(this.config.gasLimitESDTTransfer).plus(
                 new BigNumber(ADDITIONAL_GAS_FOR_ESDT_TRANSFER)
             );
         } else {
             transferArgs = this.dataArgsBuilder.buildArgsForSingleESDTNFTTransfer(transfer, receiver);
-            this.providedGasLimit = new BigNumber(this.config.gasLimitESDTNFTTransfer).plus(
+            providedGasLimit = new BigNumber(this.config.gasLimitESDTNFTTransfer).plus(
                 new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER)
             );
             receiver = options.sender;
         }
 
-        this.dataParts = transferArgs;
-        const data = this.buildTransactionPayload();
-        this.addDataMovementGas = true;
-        const gasLimit = this.computeGasLimit(data);
+        const data = this.buildTransactionPayload(transferArgs);
+        const gasLimit = this.computeGasLimit(addDataMovementGas, providedGasLimit, data);
 
         return new TransactionNext({
             sender: options.sender.bech32(),
@@ -133,18 +130,18 @@ export class NextTransferTransactionsFactory {
         });
     }
 
-    private buildTransactionPayload(): TransactionPayload {
-        const data = this.dataParts.join(ARGUMENTS_SEPARATOR);
+    private buildTransactionPayload(dataParts: string[]): TransactionPayload {
+        const data = dataParts.join(ARGUMENTS_SEPARATOR);
         return new TransactionPayload(data);
     }
 
-    private computeGasLimit(payload: ITransactionPayload): BigNumber.Value {
-        if (!this.addDataMovementGas) {
-            return this.providedGasLimit;
+    private computeGasLimit(addDataMovementGas: boolean, providedGasLimit: BigNumber, payload: ITransactionPayload): BigNumber.Value {
+        if (!addDataMovementGas) {
+            return providedGasLimit;
         }
 
         const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()));
-        const gasLimit = dataMovementGas.plus(this.providedGasLimit);
+        const gasLimit = dataMovementGas.plus(providedGasLimit);
         return gasLimit;
     }
 }

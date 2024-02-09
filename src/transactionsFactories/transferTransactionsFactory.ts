@@ -40,13 +40,10 @@ export class NextTransferTransactionsFactory {
         nativeAmount: BigNumber.Value;
         data?: string;
     }): TransactionNext {
-        const d = options.data || "";
-        let dataParts: string[] = [d];
+        const dataParts = [options.data || ""]; 
         const data = this.buildTransactionPayload(dataParts);
-        const addDataMovementGas: boolean = true;
-        const providedGasLimit: BigNumber = new BigNumber(0);
-        const gasLimit = this.computeGasLimit(addDataMovementGas, providedGasLimit, data);
-
+        const extraGasLimit: BigNumber = new BigNumber(0);
+        const gasLimit = this.computeGasLimit(extraGasLimit, data);
 
         return new TransactionNext({
             sender: options.sender.bech32(),
@@ -73,16 +70,15 @@ export class NextTransferTransactionsFactory {
             return this.createSingleESDTTransferNext(options);
         }
 
-        let dataParts: string[] = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(
+        const dataParts: string[] = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(
             options.receiver,
             options.tokenTransfers
         );
         const data = this.buildTransactionPayload(dataParts);
-        const addDataMovementGas: boolean = true;
-        const providedGasLimit: BigNumber = new BigNumber(this.config.gasLimitMultiESDTNFTTransfer)
+        const extraGasLimit: BigNumber = new BigNumber(this.config.gasLimitMultiESDTNFTTransfer)
             .multipliedBy(new BigNumber(numberOfTransfers))
             .plus(new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER));
-            const gasLimit = this.computeGasLimit(addDataMovementGas, providedGasLimit, data);
+            const gasLimit = this.computeGasLimit(extraGasLimit, data);
 
         return new TransactionNext({
             sender: options.sender.bech32(),
@@ -101,25 +97,23 @@ export class NextTransferTransactionsFactory {
         let transferArgs: string[] = [];
         const transfer = options.tokenTransfers[0];
         let receiver = options.receiver;
-        const addDataMovementGas: boolean = true;
-        let providedGasLimit: BigNumber = new BigNumber(0);
+        let extraGasLimit: BigNumber = new BigNumber(0);
         
-
         if (this.tokenComputer.isFungible(transfer.token)) {
             transferArgs = this.dataArgsBuilder.buildArgsForESDTTransfer(transfer);
-            providedGasLimit = new BigNumber(this.config.gasLimitESDTTransfer).plus(
+            extraGasLimit = new BigNumber(this.config.gasLimitESDTTransfer).plus(
                 new BigNumber(ADDITIONAL_GAS_FOR_ESDT_TRANSFER)
             );
         } else {
             transferArgs = this.dataArgsBuilder.buildArgsForSingleESDTNFTTransfer(transfer, receiver);
-            providedGasLimit = new BigNumber(this.config.gasLimitESDTNFTTransfer).plus(
+            extraGasLimit = new BigNumber(this.config.gasLimitESDTNFTTransfer).plus(
                 new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER)
             );
             receiver = options.sender;
         }
 
         const data = this.buildTransactionPayload(transferArgs);
-        const gasLimit = this.computeGasLimit(addDataMovementGas, providedGasLimit, data);
+        const gasLimit = this.computeGasLimit(extraGasLimit, data);
 
         return new TransactionNext({
             sender: options.sender.bech32(),
@@ -135,11 +129,7 @@ export class NextTransferTransactionsFactory {
         return new TransactionPayload(data);
     }
 
-    private computeGasLimit(addDataMovementGas: boolean, providedGasLimit: BigNumber, payload: ITransactionPayload): BigNumber.Value {
-        if (!addDataMovementGas) {
-            return providedGasLimit;
-        }
-
+    private computeGasLimit(providedGasLimit: BigNumber, payload: ITransactionPayload): BigNumber.Value {
         const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()));
         const gasLimit = dataMovementGas.plus(providedGasLimit);
         return gasLimit;

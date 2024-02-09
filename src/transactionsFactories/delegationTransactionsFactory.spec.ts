@@ -10,7 +10,7 @@ describe("test delegation transactions factory", function () {
     const config = new TransactionsFactoryConfig("D");
     const delegationFactory = new DelegationTransactionsFactory(config);
 
-    it("should create next transaction for new delegation contract", async function () {
+    it("should create 'TransactionNext' for new delegation contract", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delagationCap = "5000000000000000000000";
         const serviceFee = 10;
@@ -31,7 +31,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.value, value);
     });
 
-    it("should create next transaction for adding nodes", async function () {
+    it("should create 'TransactionNext' for adding nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         const publicKey = new ValidatorPublicKey(Buffer.from("e7beaa95b3877f47348df4dd1cb578a4f7cabf7a20bfeefe5cdd263878ff132b765e04fef6f40c93512b666c47ed7719b8902f6c922c04247989b7137e837cc81a62e54712471c97a2ddab75aa9c2f58f813ed4c0fa722bde0ab718bff382208", "hex"));
@@ -54,7 +54,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.value, 0);
     });
 
-    it("should create next transaction for removing nodes", async function () {
+    it("should create 'TransactionNext' for removing nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -77,7 +77,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.value, 0);
     });
 
-    it("should create next transaction for staking nodes", async function () {
+    it("should create 'TransactionNext' for staking nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -100,7 +100,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.value, 0);
     });
 
-    it("should create next transaction for unbonding nodes", async function () {
+    it("should create 'TransactionNext' for unbonding nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -124,7 +124,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.gasLimit.valueOf(), 12080000);
     });
 
-    it("should create next transaction for unstaking nodes", async function () {
+    it("should create 'TransactionNext' for unstaking nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -148,7 +148,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.gasLimit.valueOf(), 12081500);
     });
 
-    it("should create next transaction for unjailing nodes", async function () {
+    it("should create 'TransactionNext' for unjailing nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -171,7 +171,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.value, 0);
     });
 
-    it("should create next transaction for changing service fee", async function () {
+    it("should create 'TransactionNext' for changing service fee", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         const serviceFee = new BigNumber(10);
@@ -189,7 +189,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.value, 0);
     });
 
-    it("should create next transaction for changing delegation cap", async function () {
+    it("should create 'TransactionNext' for changing delegation cap", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         const delegationCap = new BigNumber("5000000000000000000000");
@@ -207,7 +207,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.value, 0);
     });
 
-    it("should create next transaction for setting automatic activation", async function () {
+    it("should create 'TransactionNext' for setting automatic activation", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -223,7 +223,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.value, 0);
     });
 
-    it("should create next transaction for unsetting automatic activation", async function () {
+    it("should create 'TransactionNext' for unsetting automatic activation", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -239,7 +239,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.value, 0);
     });
 
-    it("should create next transaction for setting cap check on redelegate rewards", async function () {
+    it("should create 'TransactionNext' for setting cap check on redelegate rewards", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -255,7 +255,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.value, 0);
     });
 
-    it("should create next transaction for unsetting cap check on redelegate rewards", async function () {
+    it("should create 'TransactionNext' for unsetting cap check on redelegate rewards", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
@@ -271,7 +271,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(next.value, 0);
     });
 
-    it("should create next transaction for setting metadata", async function () {
+    it("should create 'TransactionNext' for setting metadata", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 

@@ -16,7 +16,7 @@ describe("test token management transactions factory", () => {
         factory = new TokenManagementTransactionsFactory(config);
     });
 
-    it("should create next transaction for registering and setting roles", () => {
+    it("should create 'TransactionNext' for registering and setting roles", () => {
         const next = factory.createTransactionForRegisteringAndSettingRoles({
             sender: frank.address,
             tokenName: "TEST",
@@ -32,7 +32,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(next.gasLimit, new BigNumber("60125000"));
     });
 
-    it("should create next transaction for issuing fungible token", () => {
+    it("should create 'TransactionNext' for issuing fungible token", () => {
         const next = factory.createTransactionForIssuingFungible({
             sender: frank.address,
             tokenName: "FRANK",
@@ -53,7 +53,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(next.value, config.issueCost);
     });
 
-    it("should create next transaction for issuing semi-fungible token", () => {
+    it("should create 'TransactionNext' for issuing semi-fungible token", () => {
         const next = factory.createTransactionForIssuingSemiFungible({
             sender: frank.address,
             tokenName: "FRANK",
@@ -73,7 +73,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(next.value, config.issueCost);
     });
 
-    it("should create next transaction for issuing non-fungible token", () => {
+    it("should create 'TransactionNext' for issuing non-fungible token", () => {
         const next = factory.createTransactionForIssuingNonFungible({
             sender: frank.address,
             tokenName: "FRANK",
@@ -93,7 +93,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(next.value, config.issueCost);
     });
 
-    it("should create next transaction for registering metaEsdt", () => {
+    it("should create 'TransactionNext' for registering metaEsdt", () => {
         const next = factory.createTransactionForRegisteringMetaESDT({
             sender: frank.address,
             tokenName: "FRANK",
@@ -114,7 +114,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(next.value, config.issueCost);
     });
 
-    it("should create next transaction for setting spcial role on non-fungible token", () => {
+    it("should create 'TransactionNext' for setting spcial role on non-fungible token", () => {
         const next = factory.createTransactionForSettingSpecialRoleOnNonFungibleToken({
             sender: frank.address,
             user: grace.address,
@@ -132,7 +132,7 @@ describe("test token management transactions factory", () => {
         assert.equal(next.value, 0);
     });
 
-    it("should create next transaction for creating nft", () => {
+    it("should create 'TransactionNext' for creating nft", () => {
         const next = factory.createTransactionForCreatingNFT({
             sender: grace.address,
             tokenIdentifier: "FRANK-aa9e8d",

@@ -52,7 +52,7 @@ describe("test smart contract transactions factory", function () {
         );
     });
 
-    it("should create next transaction for deploy", async function () {
+    it("should create 'TransactionNext' for deploy", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const gasLimit = 6000000;
         const args = [new U32Value(0)];
@@ -79,7 +79,7 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(deployNext, abiDeployNext);
     });
 
-    it("should create next transaction for execute without transfer", async function () {
+    it("should create 'TransactionNext' for execute without transfer", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const func = "add";
@@ -110,7 +110,7 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(executeNext, abiExecuteNext);
     });
 
-    it("should create next transaction for execute and transfer native token", async function () {
+    it("should create 'TransactionNext' for execute and transfer native token", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const func = "add";
@@ -143,7 +143,7 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(executeNext, abiExecuteNext);
     });
 
-    it("should create next transaction for execute and transfer single esdt", async function () {
+    it("should create 'TransactionNext' for execute and transfer single esdt", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const func = "add";
@@ -178,7 +178,7 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(executeNext, abiExecuteNext);
     });
 
-    it("should create next transaction for execute and transfer multiple esdts", async function () {
+    it("should create 'TransactionNext' for execute and transfer multiple esdts", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");
         const func = "add";
@@ -223,7 +223,7 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(executeNext, abiExecuteNext);
     });
 
-    it("should create next transaction for execute and transfer single nft", async function () {
+    it("should create 'TransactionNext' for execute and transfer single nft", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const func = "add";
@@ -267,7 +267,7 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(executeNext, abiExecuteNext);
     });
 
-    it("should create next transaction for execute and transfer multiple nfts", async function () {
+    it("should create 'TransactionNext' for execute and transfer multiple nfts", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const func = "add";
@@ -313,7 +313,7 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(executeNext, abiExecuteNext);
     });
 
-    it("should create next transaction for upgrade", async function () {
+    it("should create 'TransactionNext' for upgrade", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const gasLimit = 6000000;

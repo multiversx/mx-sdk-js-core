@@ -5,7 +5,6 @@ import { byteArrayToHex, utf8ToHex } from "../utils.codec";
 import { ARGUMENTS_SEPARATOR, CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
 import { Err, ErrBadUsage } from "../errors";
-import { Address } from "../address";
 import { Token, NextTokenTransfer } from "../tokens";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
 import { TransactionNext } from "../transaction";
@@ -32,7 +31,6 @@ export class SmartContractTransactionsFactory {
     private readonly abiRegistry?: Abi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
-    //private dataParts!: string[];
 
     constructor({ config, abi, tokenComputer }: { config: Config; abi?: Abi; tokenComputer: TokenComputer }) {
         this.config = config;
@@ -61,12 +59,12 @@ export class SmartContractTransactionsFactory {
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
         let parts = [byteArrayToHex(options.bytecode), byteArrayToHex(VM_TYPE_WASM_VM), metadata.toString()];
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
-        let dataParts: string[] = parts.concat(preparedArgs);
+        const dataParts: string[] = parts.concat(preparedArgs);
         const data = this.buildTransactionPayload(dataParts);
 
         return new TransactionNext({
             sender: options.sender.bech32(),
-            receiver: Address.fromBech32(CONTRACT_DEPLOY_ADDRESS).bech32(),
+            receiver: CONTRACT_DEPLOY_ADDRESS,
             data: data.valueOf(),
             gasLimit: options.gasLimit,
             value: nativeTransferAmount,
@@ -149,7 +147,7 @@ export class SmartContractTransactionsFactory {
 
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
         parts = parts.concat(preparedArgs);
-        let dataParts: string[] = parts.concat(preparedArgs);
+        const dataParts: string[] = parts.concat(preparedArgs);
         const data = this.buildTransactionPayload(dataParts);
 
         return new TransactionNext({

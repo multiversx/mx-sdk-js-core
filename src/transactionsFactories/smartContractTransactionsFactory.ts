@@ -11,7 +11,6 @@ import { Token, NextTokenTransfer } from "../tokens";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
 import { TransactionNext } from "../transaction";
 
-
 interface Config {
     chainID: string;
     minGasLimit: BigNumber.Value;
@@ -150,7 +149,6 @@ export class SmartContractTransactionsFactory {
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
 
         parts = parts.concat(preparedArgs);
-
 
         return new TransactionNextBuilder({
             config: this.config,

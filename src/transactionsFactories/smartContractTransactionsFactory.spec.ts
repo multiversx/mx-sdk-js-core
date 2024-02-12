@@ -13,13 +13,13 @@ import { Token, NextTokenTransfer, TokenComputer } from "../tokens";
 
 describe("test smart contract transactions factory", function () {
     const config = new TransactionsFactoryConfig("D");
-    let transaction: SmartContractTransactionsFactory;
+    let smartContractFactory: SmartContractTransactionsFactory;
     let abiAwareFactory: SmartContractTransactionsFactory;
     let adderByteCode: Code;
     let abiRegistry: AbiRegistry;
 
     before(async function () {
-        transaction = new SmartContractTransactionsFactory({
+        smartContractFactory = new SmartContractTransactionsFactory({
             config: config,
             tokenComputer: new TokenComputer(),
         });
@@ -41,14 +41,14 @@ describe("test smart contract transactions factory", function () {
 
         assert.throws(
             () =>
-                transaction.createTransactionForDeploy({
+                smartContractFactory.createTransactionForDeploy({
                     sender: sender,
                     bytecode: adderByteCode.valueOf(),
                     gasLimit: gasLimit,
                     args: args,
                 }),
             Err,
-            "Can't convert args to TypedValues"
+            "Can't convert args to TypedValues",
         );
     });
 
@@ -57,7 +57,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000;
         const args = [new U32Value(0)];
 
-        const deployNext = transaction.createTransactionForDeploy({
+        const transaction = smartContractFactory.createTransactionForDeploy({
             sender: sender,
             bytecode: adderByteCode.valueOf(),
             gasLimit: gasLimit,
@@ -70,13 +70,13 @@ describe("test smart contract transactions factory", function () {
             args: args,
         });
 
-        assert.equal(deployNext.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(deployNext.receiver, CONTRACT_DEPLOY_ADDRESS);
-        expect(deployNext.data.length).to.be.greaterThan(0);
-        assert.equal(deployNext.gasLimit.valueOf(), gasLimit);
-        assert.equal(deployNext.value, 0);
+        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.receiver, CONTRACT_DEPLOY_ADDRESS);
+        expect(transaction.data.length).to.be.greaterThan(0);
+        assert.equal(transaction.gasLimit.valueOf(), gasLimit);
+        assert.equal(transaction.value, 0);
 
-        assert.deepEqual(deployNext, abiDeployNext);
+        assert.deepEqual(transaction, abiDeployNext);
     });
 
     it("should create 'TransactionNext' for execute without transfer", async function () {
@@ -86,7 +86,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000;
         const args = [new U32Value(7)];
 
-        const executeNext = transaction.createTransactionForExecute({
+        const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -101,13 +101,13 @@ describe("test smart contract transactions factory", function () {
             args: args,
         });
 
-        assert.equal(executeNext.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(executeNext.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        assert.deepEqual(executeNext.data, Buffer.from("add@07"));
-        assert.equal(executeNext.gasLimit.valueOf(), gasLimit);
-        assert.equal(executeNext.value, 0);
+        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.deepEqual(transaction.data, Buffer.from("add@07"));
+        assert.equal(transaction.gasLimit.valueOf(), gasLimit);
+        assert.equal(transaction.value, 0);
 
-        assert.deepEqual(executeNext, abiExecuteNext);
+        assert.deepEqual(transaction, abiExecuteNext);
     });
 
     it("should create 'TransactionNext' for execute and transfer native token", async function () {
@@ -117,7 +117,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000;
         const egldAmount = new BigNumber("1000000000000000000");
 
-        const executeNext = transaction.createTransactionForExecute({
+        const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -134,13 +134,13 @@ describe("test smart contract transactions factory", function () {
             nativeTransferAmount: egldAmount,
         });
 
-        assert.equal(executeNext.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(executeNext.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        assert.deepEqual(executeNext.data, Buffer.from("add@07"));
-        assert.equal(executeNext.gasLimit.valueOf(), gasLimit);
-        assert.equal(executeNext.value.valueOf(), "1000000000000000000");
+        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.deepEqual(transaction.data, Buffer.from("add@07"));
+        assert.equal(transaction.gasLimit.valueOf(), gasLimit);
+        assert.equal(transaction.value.valueOf(), "1000000000000000000");
 
-        assert.deepEqual(executeNext, abiExecuteNext);
+        assert.deepEqual(transaction, abiExecuteNext);
     });
 
     it("should create 'TransactionNext' for execute and transfer single esdt", async function () {
@@ -152,7 +152,7 @@ describe("test smart contract transactions factory", function () {
         const token = new Token("FOO-6ce17b", 0);
         const transfer = new NextTokenTransfer(token, 10);
 
-        const executeNext = transaction.createTransactionForExecute({
+        const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -169,13 +169,13 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [transfer],
         });
 
-        assert.equal(executeNext.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(executeNext.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        assert.deepEqual(executeNext.data, Buffer.from("ESDTTransfer@464f4f2d366365313762@0a@616464@07"));
-        assert.equal(executeNext.gasLimit.valueOf(), gasLimit);
-        assert.equal(executeNext.value.valueOf(), "0");
+        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.deepEqual(transaction.data, Buffer.from("ESDTTransfer@464f4f2d366365313762@0a@616464@07"));
+        assert.equal(transaction.gasLimit.valueOf(), gasLimit);
+        assert.equal(transaction.value.valueOf(), "0");
 
-        assert.deepEqual(executeNext, abiExecuteNext);
+        assert.deepEqual(transaction, abiExecuteNext);
     });
 
     it("should create 'TransactionNext' for execute and transfer multiple esdts", async function () {
@@ -190,7 +190,7 @@ describe("test smart contract transactions factory", function () {
         const barToken = new Token("BAR-5bc08f", 0);
         const barTransfer = new NextTokenTransfer(barToken, 3140);
 
-        const executeNext = transaction.createTransactionForExecute({
+        const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -207,20 +207,20 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [fooTransfer, barTransfer],
         });
 
-        assert.equal(executeNext.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(executeNext.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
         assert.deepEqual(
-            executeNext.data,
+            transaction.data,
             Buffer.from(
-                "MultiESDTNFTTransfer@00000000000000000500ed8e25a94efa837aae0e593112cfbb01b448755069e1@02@464f4f2d366365313762@00@0a@4241522d356263303866@00@0c44@616464@07"
-            )
+                "MultiESDTNFTTransfer@00000000000000000500ed8e25a94efa837aae0e593112cfbb01b448755069e1@02@464f4f2d366365313762@00@0a@4241522d356263303866@00@0c44@616464@07",
+            ),
         );
 
-        assert.equal(executeNext.gasLimit.valueOf(), gasLimit);
-        assert.equal(executeNext.value.valueOf(), "0");
+        assert.equal(transaction.gasLimit.valueOf(), gasLimit);
+        assert.equal(transaction.value.valueOf(), "0");
 
-        assert.deepEqual(executeNext, abiExecuteNext);
+        assert.deepEqual(transaction, abiExecuteNext);
     });
 
     it("should create 'TransactionNext' for execute and transfer single nft", async function () {
@@ -233,7 +233,7 @@ describe("test smart contract transactions factory", function () {
         const token = new Token("NFT-123456", 1);
         const transfer = new NextTokenTransfer(token, 1);
 
-        const executeNext = transaction.createTransactionForExecute({
+        const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -250,21 +250,21 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [transfer],
         });
 
-        assert.equal(executeNext.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(executeNext.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
-        assert.isDefined(executeNext.data);
+        assert.isDefined(transaction.data);
         assert.deepEqual(
-            executeNext.data,
+            transaction.data,
             Buffer.from(
-                "ESDTNFTTransfer@4e46542d313233343536@01@01@00000000000000000500b9353fe8407f87310c87e12fa1ac807f0485da39d152@616464@07"
-            )
+                "ESDTNFTTransfer@4e46542d313233343536@01@01@00000000000000000500b9353fe8407f87310c87e12fa1ac807f0485da39d152@616464@07",
+            ),
         );
 
-        assert.equal(executeNext.gasLimit.valueOf(), gasLimit);
-        assert.equal(executeNext.value.valueOf(), "0");
+        assert.equal(transaction.gasLimit.valueOf(), gasLimit);
+        assert.equal(transaction.value.valueOf(), "0");
 
-        assert.deepEqual(executeNext, abiExecuteNext);
+        assert.deepEqual(transaction, abiExecuteNext);
     });
 
     it("should create 'TransactionNext' for execute and transfer multiple nfts", async function () {
@@ -279,7 +279,7 @@ describe("test smart contract transactions factory", function () {
         const secondToken = new Token("NFT-123456", 42);
         const secondTransfer = new NextTokenTransfer(secondToken, 1);
 
-        const executeNext = transaction.createTransactionForExecute({
+        const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -296,21 +296,21 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [firstTransfer, secondTransfer],
         });
 
-        assert.equal(executeNext.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(executeNext.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
-        assert.isDefined(executeNext.data);
+        assert.isDefined(transaction.data);
         assert.deepEqual(
-            executeNext.data,
+            transaction.data,
             Buffer.from(
-                "MultiESDTNFTTransfer@00000000000000000500b9353fe8407f87310c87e12fa1ac807f0485da39d152@02@4e46542d313233343536@01@01@4e46542d313233343536@2a@01@616464@07"
-            )
+                "MultiESDTNFTTransfer@00000000000000000500b9353fe8407f87310c87e12fa1ac807f0485da39d152@02@4e46542d313233343536@01@01@4e46542d313233343536@2a@01@616464@07",
+            ),
         );
 
-        assert.equal(executeNext.gasLimit.valueOf(), gasLimit);
-        assert.equal(executeNext.value.valueOf(), "0");
+        assert.equal(transaction.gasLimit.valueOf(), gasLimit);
+        assert.equal(transaction.value.valueOf(), "0");
 
-        assert.deepEqual(executeNext, abiExecuteNext);
+        assert.deepEqual(transaction, abiExecuteNext);
     });
 
     it("should create 'TransactionNext' for upgrade", async function () {
@@ -319,7 +319,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000;
         const args = [new U32Value(0)];
 
-        const upgradeNext = transaction.createTransactionForUpgrade({
+        const transaction = smartContractFactory.createTransactionForUpgrade({
             sender: sender,
             contract: contract,
             bytecode: adderByteCode.valueOf(),
@@ -335,12 +335,12 @@ describe("test smart contract transactions factory", function () {
             args: args,
         });
 
-        assert.equal(upgradeNext.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(upgradeNext.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        assert.isTrue(Buffer.from(upgradeNext.data!).toString().startsWith("upgradeContract@"));
-        assert.equal(upgradeNext.gasLimit.valueOf(), gasLimit);
-        assert.equal(upgradeNext.value, 0);
+        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.isTrue(Buffer.from(transaction.data!).toString().startsWith("upgradeContract@"));
+        assert.equal(transaction.gasLimit.valueOf(), gasLimit);
+        assert.equal(transaction.value, 0);
 
-        assert.deepEqual(upgradeNext, abiUpgradeNext);
+        assert.deepEqual(transaction, abiUpgradeNext);
     });
 });

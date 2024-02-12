@@ -4,7 +4,6 @@ import { ARGUMENTS_SEPARATOR } from "../constants";
 import { TransactionPayload } from "../transactionPayload";
 import { TransactionNext } from "../transaction";
 
-
 interface Config {
     chainID: string;
     minGasLimit: BigNumber.Value;
@@ -21,13 +20,13 @@ export class TransactionNextBuilder {
     private amount?: BigNumber.Value;
 
     constructor(options: {
-        config: Config,
-        sender: IAddress,
-        receiver: IAddress,
-        dataParts: string[],
-        gasLimit: BigNumber.Value,
-        addDataMovementGas: boolean,
-        amount?: BigNumber.Value,
+        config: Config;
+        sender: IAddress;
+        receiver: IAddress;
+        dataParts: string[];
+        gasLimit: BigNumber.Value;
+        addDataMovementGas: boolean;
+        amount?: BigNumber.Value;
     }) {
         this.config = options.config;
         this.sender = options.sender;
@@ -43,7 +42,9 @@ export class TransactionNextBuilder {
             return this.providedGasLimit;
         }
 
-        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()));
+        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(
+            new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()),
+        );
         const gasLimit = dataMovementGas.plus(this.providedGasLimit);
         return gasLimit;
     }
@@ -54,7 +55,7 @@ export class TransactionNextBuilder {
     }
 
     build(): TransactionNext {
-        const data = this.buildTransactionPayload()
+        const data = this.buildTransactionPayload();
         const gasLimit = this.computeGasLimit(data);
 
         return new TransactionNext({
@@ -63,7 +64,7 @@ export class TransactionNextBuilder {
             gasLimit: gasLimit,
             value: this.amount || 0,
             data: data.valueOf(),
-            chainID: this.config.toString()
-        })
+            chainID: this.config.toString(),
+        });
     }
 }

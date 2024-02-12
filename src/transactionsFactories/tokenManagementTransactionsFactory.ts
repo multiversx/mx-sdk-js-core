@@ -7,7 +7,6 @@ import { addressToHex, bigIntToHex, byteArrayToHex, utf8ToHex } from "../utils.c
 import { TransactionNextBuilder } from "./transactionNextBuilder";
 import { TransactionNext } from "../transaction";
 
-
 interface Config {
     chainID: string;
     minGasLimit: BigNumber.Value;
@@ -76,7 +75,6 @@ export class TokenManagementTransactionsFactory {
             options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
-
         return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
@@ -121,8 +119,7 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex("canAddSpecialRoles"),
             options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
-        
-        
+
         return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
@@ -167,7 +164,6 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex("canAddSpecialRoles"),
             options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
-
 
         return new TransactionNextBuilder({
             config: this.config,
@@ -216,7 +212,6 @@ export class TokenManagementTransactionsFactory {
             options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
-
         return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
@@ -244,7 +239,6 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex(options.tokenType),
             bigIntToHex(options.numDecimals),
         ];
-
 
         return new TransactionNextBuilder({
             config: this.config,
@@ -304,7 +298,6 @@ export class TokenManagementTransactionsFactory {
             ...(options.addRoleLocalBurn ? [utf8ToHex("ESDTRoleLocalBurn")] : []),
         ];
 
-
         return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
@@ -333,7 +326,6 @@ export class TokenManagementTransactionsFactory {
             ...(options.addRoleNFTAddQuantity ? [utf8ToHex("ESDTRoleNFTAddQuantity")] : []),
             ...(options.addRoleESDTTransferRole ? [utf8ToHex("ESDTTransferRole")] : []),
         ];
-
 
         return new TransactionNextBuilder({
             config: this.config,
@@ -378,7 +370,6 @@ export class TokenManagementTransactionsFactory {
             ...(options.addRoleESDTTransferRole ? [utf8ToHex("ESDTTransferRole")] : []),
         ];
 
-
         return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
@@ -410,11 +401,9 @@ export class TokenManagementTransactionsFactory {
             ...options.uris.map(utf8ToHex),
         ];
 
-
         // Note that the following is an approximation (a reasonable one):
         const nftData = options.name + options.hash + options.attributes + options.uris.join("");
         const storageGasLimit = new BigNumber(this.config.gasLimitPerByte).multipliedBy(nftData.length);
-
 
         return new TransactionNextBuilder({
             config: this.config,
@@ -426,10 +415,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForPausing(options: { 
-        sender: IAddress; 
-        tokenIdentifier: string 
-    }): TransactionNext {
+    createTransactionForPausing(options: { sender: IAddress; tokenIdentifier: string }): TransactionNext {
         const dataParts = ["pause", utf8ToHex(options.tokenIdentifier)];
 
         return new TransactionNextBuilder({
@@ -442,10 +428,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnpausing(options: {
-        sender: IAddress; 
-        tokenIdentifier: string 
-    }): TransactionNext {
+    createTransactionForUnpausing(options: { sender: IAddress; tokenIdentifier: string }): TransactionNext {
         const dataParts = ["unPause", utf8ToHex(options.tokenIdentifier)];
 
         return new TransactionNextBuilder({
@@ -556,7 +539,6 @@ export class TokenManagementTransactionsFactory {
             byteArrayToHex(options.attributes),
         ];
 
-
         return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
@@ -580,7 +562,6 @@ export class TokenManagementTransactionsFactory {
             bigIntToHex(options.quantityToAdd),
         ];
 
-
         return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
@@ -603,7 +584,6 @@ export class TokenManagementTransactionsFactory {
             bigIntToHex(options.tokenNonce),
             bigIntToHex(options.quantityToBurn),
         ];
-
 
         return new TransactionNextBuilder({
             config: this.config,

@@ -71,7 +71,7 @@ export class NextTransferTransactionsFactory {
         const transferArgs = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(
             options.receiver,
             options.tokenTransfers
-        )
+        );
 
         const extraGasForTransfer = new BigNumber(this.config.gasLimitMultiESDTNFTTransfer).multipliedBy(new BigNumber(numberOfTransfers)).plus(new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER));
 

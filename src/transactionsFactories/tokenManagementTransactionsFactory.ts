@@ -121,7 +121,7 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex("canAddSpecialRoles"),
             options.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
-
+        
         
         return new TransactionNextBuilder({
             config: this.config,

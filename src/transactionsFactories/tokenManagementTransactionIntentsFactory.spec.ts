@@ -7,17 +7,17 @@ import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test token management transactions factory", () => {
     let frank: TestWallet, grace: TestWallet;
-    let factory: TokenManagementTransactionsFactory;
+    let transaction: TokenManagementTransactionsFactory;
     let config: TransactionsFactoryConfig;
 
     before(async function () {
         ({ frank, grace } = await loadTestWallets());
         config = new TransactionsFactoryConfig("T");
-        factory = new TokenManagementTransactionsFactory(config);
+        transaction = new TokenManagementTransactionsFactory(config);
     });
 
     it("should create 'TransactionNext' for registering and setting roles", () => {
-        const next = factory.createTransactionForRegisteringAndSettingRoles({
+        const next = transaction.createTransactionForRegisteringAndSettingRoles({
             sender: frank.address,
             tokenName: "TEST",
             tokenTicker: "TEST",
@@ -33,7 +33,7 @@ describe("test token management transactions factory", () => {
     });
 
     it("should create 'TransactionNext' for issuing fungible token", () => {
-        const next = factory.createTransactionForIssuingFungible({
+        const next = transaction.createTransactionForIssuingFungible({
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
@@ -54,7 +54,7 @@ describe("test token management transactions factory", () => {
     });
 
     it("should create 'TransactionNext' for issuing semi-fungible token", () => {
-        const next = factory.createTransactionForIssuingSemiFungible({
+        const next = transaction.createTransactionForIssuingSemiFungible({
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
@@ -74,7 +74,7 @@ describe("test token management transactions factory", () => {
     });
 
     it("should create 'TransactionNext' for issuing non-fungible token", () => {
-        const next = factory.createTransactionForIssuingNonFungible({
+        const next = transaction.createTransactionForIssuingNonFungible({
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
@@ -94,7 +94,7 @@ describe("test token management transactions factory", () => {
     });
 
     it("should create 'TransactionNext' for registering metaEsdt", () => {
-        const next = factory.createTransactionForRegisteringMetaESDT({
+        const next = transaction.createTransactionForRegisteringMetaESDT({
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
@@ -115,7 +115,7 @@ describe("test token management transactions factory", () => {
     });
 
     it("should create 'TransactionNext' for setting spcial role on non-fungible token", () => {
-        const next = factory.createTransactionForSettingSpecialRoleOnNonFungibleToken({
+        const next = transaction.createTransactionForSettingSpecialRoleOnNonFungibleToken({
             sender: frank.address,
             user: grace.address,
             tokenIdentifier: "FRANK-11ce3e",
@@ -133,7 +133,7 @@ describe("test token management transactions factory", () => {
     });
 
     it("should create 'TransactionNext' for creating nft", () => {
-        const next = factory.createTransactionForCreatingNFT({
+        const next = transaction.createTransactionForCreatingNFT({
             sender: grace.address,
             tokenIdentifier: "FRANK-aa9e8d",
             initialQuantity: 1,

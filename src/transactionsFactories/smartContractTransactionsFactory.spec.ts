@@ -13,13 +13,13 @@ import { Token, NextTokenTransfer, TokenComputer } from "../tokens";
 
 describe("test smart contract transactions factory", function () {
     const config = new TransactionsFactoryConfig("D");
-    let factory: SmartContractTransactionsFactory;
+    let transaction: SmartContractTransactionsFactory;
     let abiAwareFactory: SmartContractTransactionsFactory;
     let adderByteCode: Code;
     let abiRegistry: AbiRegistry;
 
     before(async function () {
-        factory = new SmartContractTransactionsFactory({
+        transaction = new SmartContractTransactionsFactory({
             config: config,
             tokenComputer: new TokenComputer(),
         });
@@ -41,7 +41,7 @@ describe("test smart contract transactions factory", function () {
 
         assert.throws(
             () =>
-                factory.createTransactionForDeploy({
+                transaction.createTransactionForDeploy({
                     sender: sender,
                     bytecode: adderByteCode.valueOf(),
                     gasLimit: gasLimit,
@@ -57,7 +57,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000;
         const args = [new U32Value(0)];
 
-        const deployNext = factory.createTransactionForDeploy({
+        const deployNext = transaction.createTransactionForDeploy({
             sender: sender,
             bytecode: adderByteCode.valueOf(),
             gasLimit: gasLimit,
@@ -86,7 +86,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000;
         const args = [new U32Value(7)];
 
-        const executeNext = factory.createTransactionForExecute({
+        const executeNext = transaction.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -117,7 +117,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000;
         const egldAmount = new BigNumber("1000000000000000000");
 
-        const executeNext = factory.createTransactionForExecute({
+        const executeNext = transaction.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -152,7 +152,7 @@ describe("test smart contract transactions factory", function () {
         const token = new Token("FOO-6ce17b", 0);
         const transfer = new NextTokenTransfer(token, 10);
 
-        const executeNext = factory.createTransactionForExecute({
+        const executeNext = transaction.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -190,7 +190,7 @@ describe("test smart contract transactions factory", function () {
         const barToken = new Token("BAR-5bc08f", 0);
         const barTransfer = new NextTokenTransfer(barToken, 3140);
 
-        const executeNext = factory.createTransactionForExecute({
+        const executeNext = transaction.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -233,7 +233,7 @@ describe("test smart contract transactions factory", function () {
         const token = new Token("NFT-123456", 1);
         const transfer = new NextTokenTransfer(token, 1);
 
-        const executeNext = factory.createTransactionForExecute({
+        const executeNext = transaction.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -279,7 +279,7 @@ describe("test smart contract transactions factory", function () {
         const secondToken = new Token("NFT-123456", 42);
         const secondTransfer = new NextTokenTransfer(secondToken, 1);
 
-        const executeNext = factory.createTransactionForExecute({
+        const executeNext = transaction.createTransactionForExecute({
             sender: sender,
             contract: contract,
             functionName: func,
@@ -319,7 +319,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000;
         const args = [new U32Value(0)];
 
-        const upgradeNext = factory.createTransactionForUpgrade({
+        const upgradeNext = transaction.createTransactionForUpgrade({
             sender: sender,
             contract: contract,
             bytecode: adderByteCode.valueOf(),

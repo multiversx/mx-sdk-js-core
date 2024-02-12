@@ -1,11 +1,11 @@
 import BigNumber from "bignumber.js";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
-import { IAddress, ITransactionPayload } from "../interface";
+import { IAddress } from "../interface";
 import { NextTokenTransfer, Token } from "../tokens";
 import { ErrBadUsage } from "../errors";
+import { TransactionNextBuilder } from "./transactionNextBuilder";
 import { TransactionNext } from "../transaction";
-import { TransactionPayload } from "../transactionPayload";
-import { ARGUMENTS_SEPARATOR } from "../constants";
+
 
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
@@ -40,19 +40,17 @@ export class NextTransferTransactionsFactory {
         nativeAmount: BigNumber.Value;
         data?: string;
     }): TransactionNext {
-        const dataParts = [options.data || ""]; 
-        const data = this.buildTransactionPayload(dataParts);
-        const extraGasLimit: BigNumber = new BigNumber(0);
-        const gasLimit = this.computeGasLimit(extraGasLimit, data);
+        const data = options.data || "";
 
-        return new TransactionNext({
-            sender: options.sender.bech32(),
-            receiver: options.receiver.bech32(),
-            data: data.valueOf(),
-            gasLimit: gasLimit,
-            value: options.nativeAmount,
-            chainID: this.config.chainID
-        });
+        return new TransactionNextBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.receiver,
+            dataParts: [data],
+            gasLimit: 0,
+            addDataMovementGas: true,
+            amount: options.nativeAmount,
+        }).build();
     }
 
     createTransactionForESDTTokenTransfer(options: {
@@ -67,71 +65,56 @@ export class NextTransferTransactionsFactory {
         }
 
         if (numberOfTransfers === 1) {
-            return this.createSingleESDTTransferNext(options);
+            return this.createSingleESDTTransferDraft(options);
         }
 
-        const dataParts: string[] = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(
+        const transferArgs = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(
             options.receiver,
             options.tokenTransfers
-        );
-        const data = this.buildTransactionPayload(dataParts);
-        const extraGasLimit: BigNumber = new BigNumber(this.config.gasLimitMultiESDTNFTTransfer)
-            .multipliedBy(new BigNumber(numberOfTransfers))
-            .plus(new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER));
-            const gasLimit = this.computeGasLimit(extraGasLimit, data);
+        )
 
-        return new TransactionNext({
-            sender: options.sender.bech32(),
-            receiver: options.sender.bech32(),
-            data: data.valueOf(),
-            gasLimit: gasLimit,
-            chainID: this.config.chainID
-        });
+        const extraGasForTransfer = new BigNumber(this.config.gasLimitMultiESDTNFTTransfer).multipliedBy(new BigNumber(numberOfTransfers)).plus(new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER));
+
+        return new TransactionNextBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: transferArgs,
+            gasLimit: extraGasForTransfer,
+            addDataMovementGas: true,
+        }).build();
     }
 
-    private createSingleESDTTransferNext(options: {
+    private createSingleESDTTransferDraft(options: {
         sender: IAddress;
         receiver: IAddress;
         tokenTransfers: NextTokenTransfer[];
     }): TransactionNext {
         let transferArgs: string[] = [];
         const transfer = options.tokenTransfers[0];
+        let extraGasForTransfer = new BigNumber(0);
         let receiver = options.receiver;
-        let extraGasLimit: BigNumber = new BigNumber(0);
-        
+
         if (this.tokenComputer.isFungible(transfer.token)) {
             transferArgs = this.dataArgsBuilder.buildArgsForESDTTransfer(transfer);
-            extraGasLimit = new BigNumber(this.config.gasLimitESDTTransfer).plus(
+            extraGasForTransfer = new BigNumber(this.config.gasLimitESDTTransfer).plus(
                 new BigNumber(ADDITIONAL_GAS_FOR_ESDT_TRANSFER)
             );
         } else {
             transferArgs = this.dataArgsBuilder.buildArgsForSingleESDTNFTTransfer(transfer, receiver);
-            extraGasLimit = new BigNumber(this.config.gasLimitESDTNFTTransfer).plus(
+            extraGasForTransfer = new BigNumber(this.config.gasLimitESDTNFTTransfer).plus(
                 new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER)
             );
             receiver = options.sender;
         }
 
-        const data = this.buildTransactionPayload(transferArgs);
-        const gasLimit = this.computeGasLimit(extraGasLimit, data);
-
-        return new TransactionNext({
-            sender: options.sender.bech32(),
-            receiver: receiver.bech32(),
-            data: data.valueOf(),
-            gasLimit: gasLimit,
-            chainID: this.config.chainID
-        });
-    }
-
-    private buildTransactionPayload(dataParts: string[]): TransactionPayload {
-        const data = dataParts.join(ARGUMENTS_SEPARATOR);
-        return new TransactionPayload(data);
-    }
-
-    private computeGasLimit(providedGasLimit: BigNumber, payload: ITransactionPayload): BigNumber.Value {
-        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()));
-        const gasLimit = dataMovementGas.plus(providedGasLimit);
-        return gasLimit;
+        return new TransactionNextBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: receiver,
+            dataParts: transferArgs,
+            gasLimit: extraGasForTransfer,
+            addDataMovementGas: true,
+        }).build();
     }
 }

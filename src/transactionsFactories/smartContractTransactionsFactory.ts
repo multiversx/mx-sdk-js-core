@@ -2,13 +2,15 @@ import { BigNumber } from "bignumber.js";
 import { IAddress } from "../interface";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { byteArrayToHex, utf8ToHex } from "../utils.codec";
-import { ARGUMENTS_SEPARATOR, CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
+import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
 import { Err, ErrBadUsage } from "../errors";
+import { Address } from "../address";
+import { TransactionNextBuilder } from "./transactionNextBuilder";
 import { Token, NextTokenTransfer } from "../tokens";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
 import { TransactionNext } from "../transaction";
-import { TransactionPayload } from "../transactionPayload";
+
 
 interface Config {
     chainID: string;
@@ -59,17 +61,17 @@ export class SmartContractTransactionsFactory {
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
         let parts = [byteArrayToHex(options.bytecode), byteArrayToHex(VM_TYPE_WASM_VM), metadata.toString()];
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
-        const dataParts: string[] = parts.concat(preparedArgs);
-        const data = this.buildTransactionPayload(dataParts);
+        parts = parts.concat(preparedArgs);
 
-        return new TransactionNext({
-            sender: options.sender.bech32(),
-            receiver: CONTRACT_DEPLOY_ADDRESS,
-            data: data.valueOf(),
+        return new TransactionNextBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: Address.fromBech32(CONTRACT_DEPLOY_ADDRESS),
+            dataParts: parts,
             gasLimit: options.gasLimit,
-            value: nativeTransferAmount,
-            chainID: this.config.chainID
-        });
+            addDataMovementGas: false,
+            amount: nativeTransferAmount,
+        }).build();
     }
 
     createTransactionForExecute(options: {
@@ -109,16 +111,16 @@ export class SmartContractTransactionsFactory {
 
         dataParts.push(dataParts.length ? utf8ToHex(options.functionName) : options.functionName);
         dataParts = dataParts.concat(this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName)));
-        const data = this.buildTransactionPayload(dataParts);
 
-        return new TransactionNext({
-            sender: options.sender.bech32(),
-            receiver: receiver.bech32(),
-            data: data.valueOf(),
+        return new TransactionNextBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: receiver,
+            dataParts: dataParts,
             gasLimit: options.gasLimit,
-            value: nativeTransferAmount,
-            chainID: this.config.chainID
-        });
+            addDataMovementGas: false,
+            amount: nativeTransferAmount,
+        }).build();
     }
 
     createTransactionForUpgrade(options: {
@@ -146,18 +148,19 @@ export class SmartContractTransactionsFactory {
         let parts = ["upgradeContract", byteArrayToHex(options.bytecode), metadata.toString()];
 
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
-        parts = parts.concat(preparedArgs);
-        const dataParts: string[] = parts.concat(preparedArgs);
-        const data = this.buildTransactionPayload(dataParts);
 
-        return new TransactionNext({
-            sender: options.sender.bech32(),
-            receiver: options.contract.bech32(),
-            data: data.valueOf(),
+        parts = parts.concat(preparedArgs);
+
+
+        return new TransactionNextBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.contract,
+            dataParts: parts,
             gasLimit: options.gasLimit,
-            value: nativeTransferAmount,
-            chainID: this.config.chainID
-        });
+            addDataMovementGas: false,
+            amount: nativeTransferAmount,
+        }).build();
     }
 
     private argsToDataParts(args: any[], endpoint?: EndpointDefinition): string[] {
@@ -169,7 +172,6 @@ export class SmartContractTransactionsFactory {
         if (this.areArgsOfTypedValue(args)) {
             return new ArgSerializer().valuesToStrings(args);
         }
-
         throw new Err("Can't convert args to TypedValues");
     }
 
@@ -180,10 +182,5 @@ export class SmartContractTransactionsFactory {
             }
         }
         return true;
-    }
-
-    private buildTransactionPayload(dataParts: string[]): TransactionPayload {
-        const data = dataParts.join(ARGUMENTS_SEPARATOR);
-        return new TransactionPayload(data);
     }
 }

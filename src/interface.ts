@@ -26,16 +26,36 @@ export interface IPlainTransactionObject {
     guardianSignature?: string;
 }
 
-export interface ISignature { hex(): string; }
-export interface IAddress { bech32(): string; }
-export interface ITransactionValue { toString(): string; }
-export interface IAccountBalance { toString(): string; }
-export interface INonce { valueOf(): number; }
-export interface IChainID { valueOf(): string; }
-export interface IGasLimit { valueOf(): number; }
-export interface IGasPrice { valueOf(): number; }
-export interface ITransactionVersion { valueOf(): number; }
-export interface ITransactionOptions { valueOf(): number; }
+export interface ISignature {
+    hex(): string;
+}
+export interface IAddress {
+    bech32(): string;
+}
+export interface ITransactionValue {
+    toString(): string;
+}
+export interface IAccountBalance {
+    toString(): string;
+}
+export interface INonce {
+    valueOf(): number;
+}
+export interface IChainID {
+    valueOf(): string;
+}
+export interface IGasLimit {
+    valueOf(): number;
+}
+export interface IGasPrice {
+    valueOf(): number;
+}
+export interface ITransactionVersion {
+    valueOf(): number;
+}
+export interface ITransactionOptions {
+    valueOf(): number;
+}
 
 export interface ITransactionPayload {
     length(): number;
@@ -72,4 +92,11 @@ export interface ITransactionNext {
     guardian: string;
     signature: Uint8Array;
     guardianSignature: Uint8Array;
-  }
+}
+
+export interface IMessage {
+    data: Uint8Array;
+    signature?: Uint8Array;
+    address?: IAddress;
+    version?: number;
+}

@@ -2,14 +2,15 @@ import { BigNumber } from "bignumber.js";
 import { IAddress, ITransactionPayload } from "../interface";
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { TransactionPayload } from "../transactionPayload";
-import { DraftTransaction } from "../draftTransaction";
+import { TransactionNext } from "../transaction";
 
 interface Config {
+    chainID: string;
     minGasLimit: BigNumber.Value;
     gasLimitPerByte: BigNumber.Value;
 }
 
-export class DraftTransactionBuilder {
+export class TransactionNextBuilder {
     private config: Config;
     private sender: IAddress;
     private receiver: IAddress;
@@ -19,13 +20,13 @@ export class DraftTransactionBuilder {
     private amount?: BigNumber.Value;
 
     constructor(options: {
-        config: Config,
-        sender: IAddress,
-        receiver: IAddress,
-        dataParts: string[],
-        gasLimit: BigNumber.Value,
-        addDataMovementGas: boolean,
-        amount?: BigNumber.Value
+        config: Config;
+        sender: IAddress;
+        receiver: IAddress;
+        dataParts: string[];
+        gasLimit: BigNumber.Value;
+        addDataMovementGas: boolean;
+        amount?: BigNumber.Value;
     }) {
         this.config = options.config;
         this.sender = options.sender;
@@ -41,7 +42,9 @@ export class DraftTransactionBuilder {
             return this.providedGasLimit;
         }
 
-        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()));
+        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(
+            new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()),
+        );
         const gasLimit = dataMovementGas.plus(this.providedGasLimit);
         return gasLimit;
     }
@@ -51,16 +54,17 @@ export class DraftTransactionBuilder {
         return new TransactionPayload(data);
     }
 
-    build(): DraftTransaction {
-        const data = this.buildTransactionPayload()
+    build(): TransactionNext {
+        const data = this.buildTransactionPayload();
         const gasLimit = this.computeGasLimit(data);
 
-        return new DraftTransaction({
+        return new TransactionNext({
             sender: this.sender.bech32(),
             receiver: this.receiver.bech32(),
             gasLimit: gasLimit,
             value: this.amount || 0,
-            data: data.valueOf()
-        })
+            data: data.valueOf(),
+            chainID: this.config.toString(),
+        });
     }
 }

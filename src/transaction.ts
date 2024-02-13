@@ -2,7 +2,6 @@ import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
 import { Compatibility } from "./compatibility";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
-import { DraftTransaction } from "./draftTransaction";
 import * as errors from "./errors";
 import { Hash } from "./hash";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionNext, ITransactionOptions, ITransactionPayload, ITransactionValue, ITransactionVersion } from "./interface";
@@ -420,20 +419,6 @@ export class Transaction {
     let processingFee = diff.multipliedBy(modifiedGasPrice);
 
     return feeForMove.plus(processingFee);
-  }
-
-  /**
-   * Creates a new Transaction object from a DraftTransaction.
-   */
-  static fromDraft(draft: DraftTransaction): Transaction {
-    return new Transaction({
-      sender: Address.fromBech32(draft.sender),
-      receiver: Address.fromBech32(draft.receiver),
-      gasLimit: new BigNumber(draft.gasLimit).toNumber(),
-      chainID: "",
-      value: draft.value,
-      data: new TransactionPayload(Buffer.from(draft.data))
-    })
   }
 
   /**

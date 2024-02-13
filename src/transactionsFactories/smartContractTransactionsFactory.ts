@@ -27,6 +27,9 @@ interface TokenComputer {
     isFungible(token: Token): boolean;
 }
 
+/**
+ * Use this class to create transactions to deploy, call or upgrade a smart contract.
+ */
 export class SmartContractTransactionsFactory {
     private readonly config: Config;
     private readonly abiRegistry?: Abi;

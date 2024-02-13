@@ -145,9 +145,7 @@ export class SmartContractTransactionsFactory {
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
 
         let parts = ["upgradeContract", byteArrayToHex(options.bytecode), metadata.toString()];
-
         const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
-
         parts = parts.concat(preparedArgs);
 
         return new TransactionNextBuilder({

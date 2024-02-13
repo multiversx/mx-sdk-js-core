@@ -27,7 +27,7 @@ export class TokenTransfersDataBuilder {
                 numberToPaddedHex(token.nonce),
                 numberToPaddedHex(transfer.amount),
                 addressToHex(receiver),
-            ]
+            ],
         );
         return args;
     }
@@ -38,7 +38,7 @@ export class TokenTransfersDataBuilder {
         for (let transfer of transfers) {
             const identifier = this.tokenComputer.extractIdentifierFromExtendedIdentifier(transfer.token.identifier);
             args.push(
-                ...[utf8ToHex(identifier), numberToPaddedHex(transfer.token.nonce), numberToPaddedHex(transfer.amount)]
+                ...[utf8ToHex(identifier), numberToPaddedHex(transfer.token.nonce), numberToPaddedHex(transfer.amount)],
             );
         }
 

@@ -36,7 +36,7 @@ export class RelayedTransactionsFactory {
         const data = `relayedTx@${Buffer.from(serializedTransaction).toString("hex")}`;
 
         const additionalGasForDataLength = new BigNumber(this.config.gasLimitPerByte).multipliedBy(
-            new BigNumber(data.length)
+            new BigNumber(data.length),
         );
         const gasLimit = new BigNumber(this.config.minGasLimit)
             .plus(additionalGasForDataLength)
@@ -74,7 +74,7 @@ export class RelayedTransactionsFactory {
         const data = `relayedTxV2@${argumentsString}`;
 
         const additionalGasForDataLength = new BigNumber(this.config.gasLimitPerByte).multipliedBy(
-            new BigNumber(data.length)
+            new BigNumber(data.length),
         );
         const gasLimit = new BigNumber(options.innerTransactionGasLimit)
             .plus(new BigNumber(this.config.minGasLimit))

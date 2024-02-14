@@ -20,7 +20,7 @@ export class Message {
     /**
      * Number representing the message version.
      */
-    public version?: number;
+    public version: number;
 
     constructor(options: { data: Uint8Array; signature?: Uint8Array; address?: IAddress; version?: number }) {
         this.data = options.data;
@@ -60,14 +60,11 @@ export class MessageComputer {
     }
 
     unpackMessage(packedMessage: { message: string; signature?: string; address?: string; version?: number }): Message {
-        let dataHex = this.trimHexPrefix(packedMessage.message);
+        const dataHex = this.trimHexPrefix(packedMessage.message);
         const data = Buffer.from(dataHex, "hex");
 
-        let signature: Uint8Array | undefined = undefined;
-        if (packedMessage.signature) {
-            let signatureHex = this.trimHexPrefix(packedMessage.signature);
-            signature = Buffer.from(signatureHex, "hex");
-        }
+        const signatureHex = this.trimHexPrefix(packedMessage.signature || "");
+        const signature = Buffer.from(signatureHex, "hex");
 
         let address: Address | undefined = undefined;
         if (packedMessage.address) {

@@ -138,9 +138,16 @@ export class Address {
     }
 
     /**
-     * Returns the hex representation of the address (pubkey)
+     * Use {@link toHex} instead.
      */
     hex(): string {
+        return this.toHex();
+    }
+
+    /**
+     * Returns the hex representation of the address (pubkey)
+     */
+    toHex(): string {
         if (this.isEmpty()) {
             return "";
         }
@@ -149,9 +156,16 @@ export class Address {
     }
 
     /**
-     * Returns the bech32 representation of the address
+     * Use {@link toBech32} instead.
      */
     bech32(): string {
+        return this.toBech32();
+    }
+
+    /**
+     * Returns the bech32 representation of the address
+     */
+    toBech32(): string {
         if (this.isEmpty()) {
             return "";
         }
@@ -162,9 +176,16 @@ export class Address {
     }
 
     /**
-     * Returns the pubkey as raw bytes (buffer)
+     * Use {@link getPublicKey} instead.
      */
     pubkey(): Buffer {
+        return this.getPublicKey();
+    }
+
+    /**
+     * Returns the pubkey as raw bytes (buffer)
+     */
+    getPublicKey(): Buffer {
         if (this.isEmpty()) {
             return Buffer.from([]);
         }
@@ -214,7 +235,17 @@ export class Address {
         return new Address("0".repeat(64));
     }
 
+    /**
+     * Use {@link isSmartContract} instead.
+     */
     isContractAddress(): boolean {
         return this.hex().startsWith(SMART_CONTRACT_HEX_PUBKEY_PREFIX);
+    }
+
+    /**
+     * Returns whether the address is a smart contract address.
+     */
+    isSmartContract(): boolean {
+        return this.isContractAddress();
     }
 }

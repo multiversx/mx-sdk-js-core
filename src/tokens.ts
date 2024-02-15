@@ -24,7 +24,7 @@ export class TokenComputer {
     constructor() {}
 
     isFungible(token: Token): boolean {
-        return token.nonce == 0n;
+        return token.nonce === 0n;
     }
 
     extractNonceFromExtendedIdentifier(identifier: string): number {

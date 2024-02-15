@@ -1,12 +1,12 @@
-import { Token, TokenComputer } from "./tokens";
 import { assert } from "chai";
+import { Token, TokenComputer } from "./tokens";
 
 describe("test token computer", async () => {
     const tokenComputer = new TokenComputer();
 
     it("should test if token is fungible", async () => {
-        const fungibleToken = new Token("TEST-123456", 0);
-        const nonFungibleToken = new Token("NFT-987654", 7);
+        const fungibleToken = new Token("TEST-123456", 0n);
+        const nonFungibleToken = new Token("NFT-987654", 7n);
 
         assert.equal(tokenComputer.isFungible(fungibleToken), true);
         assert.equal(tokenComputer.isFungible(nonFungibleToken), false);

@@ -1,11 +1,10 @@
-import BigNumber from "bignumber.js";
 import { ErrInvalidTokenIdentifier } from "./errors";
 
 export class Token {
     identifier: string;
-    nonce: BigNumber.Value;
+    nonce: bigint;
 
-    constructor(identifier: string, nonce: BigNumber.Value) {
+    constructor(identifier: string, nonce: bigint) {
         this.identifier = identifier;
         this.nonce = nonce;
     }
@@ -13,9 +12,9 @@ export class Token {
 
 export class NextTokenTransfer {
     token: Token;
-    amount: BigNumber.Value;
+    amount: bigint;
 
-    constructor(token: Token, amount: BigNumber.Value) {
+    constructor(token: Token, amount: bigint) {
         this.token = token;
         this.amount = amount;
     }
@@ -25,7 +24,7 @@ export class TokenComputer {
     constructor() {}
 
     isFungible(token: Token): boolean {
-        return token.nonce === 0;
+        return token.nonce == 0n;
     }
 
     extractNonceFromExtendedIdentifier(identifier: string): number {

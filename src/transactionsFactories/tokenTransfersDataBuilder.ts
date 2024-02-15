@@ -1,6 +1,6 @@
 import { IAddress } from "../interface";
 import { NextTokenTransfer, TokenComputer } from "../tokens";
-import { numberToPaddedHex, utf8ToHex, addressToHex } from "../utils.codec";
+import { addressToHex, numberToPaddedHex, utf8ToHex } from "../utils.codec";
 
 export class TokenTransfersDataBuilder {
     private tokenComputer: TokenComputer;

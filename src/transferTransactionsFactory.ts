@@ -102,7 +102,7 @@ export class TransferTransactionsFactory {
 
         return new Transaction({
             nonce: args.nonce,
-            receiver: args.sender,
+            receiver: args.destination,
             sender: args.sender,
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,

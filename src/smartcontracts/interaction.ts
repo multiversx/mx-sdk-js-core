@@ -35,9 +35,9 @@ export class Interaction {
     private gasLimit: IGasLimit = 0;
     private gasPrice: IGasPrice | undefined = undefined;
     private chainID: IChainID = "";
-    private querent: IAddress = new Address();
+    private querent: IAddress = Address.empty();
     private explicitReceiver?: IAddress;
-    private sender: IAddress = new Address();
+    private sender: IAddress = Address.empty();
 
     private isWithSingleESDTTransfer: boolean = false;
     private isWithSingleESDTNFTTransfer: boolean = false;

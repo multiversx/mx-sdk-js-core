@@ -17,7 +17,7 @@ describe("test address", () => {
     });
 
     it("should create empty address", async () => {
-        let nobody = new Address();
+        const nobody = Address.empty();
 
         assert.isEmpty(nobody.hex());
         assert.isEmpty(nobody.bech32());

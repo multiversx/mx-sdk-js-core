@@ -31,7 +31,7 @@ interface IAbi {
  * An abstraction for deploying and interacting with Smart Contracts.
  */
 export class SmartContract implements ISmartContract {
-    private address: IAddress = new Address();
+    private address: IAddress = Address.empty();
     private abi?: IAbi;
 
     /**
@@ -53,7 +53,7 @@ export class SmartContract implements ISmartContract {
      * Create a SmartContract object by providing its address on the Network.
      */
     constructor(options: { address?: IAddress, abi?: IAbi } = {}) {
-        this.address = options.address || new Address();
+        this.address = options.address || Address.empty();
         this.abi = options.abi;
 
         if (this.abi) {

@@ -23,7 +23,7 @@ export class Address {
     /**
      * Creates an address object, given a raw string (whether a hex pubkey or a Bech32 address), a sequence of bytes, or another Address object.
      */
-    public constructor(value?: Address | Buffer | string) {
+    public constructor(value: Address | Buffer | string) {
         if (!value) {
             return;
         }
@@ -48,7 +48,7 @@ export class Address {
     }
 
     private static fromValidHex(value: string): Address {
-        let result = new Address();
+        let result = Address.empty();
         result.valueHex = value;
         return result;
     }
@@ -91,10 +91,10 @@ export class Address {
     }
 
     /**
-     * Creates an empty address object
+     * Creates an empty address object. Generally speaking, this should not be used in client code (internal use only).
      */
     static empty(): Address {
-        return new Address();
+        return new Address("");
     }
 
     /**

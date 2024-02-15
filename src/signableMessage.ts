@@ -36,7 +36,7 @@ export class SignableMessage {
     this.signature = Buffer.from([]);
     this.version = 1;
     this.signer = "ErdJS";
-    this.address = new Address();
+    this.address = Address.empty();
 
     Object.assign(this, init);
   }

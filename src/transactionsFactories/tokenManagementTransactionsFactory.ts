@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { Address } from "../address";
 import { ESDT_CONTRACT_ADDRESS } from "../constants";
 import { IAddress } from "../interface";
@@ -6,25 +5,26 @@ import { Logger } from "../logger";
 import { addressToHex, bigIntToHex, byteArrayToHex, utf8ToHex } from "../utils.codec";
 import { TransactionNextBuilder } from "./transactionNextBuilder";
 import { TransactionNext } from "../transaction";
+import BigNumber from "bignumber.js";
 
 interface Config {
     chainID: string;
-    minGasLimit: BigNumber.Value;
-    gasLimitPerByte: BigNumber.Value;
-    gasLimitIssue: BigNumber.Value;
-    gasLimitToggleBurnRoleGlobally: BigNumber.Value;
-    gasLimitEsdtLocalMint: BigNumber.Value;
-    gasLimitEsdtLocalBurn: BigNumber.Value;
-    gasLimitSetSpecialRole: BigNumber.Value;
-    gasLimitPausing: BigNumber.Value;
-    gasLimitFreezing: BigNumber.Value;
-    gasLimitWiping: BigNumber.Value;
-    gasLimitEsdtNftCreate: BigNumber.Value;
-    gasLimitEsdtNftUpdateAttributes: BigNumber.Value;
-    gasLimitEsdtNftAddQuantity: BigNumber.Value;
-    gasLimitEsdtNftBurn: BigNumber.Value;
-    gasLimitStorePerByte: BigNumber.Value;
-    issueCost: BigNumber.Value;
+    minGasLimit: bigint;
+    gasLimitPerByte: bigint;
+    gasLimitIssue: bigint;
+    gasLimitToggleBurnRoleGlobally: bigint;
+    gasLimitEsdtLocalMint: bigint;
+    gasLimitEsdtLocalBurn: bigint;
+    gasLimitSetSpecialRole: bigint;
+    gasLimitPausing: bigint;
+    gasLimitFreezing: bigint;
+    gasLimitWiping: bigint;
+    gasLimitEsdtNftCreate: bigint;
+    gasLimitEsdtNftUpdateAttributes: bigint;
+    gasLimitEsdtNftAddQuantity: bigint;
+    gasLimitEsdtNftBurn: bigint;
+    gasLimitStorePerByte: bigint;
+    issueCost: bigint;
 }
 
 type RegisterAndSetAllRolesTokenType = "NFT" | "SFT" | "META" | "FNG";
@@ -44,8 +44,8 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
-        initialSupply: BigNumber.Value;
-        numDecimals: BigNumber.Value;
+        initialSupply: bigint;
+        numDecimals: bigint;
         canFreeze: boolean;
         canWipe: boolean;
         canPause: boolean;
@@ -59,8 +59,8 @@ export class TokenManagementTransactionsFactory {
             "issue",
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
-            bigIntToHex(options.initialSupply),
-            bigIntToHex(options.numDecimals),
+            bigIntToHex(new BigNumber(options.initialSupply.toString())),
+            bigIntToHex(new BigNumber(options.numDecimals.toString())),
             utf8ToHex("canFreeze"),
             options.canFreeze ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canWipe"),
@@ -180,7 +180,7 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
-        numDecimals: BigNumber.Value;
+        numDecimals: bigint;
         canFreeze: boolean;
         canWipe: boolean;
         canPause: boolean;
@@ -195,7 +195,7 @@ export class TokenManagementTransactionsFactory {
             "registerMetaESDT",
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
-            bigIntToHex(options.numDecimals),
+            bigIntToHex(new BigNumber(options.numDecimals.toString())),
             utf8ToHex("canFreeze"),
             options.canFreeze ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canWipe"),
@@ -228,7 +228,7 @@ export class TokenManagementTransactionsFactory {
         tokenName: string;
         tokenTicker: string;
         tokenType: RegisterAndSetAllRolesTokenType;
-        numDecimals: BigNumber.Value;
+        numDecimals: bigint;
     }): TransactionNext {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
@@ -237,7 +237,7 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
             utf8ToHex(options.tokenType),
-            bigIntToHex(options.numDecimals),
+            bigIntToHex(new BigNumber(options.numDecimals.toString())),
         ];
 
         return new TransactionNextBuilder({
@@ -383,7 +383,7 @@ export class TokenManagementTransactionsFactory {
     createTransactionForCreatingNFT(options: {
         sender: IAddress;
         tokenIdentifier: string;
-        initialQuantity: BigNumber.Value;
+        initialQuantity: bigint;
         name: string;
         royalties: number;
         hash: string;
@@ -393,7 +393,7 @@ export class TokenManagementTransactionsFactory {
         const dataParts = [
             "ESDTNFTCreate",
             utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(options.initialQuantity),
+            bigIntToHex(new BigNumber(options.initialQuantity.toString())),
             utf8ToHex(options.name),
             bigIntToHex(options.royalties),
             utf8ToHex(options.hash),
@@ -403,14 +403,14 @@ export class TokenManagementTransactionsFactory {
 
         // Note that the following is an approximation (a reasonable one):
         const nftData = options.name + options.hash + options.attributes + options.uris.join("");
-        const storageGasLimit = new BigNumber(this.config.gasLimitPerByte).multipliedBy(nftData.length);
+        const storageGasLimit = this.config.gasLimitPerByte + BigInt(nftData.length);
 
         return new TransactionNextBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
             dataParts: dataParts,
-            gasLimit: new BigNumber(this.config.gasLimitEsdtNftCreate).plus(storageGasLimit),
+            gasLimit: this.config.gasLimitEsdtNftCreate + storageGasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -495,9 +495,13 @@ export class TokenManagementTransactionsFactory {
     createTransactionForLocalMint(options: {
         sender: IAddress;
         tokenIdentifier: string;
-        supplyToMint: BigNumber.Value;
+        supplyToMint: bigint;
     }): TransactionNext {
-        const dataParts = ["ESDTLocalMint", utf8ToHex(options.tokenIdentifier), bigIntToHex(options.supplyToMint)];
+        const dataParts = [
+            "ESDTLocalMint",
+            utf8ToHex(options.tokenIdentifier),
+            bigIntToHex(new BigNumber(options.supplyToMint.toString())),
+        ];
 
         return new TransactionNextBuilder({
             config: this.config,
@@ -512,9 +516,13 @@ export class TokenManagementTransactionsFactory {
     createTransactionForLocalBurning(options: {
         sender: IAddress;
         tokenIdentifier: string;
-        supplyToBurn: BigNumber.Value;
+        supplyToBurn: bigint;
     }): TransactionNext {
-        const dataParts = ["ESDTLocalBurn", utf8ToHex(options.tokenIdentifier), bigIntToHex(options.supplyToBurn)];
+        const dataParts = [
+            "ESDTLocalBurn",
+            utf8ToHex(options.tokenIdentifier),
+            bigIntToHex(new BigNumber(options.supplyToBurn.toString())),
+        ];
 
         return new TransactionNextBuilder({
             config: this.config,
@@ -529,13 +537,13 @@ export class TokenManagementTransactionsFactory {
     createTransactionForUpdatingAttributes(options: {
         sender: IAddress;
         tokenIdentifier: string;
-        tokenNonce: BigNumber.Value;
+        tokenNonce: bigint;
         attributes: Uint8Array;
     }): TransactionNext {
         const dataParts = [
             "ESDTNFTUpdateAttributes",
             utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(options.tokenNonce),
+            bigIntToHex(new BigNumber(options.tokenNonce.toString())),
             byteArrayToHex(options.attributes),
         ];
 
@@ -552,14 +560,14 @@ export class TokenManagementTransactionsFactory {
     createTransactionForAddingQuantity(options: {
         sender: IAddress;
         tokenIdentifier: string;
-        tokenNonce: BigNumber.Value;
-        quantityToAdd: BigNumber.Value;
+        tokenNonce: bigint;
+        quantityToAdd: bigint;
     }): TransactionNext {
         const dataParts = [
             "ESDTNFTAddQuantity",
             utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(options.tokenNonce),
-            bigIntToHex(options.quantityToAdd),
+            bigIntToHex(new BigNumber(options.tokenNonce.toString())),
+            bigIntToHex(new BigNumber(options.quantityToAdd.toString())),
         ];
 
         return new TransactionNextBuilder({
@@ -575,14 +583,14 @@ export class TokenManagementTransactionsFactory {
     createTransactionForBurningQuantity(options: {
         sender: IAddress;
         tokenIdentifier: string;
-        tokenNonce: BigNumber.Value;
-        quantityToBurn: BigNumber.Value;
+        tokenNonce: bigint;
+        quantityToBurn: bigint;
     }): TransactionNext {
         const dataParts = [
             "ESDTNFTBurn",
             utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(options.tokenNonce),
-            bigIntToHex(options.quantityToBurn),
+            bigIntToHex(new BigNumber(options.tokenNonce.toString())),
+            bigIntToHex(new BigNumber(options.quantityToBurn.toString())),
         ];
 
         return new TransactionNextBuilder({

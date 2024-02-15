@@ -6,8 +6,8 @@ import { TransactionNext } from "../transaction";
 
 interface Config {
     chainID: string;
-    minGasLimit: BigNumber.Value;
-    gasLimitPerByte: BigNumber.Value;
+    minGasLimit: bigint;
+    gasLimitPerByte: bigint;
 }
 
 export class TransactionNextBuilder {
@@ -15,37 +15,35 @@ export class TransactionNextBuilder {
     private sender: IAddress;
     private receiver: IAddress;
     private dataParts: string[];
-    private providedGasLimit: BigNumber;
+    private providedGasLimit: bigint;
     private addDataMovementGas: boolean;
-    private amount?: BigNumber.Value;
+    private amount?: bigint;
 
     constructor(options: {
         config: Config;
         sender: IAddress;
         receiver: IAddress;
         dataParts: string[];
-        gasLimit: BigNumber.Value;
+        gasLimit: bigint;
         addDataMovementGas: boolean;
-        amount?: BigNumber.Value;
+        amount?: bigint;
     }) {
         this.config = options.config;
         this.sender = options.sender;
         this.receiver = options.receiver;
         this.dataParts = options.dataParts;
-        this.providedGasLimit = new BigNumber(options.gasLimit);
+        this.providedGasLimit = options.gasLimit;
         this.addDataMovementGas = options.addDataMovementGas;
         this.amount = options.amount;
     }
 
-    private computeGasLimit(payload: ITransactionPayload): BigNumber.Value {
+    private computeGasLimit(payload: ITransactionPayload): bigint {
         if (!this.addDataMovementGas) {
             return this.providedGasLimit;
         }
 
-        const dataMovementGas = new BigNumber(this.config.minGasLimit).plus(
-            new BigNumber(this.config.gasLimitPerByte).multipliedBy(payload.length()),
-        );
-        const gasLimit = dataMovementGas.plus(this.providedGasLimit);
+        const dataMovementGas = this.config.minGasLimit + this.config.gasLimitPerByte * BigInt(payload.length());
+        const gasLimit = dataMovementGas + this.providedGasLimit;
         return gasLimit;
     }
 
@@ -62,7 +60,7 @@ export class TransactionNextBuilder {
             sender: this.sender.bech32(),
             receiver: this.receiver.bech32(),
             gasLimit: gasLimit,
-            value: this.amount || 0,
+            value: this.amount || 0n,
             data: data.valueOf(),
             chainID: this.config.toString(),
         });

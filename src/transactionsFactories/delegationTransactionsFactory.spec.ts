@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { Address } from "../address";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
 import { assert } from "chai";
@@ -12,9 +11,9 @@ describe("test delegation transactions factory", function () {
 
     it("should create 'TransactionNext' for new delegation contract", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        const delagationCap = "5000000000000000000000";
-        const serviceFee = 10;
-        const value = new BigNumber("1250000000000000000000");
+        const delagationCap = 5000000000000000000000n;
+        const serviceFee = 10n;
+        const value = 1250000000000000000000n;
 
         const transaction = delegationFactory.createTransactionForNewDelegationContract({
             sender: sender,
@@ -27,7 +26,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, DELEGATION_MANAGER_SC_ADDRESS);
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("createNewDelegationContract@010f0cf064dd59200000@0a"));
-        assert.equal(transaction.gasLimit.valueOf(), 60126500);
+        assert.equal(transaction.gasLimit, 60126500n);
         assert.equal(transaction.value, value);
     });
 
@@ -65,7 +64,7 @@ describe("test delegation transactions factory", function () {
                 "addNodes@e7beaa95b3877f47348df4dd1cb578a4f7cabf7a20bfeefe5cdd263878ff132b765e04fef6f40c93512b666c47ed7719b8902f6c922c04247989b7137e837cc81a62e54712471c97a2ddab75aa9c2f58f813ed4c0fa722bde0ab718bff382208@81109fa1c8d3dc7b6c2d6e65206cc0bc1a83c9b2d1eb91a601d66ad32def430827d5eb52917bd2b0d04ce195738db216",
             ),
         );
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for removing nodes", async function () {
@@ -88,7 +87,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("removeNodes@61626261"));
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for staking nodes", async function () {
@@ -111,7 +110,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("stakeNodes@61626261"));
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for unbonding nodes", async function () {
@@ -134,8 +133,8 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("unBondNodes@61626261"));
-        assert.equal(transaction.value, 0);
-        assert.equal(transaction.gasLimit.valueOf(), 12080000);
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.gasLimit, 12080000n);
     });
 
     it("should create 'TransactionNext' for unstaking nodes", async function () {
@@ -158,8 +157,8 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("unStakeNodes@61626261"));
-        assert.equal(transaction.value, 0);
-        assert.equal(transaction.gasLimit.valueOf(), 12081500);
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.gasLimit, 12081500n);
     });
 
     it("should create 'TransactionNext' for unjailing nodes", async function () {
@@ -182,13 +181,13 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("unJailNodes@61626261"));
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for changing service fee", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        const serviceFee = new BigNumber(10);
+        const serviceFee = 10n;
 
         const transaction = delegationFactory.createTransactionForChangingServiceFee({
             sender: sender,
@@ -200,13 +199,13 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("changeServiceFee@0a"));
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for changing delegation cap", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-        const delegationCap = new BigNumber("5000000000000000000000");
+        const delegationCap = 5000000000000000000000n;
 
         const transaction = delegationFactory.createTransactionForModifyingDelegationCap({
             sender: sender,
@@ -218,7 +217,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("modifyTotalDelegationCap@010f0cf064dd59200000"));
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for setting automatic activation", async function () {
@@ -234,7 +233,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("setAutomaticActivation@74727565"));
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for unsetting automatic activation", async function () {
@@ -250,7 +249,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("setAutomaticActivation@66616c7365"));
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for setting cap check on redelegate rewards", async function () {
@@ -266,7 +265,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("setCheckCapOnReDelegateRewards@74727565"));
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for unsetting cap check on redelegate rewards", async function () {
@@ -282,7 +281,7 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("setCheckCapOnReDelegateRewards@66616c7365"));
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for setting metadata", async function () {
@@ -301,6 +300,6 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("setMetaData@6e616d65@77656273697465@6964656e746966696572"));
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 });

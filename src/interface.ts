@@ -59,13 +59,13 @@ export type ITokenPayment = ITokenTransfer;
 export interface ITransactionNext {
     sender: string;
     receiver: string;
-    gasLimit: BigNumber.Value;
+    gasLimit: bigint;
     chainID: string;
-    nonce: BigNumber.Value;
-    value: BigNumber.Value;
+    nonce: bigint;
+    value: bigint;
     senderUsername: string;
     receiverUsername: string;
-    gasPrice: BigNumber.Value;
+    gasPrice: bigint;
     data: Uint8Array;
     version: number;
     options: number;

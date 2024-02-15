@@ -130,7 +130,7 @@ export class SmartContract implements ISmartContract {
         const nextTx = scNextTransactionFactory.createTransactionForDeploy({
             sender: deployer,
             bytecode: bytecode,
-            gasLimit: gasLimit.valueOf(),
+            gasLimit: BigInt(gasLimit.valueOf()),
             args: initArguments,
             isUpgradeable: metadataAsJson.upgradeable,
             isReadable: metadataAsJson.readable,
@@ -191,7 +191,7 @@ export class SmartContract implements ISmartContract {
             sender: caller,
             contract: this.getAddress(),
             bytecode: bytecode,
-            gasLimit: gasLimit.valueOf(),
+            gasLimit: BigInt(gasLimit.valueOf()),
             args: initArguments,
             isUpgradeable: metadataAsJson.upgradeable,
             isReadable: metadataAsJson.readable,
@@ -229,7 +229,7 @@ export class SmartContract implements ISmartContract {
             sender: caller,
             contract: receiver ? receiver : this.getAddress(),
             functionName: func.toString(),
-            gasLimit: gasLimit.valueOf(),
+            gasLimit: BigInt(gasLimit.valueOf()),
             args: args
         })
 

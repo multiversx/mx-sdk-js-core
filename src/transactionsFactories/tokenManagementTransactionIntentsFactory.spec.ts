@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { ESDT_CONTRACT_ADDRESS } from "../constants";
 import { loadTestWallets, TestWallet } from "../testutils";
@@ -22,14 +21,14 @@ describe("test token management transactions factory", () => {
             tokenName: "TEST",
             tokenTicker: "TEST",
             tokenType: "FNG",
-            numDecimals: 2,
+            numDecimals: 2n,
         });
 
         assert.deepEqual(transaction.data, Buffer.from("registerAndSetAllRoles@54455354@54455354@464e47@02"));
         assert.equal(transaction.sender, frank.address.toString());
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
         assert.deepEqual(transaction.value, config.issueCost);
-        assert.deepEqual(transaction.gasLimit, new BigNumber("60125000"));
+        assert.deepEqual(transaction.gasLimit, 60125000n);
     });
 
     it("should create 'TransactionNext' for issuing fungible token", () => {
@@ -37,8 +36,8 @@ describe("test token management transactions factory", () => {
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
-            initialSupply: 100,
-            numDecimals: 0,
+            initialSupply: 100n,
+            numDecimals: 0n,
             canFreeze: true,
             canWipe: true,
             canPause: true,
@@ -113,7 +112,7 @@ describe("test token management transactions factory", () => {
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
-            numDecimals: 10,
+            numDecimals: 10n,
             canFreeze: true,
             canWipe: true,
             canPause: true,
@@ -154,14 +153,14 @@ describe("test token management transactions factory", () => {
         );
         assert.equal(transaction.sender, frank.address.toString());
         assert.equal(transaction.receiver, ESDT_CONTRACT_ADDRESS);
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for creating nft", () => {
         const transaction = tokenManagementFactory.createTransactionForCreatingNFT({
             sender: grace.address,
             tokenIdentifier: "FRANK-aa9e8d",
-            initialQuantity: 1,
+            initialQuantity: 1n,
             name: "test",
             royalties: 1000,
             hash: "abba",
@@ -175,6 +174,6 @@ describe("test token management transactions factory", () => {
         );
         assert.equal(transaction.sender, grace.address.toString());
         assert.equal(transaction.receiver, grace.address.toString());
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 });

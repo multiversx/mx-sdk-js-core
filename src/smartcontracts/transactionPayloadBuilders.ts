@@ -7,10 +7,9 @@ import { TypedValue } from "./typesystem";
 export const WasmVirtualMachine = "0500";
 
 /**
- * A builder for {@link TransactionPayload} objects, to be used for Smart Contract deployment transactions.
- */
-/**
  * @deprecated Use {@link SmartContractTransactionsFactory} instead.
+ *
+ * A builder for {@link TransactionPayload} objects, to be used for Smart Contract deployment transactions.
  */
 export class ContractDeployPayloadBuilder {
     private code: ICode | null = null;
@@ -65,6 +64,8 @@ export class ContractDeployPayloadBuilder {
 }
 
 /**
+ * @deprecated Use {@link SmartContractTransactionsFactory} instead.
+ *
  * A builder for {@link TransactionPayload} objects, to be used for Smart Contract upgrade transactions.
  */
 export class ContractUpgradePayloadBuilder {
@@ -120,6 +121,8 @@ export class ContractUpgradePayloadBuilder {
 }
 
 /**
+ * @deprecated Use {@link SmartContractTransactionsFactory} instead.
+ *
  * A builder for {@link TransactionPayload} objects, to be used for Smart Contract execution transactions.
  */
 export class ContractCallPayloadBuilder {

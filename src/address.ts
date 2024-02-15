@@ -91,7 +91,8 @@ export class Address {
     }
 
     /**
-     * Creates an empty address object. Generally speaking, this should not be used in client code (internal use only).
+     * Creates an empty address object.
+     * Generally speaking, this should not be used by client code (internal use only).
      */
     static empty(): Address {
         return new Address("");
@@ -229,7 +230,8 @@ export class Address {
     }
 
     /**
-     * Creates the Zero address (the one that should be used when deploying smart contracts)
+     * Creates the Zero address (the one that should be used when deploying smart contracts).
+     * Generally speaking, this should not be used by client code (internal use only).
      */
     static Zero(): Address {
         return new Address("0".repeat(64));

@@ -1,9 +1,9 @@
 import { assert } from "chai";
 import { Address } from "../address";
-import { Token, NextTokenTransfer, TokenComputer } from "../tokens";
+import { ErrBadUsage } from "../errors";
+import { NextTokenTransfer, Token, TokenComputer } from "../tokens";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 import { NextTransferTransactionsFactory } from "./transferTransactionsFactory";
-import { ErrBadUsage } from "../errors";
 
 describe("test transfer transcations factory", function () {
     const config = new TransactionsFactoryConfig("D");
@@ -58,8 +58,8 @@ describe("test transfer transcations factory", function () {
     });
 
     it("should create 'TransactionNext' for esdt transfer", async () => {
-        const fooToken = new Token("FOO-123456", 0);
-        const transfer = new NextTokenTransfer(fooToken, 1000000);
+        const fooToken = new Token("FOO-123456", 0n);
+        const transfer = new NextTokenTransfer(fooToken, 1000000n);
 
         const transaction = nextTransferFactory.createTransactionForESDTTokenTransfer({
             sender: alice,
@@ -75,8 +75,8 @@ describe("test transfer transcations factory", function () {
     });
 
     it("should create 'TransactionNext' for nft transfer", async () => {
-        const nft = new Token("NFT-123456", 10);
-        const transfer = new NextTokenTransfer(nft, 1);
+        const nft = new Token("NFT-123456", 10n);
+        const transfer = new NextTokenTransfer(nft, 1n);
 
         const transaction = nextTransferFactory.createTransactionForESDTTokenTransfer({
             sender: alice,
@@ -95,11 +95,11 @@ describe("test transfer transcations factory", function () {
     });
 
     it("should create 'TransactionNext' for multiple nft transfers", async () => {
-        const firstNft = new Token("NFT-123456", 10);
-        const firstTransfer = new NextTokenTransfer(firstNft, 1);
+        const firstNft = new Token("NFT-123456", 10n);
+        const firstTransfer = new NextTokenTransfer(firstNft, 1n);
 
-        const secondNft = new Token("TEST-987654", 1);
-        const secondTransfer = new NextTokenTransfer(secondNft, 1);
+        const secondNft = new Token("TEST-987654", 1n);
+        const secondTransfer = new NextTokenTransfer(secondNft, 1n);
 
         const transaction = nextTransferFactory.createTransactionForESDTTokenTransfer({
             sender: alice,

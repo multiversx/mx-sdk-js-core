@@ -2,10 +2,9 @@ import { Address } from "../address";
 import { ESDT_CONTRACT_ADDRESS } from "../constants";
 import { IAddress } from "../interface";
 import { Logger } from "../logger";
-import { addressToHex, bigIntToHex, byteArrayToHex, utf8ToHex } from "../utils.codec";
+import { addressToHex, byteArrayToHex, utf8ToHex, numberToPaddedHex } from "../utils.codec";
 import { TransactionNextBuilder } from "./transactionNextBuilder";
 import { TransactionNext } from "../transaction";
-import BigNumber from "bignumber.js";
 
 interface Config {
     chainID: string;
@@ -59,8 +58,8 @@ export class TokenManagementTransactionsFactory {
             "issue",
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
-            bigIntToHex(new BigNumber(options.initialSupply.toString())),
-            bigIntToHex(new BigNumber(options.numDecimals.toString())),
+            numberToPaddedHex(options.initialSupply),
+            numberToPaddedHex(options.numDecimals),
             utf8ToHex("canFreeze"),
             options.canFreeze ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canWipe"),
@@ -195,7 +194,7 @@ export class TokenManagementTransactionsFactory {
             "registerMetaESDT",
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
-            bigIntToHex(new BigNumber(options.numDecimals.toString())),
+            numberToPaddedHex(options.numDecimals),
             utf8ToHex("canFreeze"),
             options.canFreeze ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canWipe"),
@@ -237,7 +236,7 @@ export class TokenManagementTransactionsFactory {
             utf8ToHex(options.tokenName),
             utf8ToHex(options.tokenTicker),
             utf8ToHex(options.tokenType),
-            bigIntToHex(new BigNumber(options.numDecimals.toString())),
+            numberToPaddedHex(options.numDecimals),
         ];
 
         return new TransactionNextBuilder({
@@ -393,9 +392,9 @@ export class TokenManagementTransactionsFactory {
         const dataParts = [
             "ESDTNFTCreate",
             utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(new BigNumber(options.initialQuantity.toString())),
+            numberToPaddedHex(options.initialQuantity),
             utf8ToHex(options.name),
-            bigIntToHex(options.royalties),
+            numberToPaddedHex(options.royalties),
             utf8ToHex(options.hash),
             byteArrayToHex(options.attributes),
             ...options.uris.map(utf8ToHex),
@@ -500,7 +499,7 @@ export class TokenManagementTransactionsFactory {
         const dataParts = [
             "ESDTLocalMint",
             utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(new BigNumber(options.supplyToMint.toString())),
+            numberToPaddedHex(options.supplyToMint),
         ];
 
         return new TransactionNextBuilder({
@@ -521,7 +520,7 @@ export class TokenManagementTransactionsFactory {
         const dataParts = [
             "ESDTLocalBurn",
             utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(new BigNumber(options.supplyToBurn.toString())),
+            numberToPaddedHex(options.supplyToBurn),
         ];
 
         return new TransactionNextBuilder({
@@ -543,7 +542,7 @@ export class TokenManagementTransactionsFactory {
         const dataParts = [
             "ESDTNFTUpdateAttributes",
             utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(new BigNumber(options.tokenNonce.toString())),
+            numberToPaddedHex(options.tokenNonce),
             byteArrayToHex(options.attributes),
         ];
 
@@ -566,8 +565,8 @@ export class TokenManagementTransactionsFactory {
         const dataParts = [
             "ESDTNFTAddQuantity",
             utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(new BigNumber(options.tokenNonce.toString())),
-            bigIntToHex(new BigNumber(options.quantityToAdd.toString())),
+            numberToPaddedHex(options.tokenNonce),
+            numberToPaddedHex(options.quantityToAdd),
         ];
 
         return new TransactionNextBuilder({
@@ -589,8 +588,8 @@ export class TokenManagementTransactionsFactory {
         const dataParts = [
             "ESDTNFTBurn",
             utf8ToHex(options.tokenIdentifier),
-            bigIntToHex(new BigNumber(options.tokenNonce.toString())),
-            bigIntToHex(new BigNumber(options.quantityToBurn.toString())),
+            numberToPaddedHex(options.tokenNonce),
+            numberToPaddedHex(options.quantityToBurn),
         ];
 
         return new TransactionNextBuilder({

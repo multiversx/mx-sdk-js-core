@@ -32,7 +32,7 @@ describe("test transaction construction", async () => {
         const transaction = Transaction.fromTransactionNext(nextTransaction);
         assert.deepEqual(transaction.getSender(), Address.fromBech32(plainTransactionNextObject.sender));
         assert.deepEqual(transaction.getReceiver(), Address.fromBech32(plainTransactionNextObject.receiver));
-        assert.equal(transaction.getGasLimit().valueOf().toFixed(0), plainTransactionNextObject.gasLimit.toString());
+        assert.equal(transaction.getGasLimit().valueOf().toString(), plainTransactionNextObject.gasLimit.toString());
         assert.equal(transaction.getValue().toString(), plainTransactionNextObject.value.toString());
         assert.equal(transaction.getData().toString(), plainTransactionNextObject.data.toString());
         assert.equal(transaction.getChainID().valueOf(), plainTransactionNextObject.chainID);

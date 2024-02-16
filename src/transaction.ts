@@ -428,7 +428,7 @@ export class Transaction {
     const tx = new Transaction({
       sender: Address.fromBech32(transaction.sender),
       receiver: Address.fromBech32(transaction.receiver),
-      gasLimit: new BigNumber(transaction.gasLimit.toString()).toNumber(),
+      gasLimit: Number(transaction.gasLimit),
       chainID: transaction.chainID,
       value: new BigNumber(transaction.value.toString()).toFixed(0),
       data: new TransactionPayload(Buffer.from(transaction.data)),

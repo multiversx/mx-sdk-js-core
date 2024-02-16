@@ -110,12 +110,12 @@ export class Address {
             throw new errors.ErrAddressCannotCreate(value, err);
         }
 
-        let prefix = decoded.prefix;
+        const prefix = decoded.prefix;
         if (prefix != HRP) {
             throw new errors.ErrAddressBadHrp(HRP, prefix);
         }
 
-        let pubkey = Buffer.from(bech32.fromWords(decoded.words));
+        const pubkey = Buffer.from(bech32.fromWords(decoded.words));
         if (pubkey.length != PUBKEY_LENGTH) {
             throw new errors.ErrAddressCannotCreate(value);
         }
@@ -195,6 +195,14 @@ export class Address {
     }
 
     /**
+     * Returns the human-readable-part of the bech32 addresses.
+     * The HRP is currently hardcoded to "erd".
+     */
+    getHrp(): string {
+        return HRP;
+    }
+
+    /**
      * Returns whether the address is empty.
      */
     isEmpty() {
@@ -216,7 +224,7 @@ export class Address {
      * Returns the bech32 representation of the address
      */
     toString(): string {
-        return this.bech32();
+        return this.toBech32();
     }
 
     /**
@@ -224,8 +232,8 @@ export class Address {
      */
     toJSON(): object {
         return {
-            bech32: this.bech32(),
-            pubkey: this.hex(),
+            bech32: this.toBech32(),
+            pubkey: this.toHex(),
         };
     }
 
@@ -241,13 +249,13 @@ export class Address {
      * Use {@link isSmartContract} instead.
      */
     isContractAddress(): boolean {
-        return this.hex().startsWith(SMART_CONTRACT_HEX_PUBKEY_PREFIX);
+        return this.isSmartContract();
     }
 
     /**
      * Returns whether the address is a smart contract address.
      */
     isSmartContract(): boolean {
-        return this.isContractAddress();
+        return this.toHex().startsWith(SMART_CONTRACT_HEX_PUBKEY_PREFIX);
     }
 }

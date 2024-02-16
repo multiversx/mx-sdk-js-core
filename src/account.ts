@@ -8,7 +8,7 @@ export class Account {
     /**
      * The address of the account.
      */
-    readonly address: IAddress = new Address();
+    readonly address: IAddress = Address.empty();
 
     /**
      * The nonce of the account (the account sequence number).

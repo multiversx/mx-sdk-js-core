@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
-import { INetworkProvider } from "./interface";
+import { INetworkProvider, ITransactionNext } from "./interface";
 import { Address } from "./primitives";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { MockQuery } from "./testscommon/dummyQuery";
@@ -315,5 +315,51 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.deepEqual(apiResponse.logs.events[0].additionalData, [TransactionEventData.fromBase64("dGVzdA==")]);
         assert.deepEqual(proxyResponse.logs.events[0].additionalData, [TransactionEventData.fromBase64("dGVzdA==")]);
     });
-});
 
+    it.only("should send both `Transaction` and `TransactionNext`", async function () {
+        this.timeout(50000);
+
+        const transaction = {
+            toSendable: function () {
+                return {
+                    "nonce": 7,
+                    "value": "0",
+                    "receiver": "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+                    "sender": "erd1zztjf9fhwvuvquzsllknq4qcmffwad6n0hjtn5dyzytr5tgz7uas0mkgrq",
+                    "gasPrice": 1000000000,
+                    "gasLimit": 50000,
+                    "chainID": "D",
+                    "version": 2,
+                    "signature": "149f1d8296efcb9489c5b3142ae659aacfa3a7daef3645f1d3747a96dc9cee377070dd8b83b322997c15ba3c305ac18daaee0fd25760eba334b14a9272b34802"
+                }
+            }
+        }
+
+        const transactionNext: ITransactionNext = {
+            nonce: BigInt(8),
+            value: BigInt(0),
+            receiver: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+            sender: "erd1zztjf9fhwvuvquzsllknq4qcmffwad6n0hjtn5dyzytr5tgz7uas0mkgrq",
+            data: new Uint8Array(Buffer.from("test")),
+            gasPrice: BigInt(1000000000),
+            gasLimit: BigInt(80000),
+            chainID: "D",
+            version: 2,
+            signature: new Uint8Array(Buffer.from("3fa42d97b4f85442850340a11411a3cbd63885e06ff3f84c7a75d0ef59c780f7a18aa4f331cf460300bc8bd99352aea10b7c3bc17e40287337ae9f9842470205", "hex")),
+            senderUsername: "",
+            receiverUsername: "",
+            guardian: "",
+            guardianSignature: new Uint8Array(),
+            options: 0
+        }
+
+        const apiLegacyTxHash = await apiProvider.sendTransaction(transaction);
+        const apiTxNextHash = await apiProvider.sendTransaction(transactionNext);
+
+        const proxyLegacyTxHash = await apiProvider.sendTransaction(transaction);
+        const proxyTxNextHash = await apiProvider.sendTransaction(transactionNext);
+
+        assert.equal(apiLegacyTxHash, proxyLegacyTxHash);
+        assert.equal(apiTxNextHash, proxyTxNextHash);
+    });
+});

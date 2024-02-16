@@ -5,14 +5,14 @@ import { EsdtContractAddress } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { ErrContractQuery, ErrNetworkProvider } from "./errors";
-import { IAddress, IContractQuery, INetworkProvider, IPagination, ITransaction } from "./interface";
+import { IAddress, IContractQuery, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
-import { TransactionOnNetwork } from "./transactions";
+import { TransactionOnNetwork, prepareTransactionNextForBroadcasting } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
@@ -122,13 +122,25 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return status;
     }
 
-    async sendTransaction(tx: ITransaction): Promise<string> {
-        let response = await this.doPostGeneric("transaction/send", tx.toSendable());
+    async sendTransaction(tx: ITransaction | ITransactionNext): Promise<string> {
+        if ("toSendable" in tx){
+            const response = await this.doPostGeneric("transactions", tx.toSendable());
+            return response.txHash;
+        }
+
+        const transaction = prepareTransactionNextForBroadcasting(tx);
+        const response = await this.doPostGeneric("transactions", transaction);
         return response.txHash;
     }
 
-    async sendTransactions(txs: ITransaction[]): Promise<string[]> {
-        const data: any = txs.map(tx => tx.toSendable());
+    async sendTransactions(txs: ITransaction[] | ITransactionNext[]): Promise<string[]> {
+        let data: any[];
+        if ("toSendable" in txs[0]){
+            data = (txs as ITransaction[]).map(tx => tx.toSendable());
+        } else {
+            data = (txs as ITransactionNext[]).map(tx => prepareTransactionNextForBroadcasting(tx));
+        }
+
         const response = await this.doPostGeneric("transaction/send-multiple", data);
         const hashes = Array(txs.length).fill(null);
 
@@ -139,8 +151,14 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return hashes;
     }
 
-    async simulateTransaction(tx: ITransaction): Promise<any> {
-        let response = await this.doPostGeneric("transaction/simulate", tx.toSendable());
+    async simulateTransaction(tx: ITransaction | ITransactionNext): Promise<any> {
+        if ("toSendable" in tx){
+            const response = await this.doPostGeneric("transaction/simulate", tx.toSendable());
+            return response;
+        }
+        
+        const transaction = prepareTransactionNextForBroadcasting(tx);
+        const response = await this.doPostGeneric("transaction/simulate", transaction);
         return response;
     }
 

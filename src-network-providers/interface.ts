@@ -71,7 +71,7 @@ export interface INetworkProvider {
     /**
      * Broadcasts an already-signed transaction.
      */
-    sendTransaction(tx: ITransaction): Promise<string>;
+    sendTransaction(tx: ITransaction | ITransactionNext): Promise<string>;
 
     /**
      * Broadcasts a list of already-signed transactions.
@@ -133,3 +133,21 @@ export interface ITransaction {
 }
 
 export interface IAddress { bech32(): string; }
+
+export interface ITransactionNext {
+    sender: string;
+    receiver: string;
+    gasLimit: bigint;
+    chainID: string;
+    nonce: bigint;
+    value: bigint;
+    senderUsername: string;
+    receiverUsername: string;
+    gasPrice: bigint;
+    data: Uint8Array;
+    version: number;
+    options: number;
+    guardian: string;
+    signature: Uint8Array;
+    guardianSignature: Uint8Array;
+  }

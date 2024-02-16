@@ -1,4 +1,3 @@
-import { BigNumber } from "bignumber.js";
 import { IAddress, ITransactionPayload } from "../interface";
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { TransactionPayload } from "../transactionPayload";

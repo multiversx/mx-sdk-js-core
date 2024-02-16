@@ -628,7 +628,7 @@ export class TransactionComputer {
     }
 
     const diff = transaction.gasLimit- moveBalanceGas;
-    const modifiedGasPrice = gasPrice * BigInt(networkConfig.GasPriceModifier);
+    const modifiedGasPrice = BigInt(new BigNumber(gasPrice.toString()).multipliedBy(new BigNumber(networkConfig.GasPriceModifier)).toFixed(0));
     const processingFee = diff * modifiedGasPrice;
 
     return feeForMove + processingFee;
@@ -668,14 +668,14 @@ export class TransactionComputer {
 
   private toPlainObject(transaction: ITransactionNext) {
     return {
-      nonce: transaction.nonce,
+      nonce: Number(transaction.nonce),
       value: transaction.value.toString(),
       receiver: transaction.receiver,
       sender: transaction.sender,
       senderUsername: transaction.senderUsername ? Buffer.from(transaction.senderUsername).toString("base64") : undefined,
       receiverUsername: transaction.receiverUsername ? Buffer.from(transaction.receiverUsername).toString("base64") : undefined,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
+      gasPrice: Number(transaction.gasPrice),
+      gasLimit: Number(transaction.gasLimit),
       data: transaction.data && transaction.data.length === 0 ? undefined : Buffer.from(transaction.data).toString("base64"),
       chainID: transaction.chainID,
       version: transaction.version,

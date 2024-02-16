@@ -3,7 +3,6 @@ import { TestWallet, loadTestWallets } from "../testutils";
 import { TransactionComputer, TransactionNext } from "../transaction";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
-import BigNumber from "bignumber.js";
 
 describe("test relayed v1 transaction builder", function () {
     const config = new TransactionsFactoryConfig("T");

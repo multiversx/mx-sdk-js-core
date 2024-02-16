@@ -1,7 +1,6 @@
 import { assert } from "chai";
 import { TestWallet, loadTestWallets } from "./testutils";
 import { TransactionNext, TransactionComputer, Transaction } from "./transaction";
-import BigNumber from "bignumber.js";
 import { ProtoSerializer } from "./proto";
 
 class NetworkConfig {

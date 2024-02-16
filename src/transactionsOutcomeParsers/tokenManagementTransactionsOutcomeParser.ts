@@ -10,36 +10,36 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const event = this.findSingleEventByIdentifier(transactionOutcome, "issue");
-        const identifer = this.extractTokenIdentifier(event);
+        const identifier = this.extractTokenIdentifier(event);
 
-        return { tokenIdentifier: identifer };
+        return { tokenIdentifier: identifier };
     }
 
     parseIssueNonFungible(transactionOutcome: TransactionOutcome): { tokenIdentifier: string } {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const event = this.findSingleEventByIdentifier(transactionOutcome, "issueNonFungible");
-        const identifer = this.extractTokenIdentifier(event);
+        const identifier = this.extractTokenIdentifier(event);
 
-        return { tokenIdentifier: identifer };
+        return { tokenIdentifier: identifier };
     }
 
     parseIssueSemiFungible(transactionOutcome: TransactionOutcome): { tokenIdentifier: string } {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const event = this.findSingleEventByIdentifier(transactionOutcome, "issueSemiFungible");
-        const identifer = this.extractTokenIdentifier(event);
+        const identifier = this.extractTokenIdentifier(event);
 
-        return { tokenIdentifier: identifer };
+        return { tokenIdentifier: identifier };
     }
 
     parseRegisterMetaEsdt(transactionOutcome: TransactionOutcome): { tokenIdentifier: string } {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const event = this.findSingleEventByIdentifier(transactionOutcome, "registerMetaESDT");
-        const identifer = this.extractTokenIdentifier(event);
+        const identifier = this.extractTokenIdentifier(event);
 
-        return { tokenIdentifier: identifer };
+        return { tokenIdentifier: identifier };
     }
 
     parseRegisterAndSetAllRoles(transactionOutcome: TransactionOutcome): { tokenIdentifier: string; roles: string[] } {
@@ -53,8 +53,7 @@ export class TokenManagementTransactionsOutcomeParser {
 
         let roles: string[] = [];
         for (const role of encodedRoles) {
-            const decodedRole = Buffer.from(role, "base64");
-            roles = roles.concat(decodedRole.toString());
+            roles = roles.concat(this.decodeTopicAsString(role));
         }
 
         return { tokenIdentifier: tokenIdentifier, roles: roles };
@@ -83,8 +82,7 @@ export class TokenManagementTransactionsOutcomeParser {
 
         let roles: string[] = [];
         for (const role of encodedRoles) {
-            const decodedRole = Buffer.from(role, "base64");
-            roles = roles.concat(decodedRole.toString());
+            roles = roles.concat(this.decodeTopicAsString(role));
         }
 
         return { userAddress: userAddress, tokenIdentifier: tokenIdentifier, roles: roles };
@@ -294,7 +292,7 @@ export class TokenManagementTransactionsOutcomeParser {
         for (const event of transactionEvents) {
             if (event.identifier == "signalError") {
                 const data = Buffer.from(event.data.toString().slice(1)).toString();
-                const message = Buffer.from(event.topics[1], "base64").toString();
+                const message = this.decodeTopicAsString(event.topics[1]);
 
                 throw new ErrParseTransactionOutcome(
                     `encountered signalError: ${message} (${Buffer.from(data, "hex").toString()})`,
@@ -332,7 +330,7 @@ export class TokenManagementTransactionsOutcomeParser {
         if (!event.topics[0]) {
             return "";
         }
-        return Buffer.from(event.topics[0], "base64").toString();
+        return this.decodeTopicAsString(event.topics[0]);
     }
 
     private extractNonce(event: TransactionEvent): bigint {
@@ -357,5 +355,9 @@ export class TokenManagementTransactionsOutcomeParser {
         }
         const address = Buffer.from(event.topics[3], "base64");
         return Address.fromBuffer(address).bech32();
+    }
+
+    private decodeTopicAsString(topic: string): string {
+        return Buffer.from(topic, "base64").toString();
     }
 }

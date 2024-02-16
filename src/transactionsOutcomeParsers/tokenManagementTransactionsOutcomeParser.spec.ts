@@ -15,8 +15,7 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const logs = new TransactionLogs({ events: [event] });
-        const scResult = new SmartContractResult({});
-        const txOutcome = new TransactionOutcome({ smartContractResults: [scResult], transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ transactionLogs: logs });
 
         assert.throws(
             () => {
@@ -28,8 +27,8 @@ describe("test token management transactions outcome parser", () => {
     });
 
     it("should test parse issue fungible", () => {
-        const identifer = "ZZZ-9ee87d";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "ZZZ-9ee87d";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
 
         const event = new TransactionEvent({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
@@ -42,16 +41,15 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-        const txOutcome = new TransactionOutcome({ smartContractResults: [scResult], transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ transactionLogs: logs });
 
         const outcome = parser.parseIssueFungible(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
     });
 
     it("should test parse issue non fungible", () => {
-        const identifer = "NFT-f01d1e";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "NFT-f01d1e";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
 
         const firstEvent = new TransactionEvent({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
@@ -76,16 +74,15 @@ describe("test token management transactions outcome parser", () => {
             events: [firstEvent, secondEvent, thirdEvent],
         });
 
-        const scResult = new SmartContractResult({});
-        const txOutcome = new TransactionOutcome({ smartContractResults: [scResult], transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ transactionLogs: logs });
 
         const outcome = parser.parseIssueNonFungible(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
     });
 
     it("should test parse issue semi fungible", () => {
-        const identifer = "SEMIFNG-2c6d9f";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "SEMIFNG-2c6d9f";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
 
         const event = new TransactionEvent({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
@@ -98,16 +95,15 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-        const txOutcome = new TransactionOutcome({ smartContractResults: [scResult], transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ transactionLogs: logs });
 
         const outcome = parser.parseIssueSemiFungible(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
     });
 
     it("should test parse register meta esdt", () => {
-        const identifer = "METATEST-e05d11";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "METATEST-e05d11";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
 
         const event = new TransactionEvent({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
@@ -120,16 +116,15 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-        const txOutcome = new TransactionOutcome({ smartContractResults: [scResult], transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ transactionLogs: logs });
 
         const outcome = parser.parseRegisterMetaEsdt(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
     });
 
     it("should test parse register and set all roles", () => {
-        const identifer = "LMAO-d9f892";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "LMAO-d9f892";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
         const roles = ["ESDTRoleLocalMint", "ESDTRoleLocalBurn"];
 
         const event = new TransactionEvent({
@@ -170,13 +165,13 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseRegisterAndSetAllRoles(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
         assert.deepEqual(outcome.roles, roles);
     });
 
     it("should test parse register set special role", () => {
-        const identifer = "METATEST-e05d11";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "METATEST-e05d11";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
         const roles = ["ESDTRoleNFTCreate", "ESDTRoleNFTAddQuantity", "ESDTRoleNFTBurn"];
 
         const event = new TransactionEvent({
@@ -197,22 +192,19 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-
         const txOutcome = new TransactionOutcome({
-            smartContractResults: [scResult],
             transactionLogs: transactionLogs,
         });
 
         const outcome = parser.parseSetSpecialRole(txOutcome);
         assert.equal(outcome.userAddress, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
         assert.deepEqual(outcome.roles, roles);
     });
 
     it("should test parse nft create", () => {
-        const identifer = "NFT-f01d1e";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "NFT-f01d1e";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
         const nonce = BigInt(1);
         const initialQuantity = BigInt(1);
 
@@ -232,22 +224,19 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-
         const txOutcome = new TransactionOutcome({
-            smartContractResults: [scResult],
             transactionLogs: transactionLogs,
         });
 
         const outcome = parser.parseNftCreate(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
         assert.equal(outcome.nonce, nonce);
         assert.equal(outcome.initialQuantity, initialQuantity);
     });
 
     it("should test parse local mint", () => {
-        const identifer = "AAA-29c4c9";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "AAA-29c4c9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
         const nonce = BigInt(0);
         const mintedSupply = BigInt(100000);
 
@@ -262,23 +251,20 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-
         const txOutcome = new TransactionOutcome({
-            smartContractResults: [scResult],
             transactionLogs: transactionLogs,
         });
 
         const outcome = parser.parseLocalMint(txOutcome);
         assert.equal(outcome.userAddress, event.address);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
         assert.equal(outcome.nonce, nonce);
         assert.equal(outcome.mintedSupply, mintedSupply);
     });
 
     it("should test parse local burn", () => {
-        const identifer = "AAA-29c4c9";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "AAA-29c4c9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
         const nonce = BigInt(0);
         const burntSupply = BigInt(100000);
 
@@ -293,23 +279,20 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-
         const txOutcome = new TransactionOutcome({
-            smartContractResults: [scResult],
             transactionLogs: transactionLogs,
         });
 
         const outcome = parser.parseLocalBurn(txOutcome);
         assert.equal(outcome.userAddress, event.address);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
         assert.equal(outcome.nonce, nonce);
         assert.equal(outcome.burntSupply, burntSupply);
     });
 
     it("should test parse pause", () => {
-        const identifer = "AAA-29c4c9";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "AAA-29c4c9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
 
         const event = new TransactionEvent({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
@@ -322,20 +305,17 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-
         const txOutcome = new TransactionOutcome({
-            smartContractResults: [scResult],
             transactionLogs: transactionLogs,
         });
 
         const outcome = parser.parsePause(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
     });
 
     it("should test parse unpause", () => {
-        const identifer = "AAA-29c4c9";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "AAA-29c4c9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
 
         const event = new TransactionEvent({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
@@ -348,20 +328,17 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-
         const txOutcome = new TransactionOutcome({
-            smartContractResults: [scResult],
             transactionLogs: transactionLogs,
         });
 
         const outcome = parser.parseUnpause(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
     });
 
     it("should test parse freeze", () => {
-        const identifer = "AAA-29c4c9";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "AAA-29c4c9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
         const nonce = BigInt(0);
         const balance = BigInt(10000000);
         const address = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th";
@@ -390,14 +367,14 @@ describe("test token management transactions outcome parser", () => {
 
         const outcome = parser.parseFreeze(txOutcome);
         assert.equal(outcome.userAddress, address);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
         assert.equal(outcome.nonce, nonce);
         assert.equal(outcome.balance, balance);
     });
 
     it("should test parse unfreeze", () => {
-        const identifer = "AAA-29c4c9";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "AAA-29c4c9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
         const nonce = BigInt(0);
         const balance = BigInt(10000000);
         const address = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th";
@@ -426,14 +403,14 @@ describe("test token management transactions outcome parser", () => {
 
         const outcome = parser.parseUnfreeze(txOutcome);
         assert.equal(outcome.userAddress, address);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
         assert.equal(outcome.nonce, nonce);
         assert.equal(outcome.balance, balance);
     });
 
     it("should test parse wipe", () => {
-        const identifer = "AAA-29c4c9";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "AAA-29c4c9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
         const nonce = BigInt(0);
         const balance = BigInt(10000000);
         const address = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th";
@@ -462,14 +439,14 @@ describe("test token management transactions outcome parser", () => {
 
         const outcome = parser.parseWipe(txOutcome);
         assert.equal(outcome.userAddress, address);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
         assert.equal(outcome.nonce, nonce);
         assert.equal(outcome.balance, balance);
     });
 
     it("should test parse update attributes", () => {
-        const identifer = "NFT-f01d1e";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "NFT-f01d1e";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
         const nonce = BigInt(1);
         const attributes = "metadata:ipfsCID/test.json;tags:tag1,tag2";
         const base64Attributes = Buffer.from(attributes).toString("base64");
@@ -485,22 +462,19 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-
         const txOutcome = new TransactionOutcome({
-            smartContractResults: [scResult],
             transactionLogs: transactionLogs,
         });
 
         const outcome = parser.parseUpdateAttributes(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
         assert.equal(outcome.nonce, nonce);
         assert.equal(Buffer.from(outcome.attributes).toString(), attributes);
     });
 
     it("should test parse add quantity", () => {
-        const identifer = "NFT-f01d1e";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "NFT-f01d1e";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
         const nonce = BigInt(1);
         const addedQuantity = BigInt(10);
 
@@ -515,22 +489,19 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-
         const txOutcome = new TransactionOutcome({
-            smartContractResults: [scResult],
             transactionLogs: transactionLogs,
         });
 
         const outcome = parser.parseAddQuantity(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
         assert.equal(outcome.nonce, nonce);
         assert.equal(outcome.addedQuantity, addedQuantity);
     });
 
     it("should test parse burn quantity", () => {
-        const identifer = "NFT-f01d1e";
-        const base64Identifier = Buffer.from(identifer).toString("base64");
+        const identifier = "NFT-f01d1e";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
         const nonce = BigInt(1);
         const burntQuantity = BigInt(16);
 
@@ -545,15 +516,12 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const scResult = new SmartContractResult({});
-
         const txOutcome = new TransactionOutcome({
-            smartContractResults: [scResult],
             transactionLogs: transactionLogs,
         });
 
         const outcome = parser.parseBurnQuantity(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifer);
+        assert.equal(outcome.tokenIdentifier, identifier);
         assert.equal(outcome.nonce, nonce);
         assert.equal(outcome.burntQuantity, burntQuantity);
     });

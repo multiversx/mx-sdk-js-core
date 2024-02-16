@@ -560,51 +560,25 @@ export class TransactionNext {
   /**
    * Creates a new Transaction object.
    */
-    public constructor({
-      sender,
-      receiver,
-      gasLimit,
-      chainID,
-      nonce,
-      value,
-      senderUsername,
-      receiverUsername,
-      gasPrice,
-      data,
-      version,
-      options,
-      guardian,
-    }: {
-      nonce?: BigNumber.Value;
-      value?: BigNumber.Value;
-      sender: string;
-      receiver: string;
-      senderUsername?: string;
-      receiverUsername?: string;
-      gasPrice?: BigNumber.Value;
-      gasLimit: BigNumber.Value;
-      data?: Uint8Array;
-      chainID: string;
-      version?: number;
-      options?: number;
-      guardian?: string;
-    }) {
-      this.nonce = nonce || 0;
-      this.value = value || new BigNumber(0);
-      this.sender = sender;
-      this.receiver = receiver;
-      this.senderUsername = senderUsername || "";
-      this.receiverUsername = receiverUsername || "";
-      this.gasPrice = gasPrice || new BigNumber(TRANSACTION_MIN_GAS_PRICE);
-      this.gasLimit = gasLimit;
-      this.data = data || new Uint8Array();
-      this.chainID = chainID;
-      this.version = version || TRANSACTION_VERSION_DEFAULT;
-      this.options = options || TRANSACTION_OPTIONS_DEFAULT;
-      this.guardian = guardian || "";
+    public constructor(init: Partial<TransactionNext>) {
+      this.nonce = 0;
+      this.value = new BigNumber(0);
+      this.sender = "";
+      this.receiver = "";
+      this.senderUsername = "";
+      this.receiverUsername = "";
+      this.gasPrice = new BigNumber(TRANSACTION_MIN_GAS_PRICE);
+      this.gasLimit = 0;
+      this.data = new Uint8Array();
+      this.chainID = "";
+      this.version = TRANSACTION_VERSION_DEFAULT;
+      this.options = TRANSACTION_OPTIONS_DEFAULT;
+      this.guardian = "";
   
       this.signature = new Uint8Array();
       this.guardianSignature = new Uint8Array();
+
+      Object.assign(this, init);
     }
 }
 

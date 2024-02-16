@@ -1,4 +1,4 @@
-import { IAddress, IMessage } from "./interface";
+import { IAddress } from "./interface";
 import { DEFAULT_MESSAGE_VERSION, MESSAGE_PREFIX } from "./constants";
 import { Address } from "./address";
 
@@ -26,14 +26,14 @@ export class Message {
         this.data = options.data;
         this.signature = options.signature;
         this.address = options.address;
-        this.version = options.version ? options.version : DEFAULT_MESSAGE_VERSION;
+        this.version = options.version || DEFAULT_MESSAGE_VERSION;
     }
 }
 
 export class MessageComputer {
     constructor() {}
 
-    computeBytesForSigning(message: IMessage): Uint8Array {
+    computeBytesForSigning(message: Message): Uint8Array {
         const messageSize = Buffer.from(message.data.length.toString());
         const signableMessage = Buffer.concat([messageSize, message.data]);
         let bytesToHash = Buffer.concat([Buffer.from(MESSAGE_PREFIX), signableMessage]);
@@ -41,11 +41,11 @@ export class MessageComputer {
         return createKeccakHash("keccak256").update(bytesToHash).digest();
     }
 
-    computeBytesForVerifying(message: IMessage): Uint8Array {
+    computeBytesForVerifying(message: Message): Uint8Array {
         return this.computeBytesForSigning(message);
     }
 
-    packMessage(message: IMessage): {
+    packMessage(message: Message): {
         message: string;
         signature: string;
         address: string;

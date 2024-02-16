@@ -102,10 +102,3 @@ export interface ITransactionNext {
     signature: Uint8Array;
     guardianSignature: Uint8Array;
 }
-
-export interface IMessage {
-    data: Uint8Array;
-    signature?: Uint8Array;
-    address?: IAddress;
-    version?: number;
-}

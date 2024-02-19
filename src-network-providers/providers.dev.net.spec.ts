@@ -316,7 +316,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.deepEqual(proxyResponse.logs.events[0].additionalData, [TransactionEventData.fromBase64("dGVzdA==")]);
     });
 
-    it.only("should send both `Transaction` and `TransactionNext`", async function () {
+    it("should send both `Transaction` and `TransactionNext`", async function () {
         this.timeout(50000);
 
         const transaction = {
@@ -345,7 +345,7 @@ describe("test network providers on devnet: Proxy and API", function () {
             gasLimit: BigInt(80000),
             chainID: "D",
             version: 2,
-            signature: new Uint8Array(Buffer.from("3fa42d97b4f85442850340a11411a3cbd63885e06ff3f84c7a75d0ef59c780f7a18aa4f331cf460300bc8bd99352aea10b7c3bc17e40287337ae9f9842470205", "hex")),
+            signature: Buffer.from("3fa42d97b4f85442850340a11411a3cbd63885e06ff3f84c7a75d0ef59c780f7a18aa4f331cf460300bc8bd99352aea10b7c3bc17e40287337ae9f9842470205", "hex"),
             senderUsername: "",
             receiverUsername: "",
             guardian: "",
@@ -356,8 +356,8 @@ describe("test network providers on devnet: Proxy and API", function () {
         const apiLegacyTxHash = await apiProvider.sendTransaction(transaction);
         const apiTxNextHash = await apiProvider.sendTransaction(transactionNext);
 
-        const proxyLegacyTxHash = await apiProvider.sendTransaction(transaction);
-        const proxyTxNextHash = await apiProvider.sendTransaction(transactionNext);
+        const proxyLegacyTxHash = await proxyProvider.sendTransaction(transaction);
+        const proxyTxNextHash = await proxyProvider.sendTransaction(transactionNext);
 
         assert.equal(apiLegacyTxHash, proxyLegacyTxHash);
         assert.equal(apiTxNextHash, proxyTxNextHash);

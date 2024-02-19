@@ -1,11 +1,15 @@
 import { TransactionStatus } from "./transactionStatus";
 import { ContractResults } from "./contractResults";
 import { Address } from "./primitives";
-import { IAddress, ITransactionNext } from "./interface";
+import { IAddress, ITransaction, ITransactionNext } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
 
-export function prepareTransactionNextForBroadcasting(transaction: ITransactionNext): any {
+export function prepareTransactionForBroadcasting(transaction: ITransaction | ITransactionNext): any {
+    if ("toSendable" in transaction){
+        return transaction.toSendable();
+    }
+
     return {
         nonce: Number(transaction.nonce),
         value: transaction.value.toString(),

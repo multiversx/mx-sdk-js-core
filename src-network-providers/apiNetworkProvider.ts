@@ -14,7 +14,7 @@ import { Nonce } from "./primitives";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
-import { TransactionOnNetwork, prepareTransactionNextForBroadcasting } from "./transactions";
+import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
@@ -120,17 +120,12 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     async sendTransaction(tx: ITransaction | ITransactionNext): Promise<string> {
-        if ("toSendable" in tx){
-            const response = await this.doPostGeneric("transactions", tx.toSendable());
-            return response.txHash;
-        }
-
-        const transaction = prepareTransactionNextForBroadcasting(tx);
+        const transaction = prepareTransactionForBroadcasting(tx);
         const response = await this.doPostGeneric("transactions", transaction);
         return response.txHash;
     }
 
-    async sendTransactions(txs: ITransaction[] | ITransactionNext[]): Promise<string[]> {
+    async sendTransactions(txs: (ITransaction | ITransactionNext)[]): Promise<string[]> {
         return await this.backingProxyNetworkProvider.sendTransactions(txs);
     }
 

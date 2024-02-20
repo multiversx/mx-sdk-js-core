@@ -627,7 +627,7 @@ export class TransactionComputer {
       return feeForMove;
     }
 
-    const diff = transaction.gasLimit- moveBalanceGas;
+    const diff = transaction.gasLimit - moveBalanceGas;
     const modifiedGasPrice = BigInt(new BigNumber(gasPrice.toString()).multipliedBy(new BigNumber(networkConfig.GasPriceModifier)).toFixed(0));
     const processingFee = diff * modifiedGasPrice;
 

@@ -560,51 +560,25 @@ export class TransactionNext {
   /**
    * Creates a new Transaction object.
    */
-    public constructor({
-      sender,
-      receiver,
-      gasLimit,
-      chainID,
-      nonce,
-      value,
-      senderUsername,
-      receiverUsername,
-      gasPrice,
-      data,
-      version,
-      options,
-      guardian,
-    }: {
-      nonce?: bigint;
-      value?: bigint;
-      sender: string;
-      receiver: string;
-      senderUsername?: string;
-      receiverUsername?: string;
-      gasPrice?: bigint;
-      gasLimit: bigint;
-      data?: Uint8Array;
-      chainID: string;
-      version?: number;
-      options?: number;
-      guardian?: string;
-    }) {
-      this.nonce = nonce || 0n;
-      this.value = value || 0n;
-      this.sender = sender;
-      this.receiver = receiver;
-      this.senderUsername = senderUsername || "";
-      this.receiverUsername = receiverUsername || "";
-      this.gasPrice = gasPrice || BigInt(TRANSACTION_MIN_GAS_PRICE);
-      this.gasLimit = gasLimit;
-      this.data = data || new Uint8Array();
-      this.chainID = chainID;
-      this.version = version || TRANSACTION_VERSION_DEFAULT;
-      this.options = options || TRANSACTION_OPTIONS_DEFAULT;
-      this.guardian = guardian || "";
+    public constructor(init: Partial<TransactionNext>) {
+      this.nonce = 0n;
+      this.value = 0n;
+      this.sender = "";
+      this.receiver = "";
+      this.senderUsername = "";
+      this.receiverUsername = "";
+      this.gasPrice = BigInt(TRANSACTION_MIN_GAS_PRICE);
+      this.gasLimit = 0n;
+      this.data = new Uint8Array();
+      this.chainID = "";
+      this.version = TRANSACTION_VERSION_DEFAULT;
+      this.options = TRANSACTION_OPTIONS_DEFAULT;
+      this.guardian = "";
   
       this.signature = new Uint8Array();
       this.guardianSignature = new Uint8Array();
+
+      Object.assign(this, init);
     }
 }
 
@@ -616,19 +590,22 @@ export class TransactionComputer {
 
   computeTransactionFee(transaction: ITransactionNext, networkConfig: INetworkConfig): bigint {
     const moveBalanceGas = BigInt(
-      networkConfig.MinGasLimit + transaction.data.length * networkConfig.GasPerDataByte);
+        networkConfig.MinGasLimit + transaction.data.length * networkConfig.GasPerDataByte,
+    );
     if (moveBalanceGas > transaction.gasLimit) {
-      throw new errors.ErrNotEnoughGas(parseInt(transaction.gasLimit.toString(), 10));
+        throw new errors.ErrNotEnoughGas(parseInt(transaction.gasLimit.toString(), 10));
     }
 
     const gasPrice = transaction.gasPrice;
     const feeForMove = moveBalanceGas * gasPrice;
     if (moveBalanceGas === transaction.gasLimit) {
-      return feeForMove;
+        return feeForMove;
     }
 
     const diff = transaction.gasLimit - moveBalanceGas;
-    const modifiedGasPrice = BigInt(new BigNumber(gasPrice.toString()).multipliedBy(new BigNumber(networkConfig.GasPriceModifier)).toFixed(0));
+    const modifiedGasPrice = BigInt(
+        new BigNumber(gasPrice.toString()).multipliedBy(new BigNumber(networkConfig.GasPriceModifier)).toFixed(0),
+    );
     const processingFee = diff * modifiedGasPrice;
 
     return feeForMove + processingFee;
@@ -651,7 +628,7 @@ export class TransactionComputer {
 
     const serialized = JSON.stringify(plainTransaction);
 
-    return Buffer.from(serialized);
+    return new Uint8Array(Buffer.from(serialized));
   }
 
   computeTransactionHash(transaction: ITransactionNext): Uint8Array {
@@ -685,5 +662,4 @@ export class TransactionComputer {
       guardianSignature: transaction.guardianSignature.length == 0 ? undefined : Buffer.from(transaction.guardianSignature).toString("hex")
     }
   }
-
 }

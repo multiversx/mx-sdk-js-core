@@ -60,8 +60,8 @@ describe("test transaction", function () {
         await provider.sendTransaction(transactionOne);
         await provider.sendTransaction(transactionTwo);
 
-        await watcher.awaitCompleted(transactionOne);
-        await watcher.awaitCompleted(transactionTwo);
+        await watcher.awaitCompleted(transactionOne.getHash().hex());
+        await watcher.awaitCompleted(transactionTwo.getHash().hex());
 
         await bob.sync(provider);
         let newBalanceOfBob = new BigNumber(bob.account.balance.toString());
@@ -96,7 +96,7 @@ describe("test transaction", function () {
         transactionOne.setNonce(alice.account.nonce);
         await signTransaction({ transaction: transactionOne, wallet: alice });
         await provider.sendTransaction(transactionOne);
-        await watcher.awaitCompleted(transactionOne);
+        await watcher.awaitCompleted(transactionOne.getHash().hex());
 
         await bob.sync(provider);
         let newBalanceOfBob = new BigNumber(bob.account.balance.toString());
@@ -161,17 +161,17 @@ describe("test transaction", function () {
         let transaction = factory.createTransactionForNativeTokenTransfer({
             sender: alice.address,
             receiver: bob.address,
-            nativeAmount: new BigNumber("42000000000000000000"),
+            nativeAmount: 42000000000000000000n,
         });
-        transaction.nonce = alice.account.nonce.valueOf();
+        transaction.nonce = BigInt(alice.account.nonce.valueOf());
 
         const transactionComputer = new TransactionComputer();
         transaction.signature = await alice.signer.sign(
             Buffer.from(transactionComputer.computeBytesForSigning(transaction)),
         );
 
-        await provider.sendTransaction(transaction);
-        await watcher.awaitCompleted(transaction);
+        const txHash = await provider.sendTransaction(transaction);
+        await watcher.awaitCompleted(txHash);
 
         await bob.sync(provider);
         let newBalanceOfBob = new BigNumber(bob.account.balance.toString());

@@ -61,7 +61,7 @@ export class TransactionNextBuilder {
             gasLimit: gasLimit,
             value: this.amount || 0n,
             data: data.valueOf(),
-            chainID: this.config.toString(),
+            chainID: this.config.chainID,
         });
     }
 }

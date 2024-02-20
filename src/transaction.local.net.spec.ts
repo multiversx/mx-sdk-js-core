@@ -4,9 +4,12 @@ import { Logger } from "./logger";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { createLocalnetProvider } from "./testutils/networkProviders";
 import { TokenTransfer } from "./tokenTransfer";
-import { Transaction } from "./transaction";
+import { Transaction, TransactionComputer } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 import { TransactionWatcher } from "./transactionWatcher";
+import { TransactionsFactoryConfig } from "./transactionsFactories/transactionsFactoryConfig";
+import { NextTransferTransactionsFactory } from "./transactionsFactories/transferTransactionsFactory";
+import { TokenComputer } from "./tokens";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;
@@ -20,7 +23,9 @@ describe("test transaction", function () {
 
         let provider = createLocalnetProvider();
         let watcher = new TransactionWatcher({
-            getTransaction: async (hash: string) => { return await provider.getTransaction(hash, true) }
+            getTransaction: async (hash: string) => {
+                return await provider.getTransaction(hash, true);
+            },
         });
         let network = await provider.getNetworkConfig();
 
@@ -34,7 +39,7 @@ describe("test transaction", function () {
             receiver: bob.address,
             value: TokenTransfer.egldFromAmount(42),
             gasLimit: network.MinGasLimit,
-            chainID: network.ChainID
+            chainID: network.ChainID,
         });
 
         let transactionTwo = new Transaction({
@@ -42,7 +47,7 @@ describe("test transaction", function () {
             receiver: bob.address,
             value: TokenTransfer.egldFromAmount(43),
             gasLimit: network.MinGasLimit,
-            chainID: network.ChainID
+            chainID: network.ChainID,
         });
 
         transactionOne.setNonce(alice.account.nonce);
@@ -69,7 +74,9 @@ describe("test transaction", function () {
 
         let provider = createLocalnetProvider();
         let watcher = new TransactionWatcher({
-            getTransaction: async (hash: string) => { return await provider.getTransaction(hash, true) }
+            getTransaction: async (hash: string) => {
+                return await provider.getTransaction(hash, true);
+            },
         });
 
         let network = await provider.getNetworkConfig();
@@ -83,7 +90,7 @@ describe("test transaction", function () {
             receiver: bob.address,
             value: TokenTransfer.egldFromAmount(42),
             gasLimit: network.MinGasLimit,
-            chainID: network.ChainID
+            chainID: network.ChainID,
         });
 
         transactionOne.setNonce(alice.account.nonce);
@@ -110,7 +117,7 @@ describe("test transaction", function () {
             gasLimit: 70000,
             receiver: alice.address,
             value: TokenTransfer.egldFromAmount(1000),
-            chainID: network.ChainID
+            chainID: network.ChainID,
         });
 
         let transactionTwo = new Transaction({
@@ -119,7 +126,7 @@ describe("test transaction", function () {
             gasLimit: 70000,
             receiver: alice.address,
             value: TokenTransfer.egldFromAmount(1000000),
-            chainID: network.ChainID
+            chainID: network.ChainID,
         });
 
         transactionOne.setNonce(alice.account.nonce);
@@ -132,7 +139,47 @@ describe("test transaction", function () {
         Logger.trace(JSON.stringify(await provider.simulateTransaction(transactionTwo), null, 4));
     });
 
-    async function signTransaction(options: { transaction: Transaction, wallet: TestWallet }) {
+    it("should create transaction using the NextTokenTransferFactory", async function () {
+        this.timeout(70000);
+
+        let provider = createLocalnetProvider();
+        let watcher = new TransactionWatcher({
+            getTransaction: async (hash: string) => {
+                return await provider.getTransaction(hash, true);
+            },
+        });
+
+        let network = await provider.getNetworkConfig();
+
+        const config = new TransactionsFactoryConfig(network.ChainID);
+        const factory = new NextTransferTransactionsFactory(config, new TokenComputer());
+
+        await alice.sync(provider);
+        await bob.sync(provider);
+        let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
+
+        let transaction = factory.createTransactionForNativeTokenTransfer({
+            sender: alice.address,
+            receiver: bob.address,
+            nativeAmount: new BigNumber("42000000000000000000"),
+        });
+        transaction.nonce = alice.account.nonce.valueOf();
+
+        const transactionComputer = new TransactionComputer();
+        transaction.signature = await alice.signer.sign(
+            Buffer.from(transactionComputer.computeBytesForSigning(transaction)),
+        );
+
+        await provider.sendTransaction(transaction);
+        await watcher.awaitCompleted(transaction);
+
+        await bob.sync(provider);
+        let newBalanceOfBob = new BigNumber(bob.account.balance.toString());
+
+        assert.deepEqual(TokenTransfer.egldFromAmount(42).valueOf(), newBalanceOfBob.minus(initialBalanceOfBob));
+    });
+
+    async function signTransaction(options: { transaction: Transaction; wallet: TestWallet }) {
         const transaction = options.transaction;
         const wallet = options.wallet;
 

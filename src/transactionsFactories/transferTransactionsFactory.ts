@@ -22,6 +22,7 @@ interface TokenComputer {
     isFungible(token: Token): boolean;
 }
 
+// this name is only temporary; the class will be renamed to `TransferTransactionsFactory`
 export class NextTransferTransactionsFactory {
     private readonly config: IConfig;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;

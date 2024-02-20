@@ -3,7 +3,6 @@ import { TestWallet, loadTestWallets } from "../testutils";
 import { TransactionComputer, TransactionNext } from "../transaction";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
-import BigNumber from "bignumber.js";
 
 describe("test relayed v1 transaction builder", function () {
     const config = new TransactionsFactoryConfig("T");
@@ -19,7 +18,7 @@ describe("test relayed v1 transaction builder", function () {
         let innerTransaction = new TransactionNext({
             sender: alice.address.bech32(),
             receiver: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
-            gasLimit: 10000000,
+            gasLimit: 10000000n,
             data: Buffer.from("getContractConfig"),
             chainID: config.chainID,
         });
@@ -29,7 +28,7 @@ describe("test relayed v1 transaction builder", function () {
                 "The inner transaction is not signed";
         });
 
-        innerTransaction.gasLimit = 0;
+        innerTransaction.gasLimit = 0n;
         innerTransaction.signature = Buffer.from("invalidsignature");
 
         assert.throws(() => {
@@ -42,10 +41,10 @@ describe("test relayed v1 transaction builder", function () {
         let innerTransaction = new TransactionNext({
             sender: bob.address.bech32(),
             receiver: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
-            gasLimit: 60000000,
+            gasLimit: 60000000n,
             data: Buffer.from("getContractConfig"),
             chainID: config.chainID,
-            nonce: 198,
+            nonce: 198n,
         });
 
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
@@ -55,7 +54,7 @@ describe("test relayed v1 transaction builder", function () {
             innerTransaction: innerTransaction,
             relayerAddress: alice.address,
         });
-        relayedTransaction.nonce = 2627;
+        relayedTransaction.nonce = 2627n;
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
         relayedTransaction.signature = await alice.signer.sign(Buffer.from(serializedRelayedTransaction));
@@ -74,12 +73,12 @@ describe("test relayed v1 transaction builder", function () {
         let innerTransaction = new TransactionNext({
             sender: carol.address.bech32(),
             receiver: alice.address.bech32(),
-            gasLimit: 50000,
+            gasLimit: 50000n,
             chainID: config.chainID,
-            nonce: 208,
+            nonce: 208n,
             senderUsername: "carol",
             receiverUsername: "alice",
-            value: new BigNumber("1000000000000000000"),
+            value: 1000000000000000000n,
         });
 
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
@@ -89,7 +88,7 @@ describe("test relayed v1 transaction builder", function () {
             innerTransaction: innerTransaction,
             relayerAddress: frank.address,
         });
-        relayedTransaction.nonce = 715;
+        relayedTransaction.nonce = 715n;
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
         relayedTransaction.signature = await frank.signer.sign(Buffer.from(serializedRelayedTransaction));
@@ -108,12 +107,12 @@ describe("test relayed v1 transaction builder", function () {
         let innerTransaction = new TransactionNext({
             sender: carol.address.bech32(),
             receiver: alice.address.bech32(),
-            gasLimit: 50000,
+            gasLimit: 50000n,
             chainID: config.chainID,
-            nonce: 208,
+            nonce: 208n,
             senderUsername: "carol",
             receiverUsername: "alice",
-            value: new BigNumber("1999999000000000000000000"),
+            value: 1999999000000000000000000n,
         });
 
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
@@ -123,7 +122,7 @@ describe("test relayed v1 transaction builder", function () {
             innerTransaction: innerTransaction,
             relayerAddress: frank.address,
         });
-        relayedTransaction.nonce = 715;
+        relayedTransaction.nonce = 715n;
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
         relayedTransaction.signature = await frank.signer.sign(Buffer.from(serializedRelayedTransaction));
@@ -142,10 +141,10 @@ describe("test relayed v1 transaction builder", function () {
         let innerTransaction = new TransactionNext({
             sender: bob.address.bech32(),
             receiver: "erd1qqqqqqqqqqqqqpgq54tsxmej537z9leghvp69hfu4f8gg5eu396q83gnnz",
-            gasLimit: 60000000,
+            gasLimit: 60000000n,
             chainID: config.chainID,
             data: Buffer.from("getContractConfig"),
-            nonce: 198,
+            nonce: 198n,
             version: 2,
             options: 2,
             guardian: grace.address.bech32(),
@@ -159,7 +158,7 @@ describe("test relayed v1 transaction builder", function () {
             innerTransaction: innerTransaction,
             relayerAddress: alice.address,
         });
-        relayedTransaction.nonce = 2627;
+        relayedTransaction.nonce = 2627n;
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
         relayedTransaction.signature = await alice.signer.sign(Buffer.from(serializedRelayedTransaction));
@@ -178,10 +177,10 @@ describe("test relayed v1 transaction builder", function () {
         let innerTransaction = new TransactionNext({
             sender: bob.address.bech32(),
             receiver: "erd1qqqqqqqqqqqqqpgq54tsxmej537z9leghvp69hfu4f8gg5eu396q83gnnz",
-            gasLimit: 60000000,
+            gasLimit: 60000000n,
             chainID: config.chainID,
             data: Buffer.from("addNumber"),
-            nonce: 198,
+            nonce: 198n,
             version: 2,
             options: 2,
             guardian: grace.address.bech32(),
@@ -195,7 +194,7 @@ describe("test relayed v1 transaction builder", function () {
             innerTransaction: innerTransaction,
             relayerAddress: alice.address,
         });
-        relayedTransaction.nonce = 2627;
+        relayedTransaction.nonce = 2627n;
         relayedTransaction.options = 2;
         relayedTransaction.guardian = frank.address.bech32();
 
@@ -217,25 +216,25 @@ describe("test relayed v1 transaction builder", function () {
         let innerTransaction = new TransactionNext({
             sender: bob.address.bech32(),
             receiver: bob.address.bech32(),
-            gasLimit: 50000,
+            gasLimit: 50000n,
             chainID: config.chainID,
         });
 
         assert.throws(() => {
             factory.createRelayedV2Transaction({
                 innerTransaction: innerTransaction,
-                innerTransactionGasLimit: 50000,
+                innerTransactionGasLimit: 50000n,
                 relayerAddress: carol.address,
             }),
                 "The gas limit should not be set for the inner transaction";
         });
 
-        innerTransaction.gasLimit = 0;
+        innerTransaction.gasLimit = 0n;
 
         assert.throws(() => {
             factory.createRelayedV2Transaction({
                 innerTransaction: innerTransaction,
-                innerTransactionGasLimit: 50000,
+                innerTransactionGasLimit: 50000n,
                 relayerAddress: carol.address,
             }),
                 "The inner transaction is not signed";
@@ -246,10 +245,10 @@ describe("test relayed v1 transaction builder", function () {
         let innerTransaction = new TransactionNext({
             sender: bob.address.bech32(),
             receiver: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
-            gasLimit: 0,
+            gasLimit: 0n,
             chainID: config.chainID,
             data: Buffer.from("getContractConfig"),
-            nonce: 15,
+            nonce: 15n,
             version: 2,
             options: 0,
         });
@@ -259,10 +258,10 @@ describe("test relayed v1 transaction builder", function () {
 
         const relayedTransaction = factory.createRelayedV2Transaction({
             innerTransaction: innerTransaction,
-            innerTransactionGasLimit: new BigNumber("60000000"),
+            innerTransactionGasLimit: 60000000n,
             relayerAddress: alice.address,
         });
-        relayedTransaction.nonce = 37;
+        relayedTransaction.nonce = 37n;
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
         relayedTransaction.signature = await alice.signer.sign(Buffer.from(serializedRelayedTransaction));

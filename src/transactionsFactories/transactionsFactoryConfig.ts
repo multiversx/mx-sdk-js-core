@@ -1,71 +1,70 @@
-import { BigNumber } from "bignumber.js";
 import { DEFAULT_HRP } from "../constants";
 
 export class TransactionsFactoryConfig {
     chainID: string;
     addressHrp: string;
-    minGasLimit: BigNumber.Value;
-    gasLimitPerByte: BigNumber.Value;
-    gasLimitIssue: BigNumber.Value;
-    gasLimitToggleBurnRoleGlobally: BigNumber.Value;
-    gasLimitEsdtLocalMint: BigNumber.Value;
-    gasLimitEsdtLocalBurn: BigNumber.Value;
-    gasLimitSetSpecialRole: BigNumber.Value;
-    gasLimitPausing: BigNumber.Value;
-    gasLimitFreezing: BigNumber.Value;
-    gasLimitWiping: BigNumber.Value;
-    gasLimitEsdtNftCreate: BigNumber.Value;
-    gasLimitEsdtNftUpdateAttributes: BigNumber.Value;
-    gasLimitEsdtNftAddQuantity: BigNumber.Value;
-    gasLimitEsdtNftBurn: BigNumber.Value;
-    gasLimitStorePerByte: BigNumber.Value;
-    issueCost: BigNumber.Value;
-    gasLimitStake: BigNumber.Value;
-    gasLimitUnstake: BigNumber.Value;
-    gasLimitUnbond: BigNumber.Value;
-    gasLimitCreateDelegationContract: BigNumber.Value;
-    gasLimitDelegationOperations: BigNumber.Value;
-    additionalGasLimitPerValidatorNode: BigNumber.Value;
-    additionalGasLimitForDelegationOperations: BigNumber.Value;
-    gasLimitESDTTransfer: BigNumber.Value;
-    gasLimitESDTNFTTransfer: BigNumber.Value;
-    gasLimitMultiESDTNFTTransfer: BigNumber.Value;
+    minGasLimit: bigint;
+    gasLimitPerByte: bigint;
+    gasLimitIssue: bigint;
+    gasLimitToggleBurnRoleGlobally: bigint;
+    gasLimitEsdtLocalMint: bigint;
+    gasLimitEsdtLocalBurn: bigint;
+    gasLimitSetSpecialRole: bigint;
+    gasLimitPausing: bigint;
+    gasLimitFreezing: bigint;
+    gasLimitWiping: bigint;
+    gasLimitEsdtNftCreate: bigint;
+    gasLimitEsdtNftUpdateAttributes: bigint;
+    gasLimitEsdtNftAddQuantity: bigint;
+    gasLimitEsdtNftBurn: bigint;
+    gasLimitStorePerByte: bigint;
+    issueCost: bigint;
+    gasLimitStake: bigint;
+    gasLimitUnstake: bigint;
+    gasLimitUnbond: bigint;
+    gasLimitCreateDelegationContract: bigint;
+    gasLimitDelegationOperations: bigint;
+    additionalGasLimitPerValidatorNode: bigint;
+    additionalGasLimitForDelegationOperations: bigint;
+    gasLimitESDTTransfer: bigint;
+    gasLimitESDTNFTTransfer: bigint;
+    gasLimitMultiESDTNFTTransfer: bigint;
 
     constructor(chainId: string) {
         // General-purpose configuration
         this.chainID = chainId;
         this.addressHrp = DEFAULT_HRP;
-        this.minGasLimit = new BigNumber(50000);
-        this.gasLimitPerByte = new BigNumber(1500);
+        this.minGasLimit = 50000n;
+        this.gasLimitPerByte = 1500n;
 
         // Configuration for token operations
-        this.gasLimitIssue = new BigNumber(60000000);
-        this.gasLimitToggleBurnRoleGlobally = new BigNumber(60000000);
-        this.gasLimitEsdtLocalMint = new BigNumber(300000);
-        this.gasLimitEsdtLocalBurn = new BigNumber(300000);
-        this.gasLimitSetSpecialRole = new BigNumber(60000000);
-        this.gasLimitPausing = new BigNumber(60000000);
-        this.gasLimitFreezing = new BigNumber(60000000);
-        this.gasLimitWiping = new BigNumber(60000000);
-        this.gasLimitEsdtNftCreate = new BigNumber(3000000);
-        this.gasLimitEsdtNftUpdateAttributes = new BigNumber(1000000);
-        this.gasLimitEsdtNftAddQuantity = new BigNumber(1000000);
-        this.gasLimitEsdtNftBurn = new BigNumber(1000000);
-        this.gasLimitStorePerByte = new BigNumber(50000);
-        this.issueCost = new BigNumber("50000000000000000");
+        this.gasLimitIssue = 60000000n;
+        this.gasLimitToggleBurnRoleGlobally = 60000000n;
+        this.gasLimitEsdtLocalMint = 300000n;
+        this.gasLimitEsdtLocalBurn = 300000n;
+        this.gasLimitSetSpecialRole = 60000000n;
+        this.gasLimitPausing = 60000000n;
+        this.gasLimitFreezing = 60000000n;
+        this.gasLimitWiping = 60000000n;
+        this.gasLimitEsdtNftCreate = 3000000n;
+        this.gasLimitEsdtNftUpdateAttributes = 1000000n;
+        this.gasLimitEsdtNftAddQuantity = 1000000n;
+        this.gasLimitEsdtNftBurn = 1000000n;
+        this.gasLimitStorePerByte = 50000n;
+        this.issueCost = 50000000000000000n;
 
         // Configuration for delegation operations
-        this.gasLimitStake = new BigNumber(5000000);
-        this.gasLimitUnstake = new BigNumber(5000000);
-        this.gasLimitUnbond = new BigNumber(5000000);
-        this.gasLimitCreateDelegationContract = new BigNumber(50000000);
-        this.gasLimitDelegationOperations = new BigNumber(1000000);
-        this.additionalGasLimitPerValidatorNode = new BigNumber(6000000);
-        this.additionalGasLimitForDelegationOperations = new BigNumber(10000000);
+        this.gasLimitStake = 5000000n;
+        this.gasLimitUnstake = 5000000n;
+        this.gasLimitUnbond = 5000000n;
+        this.gasLimitCreateDelegationContract = 50000000n;
+        this.gasLimitDelegationOperations = 1000000n;
+        this.additionalGasLimitPerValidatorNode = 6000000n;
+        this.additionalGasLimitForDelegationOperations = 10000000n;
 
         // Configuration for token transfers
-        this.gasLimitESDTTransfer = new BigNumber(200000);
-        this.gasLimitESDTNFTTransfer = new BigNumber(200000);
-        this.gasLimitMultiESDTNFTTransfer = new BigNumber(200000);
+        this.gasLimitESDTTransfer = 200000n;
+        this.gasLimitESDTNFTTransfer = 200000n;
+        this.gasLimitMultiESDTNFTTransfer = 200000n;
     }
 }

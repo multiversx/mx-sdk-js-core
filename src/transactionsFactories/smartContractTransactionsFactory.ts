@@ -1,4 +1,3 @@
-import { BigNumber } from "bignumber.js";
 import { IAddress } from "../interface";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { byteArrayToHex, utf8ToHex } from "../utils.codec";
@@ -13,8 +12,8 @@ import { TransactionNext } from "../transaction";
 
 interface Config {
     chainID: string;
-    minGasLimit: BigNumber.Value;
-    gasLimitPerByte: BigNumber.Value;
+    minGasLimit: bigint;
+    gasLimitPerByte: bigint;
 }
 
 interface Abi {
@@ -27,6 +26,9 @@ interface TokenComputer {
     isFungible(token: Token): boolean;
 }
 
+/**
+ * Use this class to create transactions to deploy, call or upgrade a smart contract.
+ */
 export class SmartContractTransactionsFactory {
     private readonly config: Config;
     private readonly abiRegistry?: Abi;
@@ -43,15 +45,15 @@ export class SmartContractTransactionsFactory {
     createTransactionForDeploy(options: {
         sender: IAddress;
         bytecode: Uint8Array;
-        gasLimit: BigNumber.Value;
+        gasLimit: bigint;
         args?: any[];
-        nativeTransferAmount?: BigNumber.Value;
+        nativeTransferAmount?: bigint;
         isUpgradeable?: boolean;
         isReadable?: boolean;
         isPayable?: boolean;
         isPayableBySmartContract?: boolean;
     }): TransactionNext {
-        const nativeTransferAmount = options.nativeTransferAmount ?? 0;
+        const nativeTransferAmount = options.nativeTransferAmount ?? 0n;
         const isUpgradeable = options.isUpgradeable ?? true;
         const isReadable = options.isReadable ?? true;
         const isPayable = options.isPayable ?? false;
@@ -77,14 +79,14 @@ export class SmartContractTransactionsFactory {
         sender: IAddress;
         contract: IAddress;
         functionName: string;
-        gasLimit: BigNumber.Value;
+        gasLimit: bigint;
         args?: any[];
-        nativeTransferAmount?: BigNumber.Value;
+        nativeTransferAmount?: bigint;
         tokenTransfers?: NextTokenTransfer[];
     }): TransactionNext {
         const args = options.args || [];
         const tokenTransfer = options.tokenTransfers || [];
-        const nativeTransferAmount = options.nativeTransferAmount ?? 0;
+        const nativeTransferAmount = options.nativeTransferAmount ?? 0n;
         const numberOfTokens = tokenTransfer.length;
 
         if (nativeTransferAmount && numberOfTokens) {
@@ -126,15 +128,15 @@ export class SmartContractTransactionsFactory {
         sender: IAddress;
         contract: IAddress;
         bytecode: Uint8Array;
-        gasLimit: BigNumber.Value;
+        gasLimit: bigint;
         args?: any[];
-        nativeTransferAmount?: BigNumber.Value;
+        nativeTransferAmount?: bigint;
         isUpgradeable?: boolean;
         isReadable?: boolean;
         isPayable?: boolean;
         isPayableBySmartContract?: boolean;
     }): TransactionNext {
-        const nativeTransferAmount = options.nativeTransferAmount ?? 0;
+        const nativeTransferAmount = options.nativeTransferAmount ?? 0n;
 
         const isUpgradeable = options.isUpgradeable ?? true;
         const isReadable = options.isReadable ?? true;

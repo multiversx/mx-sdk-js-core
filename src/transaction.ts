@@ -428,9 +428,9 @@ export class Transaction {
     const tx = new Transaction({
       sender: Address.fromBech32(transaction.sender),
       receiver: Address.fromBech32(transaction.receiver),
-      gasLimit: new BigNumber(transaction.gasLimit).toNumber(),
+      gasLimit: Number(transaction.gasLimit),
       chainID: transaction.chainID,
-      value: new BigNumber(transaction.value).toFixed(0),
+      value: new BigNumber(transaction.value.toString()).toFixed(0),
       data: new TransactionPayload(Buffer.from(transaction.data)),
       nonce: Number(transaction.nonce),
       gasPrice: Number(transaction.gasPrice),
@@ -485,12 +485,12 @@ export class TransactionNext {
   /**
    * The nonce of the transaction (the account sequence number of the sender).
    */
-  public nonce: BigNumber.Value;
+  public nonce: bigint;
 
   /**
    * The value to transfer.
    */
-  public value: BigNumber.Value;
+  public value: bigint;
 
   /**
    * The address of the sender.
@@ -515,12 +515,12 @@ export class TransactionNext {
   /**
    * The gas price to be used.
    */
-  public gasPrice: BigNumber.Value;
+  public gasPrice: bigint;
 
   /**
    * The maximum amount of gas to be consumed when processing the transaction.
    */
-  public gasLimit: BigNumber.Value;
+  public gasLimit: bigint;
 
   /**
    * The payload of the transaction.
@@ -575,27 +575,27 @@ export class TransactionNext {
       options,
       guardian,
     }: {
-      nonce?: BigNumber.Value;
-      value?: BigNumber.Value;
+      nonce?: bigint;
+      value?: bigint;
       sender: string;
       receiver: string;
       senderUsername?: string;
       receiverUsername?: string;
-      gasPrice?: BigNumber.Value;
-      gasLimit: BigNumber.Value;
+      gasPrice?: bigint;
+      gasLimit: bigint;
       data?: Uint8Array;
       chainID: string;
       version?: number;
       options?: number;
       guardian?: string;
     }) {
-      this.nonce = nonce || 0;
-      this.value = value || new BigNumber(0);
+      this.nonce = nonce || 0n;
+      this.value = value || 0n;
       this.sender = sender;
       this.receiver = receiver;
       this.senderUsername = senderUsername || "";
       this.receiverUsername = receiverUsername || "";
-      this.gasPrice = gasPrice || new BigNumber(TRANSACTION_MIN_GAS_PRICE);
+      this.gasPrice = gasPrice || BigInt(TRANSACTION_MIN_GAS_PRICE);
       this.gasLimit = gasLimit;
       this.data = data || new Uint8Array();
       this.chainID = chainID;
@@ -614,26 +614,24 @@ export class TransactionNext {
 export class TransactionComputer {
   constructor() { }
 
-  computeTransactionFee(transaction: ITransactionNext, networkConfig: INetworkConfig): BigNumber {
-    const moveBalanceGas = new BigNumber(
+  computeTransactionFee(transaction: ITransactionNext, networkConfig: INetworkConfig): bigint {
+    const moveBalanceGas = BigInt(
       networkConfig.MinGasLimit + transaction.data.length * networkConfig.GasPerDataByte);
     if (moveBalanceGas > transaction.gasLimit) {
       throw new errors.ErrNotEnoughGas(parseInt(transaction.gasLimit.toString(), 10));
     }
 
-    const gasPrice = new BigNumber(transaction.gasPrice);
-    const feeForMove = moveBalanceGas.multipliedBy(gasPrice);
+    const gasPrice = transaction.gasPrice;
+    const feeForMove = moveBalanceGas * gasPrice;
     if (moveBalanceGas === transaction.gasLimit) {
       return feeForMove;
     }
 
-    const diff = new BigNumber(transaction.gasLimit).minus(moveBalanceGas);
-    const modifiedGasPrice = gasPrice.multipliedBy(
-      new BigNumber(networkConfig.GasPriceModifier)
-    );
-    const processingFee = diff.multipliedBy(modifiedGasPrice);
+    const diff = transaction.gasLimit - moveBalanceGas;
+    const modifiedGasPrice = BigInt(new BigNumber(gasPrice.toString()).multipliedBy(new BigNumber(networkConfig.GasPriceModifier)).toFixed(0));
+    const processingFee = diff * modifiedGasPrice;
 
-    return feeForMove.plus(processingFee);
+    return feeForMove + processingFee;
   }
 
   computeBytesForSigning(transaction: ITransactionNext): Uint8Array {
@@ -671,7 +669,7 @@ export class TransactionComputer {
   private toPlainObject(transaction: ITransactionNext) {
     return {
       nonce: Number(transaction.nonce),
-      value: new BigNumber(transaction.value).toFixed(0),
+      value: transaction.value.toString(),
       receiver: transaction.receiver,
       sender: transaction.sender,
       senderUsername: transaction.senderUsername ? Buffer.from(transaction.senderUsername).toString("base64") : undefined,

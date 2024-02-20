@@ -29,7 +29,6 @@ export class ErrNetworkProvider extends Err {
     }
 }
 
-
 /**
  * Signals a generic error in the context of querying Smart Contracts.
  */

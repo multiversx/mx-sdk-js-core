@@ -4,7 +4,7 @@ import { defaultAxiosConfig, defaultPagination } from "./config";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { ErrContractQuery, ErrNetworkProvider } from "./errors";
-import { IAddress, IContractQuery, INetworkProvider, IPagination, ITransaction } from "./interface";
+import { IAddress, IContractQuery, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkStake } from "./networkStake";
@@ -14,7 +14,7 @@ import { Nonce } from "./primitives";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
-import { TransactionOnNetwork } from "./transactions";
+import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
@@ -119,16 +119,17 @@ export class ApiNetworkProvider implements INetworkProvider {
         return status;
     }
 
-    async sendTransaction(tx: ITransaction): Promise<string> {
-        let response = await this.doPostGeneric("transactions", tx.toSendable());
+    async sendTransaction(tx: ITransaction | ITransactionNext): Promise<string> {
+        const transaction = prepareTransactionForBroadcasting(tx);
+        const response = await this.doPostGeneric("transactions", transaction);
         return response.txHash;
     }
 
-    async sendTransactions(txs: ITransaction[]): Promise<string[]> {
+    async sendTransactions(txs: (ITransaction | ITransactionNext)[]): Promise<string[]> {
         return await this.backingProxyNetworkProvider.sendTransactions(txs);
     }
 
-    async simulateTransaction(tx: ITransaction): Promise<any> {
+    async simulateTransaction(tx: ITransaction | ITransactionNext): Promise<any> {
         return await this.backingProxyNetworkProvider.simulateTransaction(tx);
     }
 

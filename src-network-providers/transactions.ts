@@ -1,9 +1,33 @@
 import { TransactionStatus } from "./transactionStatus";
 import { ContractResults } from "./contractResults";
 import { Address } from "./primitives";
-import { IAddress } from "./interface";
+import { IAddress, ITransaction, ITransactionNext } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
+
+export function prepareTransactionForBroadcasting(transaction: ITransaction | ITransactionNext): any {
+    if ("toSendable" in transaction){
+        return transaction.toSendable();
+    }
+
+    return {
+        nonce: Number(transaction.nonce),
+        value: transaction.value.toString(),
+        receiver: transaction.receiver,
+        sender: transaction.sender,
+        senderUsername: transaction.senderUsername ? Buffer.from(transaction.senderUsername).toString("base64") : undefined,
+        receiverUsername: transaction.receiverUsername ? Buffer.from(transaction.receiverUsername).toString("base64") : undefined,
+        gasPrice: Number(transaction.gasPrice),
+        gasLimit: Number(transaction.gasLimit),
+        data: transaction.data.length === 0 ? undefined : Buffer.from(transaction.data).toString("base64"),
+        chainID: transaction.chainID,
+        version: transaction.version,
+        options: transaction.options,
+        guardian: transaction.guardian || undefined,
+        signature: Buffer.from(transaction.signature).toString("hex"),
+        guardianSignature: transaction.guardianSignature.length === 0 ? undefined : Buffer.from(transaction.guardianSignature).toString("hex"),
+    }
+}
 
 export class TransactionOnNetwork {
     isCompleted?: boolean;

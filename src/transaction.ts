@@ -651,7 +651,7 @@ export class TransactionComputer {
 
     const serialized = JSON.stringify(plainTransaction);
 
-    return new Uint8Array(Buffer.from(serialized));
+    return Buffer.from(serialized);
   }
 
   computeTransactionHash(transaction: ITransactionNext): Uint8Array {

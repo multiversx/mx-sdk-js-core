@@ -28,6 +28,9 @@ interface Config {
 
 type RegisterAndSetAllRolesTokenType = "NFT" | "SFT" | "META" | "FNG";
 
+/**
+ * Use this class to create token management transactions like issuing ESDTs, creating NFTs, setting roles, etc.
+ */
 export class TokenManagementTransactionsFactory {
     private readonly config: Config;
     private readonly trueAsHex: string;

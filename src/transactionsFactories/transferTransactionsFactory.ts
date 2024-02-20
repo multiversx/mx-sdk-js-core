@@ -21,6 +21,9 @@ interface TokenComputer {
     isFungible(token: Token): boolean;
 }
 
+/**
+ * Use this class to create transactions for native token transfers (EGLD) or custom tokens transfers (ESDT/NTF/MetaESDT).
+ */
 export class NextTransferTransactionsFactory {
     private readonly config: IConfig;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;

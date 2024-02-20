@@ -23,6 +23,9 @@ interface IValidatorPublicKey {
     hex(): string;
 }
 
+/**
+ * Use this class to create delegation related transactions like creating a new delegation contract or adding nodes.
+ */
 export class DelegationTransactionsFactory {
     private readonly config: Config;
 

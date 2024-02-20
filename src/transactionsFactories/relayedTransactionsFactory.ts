@@ -13,6 +13,9 @@ interface IConfig {
     gasLimitPerByte: bigint;
 }
 
+/**
+ * Use this class to create both RelayedV1 and RelayedV2 transactions.
+ */
 export class RelayedTransactionsFactory {
     private readonly config: IConfig;
 

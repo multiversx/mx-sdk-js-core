@@ -609,7 +609,7 @@ export class TransactionComputer {
     const processingFee = diff * modifiedGasPrice;
 
     return feeForMove + processingFee;
-}
+  }
 
   computeBytesForSigning(transaction: ITransactionNext): Uint8Array {
     const plainTransaction = this.toPlainObject(transaction);

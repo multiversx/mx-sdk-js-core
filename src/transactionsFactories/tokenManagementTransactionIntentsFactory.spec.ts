@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { ESDT_CONTRACT_ADDRESS } from "../constants";
 import { loadTestWallets, TestWallet } from "../testutils";
@@ -22,14 +21,14 @@ describe("test token management transactions factory", () => {
             tokenName: "TEST",
             tokenTicker: "TEST",
             tokenType: "FNG",
-            numDecimals: 2,
+            numDecimals: 2n,
         });
 
         assert.deepEqual(transaction.data, Buffer.from("registerAndSetAllRoles@54455354@54455354@464e47@02"));
         assert.equal(transaction.sender, frank.address.toString());
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
         assert.deepEqual(transaction.value, config.issueCost);
-        assert.deepEqual(transaction.gasLimit, new BigNumber("60125000"));
+        assert.deepEqual(transaction.gasLimit, 60125000n);
     });
 
     it("should create 'TransactionNext' for issuing fungible token", () => {
@@ -37,8 +36,8 @@ describe("test token management transactions factory", () => {
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
-            initialSupply: 100,
-            numDecimals: 0,
+            initialSupply: 100n,
+            numDecimals: 0n,
             canFreeze: true,
             canWipe: true,
             canPause: true,
@@ -50,7 +49,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(
             next.data,
             Buffer.from(
-                "issue@4652414e4b@4652414e4b@64@@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@66616c7365@63616e4164645370656369616c526f6c6573@66616c7365",
+                "issue@4652414e4b@4652414e4b@64@00@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@66616c7365@63616e4164645370656369616c526f6c6573@66616c7365",
             ),
         );
         assert.equal(next.sender, frank.address.toString());
@@ -113,7 +112,7 @@ describe("test token management transactions factory", () => {
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
-            numDecimals: 10,
+            numDecimals: 10n,
             canFreeze: true,
             canWipe: true,
             canPause: true,
@@ -154,14 +153,14 @@ describe("test token management transactions factory", () => {
         );
         assert.equal(transaction.sender, frank.address.toString());
         assert.equal(transaction.receiver, ESDT_CONTRACT_ADDRESS);
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 
     it("should create 'TransactionNext' for creating nft", () => {
         const transaction = tokenManagementFactory.createTransactionForCreatingNFT({
             sender: grace.address,
             tokenIdentifier: "FRANK-aa9e8d",
-            initialQuantity: 1,
+            initialQuantity: 1n,
             name: "test",
             royalties: 1000,
             hash: "abba",
@@ -175,6 +174,6 @@ describe("test token management transactions factory", () => {
         );
         assert.equal(transaction.sender, grace.address.toString());
         assert.equal(transaction.receiver, grace.address.toString());
-        assert.equal(transaction.value, 0);
+        assert.equal(transaction.value, 0n);
     });
 });

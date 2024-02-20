@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
 import { IAddress } from "../interface";
 import { NextTokenTransfer, Token } from "../tokens";
@@ -11,17 +10,20 @@ const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
 
 interface IConfig {
     chainID: string;
-    minGasLimit: BigNumber.Value;
-    gasLimitPerByte: BigNumber.Value;
-    gasLimitESDTTransfer: BigNumber.Value;
-    gasLimitESDTNFTTransfer: BigNumber.Value;
-    gasLimitMultiESDTNFTTransfer: BigNumber.Value;
+    minGasLimit: bigint;
+    gasLimitPerByte: bigint;
+    gasLimitESDTTransfer: bigint;
+    gasLimitESDTNFTTransfer: bigint;
+    gasLimitMultiESDTNFTTransfer: bigint;
 }
 
 interface TokenComputer {
     isFungible(token: Token): boolean;
 }
 
+/**
+ * Use this class to create transactions for native token transfers (EGLD) or custom tokens transfers (ESDT/NTF/MetaESDT).
+ */
 export class NextTransferTransactionsFactory {
     private readonly config: IConfig;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
@@ -36,7 +38,7 @@ export class NextTransferTransactionsFactory {
     createTransactionForNativeTokenTransfer(options: {
         sender: IAddress;
         receiver: IAddress;
-        nativeAmount: BigNumber.Value;
+        nativeAmount: bigint;
         data?: string;
     }): TransactionNext {
         const data = options.data || "";
@@ -46,7 +48,7 @@ export class NextTransferTransactionsFactory {
             sender: options.sender,
             receiver: options.receiver,
             dataParts: [data],
-            gasLimit: 0,
+            gasLimit: 0n,
             addDataMovementGas: true,
             amount: options.nativeAmount,
         }).build();
@@ -72,9 +74,9 @@ export class NextTransferTransactionsFactory {
             options.tokenTransfers,
         );
 
-        const extraGasForTransfer = new BigNumber(this.config.gasLimitMultiESDTNFTTransfer)
-            .multipliedBy(new BigNumber(numberOfTransfers))
-            .plus(new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER));
+        const extraGasForTransfer =
+            this.config.gasLimitMultiESDTNFTTransfer * BigInt(numberOfTransfers) +
+            BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER);
 
         return new TransactionNextBuilder({
             config: this.config,
@@ -93,19 +95,15 @@ export class NextTransferTransactionsFactory {
     }): TransactionNext {
         let transferArgs: string[] = [];
         const transfer = options.tokenTransfers[0];
-        let extraGasForTransfer = new BigNumber(0);
+        let extraGasForTransfer = 0n;
         let receiver = options.receiver;
 
         if (this.tokenComputer.isFungible(transfer.token)) {
             transferArgs = this.dataArgsBuilder.buildArgsForESDTTransfer(transfer);
-            extraGasForTransfer = new BigNumber(this.config.gasLimitESDTTransfer).plus(
-                new BigNumber(ADDITIONAL_GAS_FOR_ESDT_TRANSFER),
-            );
+            extraGasForTransfer = this.config.gasLimitESDTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_TRANSFER);
         } else {
             transferArgs = this.dataArgsBuilder.buildArgsForSingleESDTNFTTransfer(transfer, receiver);
-            extraGasForTransfer = new BigNumber(this.config.gasLimitESDTNFTTransfer).plus(
-                new BigNumber(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER),
-            );
+            extraGasForTransfer = this.config.gasLimitESDTNFTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER);
             receiver = options.sender;
         }
 

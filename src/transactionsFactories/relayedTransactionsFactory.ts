@@ -9,10 +9,13 @@ const JSONbig = require("json-bigint");
 
 interface IConfig {
     chainID: string;
-    minGasLimit: BigNumber.Value;
-    gasLimitPerByte: BigNumber.Value;
+    minGasLimit: bigint;
+    gasLimitPerByte: bigint;
 }
 
+/**
+ * Use this class to create both RelayedV1 and RelayedV2 transactions.
+ */
 export class RelayedTransactionsFactory {
     private readonly config: IConfig;
 
@@ -35,12 +38,8 @@ export class RelayedTransactionsFactory {
         const serializedTransaction = this.prepareInnerTransactionForRelayedV1(options.innerTransaction);
         const data = `relayedTx@${Buffer.from(serializedTransaction).toString("hex")}`;
 
-        const additionalGasForDataLength = new BigNumber(this.config.gasLimitPerByte).multipliedBy(
-            new BigNumber(data.length),
-        );
-        const gasLimit = new BigNumber(this.config.minGasLimit)
-            .plus(additionalGasForDataLength)
-            .plus(new BigNumber(options.innerTransaction.gasLimit));
+        const additionalGasForDataLength = this.config.gasLimitPerByte * BigInt(data.length);
+        const gasLimit = this.config.minGasLimit + additionalGasForDataLength + options.innerTransaction.gasLimit;
 
         return new TransactionNext({
             chainID: this.config.chainID,
@@ -53,7 +52,7 @@ export class RelayedTransactionsFactory {
 
     createRelayedV2Transaction(options: {
         innerTransaction: ITransactionNext;
-        innerTransactionGasLimit: BigNumber.Value;
+        innerTransactionGasLimit: bigint;
         relayerAddress: IAddress;
     }): TransactionNext {
         if (options.innerTransaction.gasLimit) {
@@ -66,24 +65,20 @@ export class RelayedTransactionsFactory {
 
         const { argumentsString } = new ArgSerializer().valuesToString([
             new AddressValue(Address.fromBech32(options.innerTransaction.receiver)),
-            new U64Value(options.innerTransaction.nonce),
+            new U64Value(new BigNumber(options.innerTransaction.nonce.toString())),
             new BytesValue(Buffer.from(options.innerTransaction.data)),
             new BytesValue(Buffer.from(options.innerTransaction.signature)),
         ]);
 
         const data = `relayedTxV2@${argumentsString}`;
 
-        const additionalGasForDataLength = new BigNumber(this.config.gasLimitPerByte).multipliedBy(
-            new BigNumber(data.length),
-        );
-        const gasLimit = new BigNumber(options.innerTransactionGasLimit)
-            .plus(new BigNumber(this.config.minGasLimit))
-            .plus(additionalGasForDataLength);
+        const additionalGasForDataLength = this.config.gasLimitPerByte * BigInt(data.length);
+        const gasLimit = options.innerTransactionGasLimit + this.config.minGasLimit + additionalGasForDataLength;
 
         return new TransactionNext({
             sender: options.relayerAddress.bech32(),
             receiver: options.innerTransaction.sender,
-            value: 0,
+            value: 0n,
             gasLimit: gasLimit,
             chainID: this.config.chainID,
             data: Buffer.from(data),
@@ -94,12 +89,12 @@ export class RelayedTransactionsFactory {
 
     private prepareInnerTransactionForRelayedV1(innerTransaction: TransactionNext): string {
         const txObject = {
-            nonce: new BigNumber(innerTransaction.nonce).toNumber(),
+            nonce: innerTransaction.nonce,
             sender: Address.fromBech32(innerTransaction.sender).pubkey().toString("base64"),
             receiver: Address.fromBech32(innerTransaction.receiver).pubkey().toString("base64"),
-            value: BigInt(new BigNumber(innerTransaction.value).toFixed(0)),
-            gasPrice: new BigNumber(innerTransaction.gasPrice).toNumber(),
-            gasLimit: new BigNumber(innerTransaction.gasLimit).toNumber(),
+            value: innerTransaction.value,
+            gasPrice: innerTransaction.gasPrice,
+            gasLimit: innerTransaction.gasLimit,
             data: Buffer.from(innerTransaction.data).toString("base64"),
             signature: Buffer.from(innerTransaction.signature).toString("base64"),
             chainID: Buffer.from(innerTransaction.chainID).toString("base64"),

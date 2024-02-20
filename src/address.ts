@@ -23,7 +23,7 @@ export class Address {
     /**
      * Creates an address object, given a raw string (whether a hex pubkey or a Bech32 address), a sequence of bytes, or another Address object.
      */
-    public constructor(value?: Address | Buffer | string) {
+    public constructor(value: Address | Buffer | string) {
         if (!value) {
             return;
         }
@@ -48,7 +48,7 @@ export class Address {
     }
 
     private static fromValidHex(value: string): Address {
-        let result = new Address();
+        let result = Address.empty();
         result.valueHex = value;
         return result;
     }
@@ -91,10 +91,11 @@ export class Address {
     }
 
     /**
-     * Creates an empty address object
+     * Creates an empty address object.
+     * Generally speaking, this should not be used by client code (internal use only).
      */
     static empty(): Address {
-        return new Address();
+        return new Address("");
     }
 
     /**
@@ -109,12 +110,12 @@ export class Address {
             throw new errors.ErrAddressCannotCreate(value, err);
         }
 
-        let prefix = decoded.prefix;
+        const prefix = decoded.prefix;
         if (prefix != HRP) {
             throw new errors.ErrAddressBadHrp(HRP, prefix);
         }
 
-        let pubkey = Buffer.from(bech32.fromWords(decoded.words));
+        const pubkey = Buffer.from(bech32.fromWords(decoded.words));
         if (pubkey.length != PUBKEY_LENGTH) {
             throw new errors.ErrAddressCannotCreate(value);
         }
@@ -138,9 +139,16 @@ export class Address {
     }
 
     /**
-     * Returns the hex representation of the address (pubkey)
+     * Use {@link toHex} instead.
      */
     hex(): string {
+        return this.toHex();
+    }
+
+    /**
+     * Returns the hex representation of the address (pubkey)
+     */
+    toHex(): string {
         if (this.isEmpty()) {
             return "";
         }
@@ -149,9 +157,16 @@ export class Address {
     }
 
     /**
-     * Returns the bech32 representation of the address
+     * Use {@link toBech32} instead.
      */
     bech32(): string {
+        return this.toBech32();
+    }
+
+    /**
+     * Returns the bech32 representation of the address
+     */
+    toBech32(): string {
         if (this.isEmpty()) {
             return "";
         }
@@ -162,14 +177,29 @@ export class Address {
     }
 
     /**
-     * Returns the pubkey as raw bytes (buffer)
+     * Use {@link getPublicKey} instead.
      */
     pubkey(): Buffer {
+        return this.getPublicKey();
+    }
+
+    /**
+     * Returns the pubkey as raw bytes (buffer)
+     */
+    getPublicKey(): Buffer {
         if (this.isEmpty()) {
             return Buffer.from([]);
         }
 
         return Buffer.from(this.valueHex, "hex");
+    }
+
+    /**
+     * Returns the human-readable-part of the bech32 addresses.
+     * The HRP is currently hardcoded to "erd".
+     */
+    getHrp(): string {
+        return HRP;
     }
 
     /**
@@ -194,7 +224,7 @@ export class Address {
      * Returns the bech32 representation of the address
      */
     toString(): string {
-        return this.bech32();
+        return this.toBech32();
     }
 
     /**
@@ -202,19 +232,30 @@ export class Address {
      */
     toJSON(): object {
         return {
-            bech32: this.bech32(),
-            pubkey: this.hex(),
+            bech32: this.toBech32(),
+            pubkey: this.toHex(),
         };
     }
 
     /**
-     * Creates the Zero address (the one that should be used when deploying smart contracts)
+     * Creates the Zero address (the one that should be used when deploying smart contracts).
+     * Generally speaking, this should not be used by client code (internal use only).
      */
     static Zero(): Address {
         return new Address("0".repeat(64));
     }
 
+    /**
+     * Use {@link isSmartContract} instead.
+     */
     isContractAddress(): boolean {
-        return this.hex().startsWith(SMART_CONTRACT_HEX_PUBKEY_PREFIX);
+        return this.isSmartContract();
+    }
+
+    /**
+     * Returns whether the address is a smart contract address.
+     */
+    isSmartContract(): boolean {
+        return this.toHex().startsWith(SMART_CONTRACT_HEX_PUBKEY_PREFIX);
     }
 }

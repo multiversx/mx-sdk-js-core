@@ -31,7 +31,7 @@ interface IAbi {
  * An abstraction for deploying and interacting with Smart Contracts.
  */
 export class SmartContract implements ISmartContract {
-    private address: IAddress = new Address();
+    private address: IAddress = Address.empty();
     private abi?: IAbi;
 
     /**
@@ -53,7 +53,7 @@ export class SmartContract implements ISmartContract {
      * Create a SmartContract object by providing its address on the Network.
      */
     constructor(options: { address?: IAddress, abi?: IAbi } = {}) {
-        this.address = options.address || new Address();
+        this.address = options.address || Address.empty();
         this.abi = options.abi;
 
         if (this.abi) {
@@ -130,7 +130,7 @@ export class SmartContract implements ISmartContract {
         const nextTx = scNextTransactionFactory.createTransactionForDeploy({
             sender: deployer,
             bytecode: bytecode,
-            gasLimit: gasLimit.valueOf(),
+            gasLimit: BigInt(gasLimit.valueOf()),
             args: initArguments,
             isUpgradeable: metadataAsJson.upgradeable,
             isReadable: metadataAsJson.readable,
@@ -191,7 +191,7 @@ export class SmartContract implements ISmartContract {
             sender: caller,
             contract: this.getAddress(),
             bytecode: bytecode,
-            gasLimit: gasLimit.valueOf(),
+            gasLimit: BigInt(gasLimit.valueOf()),
             args: initArguments,
             isUpgradeable: metadataAsJson.upgradeable,
             isReadable: metadataAsJson.readable,
@@ -229,7 +229,7 @@ export class SmartContract implements ISmartContract {
             sender: caller,
             contract: receiver ? receiver : this.getAddress(),
             functionName: func.toString(),
-            gasLimit: gasLimit.valueOf(),
+            gasLimit: BigInt(gasLimit.valueOf()),
             args: args
         })
 

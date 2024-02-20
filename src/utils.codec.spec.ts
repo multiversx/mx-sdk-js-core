@@ -1,11 +1,22 @@
 import { assert } from "chai";
-import { isPaddedHex, numberToPaddedHex, zeroPadStringIfOddLength, byteArrayToHex, utf8ToHex } from "./utils.codec";
+import { byteArrayToHex, isPaddedHex, numberToPaddedHex, utf8ToHex, zeroPadStringIfOddLength } from "./utils.codec";
 
 describe("test codec utils", () => {
     it("should convert numberToPaddedHex", () => {
+        assert.equal(numberToPaddedHex(0), "00");
         assert.equal(numberToPaddedHex(1), "01");
         assert.equal(numberToPaddedHex(10), "0a");
         assert.equal(numberToPaddedHex(256), "0100");
+
+        assert.equal(numberToPaddedHex(0n), "00");
+        assert.equal(numberToPaddedHex(1n), "01");
+        assert.equal(numberToPaddedHex(10n), "0a");
+        assert.equal(numberToPaddedHex(256n), "0100");
+
+        assert.equal(numberToPaddedHex("0"), "00");
+        assert.equal(numberToPaddedHex("1"), "01");
+        assert.equal(numberToPaddedHex("10"), "0a");
+        assert.equal(numberToPaddedHex("256"), "0100");
     });
 
     it("should check if isPaddedHex", () => {

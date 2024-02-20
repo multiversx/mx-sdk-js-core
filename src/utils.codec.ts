@@ -1,10 +1,18 @@
 import BigNumber from "bignumber.js";
-import * as contractsCodecUtils from "./smartcontracts/codec/utils";
 import { Address } from "./address";
 import { IAddress } from "./interface";
+import * as contractsCodecUtils from "./smartcontracts/codec/utils";
 
-export function numberToPaddedHex(value: BigNumber.Value) {
-    let hex = new BigNumber(value).toString(16);
+export function numberToPaddedHex(value: bigint | number | BigNumber.Value) {
+    let hexableNumber: { toString(radix?: number): string };
+
+    if (typeof value === "bigint" || typeof value === "number") {
+        hexableNumber = value;
+    } else {
+        hexableNumber = new BigNumber(value);
+    }
+
+    const hex = hexableNumber.toString(16);
     return zeroPadStringIfOddLength(hex);
 }
 

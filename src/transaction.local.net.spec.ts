@@ -142,23 +142,23 @@ describe("test transaction", function () {
     it("should create transaction using the NextTokenTransferFactory", async function () {
         this.timeout(70000);
 
-        let provider = createLocalnetProvider();
-        let watcher = new TransactionWatcher({
+        const provider = createLocalnetProvider();
+        const watcher = new TransactionWatcher({
             getTransaction: async (hash: string) => {
                 return await provider.getTransaction(hash, true);
             },
         });
 
-        let network = await provider.getNetworkConfig();
+        const network = await provider.getNetworkConfig();
 
         const config = new TransactionsFactoryConfig(network.ChainID);
         const factory = new NextTransferTransactionsFactory(config, new TokenComputer());
 
         await alice.sync(provider);
         await bob.sync(provider);
-        let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
+        const initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
 
-        let transaction = factory.createTransactionForNativeTokenTransfer({
+        const transaction = factory.createTransactionForNativeTokenTransfer({
             sender: alice.address,
             receiver: bob.address,
             nativeAmount: 42000000000000000000n,
@@ -174,7 +174,7 @@ describe("test transaction", function () {
         await watcher.awaitCompleted(txHash);
 
         await bob.sync(provider);
-        let newBalanceOfBob = new BigNumber(bob.account.balance.toString());
+        const newBalanceOfBob = new BigNumber(bob.account.balance.toString());
 
         assert.deepEqual(TokenTransfer.egldFromAmount(42).valueOf(), newBalanceOfBob.minus(initialBalanceOfBob));
     });

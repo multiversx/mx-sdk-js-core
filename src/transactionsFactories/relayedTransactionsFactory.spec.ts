@@ -5,7 +5,7 @@ import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test relayed v1 transaction builder", function () {
-    const config = new TransactionsFactoryConfig("T");
+    const config = new TransactionsFactoryConfig({ chainID: "T" });
     const factory = new RelayedTransactionsFactory(config);
     const transactionComputer = new TransactionComputer();
     let alice: TestWallet, bob: TestWallet, carol: TestWallet, grace: TestWallet, frank: TestWallet;

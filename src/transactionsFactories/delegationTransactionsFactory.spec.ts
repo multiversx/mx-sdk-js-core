@@ -6,7 +6,7 @@ import { ValidatorPublicKey } from "@multiversx/sdk-wallet";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test delegation transactions factory", function () {
-    const config = new TransactionsFactoryConfig("D");
+    const config = new TransactionsFactoryConfig({ chainID: "D" });
     const delegationFactory = new DelegationTransactionsFactory(config);
 
     it("should create 'TransactionNext' for new delegation contract", async function () {

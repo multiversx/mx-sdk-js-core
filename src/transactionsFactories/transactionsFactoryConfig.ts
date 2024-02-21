@@ -30,9 +30,9 @@ export class TransactionsFactoryConfig {
     gasLimitESDTNFTTransfer: bigint;
     gasLimitMultiESDTNFTTransfer: bigint;
 
-    constructor(chainId: string) {
+    constructor(options: { chainID: string }) {
         // General-purpose configuration
-        this.chainID = chainId;
+        this.chainID = options.chainID;
         this.addressHrp = DEFAULT_HRP;
         this.minGasLimit = 50000n;
         this.gasLimitPerByte = 1500n;

@@ -11,7 +11,7 @@ describe("test token management transactions factory", () => {
 
     before(async function () {
         ({ frank, grace } = await loadTestWallets());
-        config = new TransactionsFactoryConfig("T");
+        config = new TransactionsFactoryConfig({ chainID: "T" });
         tokenManagementFactory = new TokenManagementTransactionsFactory(config);
     });
 

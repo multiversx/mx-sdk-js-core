@@ -11,7 +11,7 @@ import { SmartContractTransactionsFactory } from "./smartContractTransactionsFac
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test smart contract transactions factory", function () {
-    const config = new TransactionsFactoryConfig("D");
+    const config = new TransactionsFactoryConfig({ chainID: "D" });
     let smartContractFactory: SmartContractTransactionsFactory;
     let abiAwareFactory: SmartContractTransactionsFactory;
     let adderByteCode: Code;

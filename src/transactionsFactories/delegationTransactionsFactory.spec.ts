@@ -28,6 +28,7 @@ describe("test delegation transactions factory", function () {
         assert.deepEqual(transaction.data, Buffer.from("createNewDelegationContract@010f0cf064dd59200000@0a"));
         assert.equal(transaction.gasLimit, 60126500n);
         assert.equal(transaction.value, value);
+        assert.equal(transaction.chainID, config.chainID);
     });
 
     it("should create 'TransactionNext' for adding nodes", async function () {

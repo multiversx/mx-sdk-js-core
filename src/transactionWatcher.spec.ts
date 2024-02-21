@@ -23,7 +23,7 @@ describe("test transactionWatcher", () => {
 
         await Promise.all([
             provider.mockTransactionTimelineByHash(hash, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
-            watcher.awaitCompleted(dummyTransaction)
+            watcher.awaitCompleted(dummyTransaction.getHash().hex())
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hash.hex())).isExecuted());

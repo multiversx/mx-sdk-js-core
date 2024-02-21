@@ -117,7 +117,7 @@ export class SmartContract implements ISmartContract {
     deploy({ deployer, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
         Compatibility.guardAddressIsSetAndNonZero(deployer, "'deployer' of SmartContract.deploy()", "pass the actual address to deploy()");
 
-        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const config = new TransactionsFactoryConfig({ chainID: chainID.valueOf() });
         const scNextTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi,
@@ -177,7 +177,7 @@ export class SmartContract implements ISmartContract {
 
         this.ensureHasAddress();
 
-        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const config = new TransactionsFactoryConfig({ chainID: chainID.valueOf() });
         const scNextTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi,
@@ -215,7 +215,7 @@ export class SmartContract implements ISmartContract {
 
         this.ensureHasAddress();
 
-        const config = new TransactionsFactoryConfig(chainID.valueOf());
+        const config = new TransactionsFactoryConfig({ chainID: chainID.valueOf() });
         const scNextTransactionFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi,

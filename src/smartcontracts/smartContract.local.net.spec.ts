@@ -341,7 +341,7 @@ describe("test on local testnet", function () {
         await alice.sync(provider);
 
         const transactionComputer = new TransactionComputer();
-        const config = new TransactionsFactoryConfig(network.ChainID);
+        const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
         const factory = new SmartContractTransactionsFactory({ config: config, tokenComputer: new TokenComputer() });
 
         let bytecode = await promises.readFile("src/testdata/counter.wasm");

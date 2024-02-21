@@ -151,7 +151,7 @@ describe("test transaction", function () {
 
         const network = await provider.getNetworkConfig();
 
-        const config = new TransactionsFactoryConfig(network.ChainID);
+        const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
         const factory = new NextTransferTransactionsFactory(config, new TokenComputer());
 
         await alice.sync(provider);

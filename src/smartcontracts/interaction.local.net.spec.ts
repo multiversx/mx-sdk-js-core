@@ -236,8 +236,6 @@ describe("test smart contract interactor", function () {
         this.timeout(120000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/counter.abi.json");
-        // let contract = new SmartContract({ abi: abiRegistry });
-        // let controller = new ContractController(provider);
 
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);

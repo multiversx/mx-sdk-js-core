@@ -30,9 +30,9 @@ export class NextTransferTransactionsFactory {
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
     private readonly tokenComputer: TokenComputer;
 
-    constructor(config: IConfig, tokenComputer: TokenComputer) {
-        this.config = config;
-        this.tokenComputer = tokenComputer;
+    constructor(options: { config: IConfig; tokenComputer: TokenComputer }) {
+        this.config = options.config;
+        this.tokenComputer = options.tokenComputer;
         this.dataArgsBuilder = new TokenTransfersDataBuilder();
     }
 

@@ -35,10 +35,10 @@ export class SmartContractTransactionsFactory {
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
 
-    constructor({ config, abi, tokenComputer }: { config: Config; abi?: Abi; tokenComputer: TokenComputer }) {
-        this.config = config;
-        this.abiRegistry = abi;
-        this.tokenComputer = tokenComputer;
+    constructor(options: { config: Config; abi?: Abi; tokenComputer: TokenComputer }) {
+        this.config = options.config;
+        this.abiRegistry = options.abi;
+        this.tokenComputer = options.tokenComputer;
         this.dataArgsBuilder = new TokenTransfersDataBuilder();
     }
 

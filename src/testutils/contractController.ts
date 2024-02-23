@@ -3,7 +3,7 @@ import { Logger } from "../logger";
 import { Interaction } from "../smartcontracts/interaction";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "../smartcontracts/interface";
 import { ResultsParser } from "../smartcontracts/resultsParser";
-import { Transaction } from "../transaction";
+import { Transaction, TransactionComputer, TransactionNext } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
 import { INetworkProvider } from "./networkProviders";
 
@@ -20,27 +20,29 @@ export class ContractController {
         });
     }
 
-    async deploy(transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
-        Logger.info(`ContractController.deploy [begin]: transaction = ${transaction.getHash()}`);
+    async deploy(transaction: Transaction | TransactionNext): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
+        const txHash = this.getTransactionHash(transaction);
+        Logger.info(`ContractController.deploy [begin]: transaction = ${txHash}`);
 
         await this.provider.sendTransaction(transaction);
-        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction.getHash().hex());
+        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(txHash);
         let bundle = this.parser.parseUntypedOutcome(transactionOnNetwork);
 
-        Logger.info(`ContractController.deploy [end]: transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);
+        Logger.info(`ContractController.deploy [end]: transaction = ${txHash}, return code = ${bundle.returnCode}`);
         return { transactionOnNetwork, bundle };
     }
 
-    async execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }> {
-        Logger.info(`ContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}`);
+    async execute(interaction: Interaction, transaction: Transaction | TransactionNext): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }> {
+        const txHash = this.getTransactionHash(transaction);
+        Logger.info(`ContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${txHash}`);
 
         interaction.check();
 
         await this.provider.sendTransaction(transaction);
-        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction.getHash().hex());
+        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(txHash);
         let bundle = this.parser.parseOutcome(transactionOnNetwork, interaction.getEndpoint());
 
-        Logger.info(`ContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);
+        Logger.info(`ContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${txHash}, return code = ${bundle.returnCode}`);
         return { transactionOnNetwork, bundle };
     }
 
@@ -54,5 +56,15 @@ export class ContractController {
 
         Logger.debug(`ContractController.query [end]: function = ${interaction.getFunction()}, return code = ${bundle.returnCode}`);
         return bundle;
+    }
+
+    private getTransactionHash(transaction: Transaction | TransactionNext): string {
+        if ("toSendable" in transaction){
+            return transaction.getHash().hex();
+        }
+
+        const transactionComputer = new TransactionComputer();
+        const txHash = transactionComputer.computeTransactionHash(transaction);
+        return Buffer.from(txHash).toString("hex");
     }
 }

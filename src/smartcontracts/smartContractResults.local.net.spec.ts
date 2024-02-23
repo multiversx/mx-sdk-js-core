@@ -5,6 +5,11 @@ import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction } from "./function";
 import { ResultsParser } from "./resultsParser";
 import { SmartContract } from "./smartContract";
+import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
+import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
+import { TokenComputer } from "../tokens";
+import { promises } from "fs";
+import { TransactionComputer } from "../transaction";
 
 describe("fetch transactions from local testnet", function () {
     let alice: TestWallet;
@@ -16,7 +21,9 @@ describe("fetch transactions from local testnet", function () {
     before(async function () {
         ({ alice } = await loadTestWallets());
         watcher = new TransactionWatcher({
-            getTransaction: async (hash: string) => { return await provider.getTransaction(hash, true) }
+            getTransaction: async (hash: string) => {
+                return await provider.getTransaction(hash, true);
+            },
         });
     });
 
@@ -38,7 +45,7 @@ describe("fetch transactions from local testnet", function () {
             codePath: "src/testdata/counter.wasm",
             gasLimit: 3000000,
             initArguments: [],
-            chainID: network.ChainID
+            chainID: network.ChainID,
         });
 
         // ++
@@ -46,7 +53,7 @@ describe("fetch transactions from local testnet", function () {
             func: new ContractFunction("increment"),
             gasLimit: 3000000,
             chainID: network.ChainID,
-            caller: alice.address
+            caller: alice.address,
         });
 
         transactionIncrement.setNonce(alice.account.nonce);
@@ -63,6 +70,65 @@ describe("fetch transactions from local testnet", function () {
 
         let transactionOnNetworkDeploy = await provider.getTransaction(transactionDeploy.getHash().hex());
         let transactionOnNetworkIncrement = await provider.getTransaction(transactionIncrement.getHash().hex());
+
+        let bundle = resultsParser.parseUntypedOutcome(transactionOnNetworkDeploy);
+        assert.isTrue(bundle.returnCode.isSuccess());
+
+        bundle = resultsParser.parseUntypedOutcome(transactionOnNetworkIncrement);
+        assert.isTrue(bundle.returnCode.isSuccess());
+    });
+
+    it("interact with counter smart contract using SmartContractTransactionsFactory", async function () {
+        this.timeout(60000);
+
+        TransactionWatcher.DefaultPollingInterval = 5000;
+        TransactionWatcher.DefaultTimeout = 50000;
+
+        let network = await provider.getNetworkConfig();
+        await alice.sync(provider);
+
+        const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
+        const factory = new SmartContractTransactionsFactory({ config: config, tokenComputer: new TokenComputer() });
+
+        const bytecode = await promises.readFile("src/testdata/counter.wasm");
+
+        const deployTransaction = factory.createTransactionForDeploy({
+            sender: alice.address,
+            bytecode: bytecode,
+            gasLimit: 3000000n,
+        });
+        deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
+
+        const transactionComputer = new TransactionComputer();
+        deployTransaction.signature = await alice.signer.sign(
+            Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
+        );
+
+        const contractAddress = SmartContract.computeAddress(alice.address, alice.account.nonce);
+        alice.account.incrementNonce();
+
+        const smartContractCallTransaction = factory.createTransactionForExecute({
+            sender: alice.address,
+            contract: contractAddress,
+            functionName: "increment",
+            gasLimit: 3000000n,
+        });
+        smartContractCallTransaction.nonce = BigInt(alice.account.nonce.valueOf());
+        smartContractCallTransaction.signature = await alice.signer.sign(
+            Buffer.from(transactionComputer.computeBytesForSigning(smartContractCallTransaction)),
+        );
+
+        alice.account.incrementNonce();
+
+        // Broadcast & execute
+        const deployTxHash = await provider.sendTransaction(deployTransaction);
+        const callTxHash = await provider.sendTransaction(smartContractCallTransaction);
+
+        await watcher.awaitCompleted(deployTxHash);
+        await watcher.awaitCompleted(callTxHash);
+
+        let transactionOnNetworkDeploy = await provider.getTransaction(deployTxHash);
+        let transactionOnNetworkIncrement = await provider.getTransaction(callTxHash);
 
         let bundle = resultsParser.parseUntypedOutcome(transactionOnNetworkDeploy);
         assert.isTrue(bundle.returnCode.isSuccess());

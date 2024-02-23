@@ -24,6 +24,6 @@ export interface INetworkProvider {
     getTransaction(txHash: string, withProcessStatus?: boolean): Promise<ITransactionOnNetwork>;
     getTransactionStatus(txHash: string): Promise<ITransactionStatus>;
     sendTransaction(tx: Transaction | TransactionNext): Promise<string>;
-    simulateTransaction(tx: Transaction): Promise<any>;
+    simulateTransaction(tx: Transaction | TransactionNext): Promise<any>;
     queryContract(query: Query): Promise<IContractQueryResponse>;
 }

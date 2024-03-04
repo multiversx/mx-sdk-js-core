@@ -1,14 +1,24 @@
+import { Address } from "./address";
 import { Err } from "./errors";
+import { IAddress } from "./interface";
 import { IContractQueryResponse } from "./interfaceOfNetwork";
 import { SmartContractQuery, SmartContractQueryResponse } from "./smartContractQuery";
-import { ArgSerializer, ContractFunction, EndpointDefinition, NativeSerializer, Query } from "./smartcontracts";
+import { ArgSerializer, ContractFunction, EndpointDefinition, NativeSerializer } from "./smartcontracts";
 
 interface Abi {
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
 }
 
 interface INetworkProvider {
-    queryContract(query: Query): Promise<IContractQueryResponse>;
+    queryContract(query: ILegacyQuery): Promise<IContractQueryResponse>;
+}
+
+interface ILegacyQuery {
+    address: IAddress;
+    caller?: IAddress;
+    func: { toString(): string };
+    value?: { toString(): string };
+    getEncodedArguments(): string[];
 }
 
 export class SmartContractQueriesController {
@@ -77,8 +87,23 @@ export class SmartContractQueriesController {
         return true;
     }
 
-    runQuery(_query: SmartContractQuery): SmartContractQueryResponse {
-        throw new Err("Not implemented");
+    async runQuery(query: SmartContractQuery): Promise<SmartContractQueryResponse> {
+        const legacyQuery: ILegacyQuery = {
+            address: Address.fromBech32(query.contract),
+            caller: query.caller ? Address.fromBech32(query.caller) : undefined,
+            func: query.function,
+            value: query.value,
+            getEncodedArguments: () => query.arguments.map((arg) => Buffer.from(arg).toString("hex")),
+        };
+
+        const legacyQueryResponse = await this.networkProvider.queryContract(legacyQuery);
+        const queryResponse = new SmartContractQueryResponse({
+            returnCode: legacyQueryResponse.returnCode.toString(),
+            returnMessage: legacyQueryResponse.returnMessage,
+            returnDataParts: legacyQueryResponse.getReturnDataParts(),
+        });
+
+        return queryResponse;
     }
 
     parseQueryResponse(_response: SmartContractQueryResponse): any[] {

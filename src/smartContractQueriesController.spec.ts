@@ -3,10 +3,11 @@ import { SmartContractQueriesController } from "./smartContractQueriesController
 import { AbiRegistry, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "./smartcontracts";
 import { bigIntToBuffer } from "./smartcontracts/codec/utils";
 import { MockNetworkProvider, loadAbiRegistry } from "./testutils";
+import { ContractQueryResponse } from "@multiversx/sdk-network-providers";
 
 describe("test smart contract queries controller", () => {
     describe("createQuery", () => {
-        it("should work without ABI, when arguments are buffers", function () {
+        it("works without ABI, when arguments are buffers", function () {
             const controller = new SmartContractQueriesController({
                 networkProvider: new MockNetworkProvider(),
             });
@@ -22,7 +23,7 @@ describe("test smart contract queries controller", () => {
             assert.deepEqual(query.arguments, [bigIntToBuffer(42), Buffer.from("abba")]);
         });
 
-        it("should work without ABI, when arguments are typed values", function () {
+        it("works without ABI, when arguments are typed values", function () {
             const controller = new SmartContractQueriesController({
                 networkProvider: new MockNetworkProvider(),
             });
@@ -38,7 +39,7 @@ describe("test smart contract queries controller", () => {
             assert.deepEqual(query.arguments, [bigIntToBuffer(42), Buffer.from("abba")]);
         });
 
-        it("should err without ABI, when arguments aren't buffers, nor typed values", function () {
+        it("fails without ABI, when arguments aren't buffers, nor typed values", function () {
             const controller = new SmartContractQueriesController({
                 networkProvider: new MockNetworkProvider(),
             });
@@ -52,7 +53,7 @@ describe("test smart contract queries controller", () => {
             }, "cannot encode arguments");
         });
 
-        it("should work with ABI, when arguments are native JS objects", async function () {
+        it("works with ABI, when arguments are native JS objects", async function () {
             const controller = new SmartContractQueriesController({
                 networkProvider: new MockNetworkProvider(),
                 abi: await loadAbiRegistry("src/testdata/lottery-esdt.abi.json"),
@@ -69,7 +70,7 @@ describe("test smart contract queries controller", () => {
             assert.deepEqual(query.arguments, [Buffer.from("myLottery")]);
         });
 
-        it("should work with ABI, when arguments typed values", async function () {
+        it("works with ABI, when arguments typed values", async function () {
             const controller = new SmartContractQueriesController({
                 networkProvider: new MockNetworkProvider(),
                 abi: await loadAbiRegistry("src/testdata/lottery-esdt.abi.json"),
@@ -86,7 +87,7 @@ describe("test smart contract queries controller", () => {
             assert.deepEqual(query.arguments, [Buffer.from("myLottery")]);
         });
 
-        it("should work with ABI, with mixed arguments", async function () {
+        it("works with ABI, with mixed arguments", async function () {
             const abi = AbiRegistry.create({
                 endpoints: [
                     {
@@ -142,4 +143,34 @@ describe("test smart contract queries controller", () => {
             ]);
         });
     });
+
+    describe("runQuery", () => {
+        it("calls queryContract on the network provider", async function () {
+            const networkProvider = new MockNetworkProvider();
+            const controller = new SmartContractQueriesController({
+                networkProvider: networkProvider,
+            });
+
+            networkProvider.mockQueryContractOnFunction(
+                "bar",
+                new ContractQueryResponse({
+                    returnData: [Buffer.from("abba").toString("base64")],
+                    returnCode: "ok",
+                }),
+            );
+
+            const query = {
+                contract: "erd1qqqqqqqqqqqqqpgqvc7gdl0p4s97guh498wgz75k8sav6sjfjlwqh679jy",
+                function: "bar",
+                arguments: [],
+            };
+
+            const response = await controller.runQuery(query);
+
+            assert.equal(response.returnCode, "ok");
+            assert.deepEqual(response.returnDataParts, [Buffer.from("abba")]);
+        });
+    });
+
+    describe("parseQueryResponse", () => {});
 });

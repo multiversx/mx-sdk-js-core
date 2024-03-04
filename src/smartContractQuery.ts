@@ -21,11 +21,18 @@ export class SmartContractQuery {
 }
 
 export class SmartContractQueryResponse {
+    originalQuery: SmartContractQuery;
     returnCode: string;
     returnMessage: string;
     returnDataParts: Uint8Array[];
 
-    constructor(obj: { returnCode: string; returnMessage: string; returnDataParts: Uint8Array[] }) {
+    constructor(obj: {
+        originalQuery: SmartContractQuery;
+        returnCode: string;
+        returnMessage: string;
+        returnDataParts: Uint8Array[];
+    }) {
+        this.originalQuery = obj.originalQuery;
         this.returnCode = obj.returnCode;
         this.returnMessage = obj.returnMessage;
         this.returnDataParts = obj.returnDataParts;

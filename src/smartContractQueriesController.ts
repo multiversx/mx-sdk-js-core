@@ -3,7 +3,7 @@ import { Err } from "./errors";
 import { IAddress } from "./interface";
 import { IContractQueryResponse } from "./interfaceOfNetwork";
 import { SmartContractQuery, SmartContractQueryResponse } from "./smartContractQuery";
-import { ArgSerializer, ContractFunction, EndpointDefinition, NativeSerializer } from "./smartcontracts";
+import { ArgSerializer, ContractFunction, EndpointDefinition, NativeSerializer, ResultsParser } from "./smartcontracts";
 
 interface Abi {
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
@@ -24,10 +24,12 @@ interface ILegacyQuery {
 export class SmartContractQueriesController {
     private readonly abi?: Abi;
     private readonly networkProvider: INetworkProvider;
+    private readonly legacyResultsParser: ResultsParser;
 
     constructor(options: { abi?: Abi; networkProvider: INetworkProvider }) {
         this.abi = options.abi;
         this.networkProvider = options.networkProvider;
+        this.legacyResultsParser = new ResultsParser();
     }
 
     createQuery(options: {
@@ -98,6 +100,7 @@ export class SmartContractQueriesController {
 
         const legacyQueryResponse = await this.networkProvider.queryContract(legacyQuery);
         const queryResponse = new SmartContractQueryResponse({
+            originalQuery: query,
             returnCode: legacyQueryResponse.returnCode.toString(),
             returnMessage: legacyQueryResponse.returnMessage,
             returnDataParts: legacyQueryResponse.getReturnDataParts(),
@@ -106,7 +109,20 @@ export class SmartContractQueriesController {
         return queryResponse;
     }
 
-    parseQueryResponse(_response: SmartContractQueryResponse): any[] {
-        throw new Err("Not implemented");
+    parseQueryResponse(response: SmartContractQueryResponse): any[] {
+        if (!this.abi) {
+            return response.returnDataParts;
+        }
+
+        const legacyQueryResponse: IContractQueryResponse = {
+            returnCode: response.returnCode,
+            returnMessage: response.returnMessage,
+            getReturnDataParts: () => response.returnDataParts.map((part) => Buffer.from(part)),
+        };
+
+        const functionName = response.originalQuery.function;
+        const endpoint = this.abi.getEndpoint(functionName);
+        const legacyBundle = this.legacyResultsParser.parseQueryResponse(legacyQueryResponse, endpoint);
+        return legacyBundle.values;
     }
 }

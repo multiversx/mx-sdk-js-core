@@ -37,7 +37,7 @@ export class SmartContractQueriesController {
         caller?: string;
         value?: bigint;
         function: string;
-        arguments: Uint8Array[];
+        arguments: any[];
     }): SmartContractQuery {
         const preparedArguments = this.encodeArguments(options.function, options.arguments);
 
@@ -66,7 +66,9 @@ export class SmartContractQueriesController {
             return args.map((arg) => Buffer.from(arg));
         }
 
-        throw new Err("Can't encode arguments");
+        throw new Err(
+            "cannot encode arguments: when ABI is not available, they must be either typed values or buffers",
+        );
     }
 
     private areArgsOfTypedValue(args: any[]): boolean {

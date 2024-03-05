@@ -1,10 +1,10 @@
+import { ContractQueryResponse } from "@multiversx/sdk-network-providers";
 import { assert } from "chai";
 import { SmartContractQueriesController } from "./smartContractQueriesController";
+import { SmartContractQueryResponse } from "./smartContractQuery";
 import { AbiRegistry, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "./smartcontracts";
 import { bigIntToBuffer } from "./smartcontracts/codec/utils";
 import { MockNetworkProvider, loadAbiRegistry } from "./testutils";
-import { ContractQueryResponse } from "@multiversx/sdk-network-providers";
-import { SmartContractQueryResponse } from "./smartContractQuery";
 
 describe("test smart contract queries controller", () => {
     describe("createQuery", () => {

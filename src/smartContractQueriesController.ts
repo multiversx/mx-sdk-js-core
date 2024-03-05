@@ -102,7 +102,7 @@ export class SmartContractQueriesController {
 
         const legacyQueryResponse = await this.networkProvider.queryContract(legacyQuery);
         const queryResponse = new SmartContractQueryResponse({
-            originalQuery: query,
+            function: query.function,
             returnCode: legacyQueryResponse.returnCode.toString(),
             returnMessage: legacyQueryResponse.returnMessage,
             returnDataParts: legacyQueryResponse.getReturnDataParts(),
@@ -122,7 +122,7 @@ export class SmartContractQueriesController {
             getReturnDataParts: () => response.returnDataParts.map((part) => Buffer.from(part)),
         };
 
-        const functionName = response.originalQuery.function;
+        const functionName = response.function;
         const endpoint = this.abi.getEndpoint(functionName);
         const legacyBundle = this.legacyResultsParser.parseQueryResponse(legacyQueryResponse, endpoint);
         return legacyBundle.values;

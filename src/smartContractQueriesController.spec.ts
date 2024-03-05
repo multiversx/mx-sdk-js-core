@@ -4,6 +4,7 @@ import { AbiRegistry, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U
 import { bigIntToBuffer } from "./smartcontracts/codec/utils";
 import { MockNetworkProvider, loadAbiRegistry } from "./testutils";
 import { ContractQueryResponse } from "@multiversx/sdk-network-providers";
+import { SmartContractQueryResponse } from "./smartContractQuery";
 
 describe("test smart contract queries controller", () => {
     describe("createQuery", () => {
@@ -172,5 +173,24 @@ describe("test smart contract queries controller", () => {
         });
     });
 
-    describe("parseQueryResponse", () => {});
+    describe("parseQueryResponse", () => {
+        it("works without ABI", function () {
+            const controller = new SmartContractQueriesController({
+                networkProvider: new MockNetworkProvider(),
+            });
+
+            const response = new SmartContractQueryResponse({
+                function: "bar",
+                returnCode: "ok",
+                returnMessage: "ok",
+                returnDataParts: [Buffer.from("abba")],
+            });
+
+            const parsed = controller.parseQueryResponse(response);
+
+            assert.deepEqual(parsed, [Buffer.from("abba")]);
+        });
+
+        it("works with ABI", function () {});
+    });
 });

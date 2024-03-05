@@ -5,7 +5,7 @@ import { IContractQueryResponse } from "./interfaceOfNetwork";
 import { SmartContractQuery, SmartContractQueryResponse } from "./smartContractQuery";
 import { ArgSerializer, ContractFunction, EndpointDefinition, NativeSerializer, ResultsParser } from "./smartcontracts";
 
-interface Abi {
+interface IAbi {
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
 }
 
@@ -22,11 +22,11 @@ interface ILegacyQuery {
 }
 
 export class SmartContractQueriesController {
-    private readonly abi?: Abi;
+    private readonly abi?: IAbi;
     private readonly networkProvider: INetworkProvider;
     private readonly legacyResultsParser: ResultsParser;
 
-    constructor(options: { abi?: Abi; networkProvider: INetworkProvider }) {
+    constructor(options: { abi?: IAbi; networkProvider: INetworkProvider }) {
         this.abi = options.abi;
         this.networkProvider = options.networkProvider;
         this.legacyResultsParser = new ResultsParser();

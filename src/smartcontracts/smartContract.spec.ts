@@ -1,7 +1,7 @@
 import { TransactionStatus } from "@multiversx/sdk-network-providers";
 import { assert } from "chai";
 import { Address } from "../address";
-import { loadTestWallets, MarkCompleted, MockProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
+import { loadTestWallets, MarkCompleted, MockNetworkProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
 import { TransactionWatcher } from "../transactionWatcher";
 import { Code } from "./code";
 import { ContractFunction } from "./function";
@@ -11,7 +11,7 @@ import { BytesValue } from "./typesystem/bytes";
 
 
 describe("test contract", () => {
-    let provider = new MockProvider();
+    let provider = new MockNetworkProvider();
     let chainID = "test";
     let alice: TestWallet;
 

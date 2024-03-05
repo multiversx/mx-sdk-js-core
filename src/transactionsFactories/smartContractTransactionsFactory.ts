@@ -16,7 +16,7 @@ interface Config {
     gasLimitPerByte: bigint;
 }
 
-interface Abi {
+interface IAbi {
     constructorDefinition: EndpointDefinition;
 
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
@@ -31,13 +31,13 @@ interface TokenComputer {
  */
 export class SmartContractTransactionsFactory {
     private readonly config: Config;
-    private readonly abiRegistry?: Abi;
+    private readonly abi?: IAbi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
 
-    constructor({ config, abi, tokenComputer }: { config: Config; abi?: Abi; tokenComputer: TokenComputer }) {
+    constructor({ config, abi, tokenComputer }: { config: Config; abi?: IAbi; tokenComputer: TokenComputer }) {
         this.config = config;
-        this.abiRegistry = abi;
+        this.abi = abi;
         this.tokenComputer = tokenComputer;
         this.dataArgsBuilder = new TokenTransfersDataBuilder();
     }
@@ -61,7 +61,7 @@ export class SmartContractTransactionsFactory {
         const args = options.args || [];
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
         let parts = [byteArrayToHex(options.bytecode), byteArrayToHex(VM_TYPE_WASM_VM), metadata.toString()];
-        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
+        const preparedArgs = this.argsToDataParts(args, this.abi?.constructorDefinition);
         parts = parts.concat(preparedArgs);
 
         return new TransactionNextBuilder({
@@ -111,7 +111,7 @@ export class SmartContractTransactionsFactory {
         }
 
         dataParts.push(dataParts.length ? utf8ToHex(options.functionName) : options.functionName);
-        dataParts = dataParts.concat(this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName)));
+        dataParts = dataParts.concat(this.argsToDataParts(args, this.abi?.getEndpoint(options.functionName)));
 
         return new TransactionNextBuilder({
             config: this.config,
@@ -147,7 +147,7 @@ export class SmartContractTransactionsFactory {
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
 
         let parts = ["upgradeContract", byteArrayToHex(options.bytecode), metadata.toString()];
-        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
+        const preparedArgs = this.argsToDataParts(args, this.abi?.constructorDefinition);
         parts = parts.concat(preparedArgs);
 
         return new TransactionNextBuilder({

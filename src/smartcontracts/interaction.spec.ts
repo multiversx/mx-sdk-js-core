@@ -5,7 +5,7 @@ import { Address } from "../address";
 import {
     loadAbiRegistry,
     loadTestWallets,
-    MockProvider,
+    MockNetworkProvider,
     setupUnitTestWatcherTimeouts,
     TestWallet
 } from "../testutils";
@@ -20,7 +20,7 @@ import { BytesValue } from "./typesystem/bytes";
 
 describe("test smart contract interactor", function () {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");
-    let provider = new MockProvider();
+    let provider = new MockNetworkProvider();
     let alice: TestWallet;
 
     before(async function () {

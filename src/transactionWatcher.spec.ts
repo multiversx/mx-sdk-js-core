@@ -1,6 +1,6 @@
 import { TransactionOnNetwork, TransactionStatus } from "@multiversx/sdk-network-providers";
 import { assert } from "chai";
-import { MarkCompleted, MockProvider, Wait } from "./testutils";
+import { MarkCompleted, MockNetworkProvider, Wait } from "./testutils";
 import { TransactionHash } from "./transaction";
 import { TransactionWatcher } from "./transactionWatcher";
 
@@ -8,7 +8,7 @@ import { TransactionWatcher } from "./transactionWatcher";
 describe("test transactionWatcher", () => {
     it("should await status == executed", async () => {
         let hash = new TransactionHash("abba");
-        let provider = new MockProvider();
+        let provider = new MockNetworkProvider();
         let watcher = new TransactionWatcher(provider, {
             pollingIntervalMilliseconds: 42,
             timeoutMilliseconds: 42 * 42

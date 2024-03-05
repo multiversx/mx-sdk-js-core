@@ -1,4 +1,5 @@
 import { ContractQueryResponse } from "@multiversx/sdk-network-providers";
+import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { SmartContractQueriesController } from "./smartContractQueriesController";
 import { SmartContractQueryResponse } from "./smartContractQuery";
@@ -191,6 +192,36 @@ describe("test smart contract queries controller", () => {
             assert.deepEqual(parsed, [Buffer.from("abba")]);
         });
 
-        it("works with ABI", function () {});
+        it("works with ABI", async function () {
+            const controller = new SmartContractQueriesController({
+                networkProvider: new MockNetworkProvider(),
+                abi: await loadAbiRegistry("src/testdata/lottery-esdt.abi.json"),
+            });
+
+            const response = new SmartContractQueryResponse({
+                function: "getLotteryInfo",
+                returnCode: "ok",
+                returnMessage: "ok",
+                returnDataParts: [
+                    Buffer.from(
+                        "0000000b6c75636b792d746f6b656e000000010100000000000000005fc2b9dbffffffff00000001640000000a140ec80fa7ee88000000",
+                        "hex",
+                    ),
+                ],
+            });
+
+            const parsed = controller.parseQueryResponse(response);
+            const plainData = parsed[0].valueOf();
+
+            assert.deepEqual(plainData, {
+                token_identifier: "lucky-token",
+                ticket_price: new BigNumber("1"),
+                tickets_left: new BigNumber(0),
+                deadline: new BigNumber("0x000000005fc2b9db", 16),
+                max_entries_per_user: new BigNumber(0xffffffff),
+                prize_distribution: Buffer.from([0x64]),
+                prize_pool: new BigNumber("94720000000000000000000"),
+            });
+        });
     });
 });

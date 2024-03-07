@@ -6,12 +6,14 @@ import { SmartContractQueryResponse } from "./smartContractQuery";
 import { AbiRegistry, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "./smartcontracts";
 import { bigIntToBuffer } from "./smartcontracts/codec/utils";
 import { MockNetworkProvider, loadAbiRegistry } from "./testutils";
+import { QueryRunnerAdapter } from "./adapters/queryRunnerAdapter";
 
 describe("test smart contract queries controller", () => {
     describe("createQuery", () => {
         it("works without ABI, when arguments are buffers", function () {
+            const adapter = new QueryRunnerAdapter({ networkProvider: new MockNetworkProvider() });
             const controller = new SmartContractQueriesController({
-                networkProvider: new MockNetworkProvider(),
+                queryRunner: adapter,
             });
 
             const query = controller.createQuery({
@@ -26,8 +28,9 @@ describe("test smart contract queries controller", () => {
         });
 
         it("works without ABI, when arguments are typed values", function () {
+            const adapter = new QueryRunnerAdapter({ networkProvider: new MockNetworkProvider() });
             const controller = new SmartContractQueriesController({
-                networkProvider: new MockNetworkProvider(),
+                queryRunner: adapter,
             });
 
             const query = controller.createQuery({
@@ -42,8 +45,9 @@ describe("test smart contract queries controller", () => {
         });
 
         it("fails without ABI, when arguments aren't buffers, nor typed values", function () {
+            const adapter = new QueryRunnerAdapter({ networkProvider: new MockNetworkProvider() });
             const controller = new SmartContractQueriesController({
-                networkProvider: new MockNetworkProvider(),
+                queryRunner: adapter,
             });
 
             assert.throws(() => {
@@ -56,9 +60,12 @@ describe("test smart contract queries controller", () => {
         });
 
         it("works with ABI, when arguments are native JS objects", async function () {
-            const controller = new SmartContractQueriesController({
+            const adapter = new QueryRunnerAdapter({
                 networkProvider: new MockNetworkProvider(),
+            });
+            const controller = new SmartContractQueriesController({
                 abi: await loadAbiRegistry("src/testdata/lottery-esdt.abi.json"),
+                queryRunner: adapter,
             });
 
             const query = controller.createQuery({
@@ -73,9 +80,12 @@ describe("test smart contract queries controller", () => {
         });
 
         it("works with ABI, when arguments typed values", async function () {
-            const controller = new SmartContractQueriesController({
+            const adapter = new QueryRunnerAdapter({
                 networkProvider: new MockNetworkProvider(),
+            });
+            const controller = new SmartContractQueriesController({
                 abi: await loadAbiRegistry("src/testdata/lottery-esdt.abi.json"),
+                queryRunner: adapter,
             });
 
             const query = controller.createQuery({
@@ -113,9 +123,12 @@ describe("test smart contract queries controller", () => {
                 ],
             });
 
-            const controller = new SmartContractQueriesController({
+            const adapter = new QueryRunnerAdapter({
                 networkProvider: new MockNetworkProvider(),
+            });
+            const controller = new SmartContractQueriesController({
                 abi: abi,
+                queryRunner: adapter,
             });
 
             const query = controller.createQuery({
@@ -149,8 +162,11 @@ describe("test smart contract queries controller", () => {
     describe("runQuery", () => {
         it("calls queryContract on the network provider", async function () {
             const networkProvider = new MockNetworkProvider();
-            const controller = new SmartContractQueriesController({
+            const adapter = new QueryRunnerAdapter({
                 networkProvider: networkProvider,
+            });
+            const controller = new SmartContractQueriesController({
+                queryRunner: adapter,
             });
 
             networkProvider.mockQueryContractOnFunction(
@@ -176,8 +192,11 @@ describe("test smart contract queries controller", () => {
 
     describe("parseQueryResponse", () => {
         it("works without ABI", function () {
-            const controller = new SmartContractQueriesController({
+            const adapter = new QueryRunnerAdapter({
                 networkProvider: new MockNetworkProvider(),
+            });
+            const controller = new SmartContractQueriesController({
+                queryRunner: adapter,
             });
 
             const response = new SmartContractQueryResponse({
@@ -193,9 +212,12 @@ describe("test smart contract queries controller", () => {
         });
 
         it("works with ABI", async function () {
-            const controller = new SmartContractQueriesController({
+            const adapter = new QueryRunnerAdapter({
                 networkProvider: new MockNetworkProvider(),
+            });
+            const controller = new SmartContractQueriesController({
                 abi: await loadAbiRegistry("src/testdata/lottery-esdt.abi.json"),
+                queryRunner: adapter,
             });
 
             const response = new SmartContractQueryResponse({

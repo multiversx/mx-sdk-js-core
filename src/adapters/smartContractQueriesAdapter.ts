@@ -2,14 +2,9 @@ import { Address } from "../address";
 import { IAddress } from "../interface";
 import { IContractQueryResponse } from "../interfaceOfNetwork";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
-import { ContractFunction, EndpointDefinition } from "../smartcontracts";
 
 interface INetworkProvider {
     queryContract(query: ILegacyQuery): Promise<IContractQueryResponse>;
-}
-
-interface IAbi {
-    getEndpoint(name: string | ContractFunction): EndpointDefinition;
 }
 
 interface ILegacyQuery {
@@ -20,12 +15,10 @@ interface ILegacyQuery {
     getEncodedArguments(): string[];
 }
 
-export class SmartContractQueriesAdaptor {
-    abi?: IAbi;
+export class SmartContractQueriesAdapter {
     networkProvider: INetworkProvider;
 
-    constructor(options: { abi?: IAbi; networkProvider: INetworkProvider }) {
-        this.abi = options.abi;
+    constructor(options: { networkProvider: INetworkProvider }) {
         this.networkProvider = options.networkProvider;
     }
 

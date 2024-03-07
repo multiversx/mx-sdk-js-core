@@ -1,4 +1,3 @@
-import { Address } from "./address";
 import { Err } from "./errors";
 import { IAddress } from "./interface";
 import { IContractQueryResponse } from "./interfaceOfNetwork";
@@ -22,7 +21,6 @@ interface ILegacyQuery {
 }
 
 interface IQueryRunner {
-    abi?: IAbi;
     networkProvider: INetworkProvider;
     queryContract(query: SmartContractQuery): Promise<SmartContractQueryResponse>;
 }
@@ -32,8 +30,8 @@ export class SmartContractQueriesController {
     private readonly queryRunner: IQueryRunner;
     private readonly legacyResultsParser: ResultsParser;
 
-    constructor(options: { queryRunner: IQueryRunner }) {
-        this.abi = options.queryRunner.abi;
+    constructor(options: { abi?: IAbi; queryRunner: IQueryRunner }) {
+        this.abi = options.abi;
         this.queryRunner = options.queryRunner;
         this.legacyResultsParser = new ResultsParser();
     }

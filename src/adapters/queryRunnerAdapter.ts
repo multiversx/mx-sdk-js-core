@@ -4,10 +4,10 @@ import { IContractQueryResponse } from "../interfaceOfNetwork";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 
 interface INetworkProvider {
-    queryContract(query: ILegacyQuery): Promise<IContractQueryResponse>;
+    queryContract(query: IQuery): Promise<IContractQueryResponse>;
 }
 
-interface ILegacyQuery {
+interface IQuery {
     address: IAddress;
     caller?: IAddress;
     func: { toString(): string };
@@ -15,15 +15,15 @@ interface ILegacyQuery {
     getEncodedArguments(): string[];
 }
 
-export class SmartContractQueriesAdapter {
-    networkProvider: INetworkProvider;
+export class QueryRunnerAdapter {
+    private readonly networkProvider: INetworkProvider;
 
     constructor(options: { networkProvider: INetworkProvider }) {
         this.networkProvider = options.networkProvider;
     }
 
-    async queryContract(query: SmartContractQuery): Promise<SmartContractQueryResponse> {
-        const legacyQuery: ILegacyQuery = {
+    async runQuery(query: SmartContractQuery): Promise<SmartContractQueryResponse> {
+        const legacyQuery: IQuery = {
             address: Address.fromBech32(query.contract),
             caller: query.caller ? Address.fromBech32(query.caller) : undefined,
             func: query.function,

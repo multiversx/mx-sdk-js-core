@@ -1,1 +1,1 @@
-export * from "./smartContractQueriesAdapter";
+export * from "./queryRunnerAdapter";

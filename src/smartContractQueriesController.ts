@@ -1,5 +1,4 @@
 import { Err } from "./errors";
-import { IAddress } from "./interface";
 import { IContractQueryResponse } from "./interfaceOfNetwork";
 import { SmartContractQuery, SmartContractQueryResponse } from "./smartContractQuery";
 import { ArgSerializer, ContractFunction, EndpointDefinition, NativeSerializer, ResultsParser } from "./smartcontracts";
@@ -8,21 +7,8 @@ interface IAbi {
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
 }
 
-interface INetworkProvider {
-    queryContract(query: ILegacyQuery): Promise<IContractQueryResponse>;
-}
-
-interface ILegacyQuery {
-    address: IAddress;
-    caller?: IAddress;
-    func: { toString(): string };
-    value?: { toString(): string };
-    getEncodedArguments(): string[];
-}
-
 interface IQueryRunner {
-    networkProvider: INetworkProvider;
-    queryContract(query: SmartContractQuery): Promise<SmartContractQueryResponse>;
+    runQuery(query: SmartContractQuery): Promise<SmartContractQueryResponse>;
 }
 
 export class SmartContractQueriesController {
@@ -96,7 +82,7 @@ export class SmartContractQueriesController {
     }
 
     async runQuery(query: SmartContractQuery): Promise<SmartContractQueryResponse> {
-        const queryResponse = await this.queryRunner.queryContract(query);
+        const queryResponse = await this.queryRunner.runQuery(query);
         return queryResponse;
     }
 

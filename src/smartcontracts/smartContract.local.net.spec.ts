@@ -15,6 +15,8 @@ import { SmartContractTransactionsFactory } from "../transactionsFactories/smart
 import { TokenComputer } from "../tokens";
 import { promises } from "fs";
 import { TransactionComputer } from "../transaction";
+import { QueryRunnerAdapter } from "../adapters/queryRunnerAdapter";
+import { SmartContractQueriesController } from "../smartContractQueriesController";
 
 describe("test on local testnet", function () {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
@@ -325,10 +327,17 @@ describe("test on local testnet", function () {
         await watcher.awaitCompleted(secondScCallHash);
 
         // Check counter
-        const contract = new SmartContract({ address: contractAddress });
-        let query = contract.createQuery({ func: new ContractFunction("get") });
-        let queryResponse = await provider.queryContract(query);
-        assert.equal(3, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
+        const queryRunner = new QueryRunnerAdapter({ networkProvider: provider });
+        const smartContractQueriesController = new SmartContractQueriesController({ queryRunner: queryRunner });
+
+        const query = smartContractQueriesController.createQuery({
+            contract: contractAddress.bech32(),
+            function: "get",
+            arguments: [],
+        });
+
+        const queryResponse = await smartContractQueriesController.runQuery(query);
+        assert.equal(3, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
     });
 
     it("erc20: should deploy, call and query contract", async function () {
@@ -438,7 +447,6 @@ describe("test on local testnet", function () {
             args: [new U32Value(10000)],
         });
         deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
-
         const transactionComputer = new TransactionComputer();
         deployTransaction.signature = await alice.signer.sign(
             Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
@@ -484,36 +492,41 @@ describe("test on local testnet", function () {
         await watcher.awaitCompleted(mintBobTxHash);
         await watcher.awaitCompleted(mintCarolTxHash);
 
-        const contract = new SmartContract({ address: contractAddress });
-
         // Query state, do some assertions
-        let query = contract.createQuery({ func: new ContractFunction("totalSupply") });
-        let queryResponse = await provider.queryContract(query);
-        assert.equal(10000, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
+        const queryRunner = new QueryRunnerAdapter({ networkProvider: provider });
+        const smartContractQueriesController = new SmartContractQueriesController({ queryRunner: queryRunner });
 
-        query = contract.createQuery({
-            func: new ContractFunction("balanceOf"),
-            args: [new AddressValue(alice.address)],
+        let query = smartContractQueriesController.createQuery({
+            contract: contractAddress.bech32(),
+            function: "totalSupply",
+            arguments: [],
         });
-        queryResponse = await provider.queryContract(query);
+        let queryResponse = await smartContractQueriesController.runQuery(query);
+        assert.equal(10000, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
 
-        assert.equal(7500, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
-
-        query = contract.createQuery({
-            func: new ContractFunction("balanceOf"),
-            args: [new AddressValue(bob.address)],
+        query = smartContractQueriesController.createQuery({
+            contract: contractAddress.bech32(),
+            function: "balanceOf",
+            arguments: [new AddressValue(alice.address)],
         });
-        queryResponse = await provider.queryContract(query);
+        queryResponse = await smartContractQueriesController.runQuery(query);
+        assert.equal(7500, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
 
-        assert.equal(1000, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
-
-        query = contract.createQuery({
-            func: new ContractFunction("balanceOf"),
-            args: [new AddressValue(carol.address)],
+        query = smartContractQueriesController.createQuery({
+            contract: contractAddress.bech32(),
+            function: "balanceOf",
+            arguments: [new AddressValue(bob.address)],
         });
-        queryResponse = await provider.queryContract(query);
+        queryResponse = await smartContractQueriesController.runQuery(query);
+        assert.equal(1000, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
 
-        assert.equal(1500, decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]));
+        query = smartContractQueriesController.createQuery({
+            contract: contractAddress.bech32(),
+            function: "balanceOf",
+            arguments: [new AddressValue(carol.address)],
+        });
+        queryResponse = await smartContractQueriesController.runQuery(query);
+        assert.equal(1500, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
     });
 
     it("lottery: should deploy, call and query contract", async function () {
@@ -661,21 +674,24 @@ describe("test on local testnet", function () {
         bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
-        const contract = new SmartContract({ address: contractAddress });
-
         // Query state, do some assertions
-        let query = contract.createQuery({
-            func: new ContractFunction("status"),
-            args: [BytesValue.fromUTF8("lucky")],
-        });
-        let queryResponse = await provider.queryContract(query);
-        assert.equal(decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]), 1);
+        const queryRunner = new QueryRunnerAdapter({ networkProvider: provider });
+        const smartContractQueriesController = new SmartContractQueriesController({ queryRunner: queryRunner });
 
-        query = contract.createQuery({
-            func: new ContractFunction("status"),
-            args: [BytesValue.fromUTF8("missingLottery")],
+        let query = smartContractQueriesController.createQuery({
+            contract: contractAddress.bech32(),
+            function: "status",
+            arguments: [BytesValue.fromUTF8("lucky")],
         });
-        queryResponse = await provider.queryContract(query);
-        assert.equal(decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]), 0);
+        let queryResponse = await smartContractQueriesController.runQuery(query);
+        assert.equal(decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])), 1);
+
+        query = smartContractQueriesController.createQuery({
+            contract: contractAddress.bech32(),
+            function: "status",
+            arguments: [BytesValue.fromUTF8("missingLottery")],
+        });
+        queryResponse = await smartContractQueriesController.runQuery(query);
+        assert.equal(decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])), 0);
     });
 });

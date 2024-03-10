@@ -87,7 +87,7 @@ export class RelayedTransactionsFactory {
         });
     }
 
-    private prepareInnerTransactionForRelayedV1(innerTransaction: TransactionNext): string {
+    private prepareInnerTransactionForRelayedV1(innerTransaction: ITransactionNext): string {
         const txObject = {
             nonce: innerTransaction.nonce,
             sender: Address.fromBech32(innerTransaction.sender).pubkey().toString("base64"),

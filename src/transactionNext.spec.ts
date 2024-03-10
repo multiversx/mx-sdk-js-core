@@ -204,10 +204,8 @@ describe("test transaction next", async () => {
             await alice.signer.sign(Buffer.from(transactionComputer.computeBytesForSigning(transaction))),
         );
 
-        const oldTransaction = Transaction.fromTransactionNext(transaction);
-
         let serializer = new ProtoSerializer();
-        let buffer = serializer.serializeTransaction(oldTransaction);
+        let buffer = serializer.serializeTransaction(transaction);
         assert.equal(
             buffer.toString("hex"),
             "085c120e00018ee90ff6181f3761632000001a208049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f82a200139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1388094ebdc0340f093094a0f746573742064617461206669656c64520d6c6f63616c2d746573746e657458026240e574d78b19e1481a6b9575c162e66f2f906a3178aec537509356385c4f1a5330a9b73a87a456fc6d7041e93b5f8a1231a92fb390174872a104a0929215600c0c6802722032a3f14cf53c4d0543954f6cf1bda0369d13e661dec095107627dc0f6d33612f7a4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",

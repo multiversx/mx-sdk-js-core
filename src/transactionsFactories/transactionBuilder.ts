@@ -1,7 +1,7 @@
-import { IAddress, ITransactionPayload } from "../interface";
 import { ARGUMENTS_SEPARATOR } from "../constants";
+import { IAddress, ITransactionPayload } from "../interface";
+import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
-import { TransactionNext } from "../transaction";
 
 interface Config {
     chainID: string;
@@ -9,7 +9,7 @@ interface Config {
     gasLimitPerByte: bigint;
 }
 
-export class TransactionNextBuilder {
+export class TransactionBuilder {
     private config: Config;
     private sender: IAddress;
     private receiver: IAddress;
@@ -51,11 +51,11 @@ export class TransactionNextBuilder {
         return new TransactionPayload(data);
     }
 
-    build(): TransactionNext {
+    build(): Transaction {
         const data = this.buildTransactionPayload();
         const gasLimit = this.computeGasLimit(data);
 
-        return new TransactionNext({
+        return new Transaction({
             sender: this.sender.bech32(),
             receiver: this.receiver.bech32(),
             gasLimit: gasLimit,

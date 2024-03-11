@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { TestWallet, loadTestWallets } from "../testutils";
-import { TransactionComputer, TransactionNext } from "../transaction";
+import { Transaction, TransactionComputer } from "../transaction";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
@@ -15,7 +15,7 @@ describe("test relayed v1 transaction builder", function () {
     });
 
     it("should throw exception when creating relayed v1 transaction with invalid inner transaction", async function () {
-        let innerTransaction = new TransactionNext({
+        let innerTransaction = new Transaction({
             sender: alice.address.bech32(),
             receiver: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
             gasLimit: 10000000n,
@@ -38,7 +38,7 @@ describe("test relayed v1 transaction builder", function () {
     });
 
     it("should create relayed v1 transaction", async function () {
-        let innerTransaction = new TransactionNext({
+        let innerTransaction = new Transaction({
             sender: bob.address.bech32(),
             receiver: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
             gasLimit: 60000000n,
@@ -70,7 +70,7 @@ describe("test relayed v1 transaction builder", function () {
     });
 
     it("should create relayed v1 transaction with usernames", async function () {
-        let innerTransaction = new TransactionNext({
+        let innerTransaction = new Transaction({
             sender: carol.address.bech32(),
             receiver: alice.address.bech32(),
             gasLimit: 50000n,
@@ -104,7 +104,7 @@ describe("test relayed v1 transaction builder", function () {
     });
 
     it("should create relayed v1 transaction with big value", async function () {
-        let innerTransaction = new TransactionNext({
+        let innerTransaction = new Transaction({
             sender: carol.address.bech32(),
             receiver: alice.address.bech32(),
             gasLimit: 50000n,
@@ -138,7 +138,7 @@ describe("test relayed v1 transaction builder", function () {
     });
 
     it("should create relayed v1 transaction with guarded inner transaction", async function () {
-        let innerTransaction = new TransactionNext({
+        let innerTransaction = new Transaction({
             sender: bob.address.bech32(),
             receiver: "erd1qqqqqqqqqqqqqpgq54tsxmej537z9leghvp69hfu4f8gg5eu396q83gnnz",
             gasLimit: 60000000n,
@@ -174,7 +174,7 @@ describe("test relayed v1 transaction builder", function () {
     });
 
     it("should create guarded relayed v1 transaction with guarded inner transaction", async function () {
-        let innerTransaction = new TransactionNext({
+        let innerTransaction = new Transaction({
             sender: bob.address.bech32(),
             receiver: "erd1qqqqqqqqqqqqqpgq54tsxmej537z9leghvp69hfu4f8gg5eu396q83gnnz",
             gasLimit: 60000000n,
@@ -213,7 +213,7 @@ describe("test relayed v1 transaction builder", function () {
     });
 
     it("should throw exception when creating relayed v2 transaction with invalid inner transaction", async function () {
-        let innerTransaction = new TransactionNext({
+        let innerTransaction = new Transaction({
             sender: bob.address.bech32(),
             receiver: bob.address.bech32(),
             gasLimit: 50000n,
@@ -242,7 +242,7 @@ describe("test relayed v1 transaction builder", function () {
     });
 
     it("should create relayed v2 transaction", async function () {
-        let innerTransaction = new TransactionNext({
+        let innerTransaction = new Transaction({
             sender: bob.address.bech32(),
             receiver: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
             gasLimit: 0n,

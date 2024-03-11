@@ -15,7 +15,7 @@ describe("test token management transactions factory", () => {
         tokenManagementFactory = new TokenManagementTransactionsFactory(config);
     });
 
-    it("should create 'TransactionNext' for registering and setting roles", () => {
+    it("should create 'Transaction' for registering and setting roles", () => {
         const transaction = tokenManagementFactory.createTransactionForRegisteringAndSettingRoles({
             sender: frank.address,
             tokenName: "TEST",
@@ -31,8 +31,8 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(transaction.gasLimit, 60125000n);
     });
 
-    it("should create 'TransactionNext' for issuing fungible token", () => {
-        const next = tokenManagementFactory.createTransactionForIssuingFungible({
+    it("should create 'Transaction' for issuing fungible token", () => {
+        const transaction = tokenManagementFactory.createTransactionForIssuingFungible({
             sender: frank.address,
             tokenName: "FRANK",
             tokenTicker: "FRANK",
@@ -47,17 +47,17 @@ describe("test token management transactions factory", () => {
         });
 
         assert.deepEqual(
-            next.data,
+            transaction.data,
             Buffer.from(
                 "issue@4652414e4b@4652414e4b@64@00@63616e467265657a65@74727565@63616e57697065@74727565@63616e5061757365@74727565@63616e4368616e67654f776e6572@74727565@63616e55706772616465@66616c7365@63616e4164645370656369616c526f6c6573@66616c7365",
             ),
         );
-        assert.equal(next.sender, frank.address.toString());
-        assert.equal(next.receiver, ESDT_CONTRACT_ADDRESS);
-        assert.deepEqual(next.value, config.issueCost);
+        assert.equal(transaction.sender, frank.address.toString());
+        assert.equal(transaction.receiver, ESDT_CONTRACT_ADDRESS);
+        assert.deepEqual(transaction.value, config.issueCost);
     });
 
-    it("should create 'TransactionNext' for issuing semi-fungible token", () => {
+    it("should create 'Transaction' for issuing semi-fungible token", () => {
         const transaction = tokenManagementFactory.createTransactionForIssuingSemiFungible({
             sender: frank.address,
             tokenName: "FRANK",
@@ -82,7 +82,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
-    it("should create 'TransactionNext' for issuing non-fungible token", () => {
+    it("should create 'Transaction' for issuing non-fungible token", () => {
         const transaction = tokenManagementFactory.createTransactionForIssuingNonFungible({
             sender: frank.address,
             tokenName: "FRANK",
@@ -107,7 +107,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
-    it("should create 'TransactionNext' for registering metaEsdt", () => {
+    it("should create 'Transaction' for registering metaEsdt", () => {
         const transaction = tokenManagementFactory.createTransactionForRegisteringMetaESDT({
             sender: frank.address,
             tokenName: "FRANK",
@@ -133,7 +133,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
-    it("should create 'TransactionNext' for setting spcial role on non-fungible token", () => {
+    it("should create 'Transaction' for setting spcial role on non-fungible token", () => {
         const transaction = tokenManagementFactory.createTransactionForSettingSpecialRoleOnNonFungibleToken({
             sender: frank.address,
             user: grace.address,
@@ -156,7 +156,7 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.value, 0n);
     });
 
-    it("should create 'TransactionNext' for creating nft", () => {
+    it("should create 'Transaction' for creating nft", () => {
         const transaction = tokenManagementFactory.createTransactionForCreatingNFT({
             sender: grace.address,
             tokenIdentifier: "FRANK-aa9e8d",

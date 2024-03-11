@@ -1,9 +1,9 @@
 import BigNumber from "bignumber.js";
-import { TransactionNext } from "../transaction";
-import { IAddress, ITransactionNext } from "../interface";
-import { ErrInvalidInnerTransaction } from "../errors";
 import { Address } from "../address";
+import { ErrInvalidInnerTransaction } from "../errors";
+import { IAddress, ITransactionNext } from "../interface";
 import { AddressValue, ArgSerializer, BytesValue, U64Value } from "../smartcontracts";
+import { Transaction } from "../transaction";
 
 const JSONbig = require("json-bigint");
 
@@ -26,7 +26,7 @@ export class RelayedTransactionsFactory {
     createRelayedV1Transaction(options: {
         innerTransaction: ITransactionNext;
         relayerAddress: IAddress;
-    }): TransactionNext {
+    }): Transaction {
         if (!options.innerTransaction.gasLimit) {
             throw new ErrInvalidInnerTransaction("The gas limit is not set for the inner transaction");
         }
@@ -41,7 +41,7 @@ export class RelayedTransactionsFactory {
         const additionalGasForDataLength = this.config.gasLimitPerByte * BigInt(data.length);
         const gasLimit = this.config.minGasLimit + additionalGasForDataLength + options.innerTransaction.gasLimit;
 
-        return new TransactionNext({
+        return new Transaction({
             chainID: this.config.chainID,
             sender: options.relayerAddress.bech32(),
             receiver: options.innerTransaction.sender,
@@ -54,7 +54,7 @@ export class RelayedTransactionsFactory {
         innerTransaction: ITransactionNext;
         innerTransactionGasLimit: bigint;
         relayerAddress: IAddress;
-    }): TransactionNext {
+    }): Transaction {
         if (options.innerTransaction.gasLimit) {
             throw new ErrInvalidInnerTransaction("The gas limit should not be set for the inner transaction");
         }
@@ -75,7 +75,7 @@ export class RelayedTransactionsFactory {
         const additionalGasForDataLength = this.config.gasLimitPerByte * BigInt(data.length);
         const gasLimit = options.innerTransactionGasLimit + this.config.minGasLimit + additionalGasForDataLength;
 
-        return new TransactionNext({
+        return new Transaction({
             sender: options.relayerAddress.bech32(),
             receiver: options.innerTransaction.sender,
             value: 0n,

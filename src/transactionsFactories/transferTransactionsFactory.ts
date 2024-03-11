@@ -1,9 +1,9 @@
-import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
+import { ErrBadUsage } from "../errors";
 import { IAddress } from "../interface";
 import { NextTokenTransfer, Token } from "../tokens";
-import { ErrBadUsage } from "../errors";
-import { TransactionNextBuilder } from "./transactionNextBuilder";
 import { TransactionNext } from "../transaction";
+import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
+import { TransactionBuilder } from "./transactionBuilder";
 
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
@@ -44,7 +44,7 @@ export class NextTransferTransactionsFactory {
     }): TransactionNext {
         const data = options.data || "";
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.receiver,
@@ -79,7 +79,7 @@ export class NextTransferTransactionsFactory {
             this.config.gasLimitMultiESDTNFTTransfer * BigInt(numberOfTransfers) +
             BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER);
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.sender,
@@ -108,7 +108,7 @@ export class NextTransferTransactionsFactory {
             receiver = options.sender;
         }
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: receiver,

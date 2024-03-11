@@ -127,7 +127,7 @@ export class SmartContract implements ISmartContract {
         const bytecode = Buffer.from(code.toString(), 'hex');
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const nextTx = scNextTransactionFactory.createTransactionForDeploy({
+        const transaction = scNextTransactionFactory.createTransactionForDeploy({
             sender: deployer,
             bytecode: bytecode,
             gasLimit: BigInt(gasLimit.valueOf()),
@@ -138,7 +138,6 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc
         });
 
-        const transaction = Transaction.fromTransactionNext(nextTx);
         transaction.setChainID(chainID);
         transaction.setValue(value ?? 0);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
@@ -187,7 +186,7 @@ export class SmartContract implements ISmartContract {
         const bytecode = Uint8Array.from(Buffer.from(code.toString(), 'hex'));
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const nextTx = scNextTransactionFactory.createTransactionForUpgrade({
+        const transaction = scNextTransactionFactory.createTransactionForUpgrade({
             sender: caller,
             contract: this.getAddress(),
             bytecode: bytecode,
@@ -199,7 +198,6 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc
         })
 
-        const transaction = Transaction.fromTransactionNext(nextTx);
         transaction.setChainID(chainID);
         transaction.setValue(value ?? 0);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
@@ -225,7 +223,7 @@ export class SmartContract implements ISmartContract {
         args = args || [];
         value = value || 0;
 
-        const nextTx = scNextTransactionFactory.createTransactionForExecute({
+        const transaction = scNextTransactionFactory.createTransactionForExecute({
             sender: caller,
             contract: receiver ? receiver : this.getAddress(),
             functionName: func.toString(),
@@ -233,7 +231,6 @@ export class SmartContract implements ISmartContract {
             args: args
         })
 
-        const transaction = Transaction.fromTransactionNext(nextTx);
         transaction.setChainID(chainID);
         transaction.setValue(value);
         transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)

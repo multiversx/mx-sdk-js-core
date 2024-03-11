@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
 import { ErrInvalidInnerTransaction } from "../errors";
-import { IAddress, ITransactionNext } from "../interface";
+import { IAddress, ITransaction } from "../interface";
 import { AddressValue, ArgSerializer, BytesValue, U64Value } from "../smartcontracts";
 import { Transaction } from "../transaction";
 
@@ -24,7 +24,7 @@ export class RelayedTransactionsFactory {
     }
 
     createRelayedV1Transaction(options: {
-        innerTransaction: ITransactionNext;
+        innerTransaction: ITransaction;
         relayerAddress: IAddress;
     }): Transaction {
         if (!options.innerTransaction.gasLimit) {
@@ -51,7 +51,7 @@ export class RelayedTransactionsFactory {
     }
 
     createRelayedV2Transaction(options: {
-        innerTransaction: ITransactionNext;
+        innerTransaction: ITransaction;
         innerTransactionGasLimit: bigint;
         relayerAddress: IAddress;
     }): Transaction {
@@ -87,7 +87,7 @@ export class RelayedTransactionsFactory {
         });
     }
 
-    private prepareInnerTransactionForRelayedV1(innerTransaction: ITransactionNext): string {
+    private prepareInnerTransactionForRelayedV1(innerTransaction: ITransaction): string {
         const txObject = {
             nonce: innerTransaction.nonce,
             sender: Address.fromBech32(innerTransaction.sender).pubkey().toString("base64"),

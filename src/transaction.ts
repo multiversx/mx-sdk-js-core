@@ -11,7 +11,7 @@ import {
     INonce,
     IPlainTransactionObject,
     ISignature,
-    ITransactionNext,
+    ITransaction,
     ITransactionOptions,
     ITransactionPayload,
     ITransactionValue,
@@ -128,6 +128,8 @@ export class Transaction {
         version,
         options,
         guardian,
+        signature,
+        guardianSignature,
     }: {
         nonce?: INonce | bigint;
         value?: ITransactionValue | bigint;
@@ -142,6 +144,8 @@ export class Transaction {
         version?: ITransactionVersion | number;
         options?: ITransactionOptions | number;
         guardian?: IAddress | string;
+        signature?: Uint8Array;
+        guardianSignature?: Uint8Array;
     }) {
         this.nonce = BigInt(nonce?.valueOf() || 0n);
         // We still rely on "bigNumber" for value, because client code might be passing a BigNumber object as a legacy "ITransactionValue",
@@ -162,6 +166,14 @@ export class Transaction {
         this.signature = Buffer.from([]);
         this.guardianSignature = Buffer.from([]);
         this.hash = TransactionHash.empty();
+
+        // Legacy logic, will be kept for some time, to avoid breaking changes in behavior.
+        if (signature?.length) {
+            this.applySignature(signature);
+        }
+        if (guardianSignature?.length) {
+            this.applyGuardianSignature(guardianSignature);
+        }
     }
 
     /**
@@ -498,40 +510,6 @@ export class Transaction {
         const fee = computer.computeTransactionFee(this, networkConfig);
         return new BigNumber(fee.toString());
     }
-
-    /**
-     * Creates a new Transaction object from a TransactionNext object.
-     */
-    static fromTransactionNext(transaction: ITransactionNext): Transaction {
-        const tx = new Transaction({
-            sender: Address.fromBech32(transaction.sender),
-            receiver: Address.fromBech32(transaction.receiver),
-            gasLimit: Number(transaction.gasLimit),
-            chainID: transaction.chainID,
-            value: new BigNumber(transaction.value.toString()).toFixed(0),
-            data: new TransactionPayload(Buffer.from(transaction.data)),
-            nonce: Number(transaction.nonce),
-            gasPrice: Number(transaction.gasPrice),
-            receiverUsername: transaction.receiverUsername,
-            senderUsername: transaction.senderUsername,
-            options: transaction.options,
-            version: transaction.version,
-        });
-
-        if (transaction.guardian) {
-            tx.guardian = transaction.guardian;
-        }
-
-        if (transaction.signature.length) {
-            tx.applySignature(transaction.signature);
-        }
-
-        if (transaction.guardianSignature.length) {
-            tx.applyGuardianSignature(transaction.guardianSignature);
-        }
-
-        return tx;
-    }
 }
 
 /**
@@ -554,7 +532,7 @@ export class TransactionHash extends Hash {
 }
 
 /**
- * An utilitary class meant to work together with the {@link TransactionNext} class.
+ * An utilitary class meant to work together with the {@link Transaction} class.
  */
 export class TransactionComputer {
     constructor() {}
@@ -585,7 +563,7 @@ export class TransactionComputer {
         return feeForMove + processingFee;
     }
 
-    computeBytesForSigning(transaction: ITransactionNext): Uint8Array {
+    computeBytesForSigning(transaction: ITransaction): Uint8Array {
         // TODO: do some checks for the transaction e.g. sender, chain ID etc.
 
         const plainTransaction = this.toPlainObject(transaction);
@@ -607,17 +585,16 @@ export class TransactionComputer {
         return new Uint8Array(Buffer.from(serialized));
     }
 
-    computeTransactionHash(transaction: ITransactionNext): Uint8Array {
+    computeTransactionHash(transaction: ITransaction): Uint8Array {
         let serializer = new ProtoSerializer();
 
-        const tx = Transaction.fromTransactionNext(transaction);
-        const buffer = serializer.serializeTransaction(tx);
+        const buffer = serializer.serializeTransaction(new Transaction(transaction));
         const hash = createTransactionHasher(TRANSACTION_HASH_LENGTH).update(buffer).digest("hex");
 
         return Buffer.from(hash, "hex");
     }
 
-    private toPlainObject(transaction: ITransactionNext) {
+    private toPlainObject(transaction: ITransaction) {
         return {
             nonce: Number(transaction.nonce),
             value: transaction.value.toString(),

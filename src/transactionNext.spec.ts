@@ -1,7 +1,7 @@
 import { assert } from "chai";
-import { TestWallet, loadTestWallets } from "./testutils";
-import { TransactionNext, TransactionComputer, Transaction } from "./transaction";
 import { ProtoSerializer } from "./proto";
+import { TestWallet, loadTestWallets } from "./testutils";
+import { Transaction, TransactionComputer } from "./transaction";
 
 class NetworkConfig {
     MinGasLimit: number;
@@ -30,7 +30,7 @@ describe("test transaction next", async () => {
         const sender = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th";
         const receiver = "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx";
 
-        let transaction = new TransactionNext({
+        let transaction = new Transaction({
             chainID: networkConfig.ChainID,
             sender: sender,
             receiver: receiver,
@@ -48,7 +48,7 @@ describe("test transaction next", async () => {
             `{"nonce":89,"value":"0","receiver":"erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx","sender":"erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th","gasPrice":1000000000,"gasLimit":50000,"chainID":"D","version":2}`,
         );
 
-        transaction = new TransactionNext({
+        transaction = new Transaction({
             chainID: networkConfig.ChainID,
             sender: sender,
             receiver: receiver,
@@ -69,7 +69,7 @@ describe("test transaction next", async () => {
     });
 
     it("should serialize transaction with usernames", async () => {
-        const transaction = new TransactionNext({
+        const transaction = new Transaction({
             chainID: "T",
             sender: wallets.carol.address.bech32(),
             receiver: wallets.alice.address.bech32(),
@@ -93,7 +93,7 @@ describe("test transaction next", async () => {
     });
 
     it("should compute transaction hash", async () => {
-        const transaction = new TransactionNext({
+        const transaction = new Transaction({
             chainID: networkConfig.ChainID,
             sender: wallets.alice.address.bech32(),
             receiver: wallets.alice.address.bech32(),
@@ -116,7 +116,7 @@ describe("test transaction next", async () => {
     });
 
     it("should compute transaction hash with usernames", async () => {
-        const transaction = new TransactionNext({
+        const transaction = new Transaction({
             chainID: networkConfig.ChainID,
             sender: wallets.alice.address.bech32(),
             receiver: wallets.alice.address.bech32(),
@@ -141,7 +141,7 @@ describe("test transaction next", async () => {
     });
 
     it("should throw `NotEnoughGas` error", async () => {
-        const transaction = new TransactionNext({
+        const transaction = new Transaction({
             chainID: networkConfig.ChainID,
             sender: wallets.alice.address.bech32(),
             receiver: wallets.alice.address.bech32(),
@@ -155,7 +155,7 @@ describe("test transaction next", async () => {
     });
 
     it("should compute transaction fee", async () => {
-        const transaction = new TransactionNext({
+        const transaction = new Transaction({
             chainID: networkConfig.ChainID,
             sender: wallets.alice.address.bech32(),
             receiver: wallets.alice.address.bech32(),
@@ -169,7 +169,7 @@ describe("test transaction next", async () => {
     });
 
     it("should compute transaction fee for transaction with data field", async () => {
-        const transaction = new TransactionNext({
+        const transaction = new Transaction({
             chainID: networkConfig.ChainID,
             sender: wallets.alice.address.bech32(),
             receiver: wallets.alice.address.bech32(),
@@ -186,7 +186,7 @@ describe("test transaction next", async () => {
     it("should compute guarded transaction", async () => {
         const alice = wallets.alice;
 
-        const transaction = new TransactionNext({
+        const transaction = new Transaction({
             chainID: "local-testnet",
             sender: alice.address.bech32(),
             receiver: wallets.bob.address.bech32(),

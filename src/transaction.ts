@@ -553,8 +553,6 @@ export class TransactionHash extends Hash {
     }
 }
 
-export class TransactionNext extends Transaction {}
-
 /**
  * An utilitary class meant to work together with the {@link TransactionNext} class.
  */

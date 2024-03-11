@@ -1,7 +1,7 @@
 import { ErrBadUsage } from "../errors";
 import { IAddress } from "../interface";
 import { NextTokenTransfer, Token } from "../tokens";
-import { TransactionNext } from "../transaction";
+import { Transaction } from "../transaction";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
 import { TransactionBuilder } from "./transactionBuilder";
 
@@ -41,7 +41,7 @@ export class NextTransferTransactionsFactory {
         receiver: IAddress;
         nativeAmount: bigint;
         data?: string;
-    }): TransactionNext {
+    }): Transaction {
         const data = options.data || "";
 
         return new TransactionBuilder({
@@ -59,7 +59,7 @@ export class NextTransferTransactionsFactory {
         sender: IAddress;
         receiver: IAddress;
         tokenTransfers: NextTokenTransfer[];
-    }): TransactionNext {
+    }): Transaction {
         const numberOfTransfers = options.tokenTransfers.length;
 
         if (numberOfTransfers === 0) {
@@ -93,7 +93,7 @@ export class NextTransferTransactionsFactory {
         sender: IAddress;
         receiver: IAddress;
         tokenTransfers: NextTokenTransfer[];
-    }): TransactionNext {
+    }): Transaction {
         let transferArgs: string[] = [];
         const transfer = options.tokenTransfers[0];
         let extraGasForTransfer = 0n;

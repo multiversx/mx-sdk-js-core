@@ -22,16 +22,18 @@ export class TypeFormulaParser {
                 if (token === TypeFormulaParser.END_TYPE_PARAMETERS) {
                     const type_parameters: TypeFormula[] = [];
 
+                    // Parse type parameters
                     while (true) {
                         if (stack.length === 0) {
                             throw new Error("Badly specified type parameters.");
                         }
 
+                        // If top of stack is "<", we're done with type parameters.
                         if (stack[stack.length - 1] === TypeFormulaParser.BEGIN_TYPE_PARAMETERS) {
                             break;
                         }
 
-                        let item = stack.pop();
+                        const item = stack.pop();
                         let type_formula: TypeFormula;
 
                         if (item instanceof TypeFormula) {
@@ -89,7 +91,9 @@ export class TypeFormulaParser {
                 currentToken += character;
             } else {
                 if (currentToken) {
+                    // Retain current token
                     tokens.push(currentToken.trim());
+                    // Reset current token
                     currentToken = "";
                 }
 
@@ -99,6 +103,7 @@ export class TypeFormulaParser {
         }
 
         if (currentToken) {
+            // Retain the last token (if any)
             tokens.push(currentToken.trim());
         }
 

@@ -83,9 +83,7 @@ export class TypeFormulaParser {
         const tokens: string[] = [];
         let currentToken = "";
 
-        for (let i = 0; i < expression.length; i++) {
-            const character = expression[i];
-
+        for (const character of expression) {
             if (!TypeFormulaParser.PUNCTUATION.includes(character)) {
                 // Non-punctuation character
                 currentToken += character;

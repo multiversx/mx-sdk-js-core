@@ -22,8 +22,7 @@ export class TypeFormulaParser {
                     const typeFormula = this.acquireTypeWithParameters(stack);
                     stack.push(typeFormula);
                 } else if (this.isBeginningOfTypeParameters(token)) {
-                    // The symbol is pushed as a simple string,
-                    // as it will never be interpreted, anyway.
+                    // This symbol is pushed as a simple string.
                     stack.push(token);
                 } else {
                     throw new Error(`Unexpected token (punctuation): ${token}`);
@@ -43,11 +42,11 @@ export class TypeFormulaParser {
 
         const item = stack[0];
 
-        if (typeof item === "string") {
-            // Expression contained a simple, non-generic type
-            return new TypeFormula(item, []);
-        } else if (item instanceof TypeFormula) {
+        if (item instanceof TypeFormula) {
             return item;
+        } else if (typeof item === "string") {
+            // Expression contained a simple, non-generic type.
+            return new TypeFormula(item, []);
         } else {
             throw new Error(`Unexpected item on stack: ${item}`);
         }
@@ -75,7 +74,7 @@ export class TypeFormulaParser {
         }
 
         if (currentToken) {
-            // Retain the last token (if any)
+            // Retain the last token (if any).
             tokens.push(currentToken.trim());
         }
 
@@ -100,15 +99,15 @@ export class TypeFormulaParser {
             }
 
             if (this.isBeginningOfTypeParameters(item)) {
-                // We've acquired all type parameters
+                // We've acquired all type parameters.
                 break;
             }
 
             if (item instanceof TypeFormula) {
-                // Type parameter is a previously-acquired type
+                // Type parameter is a previously-acquired type.
                 typeParameters.push(item);
             } else if (typeof item === "string") {
-                // Type parameter is a simple, non-generic type
+                // Type parameter is a simple, non-generic type.
                 typeParameters.push(new TypeFormula(item, []));
             } else {
                 throw new Error(`Unexpected type parameter object in stack: ${item}`);

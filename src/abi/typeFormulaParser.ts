@@ -20,30 +20,7 @@ export class TypeFormulaParser {
         for (const token of tokens) {
             if (TypeFormulaParser.PUNCTUATION.includes(token)) {
                 if (token === TypeFormulaParser.END_TYPE_PARAMETERS) {
-                    const type_parameters: TypeFormula[] = [];
-
-                    // Parse type parameters
-                    while (true) {
-                        if (stack.length === 0) {
-                            throw new Error("Badly specified type parameters.");
-                        }
-
-                        // If top of stack is "<", we're done with type parameters.
-                        if (stack[stack.length - 1] === TypeFormulaParser.BEGIN_TYPE_PARAMETERS) {
-                            break;
-                        }
-
-                        const item = stack.pop();
-                        let type_formula: TypeFormula;
-
-                        if (item instanceof TypeFormula) {
-                            type_formula = item;
-                        } else {
-                            type_formula = new TypeFormula(item, []);
-                        }
-
-                        type_parameters.push(type_formula);
-                    }
+                    const type_parameters = this.acquireTypeParameters(stack);
 
                     stack.pop(); // pop "<" symbol
                     const type_name = stack.pop();
@@ -108,5 +85,33 @@ export class TypeFormulaParser {
         }
 
         return tokens;
+    }
+
+    private acquireTypeParameters(stack: any[]): TypeFormula[] {
+        const type_parameters: TypeFormula[] = [];
+
+        while (true) {
+            if (stack.length === 0) {
+                throw new Error("Badly specified type parameters.");
+            }
+
+            // If top of stack is "<", we're done with type parameters.
+            if (stack[stack.length - 1] === TypeFormulaParser.BEGIN_TYPE_PARAMETERS) {
+                break;
+            }
+
+            const item = stack.pop();
+            let type_formula: TypeFormula;
+
+            if (item instanceof TypeFormula) {
+                type_formula = item;
+            } else {
+                type_formula = new TypeFormula(item, []);
+            }
+
+            type_parameters.push(type_formula);
+        }
+
+        return type_parameters;
     }
 }

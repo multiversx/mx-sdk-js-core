@@ -14,19 +14,14 @@ export class TypeFormulaParser {
         expression = expression.trim();
 
         const tokens = this.tokenizeExpression(expression).filter((token) => token !== TypeFormulaParser.COMMA);
-
         const stack: any[] = [];
 
         for (const token of tokens) {
-            if (TypeFormulaParser.PUNCTUATION.includes(token)) {
-                if (token === TypeFormulaParser.END_TYPE_PARAMETERS) {
-                    const type_parameters = this.acquireTypeParameters(stack);
-
-                    stack.pop(); // pop "<" symbol
-                    const type_name = stack.pop();
-                    const type_formula = new TypeFormula(type_name, type_parameters.reverse());
+            if (this.isPunctuation(token)) {
+                if (this.isEndOfTypeParameters(token)) {
+                    const type_formula = this.acquireTypeWithParameters(stack);
                     stack.push(type_formula);
-                } else if (token === TypeFormulaParser.BEGIN_TYPE_PARAMETERS) {
+                } else if (this.isBeginningOfTypeParameters(token)) {
                     // The symbol is pushed as a simple string,
                     // as it will never be interpreted, anyway.
                     stack.push(token);
@@ -63,7 +58,7 @@ export class TypeFormulaParser {
         let currentToken = "";
 
         for (const character of expression) {
-            if (!TypeFormulaParser.PUNCTUATION.includes(character)) {
+            if (!this.isPunctuation(character)) {
                 // Non-punctuation character
                 currentToken += character;
             } else {
@@ -87,6 +82,13 @@ export class TypeFormulaParser {
         return tokens;
     }
 
+    private acquireTypeWithParameters(stack: any[]): TypeFormula {
+        const type_parameters = this.acquireTypeParameters(stack);
+        const type_name = stack.pop();
+        const type_formula = new TypeFormula(type_name, type_parameters.reverse());
+        return type_formula;
+    }
+
     private acquireTypeParameters(stack: any[]): TypeFormula[] {
         const type_parameters: TypeFormula[] = [];
 
@@ -95,23 +97,35 @@ export class TypeFormulaParser {
                 throw new Error("Badly specified type parameters.");
             }
 
-            // If top of stack is "<", we're done with type parameters.
-            if (stack[stack.length - 1] === TypeFormulaParser.BEGIN_TYPE_PARAMETERS) {
+            const topOfStack = stack[stack.length - 1];
+            if (this.isBeginningOfTypeParameters(topOfStack)) {
+                stack.pop();
                 break;
             }
 
             const item = stack.pop();
-            let type_formula: TypeFormula;
 
             if (item instanceof TypeFormula) {
-                type_formula = item;
+                type_parameters.push(item);
+            } else if (typeof item === "string") {
+                type_parameters.push(new TypeFormula(item, []));
             } else {
-                type_formula = new TypeFormula(item, []);
+                throw new Error(`Unexpected type parameter object in stack: ${item}`);
             }
-
-            type_parameters.push(type_formula);
         }
 
         return type_parameters;
+    }
+
+    private isPunctuation(token: string): boolean {
+        return TypeFormulaParser.PUNCTUATION.includes(token);
+    }
+
+    private isEndOfTypeParameters(token: string): boolean {
+        return token === TypeFormulaParser.END_TYPE_PARAMETERS;
+    }
+
+    private isBeginningOfTypeParameters(token: string): boolean {
+        return token === TypeFormulaParser.BEGIN_TYPE_PARAMETERS;
     }
 }

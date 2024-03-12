@@ -19,8 +19,8 @@ export class TypeFormulaParser {
         for (const token of tokens) {
             if (this.isPunctuation(token)) {
                 if (this.isEndOfTypeParameters(token)) {
-                    const type_formula = this.acquireTypeWithParameters(stack);
-                    stack.push(type_formula);
+                    const typeFormula = this.acquireTypeWithParameters(stack);
+                    stack.push(typeFormula);
                 } else if (this.isBeginningOfTypeParameters(token)) {
                     // The symbol is pushed as a simple string,
                     // as it will never be interpreted, anyway.
@@ -83,38 +83,39 @@ export class TypeFormulaParser {
     }
 
     private acquireTypeWithParameters(stack: any[]): TypeFormula {
-        const type_parameters = this.acquireTypeParameters(stack);
-        const type_name = stack.pop();
-        const type_formula = new TypeFormula(type_name, type_parameters.reverse());
-        return type_formula;
+        const typeParameters = this.acquireTypeParameters(stack);
+        const typeName = stack.pop();
+        const typeFormula = new TypeFormula(typeName, typeParameters.reverse());
+        return typeFormula;
     }
 
     private acquireTypeParameters(stack: any[]): TypeFormula[] {
-        const type_parameters: TypeFormula[] = [];
+        const typeParameters: TypeFormula[] = [];
 
         while (true) {
-            if (stack.length === 0) {
-                throw new Error("Badly specified type parameters.");
+            const item = stack.pop();
+
+            if (item === undefined) {
+                throw new Error("Badly specified type parameters");
             }
 
-            const topOfStack = stack[stack.length - 1];
-            if (this.isBeginningOfTypeParameters(topOfStack)) {
-                stack.pop();
+            if (this.isBeginningOfTypeParameters(item)) {
+                // We've acquired all type parameters
                 break;
             }
 
-            const item = stack.pop();
-
             if (item instanceof TypeFormula) {
-                type_parameters.push(item);
+                // Type parameter is a previously-acquired type
+                typeParameters.push(item);
             } else if (typeof item === "string") {
-                type_parameters.push(new TypeFormula(item, []));
+                // Type parameter is a simple, non-generic type
+                typeParameters.push(new TypeFormula(item, []));
             } else {
                 throw new Error(`Unexpected type parameter object in stack: ${item}`);
             }
         }
 
-        return type_parameters;
+        return typeParameters;
     }
 
     private isPunctuation(token: string): boolean {

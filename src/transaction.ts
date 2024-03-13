@@ -1,6 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
+import { TransactionsConverter } from "./converters/transactionsConverter";
 import * as errors from "./errors";
 import { Hash } from "./hash";
 import {
@@ -20,7 +21,7 @@ import {
 import { INetworkConfig } from "./interfaceOfNetwork";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
-import { Signature, interpretSignatureAsBuffer } from "./signature";
+import { interpretSignatureAsBuffer } from "./signature";
 import { TransactionPayload } from "./transactionPayload";
 
 const createTransactionHasher = require("blake2b");
@@ -141,16 +142,8 @@ export class Transaction {
         this.options = options.options?.valueOf() || TRANSACTION_OPTIONS_DEFAULT;
         this.guardian = options.guardian ? this.addressAsBech32(options.guardian) : "";
 
-        this.signature = Buffer.from([]);
-        this.guardianSignature = Buffer.from([]);
-
-        // Legacy logic, will be kept for some time, to avoid breaking changes in behavior.
-        if (options.signature?.length) {
-            this.applySignature(options.signature);
-        }
-        if (options.guardianSignature?.length) {
-            this.applyGuardianSignature(options.guardianSignature);
-        }
+        this.signature = options.signature || Buffer.from([]);
+        this.guardianSignature = options.guardianSignature || Buffer.from([]);
     }
 
     private addressAsBech32(address: IAddress | string): string {
@@ -370,74 +363,31 @@ export class Transaction {
     }
 
     /**
-     * Legacy method, use the "converters" package instead.
+     * Legacy method, use "TransactionsConverter.transactionToPlainObject()" instead.
      *
      * Converts the transaction object into a ready-to-serialize, plain JavaScript object.
      * This function is called internally within the signing procedure.
      */
     toPlainObject(): IPlainTransactionObject {
-        const plainObject = {
-            nonce: Number(this.nonce),
-            value: this.value.toString(),
-            receiver: this.receiver,
-            sender: this.sender,
-            senderUsername: this.senderUsername ? Buffer.from(this.senderUsername).toString("base64") : undefined,
-            receiverUsername: this.receiverUsername ? Buffer.from(this.receiverUsername).toString("base64") : undefined,
-            gasPrice: Number(this.gasPrice),
-            gasLimit: Number(this.gasLimit),
-            data: this.data.length == 0 ? undefined : Buffer.from(this.data).toString("base64"),
-            chainID: this.chainID.valueOf(),
-            version: this.getVersion().valueOf(),
-            options: this.getOptions().valueOf() == 0 ? undefined : this.getOptions().valueOf(),
-            guardian: this.guardian ? this.guardian : undefined,
-            signature: this.signature.length ? this.getSignature().toString("hex") : undefined,
-            guardianSignature: this.guardianSignature.length ? this.getGuardianSignature().toString("hex") : undefined,
-        };
-
-        return plainObject;
+        // Ideally, "converters" package should be outside of "core", and not referenced here.
+        const converter = new TransactionsConverter();
+        return converter.transactionToPlainObject(this);
     }
 
     /**
+     * Legacy method, use "TransactionsConverter.plainObjectToTransaction()" instead.
      * Converts a plain object transaction into a Transaction Object.
      *
      * @param plainObjectTransaction Raw data of a transaction, usually obtained by calling toPlainObject()
      */
     static fromPlainObject(plainObjectTransaction: IPlainTransactionObject): Transaction {
-        const tx = new Transaction({
-            nonce: Number(plainObjectTransaction.nonce),
-            value: new BigNumber(plainObjectTransaction.value).toFixed(0),
-            receiver: plainObjectTransaction.receiver,
-            receiverUsername: plainObjectTransaction.receiverUsername
-                ? Buffer.from(plainObjectTransaction.receiverUsername, "base64").toString()
-                : undefined,
-            sender: plainObjectTransaction.sender,
-            senderUsername: plainObjectTransaction.senderUsername
-                ? Buffer.from(plainObjectTransaction.senderUsername, "base64").toString()
-                : undefined,
-            guardian: plainObjectTransaction.guardian ? Address.fromString(plainObjectTransaction.guardian) : undefined,
-            gasPrice: Number(plainObjectTransaction.gasPrice),
-            gasLimit: Number(plainObjectTransaction.gasLimit),
-            data: new TransactionPayload(Buffer.from(plainObjectTransaction.data || "", "base64")),
-            chainID: String(plainObjectTransaction.chainID),
-            version: plainObjectTransaction.version,
-            options:
-                plainObjectTransaction.options != null
-                    ? new TransactionOptions(plainObjectTransaction.options)
-                    : undefined,
-        });
-
-        if (plainObjectTransaction.signature) {
-            tx.applySignature(new Signature(plainObjectTransaction.signature));
-        }
-
-        if (plainObjectTransaction.guardianSignature) {
-            tx.applyGuardianSignature(new Signature(plainObjectTransaction.guardianSignature));
-        }
-
-        return tx;
+        // Ideally, "converters" package should be outside of "core", and not referenced here.
+        const converter = new TransactionsConverter();
+        return converter.plainObjectToTransaction(plainObjectTransaction);
     }
 
     /**
+     * Legacy method, use the "signature" property instead.
      * Applies the signature on the transaction.
      *
      * @param signature The signature, as computed by a signer.
@@ -447,6 +397,7 @@ export class Transaction {
     }
 
     /**
+     * Legacy method, use the "guardianSignature" property instead.
      * Applies the guardian signature on the transaction.
      *
      * @param guardianSignature The signature, as computed by a signer.

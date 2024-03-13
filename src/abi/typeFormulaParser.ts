@@ -57,10 +57,7 @@ export class TypeFormulaParser {
         let currentToken = "";
 
         for (const character of expression) {
-            if (!this.isPunctuation(character)) {
-                // Non-punctuation character
-                currentToken += character;
-            } else {
+            if (this.isPunctuation(character)) {
                 if (currentToken) {
                     // Retain current token
                     tokens.push(currentToken.trim());
@@ -70,6 +67,8 @@ export class TypeFormulaParser {
 
                 // Punctuation character
                 tokens.push(character);
+            } else {
+                currentToken += character;
             }
         }
 

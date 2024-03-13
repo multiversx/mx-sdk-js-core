@@ -114,23 +114,7 @@ export class Transaction {
     /**
      * Creates a new Transaction object.
      */
-    public constructor({
-        nonce,
-        value,
-        sender,
-        receiver,
-        senderUsername,
-        receiverUsername,
-        gasPrice,
-        gasLimit,
-        data,
-        chainID,
-        version,
-        options,
-        guardian,
-        signature,
-        guardianSignature,
-    }: {
+    public constructor(options: {
         nonce?: INonce | bigint;
         value?: ITransactionValue | bigint;
         sender?: IAddress | string;
@@ -147,33 +131,37 @@ export class Transaction {
         signature?: Uint8Array;
         guardianSignature?: Uint8Array;
     }) {
-        this.nonce = BigInt(nonce?.valueOf() || 0n);
+        this.nonce = BigInt(options.nonce?.valueOf() || 0n);
         // We still rely on "bigNumber" for value, because client code might be passing a BigNumber object as a legacy "ITransactionValue",
         // and we want to keep compatibility.
-        this.value = value ? BigInt(new BigNumber(value.toString()).toFixed(0)) : 0n;
-        this.sender = sender ? (typeof sender === "string" ? sender : sender.bech32()) : "";
-        this.receiver = receiver ? (typeof receiver === "string" ? receiver : receiver.bech32()) : "";
-        this.senderUsername = senderUsername || "";
-        this.receiverUsername = receiverUsername || "";
-        this.gasPrice = BigInt(gasPrice?.valueOf() || TRANSACTION_MIN_GAS_PRICE);
-        this.gasLimit = BigInt(gasLimit?.valueOf() || 0n);
-        this.data = data?.valueOf() || new Uint8Array();
-        this.chainID = chainID?.valueOf() || "";
-        this.version = version?.valueOf() || TRANSACTION_VERSION_DEFAULT;
-        this.options = options?.valueOf() || TRANSACTION_OPTIONS_DEFAULT;
-        this.guardian = guardian ? (typeof guardian === "string" ? guardian : guardian.bech32()) : "";
+        this.value = options.value ? BigInt(new BigNumber(options.value.toString()).toFixed(0)) : 0n;
+        this.sender = options.sender ? this.addressAsBech32(options.sender) : "";
+        this.receiver = options.receiver ? this.addressAsBech32(options.receiver) : "";
+        this.senderUsername = options.senderUsername || "";
+        this.receiverUsername = options.receiverUsername || "";
+        this.gasPrice = BigInt(options.gasPrice?.valueOf() || TRANSACTION_MIN_GAS_PRICE);
+        this.gasLimit = BigInt(options.gasLimit?.valueOf() || 0n);
+        this.data = options.data?.valueOf() || new Uint8Array();
+        this.chainID = options.chainID?.valueOf() || "";
+        this.version = options.version?.valueOf() || TRANSACTION_VERSION_DEFAULT;
+        this.options = options.options?.valueOf() || TRANSACTION_OPTIONS_DEFAULT;
+        this.guardian = options.guardian ? this.addressAsBech32(options.guardian) : "";
 
         this.signature = Buffer.from([]);
         this.guardianSignature = Buffer.from([]);
         this.hash = TransactionHash.empty();
 
         // Legacy logic, will be kept for some time, to avoid breaking changes in behavior.
-        if (signature?.length) {
-            this.applySignature(signature);
+        if (options.signature?.length) {
+            this.applySignature(options.signature);
         }
-        if (guardianSignature?.length) {
-            this.applyGuardianSignature(guardianSignature);
+        if (options.guardianSignature?.length) {
+            this.applyGuardianSignature(options.guardianSignature);
         }
+    }
+
+    private addressAsBech32(address: IAddress | string): string {
+        return typeof address === "string" ? address : address.bech32();
     }
 
     /**

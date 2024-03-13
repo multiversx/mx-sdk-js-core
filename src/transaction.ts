@@ -42,12 +42,12 @@ export class Transaction {
     public value: bigint;
 
     /**
-     * The address of the sender.
+     * The address of the sender, in bech32 format.
      */
     public sender: string;
 
     /**
-     * The address of the receiver.
+     * The address of the receiver, in bech32 format.
      */
     public receiver: string;
 
@@ -92,7 +92,7 @@ export class Transaction {
     public options: number;
 
     /**
-     * The address of the guardian.
+     * The address of the guardian, in bech32 format.
      */
     public guardian: string;
 

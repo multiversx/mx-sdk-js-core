@@ -101,6 +101,8 @@ export class RelayedTransactionV2Builder {
                 this.innerTransactionGasLimit.valueOf() + this.netConfig.MinGasLimit + this.netConfig.GasPerDataByte * payload.length(),
             data: payload,
             chainID: this.netConfig.ChainID,
+            version: this.innerTransaction.getVersion(),
+            options: this.innerTransaction.getOptions()
         });
 
         if (this.relayerNonce) {

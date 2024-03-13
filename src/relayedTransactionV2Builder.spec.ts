@@ -67,6 +67,7 @@ describe("test relayed v2 transaction builder", function () {
             gasLimit: 0,
             chainID: networkConfig.ChainID,
             data: new TransactionPayload("getContractConfig"),
+            version: 2,
         });
 
         innerTx.applySignature(await bob.signer.sign(innerTx.serializeForSigning()));
@@ -84,6 +85,7 @@ describe("test relayed v2 transaction builder", function () {
         relayedTxV2.applySignature(await alice.signer.sign(relayedTxV2.serializeForSigning()));
 
         assert.equal(relayedTxV2.getNonce().valueOf(), 37);
+        assert.equal(relayedTxV2.getVersion().valueOf(), 2);
         assert.equal(
             relayedTxV2.getData().toString(),
             "relayedTxV2@000000000000000000010000000000000000000000000000000000000002ffff@0f@676574436f6e7472616374436f6e666967@fc3ed87a51ee659f937c1a1ed11c1ae677e99629fae9cc289461f033e6514d1a8cfad1144ae9c1b70f28554d196bd6ba1604240c1c1dc19c959e96c1c3b62d0c");

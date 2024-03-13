@@ -532,22 +532,8 @@ export class TransactionComputer {
         // TODO: do some checks for the transaction e.g. sender, chain ID etc.
         // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
 
-        const plainTransaction = this.toPlainObject(transaction);
-
-        if (plainTransaction.signature) {
-            delete plainTransaction.signature;
-        }
-
-        if (plainTransaction.guardianSignature) {
-            delete plainTransaction.guardianSignature;
-        }
-
-        if (!plainTransaction.guardian) {
-            delete plainTransaction.guardian;
-        }
-
+        const plainTransaction = this.toPlainObjectForSigning(transaction);
         const serialized = JSON.stringify(plainTransaction);
-
         return new Uint8Array(Buffer.from(serialized));
     }
 
@@ -560,7 +546,7 @@ export class TransactionComputer {
         return Buffer.from(hash, "hex");
     }
 
-    private toPlainObject(transaction: ITransaction) {
+    private toPlainObjectForSigning(transaction: ITransaction) {
         return {
             nonce: Number(transaction.nonce),
             value: transaction.value.toString(),
@@ -582,14 +568,8 @@ export class TransactionComputer {
             version: transaction.version,
             options: transaction.options ? transaction.options : undefined,
             guardian: transaction.guardian ? transaction.guardian : undefined,
-            signature:
-                transaction.signature.length == 0 ? undefined : Buffer.from(transaction.signature).toString("hex"),
-            guardianSignature:
-                transaction.guardianSignature.length == 0
-                    ? undefined
-                    : Buffer.from(transaction.guardianSignature).toString("hex"),
         };
     }
 
-    // TODO: missing functions from specs, with setting options etc.?
+    // TODO: add missing functions wrt. specs
 }

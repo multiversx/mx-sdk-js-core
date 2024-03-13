@@ -22,7 +22,6 @@ import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
 import { Signature, interpretSignatureAsBuffer } from "./signature";
 import { TransactionPayload } from "./transactionPayload";
-import { guardNotEmpty } from "./utils";
 
 const createTransactionHasher = require("blake2b");
 const TRANSACTION_HASH_LENGTH = 32;
@@ -107,11 +106,6 @@ export class Transaction {
     public guardianSignature: Uint8Array;
 
     /**
-     * The transaction hash, also used as a transaction identifier.
-     */
-    private hash: TransactionHash;
-
-    /**
      * Creates a new Transaction object.
      */
     public constructor(options: {
@@ -149,7 +143,6 @@ export class Transaction {
 
         this.signature = Buffer.from([]);
         this.guardianSignature = Buffer.from([]);
-        this.hash = TransactionHash.empty();
 
         // Legacy logic, will be kept for some time, to avoid breaking changes in behavior.
         if (options.signature?.length) {
@@ -353,8 +346,7 @@ export class Transaction {
      * Legacy method, use "TransactionComputer.computeTransactionHash()" instead.
      */
     getHash(): TransactionHash {
-        guardNotEmpty(this.hash, "hash");
-        return this.hash;
+        return TransactionHash.compute(this);
     }
 
     /**
@@ -452,7 +444,6 @@ export class Transaction {
      */
     applySignature(signature: ISignature | Uint8Array) {
         this.signature = interpretSignatureAsBuffer(signature);
-        this.hash = TransactionHash.compute(this);
     }
 
     /**
@@ -462,7 +453,6 @@ export class Transaction {
      */
     applyGuardianSignature(guardianSignature: ISignature | Uint8Array) {
         this.guardianSignature = interpretSignatureAsBuffer(guardianSignature);
-        this.hash = TransactionHash.compute(this);
     }
 
     /**
@@ -487,6 +477,7 @@ export class Transaction {
 }
 
 /**
+ * Legacy class, use "TransactionComputer.computeTransactionHash()" instead.
  * An abstraction for handling and computing transaction hashes.
  */
 export class TransactionHash extends Hash {
@@ -495,13 +486,13 @@ export class TransactionHash extends Hash {
     }
 
     /**
+     * Legacy method, use "TransactionComputer.computeTransactionHash()" instead.
      * Computes the hash of a transaction.
      */
     static compute(transaction: Transaction): TransactionHash {
-        let serializer = new ProtoSerializer();
-        let buffer = serializer.serializeTransaction(transaction);
-        let hash = createTransactionHasher(TRANSACTION_HASH_LENGTH).update(buffer).digest("hex");
-        return new TransactionHash(hash);
+        const computer = new TransactionComputer();
+        const hash = computer.computeTransactionHash(transaction);
+        return new TransactionHash(Buffer.from(hash).toString("hex"));
     }
 }
 

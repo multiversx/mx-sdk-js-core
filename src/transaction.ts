@@ -117,14 +117,14 @@ export class Transaction {
     public constructor(options: {
         nonce?: INonce | bigint;
         value?: ITransactionValue | bigint;
-        sender?: IAddress | string;
-        receiver?: IAddress | string;
+        sender: IAddress | string;
+        receiver: IAddress | string;
         senderUsername?: string;
         receiverUsername?: string;
         gasPrice?: IGasPrice | bigint;
-        gasLimit?: IGasLimit | bigint;
+        gasLimit: IGasLimit | bigint;
         data?: ITransactionPayload | Uint8Array;
-        chainID?: IChainID | string;
+        chainID: IChainID | string;
         version?: ITransactionVersion | number;
         options?: ITransactionOptions | number;
         guardian?: IAddress | string;
@@ -135,14 +135,14 @@ export class Transaction {
         // We still rely on "bigNumber" for value, because client code might be passing a BigNumber object as a legacy "ITransactionValue",
         // and we want to keep compatibility.
         this.value = options.value ? BigInt(new BigNumber(options.value.toString()).toFixed(0)) : 0n;
-        this.sender = options.sender ? this.addressAsBech32(options.sender) : "";
-        this.receiver = options.receiver ? this.addressAsBech32(options.receiver) : "";
+        this.sender = this.addressAsBech32(options.sender);
+        this.receiver = this.addressAsBech32(options.receiver);
         this.senderUsername = options.senderUsername || "";
         this.receiverUsername = options.receiverUsername || "";
         this.gasPrice = BigInt(options.gasPrice?.valueOf() || TRANSACTION_MIN_GAS_PRICE);
-        this.gasLimit = BigInt(options.gasLimit?.valueOf() || 0n);
+        this.gasLimit = BigInt(options.gasLimit.valueOf());
         this.data = options.data?.valueOf() || new Uint8Array();
-        this.chainID = options.chainID?.valueOf() || "";
+        this.chainID = options.chainID.valueOf();
         this.version = options.version?.valueOf() || TRANSACTION_VERSION_DEFAULT;
         this.options = options.options?.valueOf() || TRANSACTION_OPTIONS_DEFAULT;
         this.guardian = options.guardian ? this.addressAsBech32(options.guardian) : "";

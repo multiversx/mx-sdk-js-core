@@ -538,8 +538,7 @@ export class TransactionComputer {
     }
 
     computeTransactionHash(transaction: ITransaction): Uint8Array {
-        let serializer = new ProtoSerializer();
-
+        const serializer = new ProtoSerializer();
         const buffer = serializer.serializeTransaction(new Transaction(transaction));
         const hash = createTransactionHasher(TRANSACTION_HASH_LENGTH).update(buffer).digest("hex");
 
@@ -552,23 +551,20 @@ export class TransactionComputer {
             value: transaction.value.toString(),
             receiver: transaction.receiver,
             sender: transaction.sender,
-            senderUsername: transaction.senderUsername
-                ? Buffer.from(transaction.senderUsername).toString("base64")
-                : undefined,
-            receiverUsername: transaction.receiverUsername
-                ? Buffer.from(transaction.receiverUsername).toString("base64")
-                : undefined,
+            senderUsername: this.toBase64OrUndefined(transaction.senderUsername),
+            receiverUsername: this.toBase64OrUndefined(transaction.receiverUsername),
             gasPrice: Number(transaction.gasPrice),
             gasLimit: Number(transaction.gasLimit),
-            data:
-                transaction.data && transaction.data.length === 0
-                    ? undefined
-                    : Buffer.from(transaction.data).toString("base64"),
+            data: this.toBase64OrUndefined(transaction.data),
             chainID: transaction.chainID,
             version: transaction.version,
             options: transaction.options ? transaction.options : undefined,
             guardian: transaction.guardian ? transaction.guardian : undefined,
         };
+    }
+
+    private toBase64OrUndefined(value?: string | Uint8Array) {
+        return value && value.length ? Buffer.from(value).toString("base64") : undefined;
     }
 
     // TODO: add missing functions wrt. specs

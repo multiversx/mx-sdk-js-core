@@ -358,28 +358,14 @@ export class Transaction {
     }
 
     /**
+     * Legacy method, use "TransactionComputer.computeBytesForSigning()" instead.
      * Serializes a transaction to a sequence of bytes, ready to be signed.
      * This function is called internally by signers.
      */
     serializeForSigning(): Buffer {
-        // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
-        let plain = this.toPlainObject();
-        // Make sure we never sign the transaction with another signature set up (useful when using the same method for verification)
-        if (plain.signature) {
-            delete plain.signature;
-        }
-
-        if (plain.guardianSignature) {
-            delete plain.guardianSignature;
-        }
-
-        if (!plain.guardian) {
-            delete plain.guardian;
-        }
-
-        let serialized = JSON.stringify(plain);
-
-        return Buffer.from(serialized);
+        const computer = new TransactionComputer();
+        const bytes = computer.computeBytesForSigning(this);
+        return Buffer.from(bytes);
     }
 
     /**
@@ -553,6 +539,7 @@ export class TransactionComputer {
 
     computeBytesForSigning(transaction: ITransaction): Uint8Array {
         // TODO: do some checks for the transaction e.g. sender, chain ID etc.
+        // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
 
         const plainTransaction = this.toPlainObject(transaction);
 

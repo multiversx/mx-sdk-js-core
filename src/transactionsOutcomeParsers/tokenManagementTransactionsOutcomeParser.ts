@@ -71,15 +71,20 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "ESDTSetRole");
+        return events.map((event) => this.getOutputForSetSpecialRoleEvent(event));
+    }
 
-        return events.map((event) => {
-            const userAddress = event.address;
-            const tokenIdentifier = this.extractTokenIdentifier(event);
-            const encodedRoles = event.topics.slice(3);
-            const roles = encodedRoles.map((role) => this.decodeTopicAsString(role));
+    private getOutputForSetSpecialRoleEvent(event: TransactionEvent): {
+        userAddress: string;
+        tokenIdentifier: string;
+        roles: string[];
+    } {
+        const userAddress = event.address;
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const encodedRoles = event.topics.slice(3);
+        const roles = encodedRoles.map((role) => this.decodeTopicAsString(role));
 
-            return { userAddress: userAddress, tokenIdentifier: tokenIdentifier, roles: roles };
-        });
+        return { userAddress: userAddress, tokenIdentifier: tokenIdentifier, roles: roles };
     }
 
     parseNftCreate(transactionOutcome: TransactionOutcome): {
@@ -90,14 +95,19 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "ESDTNFTCreate");
+        return events.map((event) => this.getOutputForNftCreateEvent(event));
+    }
 
-        return events.map((event) => {
-            const tokenIdentifier = this.extractTokenIdentifier(event);
-            const nonce = this.extractNonce(event);
-            const amount = this.extractAmount(event);
+    private getOutputForNftCreateEvent(event: TransactionEvent): {
+        tokenIdentifier: string;
+        nonce: bigint;
+        initialQuantity: bigint;
+    } {
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const amount = this.extractAmount(event);
 
-            return { tokenIdentifier: tokenIdentifier, nonce: nonce, initialQuantity: amount };
-        });
+        return { tokenIdentifier: tokenIdentifier, nonce: nonce, initialQuantity: amount };
     }
 
     parseLocalMint(transactionOutcome: TransactionOutcome): {
@@ -109,20 +119,26 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "ESDTLocalMint");
+        return events.map((event) => this.getOutputForLocalMintEvent(event));
+    }
 
-        return events.map((event) => {
-            const userAddress = event.address;
-            const tokenIdentifier = this.extractTokenIdentifier(event);
-            const nonce = this.extractNonce(event);
-            const mintedSupply = this.extractAmount(event);
+    private getOutputForLocalMintEvent(event: TransactionEvent): {
+        userAddress: string;
+        tokenIdentifier: string;
+        nonce: bigint;
+        mintedSupply: bigint;
+    } {
+        const userAddress = event.address;
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const mintedSupply = this.extractAmount(event);
 
-            return {
-                userAddress: userAddress,
-                tokenIdentifier: tokenIdentifier,
-                nonce: nonce,
-                mintedSupply: mintedSupply,
-            };
-        });
+        return {
+            userAddress: userAddress,
+            tokenIdentifier: tokenIdentifier,
+            nonce: nonce,
+            mintedSupply: mintedSupply,
+        };
     }
 
     parseLocalBurn(transactionOutcome: TransactionOutcome): {
@@ -134,27 +150,32 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "ESDTLocalBurn");
+        return events.map((event) => this.getOutputForLocalBurnEvent(event));
+    }
 
-        return events.map((event) => {
-            const userAddress = event.address;
-            const tokenIdentifier = this.extractTokenIdentifier(event);
-            const nonce = this.extractNonce(event);
-            const burntSupply = this.extractAmount(event);
+    private getOutputForLocalBurnEvent(event: TransactionEvent): {
+        userAddress: string;
+        tokenIdentifier: string;
+        nonce: bigint;
+        burntSupply: bigint;
+    } {
+        const userAddress = event.address;
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const burntSupply = this.extractAmount(event);
 
-            return {
-                userAddress: userAddress,
-                tokenIdentifier: tokenIdentifier,
-                nonce: nonce,
-                burntSupply: burntSupply,
-            };
-        });
+        return {
+            userAddress: userAddress,
+            tokenIdentifier: tokenIdentifier,
+            nonce: nonce,
+            burntSupply: burntSupply,
+        };
     }
 
     parsePause(transactionOutcome: TransactionOutcome): { tokenIdentifier: string }[] {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "ESDTPause");
-
         return events.map((event) => ({ tokenIdentifier: this.extractTokenIdentifier(event) }));
     }
 
@@ -174,20 +195,26 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "ESDTFreeze");
+        return events.map((event) => this.getOutputForFreezeEvent(event));
+    }
 
-        return events.map((event) => {
-            const userAddress = this.extractAddress(event);
-            const tokenIdentifier = this.extractTokenIdentifier(event);
-            const nonce = this.extractNonce(event);
-            const balance = this.extractAmount(event);
+    private getOutputForFreezeEvent(event: TransactionEvent): {
+        userAddress: string;
+        tokenIdentifier: string;
+        nonce: bigint;
+        balance: bigint;
+    } {
+        const userAddress = this.extractAddress(event);
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const balance = this.extractAmount(event);
 
-            return {
-                userAddress: userAddress,
-                tokenIdentifier: tokenIdentifier,
-                nonce: nonce,
-                balance: balance,
-            };
-        });
+        return {
+            userAddress: userAddress,
+            tokenIdentifier: tokenIdentifier,
+            nonce: nonce,
+            balance: balance,
+        };
     }
 
     parseUnfreeze(transactionOutcome: TransactionOutcome): {
@@ -199,20 +226,26 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "ESDTUnFreeze");
+        return events.map((event) => this.getOutputForUnfreezeEvent(event));
+    }
 
-        return events.map((event) => {
-            const userAddress = this.extractAddress(event);
-            const tokenIdentifier = this.extractTokenIdentifier(event);
-            const nonce = this.extractNonce(event);
-            const balance = this.extractAmount(event);
+    private getOutputForUnfreezeEvent(event: TransactionEvent): {
+        userAddress: string;
+        tokenIdentifier: string;
+        nonce: bigint;
+        balance: bigint;
+    } {
+        const userAddress = this.extractAddress(event);
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const balance = this.extractAmount(event);
 
-            return {
-                userAddress: userAddress,
-                tokenIdentifier: tokenIdentifier,
-                nonce: nonce,
-                balance: balance,
-            };
-        });
+        return {
+            userAddress: userAddress,
+            tokenIdentifier: tokenIdentifier,
+            nonce: nonce,
+            balance: balance,
+        };
     }
 
     parseWipe(transactionOutcome: TransactionOutcome): {
@@ -224,19 +257,26 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "ESDTWipe");
-        return events.map((event) => {
-            const userAddress = this.extractAddress(event);
-            const tokenIdentifier = this.extractTokenIdentifier(event);
-            const nonce = this.extractNonce(event);
-            const balance = this.extractAmount(event);
+        return events.map((event) => this.getOutputForWipeEvent(event));
+    }
 
-            return {
-                userAddress: userAddress,
-                tokenIdentifier: tokenIdentifier,
-                nonce: nonce,
-                balance: balance,
-            };
-        });
+    private getOutputForWipeEvent(event: TransactionEvent): {
+        userAddress: string;
+        tokenIdentifier: string;
+        nonce: bigint;
+        balance: bigint;
+    } {
+        const userAddress = this.extractAddress(event);
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const balance = this.extractAmount(event);
+
+        return {
+            userAddress: userAddress,
+            tokenIdentifier: tokenIdentifier,
+            nonce: nonce,
+            balance: balance,
+        };
     }
 
     parseUpdateAttributes(transactionOutcome: TransactionOutcome): {
@@ -247,17 +287,23 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "ESDTNFTUpdateAttributes");
-        return events.map((event) => {
-            const tokenIdentifier = this.extractTokenIdentifier(event);
-            const nonce = this.extractNonce(event);
-            const attributes = event.topics[3] ? Buffer.from(event.topics[3], "base64") : new Uint8Array();
+        return events.map((event) => this.getOutputForUpdateAttributesEvent(event));
+    }
 
-            return {
-                tokenIdentifier: tokenIdentifier,
-                nonce: nonce,
-                attributes: attributes,
-            };
-        });
+    private getOutputForUpdateAttributesEvent(event: TransactionEvent): {
+        tokenIdentifier: string;
+        nonce: bigint;
+        attributes: Uint8Array;
+    } {
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const attributes = event.topics[3] ? Buffer.from(event.topics[3], "base64") : new Uint8Array();
+
+        return {
+            tokenIdentifier: tokenIdentifier,
+            nonce: nonce,
+            attributes: attributes,
+        };
     }
 
     parseAddQuantity(transactionOutcome: TransactionOutcome): {
@@ -268,17 +314,23 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "ESDTNFTAddQuantity");
-        return events.map((event) => {
-            const tokenIdentifier = this.extractTokenIdentifier(event);
-            const nonce = this.extractNonce(event);
-            const addedQuantity = this.extractAmount(event);
+        return events.map((event) => this.getOutputForAddQuantityEvent(event));
+    }
 
-            return {
-                tokenIdentifier: tokenIdentifier,
-                nonce: nonce,
-                addedQuantity: addedQuantity,
-            };
-        });
+    private getOutputForAddQuantityEvent(event: TransactionEvent): {
+        tokenIdentifier: string;
+        nonce: bigint;
+        addedQuantity: bigint;
+    } {
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const addedQuantity = this.extractAmount(event);
+
+        return {
+            tokenIdentifier: tokenIdentifier,
+            nonce: nonce,
+            addedQuantity: addedQuantity,
+        };
     }
 
     parseBurnQuantity(transactionOutcome: TransactionOutcome): {
@@ -289,17 +341,23 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "ESDTNFTBurn");
-        return events.map((event) => {
-            const tokenIdentifier = this.extractTokenIdentifier(event);
-            const nonce = this.extractNonce(event);
-            const burntQuantity = this.extractAmount(event);
+        return events.map((event) => this.getOutputForBurnQuantityEvent(event));
+    }
 
-            return {
-                tokenIdentifier: tokenIdentifier,
-                nonce: nonce,
-                burntQuantity: burntQuantity,
-            };
-        });
+    private getOutputForBurnQuantityEvent(event: TransactionEvent): {
+        tokenIdentifier: string;
+        nonce: bigint;
+        burntQuantity: bigint;
+    } {
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const burntQuantity = this.extractAmount(event);
+
+        return {
+            tokenIdentifier: tokenIdentifier,
+            nonce: nonce,
+            burntQuantity: burntQuantity,
+        };
     }
 
     private ensureNoError(transactionEvents: TransactionEvent[]) {

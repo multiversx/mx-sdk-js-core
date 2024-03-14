@@ -41,6 +41,7 @@ export class TransactionOnNetwork {
     sender: IAddress = new Address("");
     gasLimit: number = 0;
     gasPrice: number = 0;
+    function: string = "";
     data: Buffer = Buffer.from([]);
     signature: string = "";
     status: TransactionStatus = TransactionStatus.createUnknown();
@@ -90,6 +91,7 @@ export class TransactionOnNetwork {
         result.receiver = new Address(response.receiver);
         result.gasPrice = response.gasPrice || 0;
         result.gasLimit = response.gasLimit || 0;
+        result.function = response.function || "";
         result.data = Buffer.from(response.data || "", "base64");
         result.status = new TransactionStatus(response.status);
         result.timestamp = response.timestamp || 0;

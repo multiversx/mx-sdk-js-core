@@ -7,8 +7,7 @@ describe("test token management transactions outcome parser", () => {
     const parser = new DelegationTransactionsOutcomeParser();
 
     it("should test parseCreateNewDelegationContract ", () => {
-        const contractAddress = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqpf0llllsccsy0c");
-        const contractAddressB64 = Buffer.from(contractAddress.toBech32()).toString("base64");
+        const contractAddress = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy8lllls62y8s5");
 
         const delegateEvent = new TransactionEvent({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
@@ -25,7 +24,7 @@ describe("test token management transactions outcome parser", () => {
         const scDeployEvent = new TransactionEvent({
             address: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy8lllls62y8s5",
             identifier: "SCDeploy",
-            topics: [contractAddressB64, "PDXX6ssamaSgzKpTfvDMCuEJ9B9sK0AiA+Yzv7sHH1w="],
+            topics: ["AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAABD///8=", "PDXX6ssamaSgzKpTfvDMCuEJ9B9sK0AiA+Yzv7sHH1w="],
         });
 
         const logs = new TransactionLogs({ events: [delegateEvent, scDeployEvent] });

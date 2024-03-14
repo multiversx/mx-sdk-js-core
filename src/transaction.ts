@@ -1,16 +1,28 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
-import { Compatibility } from "./compatibility";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
+import { TransactionsConverter } from "./converters/transactionsConverter";
 import * as errors from "./errors";
 import { Hash } from "./hash";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionNext, ITransactionOptions, ITransactionPayload, ITransactionValue, ITransactionVersion } from "./interface";
+import {
+    IAddress,
+    IChainID,
+    IGasLimit,
+    IGasPrice,
+    INonce,
+    IPlainTransactionObject,
+    ISignature,
+    ITransaction,
+    ITransactionOptions,
+    ITransactionPayload,
+    ITransactionValue,
+    ITransactionVersion,
+} from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
-import { Signature, interpretSignatureAsBuffer } from "./signature";
+import { interpretSignatureAsBuffer } from "./signature";
 import { TransactionPayload } from "./transactionPayload";
-import { guardNotEmpty } from "./utils";
 
 const createTransactionHasher = require("blake2b");
 const TRANSACTION_HASH_LENGTH = 32;
@@ -19,647 +31,492 @@ const TRANSACTION_HASH_LENGTH = 32;
  * An abstraction for creating, signing and broadcasting transactions.
  */
 export class Transaction {
-  /**
-   * The nonce of the transaction (the account sequence number of the sender).
-   */
-  private nonce: INonce;
+    /**
+     * The nonce of the transaction (the account sequence number of the sender).
+     */
+    public nonce: bigint;
 
-  /**
-   * The value to transfer.
-   */
-  private value: ITransactionValue;
+    /**
+     * The value to transfer.
+     */
+    public value: bigint;
 
-  /**
-   * The address of the sender.
-   */
-  private sender: IAddress;
+    /**
+     * The address of the sender, in bech32 format.
+     */
+    public sender: string;
 
-  /**
-   * The address of the receiver.
-   */
-  private readonly receiver: IAddress;
+    /**
+     * The address of the receiver, in bech32 format.
+     */
+    public receiver: string;
 
-  /**
-   * The username of the sender.
-   */
-  private senderUsername: string;
+    /**
+     * The username of the sender.
+     */
+    public senderUsername: string;
 
-  /** 
-   * The username of the receiver.
-   */
-  private receiverUsername: string;
+    /**
+     * The username of the receiver.
+     */
+    public receiverUsername: string;
 
-  /**
-   * The gas price to be used.
-   */
-  private gasPrice: IGasPrice;
+    /**
+     * The gas price to be used.
+     */
+    public gasPrice: bigint;
 
-  /**
-   * The maximum amount of gas to be consumed when processing the transaction.
-   */
-  private gasLimit: IGasLimit;
+    /**
+     * The maximum amount of gas to be consumed when processing the transaction.
+     */
+    public gasLimit: bigint;
 
-  /**
-   * The payload of the transaction.
-   */
-  private readonly data: ITransactionPayload;
+    /**
+     * The payload of the transaction.
+     */
+    public data: Uint8Array;
 
-  /**
-   * The chain ID of the Network (e.g. "1" for Mainnet).
-   */
-  private chainID: IChainID;
+    /**
+     * The chain ID of the Network (e.g. "1" for Mainnet).
+     */
+    public chainID: string;
 
-  /**
-   * The version, required by the Network in order to correctly interpret the contents of the transaction.
-   * @deprecated Use getVersion() and setVersion() instead.
-   */
-  version: TransactionVersion;
+    /**
+     * The version, required by the Network in order to correctly interpret the contents of the transaction.
+     */
+    public version: number;
 
-  /**
-   * The options field, useful for describing different settings available for transactions
-   * @deprecated Use getOptions() and setOptions() instead.
-   */
-  options: TransactionOptions;
+    /**
+     * The options field, useful for describing different settings available for transactions.
+     */
+    public options: number;
 
-  /**
-   * The address of the guardian.
-   */
-  private guardian: IAddress;
+    /**
+     * The address of the guardian, in bech32 format.
+     */
+    public guardian: string;
 
-  /**
-   * The signature.
-   */
-  private signature: Buffer;
+    /**
+     * The signature.
+     */
+    public signature: Uint8Array;
 
-  /**
-   * The signature of the guardian.
-   */
-  private guardianSignature: Buffer;
+    /**
+     * The signature of the guardian.
+     */
+    public guardianSignature: Uint8Array;
 
-  /**
-   * The transaction hash, also used as a transaction identifier.
-   */
-  private hash: TransactionHash;
+    /**
+     * Creates a new Transaction object.
+     */
+    public constructor(options: {
+        nonce?: INonce | bigint;
+        value?: ITransactionValue | bigint;
+        sender: IAddress | string;
+        receiver: IAddress | string;
+        senderUsername?: string;
+        receiverUsername?: string;
+        gasPrice?: IGasPrice | bigint;
+        gasLimit: IGasLimit | bigint;
+        data?: ITransactionPayload | Uint8Array;
+        chainID: IChainID | string;
+        version?: ITransactionVersion | number;
+        options?: ITransactionOptions | number;
+        guardian?: IAddress | string;
+        signature?: Uint8Array;
+        guardianSignature?: Uint8Array;
+    }) {
+        this.nonce = BigInt(options.nonce?.valueOf() || 0n);
+        // We still rely on "bigNumber" for value, because client code might be passing a BigNumber object as a legacy "ITransactionValue",
+        // and we want to keep compatibility.
+        this.value = options.value ? BigInt(new BigNumber(options.value.toString()).toFixed(0)) : 0n;
+        this.sender = this.addressAsBech32(options.sender);
+        this.receiver = this.addressAsBech32(options.receiver);
+        this.senderUsername = options.senderUsername || "";
+        this.receiverUsername = options.receiverUsername || "";
+        this.gasPrice = BigInt(options.gasPrice?.valueOf() || TRANSACTION_MIN_GAS_PRICE);
+        this.gasLimit = BigInt(options.gasLimit.valueOf());
+        this.data = options.data?.valueOf() || new Uint8Array();
+        this.chainID = options.chainID.valueOf();
+        this.version = options.version?.valueOf() || TRANSACTION_VERSION_DEFAULT;
+        this.options = options.options?.valueOf() || TRANSACTION_OPTIONS_DEFAULT;
+        this.guardian = options.guardian ? this.addressAsBech32(options.guardian) : "";
 
-  /**
-   * Creates a new Transaction object.
-   */
-  public constructor({
-    nonce,
-    value,
-    sender,
-    receiver,
-    senderUsername,
-    receiverUsername,
-    gasPrice,
-    gasLimit,
-    data,
-    chainID,
-    version,
-    options,
-    guardian,
-  }: {
-    nonce?: INonce;
-    value?: ITransactionValue;
-    sender: IAddress;
-    receiver: IAddress;
-    senderUsername?: string;
-    receiverUsername?: string;
-    gasPrice?: IGasPrice;
-    gasLimit: IGasLimit;
-    data?: ITransactionPayload;
-    chainID: IChainID;
-    version?: ITransactionVersion;
-    options?: ITransactionOptions;
-    guardian?: IAddress;
-  }) {
-    this.nonce = nonce || 0;
-    this.value = value ? new BigNumber(value.toString()).toFixed(0) : 0;
-    this.sender = sender;
-    this.receiver = receiver;
-    this.senderUsername = senderUsername || "";
-    this.receiverUsername = receiverUsername || "";
-    this.gasPrice = gasPrice || TRANSACTION_MIN_GAS_PRICE;
-    this.gasLimit = gasLimit;
-    this.data = data || new TransactionPayload();
-    this.chainID = chainID;
-    this.version = version ? new TransactionVersion(version.valueOf()) : TransactionVersion.withDefaultVersion();
-    this.options = options ? new TransactionOptions(options.valueOf()) : TransactionOptions.withDefaultOptions();
-    this.guardian = guardian || Address.empty();
-
-    this.signature = Buffer.from([]);
-    this.guardianSignature = Buffer.from([]);
-    this.hash = TransactionHash.empty();
-  }
-
-  getNonce(): INonce {
-    return this.nonce;
-  }
-
-  /**
-   * Sets the account sequence number of the sender. Must be done prior signing.
-   */
-  setNonce(nonce: INonce) {
-    this.nonce = nonce;
-  }
-
-  getValue(): ITransactionValue {
-    return this.value;
-  }
-
-  setValue(value: ITransactionValue) {
-    this.value = value;
-  }
-
-  getSender(): IAddress {
-    return this.sender;
-  }
-
-  setSender(sender: IAddress) {
-    this.sender = sender;
-  }
-
-  getReceiver(): IAddress {
-    return this.receiver;
-  }
-
-  getSenderUsername(): string {
-    return this.senderUsername;
-  }
-
-  setSenderUsername(senderUsername: string) {
-    this.senderUsername = senderUsername;
-  }
-
-  getReceiverUsername(): string {
-    return this.receiverUsername;
-  }
-
-  setReceiverUsername(receiverUsername: string) {
-    this.receiverUsername = receiverUsername;
-  }
-
-  getGuardian(): IAddress {
-    return this.guardian;
-  }
-
-  getGasPrice(): IGasPrice {
-    return this.gasPrice;
-  }
-
-  setGasPrice(gasPrice: IGasPrice) {
-    this.gasPrice = gasPrice;
-  }
-
-  getGasLimit(): IGasLimit {
-    return this.gasLimit;
-  }
-
-  setGasLimit(gasLimit: IGasLimit) {
-    this.gasLimit = gasLimit;
-  }
-
-  getData(): ITransactionPayload {
-    return this.data;
-  }
-
-  getChainID(): IChainID {
-    return this.chainID;
-  }
-
-  setChainID(chainID: IChainID) {
-    this.chainID = chainID;
-  }
-
-  getVersion(): TransactionVersion {
-    return this.version;
-  }
-
-  setVersion(version: ITransactionVersion) {
-    this.version = new TransactionVersion(version.valueOf());
-  }
-
-  getOptions(): TransactionOptions {
-    // Make sure that "sdk-core v12" is compatible (for a while) with (older) libraries that were previously setting the (soon to be private) "options" field directly,
-    // instead of using the "setOptions()" method.
-    const options = new TransactionOptions(this.options.valueOf());
-    return options;
-  }
-
-  setOptions(options: ITransactionOptions) {
-    this.options = new TransactionOptions(options.valueOf());
-  }
-
-  getSignature(): Buffer {
-    return this.signature;
-  }
-
-  getGuardianSignature(): Buffer {
-    return this.guardianSignature;
-  }
-
-  setGuardian(guardian: IAddress) {
-    this.guardian = guardian;
-  }
-
-  getHash(): TransactionHash {
-    guardNotEmpty(this.hash, "hash");
-    return this.hash;
-  }
-
-  /**
-   * Serializes a transaction to a sequence of bytes, ready to be signed.
-   * This function is called internally by signers.
-   */
-  serializeForSigning(): Buffer {
-    // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
-    let plain = this.toPlainObject();
-    // Make sure we never sign the transaction with another signature set up (useful when using the same method for verification)
-    if (plain.signature) {
-      delete plain.signature;
+        this.signature = options.signature || Buffer.from([]);
+        this.guardianSignature = options.guardianSignature || Buffer.from([]);
     }
 
-    if (plain.guardianSignature) {
-      delete plain.guardianSignature;
+    private addressAsBech32(address: IAddress | string): string {
+        return typeof address === "string" ? address : address.bech32();
     }
 
-    if (!plain.guardian) {
-      delete plain.guardian
+    /**
+     * Legacy method, use the "nonce" property instead.
+     */
+    getNonce(): INonce {
+        return Number(this.nonce);
     }
 
-    let serialized = JSON.stringify(plain);
-
-    return Buffer.from(serialized);
-  }
-
-  /**
-   * Checks the integrity of the guarded transaction
-   */
-  isGuardedTransaction(): boolean {
-    const hasGuardian = this.guardian.bech32().length > 0;
-    const hasGuardianSignature = this.guardianSignature.length > 0;
-    return this.getOptions().isWithGuardian() && hasGuardian && hasGuardianSignature;
-  }
-
-  /**
-   * Converts the transaction object into a ready-to-serialize, plain JavaScript object.
-   * This function is called internally within the signing procedure.
-   */
-  toPlainObject(): IPlainTransactionObject {
-    const plainObject = {
-      nonce: this.nonce.valueOf(),
-      value: this.value.toString(),
-      receiver: this.receiver.bech32(),
-      sender: this.sender.bech32(),
-      senderUsername: this.senderUsername ? Buffer.from(this.senderUsername).toString("base64") : undefined,
-      receiverUsername: this.receiverUsername ? Buffer.from(this.receiverUsername).toString("base64") : undefined,
-      gasPrice: this.gasPrice.valueOf(),
-      gasLimit: this.gasLimit.valueOf(),
-      data: this.data.length() == 0 ? undefined : this.data.encoded(),
-      chainID: this.chainID.valueOf(),
-      version: this.getVersion().valueOf(),
-      options: this.getOptions().valueOf() == 0 ? undefined : this.getOptions().valueOf(),
-      guardian: this.guardian?.bech32() ? (this.guardian.bech32() == "" ? undefined : this.guardian.bech32()) : undefined,
-      signature: this.signature.toString("hex") ? this.signature.toString("hex") : undefined,
-      guardianSignature: this.guardianSignature.toString("hex") ? this.guardianSignature.toString("hex") : undefined,
-    };
-
-    Compatibility.guardAddressIsSetAndNonZero(new Address(plainObject.sender), "'sender' of transaction", "pass the actual sender to the Transaction constructor")
-
-    return plainObject;
-  }
-
-  /**
-   * Converts a plain object transaction into a Transaction Object.
-   *
-   * @param plainObjectTransaction Raw data of a transaction, usually obtained by calling toPlainObject()
-   */
-  static fromPlainObject(plainObjectTransaction: IPlainTransactionObject): Transaction {
-    const tx = new Transaction({
-      nonce: Number(plainObjectTransaction.nonce),
-      value: new BigNumber(plainObjectTransaction.value).toFixed(0),
-      receiver: Address.fromString(plainObjectTransaction.receiver),
-      receiverUsername: plainObjectTransaction.receiverUsername ? Buffer.from(plainObjectTransaction.receiverUsername, "base64").toString() : undefined,
-      sender: Address.fromString(plainObjectTransaction.sender),
-      senderUsername: plainObjectTransaction.senderUsername ? Buffer.from(plainObjectTransaction.senderUsername, "base64").toString() : undefined,
-      guardian: plainObjectTransaction.guardian ? Address.fromString(plainObjectTransaction.guardian) : undefined,
-      gasPrice: Number(plainObjectTransaction.gasPrice),
-      gasLimit: Number(plainObjectTransaction.gasLimit),
-      data: new TransactionPayload(Buffer.from(plainObjectTransaction.data || "", "base64")),
-      chainID: String(plainObjectTransaction.chainID),
-      version: new TransactionVersion(plainObjectTransaction.version),
-      options: plainObjectTransaction.options != null ? new TransactionOptions(plainObjectTransaction.options) : undefined
-    });
-
-    if (plainObjectTransaction.signature) {
-      tx.applySignature(
-        new Signature(plainObjectTransaction.signature),
-      );
+    /**
+     * Legacy method, use the "nonce" property instead.
+     * Sets the account sequence number of the sender. Must be done prior signing.
+     */
+    setNonce(nonce: INonce | bigint) {
+        this.nonce = BigInt(nonce.valueOf());
     }
 
-    if (plainObjectTransaction.guardianSignature) {
-      tx.applyGuardianSignature(
-        new Signature(plainObjectTransaction.guardianSignature)
-      );
+    /**
+     * Legacy method, use the "value" property instead.
+     */
+    getValue(): ITransactionValue {
+        return this.value;
     }
 
-    return tx;
-  }
-
-  /**
-   * Applies the signature on the transaction.
-   *
-   * @param signature The signature, as computed by a signer.
-   */
-  applySignature(signature: ISignature | Uint8Array) {
-    this.signature = interpretSignatureAsBuffer(signature);
-    this.hash = TransactionHash.compute(this);
-  }
-
-  /**
-   * Applies the guardian signature on the transaction.
-   *
-   * @param guardianSignature The signature, as computed by a signer.
-   */
-  applyGuardianSignature(guardianSignature: ISignature | Uint8Array) {
-    this.guardianSignature = interpretSignatureAsBuffer(guardianSignature);
-    this.hash = TransactionHash.compute(this);
-  }
-
-  /**
-   * Converts a transaction to a ready-to-broadcast object.
-   * Called internally by the network provider.
-   */
-  toSendable(): any {
-    return this.toPlainObject();
-  }
-
-  /**
-   * Computes the current transaction fee based on the {@link NetworkConfig} and transaction properties
-   * @param networkConfig {@link NetworkConfig}
-   */
-  computeFee(networkConfig: INetworkConfig): BigNumber {
-    let moveBalanceGas =
-      networkConfig.MinGasLimit.valueOf() +
-      this.data.length() * networkConfig.GasPerDataByte.valueOf();
-    if (moveBalanceGas > this.gasLimit.valueOf()) {
-      throw new errors.ErrNotEnoughGas(this.gasLimit.valueOf());
+    /**
+     * Legacy method, use the "value" property instead.
+     */
+    setValue(value: ITransactionValue | bigint) {
+        this.value = BigInt(value.toString());
     }
 
-    let gasPrice = new BigNumber(this.gasPrice.valueOf());
-    let feeForMove = new BigNumber(moveBalanceGas).multipliedBy(gasPrice);
-    if (moveBalanceGas === this.gasLimit.valueOf()) {
-      return feeForMove;
+    /**
+     * Legacy method, use the "sender" property instead.
+     */
+    getSender(): IAddress {
+        return Address.fromBech32(this.sender);
     }
 
-    let diff = new BigNumber(this.gasLimit.valueOf() - moveBalanceGas);
-    let modifiedGasPrice = gasPrice.multipliedBy(
-      new BigNumber(networkConfig.GasPriceModifier.valueOf())
-    );
-    let processingFee = diff.multipliedBy(modifiedGasPrice);
-
-    return feeForMove.plus(processingFee);
-  }
-
-  /**
-   * Creates a new Transaction object from a TransactionNext object.
-   */
-  static fromTransactionNext(transaction: ITransactionNext): Transaction {
-    const tx = new Transaction({
-      sender: Address.fromBech32(transaction.sender),
-      receiver: Address.fromBech32(transaction.receiver),
-      gasLimit: Number(transaction.gasLimit),
-      chainID: transaction.chainID,
-      value: new BigNumber(transaction.value.toString()).toFixed(0),
-      data: new TransactionPayload(Buffer.from(transaction.data)),
-      nonce: Number(transaction.nonce),
-      gasPrice: Number(transaction.gasPrice),
-      receiverUsername: transaction.receiverUsername,
-      senderUsername: transaction.senderUsername,
-      options: transaction.options,
-      version: transaction.version
-    });
-
-    if (transaction.guardian) {
-      tx.guardian = Address.fromBech32(transaction.guardian)
+    /**
+     * Legacy method, use the "sender" property instead.
+     */
+    setSender(sender: IAddress | string) {
+        this.sender = typeof sender === "string" ? sender : sender.bech32();
     }
 
-    if (transaction.signature.length) {
-      tx.applySignature(transaction.signature);
+    /**
+     * Legacy method, use the "receiver" property instead.
+     */
+    getReceiver(): IAddress {
+        return Address.fromBech32(this.receiver);
     }
 
-    if (transaction.guardianSignature.length) {
-      tx.applyGuardianSignature(transaction.guardianSignature);
+    /**
+     * Legacy method, use the "senderUsername" property instead.
+     */
+    getSenderUsername(): string {
+        return this.senderUsername;
     }
 
-    return tx;
-  }
+    /**
+     * Legacy method, use the "senderUsername" property instead.
+     */
+    setSenderUsername(senderUsername: string) {
+        this.senderUsername = senderUsername;
+    }
+
+    /**
+     * Legacy method, use the "receiverUsername" property instead.
+     */
+    getReceiverUsername(): string {
+        return this.receiverUsername;
+    }
+
+    /**
+     * Legacy method, use the "receiverUsername" property instead.
+     */
+    setReceiverUsername(receiverUsername: string) {
+        this.receiverUsername = receiverUsername;
+    }
+
+    /**
+     * Legacy method, use the "guardian" property instead.
+     */
+    getGuardian(): IAddress {
+        return new Address(this.guardian);
+    }
+
+    /**
+     * Legacy method, use the "gasPrice" property instead.
+     */
+    getGasPrice(): IGasPrice {
+        return Number(this.gasPrice);
+    }
+
+    /**
+     * Legacy method, use the "gasPrice" property instead.
+     */
+    setGasPrice(gasPrice: IGasPrice | bigint) {
+        this.gasPrice = BigInt(gasPrice.valueOf());
+    }
+
+    /**
+     * Legacy method, use the "gasLimit" property instead.
+     */
+    getGasLimit(): IGasLimit {
+        return Number(this.gasLimit);
+    }
+
+    /**
+     * Legacy method, use the "gasLimit" property instead.
+     */
+    setGasLimit(gasLimit: IGasLimit | bigint) {
+        this.gasLimit = BigInt(gasLimit.valueOf());
+    }
+
+    /**
+     * Legacy method, use the "data" property instead.
+     */
+    getData(): ITransactionPayload {
+        return new TransactionPayload(Buffer.from(this.data));
+    }
+
+    /**
+     * Legacy method, use the "chainID" property instead.
+     */
+    getChainID(): IChainID {
+        return this.chainID;
+    }
+
+    /**
+     * Legacy method, use the "chainID" property instead.
+     */
+    setChainID(chainID: IChainID | string) {
+        this.chainID = chainID.valueOf();
+    }
+
+    /**
+     * Legacy method, use the "version" property instead.
+     */
+    getVersion(): TransactionVersion {
+        return new TransactionVersion(this.version);
+    }
+
+    /**
+     * Legacy method, use the "version" property instead.
+     */
+    setVersion(version: ITransactionVersion | number) {
+        this.version = version.valueOf();
+    }
+
+    /**
+     * Legacy method, use the "options" property instead.
+     */
+    getOptions(): TransactionOptions {
+        return new TransactionOptions(this.options.valueOf());
+    }
+
+    /**
+     * Legacy method, use the "options" property instead.
+     *
+     * Question for review: check how the options are set by sdk-dapp, wallet, ledger, extension.
+     */
+    setOptions(options: ITransactionOptions | number) {
+        this.options = options.valueOf();
+    }
+
+    /**
+     * Legacy method, use the "signature" property instead.
+     */
+    getSignature(): Buffer {
+        return Buffer.from(this.signature);
+    }
+
+    /**
+     * Legacy method, use the "guardianSignature" property instead.
+     */
+    getGuardianSignature(): Buffer {
+        return Buffer.from(this.guardianSignature);
+    }
+
+    /**
+     * Legacy method, use the "guardian" property instead.
+     */
+    setGuardian(guardian: IAddress | string) {
+        this.guardian = typeof guardian === "string" ? guardian : guardian.bech32();
+    }
+
+    /**
+     * Legacy method, use "TransactionComputer.computeTransactionHash()" instead.
+     */
+    getHash(): TransactionHash {
+        return TransactionHash.compute(this);
+    }
+
+    /**
+     * Legacy method, use "TransactionComputer.computeBytesForSigning()" instead.
+     * Serializes a transaction to a sequence of bytes, ready to be signed.
+     * This function is called internally by signers.
+     */
+    serializeForSigning(): Buffer {
+        const computer = new TransactionComputer();
+        const bytes = computer.computeBytesForSigning(this);
+        return Buffer.from(bytes);
+    }
+
+    /**
+     * Checks the integrity of the guarded transaction
+     */
+    isGuardedTransaction(): boolean {
+        const hasGuardian = this.guardian.length > 0;
+        const hasGuardianSignature = this.guardianSignature.length > 0;
+        return this.getOptions().isWithGuardian() && hasGuardian && hasGuardianSignature;
+    }
+
+    /**
+     * Legacy method, use "TransactionsConverter.transactionToPlainObject()" instead.
+     *
+     * Converts the transaction object into a ready-to-serialize, plain JavaScript object.
+     * This function is called internally within the signing procedure.
+     */
+    toPlainObject(): IPlainTransactionObject {
+        // Ideally, "converters" package should be outside of "core", and not referenced here.
+        const converter = new TransactionsConverter();
+        return converter.transactionToPlainObject(this);
+    }
+
+    /**
+     * Legacy method, use "TransactionsConverter.plainObjectToTransaction()" instead.
+     * Converts a plain object transaction into a Transaction Object.
+     *
+     * @param plainObjectTransaction Raw data of a transaction, usually obtained by calling toPlainObject()
+     */
+    static fromPlainObject(plainObjectTransaction: IPlainTransactionObject): Transaction {
+        // Ideally, "converters" package should be outside of "core", and not referenced here.
+        const converter = new TransactionsConverter();
+        return converter.plainObjectToTransaction(plainObjectTransaction);
+    }
+
+    /**
+     * Legacy method, use the "signature" property instead.
+     * Applies the signature on the transaction.
+     *
+     * @param signature The signature, as computed by a signer.
+     */
+    applySignature(signature: ISignature | Uint8Array) {
+        this.signature = interpretSignatureAsBuffer(signature);
+    }
+
+    /**
+     * Legacy method, use the "guardianSignature" property instead.
+     * Applies the guardian signature on the transaction.
+     *
+     * @param guardianSignature The signature, as computed by a signer.
+     */
+    applyGuardianSignature(guardianSignature: ISignature | Uint8Array) {
+        this.guardianSignature = interpretSignatureAsBuffer(guardianSignature);
+    }
+
+    /**
+     * Converts a transaction to a ready-to-broadcast object.
+     * Called internally by the network provider.
+     */
+    toSendable(): any {
+        return this.toPlainObject();
+    }
+
+    /**
+     * Legacy method, use "TransactionComputer.computeTransactionFee()" instead.
+     *
+     * Computes the current transaction fee based on the {@link NetworkConfig} and transaction properties
+     * @param networkConfig {@link NetworkConfig}
+     */
+    computeFee(networkConfig: INetworkConfig): BigNumber {
+        const computer = new TransactionComputer();
+        const fee = computer.computeTransactionFee(this, networkConfig);
+        return new BigNumber(fee.toString());
+    }
 }
 
 /**
+ * Legacy class, use "TransactionComputer.computeTransactionHash()" instead.
  * An abstraction for handling and computing transaction hashes.
  */
 export class TransactionHash extends Hash {
-  constructor(hash: string) {
-    super(hash);
-  }
+    constructor(hash: string) {
+        super(hash);
+    }
 
-  /**
-   * Computes the hash of a transaction.
-   */
-  static compute(transaction: Transaction): TransactionHash {
-    let serializer = new ProtoSerializer();
-    let buffer = serializer.serializeTransaction(transaction);
-    let hash = createTransactionHasher(TRANSACTION_HASH_LENGTH)
-      .update(buffer)
-      .digest("hex");
-    return new TransactionHash(hash);
-  }
-}
-
-/**
- * An abstraction for creating, signing and broadcasting transactions.
- * Will replace the {@link Transaction} class in the future.
- */
-export class TransactionNext {
-  /**
-   * The nonce of the transaction (the account sequence number of the sender).
-   */
-  public nonce: bigint;
-
-  /**
-   * The value to transfer.
-   */
-  public value: bigint;
-
-  /**
-   * The address of the sender.
-   */
-  public sender: string;
-
-  /**
-   * The address of the receiver.
-   */
-  public receiver: string;
-
-  /**
-   * The username of the sender.
-   */
-  public senderUsername: string;
-
-  /** 
-   * The username of the receiver.
-   */
-  public receiverUsername: string;
-
-  /**
-   * The gas price to be used.
-   */
-  public gasPrice: bigint;
-
-  /**
-   * The maximum amount of gas to be consumed when processing the transaction.
-   */
-  public gasLimit: bigint;
-
-  /**
-   * The payload of the transaction.
-   */
-  public data: Uint8Array;
-
-  /**
-   * The chain ID of the Network (e.g. "1" for Mainnet).
-   */
-  public chainID: string;
-
-  /**
-   * The version, required by the Network in order to correctly interpret the contents of the transaction.
-   */
-  public version: number;
-
-  /**
-   * The options field of the transactions.
-   */
-  public options: number;
-
-  /**
-   * The address of the guardian.
-   */
-  public guardian: string;
-
-  /**
-   * The signature.
-   */
-  public signature: Uint8Array;
-
-  /**
-   * The signature of the guardian.
-   */
-  public guardianSignature: Uint8Array;
-
-  /**
-   * Creates a new Transaction object.
-   */
-    public constructor(init: Partial<TransactionNext>) {
-      this.nonce = 0n;
-      this.value = 0n;
-      this.sender = "";
-      this.receiver = "";
-      this.senderUsername = "";
-      this.receiverUsername = "";
-      this.gasPrice = BigInt(TRANSACTION_MIN_GAS_PRICE);
-      this.gasLimit = 0n;
-      this.data = new Uint8Array();
-      this.chainID = "";
-      this.version = TRANSACTION_VERSION_DEFAULT;
-      this.options = TRANSACTION_OPTIONS_DEFAULT;
-      this.guardian = "";
-  
-      this.signature = new Uint8Array();
-      this.guardianSignature = new Uint8Array();
-
-      Object.assign(this, init);
+    /**
+     * Legacy method, use "TransactionComputer.computeTransactionHash()" instead.
+     * Computes the hash of a transaction.
+     */
+    static compute(transaction: Transaction): TransactionHash {
+        const computer = new TransactionComputer();
+        const hash = computer.computeTransactionHash(transaction);
+        return new TransactionHash(Buffer.from(hash).toString("hex"));
     }
 }
 
 /**
- * An utilitary class meant to work together with the {@link TransactionNext} class.
+ * An utilitary class meant to work together with the {@link Transaction} class.
  */
 export class TransactionComputer {
-  constructor() { }
+    constructor() {}
 
-  computeTransactionFee(transaction: ITransactionNext, networkConfig: INetworkConfig): bigint {
-    const moveBalanceGas = BigInt(
-        networkConfig.MinGasLimit + transaction.data.length * networkConfig.GasPerDataByte,
-    );
-    if (moveBalanceGas > transaction.gasLimit) {
-        throw new errors.ErrNotEnoughGas(parseInt(transaction.gasLimit.toString(), 10));
+    computeTransactionFee(
+        transaction: { gasPrice: bigint; gasLimit: bigint; data: Uint8Array },
+        networkConfig: INetworkConfig,
+    ): bigint {
+        const moveBalanceGas = BigInt(
+            networkConfig.MinGasLimit + transaction.data.length * networkConfig.GasPerDataByte,
+        );
+        if (moveBalanceGas > transaction.gasLimit) {
+            throw new errors.ErrNotEnoughGas(parseInt(transaction.gasLimit.toString(), 10));
+        }
+
+        const gasPrice = transaction.gasPrice;
+        const feeForMove = moveBalanceGas * gasPrice;
+        if (moveBalanceGas === transaction.gasLimit) {
+            return feeForMove;
+        }
+
+        const diff = transaction.gasLimit - moveBalanceGas;
+        const modifiedGasPrice = BigInt(
+            new BigNumber(gasPrice.toString()).multipliedBy(new BigNumber(networkConfig.GasPriceModifier)).toFixed(0),
+        );
+        const processingFee = diff * modifiedGasPrice;
+
+        return feeForMove + processingFee;
     }
 
-    const gasPrice = transaction.gasPrice;
-    const feeForMove = moveBalanceGas * gasPrice;
-    if (moveBalanceGas === transaction.gasLimit) {
-        return feeForMove;
+    computeBytesForSigning(transaction: ITransaction): Uint8Array {
+        // TODO: do some checks for the transaction e.g. sender, chain ID etc.
+        // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
+
+        const plainTransaction = this.toPlainObjectForSigning(transaction);
+        const serialized = JSON.stringify(plainTransaction);
+        return new Uint8Array(Buffer.from(serialized));
     }
 
-    const diff = transaction.gasLimit - moveBalanceGas;
-    const modifiedGasPrice = BigInt(
-        new BigNumber(gasPrice.toString()).multipliedBy(new BigNumber(networkConfig.GasPriceModifier)).toFixed(0),
-    );
-    const processingFee = diff * modifiedGasPrice;
+    computeTransactionHash(transaction: ITransaction): Uint8Array {
+        const serializer = new ProtoSerializer();
+        const buffer = serializer.serializeTransaction(new Transaction(transaction));
+        const hash = createTransactionHasher(TRANSACTION_HASH_LENGTH).update(buffer).digest("hex");
 
-    return feeForMove + processingFee;
-  }
-
-  computeBytesForSigning(transaction: ITransactionNext): Uint8Array {
-    const plainTransaction = this.toPlainObject(transaction);
-
-    if (plainTransaction.signature) {
-      delete plainTransaction.signature;
+        return Buffer.from(hash, "hex");
     }
 
-    if (plainTransaction.guardianSignature) {
-      delete plainTransaction.guardianSignature;
+    private toPlainObjectForSigning(transaction: ITransaction) {
+        return {
+            nonce: Number(transaction.nonce),
+            value: transaction.value.toString(),
+            receiver: transaction.receiver,
+            sender: transaction.sender,
+            senderUsername: this.toBase64OrUndefined(transaction.senderUsername),
+            receiverUsername: this.toBase64OrUndefined(transaction.receiverUsername),
+            gasPrice: Number(transaction.gasPrice),
+            gasLimit: Number(transaction.gasLimit),
+            data: this.toBase64OrUndefined(transaction.data),
+            chainID: transaction.chainID,
+            version: transaction.version,
+            options: transaction.options ? transaction.options : undefined,
+            guardian: transaction.guardian ? transaction.guardian : undefined,
+        };
     }
 
-    if (!plainTransaction.guardian) {
-      delete plainTransaction.guardian
+    private toBase64OrUndefined(value?: string | Uint8Array) {
+        return value && value.length ? Buffer.from(value).toString("base64") : undefined;
     }
 
-    const serialized = JSON.stringify(plainTransaction);
-
-    return new Uint8Array(Buffer.from(serialized));
-  }
-
-  computeTransactionHash(transaction: ITransactionNext): Uint8Array {
-    let serializer = new ProtoSerializer();
-
-    const tx = Transaction.fromTransactionNext(transaction);
-    const buffer = serializer.serializeTransaction(tx);
-    const hash = createTransactionHasher(TRANSACTION_HASH_LENGTH)
-      .update(buffer)
-      .digest("hex");
-
-    return Buffer.from(hash, "hex");
-  }
-
-  private toPlainObject(transaction: ITransactionNext) {
-    return {
-      nonce: Number(transaction.nonce),
-      value: transaction.value.toString(),
-      receiver: transaction.receiver,
-      sender: transaction.sender,
-      senderUsername: transaction.senderUsername ? Buffer.from(transaction.senderUsername).toString("base64") : undefined,
-      receiverUsername: transaction.receiverUsername ? Buffer.from(transaction.receiverUsername).toString("base64") : undefined,
-      gasPrice: Number(transaction.gasPrice),
-      gasLimit: Number(transaction.gasLimit),
-      data: transaction.data && transaction.data.length === 0 ? undefined : Buffer.from(transaction.data).toString("base64"),
-      chainID: transaction.chainID,
-      version: transaction.version,
-      options: transaction.options ? transaction.options : undefined,
-      guardian: transaction.guardian ? transaction.guardian : undefined,
-      signature: transaction.signature.length == 0 ? undefined : Buffer.from(transaction.signature).toString("hex"),
-      guardianSignature: transaction.guardianSignature.length == 0 ? undefined : Buffer.from(transaction.guardianSignature).toString("hex")
-    }
-  }
+    // TODO: add missing functions wrt. specs
 }

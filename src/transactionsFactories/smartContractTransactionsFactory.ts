@@ -1,14 +1,14 @@
+import { Address } from "../address";
+import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
+import { Err, ErrBadUsage } from "../errors";
 import { IAddress } from "../interface";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
-import { byteArrayToHex, utf8ToHex } from "../utils.codec";
-import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
-import { Err, ErrBadUsage } from "../errors";
-import { Address } from "../address";
-import { TransactionNextBuilder } from "./transactionNextBuilder";
-import { Token, NextTokenTransfer } from "../tokens";
+import { NextTokenTransfer, Token } from "../tokens";
+import { Transaction } from "../transaction";
+import { byteArrayToHex, utf8ToHex } from "../utils.codec";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
-import { TransactionNext } from "../transaction";
+import { TransactionBuilder } from "./transactionBuilder";
 
 interface Config {
     chainID: string;
@@ -16,7 +16,7 @@ interface Config {
     gasLimitPerByte: bigint;
 }
 
-interface Abi {
+interface IAbi {
     constructorDefinition: EndpointDefinition;
 
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
@@ -31,13 +31,13 @@ interface TokenComputer {
  */
 export class SmartContractTransactionsFactory {
     private readonly config: Config;
-    private readonly abiRegistry?: Abi;
+    private readonly abi?: IAbi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
 
-    constructor({ config, abi, tokenComputer }: { config: Config; abi?: Abi; tokenComputer: TokenComputer }) {
+    constructor({ config, abi, tokenComputer }: { config: Config; abi?: IAbi; tokenComputer: TokenComputer }) {
         this.config = config;
-        this.abiRegistry = abi;
+        this.abi = abi;
         this.tokenComputer = tokenComputer;
         this.dataArgsBuilder = new TokenTransfersDataBuilder();
     }
@@ -52,7 +52,7 @@ export class SmartContractTransactionsFactory {
         isReadable?: boolean;
         isPayable?: boolean;
         isPayableBySmartContract?: boolean;
-    }): TransactionNext {
+    }): Transaction {
         const nativeTransferAmount = options.nativeTransferAmount ?? 0n;
         const isUpgradeable = options.isUpgradeable ?? true;
         const isReadable = options.isReadable ?? true;
@@ -61,10 +61,10 @@ export class SmartContractTransactionsFactory {
         const args = options.args || [];
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
         let parts = [byteArrayToHex(options.bytecode), byteArrayToHex(VM_TYPE_WASM_VM), metadata.toString()];
-        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
+        const preparedArgs = this.argsToDataParts(args, this.abi?.constructorDefinition);
         parts = parts.concat(preparedArgs);
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(CONTRACT_DEPLOY_ADDRESS),
@@ -83,7 +83,7 @@ export class SmartContractTransactionsFactory {
         args?: any[];
         nativeTransferAmount?: bigint;
         tokenTransfers?: NextTokenTransfer[];
-    }): TransactionNext {
+    }): Transaction {
         const args = options.args || [];
         const tokenTransfer = options.tokenTransfers || [];
         const nativeTransferAmount = options.nativeTransferAmount ?? 0n;
@@ -111,9 +111,9 @@ export class SmartContractTransactionsFactory {
         }
 
         dataParts.push(dataParts.length ? utf8ToHex(options.functionName) : options.functionName);
-        dataParts = dataParts.concat(this.argsToDataParts(args, this.abiRegistry?.getEndpoint(options.functionName)));
+        dataParts = dataParts.concat(this.argsToDataParts(args, this.abi?.getEndpoint(options.functionName)));
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: receiver,
@@ -135,7 +135,7 @@ export class SmartContractTransactionsFactory {
         isReadable?: boolean;
         isPayable?: boolean;
         isPayableBySmartContract?: boolean;
-    }): TransactionNext {
+    }): Transaction {
         const nativeTransferAmount = options.nativeTransferAmount ?? 0n;
 
         const isUpgradeable = options.isUpgradeable ?? true;
@@ -147,10 +147,10 @@ export class SmartContractTransactionsFactory {
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
 
         let parts = ["upgradeContract", byteArrayToHex(options.bytecode), metadata.toString()];
-        const preparedArgs = this.argsToDataParts(args, this.abiRegistry?.constructorDefinition);
+        const preparedArgs = this.argsToDataParts(args, this.abi?.constructorDefinition);
         parts = parts.concat(preparedArgs);
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.contract,

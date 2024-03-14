@@ -20,6 +20,7 @@ export interface ITransactionOnNetwork {
     value: string;
     receiver: IAddress;
     sender: IAddress;
+    function?: string;
     data: Buffer;
     status: ITransactionStatus;
     receipt: ITransactionReceipt;

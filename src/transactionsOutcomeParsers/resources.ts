@@ -43,10 +43,12 @@ export class SmartContractResult {
 }
 
 export class TransactionOutcome {
+    function: string;
     smartContractResults: SmartContractResult[];
     transactionLogs: TransactionLogs;
 
     constructor(init: Partial<TransactionOutcome>) {
+        this.function = "";
         this.smartContractResults = [];
         this.transactionLogs = new TransactionLogs({});
 

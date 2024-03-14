@@ -85,7 +85,7 @@ export interface ITokenTransfer {
  */
 export type ITokenPayment = ITokenTransfer;
 
-export interface ITransactionNext {
+export interface ITransaction {
     sender: string;
     receiver: string;
     gasLimit: bigint;

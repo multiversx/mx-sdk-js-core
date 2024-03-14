@@ -2,7 +2,7 @@ import { IPlainTransactionObject, ITransaction } from "../interface";
 import { Transaction } from "../transaction";
 
 export class TransactionsConverter {
-    transactionToPlainObject(transaction: ITransaction): IPlainTransactionObject {
+    public transactionToPlainObject(transaction: ITransaction): IPlainTransactionObject {
         const plainObject = {
             nonce: Number(transaction.nonce),
             value: transaction.value.toString(),

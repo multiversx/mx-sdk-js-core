@@ -34,15 +34,15 @@ export class TransactionsConverter {
 
     public plainObjectToTransaction(object: IPlainTransactionObject): Transaction {
         const transaction = new Transaction({
-            nonce: Number(object.nonce),
+            nonce: BigInt(object.nonce),
             value: BigInt(object.value || ""),
             receiver: object.receiver,
             receiverUsername: this.bufferFromBase64(object.receiverUsername).toString(),
             sender: object.sender,
             senderUsername: this.bufferFromBase64(object.senderUsername).toString(),
             guardian: object.guardian,
-            gasPrice: Number(object.gasPrice),
-            gasLimit: Number(object.gasLimit),
+            gasPrice: BigInt(object.gasPrice),
+            gasLimit: BigInt(object.gasLimit),
             data: this.bufferFromBase64(object.data),
             chainID: String(object.chainID),
             version: object.version,

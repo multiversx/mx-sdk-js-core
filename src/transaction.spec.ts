@@ -5,8 +5,9 @@ import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
 import { TestWallet, loadTestWallets } from "./testutils";
 import { TokenTransfer } from "./tokenTransfer";
-import { Transaction, TransactionComputer } from "./transaction";
+import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
+import { TransactionComputer } from "./transactionComputer";
 
 describe("test transaction", async () => {
     let wallets: Record<string, TestWallet>;

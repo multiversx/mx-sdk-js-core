@@ -7,7 +7,10 @@ import { NextTransferTransactionsFactory } from "./transferTransactionsFactory";
 
 describe("test transfer transcations factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });
-    const nextTransferFactory = new NextTransferTransactionsFactory(config, new TokenComputer());
+    const nextTransferFactory = new NextTransferTransactionsFactory({
+        config: config,
+        tokenComputer: new TokenComputer(),
+    });
 
     const alice = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
     const bob = Address.fromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");

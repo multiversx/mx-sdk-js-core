@@ -36,8 +36,8 @@ export class TokenManagementTransactionsFactory {
     private readonly trueAsHex: string;
     private readonly falseAsHex: string;
 
-    constructor(config: Config) {
-        this.config = config;
+    constructor(options: { config: Config }) {
+        this.config = options.config;
         this.trueAsHex = utf8ToHex("true");
         this.falseAsHex = utf8ToHex("false");
     }
@@ -253,10 +253,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForSettingBurnRoleGlobally(options: {
-        sender: IAddress;
-        tokenIdentifier: string;
-    }): Transaction {
+    createTransactionForSettingBurnRoleGlobally(options: { sender: IAddress; tokenIdentifier: string }): Transaction {
         const dataParts = ["setBurnRoleGlobally", utf8ToHex(options.tokenIdentifier)];
 
         return new TransactionBuilder({
@@ -269,10 +266,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnsettingBurnRoleGlobally(options: {
-        sender: IAddress;
-        tokenIdentifier: string;
-    }): Transaction {
+    createTransactionForUnsettingBurnRoleGlobally(options: { sender: IAddress; tokenIdentifier: string }): Transaction {
         const dataParts = ["unsetBurnRoleGlobally", utf8ToHex(options.tokenIdentifier)];
 
         return new TransactionBuilder({
@@ -443,11 +437,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForFreezing(options: {
-        sender: IAddress;
-        user: IAddress;
-        tokenIdentifier: string;
-    }): Transaction {
+    createTransactionForFreezing(options: { sender: IAddress; user: IAddress; tokenIdentifier: string }): Transaction {
         const dataParts = ["freeze", utf8ToHex(options.tokenIdentifier), addressToHex(options.user)];
 
         return new TransactionBuilder({
@@ -477,11 +467,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForWiping(options: {
-        sender: IAddress;
-        user: IAddress;
-        tokenIdentifier: string;
-    }): Transaction {
+    createTransactionForWiping(options: { sender: IAddress; user: IAddress; tokenIdentifier: string }): Transaction {
         const dataParts = ["wipe", utf8ToHex(options.tokenIdentifier), addressToHex(options.user)];
 
         return new TransactionBuilder({

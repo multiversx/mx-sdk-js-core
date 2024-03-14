@@ -1,12 +1,13 @@
 import { assert } from "chai";
 import { TestWallet, loadTestWallets } from "../testutils";
-import { Transaction, TransactionComputer } from "../transaction";
+import { Transaction } from "../transaction";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
+import { TransactionComputer } from "../transactionComputer";
 
 describe("test relayed v1 transaction builder", function () {
     const config = new TransactionsFactoryConfig({ chainID: "T" });
-    const factory = new RelayedTransactionsFactory(config);
+    const factory = new RelayedTransactionsFactory({ config: config });
     const transactionComputer = new TransactionComputer();
     let alice: TestWallet, bob: TestWallet, carol: TestWallet, grace: TestWallet, frank: TestWallet;
 

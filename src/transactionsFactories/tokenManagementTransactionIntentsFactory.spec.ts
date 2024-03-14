@@ -12,7 +12,7 @@ describe("test token management transactions factory", () => {
     before(async function () {
         ({ frank, grace } = await loadTestWallets());
         config = new TransactionsFactoryConfig({ chainID: "T" });
-        tokenManagementFactory = new TokenManagementTransactionsFactory(config);
+        tokenManagementFactory = new TokenManagementTransactionsFactory({ config: config });
     });
 
     it("should create 'Transaction' for registering and setting roles", () => {

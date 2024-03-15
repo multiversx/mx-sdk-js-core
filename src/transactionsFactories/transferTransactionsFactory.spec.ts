@@ -31,7 +31,7 @@ describe("test transfer transcations factory", function () {
         );
     });
 
-    it("should create 'TransactionNext' for native token transfer without data", async () => {
+    it("should create 'Transaction' for native token transfer without data", async () => {
         const transaction = nextTransferFactory.createTransactionForNativeTokenTransfer({
             sender: alice,
             receiver: bob,
@@ -45,7 +45,7 @@ describe("test transfer transcations factory", function () {
         assert.deepEqual(transaction.data, new Uint8Array());
     });
 
-    it("should create 'TransactionNext' for native token transfer with data", async () => {
+    it("should create 'Transaction' for native token transfer with data", async () => {
         const transaction = nextTransferFactory.createTransactionForNativeTokenTransfer({
             sender: alice,
             receiver: bob,
@@ -60,7 +60,7 @@ describe("test transfer transcations factory", function () {
         assert.deepEqual(transaction.data, Buffer.from("test data"));
     });
 
-    it("should create 'TransactionNext' for esdt transfer", async () => {
+    it("should create 'Transaction' for esdt transfer", async () => {
         const fooToken = new Token("FOO-123456", 0n);
         const transfer = new NextTokenTransfer(fooToken, 1000000n);
 
@@ -77,7 +77,7 @@ describe("test transfer transcations factory", function () {
         assert.deepEqual(transaction.data.toString(), "ESDTTransfer@464f4f2d313233343536@0f4240");
     });
 
-    it("should create 'TransactionNext' for nft transfer", async () => {
+    it("should create 'Transaction' for nft transfer", async () => {
         const nft = new Token("NFT-123456", 10n);
         const transfer = new NextTokenTransfer(nft, 1n);
 
@@ -97,7 +97,7 @@ describe("test transfer transcations factory", function () {
         );
     });
 
-    it("should create 'TransactionNext' for multiple nft transfers", async () => {
+    it("should create 'Transaction' for multiple nft transfers", async () => {
         const firstNft = new Token("NFT-123456", 10n);
         const firstTransfer = new NextTokenTransfer(firstNft, 1n);
 

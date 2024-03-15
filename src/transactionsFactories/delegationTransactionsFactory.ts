@@ -1,10 +1,10 @@
-import { IAddress } from "../interface";
-import { numberToPaddedHex, byteArrayToHex, utf8ToHex } from "../utils.codec";
-import { TransactionNextBuilder } from "./transactionNextBuilder";
 import { Address } from "../address";
 import { DELEGATION_MANAGER_SC_ADDRESS } from "../constants";
 import { Err } from "../errors";
-import { TransactionNext } from "../transaction";
+import { IAddress } from "../interface";
+import { Transaction } from "../transaction";
+import { byteArrayToHex, numberToPaddedHex, utf8ToHex } from "../utils.codec";
+import { TransactionBuilder } from "./transactionBuilder";
 
 interface Config {
     chainID: string;
@@ -29,8 +29,8 @@ interface IValidatorPublicKey {
 export class DelegationTransactionsFactory {
     private readonly config: Config;
 
-    constructor(config: Config) {
-        this.config = config;
+    constructor(options: { config: Config }) {
+        this.config = options.config;
     }
 
     createTransactionForNewDelegationContract(options: {
@@ -38,7 +38,7 @@ export class DelegationTransactionsFactory {
         totalDelegationCap: bigint;
         serviceFee: bigint;
         amount: bigint;
-    }): TransactionNext {
+    }): Transaction {
         const dataParts = [
             "createNewDelegationContract",
             numberToPaddedHex(options.totalDelegationCap.toString()),
@@ -48,7 +48,7 @@ export class DelegationTransactionsFactory {
         const executionGasLimit =
             this.config.gasLimitCreateDelegationContract + this.config.additionalGasLimitForDelegationOperations;
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: Address.fromBech32(DELEGATION_MANAGER_SC_ADDRESS),
@@ -64,7 +64,7 @@ export class DelegationTransactionsFactory {
         delegationContract: IAddress;
         publicKeys: IValidatorPublicKey[];
         signedMessages: Uint8Array[];
-    }): TransactionNext {
+    }): Transaction {
         if (options.publicKeys.length !== options.signedMessages.length) {
             throw new Err("The number of public keys should match the number of signed messages");
         }
@@ -76,7 +76,7 @@ export class DelegationTransactionsFactory {
             dataParts.push(...[options.publicKeys[i].hex(), byteArrayToHex(options.signedMessages[i])]);
         }
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -90,7 +90,7 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
         publicKeys: IValidatorPublicKey[];
-    }): TransactionNext {
+    }): Transaction {
         const dataParts = ["removeNodes"];
 
         for (const key of options.publicKeys) {
@@ -98,7 +98,7 @@ export class DelegationTransactionsFactory {
         }
 
         const numNodes = options.publicKeys.length;
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -112,7 +112,7 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
         publicKeys: IValidatorPublicKey[];
-    }): TransactionNext {
+    }): Transaction {
         let dataParts = ["stakeNodes"];
 
         for (const key of options.publicKeys) {
@@ -125,7 +125,7 @@ export class DelegationTransactionsFactory {
         const executionGasLimit =
             additionalGasForAllNodes + this.config.gasLimitStake + this.config.gasLimitDelegationOperations;
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -139,7 +139,7 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
         publicKeys: IValidatorPublicKey[];
-    }): TransactionNext {
+    }): Transaction {
         let dataParts = ["unBondNodes"];
 
         for (const key of options.publicKeys) {
@@ -152,7 +152,7 @@ export class DelegationTransactionsFactory {
             this.config.gasLimitUnbond +
             this.config.gasLimitDelegationOperations;
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -166,7 +166,7 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
         publicKeys: IValidatorPublicKey[];
-    }): TransactionNext {
+    }): Transaction {
         let dataParts = ["unStakeNodes"];
 
         for (const key of options.publicKeys) {
@@ -179,7 +179,7 @@ export class DelegationTransactionsFactory {
             this.config.gasLimitUnstake +
             this.config.gasLimitDelegationOperations;
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -193,7 +193,7 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
         publicKeys: IValidatorPublicKey[];
-    }): TransactionNext {
+    }): Transaction {
         const dataParts = ["unJailNodes"];
 
         for (const key of options.publicKeys) {
@@ -201,7 +201,7 @@ export class DelegationTransactionsFactory {
         }
 
         const numNodes = options.publicKeys.length;
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -215,12 +215,12 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
         serviceFee: bigint;
-    }): TransactionNext {
+    }): Transaction {
         const dataParts = ["changeServiceFee", numberToPaddedHex(options.serviceFee)];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -234,12 +234,12 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
         delegationCap: bigint;
-    }): TransactionNext {
+    }): Transaction {
         const dataParts = ["modifyTotalDelegationCap", numberToPaddedHex(options.delegationCap)];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -252,12 +252,12 @@ export class DelegationTransactionsFactory {
     createTransactionForSettingAutomaticActivation(options: {
         sender: IAddress;
         delegationContract: IAddress;
-    }): TransactionNext {
+    }): Transaction {
         const dataParts = ["setAutomaticActivation", utf8ToHex("true")];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -270,12 +270,12 @@ export class DelegationTransactionsFactory {
     createTransactionForUnsettingAutomaticActivation(options: {
         sender: IAddress;
         delegationContract: IAddress;
-    }): TransactionNext {
+    }): Transaction {
         const dataParts = ["setAutomaticActivation", utf8ToHex("false")];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -288,12 +288,12 @@ export class DelegationTransactionsFactory {
     createTransactionForSettingCapCheckOnRedelegateRewards(options: {
         sender: IAddress;
         delegationContract: IAddress;
-    }): TransactionNext {
+    }): Transaction {
         const dataParts = ["setCheckCapOnReDelegateRewards", utf8ToHex("true")];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -306,12 +306,12 @@ export class DelegationTransactionsFactory {
     createTransactionForUnsettingCapCheckOnRedelegateRewards(options: {
         sender: IAddress;
         delegationContract: IAddress;
-    }): TransactionNext {
+    }): Transaction {
         const dataParts = ["setCheckCapOnReDelegateRewards", utf8ToHex("false")];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,
@@ -327,7 +327,7 @@ export class DelegationTransactionsFactory {
         name: string;
         website: string;
         identifier: string;
-    }): TransactionNext {
+    }): Transaction {
         const dataParts = [
             "setMetaData",
             utf8ToHex(options.name),
@@ -338,7 +338,7 @@ export class DelegationTransactionsFactory {
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
-        return new TransactionNextBuilder({
+        return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
             receiver: options.delegationContract,

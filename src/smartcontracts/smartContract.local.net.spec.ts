@@ -14,7 +14,7 @@ import { TransactionsFactoryConfig } from "../transactionsFactories/transactions
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
 import { TokenComputer } from "../tokens";
 import { promises } from "fs";
-import { TransactionComputer } from "../transaction";
+import { TransactionComputer } from "../transactionComputer";
 import { QueryRunnerAdapter } from "../adapters/queryRunnerAdapter";
 import { SmartContractQueriesController } from "../smartContractQueriesController";
 

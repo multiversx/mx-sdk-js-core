@@ -44,7 +44,8 @@ describe("test token management transactions outcome parser", () => {
         const txOutcome = new TransactionOutcome({ transactionLogs: logs });
 
         const outcome = parser.parseIssueFungible(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifier);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
     });
 
     it("should test parse issue non fungible", () => {
@@ -77,7 +78,8 @@ describe("test token management transactions outcome parser", () => {
         const txOutcome = new TransactionOutcome({ transactionLogs: logs });
 
         const outcome = parser.parseIssueNonFungible(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifier);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
     });
 
     it("should test parse issue semi fungible", () => {
@@ -98,7 +100,8 @@ describe("test token management transactions outcome parser", () => {
         const txOutcome = new TransactionOutcome({ transactionLogs: logs });
 
         const outcome = parser.parseIssueSemiFungible(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifier);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
     });
 
     it("should test parse register meta esdt", () => {
@@ -119,34 +122,51 @@ describe("test token management transactions outcome parser", () => {
         const txOutcome = new TransactionOutcome({ transactionLogs: logs });
 
         const outcome = parser.parseRegisterMetaEsdt(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifier);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
     });
 
     it("should test parse register and set all roles", () => {
-        const identifier = "LMAO-d9f892";
-        const base64Identifier = Buffer.from(identifier).toString("base64");
+        const firstIdentifier = "LMAO-d9f892";
+        const firstBase64Identifier = Buffer.from(firstIdentifier).toString("base64");
+
+        const secondIdentifier = "TST-123456";
+        const secondBase64Identifier = Buffer.from(secondIdentifier).toString("base64");
+
         const roles = ["ESDTRoleLocalMint", "ESDTRoleLocalBurn"];
 
-        const event = new TransactionEvent({
+        const firstEvent = new TransactionEvent({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
             identifier: "registerAndSetAllRoles",
-            topics: [base64Identifier, "TE1BTw==", "TE1BTw==", "RnVuZ2libGVFU0RU", "Ag=="],
+            topics: [firstBase64Identifier, "TE1BTw==", "TE1BTw==", "RnVuZ2libGVFU0RU", "Ag=="],
+        });
+
+        const secondEvent = new TransactionEvent({
+            address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
+            identifier: "registerAndSetAllRoles",
+            topics: [secondBase64Identifier, "TE1BTw==", "TE1BTw==", "RnVuZ2libGVFU0RU", "Ag=="],
         });
 
         const transactionLogs = new TransactionLogs({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
-            events: [event],
+            events: [firstEvent, secondEvent],
         });
 
-        const resultEvent = new TransactionEvent({
+        const firstResultEvent = new TransactionEvent({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
             identifier: "ESDTSetRole",
             topics: ["TE1BTy1kOWY4OTI=", "", "", "RVNEVFJvbGVMb2NhbE1pbnQ=", "RVNEVFJvbGVMb2NhbEJ1cm4="],
         });
 
+        const secondResultEvent = new TransactionEvent({
+            address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
+            identifier: "ESDTSetRole",
+            topics: ["VFNULTEyMzQ1Ng==", "", "", "RVNEVFJvbGVMb2NhbE1pbnQ=", "RVNEVFJvbGVMb2NhbEJ1cm4="],
+        });
+
         const resultLogs = new TransactionLogs({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
-            events: [resultEvent],
+            events: [firstResultEvent, secondResultEvent],
         });
 
         const scResult = new SmartContractResult({
@@ -165,8 +185,13 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseRegisterAndSetAllRoles(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifier);
-        assert.deepEqual(outcome.roles, roles);
+        assert.lengthOf(outcome, 2);
+
+        assert.equal(outcome[0].tokenIdentifier, firstIdentifier);
+        assert.deepEqual(outcome[0].roles, roles);
+
+        assert.equal(outcome[1].tokenIdentifier, secondIdentifier);
+        assert.deepEqual(outcome[1].roles, roles);
     });
 
     it("should test parse register set special role", () => {
@@ -197,9 +222,10 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseSetSpecialRole(txOutcome);
-        assert.equal(outcome.userAddress, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(outcome.tokenIdentifier, identifier);
-        assert.deepEqual(outcome.roles, roles);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].userAddress, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.deepEqual(outcome[0].roles, roles);
     });
 
     it("should test parse nft create", () => {
@@ -229,9 +255,10 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseNftCreate(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifier);
-        assert.equal(outcome.nonce, nonce);
-        assert.equal(outcome.initialQuantity, initialQuantity);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.equal(outcome[0].initialQuantity, initialQuantity);
     });
 
     it("should test parse local mint", () => {
@@ -256,10 +283,11 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseLocalMint(txOutcome);
-        assert.equal(outcome.userAddress, event.address);
-        assert.equal(outcome.tokenIdentifier, identifier);
-        assert.equal(outcome.nonce, nonce);
-        assert.equal(outcome.mintedSupply, mintedSupply);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].userAddress, event.address);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.equal(outcome[0].mintedSupply, mintedSupply);
     });
 
     it("should test parse local burn", () => {
@@ -284,10 +312,11 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseLocalBurn(txOutcome);
-        assert.equal(outcome.userAddress, event.address);
-        assert.equal(outcome.tokenIdentifier, identifier);
-        assert.equal(outcome.nonce, nonce);
-        assert.equal(outcome.burntSupply, burntSupply);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].userAddress, event.address);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.equal(outcome[0].burntSupply, burntSupply);
     });
 
     it("should test parse pause", () => {
@@ -310,7 +339,8 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parsePause(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifier);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
     });
 
     it("should test parse unpause", () => {
@@ -333,7 +363,8 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseUnpause(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifier);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
     });
 
     it("should test parse freeze", () => {
@@ -366,10 +397,11 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseFreeze(txOutcome);
-        assert.equal(outcome.userAddress, address);
-        assert.equal(outcome.tokenIdentifier, identifier);
-        assert.equal(outcome.nonce, nonce);
-        assert.equal(outcome.balance, balance);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].userAddress, address);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.equal(outcome[0].balance, balance);
     });
 
     it("should test parse unfreeze", () => {
@@ -402,10 +434,11 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseUnfreeze(txOutcome);
-        assert.equal(outcome.userAddress, address);
-        assert.equal(outcome.tokenIdentifier, identifier);
-        assert.equal(outcome.nonce, nonce);
-        assert.equal(outcome.balance, balance);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].userAddress, address);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.equal(outcome[0].balance, balance);
     });
 
     it("should test parse wipe", () => {
@@ -438,10 +471,11 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseWipe(txOutcome);
-        assert.equal(outcome.userAddress, address);
-        assert.equal(outcome.tokenIdentifier, identifier);
-        assert.equal(outcome.nonce, nonce);
-        assert.equal(outcome.balance, balance);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].userAddress, address);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.equal(outcome[0].balance, balance);
     });
 
     it("should test parse update attributes", () => {
@@ -467,9 +501,10 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseUpdateAttributes(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifier);
-        assert.equal(outcome.nonce, nonce);
-        assert.equal(Buffer.from(outcome.attributes).toString(), attributes);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.equal(Buffer.from(outcome[0].attributes).toString(), attributes);
     });
 
     it("should test parse add quantity", () => {
@@ -494,9 +529,10 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseAddQuantity(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifier);
-        assert.equal(outcome.nonce, nonce);
-        assert.equal(outcome.addedQuantity, addedQuantity);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.equal(outcome[0].addedQuantity, addedQuantity);
     });
 
     it("should test parse burn quantity", () => {
@@ -521,8 +557,9 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const outcome = parser.parseBurnQuantity(txOutcome);
-        assert.equal(outcome.tokenIdentifier, identifier);
-        assert.equal(outcome.nonce, nonce);
-        assert.equal(outcome.burntQuantity, burntQuantity);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.equal(outcome[0].burntQuantity, burntQuantity);
     });
 });

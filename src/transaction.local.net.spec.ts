@@ -4,12 +4,13 @@ import { Logger } from "./logger";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { createLocalnetProvider } from "./testutils/networkProviders";
 import { TokenTransfer } from "./tokenTransfer";
-import { Transaction, TransactionComputer } from "./transaction";
+import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 import { TransactionWatcher } from "./transactionWatcher";
 import { TransactionsFactoryConfig } from "./transactionsFactories/transactionsFactoryConfig";
 import { NextTransferTransactionsFactory } from "./transactionsFactories/transferTransactionsFactory";
 import { TokenComputer } from "./tokens";
+import { TransactionComputer } from "./transactionComputer";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;

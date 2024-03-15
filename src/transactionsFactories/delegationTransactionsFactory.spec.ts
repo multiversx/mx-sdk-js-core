@@ -7,7 +7,7 @@ import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test delegation transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });
-    const delegationFactory = new DelegationTransactionsFactory(config);
+    const delegationFactory = new DelegationTransactionsFactory({ config: config });
 
     it("should create 'Transaction' for new delegation contract", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");

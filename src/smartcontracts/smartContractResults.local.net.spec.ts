@@ -9,7 +9,7 @@ import { TransactionsFactoryConfig } from "../transactionsFactories/transactions
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
 import { TokenComputer } from "../tokens";
 import { promises } from "fs";
-import { TransactionComputer } from "../transaction";
+import { TransactionComputer } from "../transactionComputer";
 
 describe("fetch transactions from local testnet", function () {
     let alice: TestWallet;

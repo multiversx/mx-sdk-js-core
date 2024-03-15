@@ -3,7 +3,8 @@ import { Logger } from "../logger";
 import { Interaction } from "../smartcontracts/interaction";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "../smartcontracts/interface";
 import { ResultsParser } from "../smartcontracts/resultsParser";
-import { Transaction, TransactionComputer, TransactionNext } from "../transaction";
+import { Transaction } from "../transaction";
+import { TransactionComputer } from "../transactionComputer";
 import { TransactionWatcher } from "../transactionWatcher";
 import { INetworkProvider } from "./networkProviders";
 
@@ -20,7 +21,7 @@ export class ContractController {
         });
     }
 
-    async deploy(transaction: Transaction | TransactionNext): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
+    async deploy(transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
         const txHash = this.getTransactionHash(transaction);
         Logger.info(`ContractController.deploy [begin]: transaction = ${txHash}`);
 
@@ -32,7 +33,7 @@ export class ContractController {
         return { transactionOnNetwork, bundle };
     }
 
-    async execute(interaction: Interaction, transaction: Transaction | TransactionNext): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }> {
+    async execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }> {
         const txHash = this.getTransactionHash(transaction);
         Logger.info(`ContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${txHash}`);
 
@@ -58,11 +59,7 @@ export class ContractController {
         return bundle;
     }
 
-    private getTransactionHash(transaction: Transaction | TransactionNext): string {
-        if ("toSendable" in transaction){
-            return transaction.getHash().hex();
-        }
-
+    private getTransactionHash(transaction: Transaction): string {
         const transactionComputer = new TransactionComputer();
         const txHash = transactionComputer.computeTransactionHash(transaction);
         return Buffer.from(txHash).toString("hex");

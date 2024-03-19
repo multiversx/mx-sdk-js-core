@@ -7,7 +7,7 @@ import { TransactionWatcher } from "./transactionWatcher";
 
 describe("test transactionWatcher", () => {
     it("should await status == executed using hash", async () => {
-        let hash = new TransactionHash("abba");
+        let hash = new TransactionHash("abbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabba");
         let provider = new MockNetworkProvider();
         let watcher = new TransactionWatcher(provider, {
             pollingIntervalMilliseconds: 42,
@@ -29,8 +29,8 @@ describe("test transactionWatcher", () => {
         assert.isTrue((await provider.getTransactionStatus(hash.hex())).isExecuted());
     });
 
-    it("should await status == executed using transction", async () => {
-        let hash = new TransactionHash("mockTransactionHash");
+    it("should await status == executed using transaction", async () => {
+        let hash = new TransactionHash("abbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabba");
         let provider = new MockNetworkProvider();
         let watcher = new TransactionWatcher(provider, {
             pollingIntervalMilliseconds: 42,

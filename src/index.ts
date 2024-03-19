@@ -19,6 +19,5 @@ export * from "./tokens";
 export * from "./transaction";
 export * from "./transactionPayload";
 export * from "./transactionWatcher";
-export * from "./transferTransactionsFactory";
 export * from "./utils";
 export * from "./transactionComputer";

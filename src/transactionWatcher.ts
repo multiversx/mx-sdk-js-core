@@ -1,5 +1,5 @@
 import { AsyncTimer } from "./asyncTimer";
-import { DEFALT_HEX_HASH_LENGTH } from "./constants";
+import { DEFAULT_HEX_HASH_LENGTH } from "./constants";
 import {
     Err,
     ErrExpectedTransactionEventsNotFound,
@@ -153,7 +153,7 @@ export class TransactionWatcher {
         const hash =
             typeof transactionOrTxHash === "string" ? transactionOrTxHash : transactionOrTxHash.getHash().hex();
 
-        if (hash.length !== DEFALT_HEX_HASH_LENGTH) {
+        if (hash.length !== DEFAULT_HEX_HASH_LENGTH) {
             throw new Err("Invalid transaction hash length. The length of a hex encoded hash should be 64.");
         }
 

@@ -64,7 +64,7 @@ export class TransactionWatcher {
     public async awaitPending(transactionOrTxHash: ITransaction | string): Promise<ITransactionOnNetwork> {
         const isPending = (transaction: ITransactionOnNetwork) => transaction.status.isPending();
         const doFetch = async () => {
-            const hash = typeof transactionOrTxHash === "string" ? transactionOrTxHash : transactionOrTxHash.getHash().hex();
+            const hash = this.transactionOrTxHashToTxHash(transactionOrTxHash);
             return await this.fetcher.getTransaction(hash);
         };
         const errorProvider = () => new ErrExpectedTransactionStatusNotReached();
@@ -85,7 +85,7 @@ export class TransactionWatcher {
         };
 
         const doFetch = async () => {
-            const hash = typeof transactionOrTxHash === "string" ? transactionOrTxHash : transactionOrTxHash.getHash().hex();
+            const hash = this.transactionOrTxHashToTxHash(transactionOrTxHash);
             return await this.fetcher.getTransaction(hash);
         };
         const errorProvider = () => new ErrExpectedTransactionStatusNotReached();
@@ -106,7 +106,7 @@ export class TransactionWatcher {
         };
 
         const doFetch = async () => {
-            const hash = typeof transactionOrTxHash === "string" ? transactionOrTxHash : transactionOrTxHash.getHash().hex();
+            const hash = this.transactionOrTxHashToTxHash(transactionOrTxHash);
             return await this.fetcher.getTransaction(hash);
         };
         const errorProvider = () => new ErrExpectedTransactionEventsNotFound();
@@ -127,7 +127,7 @@ export class TransactionWatcher {
         };
 
         const doFetch = async () => {
-            const hash = typeof transactionOrTxHash === "string" ? transactionOrTxHash : transactionOrTxHash.getHash().hex();
+            const hash = this.transactionOrTxHashToTxHash(transactionOrTxHash);
             return await this.fetcher.getTransaction(hash);
         };
         const errorProvider = () => new ErrExpectedTransactionEventsNotFound();
@@ -140,12 +140,16 @@ export class TransactionWatcher {
         condition: (data: ITransactionOnNetwork) => boolean,
     ): Promise<ITransactionOnNetwork> {
         const doFetch = async () => {
-            const hash = typeof transactionOrTxHash === "string" ? transactionOrTxHash : transactionOrTxHash.getHash().hex();
+            const hash = this.transactionOrTxHashToTxHash(transactionOrTxHash);
             return await this.fetcher.getTransaction(hash);
         };
         const errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 
         return this.awaitConditionally<ITransactionOnNetwork>(condition, doFetch, errorProvider);
+    }
+
+    private transactionOrTxHashToTxHash(transactionOrTxHash: ITransaction | string): string {
+        return typeof transactionOrTxHash === "string" ? transactionOrTxHash : transactionOrTxHash.getHash().hex();
     }
 
     protected async awaitConditionally<TData>(

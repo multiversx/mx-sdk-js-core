@@ -49,7 +49,6 @@ interface IGasEstimator {
 
 /**
  * Use this class to create transactions for native token transfers (EGLD) or custom tokens transfers (ESDT/NTF/MetaESDT).
- * This name is only temporary, the class will be renamed to `TransferTransactionsFactory`.
  */
 export class TransferTransactionsFactory {
     private readonly config?: IConfig;
@@ -57,6 +56,12 @@ export class TransferTransactionsFactory {
     private readonly tokenComputer?: ITokenComputer;
     private readonly gasEstimator?: IGasEstimator;
 
+    /**
+     * Should be instantiated using `Config` and `TokenComputer`.
+     * Instantiating this class using GasEstimator represents the legacy version of this class.
+     * The legacy version contains methods like `createEGLDTransfer`, `createESDTTransfer`, `createESDTNFTTransfer` and `createMultiESDTNFTTransfer`.
+     */
+    // this was done to minimize breaking changes in client code
     constructor(options: IGasEstimator | { config: IConfig; tokenComputer: ITokenComputer }) {
         if (this.isGasEstimator(options)) {
             this.gasEstimator = options;
@@ -81,7 +86,7 @@ export class TransferTransactionsFactory {
         if (this.gasEstimator === undefined) {
             return false;
         }
-        return this.isGasEstimator(this.gasEstimator);
+        return true;
     }
 
     private ensureMembersAreDefined() {
@@ -133,7 +138,7 @@ export class TransferTransactionsFactory {
         }
 
         if (numberOfTransfers === 1) {
-            return this.createSingleESDTTransferDraft(options);
+            return this.createSingleESDTTransferTransaction(options);
         }
 
         const transferArgs = this.dataArgsBuilder!.buildArgsForMultiESDTNFTTransfer(
@@ -155,6 +160,10 @@ export class TransferTransactionsFactory {
         }).build();
     }
 
+    /**
+     * This is a legacy method. Can only be used if the class was instantiated using `GasEstimator`.
+     * Use {@link createTransactionForNativeTokenTransfer} instead.
+     */
     createEGLDTransfer(args: {
         nonce?: INonce;
         value: ITransactionValue;
@@ -166,7 +175,9 @@ export class TransferTransactionsFactory {
         chainID: IChainID;
     }) {
         if (!this.isGasEstimatorDefined()) {
-            throw new Err("`gasEstimator` is not defined. Instantiate the factory using the gasEstimator.");
+            throw new Err(
+                "You are calling a legacy function to create an EGLD transfer transaction. If this is your intent, then instantiate the class using a `GasEstimator`. Or, instead, use the new, recommended `createTransactionForNativeTokenTransfer` method.",
+            );
         }
 
         const dataLength = args.data?.length() || 0;
@@ -184,6 +195,10 @@ export class TransferTransactionsFactory {
         });
     }
 
+    /**
+     * This is a legacy method. Can only be used if the class was instantiated using `GasEstimator`.
+     * Use {@link createTransactionForESDTTokenTransfer} instead.
+     */
     createESDTTransfer(args: {
         tokenTransfer: ITokenTransfer;
         nonce?: INonce;
@@ -194,7 +209,9 @@ export class TransferTransactionsFactory {
         chainID: IChainID;
     }) {
         if (!this.isGasEstimatorDefined()) {
-            throw new Err("`gasEstimator` is not defined. Instantiate the factory using the gasEstimator.");
+            throw new Err(
+                "You are calling a legacy function to create an ESDT transfer transaction. If this is your intent, then instantiate the class using a `GasEstimator`. Or, instead, use the new, recommended `createTransactionForESDTTokenTransfer` method.",
+            );
         }
 
         const { argumentsString } = new ArgSerializer().valuesToString([
@@ -220,6 +237,10 @@ export class TransferTransactionsFactory {
         });
     }
 
+    /**
+     * This is a legacy method. Can only be used if the class was instantiated using `GasEstimator`.
+     * Use {@link createTransactionForESDTTokenTransfer} instead.
+     */
     createESDTNFTTransfer(args: {
         tokenTransfer: ITokenTransfer;
         nonce?: INonce;
@@ -230,7 +251,9 @@ export class TransferTransactionsFactory {
         chainID: IChainID;
     }) {
         if (!this.isGasEstimatorDefined()) {
-            throw new Err("`gasEstimator` is not defined. Instantiate the factory using the gasEstimator.");
+            throw new Err(
+                "You are calling a legacy function to create an ESDTNFT transfer transaction. If this is your intent, then instantiate the class using a `GasEstimator`. Or, instead, use the new, recommended `createTransactionForESDTTokenTransfer` method.",
+            );
         }
 
         const { argumentsString } = new ArgSerializer().valuesToString([
@@ -260,6 +283,10 @@ export class TransferTransactionsFactory {
         });
     }
 
+    /**
+     * This is a legacy method. Can only be used if the class was instantiated using `GasEstimator`.
+     * Use {@link createTransactionForESDTTokenTransfer} instead.
+     */
     createMultiESDTNFTTransfer(args: {
         tokenTransfers: ITokenTransfer[];
         nonce?: INonce;
@@ -270,7 +297,9 @@ export class TransferTransactionsFactory {
         chainID: IChainID;
     }) {
         if (!this.isGasEstimatorDefined()) {
-            throw new Err("`gasEstimator` is not defined. Instantiate the factory using the gasEstimator.");
+            throw new Err(
+                "You are calling a legacy function to create a MultiESDTNFT transfer transaction. If this is your intent, then instantiate the class using a `GasEstimator`. Or, instead, use the new, recommended `createTransactionForESDTTokenTransfer` method.",
+            );
         }
 
         const parts: TypedValue[] = [
@@ -310,7 +339,7 @@ export class TransferTransactionsFactory {
         });
     }
 
-    private createSingleESDTTransferDraft(options: {
+    private createSingleESDTTransferTransaction(options: {
         sender: IAddress;
         receiver: IAddress;
         tokenTransfers: NextTokenTransfer[];

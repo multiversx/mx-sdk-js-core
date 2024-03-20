@@ -19,14 +19,11 @@ interface IConfig {
 export class RelayedTransactionsFactory {
     private readonly config: IConfig;
 
-    constructor(config: IConfig) {
-        this.config = config;
+    constructor(options: { config: IConfig }) {
+        this.config = options.config;
     }
 
-    createRelayedV1Transaction(options: {
-        innerTransaction: ITransaction;
-        relayerAddress: IAddress;
-    }): Transaction {
+    createRelayedV1Transaction(options: { innerTransaction: ITransaction; relayerAddress: IAddress }): Transaction {
         if (!options.innerTransaction.gasLimit) {
             throw new ErrInvalidInnerTransaction("The gas limit is not set for the inner transaction");
         }

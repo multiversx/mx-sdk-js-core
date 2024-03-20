@@ -29,8 +29,8 @@ interface IValidatorPublicKey {
 export class DelegationTransactionsFactory {
     private readonly config: Config;
 
-    constructor(config: Config) {
-        this.config = config;
+    constructor(options: { config: Config }) {
+        this.config = options.config;
     }
 
     createTransactionForNewDelegationContract(options: {

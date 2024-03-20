@@ -1,12 +1,12 @@
+import { Address } from "../address";
 import { ErrParseTransactionOutcome } from "../errors";
 import { TransactionEvent, TransactionOutcome } from "./resources";
-import { Address } from "../address";
 
 export class DelegationTransactionsOutcomeParser {
     constructor() {}
 
     parseCreateNewDelegationContract(transactionOutcome: TransactionOutcome): { contractAddress: string }[] {
-        this.ensureNoError(transactionOutcome.transactionLogs.events);
+        this.ensureNoError(transactionOutcome.logs.events);
 
         const events = this.findEventsByIdentifier(transactionOutcome, "SCDeploy");
 
@@ -39,7 +39,7 @@ export class DelegationTransactionsOutcomeParser {
     private gatherAllEvents(transactionOutcome: TransactionOutcome): TransactionEvent[] {
         const allEvents = [];
 
-        allEvents.push(...transactionOutcome.transactionLogs.events);
+        allEvents.push(...transactionOutcome.logs.events);
 
         for (const item of transactionOutcome.smartContractResults) {
             allEvents.push(...item.logs.events);

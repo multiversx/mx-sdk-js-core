@@ -43,14 +43,30 @@ export class SmartContractResult {
 }
 
 export class TransactionOutcome {
-    function: string;
+    directSmartContractCallOutcome: SmartContractCallOutcome;
     smartContractResults: SmartContractResult[];
-    transactionLogs: TransactionLogs;
+    logs: TransactionLogs;
 
     constructor(init: Partial<TransactionOutcome>) {
-        this.function = "";
+        this.directSmartContractCallOutcome = new SmartContractCallOutcome({});
         this.smartContractResults = [];
-        this.transactionLogs = new TransactionLogs({});
+        this.logs = new TransactionLogs({});
+
+        Object.assign(this, init);
+    }
+}
+
+export class SmartContractCallOutcome {
+    function: string;
+    returnDataParts: Uint8Array[];
+    returnMessage: string;
+    returnCode: string;
+
+    constructor(init: Partial<SmartContractCallOutcome>) {
+        this.function = "";
+        this.returnDataParts = [];
+        this.returnMessage = "";
+        this.returnCode = "";
 
         Object.assign(this, init);
     }

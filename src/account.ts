@@ -8,7 +8,7 @@ export class Account {
     /**
      * The address of the account.
      */
-    readonly address: IAddress = new Address();
+    readonly address: IAddress = Address.empty();
 
     /**
      * The nonce of the account (the account sequence number).
@@ -30,7 +30,7 @@ export class Account {
     /**
      * Updates account properties (such as nonce, balance).
      */
-    update(obj: { nonce: INonce, balance: IAccountBalance}) {
+    update(obj: { nonce: INonce; balance: IAccountBalance }) {
         this.nonce = obj.nonce;
         this.balance = obj.balance;
     }

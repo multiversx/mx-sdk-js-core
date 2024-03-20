@@ -1,4 +1,4 @@
-require('./globals');
+require("./globals");
 
 export * from "./account";
 export * from "./address";
@@ -15,9 +15,10 @@ export * from "./signableMessage";
 export * from "./smartcontracts";
 export * from "./tokenOperations";
 export * from "./tokenTransfer";
+export * from "./tokens";
 export * from "./transaction";
 export * from "./transactionPayload";
 export * from "./transactionWatcher";
 export * from "./transferTransactionsFactory";
 export * from "./utils";
-
+export * from "./transactionComputer";

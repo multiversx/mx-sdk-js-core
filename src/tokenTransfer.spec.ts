@@ -19,7 +19,10 @@ describe("test token transfer", () => {
         assert.equal(TokenTransfer.egldFromAmount(100).toPrettyString(), "100.000000000000000000 EGLD");
         assert.equal(TokenTransfer.egldFromAmount(1000).toPrettyString(), "1000.000000000000000000 EGLD");
         assert.equal(TokenTransfer.egldFromAmount("0.123456789").toPrettyString(), "0.123456789000000000 EGLD");
-        assert.equal(TokenTransfer.egldFromAmount("0.123456789123456789777777888888").toPrettyString(), "0.123456789123456789 EGLD");
+        assert.equal(
+            TokenTransfer.egldFromAmount("0.123456789123456789777777888888").toPrettyString(),
+            "0.123456789123456789 EGLD",
+        );
 
         assert.equal(TokenTransfer.egldFromBigInteger("1").toString(), "1");
         assert.equal(TokenTransfer.egldFromBigInteger("1").toPrettyString(), "0.000000000000000001 EGLD");
@@ -34,7 +37,10 @@ describe("test token transfer", () => {
         assert.equal(TokenTransfer.fungibleFromAmount(identifier, "0.1", numDecimals).toString(), "100000");
         assert.equal(TokenTransfer.fungibleFromAmount(identifier, "0.123456789", numDecimals).toString(), "123456");
         assert.equal(TokenTransfer.fungibleFromBigInteger(identifier, "1000000", numDecimals).toString(), "1000000");
-        assert.equal(TokenTransfer.fungibleFromBigInteger(identifier, "1000000", numDecimals).toPrettyString(), "1.000000 USDC-c76f1f");
+        assert.equal(
+            TokenTransfer.fungibleFromBigInteger(identifier, "1000000", numDecimals).toPrettyString(),
+            "1.000000 USDC-c76f1f",
+        );
     });
 
     it("should work with MetaESDT", () => {

@@ -6,6 +6,7 @@ export class CodeMetadata {
     public readable: boolean;
     public payable: boolean;
     public payableBySc: boolean;
+    private static readonly codeMetadataLength = 2;
 
     static ByteZero = {
         Upgradeable: 1,
@@ -34,11 +35,15 @@ export class CodeMetadata {
         this.payableBySc = payableBySc
     }
 
+    static fromBytes(bytes: Uint8Array): CodeMetadata {
+        return CodeMetadata.fromBuffer(Buffer.from(bytes));
+    }
+
     /**
      * Creates a metadata object from a buffer.
      */
     static fromBuffer(buffer: Buffer): CodeMetadata {
-        if (buffer.length < 2) {
+        if (buffer.length < this.codeMetadataLength) {
             throw new Error('Buffer is too short.');
         }
 

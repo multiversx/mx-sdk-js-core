@@ -11,6 +11,9 @@ interface IGasEstimator {
     forMultiESDTNFTTransfer(dataLength: number, numTransfers: number): number;
 }
 
+/**
+ * @deprecated Use {@link NextTransferTransactionsFactory} instead.
+ */
 export class TransferTransactionsFactory {
     private readonly gasEstimator;
 
@@ -39,12 +42,12 @@ export class TransferTransactionsFactory {
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: args.data,
-            chainID: args.chainID
+            chainID: args.chainID,
         });
     }
 
     createESDTTransfer(args: {
-        tokenTransfer: ITokenTransfer,
+        tokenTransfer: ITokenTransfer;
         nonce?: INonce;
         receiver: IAddress;
         sender: IAddress;
@@ -71,12 +74,12 @@ export class TransferTransactionsFactory {
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: transactionPayload,
-            chainID: args.chainID
+            chainID: args.chainID,
         });
     }
 
     createESDTNFTTransfer(args: {
-        tokenTransfer: ITokenTransfer,
+        tokenTransfer: ITokenTransfer;
         nonce?: INonce;
         destination: IAddress;
         sender: IAddress;
@@ -92,7 +95,7 @@ export class TransferTransactionsFactory {
             // The transferred quantity
             new BigUIntValue(args.tokenTransfer.valueOf()),
             // The destination address
-            new AddressValue(args.destination)
+            new AddressValue(args.destination),
         ]);
 
         const data = `ESDTNFTTransfer@${argumentsString}`;
@@ -107,12 +110,12 @@ export class TransferTransactionsFactory {
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: transactionPayload,
-            chainID: args.chainID
+            chainID: args.chainID,
         });
     }
 
     createMultiESDTNFTTransfer(args: {
-        tokenTransfers: ITokenTransfer[],
+        tokenTransfers: ITokenTransfer[];
         nonce?: INonce;
         destination: IAddress;
         sender: IAddress;
@@ -124,18 +127,20 @@ export class TransferTransactionsFactory {
             // The destination address
             new AddressValue(args.destination),
             // Number of tokens
-            new U16Value(args.tokenTransfers.length)
+            new U16Value(args.tokenTransfers.length),
         ];
 
         for (const payment of args.tokenTransfers) {
-            parts.push(...[
-                // The token identifier
-                BytesValue.fromUTF8(payment.tokenIdentifier),
-                // The nonce of the token
-                new U64Value(payment.nonce),
-                // The transfered quantity
-                new BigUIntValue(payment.valueOf())
-            ]);
+            parts.push(
+                ...[
+                    // The token identifier
+                    BytesValue.fromUTF8(payment.tokenIdentifier),
+                    // The nonce of the token
+                    new U64Value(payment.nonce),
+                    // The transfered quantity
+                    new BigUIntValue(payment.valueOf()),
+                ]
+            );
         }
 
         const { argumentsString } = new ArgSerializer().valuesToString(parts);
@@ -151,7 +156,7 @@ export class TransferTransactionsFactory {
             gasPrice: args.gasPrice,
             gasLimit: args.gasLimit || estimatedGasLimit,
             data: transactionPayload,
-            chainID: args.chainID
+            chainID: args.chainID,
         });
     }
 }

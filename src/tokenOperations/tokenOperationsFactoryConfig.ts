@@ -2,6 +2,9 @@ import BigNumber from "bignumber.js";
 import { Address } from "../address";
 import { IAddress, IChainID, IGasLimit, IGasPrice } from "../interface";
 
+/**
+ * @deprecated Use {@link TransactionsFactoryConfig} instead.
+ */
 export class TokenOperationsFactoryConfig {
     chainID: IChainID;
     minGasPrice: IGasPrice = 1000000000;
@@ -21,7 +24,9 @@ export class TokenOperationsFactoryConfig {
     gasLimitESDTNFTBurn: IGasLimit = 1000000;
     gasLimitStorePerByte: IGasLimit = 50000;
     issueCost: BigNumber.Value = "50000000000000000";
-    esdtContractAddress: IAddress = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u");
+    esdtContractAddress: IAddress = Address.fromBech32(
+        "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
+    );
 
     constructor(chainID: IChainID) {
         this.chainID = chainID;

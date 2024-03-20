@@ -5,7 +5,7 @@ import { Address } from "../address";
 import {
     loadAbiRegistry,
     loadTestWallets,
-    MockProvider,
+    MockNetworkProvider,
     setupUnitTestWatcherTimeouts,
     TestWallet
 } from "../testutils";
@@ -20,7 +20,7 @@ import { BytesValue } from "./typesystem/bytes";
 
 describe("test smart contract interactor", function () {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");
-    let provider = new MockProvider();
+    let provider = new MockNetworkProvider();
     let alice: TestWallet;
 
     before(async function () {
@@ -33,6 +33,7 @@ describe("test smart contract interactor", function () {
         let interaction = new Interaction(contract, dummyFunction, []);
 
         let transaction = interaction
+            .withSender(alice.address)
             .withNonce(7)
             .withValue(TokenTransfer.egldFromAmount(1))
             .withGasLimit(20000000)
@@ -63,6 +64,7 @@ describe("test smart contract interactor", function () {
 
         // ESDT, single
         let transaction = new Interaction(contract, dummyFunction, [])
+            .withSender(alice)
             .withSingleESDTTransfer(TokenFoo(10))
             .buildTransaction();
 
@@ -180,31 +182,31 @@ describe("test smart contract interactor", function () {
         assert.isTrue(queryCode.equals(ReturnCode.Ok));
 
         // Execute, do not wait for execution
-        let transaction = interaction.withNonce(0).buildTransaction();
+        let transaction = interaction.withSender(alice.address).withNonce(0).buildTransaction();
         transaction.setSender(alice.address);
-        await alice.signer.sign(transaction);
+        transaction.applySignature(await alice.signer.sign(transaction.serializeForSigning()));
         await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce().valueOf(), 0);
         assert.equal(transaction.getData().toString(), "getUltimateAnswer");
         assert.equal(
             transaction.getHash().toString(),
-            "60d0956a8902c1179dce92d91bd9670e31b9a9cd07c1d620edb7754a315b4818"
+            "3579ad09099feb9755c860ddd225251170806d833342e912fccdfe2ed5c3a364"
         );
 
         transaction = interaction.withNonce(1).buildTransaction();
         transaction.setSender(alice.address);
-        await alice.signer.sign(transaction);
+        transaction.applySignature(await alice.signer.sign(transaction.serializeForSigning()));
         await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce().valueOf(), 1);
         assert.equal(
             transaction.getHash().toString(),
-            "acd207c38f6c3341b18d8ef331fa07ba49615fa12d7610aad5d8495293049f24"
+            "ad513ce7c5d371d30e48f073326899766736eac1ac231d847d45bc3facbcb496"
         );
 
         // Execute, and wait for execution
         transaction = interaction.withNonce(2).buildTransaction();
         transaction.setSender(alice.address);
-        await alice.signer.sign(transaction);
+        transaction.applySignature(await alice.signer.sign(transaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@2bs");
         let { bundle } = await controller.execute(interaction, transaction);
 
@@ -235,25 +237,25 @@ describe("test smart contract interactor", function () {
 
         assert.deepEqual(counterValue!.valueOf(), new BigNumber(7));
 
-        let incrementTransaction = incrementInteraction.withNonce(14).buildTransaction();
-        await alice.signer.sign(incrementTransaction);
+        let incrementTransaction = incrementInteraction.withSender(alice.address).withNonce(14).buildTransaction();
+        incrementTransaction.applySignature(await alice.signer.sign(incrementTransaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@08");
         let { bundle: { firstValue: valueAfterIncrement } } = await controller.execute(incrementInteraction, incrementTransaction);
         assert.deepEqual(valueAfterIncrement!.valueOf(), new BigNumber(8));
 
         // Decrement three times (simulate three parallel broadcasts). Wait for execution of the latter (third transaction). Return fake "5".
         // Decrement #1
-        let decrementTransaction = decrementInteraction.withNonce(15).buildTransaction();
-        await alice.signer.sign(decrementTransaction);
+        let decrementTransaction = decrementInteraction.withSender(alice.address).withNonce(15).buildTransaction();
+        decrementTransaction.applySignature(await alice.signer.sign(decrementTransaction.serializeForSigning()));
         await provider.sendTransaction(decrementTransaction);
         // Decrement #2
         decrementTransaction = decrementInteraction.withNonce(16).buildTransaction();
-        await alice.signer.sign(decrementTransaction);
+        decrementTransaction.applySignature(await alice.signer.sign(decrementTransaction.serializeForSigning()));
         await provider.sendTransaction(decrementTransaction);
         // Decrement #3
 
         decrementTransaction = decrementInteraction.withNonce(17).buildTransaction();
-        await alice.signer.sign(decrementTransaction);
+        decrementTransaction.applySignature(await alice.signer.sign(decrementTransaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@05");
         let { bundle: { firstValue: valueAfterDecrement } } = await controller.execute(decrementInteraction, decrementTransaction);
         assert.deepEqual(valueAfterDecrement!.valueOf(), new BigNumber(5));
@@ -292,8 +294,8 @@ describe("test smart contract interactor", function () {
         );
 
         // start()
-        let startTransaction = startInteraction.withNonce(14).buildTransaction();
-        await alice.signer.sign(startTransaction);
+        let startTransaction = startInteraction.withSender(alice.address).withNonce(14).buildTransaction();
+        startTransaction.applySignature(await alice.signer.sign(startTransaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b");
         let { bundle: { returnCode: startReturnCode, values: startReturnValues } } = await controller.execute(startInteraction, startTransaction);
 
@@ -302,8 +304,8 @@ describe("test smart contract interactor", function () {
         assert.lengthOf(startReturnValues, 0);
 
         // status() (this is a view function, but for the sake of the test, we'll execute it)
-        let statusTransaction = statusInteraction.withNonce(15).buildTransaction();
-        await alice.signer.sign(statusTransaction);
+        let statusTransaction = statusInteraction.withSender(alice.address).withNonce(15).buildTransaction();
+        statusTransaction.applySignature(await alice.signer.sign(statusTransaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@01");
         let { bundle: { returnCode: statusReturnCode, values: statusReturnValues, firstValue: statusFirstValue } } = await controller.execute(statusInteraction, statusTransaction);
 
@@ -313,8 +315,8 @@ describe("test smart contract interactor", function () {
         assert.deepEqual(statusFirstValue!.valueOf(), { name: "Running", fields: [] });
 
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
-        let getLotteryInfoTransaction = getLotteryInfoInteraction.withNonce(15).buildTransaction();
-        await alice.signer.sign(getLotteryInfoTransaction);
+        let getLotteryInfoTransaction = getLotteryInfoInteraction.withSender(alice.address).withNonce(15).buildTransaction();
+        getLotteryInfoTransaction.applySignature(await alice.signer.sign(getLotteryInfoTransaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@0000000b6c75636b792d746f6b656e000000010100000000000000005fc2b9dbffffffff00000001640000000a140ec80fa7ee88000000");
         let { bundle: { returnCode: infoReturnCode, values: infoReturnValues, firstValue: infoFirstValue } } = await controller.execute(getLotteryInfoInteraction, getLotteryInfoTransaction);
 

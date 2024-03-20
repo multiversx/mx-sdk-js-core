@@ -11,12 +11,12 @@ import axios, { AxiosResponse } from "axios";
 import BigNumber from "bignumber.js";
 
 export async function prepareDeployment(obj: {
-    deployer: TestWallet,
-    contract: SmartContract,
-    codePath: string,
-    initArguments: TypedValue[],
-    gasLimit: IGasLimit,
-    chainID: IChainID
+    deployer: TestWallet;
+    contract: SmartContract;
+    codePath: string;
+    initArguments: TypedValue[];
+    gasLimit: IGasLimit;
+    chainID: IChainID;
 }): Promise<Transaction> {
     let contract = obj.contract;
     let deployer = obj.deployer;
@@ -26,15 +26,15 @@ export async function prepareDeployment(obj: {
         gasLimit: obj.gasLimit,
         initArguments: obj.initArguments,
         chainID: obj.chainID,
-        deployer: deployer.address
+        deployer: deployer.address,
     });
 
     let nonce = deployer.account.getNonceThenIncrement();
     let contractAddress = SmartContract.computeAddress(deployer.address, nonce);
     transaction.setNonce(nonce);
-    transaction.setSender(deployer.address)
+    transaction.setSender(deployer.address);
     contract.setAddress(contractAddress);
-    await deployer.signer.sign(transaction);
+    transaction.applySignature(await deployer.signer.sign(transaction.serializeForSigning()));
 
     return transaction;
 }
@@ -42,11 +42,11 @@ export async function prepareDeployment(obj: {
 export async function loadContractCode(path: PathLike): Promise<Code> {
     if (isOnBrowserTests()) {
         let response: AxiosResponse<ArrayBuffer> = await axios.get(path.toString(), {
-            responseType: 'arraybuffer',
+            responseType: "arraybuffer",
             transformResponse: [],
             headers: {
-                "Accept": "application/wasm"
-            }
+                Accept: "application/wasm",
+            },
         });
 
         let buffer = Buffer.from(response.data);

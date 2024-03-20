@@ -23,7 +23,7 @@ export class EnumBinaryCodec {
 
         let variant = type.getVariantByDiscriminant(discriminant);
         let fieldDefinitions = variant.getFieldsDefinitions();
-        
+
         let [fields, lengthOfFields]: [Field[], number] = this.fieldsCodec.decodeNested(buffer, fieldDefinitions);
         let enumValue = new EnumValue(type, variant, fields);
 
@@ -33,7 +33,7 @@ export class EnumBinaryCodec {
     private readDiscriminant(buffer: Buffer): [discriminant: number, length: number] {
         let [value, length] = this.binaryCodec.decodeNested(buffer, new U8Type());
         let discriminant = value.valueOf();
-        
+
         return [discriminant, length];
     }
 
@@ -51,9 +51,11 @@ export class EnumBinaryCodec {
         let fields = enumValue.getFields();
         let hasFields = fields.length > 0;
         let fieldsBuffer = this.fieldsCodec.encodeNested(fields);
-        
+
         let discriminant = new U8Value(enumValue.discriminant);
-        let discriminantBuffer = hasFields ? this.binaryCodec.encodeNested(discriminant) : this.binaryCodec.encodeTopLevel(discriminant);
+        let discriminantBuffer = hasFields
+            ? this.binaryCodec.encodeNested(discriminant)
+            : this.binaryCodec.encodeTopLevel(discriminant);
 
         return Buffer.concat([discriminantBuffer, fieldsBuffer]);
     }

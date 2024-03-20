@@ -56,7 +56,7 @@ export class PrimitiveBinaryCodec {
             onString: () => this.stringCodec.decodeNested(buffer),
             onH256: () => this.h256Codec.decodeNested(buffer),
             onTokenIndetifier: () => this.tokenIdentifierCodec.decodeNested(buffer),
-            onNothing: () => this.nothingCodec.decodeNested()
+            onNothing: () => this.nothingCodec.decodeNested(),
         });
     }
 
@@ -69,7 +69,7 @@ export class PrimitiveBinaryCodec {
             onString: () => this.stringCodec.decodeTopLevel(buffer),
             onH256: () => this.h256Codec.decodeTopLevel(buffer),
             onTokenIndetifier: () => this.tokenIdentifierCodec.decodeTopLevel(buffer),
-            onNothing: () => this.nothingCodec.decodeTopLevel()
+            onNothing: () => this.nothingCodec.decodeTopLevel(),
         });
     }
 
@@ -82,7 +82,7 @@ export class PrimitiveBinaryCodec {
             onString: () => this.stringCodec.encodeNested(<StringValue>value),
             onH256: () => this.h256Codec.encodeNested(<H256Value>value),
             onTypeIdentifier: () => this.tokenIdentifierCodec.encodeNested(<TokenIdentifierValue>value),
-            onNothing: () => this.nothingCodec.encodeNested()
+            onNothing: () => this.nothingCodec.encodeNested(),
         });
     }
 
@@ -95,7 +95,7 @@ export class PrimitiveBinaryCodec {
             onString: () => this.stringCodec.encodeTopLevel(<StringValue>value),
             onH256: () => this.h256Codec.encodeTopLevel(<H256Value>value),
             onTypeIdentifier: () => this.tokenIdentifierCodec.encodeTopLevel(<TokenIdentifierValue>value),
-            onNothing: () => this.nothingCodec.encodeTopLevel()
+            onNothing: () => this.nothingCodec.encodeTopLevel(),
         });
     }
 }

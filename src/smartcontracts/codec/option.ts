@@ -34,7 +34,7 @@ export class OptionValueBinaryCodec {
             throw new errors.ErrCodec("invalid buffer for optional value");
         }
 
-        let [decoded, decodedLength] = this.binaryCodec.decodeNested(buffer.slice(1), type);
+        let [decoded, _decodedLength] = this.binaryCodec.decodeNested(buffer.slice(1), type);
         return new OptionValue(type, decoded);
     }
 

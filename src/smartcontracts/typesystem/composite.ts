@@ -32,7 +32,7 @@ export class CompositeValue extends TypedValue {
     }
 
     static fromItems(...items: TypedValue[]): CompositeValue {
-        let typeParameters = items.map(value => value.getType());
+        let typeParameters = items.map((value) => value.getType());
         let type = new CompositeType(...typeParameters);
         return new CompositeValue(type, items);
     }
@@ -42,7 +42,7 @@ export class CompositeValue extends TypedValue {
     }
 
     valueOf(): any[] {
-        return this.items.map(item => item?.valueOf());
+        return this.items.map((item) => item?.valueOf());
     }
 
     equals(other: CompositeValue): boolean {

@@ -2,7 +2,6 @@ import { assert } from "chai";
 import { Address } from "./address";
 import * as errors from "./errors";
 
-
 describe("test address", () => {
     let aliceBech32 = "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th";
     let bobBech32 = "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx";
@@ -18,7 +17,7 @@ describe("test address", () => {
     });
 
     it("should create empty address", async () => {
-        let nobody = new Address();
+        const nobody = Address.empty();
 
         assert.isEmpty(nobody.hex());
         assert.isEmpty(nobody.bech32());
@@ -41,13 +40,31 @@ describe("test address", () => {
         assert.throw(() => new Address("foo"), errors.ErrAddressCannotCreate);
         assert.throw(() => new Address("a".repeat(7)), errors.ErrAddressCannotCreate);
         assert.throw(() => new Address(Buffer.from("aaaa", "hex")), errors.ErrAddressCannotCreate);
-        assert.throw(() => new Address("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2"), errors.ErrAddressCannotCreate);
-        assert.throw(() => new Address("xerd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"), errors.ErrAddressCannotCreate);
+        assert.throw(
+            () => new Address("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2"),
+            errors.ErrAddressCannotCreate,
+        );
+        assert.throw(
+            () => new Address("xerd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"),
+            errors.ErrAddressCannotCreate,
+        );
     });
 
     it("should validate the address without throwing the error", () => {
         assert.isTrue(Address.isValid(aliceBech32));
-        assert.isFalse(Address.isValid('xerd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz'));
-        assert.isFalse(Address.isValid('erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2'))
-    })
+        assert.isFalse(Address.isValid("xerd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz"));
+        assert.isFalse(Address.isValid("erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2"));
+    });
+
+    it("should check whether isSmartContract", () => {
+        assert.isFalse(
+            Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th").isSmartContract(),
+        );
+        assert.isTrue(
+            Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l").isSmartContract(),
+        );
+        assert.isTrue(
+            Address.fromBech32("erd1qqqqqqqqqqqqqpgqxwakt2g7u9atsnr03gqcgmhcv38pt7mkd94q6shuwt").isSmartContract(),
+        );
+    });
 });

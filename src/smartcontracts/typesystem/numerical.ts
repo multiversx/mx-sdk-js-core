@@ -1,6 +1,6 @@
-import * as errors from "../../errors";
-import { PrimitiveType, PrimitiveValue, Type } from "./types";
 import BigNumber from "bignumber.js";
+import * as errors from "../../errors";
+import { PrimitiveType, PrimitiveValue } from "./types";
 
 export class NumericalType extends PrimitiveType {
     static ClassName = "NumericalType";

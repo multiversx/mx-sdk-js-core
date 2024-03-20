@@ -32,7 +32,7 @@ export class AddressValue extends PrimitiveValue {
 
     /**
      * Returns whether two objects have the same value.
-     * 
+     *
      * @param other another AddressValue
      */
     equals(other: AddressValue): boolean {

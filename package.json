@@ -1,6 +1,6 @@
 {
   "name": "@multiversx/sdk-core",
-  "version": "12.20.0-beta.2",
+  "version": "13.0.0-beta.6",
   "description": "MultiversX SDK for JavaScript and TypeScript",
   "main": "out/index.js",
   "types": "out/index.d.js",
@@ -18,7 +18,8 @@
     "compile": "tsc -p tsconfig.json",
     "compile-proto": "npx pbjs -t static-module -w default -o src/proto/compiled.js src/proto/transaction.proto",
     "browser-tests": "make clean && make browser-tests && http-server --port=9876 -o browser-tests/index.html",
-    "lint": "tslint --project .",
+    "lint": "eslint .",
+    "pretty": "prettier --write ./src/**/*.{js,ts}",
     "pretest": "npm run compile",
     "prepare": "npm run compile"
   },
@@ -26,16 +27,15 @@
   "license": "MIT",
   "dependencies": {
     "@multiversx/sdk-transaction-decoder": "1.0.2",
+    "json-bigint": "1.0.0",
     "bech32": "1.1.4",
     "blake2b": "2.1.3",
     "buffer": "6.0.3",
-    "json-duplicate-key-handle": "1.0.0",
     "keccak": "3.0.2"
   },
   "devDependencies": {
-    "@multiversx/sdk-network-providers": "2.2.0",
-    "@multiversx/sdk-wallet": "3.0.0",
-    "@multiversx/sdk-wallet-next": "npm:@multiversx/sdk-wallet@4.0.0",
+    "@multiversx/sdk-network-providers": "2.3.0",
+    "@multiversx/sdk-wallet": "4.2.0",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",
     "@types/mocha": "9.1.0",
@@ -48,8 +48,12 @@
     "mocha": "9.2.2",
     "protobufjs-cli": "1.1.2",
     "ts-node": "9.1.1",
-    "tslint": "6.1.3",
-    "typescript": "4.1.2"
+    "typescript": "4.1.2",
+    "@typescript-eslint/eslint-plugin": "5.44.0",
+    "@typescript-eslint/parser": "5.44.0",
+    "eslint": "8.28.0",
+    "eslint-config-prettier": "9.1.0",
+    "prettier": "3.2.4"
   },
   "peerDependencies": {
     "bignumber.js": "^9.0.1",

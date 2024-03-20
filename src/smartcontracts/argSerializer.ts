@@ -5,7 +5,6 @@ import { OptionalType, OptionalValue } from "./typesystem/algebraic";
 import { CompositeType, CompositeValue } from "./typesystem/composite";
 import { VariadicType, VariadicValue } from "./typesystem/variadic";
 
-
 interface IArgSerializerOptions {
     codec: ICodec;
 }
@@ -22,7 +21,7 @@ interface IParameterDefinition {
 // TODO: perhaps move default construction options to a factory (ArgSerializerFactory), instead of referencing them in the constructor
 // (postpone as much as possible, breaking change)
 const defaultArgSerializerOptions: IArgSerializerOptions = {
-    codec: new BinaryCodec()
+    codec: new BinaryCodec(),
 };
 
 export class ArgSerializer {
@@ -47,7 +46,7 @@ export class ArgSerializer {
      */
     stringToBuffers(joinedString: string): Buffer[] {
         // We also keep the zero-length buffers (they could encode missing options, Option<T>).
-        return joinedString.split(ARGUMENTS_SEPARATOR).map(item => Buffer.from(item, "hex"));
+        return joinedString.split(ARGUMENTS_SEPARATOR).map((item) => Buffer.from(item, "hex"));
     }
 
     /**
@@ -55,6 +54,7 @@ export class ArgSerializer {
      */
     buffersToValues(buffers: Buffer[], parameters: IParameterDefinition[]): TypedValue[] {
         // TODO: Refactor, split (function is quite complex).
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
 
         buffers = buffers || [];
@@ -136,7 +136,7 @@ export class ArgSerializer {
     /**
      * Serializes a set of typed values into an arguments string (e.g. aa@bb@@cc).
      */
-    valuesToString(values: TypedValue[]): { argumentsString: string, count: number } {
+    valuesToString(values: TypedValue[]): { argumentsString: string; count: number } {
         let strings = this.valuesToStrings(values);
         let argumentsString = strings.join(ARGUMENTS_SEPARATOR);
         let count = strings.length;
@@ -148,7 +148,7 @@ export class ArgSerializer {
      */
     valuesToStrings(values: TypedValue[]): string[] {
         let buffers = this.valuesToBuffers(values);
-        let strings = buffers.map(buffer => buffer.toString("hex"));
+        let strings = buffers.map((buffer) => buffer.toString("hex"));
         return strings;
     }
 
@@ -158,6 +158,7 @@ export class ArgSerializer {
      */
     valuesToBuffers(values: TypedValue[]): Buffer[] {
         // TODO: Refactor, split (function is quite complex).
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
 
         const buffers: Buffer[] = [];
@@ -190,7 +191,7 @@ export class ArgSerializer {
                     handleValue(item);
                 }
 
-                return
+                return;
             }
 
             // Non-composite (singular), non-variadic (fixed) type.

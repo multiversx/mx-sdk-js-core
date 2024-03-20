@@ -16,7 +16,7 @@ export class OptionalType extends Type {
     }
 
     isAssignableFrom(type: Type): boolean {
-        if (!(type.hasExactClass(OptionalType.ClassName))) {
+        if (!type.hasExactClass(OptionalType.ClassName)) {
             return false;
         }
 

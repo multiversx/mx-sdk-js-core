@@ -622,6 +622,7 @@ describe("test transaction", async () => {
             sender: wallets.alice.address.toBech32(),
             receiver: wallets.bob.address.toBech32(),
             gasLimit: 50000n,
+            gasPrice: 1000000000n,
             chainID: "integration tests chain ID",
             version: 2,
             options: 1,

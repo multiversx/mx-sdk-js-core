@@ -77,6 +77,7 @@ export class TransactionsConverter {
         const legacyResultsParser = new ResultsParser();
         const callOutcomeBundle = legacyResultsParser.parseUntypedOutcome(transactionOnNetwork);
         const callOutcome = new SmartContractCallOutcome({
+            function: transactionOnNetwork.function,
             returnCode: callOutcomeBundle.returnCode.toString(),
             returnMessage: callOutcomeBundle.returnMessage,
             returnDataParts: callOutcomeBundle.values,

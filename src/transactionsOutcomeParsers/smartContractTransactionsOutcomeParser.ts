@@ -20,33 +20,29 @@ export class SmartContractTransactionsOutcomeParser {
         returnMessage: string;
     } {
         const directCallOutcome = options.outcome.directSmartContractCallOutcome;
-        const functionName = options.function || directCallOutcome.function;
 
-        if (this.abi) {
-            const endpoint = this.abi.getEndpoint(functionName);
-            const legacyUntypedBundle = {
-                returnCode: new ReturnCode(directCallOutcome.returnCode),
-                returnMessage: directCallOutcome.returnMessage,
-                values: directCallOutcome.returnDataParts.map((part) => Buffer.from(part)),
-            };
-
-            const legacyTypedBundle = this.legacyResultsParser.parseOutcomeFromUntypedBundle(
-                legacyUntypedBundle,
-                endpoint,
-            );
-
-            // TODO: maybe also apply "valueOf()"?
+        if (!this.abi) {
             return {
-                values: legacyTypedBundle.values,
-                returnCode: legacyTypedBundle.returnCode.toString(),
-                returnMessage: legacyTypedBundle.returnMessage,
+                values: directCallOutcome.returnDataParts,
+                returnCode: directCallOutcome.returnCode,
+                returnMessage: directCallOutcome.returnMessage,
             };
         }
 
-        return {
-            values: directCallOutcome.returnDataParts,
-            returnCode: directCallOutcome.returnCode,
+        const functionName = options.function || directCallOutcome.function;
+        const endpoint = this.abi.getEndpoint(functionName);
+        const legacyUntypedBundle = {
+            returnCode: new ReturnCode(directCallOutcome.returnCode),
             returnMessage: directCallOutcome.returnMessage,
+            values: directCallOutcome.returnDataParts.map((part) => Buffer.from(part)),
+        };
+
+        const legacyTypedBundle = this.legacyResultsParser.parseOutcomeFromUntypedBundle(legacyUntypedBundle, endpoint);
+
+        return {
+            values: legacyTypedBundle.values.map((value) => value.valueOf()),
+            returnCode: legacyTypedBundle.returnCode.toString(),
+            returnMessage: legacyTypedBundle.returnMessage,
         };
     }
 }

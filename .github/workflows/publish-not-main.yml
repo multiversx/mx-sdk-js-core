@@ -33,6 +33,7 @@ jobs:
 
       # - run: npm ci
       # - run: npm test
+      - run: npm install
 
       - name: Publish to npmjs
         env:

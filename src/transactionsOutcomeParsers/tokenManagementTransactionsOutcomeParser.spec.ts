@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { ErrParseTransactionOutcome } from "../errors";
-import { TokenManagementTransactionsOutcomeParser } from "./tokenManagementTransactionsOutcomeParser";
 import { SmartContractResult, TransactionEvent, TransactionLogs, TransactionOutcome } from "./resources";
+import { TokenManagementTransactionsOutcomeParser } from "./tokenManagementTransactionsOutcomeParser";
 
 describe("test token management transactions outcome parser", () => {
     const parser = new TokenManagementTransactionsOutcomeParser();
@@ -15,7 +15,7 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const logs = new TransactionLogs({ events: [event] });
-        const txOutcome = new TransactionOutcome({ transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ logs: logs });
 
         assert.throws(
             () => {
@@ -41,7 +41,7 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOutcome({ transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ logs: logs });
 
         const outcome = parser.parseIssueFungible(txOutcome);
         assert.lengthOf(outcome, 1);
@@ -75,7 +75,7 @@ describe("test token management transactions outcome parser", () => {
             events: [firstEvent, secondEvent, thirdEvent],
         });
 
-        const txOutcome = new TransactionOutcome({ transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ logs: logs });
 
         const outcome = parser.parseIssueNonFungible(txOutcome);
         assert.lengthOf(outcome, 1);
@@ -97,7 +97,7 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOutcome({ transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ logs: logs });
 
         const outcome = parser.parseIssueSemiFungible(txOutcome);
         assert.lengthOf(outcome, 1);
@@ -119,7 +119,7 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOutcome({ transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ logs: logs });
 
         const outcome = parser.parseRegisterMetaEsdt(txOutcome);
         assert.lengthOf(outcome, 1);
@@ -181,7 +181,7 @@ describe("test token management transactions outcome parser", () => {
 
         const txOutcome = new TransactionOutcome({
             smartContractResults: [scResult],
-            transactionLogs: transactionLogs,
+            logs: transactionLogs,
         });
 
         const outcome = parser.parseRegisterAndSetAllRoles(txOutcome);
@@ -218,7 +218,7 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const txOutcome = new TransactionOutcome({
-            transactionLogs: transactionLogs,
+            logs: transactionLogs,
         });
 
         const outcome = parser.parseSetSpecialRole(txOutcome);
@@ -251,7 +251,7 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const txOutcome = new TransactionOutcome({
-            transactionLogs: transactionLogs,
+            logs: transactionLogs,
         });
 
         const outcome = parser.parseNftCreate(txOutcome);
@@ -279,7 +279,7 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const txOutcome = new TransactionOutcome({
-            transactionLogs: transactionLogs,
+            logs: transactionLogs,
         });
 
         const outcome = parser.parseLocalMint(txOutcome);
@@ -308,7 +308,7 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const txOutcome = new TransactionOutcome({
-            transactionLogs: transactionLogs,
+            logs: transactionLogs,
         });
 
         const outcome = parser.parseLocalBurn(txOutcome);
@@ -335,7 +335,7 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const txOutcome = new TransactionOutcome({
-            transactionLogs: transactionLogs,
+            logs: transactionLogs,
         });
 
         const outcome = parser.parsePause(txOutcome);
@@ -359,7 +359,7 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const txOutcome = new TransactionOutcome({
-            transactionLogs: transactionLogs,
+            logs: transactionLogs,
         });
 
         const outcome = parser.parseUnpause(txOutcome);
@@ -497,7 +497,7 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const txOutcome = new TransactionOutcome({
-            transactionLogs: transactionLogs,
+            logs: transactionLogs,
         });
 
         const outcome = parser.parseUpdateAttributes(txOutcome);
@@ -525,7 +525,7 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const txOutcome = new TransactionOutcome({
-            transactionLogs: transactionLogs,
+            logs: transactionLogs,
         });
 
         const outcome = parser.parseAddQuantity(txOutcome);
@@ -553,7 +553,7 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const txOutcome = new TransactionOutcome({
-            transactionLogs: transactionLogs,
+            logs: transactionLogs,
         });
 
         const outcome = parser.parseBurnQuantity(txOutcome);

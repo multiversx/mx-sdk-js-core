@@ -1,7 +1,7 @@
 import { assert } from "chai";
+import { Address } from "../address";
 import { DelegationTransactionsOutcomeParser } from "./delegationTransactionsOutcomeParser";
 import { SmartContractResult, TransactionEvent, TransactionLogs, TransactionOutcome } from "./resources";
-import { Address } from "../address";
 
 describe("test token management transactions outcome parser", () => {
     const parser = new DelegationTransactionsOutcomeParser();
@@ -50,7 +50,7 @@ describe("test token management transactions outcome parser", () => {
             logs: scResultLog,
         });
 
-        const txOutcome = new TransactionOutcome({ smartContractResults: [scResult], transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ smartContractResults: [scResult], logs: logs });
 
         const outcome = parser.parseCreateNewDelegationContract(txOutcome);
 

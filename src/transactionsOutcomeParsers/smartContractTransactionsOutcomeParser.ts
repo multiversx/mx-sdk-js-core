@@ -1,4 +1,4 @@
-import { EndpointDefinition, ResultsParser } from "../smartcontracts";
+import { EndpointDefinition, ResultsParser, ReturnCode } from "../smartcontracts";
 import { TransactionOutcome } from "./resources";
 
 interface Abi {
@@ -19,16 +19,34 @@ export class SmartContractTransactionsOutcomeParser {
         returnCode: string;
         returnMessage: string;
     } {
-        const functionName = options.function || options.outcome.function;
+        const directCallOutcome = options.outcome.directSmartContractCallOutcome;
+        const functionName = options.function || directCallOutcome.function;
 
         if (this.abi) {
             const endpoint = this.abi.getEndpoint(functionName);
+            const legacyUntypedBundle = {
+                returnCode: new ReturnCode(directCallOutcome.returnCode),
+                returnMessage: directCallOutcome.returnMessage,
+                values: directCallOutcome.returnDataParts.map((part) => Buffer.from(part)),
+            };
+
+            const legacyTypedBundle = this.legacyResultsParser.parseOutcomeFromUntypedBundle(
+                legacyUntypedBundle,
+                endpoint,
+            );
+
+            // TODO: maybe also apply "valueOf()"?
+            return {
+                values: legacyTypedBundle.values,
+                returnCode: legacyTypedBundle.returnCode.toString(),
+                returnMessage: legacyTypedBundle.returnMessage,
+            };
         }
 
         return {
-            values: [],
-            returnCode: "",
-            returnMessage: "",
+            values: directCallOutcome.returnDataParts,
+            returnCode: directCallOutcome.returnCode,
+            returnMessage: directCallOutcome.returnMessage,
         };
     }
 }

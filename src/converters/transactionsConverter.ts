@@ -74,8 +74,8 @@ export class TransactionsConverter {
     public transactionOnNetworkToOutcome(transactionOnNetwork: ITransactionOnNetwork): TransactionOutcome {
         // In the future, this will not be needed because the transaction, as returned from the API,
         // will hold the data corresponding to the direct smart contract call outcome (in case of smart contract calls).
-        const resultsParser = new ResultsParser();
-        const callOutcomeBundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
+        const legacyResultsParser = new ResultsParser();
+        const callOutcomeBundle = legacyResultsParser.parseUntypedOutcome(transactionOnNetwork);
         const callOutcome = new SmartContractCallOutcome({
             returnCode: callOutcomeBundle.returnCode.toString(),
             returnMessage: callOutcomeBundle.returnMessage,

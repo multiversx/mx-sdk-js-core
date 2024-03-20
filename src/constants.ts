@@ -16,4 +16,5 @@ export const DEFAULT_HRP = "erd";
 export const ESDT_CONTRACT_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 export const DEFAULT_MESSAGE_VERSION = 1;
 export const MESSAGE_PREFIX = "\x17Elrond Signed Message:\n";
-export const DEFAULT_HEX_HASH_LENGTH = 64;
+export const HEX_TRANSACTION_HASH_LENGTH = 64;
+export const BECH32_ADDRESS_LENGTH = 62;

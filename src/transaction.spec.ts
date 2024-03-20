@@ -614,4 +614,43 @@ describe("test transaction", async () => {
         transaction.applyGuardianSignature(transaction.getSignature());
         assert.isTrue(transaction.isGuardedTransaction());
     });
+
+    it("test sign using hash", async () => {
+        let transaction = new Transaction({
+            nonce: 89n,
+            value: 0n,
+            sender: wallets.alice.address.toBech32(),
+            receiver: wallets.bob.address.toBech32(),
+            gasLimit: 50000n,
+            chainID: "integration tests chain ID",
+            version: 2,
+            options: 1,
+        });
+
+        transaction.signature = await wallets.alice.signer.sign(
+            Buffer.from(transactionComputer.computeBytesForSigning(transaction)),
+        );
+
+        assert.equal(
+            "f0c81f2393b1ec5972c813f817bae8daa00ade91c6f75ea604ab6a4d2797aca4378d783023ff98f1a02717fe4f24240cdfba0b674ee9abb18042203d713bc70a",
+            Buffer.from(transaction.signature).toString("hex"),
+        );
+    });
+
+    it("should apply guardian", async () => {
+        let transaction = new Transaction({
+            nonce: 89n,
+            value: 0n,
+            sender: wallets.alice.address.toBech32(),
+            receiver: wallets.bob.address.toBech32(),
+            gasLimit: 50000n,
+            chainID: "localnet",
+        });
+
+        transactionComputer.applyGuardian(transaction, wallets.carol.address.toBech32());
+
+        assert.equal(transaction.version, 2);
+        assert.equal(transaction.options, 2);
+        assert.equal(transaction.guardian, wallets.carol.address.toBech32());
+    });
 });

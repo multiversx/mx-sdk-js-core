@@ -60,8 +60,8 @@ export class TransferTransactionsFactory {
      * Should be instantiated using `Config` and `TokenComputer`.
      * Instantiating this class using GasEstimator represents the legacy version of this class.
      * The legacy version contains methods like `createEGLDTransfer`, `createESDTTransfer`, `createESDTNFTTransfer` and `createMultiESDTNFTTransfer`.
+     * This was done in order to minimize breaking changes in client code.
      */
-    // this was done to minimize breaking changes in client code
     constructor(options: IGasEstimator | { config: IConfig; tokenComputer: ITokenComputer }) {
         if (this.isGasEstimator(options)) {
             this.gasEstimator = options;
@@ -83,10 +83,7 @@ export class TransferTransactionsFactory {
     }
 
     private isGasEstimatorDefined(): boolean {
-        if (this.gasEstimator === undefined) {
-            return false;
-        }
-        return true;
+        return this.gasEstimator !== undefined;
     }
 
     private ensureMembersAreDefined() {

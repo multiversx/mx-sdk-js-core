@@ -106,11 +106,15 @@ export class TransactionComputer {
 
     private ensureFields(transaction: ITransaction) {
         if (transaction.sender.length !== BECH32_ADDRESS_LENGTH) {
-            throw new errors.ErrBadUsage("The `sender` field is not set");
+            throw new errors.ErrBadUsage(
+                "The `sender` field is invalid. Should be set to the bech32 address of the sender.",
+            );
         }
 
         if (transaction.receiver.length !== BECH32_ADDRESS_LENGTH) {
-            throw new errors.ErrBadUsage("The `receiver` field is not set");
+            throw new errors.ErrBadUsage(
+                "The `receiver` field is invalid. Should be set to the bech32 address of the receiver.",
+            );
         }
 
         if (!transaction.chainID.length) {

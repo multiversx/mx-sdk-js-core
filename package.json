@@ -1,6 +1,6 @@
 {
   "name": "@multiversx/sdk-core",
-  "version": "13.0.0-beta.6",
+  "version": "13.0.0-beta.7",
   "description": "MultiversX SDK for JavaScript and TypeScript",
   "main": "out/index.js",
   "types": "out/index.d.js",

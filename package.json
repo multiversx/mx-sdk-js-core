@@ -34,8 +34,8 @@
     "keccak": "3.0.2"
   },
   "devDependencies": {
-    "@multiversx/sdk-network-providers": "2.3.0",
-    "@multiversx/sdk-wallet": "4.2.0",
+    "@multiversx/sdk-network-providers": "2.4.0",
+    "@multiversx/sdk-wallet": "4.4.0",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",
     "@types/mocha": "9.1.0",

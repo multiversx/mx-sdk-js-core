@@ -1,8 +1,8 @@
-import { assert } from "chai";
-import { Message, MessageComputer } from "./message";
-import { loadTestWallets, TestWallet } from "./testutils";
 import { UserVerifier } from "@multiversx/sdk-wallet";
+import { assert } from "chai";
 import { DEFAULT_MESSAGE_VERSION } from "./constants";
+import { Message, MessageComputer } from "./message";
+import { TestWallet, loadTestWallets } from "./testutils";
 
 describe("test message", () => {
     let alice: TestWallet;
@@ -35,7 +35,7 @@ describe("test message", () => {
             address: alice.getAddress(),
         });
 
-        message.signature = await alice.signer.sign(Buffer.from(messageComputer.computeBytesForSigning(message)));
+        message.signature = await alice.signer.sign(messageComputer.computeBytesForSigning(message));
 
         assert.equal(
             Buffer.from(message.signature).toString("hex"),

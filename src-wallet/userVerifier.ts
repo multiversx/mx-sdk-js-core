@@ -25,7 +25,7 @@ export class UserVerifier {
    * @param signature the signature to be verified
    * @returns true if the signature is valid, false otherwise
    */
-  verify(data: Buffer, signature: Buffer): boolean {
+  verify(data: Buffer | Uint8Array, signature: Buffer | Uint8Array): boolean {
     return this.publicKey.verify(data, signature);
   }
 }

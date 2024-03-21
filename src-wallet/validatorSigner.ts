@@ -8,7 +8,7 @@ export class ValidatorSigner {
     /**
      * Signs a message.
      */
-    async signUsingPem(pemText: string, pemIndex: number = 0, signable: Buffer): Promise<void> {
+    async signUsingPem(pemText: string, pemIndex: number = 0, signable: Buffer | Uint8Array): Promise<void> {
         await BLS.initIfNecessary();
 
         try {

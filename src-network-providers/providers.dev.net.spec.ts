@@ -178,7 +178,7 @@ describe("test network providers on devnet: Proxy and API", function () {
             let apiResponse = await apiProvider.getTransaction(hash);
             let proxyResponse = await proxyProvider.getTransaction(hash, true);
 
-            ignoreKnownTransactionDifferencesBetweenProviders(proxyResponse);
+            ignoreKnownTransactionDifferencesBetweenProviders(apiResponse, proxyResponse);
             assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
 
             // Also assert completion
@@ -188,7 +188,10 @@ describe("test network providers on devnet: Proxy and API", function () {
     });
 
     // TODO: Strive to have as little differences as possible between Proxy and API.
-    function ignoreKnownTransactionDifferencesBetweenProviders(proxyResponse: TransactionOnNetwork) {
+    function ignoreKnownTransactionDifferencesBetweenProviders(apiResponse: TransactionOnNetwork, proxyResponse: TransactionOnNetwork) {
+        // Proxy and API exhibit differences in the "function" field, in case of move-balance transactions.
+        apiResponse.function = proxyResponse.function
+
         // Ignore fields which are not present on API response:
         proxyResponse.type = "";
         proxyResponse.epoch = 0;

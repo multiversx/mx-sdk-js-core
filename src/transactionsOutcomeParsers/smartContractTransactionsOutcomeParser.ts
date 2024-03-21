@@ -1,17 +1,37 @@
-import { EndpointDefinition, ResultsParser, ReturnCode } from "../smartcontracts";
+import { EndpointDefinition, ResultsParser, ReturnCode, Type, UntypedOutcomeBundle } from "../smartcontracts";
 import { TransactionOutcome } from "./resources";
 
 interface Abi {
     getEndpoint(name: string): EndpointDefinition;
 }
 
+interface ILegacyResultsParser {
+    parseOutcomeFromUntypedBundle(
+        bundle: UntypedOutcomeBundle,
+        endpoint: { output: IParameterDefinition[] },
+    ): {
+        values: any[];
+        returnCode: { valueOf(): string };
+        returnMessage: string;
+    };
+}
+
+interface IParameterDefinition {
+    type: Type;
+}
+
 export class SmartContractTransactionsOutcomeParser {
     private readonly abi?: Abi;
-    private readonly legacyResultsParser: ResultsParser;
+    private readonly legacyResultsParser: ILegacyResultsParser;
 
-    constructor(options: { abi?: Abi }) {
+    constructor(options: { abi?: Abi; legacyResultsParser?: ILegacyResultsParser }) {
         this.abi = options.abi;
-        this.legacyResultsParser = new ResultsParser();
+
+        // Prior v13, we've advertised that people can override the "ResultsParser" to alter it's behavior in case of exotic flows.
+        // Now, since the new "SmartContractTransactionsOutcomeParser" (still) depends on the legacy "ResultsParser",
+        // at least until "return data parts of direct outcome of contract call" are included on API & Proxy responses (on GET transaction),
+        // we have to allow the same level of customization (for exotic flows).
+        this.legacyResultsParser = options.legacyResultsParser || new ResultsParser();
     }
 
     parseExecute(options: { outcome: TransactionOutcome; function?: string }): {

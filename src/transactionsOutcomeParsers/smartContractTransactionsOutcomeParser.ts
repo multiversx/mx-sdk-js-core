@@ -1,3 +1,4 @@
+import { Err } from "../errors";
 import { EndpointDefinition, ResultsParser, ReturnCode, Type, UntypedOutcomeBundle } from "../smartcontracts";
 import { SmartContractCallOutcome } from "./resources";
 
@@ -54,6 +55,13 @@ export class SmartContractTransactionsOutcomeParser {
         }
 
         const functionName = options.function || directCallOutcome.function;
+
+        if (!functionName) {
+            throw new Err(
+                `Function name is not available in the transaction outcome, thus endpoint definition (ABI) cannot be picked (for parsing). Maybe provide the "function" parameter explicitly?`,
+            );
+        }
+
         const endpoint = this.abi.getEndpoint(functionName);
 
         const legacyUntypedBundle = {

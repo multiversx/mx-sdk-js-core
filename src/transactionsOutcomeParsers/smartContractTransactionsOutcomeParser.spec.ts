@@ -96,4 +96,27 @@ describe("test smart contract transactions outcome parser", () => {
         assert.equal(parsed.returnCode, "ok");
         assert.equal(parsed.returnMessage, "ok");
     });
+
+    it("cannot parse execute outcome, with ABI, when function name is missing", async function () {
+        const parser = new SmartContractTransactionsOutcomeParser({
+            abi: await loadAbiRegistry("src/testdata/answer.abi.json"),
+        });
+
+        const transactionsConverter = new TransactionsConverter();
+        const transactionOnNetwork = new TransactionOnNetwork({
+            nonce: 7,
+            contractResults: new ContractResults([
+                new ContractResultItem({
+                    nonce: 8,
+                    data: "@6f6b@2a",
+                }),
+            ]),
+        });
+
+        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
+
+        assert.throws(() => {
+            parser.parseExecute({ transactionOutcome });
+        }, 'Function name is not available in the transaction outcome, thus endpoint definition (ABI) cannot be picked (for parsing). Maybe provide the "function" parameter explicitly?');
+    });
 });

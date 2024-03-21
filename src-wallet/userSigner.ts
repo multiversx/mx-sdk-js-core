@@ -4,7 +4,7 @@ import { UserSecretKey } from "./userKeys";
 import { UserWallet } from "./userWallet";
 
 interface IUserSecretKey {
-    sign(message: Buffer): Buffer;
+    sign(message: Buffer | Uint8Array): Buffer;
     generatePublicKey(): IUserPublicKey;
 }
 
@@ -33,7 +33,7 @@ export class UserSigner {
         return new UserSigner(secretKey);
     }
 
-    async sign(data: Buffer): Promise<Buffer> {
+    async sign(data: Buffer | Uint8Array): Promise<Buffer> {
         try {
             const signature = this.secretKey.sign(data);
             return signature;

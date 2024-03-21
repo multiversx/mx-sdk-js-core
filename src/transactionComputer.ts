@@ -4,8 +4,10 @@ import BigNumber from "bignumber.js";
 import { ITransaction } from "./interface";
 import { ProtoSerializer } from "./proto";
 import { Transaction } from "./transaction";
+import { BECH32_ADDRESS_LENGTH, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_HASH_SIGN } from "./constants";
 
 const createTransactionHasher = require("blake2b");
+const createKeccakHash = require("keccak");
 const TRANSACTION_HASH_LENGTH = 32;
 
 /**
@@ -41,12 +43,21 @@ export class TransactionComputer {
     }
 
     computeBytesForSigning(transaction: ITransaction): Uint8Array {
-        // TODO: do some checks for the transaction e.g. sender, chain ID etc.
-        // TODO: for appropriate tx.version, interpret tx.options accordingly and sign using the content / data hash
+        this.ensureFields(transaction);
+
+        if (transaction.version >= 2 && this.hasOptionsSetForHashSigning(transaction)) {
+            return this.computeHashForSigning(transaction);
+        }
 
         const plainTransaction = this.toPlainObjectForSigning(transaction);
         const serialized = JSON.stringify(plainTransaction);
         return new Uint8Array(Buffer.from(serialized));
+    }
+
+    computeHashForSigning(transaction: ITransaction): Uint8Array {
+        const plainTransaction = this.toPlainObjectForSigning(transaction);
+        const signable = Buffer.from(JSON.stringify(plainTransaction));
+        return createKeccakHash("keccak256").update(signable).digest();
     }
 
     computeTransactionHash(transaction: ITransaction): Uint8Array {
@@ -55,6 +66,20 @@ export class TransactionComputer {
         const hash = createTransactionHasher(TRANSACTION_HASH_LENGTH).update(buffer).digest("hex");
 
         return Buffer.from(hash, "hex");
+    }
+
+    hasOptionsSetForGuardedTransaction(transaction: ITransaction): boolean {
+        return (transaction.options & TRANSACTION_OPTIONS_TX_GUARDED) == TRANSACTION_OPTIONS_TX_GUARDED;
+    }
+
+    hasOptionsSetForHashSigning(transaction: ITransaction): boolean {
+        return (transaction.options & TRANSACTION_OPTIONS_TX_HASH_SIGN) == TRANSACTION_OPTIONS_TX_HASH_SIGN;
+    }
+
+    applyGuardian(transaction: ITransaction, guardian: string) {
+        transaction.version = 2;
+        transaction.options = transaction.options | TRANSACTION_OPTIONS_TX_GUARDED;
+        transaction.guardian = guardian;
     }
 
     private toPlainObjectForSigning(transaction: ITransaction) {
@@ -79,5 +104,17 @@ export class TransactionComputer {
         return value && value.length ? Buffer.from(value).toString("base64") : undefined;
     }
 
-    // TODO: add missing functions wrt. specs
+    private ensureFields(transaction: ITransaction) {
+        if (transaction.sender.length !== BECH32_ADDRESS_LENGTH) {
+            throw new errors.ErrBadUsage("Invalid `sender` field. Should be the bech32 address of the sender.");
+        }
+
+        if (transaction.receiver.length !== BECH32_ADDRESS_LENGTH) {
+            throw new errors.ErrBadUsage("Invalid `receiver` field. Should be the bech32 address of the receiver.");
+        }
+
+        if (!transaction.chainID.length) {
+            throw new errors.ErrBadUsage("The `chainID` field is not set");
+        }
+    }
 }

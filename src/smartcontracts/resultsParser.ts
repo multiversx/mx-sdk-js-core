@@ -308,7 +308,7 @@ export class ResultsParser {
         return null;
     }
 
-    private sliceDataFieldInParts(data: string): { returnCode: ReturnCode, returnDataParts: Buffer[] } {
+    protected sliceDataFieldInParts(data: string): { returnCode: ReturnCode, returnDataParts: Buffer[] } {
         // By default, skip the first part, which is usually empty (e.g. "[empty]@6f6b")
         let startingIndex = 1;
 

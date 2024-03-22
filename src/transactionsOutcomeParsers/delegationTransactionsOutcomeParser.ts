@@ -27,14 +27,14 @@ export class DelegationTransactionsOutcomeParser {
     }
 
     private extractContractAddress(event: TransactionEvent): string {
-        if (!event.topics[0]) {
+        if (!event.topics[0].length) {
             return "";
         }
-        const address = Buffer.from(event.topics[0], "base64");
+        const address = Buffer.from(event.topics[0]);
         return Address.fromBuffer(address).bech32();
     }
 
-    private decodeTopicAsString(topic: string): string {
-        return Buffer.from(topic, "base64").toString();
+    private decodeTopicAsString(topic: Uint8Array): string {
+        return Buffer.from(topic).toString();
     }
 }

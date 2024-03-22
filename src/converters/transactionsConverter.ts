@@ -106,6 +106,7 @@ export class TransactionsConverter {
             receiver: resultOnNetwork.receiver.bech32(),
             data: Buffer.from(resultOnNetwork.data),
             logs: new TransactionLogs({
+                address: resultOnNetwork.logs.address.bech32(),
                 events: resultOnNetwork.logs.events.map((event) => this.eventOnNetworkToEvent(event)),
             }),
         });
@@ -116,7 +117,7 @@ export class TransactionsConverter {
             address: eventOnNetwork.address.bech32(),
             identifier: eventOnNetwork.identifier,
             // TODO: Fix this workaround.
-            topics: eventOnNetwork.topics.map((topic) => Buffer.from(topic.hex()).toString("base64")),
+            topics: eventOnNetwork.topics.map((topic) => Buffer.from(topic.hex(), "hex").toString("base64")),
             // TODO: Check if OK.
             data: Buffer.from(eventOnNetwork.data),
         });

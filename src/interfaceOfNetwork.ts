@@ -64,6 +64,7 @@ export interface IContractReturnCode {
 }
 
 export interface ITransactionLogs {
+    address: IAddress;
     events: ITransactionEvent[];
 
     findSingleOrNoneEvent(
@@ -77,6 +78,9 @@ export interface ITransactionEvent {
     readonly identifier: string;
     readonly topics: ITransactionEventTopic[];
     readonly data: string;
+    // TODO: https://github.com/multiversx/mx-sdk-js-network-providers/blob/v2.4.0/src/transactionEvents.ts#L13
+    // TODO: readonly dataPayload?: { valueOf(): Uint8Array };
+    // TODO: readonly additionalData?: { valueOf(): Uint8Array }[];
 
     findFirstOrNoneTopic(predicate: (topic: ITransactionEventTopic) => boolean): ITransactionEventTopic | undefined;
     getLastTopic(): ITransactionEventTopic;

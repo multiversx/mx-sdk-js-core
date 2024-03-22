@@ -1,6 +1,6 @@
-import { ErrParseTransactionOutcome } from "../errors";
-import { TransactionEvent, TransactionOutcome } from "./resources";
 import { Address } from "../address";
+import { ErrParseTransactionOutcome } from "../errors";
+import { TransactionEvent, TransactionOutcome, findEventsByIdentifier } from "./resources";
 
 export class DelegationTransactionsOutcomeParser {
     constructor() {}
@@ -8,7 +8,7 @@ export class DelegationTransactionsOutcomeParser {
     parseCreateNewDelegationContract(transactionOutcome: TransactionOutcome): { contractAddress: string }[] {
         this.ensureNoError(transactionOutcome.transactionLogs.events);
 
-        const events = this.findEventsByIdentifier(transactionOutcome, "SCDeploy");
+        const events = findEventsByIdentifier(transactionOutcome, "SCDeploy");
 
         return events.map((event) => ({ contractAddress: this.extractContractAddress(event) }));
     }
@@ -24,28 +24,6 @@ export class DelegationTransactionsOutcomeParser {
                 );
             }
         }
-    }
-
-    private findEventsByIdentifier(transactionOutcome: TransactionOutcome, identifier: string): TransactionEvent[] {
-        const events = this.gatherAllEvents(transactionOutcome).filter((event) => event.identifier == identifier);
-
-        if (events.length == 0) {
-            throw new ErrParseTransactionOutcome(`cannot find event of type ${identifier}`);
-        }
-
-        return events;
-    }
-
-    private gatherAllEvents(transactionOutcome: TransactionOutcome): TransactionEvent[] {
-        const allEvents = [];
-
-        allEvents.push(...transactionOutcome.transactionLogs.events);
-
-        for (const item of transactionOutcome.smartContractResults) {
-            allEvents.push(...item.logs.events);
-        }
-
-        return allEvents;
     }
 
     private extractContractAddress(event: TransactionEvent): string {

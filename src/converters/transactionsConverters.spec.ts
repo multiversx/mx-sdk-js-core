@@ -74,7 +74,7 @@ describe("test transactions converter", async () => {
                     new TransactionEventOnNetwork({
                         identifier: "foobar",
                         topics: [],
-                        data: Buffer.from("foo").toString(),
+                        dataPayload: new TransactionEventData(Buffer.from("foo")),
                         additionalData: [],
                     }),
                 ],
@@ -94,7 +94,7 @@ describe("test transactions converter", async () => {
                                         "QHRvbyBtdWNoIGdhcyBwcm92aWRlZCBmb3IgcHJvY2Vzc2luZzogZ2FzIHByb3ZpZGVkID0gNTk2Mzg0NTAwLCBnYXMgdXNlZCA9IDczMzAxMA==",
                                     ),
                                 ],
-                                data: Buffer.from("QDZmNmI=", "base64").toString(),
+                                dataPayload: TransactionEventData.fromBase64("QDZmNmI="),
                             }),
                         ],
                     }),
@@ -149,7 +149,7 @@ describe("test transactions converter", async () => {
         assert.deepEqual(actualTransactionOutcome, expectedTransactionOutcome);
     });
 
-    it.only("converts transaction on network to transaction outcome (with signal error)", () => {
+    it("converts transaction on network to transaction outcome (with signal error)", () => {
         const converter = new TransactionsConverter();
 
         const transactionOnNetwork = new TransactionOnNetwork({

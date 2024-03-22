@@ -92,12 +92,5 @@ export function createAccountBalance(egld: number): BigNumber {
 }
 
 export function b64TopicsToBytes(topics: string[]): Uint8Array[] {
-    const decodedTopics: Buffer[] = [];
-
-    topics.map((topic) => {
-        const decodedTopic = Buffer.from(topic, "base64");
-        decodedTopics.push(decodedTopic);
-    });
-
-    return decodedTopics;
+    return topics.map((topic) => Buffer.from(topic, "base64"));
 }

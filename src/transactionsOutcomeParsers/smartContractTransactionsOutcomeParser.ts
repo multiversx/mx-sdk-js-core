@@ -2,24 +2,12 @@ import { Err } from "../errors";
 import { EndpointDefinition, ResultsParser, ReturnCode, Type, UntypedOutcomeBundle } from "../smartcontracts";
 import { TransactionOutcome } from "./resources";
 
-interface ITransactionEvent {
-    readonly topics: { valueOf(): Uint8Array }[];
-    readonly dataPayload?: { valueOf(): Uint8Array };
-    readonly additionalData?: { valueOf(): Uint8Array }[];
-}
-
-interface Abi {
+interface IAbi {
     getEndpoint(name: string): EndpointDefinition;
 }
 
 interface IParameterDefinition {
     type: Type;
-}
-
-interface IEventInputDefinition {
-    name: string;
-    type: Type;
-    indexed: boolean;
 }
 
 interface ILegacyResultsParser {
@@ -31,15 +19,13 @@ interface ILegacyResultsParser {
         returnCode: { valueOf(): string };
         returnMessage: string;
     };
-
-    parseEvent(transactionEvent: ITransactionEvent, eventDefinition: { inputs: IEventInputDefinition[] }): any;
 }
 
 export class SmartContractTransactionsOutcomeParser {
-    private readonly abi?: Abi;
+    private readonly abi?: IAbi;
     private readonly legacyResultsParser: ILegacyResultsParser;
 
-    constructor(options?: { abi?: Abi; legacyResultsParser?: ILegacyResultsParser }) {
+    constructor(options?: { abi?: IAbi; legacyResultsParser?: ILegacyResultsParser }) {
         this.abi = options?.abi;
 
         // Prior v13, we've advertised that people can override the "ResultsParser" to alter it's behavior in case of exotic flows.
@@ -88,20 +74,4 @@ export class SmartContractTransactionsOutcomeParser {
             returnMessage: legacyTypedBundle.returnMessage,
         };
     }
-
-    parseExecuteEvent(options: { transactionOutcome: TransactionOutcome; eventIdentifier: string }): any {
-        if (!this.abi) {
-            throw new Err("For parsing an event, the ABI must be present (provided to the constructor).");
-        }
-
-        // this.legacyResultsParser.parseEvent({
-        //     topic:
-        // })
-
-        return {};
-    }
 }
-
-// readonly topics: { valueOf(): Uint8Array }[];
-// readonly dataPayload?: { valueOf(): Uint8Array };
-// readonly additionalData?: { valueOf(): Uint8Array }[];

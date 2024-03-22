@@ -3,7 +3,7 @@ import { ErrParseTransactionOutcome } from "../errors";
 export class TransactionEvent {
     address: string;
     identifier: string;
-    topics: string[];
+    topics: Uint8Array[];
     data: Uint8Array;
     additionalData: Uint8Array[];
 

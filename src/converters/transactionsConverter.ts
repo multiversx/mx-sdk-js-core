@@ -117,8 +117,7 @@ export class TransactionsConverter {
         return new TransactionEvent({
             address: eventOnNetwork.address.bech32(),
             identifier: eventOnNetwork.identifier,
-            // TODO: Workaround will be fixed soon, once "topics" become Uint8Array[].
-            topics: eventOnNetwork.topics.map((topic) => Buffer.from(topic.hex(), "hex").toString("base64")),
+            topics: eventOnNetwork.topics.map((topic) => Buffer.from(topic.hex(), "hex")),
             data: eventOnNetwork.dataPayload?.valueOf() || Buffer.from(eventOnNetwork.data),
             additionalData: eventOnNetwork.additionalData?.map((data) => data.valueOf()) || [],
         });

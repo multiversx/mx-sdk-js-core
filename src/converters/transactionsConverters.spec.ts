@@ -122,7 +122,9 @@ describe("test transactions converter", async () => {
                                 address: "",
                                 identifier: "writeLog",
                                 topics: [
-                                    "QHRvbyBtdWNoIGdhcyBwcm92aWRlZCBmb3IgcHJvY2Vzc2luZzogZ2FzIHByb3ZpZGVkID0gNTk2Mzg0NTAwLCBnYXMgdXNlZCA9IDczMzAxMA==",
+                                    Buffer.from(
+                                        "@too much gas provided for processing: gas provided = 596384500, gas used = 733010",
+                                    ),
                                 ],
                                 data: Buffer.from("QDZmNmI=", "base64"),
                             }),
@@ -200,7 +202,12 @@ describe("test transactions converter", async () => {
                             new TransactionEvent({
                                 address: "erd1qqqqqqqqqqqqqpgqj8k976l59n7fyth8ujl4as5uyn3twn0ha0wsge5r5x",
                                 identifier: "signalError",
-                                topics: ["XmC5/yOF6ie6DD2kaJd5qPc2Ss7h2w7nvuWaxmCiiXQ=", "aW5zdWZmaWNpZW50IGZ1bmRz"],
+                                topics: [
+                                    Address.fromBech32(
+                                        "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
+                                    ).getPublicKey(),
+                                    Buffer.from("insufficient funds"),
+                                ],
                                 data: Buffer.from("@657865637574696f6e206661696c6564"),
                                 additionalData: [Buffer.from("foo"), Buffer.from("bar")],
                             }),

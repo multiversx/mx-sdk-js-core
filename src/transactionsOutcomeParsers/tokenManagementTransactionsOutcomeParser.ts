@@ -297,7 +297,7 @@ export class TokenManagementTransactionsOutcomeParser {
     } {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const attributes = event.topics[3] ? Buffer.from(event.topics[3], "base64") : new Uint8Array();
+        const attributes = event.topics[3] ? event.topics[3] : new Uint8Array();
 
         return {
             tokenIdentifier: tokenIdentifier,
@@ -374,37 +374,37 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private extractTokenIdentifier(event: TransactionEvent): string {
-        if (!event.topics[0]) {
+        if (!event.topics[0]?.length) {
             return "";
         }
         return this.decodeTopicAsString(event.topics[0]);
     }
 
     private extractNonce(event: TransactionEvent): bigint {
-        if (!event.topics[1]) {
+        if (!event.topics[1]?.length) {
             return BigInt(0);
         }
-        const nonce = Buffer.from(event.topics[1], "base64");
+        const nonce = Buffer.from(event.topics[1]);
         return BigInt(bufferToBigInt(nonce).toFixed(0));
     }
 
     private extractAmount(event: TransactionEvent): bigint {
-        if (!event.topics[2]) {
+        if (!event.topics[2]?.length) {
             return BigInt(0);
         }
-        const amount = Buffer.from(event.topics[2], "base64");
+        const amount = Buffer.from(event.topics[2]);
         return BigInt(bufferToBigInt(amount).toFixed(0));
     }
 
     private extractAddress(event: TransactionEvent): string {
-        if (!event.topics[3]) {
+        if (!event.topics[3]?.length) {
             return "";
         }
-        const address = Buffer.from(event.topics[3], "base64");
+        const address = Buffer.from(event.topics[3]);
         return Address.fromBuffer(address).bech32();
     }
 
-    private decodeTopicAsString(topic: string): string {
-        return Buffer.from(topic, "base64").toString();
+    private decodeTopicAsString(topic: Uint8Array): string {
+        return Buffer.from(topic).toString();
     }
 }

@@ -4,7 +4,7 @@ import {
     TransactionEventData,
     TransactionEvent as TransactionEventOnNetwork,
     TransactionEventTopic,
-    TransactionLogs,
+    TransactionLogs as TransactionLogsOnNetwork,
     TransactionOnNetwork,
 } from "@multiversx/sdk-network-providers";
 import { assert } from "chai";
@@ -14,6 +14,7 @@ import {
     SmartContractCallOutcome,
     SmartContractResult,
     TransactionEvent,
+    TransactionLogs,
     TransactionOutcome,
 } from "../transactionsOutcomeParsers/resources";
 import { TransactionsConverter } from "./transactionsConverter";
@@ -67,11 +68,22 @@ describe("test transactions converter", async () => {
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
             function: "hello",
+            logs: new TransactionLogsOnNetwork({
+                address: Address.fromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
+                events: [
+                    new TransactionEventOnNetwork({
+                        identifier: "foobar",
+                        topics: [],
+                        data: Buffer.from("foo").toString(),
+                        additionalData: [],
+                    }),
+                ],
+            }),
             contractResults: new ContractResults([
                 new ContractResultItem({
                     nonce: 8,
                     data: "@6f6b@2a",
-                    logs: new TransactionLogs({
+                    logs: new TransactionLogsOnNetwork({
                         address: Address.fromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
                         events: [
                             new TransactionEventOnNetwork({
@@ -118,6 +130,18 @@ describe("test transactions converter", async () => {
                     },
                 }),
             ],
+            logs: new TransactionLogs({
+                address: "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8",
+                events: [
+                    new TransactionEvent({
+                        address: "",
+                        identifier: "foobar",
+                        topics: [],
+                        data: Buffer.from("foo"),
+                        additionalData: [],
+                    }),
+                ],
+            }),
         });
 
         assert.deepEqual(actualTransactionOutcome, expectedTransactionOutcome);
@@ -133,7 +157,7 @@ describe("test transactions converter", async () => {
                 new ContractResultItem({
                     nonce: 42,
                     data: "@657865637574696f6e206661696c6564",
-                    logs: new TransactionLogs({
+                    logs: new TransactionLogsOnNetwork({
                         address: Address.fromBech32("erd1qqqqqqqqqqqqqpgqj8k976l59n7fyth8ujl4as5uyn3twn0ha0wsge5r5x"),
                         events: [
                             new TransactionEventOnNetwork({

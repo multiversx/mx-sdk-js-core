@@ -2,6 +2,7 @@ import { assert } from "chai";
 import { ErrParseTransactionOutcome } from "../errors";
 import { TokenManagementTransactionsOutcomeParser } from "./tokenManagementTransactionsOutcomeParser";
 import { SmartContractResult, TransactionEvent, TransactionLogs, TransactionOutcome } from "./resources";
+import { b64TopicsToBytes } from "../testutils";
 
 describe("test token management transactions outcome parser", () => {
     const parser = new TokenManagementTransactionsOutcomeParser();
@@ -592,15 +593,4 @@ describe("test token management transactions outcome parser", () => {
         assert.equal(outcome[0].nonce, nonce);
         assert.equal(outcome[0].burntQuantity, burntQuantity);
     });
-
-    function b64TopicsToBytes(topics: string[]): Uint8Array[] {
-        const decodedTopics: Buffer[] = [];
-
-        for (let i = 0; i < topics.length; i++) {
-            const decodedTopic = Buffer.from(topics[i], "base64");
-            decodedTopics.push(decodedTopic);
-        }
-
-        return decodedTopics;
-    }
 });

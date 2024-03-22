@@ -374,14 +374,14 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private extractTokenIdentifier(event: TransactionEvent): string {
-        if (!event.topics[0].length) {
+        if (!event.topics[0]?.length) {
             return "";
         }
         return this.decodeTopicAsString(event.topics[0]);
     }
 
     private extractNonce(event: TransactionEvent): bigint {
-        if (!event.topics[1].length) {
+        if (!event.topics[1]?.length) {
             return BigInt(0);
         }
         const nonce = Buffer.from(event.topics[1]);
@@ -389,7 +389,7 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private extractAmount(event: TransactionEvent): bigint {
-        if (!event.topics[2].length) {
+        if (!event.topics[2]?.length) {
             return BigInt(0);
         }
         const amount = Buffer.from(event.topics[2]);
@@ -397,7 +397,7 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private extractAddress(event: TransactionEvent): string {
-        if (!event.topics[3].length) {
+        if (!event.topics[3]?.length) {
             return "";
         }
         const address = Buffer.from(event.topics[3]);

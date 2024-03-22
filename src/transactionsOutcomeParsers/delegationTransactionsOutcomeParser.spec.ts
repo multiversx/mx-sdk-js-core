@@ -2,6 +2,7 @@ import { assert } from "chai";
 import { DelegationTransactionsOutcomeParser } from "./delegationTransactionsOutcomeParser";
 import { SmartContractResult, TransactionEvent, TransactionLogs, TransactionOutcome } from "./resources";
 import { Address } from "../address";
+import { b64TopicsToBytes } from "../testutils";
 
 describe("test delegation transactions outcome parser", () => {
     const parser = new DelegationTransactionsOutcomeParser();
@@ -63,15 +64,4 @@ describe("test delegation transactions outcome parser", () => {
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].contractAddress, contractAddress.toBech32());
     });
-
-    function b64TopicsToBytes(topics: string[]): Uint8Array[] {
-        const decodedTopics: Buffer[] = [];
-
-        for (let i = 0; i < topics.length; i++) {
-            const decodedTopic = Buffer.from(topics[i], "base64");
-            decodedTopics.push(decodedTopic);
-        }
-
-        return decodedTopics;
-    }
 });

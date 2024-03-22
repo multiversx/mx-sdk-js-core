@@ -90,3 +90,14 @@ export function setupUnitTestWatcherTimeouts() {
 export function createAccountBalance(egld: number): BigNumber {
     return new BigNumber(egld.toString() + "0".repeat(18));
 }
+
+export function b64TopicsToBytes(topics: string[]): Uint8Array[] {
+    const decodedTopics: Buffer[] = [];
+
+    topics.map((topic) => {
+        const decodedTopic = Buffer.from(topic, "base64");
+        decodedTopics.push(decodedTopic);
+    });
+
+    return decodedTopics;
+}

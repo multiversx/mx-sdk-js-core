@@ -27,7 +27,7 @@ export class DelegationTransactionsOutcomeParser {
     }
 
     private extractContractAddress(event: TransactionEvent): string {
-        if (!event.topics[0].length) {
+        if (!event.topics[0]?.length) {
             return "";
         }
         const address = Buffer.from(event.topics[0]);

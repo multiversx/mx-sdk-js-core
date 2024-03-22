@@ -119,7 +119,8 @@ export class TransactionsConverter {
             // TODO: Fix this workaround.
             topics: eventOnNetwork.topics.map((topic) => Buffer.from(topic.hex(), "hex").toString("base64")),
             // TODO: Check if OK.
-            data: Buffer.from(eventOnNetwork.data),
+            data: eventOnNetwork.dataPayload?.valueOf() || Buffer.from(eventOnNetwork.data),
+            additionalData: eventOnNetwork.additionalData?.map((data) => data.valueOf()) || [],
         });
     }
 }

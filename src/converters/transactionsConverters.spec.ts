@@ -1,6 +1,7 @@
 import {
     ContractResultItem,
     ContractResults,
+    TransactionEventData,
     TransactionEvent as TransactionEventOnNetwork,
     TransactionEventTopic,
     TransactionLogs,
@@ -144,7 +145,11 @@ describe("test transactions converter", async () => {
                                     new TransactionEventTopic("XmC5/yOF6ie6DD2kaJd5qPc2Ss7h2w7nvuWaxmCiiXQ="),
                                     new TransactionEventTopic("aW5zdWZmaWNpZW50IGZ1bmRz"),
                                 ],
-                                data: "@657865637574696f6e206661696c6564",
+                                dataPayload: new TransactionEventData(Buffer.from("@657865637574696f6e206661696c6564")),
+                                additionalData: [
+                                    new TransactionEventData(Buffer.from("foo")),
+                                    new TransactionEventData(Buffer.from("bar")),
+                                ],
                             }),
                         ],
                     }),
@@ -173,6 +178,7 @@ describe("test transactions converter", async () => {
                                 identifier: "signalError",
                                 topics: ["XmC5/yOF6ie6DD2kaJd5qPc2Ss7h2w7nvuWaxmCiiXQ=", "aW5zdWZmaWNpZW50IGZ1bmRz"],
                                 data: Buffer.from("@657865637574696f6e206661696c6564"),
+                                additionalData: [Buffer.from("foo"), Buffer.from("bar")],
                             }),
                         ],
                     },

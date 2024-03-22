@@ -5,12 +5,14 @@ export class TransactionEvent {
     identifier: string;
     topics: string[];
     data: Uint8Array;
+    additionalData: Uint8Array[];
 
     constructor(init: Partial<TransactionEvent>) {
         this.address = "";
         this.identifier = "";
         this.topics = [];
         this.data = new Uint8Array();
+        this.additionalData = [];
 
         Object.assign(this, init);
     }

@@ -8,6 +8,7 @@ import { TokenTransfer } from "./tokenTransfer";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 import { TransactionComputer } from "./transactionComputer";
+import { MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS } from "./constants";
 
 describe("test transaction", async () => {
     let wallets: Record<string, TestWallet>;
@@ -206,7 +207,7 @@ describe("test transaction", async () => {
 
         assert.throws(() => {
             transaction.serializeForSigning();
-        }, "The `version` field should be 2 so the `options` field can be set.");
+        }, `Non-empty transaction options requires transaction version >= ${MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS}`);
     });
 
     it("should sign & compute hash (with data, with value) (legacy)", async () => {
@@ -639,17 +640,16 @@ describe("test transaction", async () => {
             receiver: wallets.bob.address.toBech32(),
             gasLimit: 50000n,
             chainID: "localnet",
-            options: 1,
         });
 
         transactionComputer.applyGuardian(transaction, wallets.carol.address.toBech32());
 
         assert.equal(transaction.version, 2);
-        assert.equal(transaction.options, 3);
+        assert.equal(transaction.options, 2);
         assert.equal(transaction.guardian, wallets.carol.address.toBech32());
     });
 
-    it("should apply options for hash signing", async () => {
+    it("should apply guardian with options set for hash signing", async () => {
         let transaction = new Transaction({
             nonce: 89n,
             value: 0n,
@@ -658,11 +658,13 @@ describe("test transaction", async () => {
             gasLimit: 50000n,
             chainID: "localnet",
             version: 1,
-            options: 2,
         });
 
         transactionComputer.applyOptionsForHashSigning(transaction);
+        assert.equal(transaction.version, 2);
+        assert.equal(transaction.options, 1);
 
+        transactionComputer.applyGuardian(transaction, wallets.carol.address.toBech32());
         assert.equal(transaction.version, 2);
         assert.equal(transaction.options, 3);
     });
@@ -691,7 +693,7 @@ describe("test transaction", async () => {
 
         assert.throws(() => {
             transactionComputer.computeBytesForSigning(transaction);
-        }, "The `version` field should be 2 so the `options` field can be set.");
+        }, `Non-empty transaction options requires transaction version >= ${MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS}`);
 
         transactionComputer.applyOptionsForHashSigning(transaction);
 

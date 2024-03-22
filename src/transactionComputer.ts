@@ -6,9 +6,9 @@ import { ProtoSerializer } from "./proto";
 import { Transaction } from "./transaction";
 import {
     BECH32_ADDRESS_LENGTH,
+    MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS,
     TRANSACTION_OPTIONS_TX_GUARDED,
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
-    TRANSACTION_VERSION_DEFAULT,
 } from "./constants";
 
 const createTransactionHasher = require("blake2b");
@@ -82,8 +82,8 @@ export class TransactionComputer {
     }
 
     applyGuardian(transaction: ITransaction, guardian: string) {
-        if (transaction.version < TRANSACTION_VERSION_DEFAULT) {
-            transaction.version = TRANSACTION_VERSION_DEFAULT;
+        if (transaction.version < MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS) {
+            transaction.version = MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS;
         }
 
         transaction.options = transaction.options | TRANSACTION_OPTIONS_TX_GUARDED;
@@ -91,8 +91,8 @@ export class TransactionComputer {
     }
 
     applyOptionsForHashSigning(transaction: ITransaction) {
-        if (transaction.version < TRANSACTION_VERSION_DEFAULT) {
-            transaction.version = TRANSACTION_VERSION_DEFAULT;
+        if (transaction.version < MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS) {
+            transaction.version = MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS;
         }
         transaction.options = transaction.options | TRANSACTION_OPTIONS_TX_HASH_SIGN;
     }
@@ -132,12 +132,10 @@ export class TransactionComputer {
             throw new errors.ErrBadUsage("The `chainID` field is not set");
         }
 
-        if (transaction.version < TRANSACTION_VERSION_DEFAULT) {
+        if (transaction.version < MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS) {
             if (this.hasOptionsSetForGuardedTransaction(transaction) || this.hasOptionsSetForHashSigning(transaction)) {
                 throw new errors.ErrBadUsage(
-                    "The `version` field should be " +
-                        `${TRANSACTION_VERSION_DEFAULT}` +
-                        " so the `options` field can be set.",
+                    `Non-empty transaction options requires transaction version >= ${MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS}`,
                 );
             }
         }

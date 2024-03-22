@@ -86,6 +86,13 @@ export function findEventsByIdentifier(transactionOutcome: TransactionOutcome, i
     return events;
 }
 
+export function findEventsByPredicate(
+    transactionOutcome: TransactionOutcome,
+    predicate: (event: TransactionEvent) => boolean,
+): TransactionEvent[] {
+    return gatherAllEvents(transactionOutcome).filter(predicate);
+}
+
 export function gatherAllEvents(transactionOutcome: TransactionOutcome): TransactionEvent[] {
     const allEvents = [];
 

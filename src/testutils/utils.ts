@@ -90,3 +90,7 @@ export function setupUnitTestWatcherTimeouts() {
 export function createAccountBalance(egld: number): BigNumber {
     return new BigNumber(egld.toString() + "0".repeat(18));
 }
+
+export function b64TopicsToBytes(topics: string[]): Uint8Array[] {
+    return topics.map((topic) => Buffer.from(topic, "base64"));
+}

@@ -1,20 +1,25 @@
 import { Err } from "../errors";
-import {
-    EndpointDefinition,
-    ResultsParser,
-    ReturnCode,
-    Type,
-    TypedValue,
-    UntypedOutcomeBundle,
-} from "../smartcontracts";
-import { SmartContractCallOutcome } from "./resources";
+import { EndpointDefinition, ResultsParser, ReturnCode, Type, UntypedOutcomeBundle } from "../smartcontracts";
+import { TransactionOutcome } from "./resources";
 
-interface ITransactionOutcome {
-    directSmartContractCallOutcome: SmartContractCallOutcome;
+interface ITransactionEvent {
+    readonly topics: { valueOf(): Uint8Array }[];
+    readonly dataPayload?: { valueOf(): Uint8Array };
+    readonly additionalData?: { valueOf(): Uint8Array }[];
 }
 
 interface Abi {
     getEndpoint(name: string): EndpointDefinition;
+}
+
+interface IParameterDefinition {
+    type: Type;
+}
+
+interface IEventInputDefinition {
+    name: string;
+    type: Type;
+    indexed: boolean;
 }
 
 interface ILegacyResultsParser {
@@ -26,10 +31,8 @@ interface ILegacyResultsParser {
         returnCode: { valueOf(): string };
         returnMessage: string;
     };
-}
 
-interface IParameterDefinition {
-    type: Type;
+    parseEvent(transactionEvent: ITransactionEvent, eventDefinition: { inputs: IEventInputDefinition[] }): any;
 }
 
 export class SmartContractTransactionsOutcomeParser {
@@ -46,9 +49,8 @@ export class SmartContractTransactionsOutcomeParser {
         this.legacyResultsParser = options?.legacyResultsParser || new ResultsParser();
     }
 
-    parseExecute(options: { transactionOutcome: ITransactionOutcome; function?: string }): {
+    parseExecute(options: { transactionOutcome: TransactionOutcome; function?: string }): {
         values: any[];
-        valuesTyped?: TypedValue[];
         returnCode: string;
         returnMessage: string;
     } {
@@ -57,7 +59,6 @@ export class SmartContractTransactionsOutcomeParser {
         if (!this.abi) {
             return {
                 values: directCallOutcome.returnDataParts,
-                valuesTyped: undefined,
                 returnCode: directCallOutcome.returnCode,
                 returnMessage: directCallOutcome.returnMessage,
             };
@@ -83,9 +84,24 @@ export class SmartContractTransactionsOutcomeParser {
 
         return {
             values: legacyTypedBundle.values.map((value) => value.valueOf()),
-            valuesTyped: legacyTypedBundle.values,
             returnCode: legacyTypedBundle.returnCode.toString(),
             returnMessage: legacyTypedBundle.returnMessage,
         };
     }
+
+    parseExecuteEvent(options: { transactionOutcome: TransactionOutcome; eventIdentifier: string }): any {
+        if (!this.abi) {
+            throw new Err("For parsing an event, the ABI must be present (provided to the constructor).");
+        }
+
+        // this.legacyResultsParser.parseEvent({
+        //     topic:
+        // })
+
+        return {};
+    }
 }
+
+// readonly topics: { valueOf(): Uint8Array }[];
+// readonly dataPayload?: { valueOf(): Uint8Array };
+// readonly additionalData?: { valueOf(): Uint8Array }[];

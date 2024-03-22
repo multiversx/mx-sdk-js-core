@@ -1,3 +1,5 @@
+import { ErrParseTransactionOutcome } from "../errors";
+
 export class TransactionEvent {
     address: string;
     identifier: string;
@@ -74,11 +76,14 @@ export class SmartContractCallOutcome {
     }
 }
 
-export function findEventsByPredicate(
-    transactionOutcome: TransactionOutcome,
-    predicate: (event: TransactionEvent) => boolean,
-): TransactionEvent[] {
-    return gatherAllEvents(transactionOutcome).filter(predicate);
+export function findEventsByIdentifier(transactionOutcome: TransactionOutcome, identifier: string): TransactionEvent[] {
+    const events = gatherAllEvents(transactionOutcome).filter((event) => event.identifier == identifier);
+
+    if (events.length == 0) {
+        throw new ErrParseTransactionOutcome(`cannot find event of type ${identifier}`);
+    }
+
+    return events;
 }
 
 export function gatherAllEvents(transactionOutcome: TransactionOutcome): TransactionEvent[] {

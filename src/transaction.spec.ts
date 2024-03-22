@@ -204,16 +204,9 @@ describe("test transaction", async () => {
             options: new TransactionOptions(1),
         });
 
-        transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
-
-        assert.equal(
-            "c83e69b853a891bf2130c1839362fe2a7a8db327dcc0c9f130497a4f24b0236140b394801bb2e04ce061a6f873cb432bf1bb1e6072e295610904662ac427a30a",
-            transaction.getSignature().toString("hex"),
-        );
-        assert.equal(
-            transaction.getHash().toString(),
-            "32fb1681bd532b226b5bdeed61ae62ce9416bf5e92e48caf96253ff72d1670ac",
-        );
+        assert.throws(() => {
+            transaction.serializeForSigning();
+        }, "The `version` field should be 2 so the `options` field can be set.");
     });
 
     it("should sign & compute hash (with data, with value) (legacy)", async () => {
@@ -646,12 +639,63 @@ describe("test transaction", async () => {
             receiver: wallets.bob.address.toBech32(),
             gasLimit: 50000n,
             chainID: "localnet",
+            options: 1,
         });
 
         transactionComputer.applyGuardian(transaction, wallets.carol.address.toBech32());
 
         assert.equal(transaction.version, 2);
-        assert.equal(transaction.options, 2);
+        assert.equal(transaction.options, 3);
         assert.equal(transaction.guardian, wallets.carol.address.toBech32());
+    });
+
+    it("should apply options for hash signing", async () => {
+        let transaction = new Transaction({
+            nonce: 89n,
+            value: 0n,
+            sender: wallets.alice.address.toBech32(),
+            receiver: wallets.bob.address.toBech32(),
+            gasLimit: 50000n,
+            chainID: "localnet",
+            version: 1,
+            options: 2,
+        });
+
+        transactionComputer.applyOptionsForHashSigning(transaction);
+
+        assert.equal(transaction.version, 2);
+        assert.equal(transaction.options, 3);
+    });
+
+    it("should ensure transaction is valid", async () => {
+        let transaction = new Transaction({
+            sender: "invalidAddress",
+            receiver: wallets.bob.address.toBech32(),
+            gasLimit: 50000n,
+            chainID: "",
+        });
+
+        assert.throws(() => {
+            transactionComputer.computeBytesForSigning(transaction);
+        }, "Invalid `sender` field. Should be the bech32 address of the sender.");
+
+        transaction.sender = wallets.alice.address.toBech32();
+
+        assert.throws(() => {
+            transactionComputer.computeBytesForSigning(transaction);
+        }, "The `chainID` field is not set");
+
+        transaction.chainID = "localnet";
+        transaction.version = 1;
+        transaction.options = 2;
+
+        assert.throws(() => {
+            transactionComputer.computeBytesForSigning(transaction);
+        }, "The `version` field should be 2 so the `options` field can be set.");
+
+        transactionComputer.applyOptionsForHashSigning(transaction);
+
+        assert.equal(transaction.version, 2);
+        assert.equal(transaction.options, 3);
     });
 });

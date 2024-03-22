@@ -4,7 +4,12 @@ import BigNumber from "bignumber.js";
 import { ITransaction } from "./interface";
 import { ProtoSerializer } from "./proto";
 import { Transaction } from "./transaction";
-import { BECH32_ADDRESS_LENGTH, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_HASH_SIGN } from "./constants";
+import {
+    BECH32_ADDRESS_LENGTH,
+    TRANSACTION_OPTIONS_TX_GUARDED,
+    TRANSACTION_OPTIONS_TX_HASH_SIGN,
+    TRANSACTION_VERSION_DEFAULT,
+} from "./constants";
 
 const createTransactionHasher = require("blake2b");
 const createKeccakHash = require("keccak");
@@ -43,7 +48,7 @@ export class TransactionComputer {
     }
 
     computeBytesForSigning(transaction: ITransaction): Uint8Array {
-        this.ensureFields(transaction);
+        this.ensureValidTransactionFields(transaction);
 
         if (transaction.version >= 2 && this.hasOptionsSetForHashSigning(transaction)) {
             return this.computeHashForSigning(transaction);
@@ -77,9 +82,19 @@ export class TransactionComputer {
     }
 
     applyGuardian(transaction: ITransaction, guardian: string) {
-        transaction.version = 2;
+        if (transaction.version < TRANSACTION_VERSION_DEFAULT) {
+            transaction.version = TRANSACTION_VERSION_DEFAULT;
+        }
+
         transaction.options = transaction.options | TRANSACTION_OPTIONS_TX_GUARDED;
         transaction.guardian = guardian;
+    }
+
+    applyOptionsForHashSigning(transaction: ITransaction) {
+        if (transaction.version < TRANSACTION_VERSION_DEFAULT) {
+            transaction.version = TRANSACTION_VERSION_DEFAULT;
+        }
+        transaction.options = transaction.options | TRANSACTION_OPTIONS_TX_HASH_SIGN;
     }
 
     private toPlainObjectForSigning(transaction: ITransaction) {
@@ -104,7 +119,7 @@ export class TransactionComputer {
         return value && value.length ? Buffer.from(value).toString("base64") : undefined;
     }
 
-    private ensureFields(transaction: ITransaction) {
+    private ensureValidTransactionFields(transaction: ITransaction) {
         if (transaction.sender.length !== BECH32_ADDRESS_LENGTH) {
             throw new errors.ErrBadUsage("Invalid `sender` field. Should be the bech32 address of the sender.");
         }
@@ -115,6 +130,16 @@ export class TransactionComputer {
 
         if (!transaction.chainID.length) {
             throw new errors.ErrBadUsage("The `chainID` field is not set");
+        }
+
+        if (transaction.version < TRANSACTION_VERSION_DEFAULT) {
+            if (this.hasOptionsSetForGuardedTransaction(transaction) || this.hasOptionsSetForHashSigning(transaction)) {
+                throw new errors.ErrBadUsage(
+                    "The `version` field should be " +
+                        `${TRANSACTION_VERSION_DEFAULT}` +
+                        " so the `options` field can be set.",
+                );
+            }
         }
     }
 }

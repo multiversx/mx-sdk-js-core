@@ -54,8 +54,8 @@ export class TransactionsConverter {
             gasLimit: BigInt(object.gasLimit),
             data: this.bufferFromBase64(object.data),
             chainID: String(object.chainID),
-            version: object.version,
-            options: object.options,
+            version: Number(object.version),
+            options: Number(object.options),
             signature: this.bufferFromHex(object.signature),
             guardianSignature: this.bufferFromHex(object.guardianSignature),
         });

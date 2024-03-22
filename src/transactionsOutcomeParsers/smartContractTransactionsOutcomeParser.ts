@@ -1,5 +1,12 @@
 import { Err } from "../errors";
-import { EndpointDefinition, ResultsParser, ReturnCode, Type, UntypedOutcomeBundle } from "../smartcontracts";
+import {
+    EndpointDefinition,
+    ResultsParser,
+    ReturnCode,
+    Type,
+    TypedValue,
+    UntypedOutcomeBundle,
+} from "../smartcontracts";
 import { SmartContractCallOutcome } from "./resources";
 
 interface ITransactionOutcome {
@@ -41,6 +48,7 @@ export class SmartContractTransactionsOutcomeParser {
 
     parseExecute(options: { transactionOutcome: ITransactionOutcome; function?: string }): {
         values: any[];
+        valuesTyped?: TypedValue[];
         returnCode: string;
         returnMessage: string;
     } {
@@ -49,6 +57,7 @@ export class SmartContractTransactionsOutcomeParser {
         if (!this.abi) {
             return {
                 values: directCallOutcome.returnDataParts,
+                valuesTyped: undefined,
                 returnCode: directCallOutcome.returnCode,
                 returnMessage: directCallOutcome.returnMessage,
             };
@@ -74,6 +83,7 @@ export class SmartContractTransactionsOutcomeParser {
 
         return {
             values: legacyTypedBundle.values.map((value) => value.valueOf()),
+            valuesTyped: legacyTypedBundle.values,
             returnCode: legacyTypedBundle.returnCode.toString(),
             returnMessage: legacyTypedBundle.returnMessage,
         };

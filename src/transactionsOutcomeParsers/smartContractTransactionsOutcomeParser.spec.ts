@@ -2,6 +2,7 @@ import { ContractResultItem, ContractResults, TransactionOnNetwork } from "@mult
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { TransactionsConverter } from "../converters/transactionsConverter";
+import { U64Value } from "../smartcontracts";
 import { loadAbiRegistry } from "../testutils";
 import { SmartContractCallOutcome, TransactionOutcome } from "./resources";
 import { SmartContractTransactionsOutcomeParser } from "./smartContractTransactionsOutcomeParser";
@@ -22,6 +23,7 @@ describe("test smart contract transactions outcome parser", () => {
         });
 
         assert.deepEqual(parsed.values, [Buffer.from([42])]);
+        assert.isUndefined(parsed.valuesTyped);
         assert.equal(parsed.returnCode, "ok");
         assert.equal(parsed.returnMessage, "ok");
     });
@@ -44,6 +46,7 @@ describe("test smart contract transactions outcome parser", () => {
         const parsed = parser.parseExecute({ transactionOutcome });
 
         assert.deepEqual(parsed.values, [Buffer.from([42])]);
+        assert.isUndefined(parsed.valuesTyped);
         assert.equal(parsed.returnCode, "ok");
         assert.equal(parsed.returnMessage, "ok");
     });
@@ -67,6 +70,7 @@ describe("test smart contract transactions outcome parser", () => {
 
         // At this moment, U64Value.valueOf() returns a BigNumber. This might change in the future.
         assert.deepEqual(parsed.values, [new BigNumber("42")]);
+        assert.deepEqual(parsed.valuesTyped, [new U64Value(42)]);
         assert.equal(parsed.returnCode, "ok");
         assert.equal(parsed.returnMessage, "ok");
     });
@@ -93,6 +97,7 @@ describe("test smart contract transactions outcome parser", () => {
 
         // At this moment, U64Value.valueOf() returns a BigNumber. This might change in the future.
         assert.deepEqual(parsed.values, [new BigNumber("42")]);
+        assert.deepEqual(parsed.valuesTyped, [new U64Value(42)]);
         assert.equal(parsed.returnCode, "ok");
         assert.equal(parsed.returnMessage, "ok");
     });

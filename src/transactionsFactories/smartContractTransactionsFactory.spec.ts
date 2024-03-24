@@ -152,7 +152,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const args = [new U32Value(7)];
         const token = new Token("FOO-6ce17b", 0n);
-        const transfer = new NextTokenTransfer(token, 10n);
+        const transfer = new NextTokenTransfer({ token, amount: 10n });
 
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
@@ -189,9 +189,9 @@ describe("test smart contract transactions factory", function () {
         const args = [new U32Value(7)];
 
         const fooToken = new Token("FOO-6ce17b", 0n);
-        const fooTransfer = new NextTokenTransfer(fooToken, 10n);
+        const fooTransfer = new NextTokenTransfer({ token: fooToken, amount: 10n });
         const barToken = new Token("BAR-5bc08f", 0n);
-        const barTransfer = new NextTokenTransfer(barToken, 3140n);
+        const barTransfer = new NextTokenTransfer({ token: barToken, amount: 3140n });
 
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
@@ -235,7 +235,7 @@ describe("test smart contract transactions factory", function () {
         const args = [new U32Value(7)];
 
         const token = new Token("NFT-123456", 1n);
-        const transfer = new NextTokenTransfer(token, 1n);
+        const transfer = new NextTokenTransfer({ token, amount: 1n });
 
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
@@ -280,9 +280,9 @@ describe("test smart contract transactions factory", function () {
         const args = [new U32Value(7)];
 
         const firstToken = new Token("NFT-123456", 1n);
-        const firstTransfer = new NextTokenTransfer(firstToken, 1n);
+        const firstTransfer = new NextTokenTransfer({ token: firstToken, amount: 1n });
         const secondToken = new Token("NFT-123456", 42n);
-        const secondTransfer = new NextTokenTransfer(secondToken, 1n);
+        const secondTransfer = new NextTokenTransfer({ token: secondToken, amount: 1n });
 
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,

@@ -140,7 +140,7 @@ describe("test transaction", function () {
         Logger.trace(JSON.stringify(await provider.simulateTransaction(transactionTwo), null, 4));
     });
 
-    it("should create transaction using the NextTokenTransferFactory", async function () {
+    it("should create transaction using the TokenTransferFactory", async function () {
         this.timeout(70000);
 
         const provider = createLocalnetProvider();

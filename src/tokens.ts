@@ -14,9 +14,9 @@ export class NextTokenTransfer {
     token: Token;
     amount: bigint;
 
-    constructor(token: Token, amount: bigint) {
-        this.token = token;
-        this.amount = amount;
+    constructor(options: { token: Token; amount: bigint }) {
+        this.token = options.token;
+        this.amount = options.amount;
     }
 }
 

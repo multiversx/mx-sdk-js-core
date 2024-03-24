@@ -151,7 +151,7 @@ describe("test smart contract transactions factory", function () {
         const func = "add";
         const gasLimit = 6000000n;
         const args = [new U32Value(7)];
-        const token = new Token("FOO-6ce17b", 0n);
+        const token = new Token({ identifier: "FOO-6ce17b", nonce: 0n });
         const transfer = new NextTokenTransfer({ token, amount: 10n });
 
         const transaction = smartContractFactory.createTransactionForExecute({
@@ -188,9 +188,9 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const args = [new U32Value(7)];
 
-        const fooToken = new Token("FOO-6ce17b", 0n);
+        const fooToken = new Token({ identifier: "FOO-6ce17b", nonce: 0n });
         const fooTransfer = new NextTokenTransfer({ token: fooToken, amount: 10n });
-        const barToken = new Token("BAR-5bc08f", 0n);
+        const barToken = new Token({ identifier: "BAR-5bc08f", nonce: 0n });
         const barTransfer = new NextTokenTransfer({ token: barToken, amount: 3140n });
 
         const transaction = smartContractFactory.createTransactionForExecute({
@@ -234,7 +234,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const args = [new U32Value(7)];
 
-        const token = new Token("NFT-123456", 1n);
+        const token = new Token({ identifier: "NFT-123456", nonce: 1n });
         const transfer = new NextTokenTransfer({ token, amount: 1n });
 
         const transaction = smartContractFactory.createTransactionForExecute({
@@ -279,9 +279,9 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const args = [new U32Value(7)];
 
-        const firstToken = new Token("NFT-123456", 1n);
+        const firstToken = new Token({ identifier: "NFT-123456", nonce: 1n });
         const firstTransfer = new NextTokenTransfer({ token: firstToken, amount: 1n });
-        const secondToken = new Token("NFT-123456", 42n);
+        const secondToken = new Token({ identifier: "NFT-123456", nonce: 42n });
         const secondTransfer = new NextTokenTransfer({ token: secondToken, amount: 1n });
 
         const transaction = smartContractFactory.createTransactionForExecute({

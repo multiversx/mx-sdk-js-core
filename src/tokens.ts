@@ -53,6 +53,7 @@ export class TokenTransfer {
 
     constructor(options: { token: Token; amount: bigint } | ILegacyTokenTransferOptions) {
         if (this.isLegacyTokenTransferOptions(options)) {
+            // Handle legacy fields.
             const amount = new BigNumber(options.amountAsBigInteger);
             if (!amount.isInteger() || amount.isNegative()) {
                 throw new ErrInvalidArgument(`bad amountAsBigInteger: ${options.amountAsBigInteger}`);
@@ -63,6 +64,7 @@ export class TokenTransfer {
             this.amountAsBigInteger = amount;
             this.numDecimals = options.numDecimals || 0;
 
+            // Handle new fields.
             this.token = new Token({
                 identifier: options.tokenIdentifier,
                 nonce: BigInt(options.nonce),
@@ -70,9 +72,11 @@ export class TokenTransfer {
 
             this.amount = BigInt(this.amountAsBigInteger.toFixed(0));
         } else {
+            // Handle new fields.
             this.token = options.token;
             this.amount = options.amount;
 
+            // Handle legacy fields.
             this.tokenIdentifier = options.token.identifier;
             this.nonce = Number(options.token.nonce);
             this.amountAsBigInteger = new BigNumber(this.amount.toString());

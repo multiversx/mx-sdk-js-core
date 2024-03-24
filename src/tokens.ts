@@ -1,8 +1,8 @@
 import { ErrInvalidTokenIdentifier } from "./errors";
 
 export class Token {
-    identifier: string;
-    nonce: bigint;
+    readonly identifier: string;
+    readonly nonce: bigint;
 
     constructor(identifier: string, nonce: bigint) {
         this.identifier = identifier;
@@ -11,8 +11,8 @@ export class Token {
 }
 
 export class NextTokenTransfer {
-    token: Token;
-    amount: bigint;
+    readonly token: Token;
+    readonly amount: bigint;
 
     constructor(options: { token: Token; amount: bigint }) {
         this.token = options.token;

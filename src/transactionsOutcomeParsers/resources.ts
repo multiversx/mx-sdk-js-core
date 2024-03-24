@@ -4,15 +4,13 @@ export class TransactionEvent {
     address: string;
     identifier: string;
     topics: Uint8Array[];
-    data: Uint8Array;
-    additionalData: Uint8Array[];
+    dataItems: Uint8Array[];
 
     constructor(init: Partial<TransactionEvent>) {
         this.address = "";
         this.identifier = "";
         this.topics = [];
-        this.data = new Uint8Array();
-        this.additionalData = [];
+        this.dataItems = [];
 
         Object.assign(this, init);
     }

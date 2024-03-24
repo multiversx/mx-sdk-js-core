@@ -13,7 +13,7 @@ describe("test token management transactions outcome parser", () => {
             address: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
             identifier: "signalError",
             topics: b64TopicsToBytes(encodedTopics),
-            data: Buffer.from("QDc1NzM2NTcyMjA2NTcyNzI2Zjcy", "base64"),
+            dataItems: [Buffer.from("QDc1NzM2NTcyMjA2NTcyNzI2Zjcy", "base64")],
         });
 
         const logs = new TransactionLogs({ events: [event] });

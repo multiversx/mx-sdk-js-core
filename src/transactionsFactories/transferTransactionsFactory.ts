@@ -18,7 +18,7 @@ import {
     U16Value,
     U64Value,
 } from "../smartcontracts";
-import { NextTokenTransfer, Token } from "../tokens";
+import { Token, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
@@ -124,7 +124,7 @@ export class TransferTransactionsFactory {
     createTransactionForESDTTokenTransfer(options: {
         sender: IAddress;
         receiver: IAddress;
-        tokenTransfers: NextTokenTransfer[];
+        tokenTransfers: TokenTransfer[];
     }): Transaction {
         this.ensureMembersAreDefined();
 
@@ -339,7 +339,7 @@ export class TransferTransactionsFactory {
     private createSingleESDTTransferTransaction(options: {
         sender: IAddress;
         receiver: IAddress;
-        tokenTransfers: NextTokenTransfer[];
+        tokenTransfers: TokenTransfer[];
     }): Transaction {
         this.ensureMembersAreDefined();
 

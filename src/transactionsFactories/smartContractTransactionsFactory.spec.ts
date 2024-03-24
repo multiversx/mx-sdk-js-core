@@ -6,7 +6,7 @@ import { U32Value } from "../smartcontracts";
 import { Code } from "../smartcontracts/code";
 import { AbiRegistry } from "../smartcontracts/typesystem/abiRegistry";
 import { loadAbiRegistry, loadContractCode } from "../testutils/utils";
-import { NextTokenTransfer, Token, TokenComputer } from "../tokens";
+import { Token, TokenComputer, TokenTransfer } from "../tokens";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
@@ -152,7 +152,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const args = [new U32Value(7)];
         const token = new Token({ identifier: "FOO-6ce17b", nonce: 0n });
-        const transfer = new NextTokenTransfer({ token, amount: 10n });
+        const transfer = new TokenTransfer({ token, amount: 10n });
 
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
@@ -189,9 +189,9 @@ describe("test smart contract transactions factory", function () {
         const args = [new U32Value(7)];
 
         const fooToken = new Token({ identifier: "FOO-6ce17b", nonce: 0n });
-        const fooTransfer = new NextTokenTransfer({ token: fooToken, amount: 10n });
+        const fooTransfer = new TokenTransfer({ token: fooToken, amount: 10n });
         const barToken = new Token({ identifier: "BAR-5bc08f", nonce: 0n });
-        const barTransfer = new NextTokenTransfer({ token: barToken, amount: 3140n });
+        const barTransfer = new TokenTransfer({ token: barToken, amount: 3140n });
 
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
@@ -235,7 +235,7 @@ describe("test smart contract transactions factory", function () {
         const args = [new U32Value(7)];
 
         const token = new Token({ identifier: "NFT-123456", nonce: 1n });
-        const transfer = new NextTokenTransfer({ token, amount: 1n });
+        const transfer = new TokenTransfer({ token, amount: 1n });
 
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
@@ -280,9 +280,9 @@ describe("test smart contract transactions factory", function () {
         const args = [new U32Value(7)];
 
         const firstToken = new Token({ identifier: "NFT-123456", nonce: 1n });
-        const firstTransfer = new NextTokenTransfer({ token: firstToken, amount: 1n });
+        const firstTransfer = new TokenTransfer({ token: firstToken, amount: 1n });
         const secondToken = new Token({ identifier: "NFT-123456", nonce: 42n });
-        const secondTransfer = new NextTokenTransfer({ token: secondToken, amount: 1n });
+        const secondTransfer = new TokenTransfer({ token: secondToken, amount: 1n });
 
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,

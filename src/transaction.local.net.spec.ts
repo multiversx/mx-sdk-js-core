@@ -3,7 +3,7 @@ import { assert } from "chai";
 import { Logger } from "./logger";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { createLocalnetProvider } from "./testutils/networkProviders";
-import { TokenTransfer } from "./tokenTransfer";
+import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 import { TransactionWatcher } from "./transactionWatcher";

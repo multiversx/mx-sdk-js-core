@@ -10,7 +10,7 @@ import {
     TestWallet
 } from "../testutils";
 import { ContractController } from "../testutils/contractController";
-import { TokenTransfer } from "../tokenTransfer";
+import { TokenTransfer } from "../tokens";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { ReturnCode } from "./returnCode";

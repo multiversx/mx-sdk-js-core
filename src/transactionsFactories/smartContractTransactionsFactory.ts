@@ -4,7 +4,7 @@ import { Err, ErrBadUsage } from "../errors";
 import { IAddress } from "../interface";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
-import { NextTokenTransfer, Token } from "../tokens";
+import { Token, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { byteArrayToHex, utf8ToHex } from "../utils.codec";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
@@ -82,7 +82,7 @@ export class SmartContractTransactionsFactory {
         gasLimit: bigint;
         args?: any[];
         nativeTransferAmount?: bigint;
-        tokenTransfers?: NextTokenTransfer[];
+        tokenTransfers?: TokenTransfer[];
     }): Transaction {
         const args = options.args || [];
         const tokenTransfer = options.tokenTransfers || [];

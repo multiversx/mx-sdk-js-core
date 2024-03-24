@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { Address } from "../address";
 import * as errors from "../errors";
 import { loadAbiRegistry } from "../testutils";
-import { TokenTransfer } from "../tokenTransfer";
+import { TokenTransfer } from "../tokens";
 import { Interaction } from "./interaction";
 import { InteractionChecker } from "./interactionChecker";
 import { SmartContract } from "./smartContract";

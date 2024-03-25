@@ -120,7 +120,7 @@ export class TransactionsConverter {
         const legacyData = eventOnNetwork.dataPayload?.valueOf() || Buffer.from([]);
         const dataItems = eventOnNetwork.additionalData?.map((data) => Buffer.from(data.valueOf())) || [];
 
-        if (dataItems.length == 0) {
+        if (dataItems.length === 0) {
             if (legacyData.length) {
                 dataItems.push(Buffer.from(legacyData));
             }

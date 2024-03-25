@@ -167,9 +167,7 @@ describe("test transaction", function () {
         transaction.nonce = BigInt(alice.account.nonce.valueOf());
 
         const transactionComputer = new TransactionComputer();
-        transaction.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(transaction)),
-        );
+        transaction.signature = await alice.signer.sign(transactionComputer.computeBytesForSigning(transaction));
 
         const txHash = await provider.sendTransaction(transaction);
         await watcher.awaitCompleted(txHash);

@@ -6,7 +6,7 @@ export class DelegationTransactionsOutcomeParser {
     constructor() {}
 
     parseCreateNewDelegationContract(transactionOutcome: TransactionOutcome): { contractAddress: string }[] {
-        this.ensureNoError(transactionOutcome.transactionLogs.events);
+        this.ensureNoError(transactionOutcome.logs.events);
 
         const events = findEventsByIdentifier(transactionOutcome, "SCDeploy");
 

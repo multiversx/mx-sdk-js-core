@@ -1,14 +1,14 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "./address";
+import { MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS } from "./constants";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { ProtoSerializer } from "./proto";
 import { TestWallet, loadTestWallets } from "./testutils";
 import { TokenTransfer } from "./tokenTransfer";
 import { Transaction } from "./transaction";
-import { TransactionPayload } from "./transactionPayload";
 import { TransactionComputer } from "./transactionComputer";
-import { MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS } from "./constants";
+import { TransactionPayload } from "./transactionPayload";
 
 describe("test transaction", async () => {
     let wallets: Record<string, TestWallet>;
@@ -130,7 +130,7 @@ describe("test transaction", async () => {
         });
 
         transaction.signature = await wallets.carol.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(transaction)),
+            transactionComputer.computeBytesForSigning(transaction),
         );
 
         assert.equal(
@@ -376,9 +376,7 @@ describe("test transaction", async () => {
             guardian: "erd1x23lzn8483xs2su4fak0r0dqx6w38enpmmqf2yrkylwq7mfnvyhsxqw57y",
         });
         transaction.guardianSignature = new Uint8Array(64);
-        transaction.signature = new Uint8Array(
-            await alice.signer.sign(Buffer.from(transactionComputer.computeBytesForSigning(transaction))),
-        );
+        transaction.signature = await alice.signer.sign(transactionComputer.computeBytesForSigning(transaction));
 
         const serializer = new ProtoSerializer();
         const buffer = serializer.serializeTransaction(transaction);

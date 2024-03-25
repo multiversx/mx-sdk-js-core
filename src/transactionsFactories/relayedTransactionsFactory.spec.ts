@@ -1,9 +1,9 @@
 import { assert } from "chai";
 import { TestWallet, loadTestWallets } from "../testutils";
 import { Transaction } from "../transaction";
+import { TransactionComputer } from "../transactionComputer";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
-import { TransactionComputer } from "../transactionComputer";
 
 describe("test relayed v1 transaction builder", function () {
     const config = new TransactionsFactoryConfig({ chainID: "T" });
@@ -49,7 +49,7 @@ describe("test relayed v1 transaction builder", function () {
         });
 
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await bob.signer.sign(Buffer.from(serializedInnerTransaction));
+        innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
 
         const relayedTransaction = factory.createRelayedV1Transaction({
             innerTransaction: innerTransaction,
@@ -58,7 +58,7 @@ describe("test relayed v1 transaction builder", function () {
         relayedTransaction.nonce = 2627n;
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await alice.signer.sign(Buffer.from(serializedRelayedTransaction));
+        relayedTransaction.signature = await alice.signer.sign(serializedRelayedTransaction);
 
         assert.equal(
             Buffer.from(relayedTransaction.data).toString(),
@@ -83,7 +83,7 @@ describe("test relayed v1 transaction builder", function () {
         });
 
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await carol.signer.sign(Buffer.from(serializedInnerTransaction));
+        innerTransaction.signature = await carol.signer.sign(serializedInnerTransaction);
 
         const relayedTransaction = factory.createRelayedV1Transaction({
             innerTransaction: innerTransaction,
@@ -92,7 +92,7 @@ describe("test relayed v1 transaction builder", function () {
         relayedTransaction.nonce = 715n;
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await frank.signer.sign(Buffer.from(serializedRelayedTransaction));
+        relayedTransaction.signature = await frank.signer.sign(serializedRelayedTransaction);
 
         assert.equal(
             Buffer.from(relayedTransaction.data).toString(),
@@ -117,7 +117,7 @@ describe("test relayed v1 transaction builder", function () {
         });
 
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await carol.signer.sign(Buffer.from(serializedInnerTransaction));
+        innerTransaction.signature = await carol.signer.sign(serializedInnerTransaction);
 
         const relayedTransaction = factory.createRelayedV1Transaction({
             innerTransaction: innerTransaction,
@@ -126,7 +126,7 @@ describe("test relayed v1 transaction builder", function () {
         relayedTransaction.nonce = 715n;
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await frank.signer.sign(Buffer.from(serializedRelayedTransaction));
+        relayedTransaction.signature = await frank.signer.sign(serializedRelayedTransaction);
 
         assert.equal(
             Buffer.from(relayedTransaction.data).toString(),
@@ -152,8 +152,8 @@ describe("test relayed v1 transaction builder", function () {
         });
 
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await bob.signer.sign(Buffer.from(serializedInnerTransaction));
-        innerTransaction.guardianSignature = await grace.signer.sign(Buffer.from(serializedInnerTransaction));
+        innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
+        innerTransaction.guardianSignature = await grace.signer.sign(serializedInnerTransaction);
 
         const relayedTransaction = factory.createRelayedV1Transaction({
             innerTransaction: innerTransaction,
@@ -162,7 +162,7 @@ describe("test relayed v1 transaction builder", function () {
         relayedTransaction.nonce = 2627n;
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await alice.signer.sign(Buffer.from(serializedRelayedTransaction));
+        relayedTransaction.signature = await alice.signer.sign(serializedRelayedTransaction);
 
         assert.equal(
             Buffer.from(relayedTransaction.data).toString(),
@@ -188,8 +188,8 @@ describe("test relayed v1 transaction builder", function () {
         });
 
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await bob.signer.sign(Buffer.from(serializedInnerTransaction));
-        innerTransaction.guardianSignature = await grace.signer.sign(Buffer.from(serializedInnerTransaction));
+        innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
+        innerTransaction.guardianSignature = await grace.signer.sign(serializedInnerTransaction);
 
         const relayedTransaction = factory.createRelayedV1Transaction({
             innerTransaction: innerTransaction,
@@ -200,8 +200,8 @@ describe("test relayed v1 transaction builder", function () {
         relayedTransaction.guardian = frank.address.bech32();
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await alice.signer.sign(Buffer.from(serializedRelayedTransaction));
-        relayedTransaction.guardianSignature = await frank.signer.sign(Buffer.from(serializedRelayedTransaction));
+        relayedTransaction.signature = await alice.signer.sign(serializedRelayedTransaction);
+        relayedTransaction.guardianSignature = await frank.signer.sign(serializedRelayedTransaction);
 
         assert.equal(
             Buffer.from(relayedTransaction.data).toString(),
@@ -255,7 +255,7 @@ describe("test relayed v1 transaction builder", function () {
         });
 
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await bob.signer.sign(Buffer.from(serializedInnerTransaction));
+        innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
 
         const relayedTransaction = factory.createRelayedV2Transaction({
             innerTransaction: innerTransaction,
@@ -265,7 +265,7 @@ describe("test relayed v1 transaction builder", function () {
         relayedTransaction.nonce = 37n;
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await alice.signer.sign(Buffer.from(serializedRelayedTransaction));
+        relayedTransaction.signature = await alice.signer.sign(serializedRelayedTransaction);
 
         assert.equal(relayedTransaction.version, 2);
         assert.equal(relayedTransaction.options, 0);

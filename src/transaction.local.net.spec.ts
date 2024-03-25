@@ -3,7 +3,7 @@ import { assert } from "chai";
 import { Logger } from "./logger";
 import { loadTestWallets, TestWallet } from "./testutils";
 import { createLocalnetProvider } from "./testutils/networkProviders";
-import { TokenTransfer } from "./tokenTransfer";
+import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 import { TransactionWatcher } from "./transactionWatcher";
@@ -140,7 +140,7 @@ describe("test transaction", function () {
         Logger.trace(JSON.stringify(await provider.simulateTransaction(transactionTwo), null, 4));
     });
 
-    it("should create transaction using the NextTokenTransferFactory", async function () {
+    it("should create transaction using the TokenTransferFactory", async function () {
         this.timeout(70000);
 
         const provider = createLocalnetProvider();

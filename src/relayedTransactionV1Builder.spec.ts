@@ -4,7 +4,7 @@ import * as errors from "./errors";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { RelayedTransactionV1Builder } from "./relayedTransactionV1Builder";
 import { TestWallet, loadTestWallets } from "./testutils";
-import { TokenTransfer } from "./tokenTransfer";
+import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 

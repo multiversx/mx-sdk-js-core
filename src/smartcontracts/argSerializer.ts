@@ -94,6 +94,8 @@ export class ArgSerializer {
             // Non-composite (singular), non-variadic (fixed) type.
             // The only branching without a recursive call.
             const typedValue = decodeNextBuffer(type);
+
+            // TODO: Handle the case (maybe throw error) when "typedValue" is, actually, null.
             return typedValue!;
         }
 

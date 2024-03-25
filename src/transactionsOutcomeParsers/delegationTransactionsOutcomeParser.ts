@@ -16,7 +16,7 @@ export class DelegationTransactionsOutcomeParser {
     private ensureNoError(transactionEvents: TransactionEvent[]) {
         for (const event of transactionEvents) {
             if (event.identifier == "signalError") {
-                const data = Buffer.from(event.data.toString().slice(1)).toString();
+                const data = Buffer.from(event.dataItems[0]?.toString().slice(1)).toString() || "";
                 const message = this.decodeTopicAsString(event.topics[1]);
 
                 throw new ErrParseTransactionOutcome(

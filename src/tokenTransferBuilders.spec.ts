@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { Address } from "./address";
-import { TokenTransfer } from "./tokenTransfer";
+import { TokenTransfer } from "./tokens";
 import {
     ESDTNFTTransferPayloadBuilder,
     ESDTTransferPayloadBuilder,

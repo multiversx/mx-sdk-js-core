@@ -16,11 +16,6 @@ export function numberToPaddedHex(value: bigint | number | BigNumber.Value) {
     return zeroPadStringIfOddLength(hex);
 }
 
-export function numberToPaddedHexWithZeroAsEmptyString(value: bigint | number | BigNumber.Value) {
-    const paddedHex = numberToPaddedHex(value);
-    return paddedHex == "00" ? "" : paddedHex;
-}
-
 export function isPaddedHex(input: string) {
     input = input || "";
     let decodedThenEncoded = Buffer.from(input, "hex").toString("hex");

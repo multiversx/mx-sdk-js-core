@@ -4,15 +4,13 @@ export class TransactionEvent {
     address: string;
     identifier: string;
     topics: Uint8Array[];
-    data: Uint8Array;
-    additionalData: Uint8Array[];
+    dataItems: Uint8Array[];
 
     constructor(init: Partial<TransactionEvent>) {
         this.address = "";
         this.identifier = "";
         this.topics = [];
-        this.data = new Uint8Array();
-        this.additionalData = [];
+        this.dataItems = [];
 
         Object.assign(this, init);
     }
@@ -76,8 +74,15 @@ export class SmartContractCallOutcome {
     }
 }
 
+export function findEventsByPredicate(
+    transactionOutcome: TransactionOutcome,
+    predicate: (event: TransactionEvent) => boolean,
+): TransactionEvent[] {
+    return gatherAllEvents(transactionOutcome).filter(predicate);
+}
+
 export function findEventsByIdentifier(transactionOutcome: TransactionOutcome, identifier: string): TransactionEvent[] {
-    const events = gatherAllEvents(transactionOutcome).filter((event) => event.identifier == identifier);
+    const events = findEventsByPredicate(transactionOutcome, (event) => event.identifier == identifier);
 
     if (events.length == 0) {
         throw new ErrParseTransactionOutcome(`cannot find event of type ${identifier}`);

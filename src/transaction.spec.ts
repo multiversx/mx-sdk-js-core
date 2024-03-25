@@ -620,9 +620,7 @@ describe("test transaction", async () => {
             options: 1,
         });
 
-        transaction.signature = await wallets.alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(transaction)),
-        );
+        transaction.signature = await wallets.alice.signer.sign(transactionComputer.computeHashForSigning(transaction));
 
         assert.equal(
             "f0c81f2393b1ec5972c813f817bae8daa00ade91c6f75ea604ab6a4d2797aca4378d783023ff98f1a02717fe4f24240cdfba0b674ee9abb18042203d713bc70a",

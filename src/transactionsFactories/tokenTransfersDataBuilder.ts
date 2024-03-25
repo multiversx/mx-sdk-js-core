@@ -1,6 +1,6 @@
 import { IAddress } from "../interface";
 import { TokenComputer, TokenTransfer } from "../tokens";
-import { addressToHex, numberToPaddedHex, utf8ToHex } from "../utils.codec";
+import { addressToHex, numberToPaddedHex, numberToPaddedHexWithZeroAsEmptyString, utf8ToHex } from "../utils.codec";
 
 export class TokenTransfersDataBuilder {
     private tokenComputer: TokenComputer;
@@ -11,7 +11,7 @@ export class TokenTransfersDataBuilder {
 
     buildArgsForESDTTransfer(transfer: TokenTransfer): string[] {
         let args = ["ESDTTransfer"];
-        args.push(...[utf8ToHex(transfer.token.identifier), numberToPaddedHex(transfer.amount)]);
+        args.push(...[utf8ToHex(transfer.token.identifier), numberToPaddedHexWithZeroAsEmptyString(transfer.amount)]);
         return args;
     }
 
@@ -24,8 +24,8 @@ export class TokenTransfersDataBuilder {
         args.push(
             ...[
                 utf8ToHex(identifier),
-                numberToPaddedHex(token.nonce),
-                numberToPaddedHex(transfer.amount),
+                numberToPaddedHexWithZeroAsEmptyString(token.nonce),
+                numberToPaddedHexWithZeroAsEmptyString(transfer.amount),
                 addressToHex(receiver),
             ],
         );
@@ -38,7 +38,11 @@ export class TokenTransfersDataBuilder {
         for (let transfer of transfers) {
             const identifier = this.tokenComputer.extractIdentifierFromExtendedIdentifier(transfer.token.identifier);
             args.push(
-                ...[utf8ToHex(identifier), numberToPaddedHex(transfer.token.nonce), numberToPaddedHex(transfer.amount)],
+                ...[
+                    utf8ToHex(identifier),
+                    numberToPaddedHexWithZeroAsEmptyString(transfer.token.nonce),
+                    numberToPaddedHexWithZeroAsEmptyString(transfer.amount),
+                ],
             );
         }
 

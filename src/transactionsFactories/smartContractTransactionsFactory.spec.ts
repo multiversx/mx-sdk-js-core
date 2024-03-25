@@ -217,7 +217,7 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(
             transaction.data,
             Buffer.from(
-                "MultiESDTNFTTransfer@00000000000000000500ed8e25a94efa837aae0e593112cfbb01b448755069e1@02@464f4f2d366365313762@00@0a@4241522d356263303866@00@0c44@616464@07",
+                "MultiESDTNFTTransfer@00000000000000000500ed8e25a94efa837aae0e593112cfbb01b448755069e1@02@464f4f2d366365313762@@0a@4241522d356263303866@@0c44@616464@07",
             ),
         );
 

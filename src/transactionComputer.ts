@@ -50,10 +50,6 @@ export class TransactionComputer {
     computeBytesForSigning(transaction: ITransaction): Uint8Array {
         this.ensureValidTransactionFields(transaction);
 
-        if (transaction.version >= 2 && this.hasOptionsSetForHashSigning(transaction)) {
-            return this.computeHashForSigning(transaction);
-        }
-
         const plainTransaction = this.toPlainObjectForSigning(transaction);
         const serialized = JSON.stringify(plainTransaction);
         return new Uint8Array(Buffer.from(serialized));

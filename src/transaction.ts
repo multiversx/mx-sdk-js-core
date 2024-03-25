@@ -133,8 +133,8 @@ export class Transaction {
         this.gasLimit = BigInt(options.gasLimit.valueOf());
         this.data = options.data?.valueOf() || new Uint8Array();
         this.chainID = options.chainID.valueOf();
-        this.version = options.version?.valueOf() || TRANSACTION_VERSION_DEFAULT;
-        this.options = options.options?.valueOf() || TRANSACTION_OPTIONS_DEFAULT;
+        this.version = Number(options.version?.valueOf() || TRANSACTION_VERSION_DEFAULT);
+        this.options = Number(options.options?.valueOf() || TRANSACTION_OPTIONS_DEFAULT);
         this.guardian = options.guardian ? this.addressAsBech32(options.guardian) : "";
 
         this.signature = options.signature || Buffer.from([]);

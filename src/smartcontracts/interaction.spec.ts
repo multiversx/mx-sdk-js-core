@@ -175,7 +175,7 @@ describe("test smart contract interactor", function () {
                 data: Buffer.from("ESDTTransfer@464f4f2d616263646566@64@676574556c74696d617465416e73776572"),
                 gasLimit: 543210n,
                 value: 0n,
-                version: 1,
+                version: 2,
                 nonce: 42n,
             }),
         );
@@ -189,7 +189,7 @@ describe("test smart contract interactor", function () {
         let controller = new ContractController(provider);
 
         let interaction = <Interaction>(
-            contract.methods.getUltimateAnswer().withGasLimit(543210).withChainID("T").withVersion(2)
+            contract.methods.getUltimateAnswer().withGasLimit(543210).withChainID("T")
         );
 
         assert.equal(contract.getAddress(), dummyAddress);

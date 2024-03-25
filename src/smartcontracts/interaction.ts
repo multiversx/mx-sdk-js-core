@@ -1,6 +1,7 @@
 import { Account } from "../account";
 import { Address } from "../address";
 import { Compatibility } from "../compatibility";
+import { TRANSACTION_VERSION_DEFAULT } from "../constants";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenTransfer, ITransactionValue } from "../interface";
 import { TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
@@ -41,10 +42,7 @@ export class Interaction {
     private querent: IAddress = Address.empty();
     private explicitReceiver?: IAddress;
     private sender: IAddress = Address.empty();
-
-    // When using the Interaction API, we use the legacy transaction version by default,
-    // in order to have as little impact as possible on a quick upgrade from v12 to v13.
-    private version: number = 1;
+    private version: number = TRANSACTION_VERSION_DEFAULT;
 
     private tokenTransfers: TokenTransfer[];
 

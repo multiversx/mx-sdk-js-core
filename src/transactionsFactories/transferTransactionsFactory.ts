@@ -52,7 +52,7 @@ interface IGasEstimator {
  */
 export class TransferTransactionsFactory {
     private readonly config?: IConfig;
-    private readonly dataArgsBuilder?: TokenTransfersDataBuilder;
+    private readonly tokenTransfersDataBuilder?: TokenTransfersDataBuilder;
     private readonly tokenComputer?: ITokenComputer;
     private readonly gasEstimator?: IGasEstimator;
 
@@ -68,7 +68,7 @@ export class TransferTransactionsFactory {
         } else {
             this.config = options.config;
             this.tokenComputer = options.tokenComputer;
-            this.dataArgsBuilder = new TokenTransfersDataBuilder();
+            this.tokenTransfersDataBuilder = new TokenTransfersDataBuilder();
         }
     }
 
@@ -91,7 +91,7 @@ export class TransferTransactionsFactory {
             throw new Err("'config' is not defined");
         }
 
-        if (this.dataArgsBuilder === undefined) {
+        if (this.tokenTransfersDataBuilder === undefined) {
             throw new Err("`dataArgsBuilder is not defined`");
         }
 
@@ -138,7 +138,7 @@ export class TransferTransactionsFactory {
             return this.createSingleESDTTransferTransaction(options);
         }
 
-        const transferArgs = this.dataArgsBuilder!.buildArgsForMultiESDTNFTTransfer(
+        const dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForMultiESDTNFTTransfer(
             options.receiver,
             options.tokenTransfers,
         );
@@ -151,7 +151,7 @@ export class TransferTransactionsFactory {
             config: this.config!,
             sender: options.sender,
             receiver: options.sender,
-            dataParts: transferArgs,
+            dataParts: dataParts,
             gasLimit: extraGasForTransfer,
             addDataMovementGas: true,
         }).build();
@@ -343,16 +343,16 @@ export class TransferTransactionsFactory {
     }): Transaction {
         this.ensureMembersAreDefined();
 
-        let transferArgs: string[] = [];
+        let dataParts: string[] = [];
         const transfer = options.tokenTransfers[0];
         let extraGasForTransfer = 0n;
         let receiver = options.receiver;
 
         if (this.tokenComputer!.isFungible(transfer.token)) {
-            transferArgs = this.dataArgsBuilder!.buildArgsForESDTTransfer(transfer);
+            dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForESDTTransfer(transfer);
             extraGasForTransfer = this.config!.gasLimitESDTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_TRANSFER);
         } else {
-            transferArgs = this.dataArgsBuilder!.buildArgsForSingleESDTNFTTransfer(transfer, receiver);
+            dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForSingleESDTNFTTransfer(transfer, receiver);
             extraGasForTransfer = this.config!.gasLimitESDTNFTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER);
             receiver = options.sender;
         }
@@ -361,7 +361,7 @@ export class TransferTransactionsFactory {
             config: this.config!,
             sender: options.sender,
             receiver: receiver,
-            dataParts: transferArgs,
+            dataParts: dataParts,
             gasLimit: extraGasForTransfer,
             addDataMovementGas: true,
         }).build();

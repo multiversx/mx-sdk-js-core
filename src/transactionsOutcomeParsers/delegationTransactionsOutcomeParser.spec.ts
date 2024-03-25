@@ -1,38 +1,45 @@
 import { assert } from "chai";
+import { Address } from "../address";
+import { b64TopicsToBytes } from "../testutils";
 import { DelegationTransactionsOutcomeParser } from "./delegationTransactionsOutcomeParser";
 import { SmartContractResult, TransactionEvent, TransactionLogs, TransactionOutcome } from "./resources";
-import { Address } from "../address";
 
-describe("test token management transactions outcome parser", () => {
+describe("test delegation transactions outcome parser", () => {
     const parser = new DelegationTransactionsOutcomeParser();
 
     it("should test parseCreateNewDelegationContract ", () => {
         const contractAddress = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy8lllls62y8s5");
+        let encodedTopics = [
+            "Q8M8GTdWSAAA",
+            "Q8M8GTdWSAAA",
+            "AQ==",
+            "Q8M8GTdWSAAA",
+            "AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAABD///8=",
+        ];
 
         const delegateEvent = new TransactionEvent({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
             identifier: "delegate",
-            topics: [
-                "Q8M8GTdWSAAA",
-                "Q8M8GTdWSAAA",
-                "AQ==",
-                "Q8M8GTdWSAAA",
-                "AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAABD///8=",
-            ],
+            topics: b64TopicsToBytes(encodedTopics),
         });
 
+        encodedTopics = [
+            "AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAABD///8=",
+            "PDXX6ssamaSgzKpTfvDMCuEJ9B9sK0AiA+Yzv7sHH1w=",
+        ];
         const scDeployEvent = new TransactionEvent({
             address: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqy8lllls62y8s5",
             identifier: "SCDeploy",
-            topics: ["AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAABD///8=", "PDXX6ssamaSgzKpTfvDMCuEJ9B9sK0AiA+Yzv7sHH1w="],
+            topics: b64TopicsToBytes(encodedTopics),
         });
 
         const logs = new TransactionLogs({ events: [delegateEvent, scDeployEvent] });
 
+        encodedTopics = ["b2g6sUl6beG17FCUIkFwCOTGJjoJJi5SjkP2077e6xA="];
         const scResultEvent = new TransactionEvent({
             address: "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2",
             identifier: "completedTxEvent",
-            topics: ["b2g6sUl6beG17FCUIkFwCOTGJjoJJi5SjkP2077e6xA="],
+            topics: b64TopicsToBytes(encodedTopics),
         });
 
         const scResultLog = new TransactionLogs({
@@ -50,7 +57,7 @@ describe("test token management transactions outcome parser", () => {
             logs: scResultLog,
         });
 
-        const txOutcome = new TransactionOutcome({ smartContractResults: [scResult], transactionLogs: logs });
+        const txOutcome = new TransactionOutcome({ smartContractResults: [scResult], logs: logs });
 
         const outcome = parser.parseCreateNewDelegationContract(txOutcome);
 

@@ -3,11 +3,11 @@ import { Address } from "../address";
 import { ErrBadUsage } from "../errors";
 import { NextTokenTransfer, Token, TokenComputer } from "../tokens";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
-import { NextTransferTransactionsFactory } from "./transferTransactionsFactory";
+import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 
 describe("test transfer transcations factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });
-    const nextTransferFactory = new NextTransferTransactionsFactory({
+    const transferFactory = new TransferTransactionsFactory({
         config: config,
         tokenComputer: new TokenComputer(),
     });
@@ -20,7 +20,7 @@ describe("test transfer transcations factory", function () {
 
         assert.throw(
             () => {
-                nextTransferFactory.createTransactionForESDTTokenTransfer({
+                transferFactory.createTransactionForESDTTokenTransfer({
                     sender: alice,
                     receiver: bob,
                     tokenTransfers: transfers,
@@ -32,7 +32,7 @@ describe("test transfer transcations factory", function () {
     });
 
     it("should create 'Transaction' for native token transfer without data", async () => {
-        const transaction = nextTransferFactory.createTransactionForNativeTokenTransfer({
+        const transaction = transferFactory.createTransactionForNativeTokenTransfer({
             sender: alice,
             receiver: bob,
             nativeAmount: 1000000000000000000n,
@@ -46,7 +46,7 @@ describe("test transfer transcations factory", function () {
     });
 
     it("should create 'Transaction' for native token transfer with data", async () => {
-        const transaction = nextTransferFactory.createTransactionForNativeTokenTransfer({
+        const transaction = transferFactory.createTransactionForNativeTokenTransfer({
             sender: alice,
             receiver: bob,
             nativeAmount: 1000000000000000000n,
@@ -64,7 +64,7 @@ describe("test transfer transcations factory", function () {
         const fooToken = new Token("FOO-123456", 0n);
         const transfer = new NextTokenTransfer(fooToken, 1000000n);
 
-        const transaction = nextTransferFactory.createTransactionForESDTTokenTransfer({
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
             sender: alice,
             receiver: bob,
             tokenTransfers: [transfer],
@@ -81,7 +81,7 @@ describe("test transfer transcations factory", function () {
         const nft = new Token("NFT-123456", 10n);
         const transfer = new NextTokenTransfer(nft, 1n);
 
-        const transaction = nextTransferFactory.createTransactionForESDTTokenTransfer({
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
             sender: alice,
             receiver: bob,
             tokenTransfers: [transfer],
@@ -104,7 +104,7 @@ describe("test transfer transcations factory", function () {
         const secondNft = new Token("TEST-987654", 1n);
         const secondTransfer = new NextTokenTransfer(secondNft, 1n);
 
-        const transaction = nextTransferFactory.createTransactionForESDTTokenTransfer({
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
             sender: alice,
             receiver: bob,
             tokenTransfers: [firstTransfer, secondTransfer],

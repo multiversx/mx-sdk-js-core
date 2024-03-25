@@ -89,12 +89,17 @@ export class ResultsParser {
     }
 
     parseOutcome(transaction: ITransactionOnNetwork, endpoint: { output: IParameterDefinition[] }): TypedOutcomeBundle {
-        let untypedBundle = this.parseUntypedOutcome(transaction);
-        let values = this.argsSerializer.buffersToValues(untypedBundle.values, endpoint.output);
+        const untypedBundle = this.parseUntypedOutcome(transaction);
+        const typedBundle = this.parseOutcomeFromUntypedBundle(untypedBundle, endpoint);
+        return typedBundle;
+    }
+
+    parseOutcomeFromUntypedBundle(bundle: UntypedOutcomeBundle, endpoint: { output: IParameterDefinition[] }) {
+        const values = this.argsSerializer.buffersToValues(bundle.values, endpoint.output);
 
         return {
-            returnCode: untypedBundle.returnCode,
-            returnMessage: untypedBundle.returnMessage,
+            returnCode: bundle.returnCode,
+            returnMessage: bundle.returnMessage,
             values: values,
             firstValue: values[0],
             secondValue: values[1],
@@ -308,7 +313,7 @@ export class ResultsParser {
         return null;
     }
 
-    private sliceDataFieldInParts(data: string): { returnCode: ReturnCode, returnDataParts: Buffer[] } {
+    protected sliceDataFieldInParts(data: string): { returnCode: ReturnCode, returnDataParts: Buffer[] } {
         // By default, skip the first part, which is usually empty (e.g. "[empty]@6f6b")
         let startingIndex = 1;
 

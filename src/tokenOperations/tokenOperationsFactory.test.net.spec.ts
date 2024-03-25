@@ -6,7 +6,7 @@ import { INetworkProvider, createTestnetProvider } from "../testutils/networkPro
 import { TokenTransfer } from "../tokenTransfer";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
-import { TransferTransactionsFactory } from "../transferTransactionsFactory";
+import { TransferTransactionsFactory } from "../transactionsFactories/transferTransactionsFactory";
 import { TokenOperationsFactory } from "./tokenOperationsFactory";
 import { TokenOperationsFactoryConfig } from "./tokenOperationsFactoryConfig";
 import { TokenOperationsOutcomeParser } from "./tokenOperationsOutcomeParser";
@@ -675,7 +675,7 @@ describe("test factory on testnet", function () {
     async function processTransaction(
         wallet: TestWallet,
         transaction: Transaction,
-        tag: string
+        tag: string,
     ): Promise<ITransactionOnNetwork> {
         wallet.account.incrementNonce();
         transaction.applySignature(await wallet.signer.sign(transaction.serializeForSigning()));

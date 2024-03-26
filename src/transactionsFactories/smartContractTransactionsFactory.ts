@@ -100,13 +100,13 @@ export class SmartContractTransactionsFactory {
             const transfer = tokenTransfer[0];
 
             if (this.tokenComputer.isFungible(transfer.token)) {
-                dataParts = this.dataArgsBuilder.buildArgsForESDTTransfer(transfer);
+                dataParts = this.dataArgsBuilder.buildDataPartsForESDTTransfer(transfer);
             } else {
-                dataParts = this.dataArgsBuilder.buildArgsForSingleESDTNFTTransfer(transfer, receiver);
+                dataParts = this.dataArgsBuilder.buildDataPartsForSingleESDTNFTTransfer(transfer, receiver);
                 receiver = options.sender;
             }
         } else if (numberOfTokens > 1) {
-            dataParts = this.dataArgsBuilder.buildArgsForMultiESDTNFTTransfer(receiver, tokenTransfer);
+            dataParts = this.dataArgsBuilder.buildDataPartsForMultiESDTNFTTransfer(receiver, tokenTransfer);
             receiver = options.sender;
         }
 

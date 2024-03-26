@@ -10,7 +10,8 @@ import {
     TestWallet
 } from "../testutils";
 import { ContractController } from "../testutils/contractController";
-import { TokenTransfer } from "../tokens";
+import { Token, TokenTransfer } from "../tokens";
+import { Transaction } from "../transaction";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { ReturnCode } from "./returnCode";
@@ -148,7 +149,36 @@ describe("test smart contract interactor", function () {
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
         assert.equal(transaction.getReceiver().bech32(), alice.bech32());
-        assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexStrămoși}@01@01@${hexStrămoși}@2a@01@${hexDummyFunction}`);
+    });
+
+    it("should create transaction, with ABI, with transfer & execute", async function () {
+        const abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
+        const contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
+        const alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const token = new Token({ identifier: "FOO-abcdef", nonce: 0n });
+
+        const transaction = contract.methods
+            .getUltimateAnswer()
+            .withChainID("T")
+            .withSender(alice)
+            .withGasLimit(543210)
+            .withSingleESDTTransfer(new TokenTransfer({ token, amount: 100n }))
+            .withNonce(42)
+            .buildTransaction();
+
+        assert.deepEqual(
+            transaction,
+            new Transaction({
+                chainID: "T",
+                sender: alice.toBech32(),
+                receiver: dummyAddress.toBech32(),
+                data: Buffer.from("ESDTTransfer@464f4f2d616263646566@64@676574556c74696d617465416e73776572"),
+                gasLimit: 543210n,
+                value: 0n,
+                version: 2,
+                nonce: 42n,
+            }),
+        );
     });
 
     it("should interact with 'answer'", async function () {
@@ -158,10 +188,9 @@ describe("test smart contract interactor", function () {
         let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new ContractController(provider);
 
-        let interaction = <Interaction>contract.methods
-            .getUltimateAnswer()
-            .withGasLimit(543210)
-            .withChainID("T");
+        let interaction = <Interaction>(
+            contract.methods.getUltimateAnswer().withGasLimit(543210).withChainID("T")
+        );
 
         assert.equal(contract.getAddress(), dummyAddress);
         assert.deepEqual(interaction.getFunction(), new ContractFunction("getUltimateAnswer"));

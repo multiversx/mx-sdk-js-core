@@ -9,7 +9,6 @@ import { TransactionPayload } from "./transactionPayload";
 import { TransactionWatcher } from "./transactionWatcher";
 import { TransactionsFactoryConfig } from "./transactionsFactories/transactionsFactoryConfig";
 import { TransferTransactionsFactory } from "./transactionsFactories/transferTransactionsFactory";
-import { TokenComputer } from "./tokens";
 import { TransactionComputer } from "./transactionComputer";
 
 describe("test transaction", function () {
@@ -153,7 +152,7 @@ describe("test transaction", function () {
         const network = await provider.getNetworkConfig();
 
         const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
-        const factory = new TransferTransactionsFactory({ config: config, tokenComputer: new TokenComputer() });
+        const factory = new TransferTransactionsFactory({ config: config });
 
         await alice.sync(provider);
         await bob.sync(provider);

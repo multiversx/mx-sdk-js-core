@@ -2,7 +2,14 @@ import { Address } from "../address";
 import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
 import { Err, ErrBadUsage } from "../errors";
 import { IAddress } from "../interface";
-import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
+import {
+    ArgSerializer,
+    BytesValue,
+    CodeMetadata,
+    ContractFunction,
+    EndpointDefinition,
+    StringValue,
+} from "../smartcontracts";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
 import { Token, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
@@ -34,12 +41,14 @@ export class SmartContractTransactionsFactory {
     private readonly abi?: IAbi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
+    private readonly argSerializer: ArgSerializer;
 
     constructor(options: { config: Config; abi?: IAbi; tokenComputer: TokenComputer }) {
         this.config = options.config;
         this.abi = options.abi;
         this.tokenComputer = options.tokenComputer;
         this.dataArgsBuilder = new TokenTransfersDataBuilder();
+        this.argSerializer = new ArgSerializer();
     }
 
     createTransactionForDeploy(options: {
@@ -60,7 +69,14 @@ export class SmartContractTransactionsFactory {
         const isPayableBySmartContract = options.isPayableBySmartContract ?? true;
         const args = options.args || [];
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
-        let parts = [byteArrayToHex(options.bytecode), byteArrayToHex(VM_TYPE_WASM_VM), metadata.toString()];
+
+        let parts = [
+            ...this.argSerializer.valuesToStrings([
+                new BytesValue(Buffer.from(options.bytecode)),
+                new BytesValue(Buffer.from(VM_TYPE_WASM_VM)),
+            ]),
+            metadata.toString(),
+        ];
         const preparedArgs = this.argsToDataParts(args, this.abi?.constructorDefinition);
         parts = parts.concat(preparedArgs);
 
@@ -110,7 +126,11 @@ export class SmartContractTransactionsFactory {
             receiver = options.sender;
         }
 
-        dataParts.push(dataParts.length ? utf8ToHex(options.functionName) : options.functionName);
+        dataParts.push(
+            dataParts.length
+                ? this.argSerializer.valuesToStrings([new StringValue(options.functionName)])[0]
+                : options.functionName,
+        );
         dataParts = dataParts.concat(this.argsToDataParts(args, this.abi?.getEndpoint(options.functionName)));
 
         return new TransactionBuilder({
@@ -146,7 +166,11 @@ export class SmartContractTransactionsFactory {
         const args = options.args || [];
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
 
-        let parts = ["upgradeContract", byteArrayToHex(options.bytecode), metadata.toString()];
+        let parts = [
+            "upgradeContract",
+            this.argSerializer.valuesToStrings([new BytesValue(Buffer.from(options.bytecode))])[0],
+            metadata.toString(),
+        ];
         const preparedArgs = this.argsToDataParts(args, this.abi?.constructorDefinition);
         parts = parts.concat(preparedArgs);
 

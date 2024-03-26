@@ -2,8 +2,8 @@ import { Address } from "../address";
 import { DELEGATION_MANAGER_SC_ADDRESS } from "../constants";
 import { Err } from "../errors";
 import { IAddress } from "../interface";
+import { ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../smartcontracts";
 import { Transaction } from "../transaction";
-import { byteArrayToHex, numberToPaddedHex, utf8ToHex } from "../utils.codec";
 import { TransactionBuilder } from "./transactionBuilder";
 
 interface Config {
@@ -28,9 +28,11 @@ interface IValidatorPublicKey {
  */
 export class DelegationTransactionsFactory {
     private readonly config: Config;
+    private readonly argSerializer: ArgSerializer;
 
     constructor(options: { config: Config }) {
         this.config = options.config;
+        this.argSerializer = new ArgSerializer();
     }
 
     createTransactionForNewDelegationContract(options: {
@@ -41,8 +43,10 @@ export class DelegationTransactionsFactory {
     }): Transaction {
         const dataParts = [
             "createNewDelegationContract",
-            numberToPaddedHex(options.totalDelegationCap.toString()),
-            numberToPaddedHex(options.serviceFee.toString()),
+            ...this.argSerializer.valuesToStrings([
+                new BigUIntValue(options.totalDelegationCap),
+                new BigUIntValue(options.serviceFee),
+            ]),
         ];
 
         const executionGasLimit =
@@ -73,7 +77,12 @@ export class DelegationTransactionsFactory {
         const dataParts = ["addNodes"];
 
         for (let i = 0; i < numNodes; i++) {
-            dataParts.push(...[options.publicKeys[i].hex(), byteArrayToHex(options.signedMessages[i])]);
+            dataParts.push(
+                ...[
+                    options.publicKeys[i].hex(),
+                    this.argSerializer.valuesToStrings([new BytesValue(Buffer.from(options.signedMessages[i]))])[0],
+                ],
+            );
         }
 
         return new TransactionBuilder({
@@ -216,7 +225,10 @@ export class DelegationTransactionsFactory {
         delegationContract: IAddress;
         serviceFee: bigint;
     }): Transaction {
-        const dataParts = ["changeServiceFee", numberToPaddedHex(options.serviceFee)];
+        const dataParts = [
+            "changeServiceFee",
+            this.argSerializer.valuesToStrings([new BigUIntValue(options.serviceFee)])[0],
+        ];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
@@ -235,7 +247,10 @@ export class DelegationTransactionsFactory {
         delegationContract: IAddress;
         delegationCap: bigint;
     }): Transaction {
-        const dataParts = ["modifyTotalDelegationCap", numberToPaddedHex(options.delegationCap)];
+        const dataParts = [
+            "modifyTotalDelegationCap",
+            this.argSerializer.valuesToStrings([new BigUIntValue(options.delegationCap)])[0],
+        ];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
@@ -253,7 +268,7 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
     }): Transaction {
-        const dataParts = ["setAutomaticActivation", utf8ToHex("true")];
+        const dataParts = ["setAutomaticActivation", this.argSerializer.valuesToStrings([new StringValue("true")])[0]];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
@@ -271,7 +286,7 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
     }): Transaction {
-        const dataParts = ["setAutomaticActivation", utf8ToHex("false")];
+        const dataParts = ["setAutomaticActivation", this.argSerializer.valuesToStrings([new StringValue("false")])[0]];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
@@ -289,7 +304,10 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
     }): Transaction {
-        const dataParts = ["setCheckCapOnReDelegateRewards", utf8ToHex("true")];
+        const dataParts = [
+            "setCheckCapOnReDelegateRewards",
+            this.argSerializer.valuesToStrings([new StringValue("true")])[0],
+        ];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
@@ -307,7 +325,10 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
     }): Transaction {
-        const dataParts = ["setCheckCapOnReDelegateRewards", utf8ToHex("false")];
+        const dataParts = [
+            "setCheckCapOnReDelegateRewards",
+            this.argSerializer.valuesToStrings([new StringValue("false")])[0],
+        ];
         const gasLimit =
             this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
@@ -330,9 +351,11 @@ export class DelegationTransactionsFactory {
     }): Transaction {
         const dataParts = [
             "setMetaData",
-            utf8ToHex(options.name),
-            utf8ToHex(options.website),
-            utf8ToHex(options.identifier),
+            ...this.argSerializer.valuesToStrings([
+                new StringValue(options.name),
+                new StringValue(options.website),
+                new StringValue(options.identifier),
+            ]),
         ];
 
         const gasLimit =

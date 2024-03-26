@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { Address } from "../address";
 import { ErrBadUsage } from "../errors";
-import { Token, TokenComputer, TokenTransfer } from "../tokens";
+import { Token, TokenTransfer } from "../tokens";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 
@@ -9,7 +9,6 @@ describe("test transfer transcations factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });
     const transferFactory = new TransferTransactionsFactory({
         config: config,
-        tokenComputer: new TokenComputer(),
     });
 
     const alice = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -50,7 +49,7 @@ describe("test transfer transcations factory", function () {
             sender: alice,
             receiver: bob,
             nativeAmount: 1000000000000000000n,
-            data: "test data",
+            data: Buffer.from("test data"),
         });
 
         assert.equal(transaction.sender, alice.bech32());

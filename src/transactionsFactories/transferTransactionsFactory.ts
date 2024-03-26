@@ -18,7 +18,7 @@ import {
     U16Value,
     U64Value,
 } from "../smartcontracts";
-import { Token, TokenTransfer } from "../tokens";
+import { TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
@@ -36,10 +36,6 @@ interface IConfig {
     gasLimitMultiESDTNFTTransfer: bigint;
 }
 
-interface ITokenComputer {
-    isFungible(token: Token): boolean;
-}
-
 interface IGasEstimator {
     forEGLDTransfer(dataLength: number): number;
     forESDTTransfer(dataLength: number): number;
@@ -53,7 +49,7 @@ interface IGasEstimator {
 export class TransferTransactionsFactory {
     private readonly config?: IConfig;
     private readonly tokenTransfersDataBuilder?: TokenTransfersDataBuilder;
-    private readonly tokenComputer?: ITokenComputer;
+    private readonly tokenComputer?: TokenComputer;
     private readonly gasEstimator?: IGasEstimator;
 
     /**
@@ -62,12 +58,12 @@ export class TransferTransactionsFactory {
      * The legacy version contains methods like `createEGLDTransfer`, `createESDTTransfer`, `createESDTNFTTransfer` and `createMultiESDTNFTTransfer`.
      * This was done in order to minimize breaking changes in client code.
      */
-    constructor(options: IGasEstimator | { config: IConfig; tokenComputer: ITokenComputer }) {
+    constructor(options: IGasEstimator | { config: IConfig }) {
         if (this.isGasEstimator(options)) {
             this.gasEstimator = options;
         } else {
             this.config = options.config;
-            this.tokenComputer = options.tokenComputer;
+            this.tokenComputer = new TokenComputer();
             this.tokenTransfersDataBuilder = new TokenTransfersDataBuilder();
         }
     }
@@ -104,17 +100,17 @@ export class TransferTransactionsFactory {
         sender: IAddress;
         receiver: IAddress;
         nativeAmount: bigint;
-        data?: string;
+        data?: Uint8Array;
     }): Transaction {
         this.ensureMembersAreDefined();
 
-        const data = options.data || "";
+        const data = options.data || new Uint8Array();
 
         return new TransactionBuilder({
             config: this.config!,
             sender: options.sender,
             receiver: options.receiver,
-            dataParts: [data],
+            dataParts: [Buffer.from(data).toString()],
             gasLimit: 0n,
             addDataMovementGas: true,
             amount: options.nativeAmount,

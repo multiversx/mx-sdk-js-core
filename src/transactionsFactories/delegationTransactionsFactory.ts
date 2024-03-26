@@ -73,16 +73,16 @@ export class DelegationTransactionsFactory {
             throw new Err("The number of public keys should match the number of signed messages");
         }
 
+        const signedMessagesAsTypedValues = options.signedMessages.map(
+            (message) => new BytesValue(Buffer.from(message)),
+        );
+        const messagesAsStrings = this.argSerializer.valuesToStrings(signedMessagesAsTypedValues);
+
         const numNodes = options.publicKeys.length;
         const dataParts = ["addNodes"];
 
         for (let i = 0; i < numNodes; i++) {
-            dataParts.push(
-                ...[
-                    options.publicKeys[i].hex(),
-                    this.argSerializer.valuesToStrings([new BytesValue(Buffer.from(options.signedMessages[i]))])[0],
-                ],
-            );
+            dataParts.push(...[options.publicKeys[i].hex(), messagesAsStrings[i]]);
         }
 
         return new TransactionBuilder({

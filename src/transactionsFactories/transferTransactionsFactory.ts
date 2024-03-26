@@ -110,7 +110,7 @@ export class TransferTransactionsFactory {
             config: this.config!,
             sender: options.sender,
             receiver: options.receiver,
-            dataParts: [Buffer.from(data).toString()],
+            dataParts: [Buffer.from(data).toString("utf8")],
             gasLimit: 0n,
             addDataMovementGas: true,
             amount: options.nativeAmount,

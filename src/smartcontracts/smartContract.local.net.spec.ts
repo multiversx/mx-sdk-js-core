@@ -12,7 +12,6 @@ import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifier
 import { BytesValue } from "./typesystem/bytes";
 import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
-import { TokenComputer } from "../tokens";
 import { promises } from "fs";
 import { TransactionComputer } from "../transactionComputer";
 
@@ -26,7 +25,9 @@ describe("test on local testnet", function () {
         ({ alice, bob, carol } = await loadTestWallets());
 
         watcher = new TransactionWatcher({
-            getTransaction: async (hash: string) => { return await provider.getTransaction(hash, true) }
+            getTransaction: async (hash: string) => {
+                return await provider.getTransaction(hash, true);
+            },
         });
     });
 
@@ -48,7 +49,7 @@ describe("test on local testnet", function () {
             codePath: "src/testdata/counter.wasm",
             gasLimit: 3000000,
             initArguments: [],
-            chainID: network.ChainID
+            chainID: network.ChainID,
         });
 
         // ++
@@ -56,7 +57,7 @@ describe("test on local testnet", function () {
             func: new ContractFunction("increment"),
             gasLimit: 3000000,
             chainID: network.ChainID,
-            caller: alice.address
+            caller: alice.address,
         });
         transactionIncrement.setNonce(alice.account.nonce);
         transactionIncrement.applySignature(await alice.signer.sign(transactionIncrement.serializeForSigning()));
@@ -68,7 +69,7 @@ describe("test on local testnet", function () {
             func: new ContractFunction("increment"),
             gasLimit: 100000,
             chainID: network.ChainID,
-            caller: alice.address
+            caller: alice.address,
         });
         simulateOne.setSender(alice.address);
 
@@ -76,7 +77,7 @@ describe("test on local testnet", function () {
             func: new ContractFunction("foobar"),
             gasLimit: 500000,
             chainID: network.ChainID,
-            caller: alice.address
+            caller: alice.address,
         });
         simulateTwo.setSender(alice.address);
 
@@ -123,7 +124,7 @@ describe("test on local testnet", function () {
             codePath: "src/testdata/counter.wasm",
             gasLimit: 3000000,
             initArguments: [],
-            chainID: network.ChainID
+            chainID: network.ChainID,
         });
 
         // ++
@@ -131,10 +132,12 @@ describe("test on local testnet", function () {
             func: new ContractFunction("increment"),
             gasLimit: 2000000,
             chainID: network.ChainID,
-            caller: alice.address
+            caller: alice.address,
         });
         transactionIncrementFirst.setNonce(alice.account.nonce);
-        transactionIncrementFirst.applySignature(await alice.signer.sign(transactionIncrementFirst.serializeForSigning()));
+        transactionIncrementFirst.applySignature(
+            await alice.signer.sign(transactionIncrementFirst.serializeForSigning()),
+        );
 
         alice.account.incrementNonce();
 
@@ -143,10 +146,12 @@ describe("test on local testnet", function () {
             func: new ContractFunction("increment"),
             gasLimit: 2000000,
             chainID: network.ChainID,
-            caller: alice.address
+            caller: alice.address,
         });
         transactionIncrementSecond.setNonce(alice.account.nonce);
-        transactionIncrementSecond.applySignature(await alice.signer.sign(transactionIncrementSecond.serializeForSigning()));
+        transactionIncrementSecond.applySignature(
+            await alice.signer.sign(transactionIncrementSecond.serializeForSigning()),
+        );
 
         alice.account.incrementNonce();
 
@@ -183,7 +188,7 @@ describe("test on local testnet", function () {
             codePath: "src/testdata/erc20.wasm",
             gasLimit: 50000000,
             initArguments: [new U32Value(10000)],
-            chainID: network.ChainID
+            chainID: network.ChainID,
         });
 
         // Minting
@@ -192,7 +197,7 @@ describe("test on local testnet", function () {
             gasLimit: 9000000,
             args: [new AddressValue(bob.address), new U32Value(1000)],
             chainID: network.ChainID,
-            caller: alice.address
+            caller: alice.address,
         });
 
         let transactionMintCarol = contract.call({
@@ -200,7 +205,7 @@ describe("test on local testnet", function () {
             gasLimit: 9000000,
             args: [new AddressValue(carol.address), new U32Value(1500)],
             chainID: network.ChainID,
-            caller: alice.address
+            caller: alice.address,
         });
 
         // Apply nonces and sign the remaining transactions
@@ -228,7 +233,7 @@ describe("test on local testnet", function () {
 
         query = contract.createQuery({
             func: new ContractFunction("balanceOf"),
-            args: [new AddressValue(alice.address)]
+            args: [new AddressValue(alice.address)],
         });
         queryResponse = await provider.queryContract(query);
 
@@ -236,7 +241,7 @@ describe("test on local testnet", function () {
 
         query = contract.createQuery({
             func: new ContractFunction("balanceOf"),
-            args: [new AddressValue(bob.address)]
+            args: [new AddressValue(bob.address)],
         });
         queryResponse = await provider.queryContract(query);
 
@@ -244,7 +249,7 @@ describe("test on local testnet", function () {
 
         query = contract.createQuery({
             func: new ContractFunction("balanceOf"),
-            args: [new AddressValue(carol.address)]
+            args: [new AddressValue(carol.address)],
         });
         queryResponse = await provider.queryContract(query);
 
@@ -269,7 +274,7 @@ describe("test on local testnet", function () {
             codePath: "src/testdata/lottery-esdt.wasm",
             gasLimit: 50000000,
             initArguments: [],
-            chainID: network.ChainID
+            chainID: network.ChainID,
         });
 
         // Start
@@ -285,7 +290,7 @@ describe("test on local testnet", function () {
                 OptionValue.newProvided(new U32Value(1)),
                 OptionValue.newMissing(),
                 OptionValue.newMissing(),
-                OptionalValue.newMissing()
+                OptionalValue.newMissing(),
             ],
             chainID: network.ChainID,
             caller: alice.address,
@@ -314,18 +319,14 @@ describe("test on local testnet", function () {
         // Query state, do some assertions
         let query = contract.createQuery({
             func: new ContractFunction("status"),
-            args: [
-                BytesValue.fromUTF8("lucky")
-            ]
+            args: [BytesValue.fromUTF8("lucky")],
         });
         let queryResponse = await provider.queryContract(query);
         assert.equal(decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]), 1);
 
         query = contract.createQuery({
             func: new ContractFunction("status"),
-            args: [
-                BytesValue.fromUTF8("missingLottery")
-            ]
+            args: [BytesValue.fromUTF8("missingLottery")],
         });
         queryResponse = await provider.queryContract(query);
         assert.equal(decodeUnsignedNumber(queryResponse.getReturnDataParts()[0]), 0);
@@ -342,7 +343,7 @@ describe("test on local testnet", function () {
 
         const transactionComputer = new TransactionComputer();
         const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
-        const factory = new SmartContractTransactionsFactory({ config: config, tokenComputer: new TokenComputer() });
+        const factory = new SmartContractTransactionsFactory({ config: config });
 
         let bytecode = await promises.readFile("src/testdata/counter.wasm");
 

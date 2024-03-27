@@ -4,7 +4,6 @@ import { Compatibility } from "../compatibility";
 import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
 import { ErrContractHasNoAddress } from "../errors";
 import { IAddress, INonce } from "../interface";
-import { TokenComputer } from "../tokens";
 import { Transaction } from "../transaction";
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
 import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
@@ -121,7 +120,6 @@ export class SmartContract implements ISmartContract {
         const factory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi,
-            tokenComputer: new TokenComputer()
         });
 
         const bytecode = Buffer.from(code.toString(), 'hex');
@@ -180,7 +178,6 @@ export class SmartContract implements ISmartContract {
         const factory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi,
-            tokenComputer: new TokenComputer()
         });
 
         const bytecode = Uint8Array.from(Buffer.from(code.toString(), 'hex'));
@@ -217,7 +214,6 @@ export class SmartContract implements ISmartContract {
         const factory = new SmartContractTransactionsFactory({
             config: config,
             abi: this.abi,
-            tokenComputer: new TokenComputer()
         });
 
         args = args || [];

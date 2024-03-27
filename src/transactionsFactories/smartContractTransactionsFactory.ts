@@ -4,7 +4,7 @@ import { Err, ErrBadUsage } from "../errors";
 import { IAddress } from "../interface";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
-import { Token, TokenTransfer } from "../tokens";
+import { TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { byteArrayToHex, utf8ToHex } from "../utils.codec";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
@@ -22,10 +22,6 @@ interface IAbi {
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
 }
 
-interface TokenComputer {
-    isFungible(token: Token): boolean;
-}
-
 /**
  * Use this class to create transactions to deploy, call or upgrade a smart contract.
  */
@@ -35,10 +31,10 @@ export class SmartContractTransactionsFactory {
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
 
-    constructor(options: { config: Config; abi?: IAbi; tokenComputer: TokenComputer }) {
+    constructor(options: { config: Config; abi?: IAbi }) {
         this.config = options.config;
         this.abi = options.abi;
-        this.tokenComputer = options.tokenComputer;
+        this.tokenComputer = new TokenComputer();
         this.dataArgsBuilder = new TokenTransfersDataBuilder();
     }
 

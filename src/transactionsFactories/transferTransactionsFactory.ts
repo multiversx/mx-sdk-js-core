@@ -106,15 +106,14 @@ export class TransferTransactionsFactory {
 
         const data = options.data || new Uint8Array();
 
-        return new TransactionBuilder({
-            config: this.config!,
-            sender: options.sender,
-            receiver: options.receiver,
-            dataParts: [Buffer.from(data).toString("utf8")],
-            gasLimit: 0n,
-            addDataMovementGas: true,
-            amount: options.nativeAmount,
-        }).build();
+        return new Transaction({
+            sender: options.sender.bech32(),
+            receiver: options.receiver.bech32(),
+            chainID: this.config!.chainID,
+            gasLimit: this.computeGasForMoveBalance(this.config!, data),
+            data: data,
+            value: options.nativeAmount,
+        });
     }
 
     createTransactionForESDTTokenTransfer(options: {
@@ -361,5 +360,9 @@ export class TransferTransactionsFactory {
             gasLimit: extraGasForTransfer,
             addDataMovementGas: true,
         }).build();
+    }
+
+    private computeGasForMoveBalance(config: IConfig, data: Uint8Array): bigint {
+        return config.minGasLimit + config.gasLimitPerByte * BigInt(data.length);
     }
 }

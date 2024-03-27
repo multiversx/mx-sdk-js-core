@@ -9,6 +9,9 @@ interface Config {
     gasLimitPerByte: bigint;
 }
 
+/**
+ * @internal
+ */
 export class TransactionBuilder {
     private config: Config;
     private sender: IAddress;

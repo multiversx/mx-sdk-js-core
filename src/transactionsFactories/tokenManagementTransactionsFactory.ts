@@ -65,17 +65,17 @@ export class TokenManagementTransactionsFactory {
             new BigUIntValue(options.initialSupply),
             new BigUIntValue(options.numDecimals),
             new StringValue("canFreeze"),
-            new StringValue(options.canFreeze ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canFreeze)),
             new StringValue("canWipe"),
-            new StringValue(options.canWipe ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canWipe)),
             new StringValue("canPause"),
-            new StringValue(options.canPause ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canPause)),
             new StringValue("canChangeOwner"),
-            new StringValue(options.canChangeOwner ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canChangeOwner)),
             new StringValue("canUpgrade"),
-            new StringValue(options.canUpgrade ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canUpgrade)),
             new StringValue("canAddSpecialRoles"),
-            new StringValue(options.canAddSpecialRoles ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canAddSpecialRoles)),
         ];
 
         const dataParts = ["issue", ...this.argSerializer.valuesToStrings(args)];
@@ -109,19 +109,19 @@ export class TokenManagementTransactionsFactory {
             new StringValue(options.tokenName),
             new StringValue(options.tokenTicker),
             new StringValue("canFreeze"),
-            new StringValue(options.canFreeze ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canFreeze)),
             new StringValue("canWipe"),
-            new StringValue(options.canWipe ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canWipe)),
             new StringValue("canPause"),
-            new StringValue(options.canPause ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canPause)),
             new StringValue("canTransferNFTCreateRole"),
-            new StringValue(options.canTransferNFTCreateRole ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canTransferNFTCreateRole)),
             new StringValue("canChangeOwner"),
-            new StringValue(options.canChangeOwner ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canChangeOwner)),
             new StringValue("canUpgrade"),
-            new StringValue(options.canUpgrade ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canUpgrade)),
             new StringValue("canAddSpecialRoles"),
-            new StringValue(options.canAddSpecialRoles ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canAddSpecialRoles)),
         ];
 
         const dataParts = ["issueSemiFungible", ...this.argSerializer.valuesToStrings(args)];
@@ -155,19 +155,19 @@ export class TokenManagementTransactionsFactory {
             new StringValue(options.tokenName),
             new StringValue(options.tokenTicker),
             new StringValue("canFreeze"),
-            new StringValue(options.canFreeze ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canFreeze)),
             new StringValue("canWipe"),
-            new StringValue(options.canWipe ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canWipe)),
             new StringValue("canPause"),
-            new StringValue(options.canPause ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canPause)),
             new StringValue("canTransferNFTCreateRole"),
-            new StringValue(options.canTransferNFTCreateRole ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canTransferNFTCreateRole)),
             new StringValue("canChangeOwner"),
-            new StringValue(options.canChangeOwner ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canChangeOwner)),
             new StringValue("canUpgrade"),
-            new StringValue(options.canUpgrade ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canUpgrade)),
             new StringValue("canAddSpecialRoles"),
-            new StringValue(options.canAddSpecialRoles ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canAddSpecialRoles)),
         ];
 
         const dataParts = ["issueNonFungible", ...this.argSerializer.valuesToStrings(args)];
@@ -203,19 +203,19 @@ export class TokenManagementTransactionsFactory {
             new StringValue(options.tokenTicker),
             new BigUIntValue(options.numDecimals),
             new StringValue("canFreeze"),
-            new StringValue(options.canFreeze ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canFreeze)),
             new StringValue("canWipe"),
-            new StringValue(options.canWipe ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canWipe)),
             new StringValue("canPause"),
-            new StringValue(options.canPause ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canPause)),
             new StringValue("canTransferNFTCreateRole"),
-            new StringValue(options.canTransferNFTCreateRole ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canTransferNFTCreateRole)),
             new StringValue("canChangeOwner"),
-            new StringValue(options.canChangeOwner ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canChangeOwner)),
             new StringValue("canUpgrade"),
-            new StringValue(options.canUpgrade ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canUpgrade)),
             new StringValue("canAddSpecialRoles"),
-            new StringValue(options.canAddSpecialRoles ? this.trueAsString : this.falseAsString),
+            new StringValue(this.boolToString(options.canAddSpecialRoles)),
         ];
 
         const dataParts = ["registerMetaESDT", ...this.argSerializer.valuesToStrings(args)];
@@ -264,7 +264,7 @@ export class TokenManagementTransactionsFactory {
     createTransactionForSettingBurnRoleGlobally(options: { sender: IAddress; tokenIdentifier: string }): Transaction {
         const dataParts = [
             "setBurnRoleGlobally",
-            this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)])[0],
+            ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
         ];
 
         return new TransactionBuilder({
@@ -280,7 +280,7 @@ export class TokenManagementTransactionsFactory {
     createTransactionForUnsettingBurnRoleGlobally(options: { sender: IAddress; tokenIdentifier: string }): Transaction {
         const dataParts = [
             "unsetBurnRoleGlobally",
-            this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)])[0],
+            ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
         ];
 
         return new TransactionBuilder({
@@ -302,8 +302,8 @@ export class TokenManagementTransactionsFactory {
     }): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.addRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : args.push(...[]);
-        options.addRoleLocalBurn ? args.push(new StringValue("ESDTRoleLocalBurn")) : args.push(...[]);
+        options.addRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
+        options.addRoleLocalBurn ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -328,10 +328,10 @@ export class TokenManagementTransactionsFactory {
     }): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.addRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : args.push(...[]);
-        options.addRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : args.push(...[]);
-        options.addRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : args.push(...[]);
-        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : args.push(...[]);
+        options.addRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
+        options.addRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
+        options.addRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
+        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -369,13 +369,11 @@ export class TokenManagementTransactionsFactory {
     }): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.addRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : args.push(...[]);
-        options.addRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : args.push(...[]);
-        options.addRoleNFTUpdateAttributes
-            ? args.push(new StringValue("ESDTRoleNFTUpdateAttributes"))
-            : args.push(...[]);
-        options.addRoleNFTAddURI ? args.push(new StringValue("ESDTRoleNFTAddURI")) : args.push(...[]);
-        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : args.push(...[]);
+        options.addRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
+        options.addRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
+        options.addRoleNFTUpdateAttributes ? args.push(new StringValue("ESDTRoleNFTUpdateAttributes")) : 0;
+        options.addRoleNFTAddURI ? args.push(new StringValue("ESDTRoleNFTAddURI")) : 0;
+        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -427,7 +425,7 @@ export class TokenManagementTransactionsFactory {
     }
 
     createTransactionForPausing(options: { sender: IAddress; tokenIdentifier: string }): Transaction {
-        const dataParts = ["pause", this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)])[0]];
+        const dataParts = ["pause", ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)])];
 
         return new TransactionBuilder({
             config: this.config,
@@ -442,7 +440,7 @@ export class TokenManagementTransactionsFactory {
     createTransactionForUnpausing(options: { sender: IAddress; tokenIdentifier: string }): Transaction {
         const dataParts = [
             "unPause",
-            this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)])[0],
+            ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
         ];
 
         return new TransactionBuilder({
@@ -644,5 +642,13 @@ IMPORTANT!
 ==========
 You are about to issue (register) a new token. This will set the role "ESDTRoleBurnForAll" (globally).
 Once the token is registered, you can unset this role by calling "unsetBurnRoleGlobally" (in a separate transaction).`);
+    }
+
+    private boolToString(value: boolean): string {
+        if (value) {
+            return this.trueAsString;
+        }
+
+        return this.falseAsString;
     }
 }

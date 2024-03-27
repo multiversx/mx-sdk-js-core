@@ -6,7 +6,7 @@ import { U32Value } from "../smartcontracts";
 import { Code } from "../smartcontracts/code";
 import { AbiRegistry } from "../smartcontracts/typesystem/abiRegistry";
 import { loadAbiRegistry, loadContractCode } from "../testutils/utils";
-import { Token, TokenComputer, TokenTransfer } from "../tokens";
+import { Token, TokenTransfer } from "../tokens";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
@@ -20,7 +20,6 @@ describe("test smart contract transactions factory", function () {
     before(async function () {
         smartContractFactory = new SmartContractTransactionsFactory({
             config: config,
-            tokenComputer: new TokenComputer(),
         });
 
         adderByteCode = await loadContractCode("src/testdata/adder.wasm");
@@ -29,7 +28,6 @@ describe("test smart contract transactions factory", function () {
         abiAwareFactory = new SmartContractTransactionsFactory({
             config: config,
             abi: abiRegistry,
-            tokenComputer: new TokenComputer(),
         });
     });
 

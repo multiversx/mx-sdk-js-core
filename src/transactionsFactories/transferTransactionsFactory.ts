@@ -18,7 +18,7 @@ import {
     U16Value,
     U64Value,
 } from "../smartcontracts";
-import { Token, TokenTransfer } from "../tokens";
+import { TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
@@ -36,10 +36,6 @@ interface IConfig {
     gasLimitMultiESDTNFTTransfer: bigint;
 }
 
-interface ITokenComputer {
-    isFungible(token: Token): boolean;
-}
-
 interface IGasEstimator {
     forEGLDTransfer(dataLength: number): number;
     forESDTTransfer(dataLength: number): number;
@@ -52,8 +48,8 @@ interface IGasEstimator {
  */
 export class TransferTransactionsFactory {
     private readonly config?: IConfig;
-    private readonly dataArgsBuilder?: TokenTransfersDataBuilder;
-    private readonly tokenComputer?: ITokenComputer;
+    private readonly tokenTransfersDataBuilder?: TokenTransfersDataBuilder;
+    private readonly tokenComputer?: TokenComputer;
     private readonly gasEstimator?: IGasEstimator;
 
     /**
@@ -62,13 +58,13 @@ export class TransferTransactionsFactory {
      * The legacy version contains methods like `createEGLDTransfer`, `createESDTTransfer`, `createESDTNFTTransfer` and `createMultiESDTNFTTransfer`.
      * This was done in order to minimize breaking changes in client code.
      */
-    constructor(options: IGasEstimator | { config: IConfig; tokenComputer: ITokenComputer }) {
+    constructor(options: IGasEstimator | { config: IConfig }) {
         if (this.isGasEstimator(options)) {
             this.gasEstimator = options;
         } else {
             this.config = options.config;
-            this.tokenComputer = options.tokenComputer;
-            this.dataArgsBuilder = new TokenTransfersDataBuilder();
+            this.tokenComputer = new TokenComputer();
+            this.tokenTransfersDataBuilder = new TokenTransfersDataBuilder();
         }
     }
 
@@ -91,7 +87,7 @@ export class TransferTransactionsFactory {
             throw new Err("'config' is not defined");
         }
 
-        if (this.dataArgsBuilder === undefined) {
+        if (this.tokenTransfersDataBuilder === undefined) {
             throw new Err("`dataArgsBuilder is not defined`");
         }
 
@@ -104,21 +100,20 @@ export class TransferTransactionsFactory {
         sender: IAddress;
         receiver: IAddress;
         nativeAmount: bigint;
-        data?: string;
+        data?: Uint8Array;
     }): Transaction {
         this.ensureMembersAreDefined();
 
-        const data = options.data || "";
+        const data = options.data || new Uint8Array();
 
-        return new TransactionBuilder({
-            config: this.config!,
-            sender: options.sender,
-            receiver: options.receiver,
-            dataParts: [data],
-            gasLimit: 0n,
-            addDataMovementGas: true,
-            amount: options.nativeAmount,
-        }).build();
+        return new Transaction({
+            sender: options.sender.bech32(),
+            receiver: options.receiver.bech32(),
+            chainID: this.config!.chainID,
+            gasLimit: this.computeGasForMoveBalance(this.config!, data),
+            data: data,
+            value: options.nativeAmount,
+        });
     }
 
     createTransactionForESDTTokenTransfer(options: {
@@ -138,7 +133,7 @@ export class TransferTransactionsFactory {
             return this.createSingleESDTTransferTransaction(options);
         }
 
-        const transferArgs = this.dataArgsBuilder!.buildArgsForMultiESDTNFTTransfer(
+        const dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForMultiESDTNFTTransfer(
             options.receiver,
             options.tokenTransfers,
         );
@@ -151,7 +146,7 @@ export class TransferTransactionsFactory {
             config: this.config!,
             sender: options.sender,
             receiver: options.sender,
-            dataParts: transferArgs,
+            dataParts: dataParts,
             gasLimit: extraGasForTransfer,
             addDataMovementGas: true,
         }).build();
@@ -343,16 +338,16 @@ export class TransferTransactionsFactory {
     }): Transaction {
         this.ensureMembersAreDefined();
 
-        let transferArgs: string[] = [];
+        let dataParts: string[] = [];
         const transfer = options.tokenTransfers[0];
         let extraGasForTransfer = 0n;
         let receiver = options.receiver;
 
         if (this.tokenComputer!.isFungible(transfer.token)) {
-            transferArgs = this.dataArgsBuilder!.buildArgsForESDTTransfer(transfer);
+            dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForESDTTransfer(transfer);
             extraGasForTransfer = this.config!.gasLimitESDTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_TRANSFER);
         } else {
-            transferArgs = this.dataArgsBuilder!.buildArgsForSingleESDTNFTTransfer(transfer, receiver);
+            dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForSingleESDTNFTTransfer(transfer, receiver);
             extraGasForTransfer = this.config!.gasLimitESDTNFTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER);
             receiver = options.sender;
         }
@@ -361,9 +356,13 @@ export class TransferTransactionsFactory {
             config: this.config!,
             sender: options.sender,
             receiver: receiver,
-            dataParts: transferArgs,
+            dataParts: dataParts,
             gasLimit: extraGasForTransfer,
             addDataMovementGas: true,
         }).build();
+    }
+
+    private computeGasForMoveBalance(config: IConfig, data: Uint8Array): bigint {
+        return config.minGasLimit + config.gasLimitPerByte * BigInt(data.length);
     }
 }

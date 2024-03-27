@@ -20,9 +20,9 @@ export class Token {
     readonly identifier: string;
     readonly nonce: bigint;
 
-    constructor(options: { identifier: string; nonce: bigint }) {
+    constructor(options: { identifier: string; nonce?: bigint }) {
         this.identifier = options.identifier;
-        this.nonce = options.nonce;
+        this.nonce = options.nonce || 0n;
     }
 }
 

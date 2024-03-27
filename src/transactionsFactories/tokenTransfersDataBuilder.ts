@@ -1,47 +1,56 @@
 import { IAddress } from "../interface";
+import { ArgSerializer } from "../smartcontracts/argSerializer";
+import { AddressValue, BigUIntValue, TokenIdentifierValue, TypedValue, U32Value } from "../smartcontracts/typesystem";
 import { TokenComputer, TokenTransfer } from "../tokens";
-import { addressToHex, numberToPaddedHex, utf8ToHex } from "../utils.codec";
 
 export class TokenTransfersDataBuilder {
     private tokenComputer: TokenComputer;
+    private argsSerializer: ArgSerializer;
 
     constructor() {
         this.tokenComputer = new TokenComputer();
+        this.argsSerializer = new ArgSerializer();
     }
 
-    buildArgsForESDTTransfer(transfer: TokenTransfer): string[] {
-        let args = ["ESDTTransfer"];
-        args.push(...[utf8ToHex(transfer.token.identifier), numberToPaddedHex(transfer.amount)]);
-        return args;
+    buildDataPartsForESDTTransfer(transfer: TokenTransfer): string[] {
+        const args = this.argsSerializer.valuesToStrings([
+            new TokenIdentifierValue(transfer.token.identifier),
+            new BigUIntValue(transfer.amount),
+        ]);
+
+        return ["ESDTTransfer", ...args];
     }
 
-    buildArgsForSingleESDTNFTTransfer(transfer: TokenTransfer, receiver: IAddress) {
-        let args = ["ESDTNFTTransfer"];
-
+    buildDataPartsForSingleESDTNFTTransfer(transfer: TokenTransfer, receiver: IAddress) {
         const token = transfer.token;
         const identifier = this.tokenComputer.extractIdentifierFromExtendedIdentifier(token.identifier);
 
-        args.push(
-            ...[
-                utf8ToHex(identifier),
-                numberToPaddedHex(token.nonce),
-                numberToPaddedHex(transfer.amount),
-                addressToHex(receiver),
-            ],
-        );
-        return args;
+        const args = this.argsSerializer.valuesToStrings([
+            new TokenIdentifierValue(identifier),
+            new BigUIntValue(token.nonce),
+            new BigUIntValue(transfer.amount),
+            new AddressValue(receiver),
+        ]);
+
+        return ["ESDTNFTTransfer", ...args];
     }
 
-    buildArgsForMultiESDTNFTTransfer(receiver: IAddress, transfers: TokenTransfer[]) {
-        let args = ["MultiESDTNFTTransfer", addressToHex(receiver), numberToPaddedHex(transfers.length)];
+    buildDataPartsForMultiESDTNFTTransfer(receiver: IAddress, transfers: TokenTransfer[]) {
+        const argsTyped: TypedValue[] = [new AddressValue(receiver), new U32Value(transfers.length)];
 
-        for (let transfer of transfers) {
+        for (const transfer of transfers) {
             const identifier = this.tokenComputer.extractIdentifierFromExtendedIdentifier(transfer.token.identifier);
-            args.push(
-                ...[utf8ToHex(identifier), numberToPaddedHex(transfer.token.nonce), numberToPaddedHex(transfer.amount)],
+
+            argsTyped.push(
+                ...[
+                    new TokenIdentifierValue(identifier),
+                    new BigUIntValue(transfer.token.nonce),
+                    new BigUIntValue(transfer.amount),
+                ],
             );
         }
 
-        return args;
+        const args = this.argsSerializer.valuesToStrings(argsTyped);
+        return ["MultiESDTNFTTransfer", ...args];
     }
 }

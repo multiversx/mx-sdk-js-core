@@ -5,7 +5,7 @@ describe("test tokens and token computer", async () => {
     const tokenComputer = new TokenComputer();
 
     it("should test if token is fungible", async () => {
-        const fungibleToken = new Token({ identifier: "TEST-123456", nonce: 0n });
+        const fungibleToken = new Token({ identifier: "TEST-123456" });
         const nonFungibleToken = new Token({ identifier: "NFT-987654", nonce: 7n });
 
         assert.equal(tokenComputer.isFungible(fungibleToken), true);

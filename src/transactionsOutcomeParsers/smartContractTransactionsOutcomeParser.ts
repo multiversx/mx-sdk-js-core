@@ -65,10 +65,8 @@ export class SmartContractTransactionsOutcomeParser {
         const topicForOwnerAddress = event.topics[1];
         const topicForCodeHash = event.topics[2];
 
-        const address = topicForAddress?.length ? Address.fromBuffer(Buffer.from(topicForAddress)).toBech32() : "";
-        const ownerAddress = topicForOwnerAddress?.length
-            ? Address.fromBuffer(Buffer.from(topicForOwnerAddress)).toBech32()
-            : "";
+        const address = topicForAddress?.length ? new Address(topicForAddress).toBech32() : "";
+        const ownerAddress = topicForOwnerAddress?.length ? new Address(topicForOwnerAddress).toBech32() : "";
         const codeHash = topicForCodeHash;
 
         return {

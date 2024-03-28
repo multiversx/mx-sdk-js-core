@@ -9,11 +9,14 @@ describe("test address", () => {
     let bobHex = "8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8";
 
     it("should create address", async () => {
-        let alice = new Address(aliceBech32);
-        let bob = new Address(bobBech32);
+        assert.equal(new Address(aliceBech32).toHex(), aliceHex);
+        assert.equal(new Address(bobBech32).toHex(), bobHex);
 
-        assert.equal(alice.hex(), aliceHex);
-        assert.equal(bob.hex(), bobHex);
+        assert.equal(new Address(Buffer.from(aliceHex, "hex")).toHex(), aliceHex);
+        assert.equal(new Address(Buffer.from(bobHex, "hex")).toHex(), bobHex);
+
+        assert.equal(new Address(new Uint8Array(Buffer.from(aliceHex, "hex"))).toHex(), aliceHex);
+        assert.equal(new Address(new Uint8Array(Buffer.from(bobHex, "hex"))).toHex(), bobHex);
     });
 
     it("should create empty address", async () => {

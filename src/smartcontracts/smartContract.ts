@@ -1,7 +1,6 @@
-import BigNumber from "bignumber.js";
-import { Address } from "../address";
+import { Address, AddressComputer } from "../address";
 import { Compatibility } from "../compatibility";
-import { TRANSACTION_MIN_GAS_PRICE, WasmVirtualMachine } from "../constants";
+import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
 import { ErrContractHasNoAddress } from "../errors";
 import { IAddress, INonce } from "../interface";
 import { Transaction } from "../transaction";
@@ -9,14 +8,12 @@ import { SmartContractTransactionsFactory } from "../transactionsFactories/smart
 import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { guardValueIsSet } from "../utils";
 import { CodeMetadata } from "./codeMetadata";
-import { bigIntToBuffer } from "./codec/utils";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { CallArguments, DeployArguments, ICodeMetadata, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
 import { EndpointDefinition, TypedValue } from "./typesystem";
-const createKeccakHash = require("keccak");
 
 interface IAbi {
     constructorDefinition: EndpointDefinition;
@@ -259,26 +256,8 @@ export class SmartContract implements ISmartContract {
      * @param nonce The owner nonce used for the deployment transaction
      */
     static computeAddress(owner: IAddress, nonce: INonce): IAddress {
-        let initialPadding = Buffer.alloc(8, 0);
-        let ownerPubkey = new Address(owner.bech32()).pubkey();
-        let shardSelector = ownerPubkey.slice(30);
-        let ownerNonceBytes = Buffer.alloc(8);
-
-        const bigNonce = new BigNumber(nonce.valueOf().toString(10));
-        const bigNonceBuffer = bigIntToBuffer(bigNonce);
-        ownerNonceBytes.write(bigNonceBuffer.reverse().toString('hex'), 'hex');
-
-        let bytesToHash = Buffer.concat([ownerPubkey, ownerNonceBytes]);
-        let hash = createKeccakHash("keccak256").update(bytesToHash).digest();
-        let vmTypeBytes = Buffer.from(WasmVirtualMachine, "hex");
-        let addressBytes = Buffer.concat([
-            initialPadding,
-            vmTypeBytes,
-            hash.slice(10, 30),
-            shardSelector
-        ]);
-
-        let address = new Address(addressBytes);
-        return address;
+        const deployer = new Address(owner.bech32());
+        const addressComputer = new AddressComputer();
+        return addressComputer.computeContractAddress(deployer, BigInt(nonce.valueOf()));
     }
 }

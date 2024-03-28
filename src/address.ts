@@ -277,22 +277,21 @@ export class AddressComputer {
     }
 
     computeContractAddress(deployer: IAddress, deploymentNonce: bigint): Address {
-        let initialPadding = Buffer.alloc(8, 0);
-        let ownerPubkey = deployer.getPublicKey();
-        let shardSelector = ownerPubkey.slice(30);
-        let ownerNonceBytes = Buffer.alloc(8);
+        const initialPadding = Buffer.alloc(8, 0);
+        const ownerPubkey = deployer.getPublicKey();
+        const shardSelector = ownerPubkey.slice(30);
+        const ownerNonceBytes = Buffer.alloc(8);
 
         const bigNonce = new BigNumber(deploymentNonce.toString());
         const bigNonceBuffer = bigIntToBuffer(bigNonce);
         ownerNonceBytes.write(bigNonceBuffer.reverse().toString("hex"), "hex");
 
-        let bytesToHash = Buffer.concat([ownerPubkey, ownerNonceBytes]);
-        let hash = createKeccakHash("keccak256").update(bytesToHash).digest();
-        let vmTypeBytes = Buffer.from(WasmVirtualMachine, "hex");
-        let addressBytes = Buffer.concat([initialPadding, vmTypeBytes, hash.slice(10, 30), shardSelector]);
+        const bytesToHash = Buffer.concat([ownerPubkey, ownerNonceBytes]);
+        const hash = createKeccakHash("keccak256").update(bytesToHash).digest();
+        const vmTypeBytes = Buffer.from(WasmVirtualMachine, "hex");
+        const addressBytes = Buffer.concat([initialPadding, vmTypeBytes, hash.slice(10, 30), shardSelector]);
 
-        let address = new Address(addressBytes);
-        return address;
+        return new Address(addressBytes);
     }
 
     getShardOfAddress(address: IAddress): number {

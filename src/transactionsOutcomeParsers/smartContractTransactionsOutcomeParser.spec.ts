@@ -1,12 +1,52 @@
 import { ContractResultItem, ContractResults, TransactionOnNetwork } from "@multiversx/sdk-network-providers";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
+import { Address } from "../address";
 import { TransactionsConverter } from "../converters/transactionsConverter";
 import { loadAbiRegistry } from "../testutils";
-import { SmartContractCallOutcome, TransactionOutcome } from "./resources";
+import { SmartContractCallOutcome, TransactionEvent, TransactionLogs, TransactionOutcome } from "./resources";
 import { SmartContractTransactionsOutcomeParser } from "./smartContractTransactionsOutcomeParser";
 
 describe("test smart contract transactions outcome parser", () => {
+    it("parses deploy outcome (minimalistic)", async function () {
+        const parser = new SmartContractTransactionsOutcomeParser();
+
+        const parsed = parser.parseDeploy({
+            transactionOutcome: new TransactionOutcome({
+                directSmartContractCallOutcome: new SmartContractCallOutcome({
+                    returnCode: "ok",
+                    returnMessage: "ok",
+                }),
+                logs: new TransactionLogs({
+                    events: [
+                        new TransactionEvent({
+                            identifier: "SCDeploy",
+                            topics: [
+                                Address.fromBech32(
+                                    "erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj",
+                                ).getPublicKey(),
+                                Address.fromBech32(
+                                    "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+                                ).getPublicKey(),
+                                Buffer.from("abba", "hex"),
+                            ],
+                        }),
+                    ],
+                }),
+            }),
+        });
+
+        assert.equal(parsed.returnCode, "ok");
+        assert.equal(parsed.returnMessage, "ok");
+        assert.deepEqual(parsed.contracts, [
+            {
+                address: "erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj",
+                ownerAddress: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+                codeHash: Buffer.from("abba", "hex"),
+            },
+        ]);
+    });
+
     it("parses execute outcome, without ABI (minimalistic)", function () {
         const parser = new SmartContractTransactionsOutcomeParser();
 

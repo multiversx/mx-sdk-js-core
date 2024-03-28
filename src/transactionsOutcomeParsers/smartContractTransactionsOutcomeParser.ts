@@ -37,31 +37,45 @@ export class SmartContractTransactionsOutcomeParser {
     }
 
     parseDeploy(options: { transactionOutcome: TransactionOutcome }): {
-        values: any[];
         returnCode: string;
         returnMessage: string;
-        addresses: string[];
+        contracts: {
+            address: string;
+            ownerAddress: string;
+            codeHash: Uint8Array;
+        }[];
     } {
         const directCallOutcome = options.transactionOutcome.directSmartContractCallOutcome;
         const events = findEventsByIdentifier(options.transactionOutcome, "SCDeploy");
-        const addresses = events.map((event) => this.extractContractAddress(event));
+        const contracts = events.map((event) => this.parseScDeployEvent(event));
 
         return {
-            values: directCallOutcome.returnDataParts,
             returnCode: directCallOutcome.returnCode,
             returnMessage: directCallOutcome.returnMessage,
-            addresses: addresses,
+            contracts: contracts,
         };
     }
 
-    private extractContractAddress(event: TransactionEvent): string {
-        const firstTopic = event.topics[0];
+    private parseScDeployEvent(event: TransactionEvent): {
+        address: string;
+        ownerAddress: string;
+        codeHash: Uint8Array;
+    } {
+        const topicForAddress = event.topics[0];
+        const topicForOwnerAddress = event.topics[1];
+        const topicForCodeHash = event.topics[2];
 
-        if (!firstTopic?.length) {
-            return "";
-        }
+        const address = topicForAddress?.length ? Address.fromBuffer(Buffer.from(topicForAddress)).toBech32() : "";
+        const ownerAddress = topicForOwnerAddress?.length
+            ? Address.fromBuffer(Buffer.from(topicForOwnerAddress)).toBech32()
+            : "";
+        const codeHash = topicForCodeHash;
 
-        return Address.fromBuffer(Buffer.from(firstTopic)).toBech32();
+        return {
+            address,
+            ownerAddress,
+            codeHash,
+        };
     }
 
     parseExecute(options: { transactionOutcome: TransactionOutcome; function?: string }): {

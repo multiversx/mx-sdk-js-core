@@ -23,7 +23,7 @@ export class QueryRunnerAdapter {
     }
 
     async runQuery(query: SmartContractQuery): Promise<SmartContractQueryResponse> {
-        const legacyQuery: IQuery = {
+        const adaptedQuery: IQuery = {
             address: Address.fromBech32(query.contract),
             caller: query.caller ? Address.fromBech32(query.caller) : undefined,
             func: query.function,
@@ -31,14 +31,12 @@ export class QueryRunnerAdapter {
             getEncodedArguments: () => query.arguments.map((arg) => Buffer.from(arg).toString("hex")),
         };
 
-        const legacyQueryResponse = await this.networkProvider.queryContract(legacyQuery);
-        const queryResponse = new SmartContractQueryResponse({
+        const adaptedQueryResponse = await this.networkProvider.queryContract(adaptedQuery);
+        return new SmartContractQueryResponse({
             function: query.function,
-            returnCode: legacyQueryResponse.returnCode.toString(),
-            returnMessage: legacyQueryResponse.returnMessage,
-            returnDataParts: legacyQueryResponse.getReturnDataParts(),
+            returnCode: adaptedQueryResponse.returnCode.toString(),
+            returnMessage: adaptedQueryResponse.returnMessage,
+            returnDataParts: adaptedQueryResponse.getReturnDataParts(),
         });
-
-        return queryResponse;
     }
 }

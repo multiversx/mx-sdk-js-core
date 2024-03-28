@@ -154,7 +154,9 @@ export class TransactionWatcher {
             typeof transactionOrTxHash === "string" ? transactionOrTxHash : transactionOrTxHash.getHash().hex();
 
         if (hash.length !== HEX_TRANSACTION_HASH_LENGTH) {
-            throw new Err("Invalid transaction hash length. The length of a hex encoded hash should be 64.");
+            throw new Err(
+                `Invalid transaction hash length. The length of a hex encoded hash should be ${HEX_TRANSACTION_HASH_LENGTH}.`,
+            );
         }
 
         return hash;

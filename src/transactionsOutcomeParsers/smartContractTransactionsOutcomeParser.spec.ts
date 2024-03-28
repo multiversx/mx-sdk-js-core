@@ -16,8 +16,8 @@ import { SmartContractTransactionsOutcomeParser } from "./smartContractTransacti
 
 describe("test smart contract transactions outcome parser", () => {
     it("parses deploy outcome (minimalistic)", async function () {
-        const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj");
+        const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const codeHash = Buffer.from("abba", "hex");
 
         const parser = new SmartContractTransactionsOutcomeParser();
@@ -51,8 +51,8 @@ describe("test smart contract transactions outcome parser", () => {
     });
 
     it("parses deploy outcome", async function () {
-        const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj");
+        const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const codeHash = Buffer.from("abba", "hex");
 
         const parser = new SmartContractTransactionsOutcomeParser();
@@ -65,13 +65,19 @@ describe("test smart contract transactions outcome parser", () => {
                     new TransactionOnNetworkEvent({
                         identifier: "SCDeploy",
                         topics: [
-                            new TransactionEventTopic(deployer.getPublicKey().toString("base64")),
                             new TransactionEventTopic(contract.getPublicKey().toString("base64")),
+                            new TransactionEventTopic(deployer.getPublicKey().toString("base64")),
                             new TransactionEventTopic(codeHash.toString("base64")),
                         ],
                     }),
                 ],
             }),
+            contractResults: new ContractResults([
+                new ContractResultItem({
+                    nonce: 8,
+                    data: "@6f6b",
+                }),
+            ]),
         });
 
         const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);

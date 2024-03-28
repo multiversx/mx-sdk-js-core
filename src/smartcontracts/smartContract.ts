@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
 import { Compatibility } from "../compatibility";
-import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
+import { TRANSACTION_MIN_GAS_PRICE, WasmVirtualMachine } from "../constants";
 import { ErrContractHasNoAddress } from "../errors";
 import { IAddress, INonce } from "../interface";
 import { Transaction } from "../transaction";
@@ -15,7 +15,6 @@ import { Interaction } from "./interaction";
 import { CallArguments, DeployArguments, ICodeMetadata, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
 import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
-import { WasmVirtualMachine } from "./transactionPayloadBuilders";
 import { EndpointDefinition, TypedValue } from "./typesystem";
 const createKeccakHash = require("keccak");
 

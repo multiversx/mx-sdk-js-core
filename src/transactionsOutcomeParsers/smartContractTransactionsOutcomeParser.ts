@@ -1,6 +1,7 @@
+import { Address } from "../address";
 import { Err } from "../errors";
 import { EndpointDefinition, ResultsParser, ReturnCode, Type, UntypedOutcomeBundle } from "../smartcontracts";
-import { TransactionOutcome } from "./resources";
+import { TransactionEvent, TransactionOutcome, findEventsByIdentifier } from "./resources";
 
 interface IAbi {
     getEndpoint(name: string): EndpointDefinition;
@@ -33,6 +34,46 @@ export class SmartContractTransactionsOutcomeParser {
         // at least until "return data parts of direct outcome of contract call" are included on API & Proxy responses (on GET transaction),
         // we have to allow the same level of customization (for exotic flows).
         this.legacyResultsParser = options?.legacyResultsParser || new ResultsParser();
+    }
+
+    parseDeploy(options: { transactionOutcome: TransactionOutcome }): {
+        returnCode: string;
+        returnMessage: string;
+        contracts: {
+            address: string;
+            ownerAddress: string;
+            codeHash: Uint8Array;
+        }[];
+    } {
+        const directCallOutcome = options.transactionOutcome.directSmartContractCallOutcome;
+        const events = findEventsByIdentifier(options.transactionOutcome, "SCDeploy");
+        const contracts = events.map((event) => this.parseScDeployEvent(event));
+
+        return {
+            returnCode: directCallOutcome.returnCode,
+            returnMessage: directCallOutcome.returnMessage,
+            contracts: contracts,
+        };
+    }
+
+    private parseScDeployEvent(event: TransactionEvent): {
+        address: string;
+        ownerAddress: string;
+        codeHash: Uint8Array;
+    } {
+        const topicForAddress = event.topics[0];
+        const topicForOwnerAddress = event.topics[1];
+        const topicForCodeHash = event.topics[2];
+
+        const address = topicForAddress?.length ? new Address(topicForAddress).toBech32() : "";
+        const ownerAddress = topicForOwnerAddress?.length ? new Address(topicForOwnerAddress).toBech32() : "";
+        const codeHash = topicForCodeHash;
+
+        return {
+            address,
+            ownerAddress,
+            codeHash,
+        };
     }
 
     parseExecute(options: { transactionOutcome: TransactionOutcome; function?: string }): {

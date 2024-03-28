@@ -1,4 +1,11 @@
-import { ContractResultItem, ContractResults, TransactionOnNetwork } from "@multiversx/sdk-network-providers";
+import {
+    ContractResultItem,
+    ContractResults,
+    TransactionEventTopic,
+    TransactionOnNetwork,
+    TransactionEvent as TransactionOnNetworkEvent,
+    TransactionLogs as TransactionOnNetworkLogs,
+} from "@multiversx/sdk-network-providers";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
@@ -9,6 +16,10 @@ import { SmartContractTransactionsOutcomeParser } from "./smartContractTransacti
 
 describe("test smart contract transactions outcome parser", () => {
     it("parses deploy outcome (minimalistic)", async function () {
+        const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj");
+        const codeHash = Buffer.from("abba", "hex");
+
         const parser = new SmartContractTransactionsOutcomeParser();
 
         const parsed = parser.parseDeploy({
@@ -21,15 +32,7 @@ describe("test smart contract transactions outcome parser", () => {
                     events: [
                         new TransactionEvent({
                             identifier: "SCDeploy",
-                            topics: [
-                                Address.fromBech32(
-                                    "erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj",
-                                ).getPublicKey(),
-                                Address.fromBech32(
-                                    "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
-                                ).getPublicKey(),
-                                Buffer.from("abba", "hex"),
-                            ],
+                            topics: [contract.getPublicKey(), deployer.getPublicKey(), codeHash],
                         }),
                     ],
                 }),
@@ -40,9 +43,47 @@ describe("test smart contract transactions outcome parser", () => {
         assert.equal(parsed.returnMessage, "ok");
         assert.deepEqual(parsed.contracts, [
             {
-                address: "erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj",
-                ownerAddress: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
-                codeHash: Buffer.from("abba", "hex"),
+                address: contract.toBech32(),
+                ownerAddress: deployer.toBech32(),
+                codeHash: codeHash,
+            },
+        ]);
+    });
+
+    it("parses deploy outcome", async function () {
+        const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj");
+        const codeHash = Buffer.from("abba", "hex");
+
+        const parser = new SmartContractTransactionsOutcomeParser();
+        const transactionsConverter = new TransactionsConverter();
+
+        const transactionOnNetwork = new TransactionOnNetwork({
+            nonce: 7,
+            logs: new TransactionOnNetworkLogs({
+                events: [
+                    new TransactionOnNetworkEvent({
+                        identifier: "SCDeploy",
+                        topics: [
+                            new TransactionEventTopic(deployer.getPublicKey().toString("base64")),
+                            new TransactionEventTopic(contract.getPublicKey().toString("base64")),
+                            new TransactionEventTopic(codeHash.toString("base64")),
+                        ],
+                    }),
+                ],
+            }),
+        });
+
+        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
+        const parsed = parser.parseDeploy({ transactionOutcome });
+
+        assert.equal(parsed.returnCode, "ok");
+        assert.equal(parsed.returnMessage, "ok");
+        assert.deepEqual(parsed.contracts, [
+            {
+                address: contract.toBech32(),
+                ownerAddress: deployer.toBech32(),
+                codeHash: codeHash,
             },
         ]);
     });

@@ -94,7 +94,7 @@ describe("test smart contract transactions outcome parser", () => {
         ]);
     });
 
-    it.only("parses deploy outcome (with error)", async function () {
+    it("parses deploy outcome (with error)", async function () {
         const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
         const parser = new SmartContractTransactionsOutcomeParser();

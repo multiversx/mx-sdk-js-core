@@ -256,7 +256,7 @@ export class SmartContract implements ISmartContract {
      * @param nonce The owner nonce used for the deployment transaction
      */
     static computeAddress(owner: IAddress, nonce: INonce): IAddress {
-        const deployer = new Address(owner.bech32());
+        const deployer = Address.fromBech32(owner.bech32());
         const addressComputer = new AddressComputer();
         return addressComputer.computeContractAddress(deployer, BigInt(nonce.valueOf()));
     }

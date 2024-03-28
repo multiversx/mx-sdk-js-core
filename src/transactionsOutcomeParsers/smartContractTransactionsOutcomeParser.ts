@@ -1,6 +1,7 @@
+import { Address } from "../address";
 import { Err } from "../errors";
 import { EndpointDefinition, ResultsParser, ReturnCode, Type, UntypedOutcomeBundle } from "../smartcontracts";
-import { TransactionOutcome } from "./resources";
+import { TransactionEvent, TransactionOutcome, findEventsByIdentifier } from "./resources";
 
 interface IAbi {
     getEndpoint(name: string): EndpointDefinition;
@@ -33,6 +34,34 @@ export class SmartContractTransactionsOutcomeParser {
         // at least until "return data parts of direct outcome of contract call" are included on API & Proxy responses (on GET transaction),
         // we have to allow the same level of customization (for exotic flows).
         this.legacyResultsParser = options?.legacyResultsParser || new ResultsParser();
+    }
+
+    parseDeploy(options: { transactionOutcome: TransactionOutcome }): {
+        values: any[];
+        returnCode: string;
+        returnMessage: string;
+        addresses: string[];
+    } {
+        const directCallOutcome = options.transactionOutcome.directSmartContractCallOutcome;
+        const events = findEventsByIdentifier(options.transactionOutcome, "SCDeploy");
+        const addresses = events.map((event) => this.extractContractAddress(event));
+
+        return {
+            values: directCallOutcome.returnDataParts,
+            returnCode: directCallOutcome.returnCode,
+            returnMessage: directCallOutcome.returnMessage,
+            addresses: addresses,
+        };
+    }
+
+    private extractContractAddress(event: TransactionEvent): string {
+        const firstTopic = event.topics[0];
+
+        if (!firstTopic?.length) {
+            return "";
+        }
+
+        return Address.fromBuffer(Buffer.from(firstTopic)).toBech32();
     }
 
     parseExecute(options: { transactionOutcome: TransactionOutcome; function?: string }): {

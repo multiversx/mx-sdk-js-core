@@ -1,7 +1,7 @@
-import * as errors from "../../errors";
 import { assert } from "chai";
-import { Type } from "./types";
+import { ErrTypingSystem } from "../../errors";
 import { TypeExpressionParser } from "./typeExpressionParser";
+import { Type } from "./types";
 
 describe("test parser", () => {
     let parser = new TypeExpressionParser();
@@ -102,54 +102,53 @@ describe("test parser", () => {
             ],
         });
 
-
         type = parser.parse("MultiArg<Option<u8>, List<u16>>");
         assert.deepEqual(type.toJSON(), {
-            "name": "MultiArg",
-            "typeParameters": [
+            name: "MultiArg",
+            typeParameters: [
                 {
-                    "name": "Option",
-                    "typeParameters": [
+                    name: "Option",
+                    typeParameters: [
                         {
-                            "name": "u8",
-                            "typeParameters": []
-                        }
-                    ]
+                            name: "u8",
+                            typeParameters: [],
+                        },
+                    ],
                 },
                 {
-                    "name": "List",
-                    "typeParameters": [
+                    name: "List",
+                    typeParameters: [
                         {
-                            "name": "u16",
-                            "typeParameters": []
-                        }
-                    ]
-                }
-            ]
+                            name: "u16",
+                            typeParameters: [],
+                        },
+                    ],
+                },
+            ],
         });
 
         type = parser.parse("variadic<multi<array32,u32,array64>>");
         assert.deepEqual(type.toJSON(), {
-            "name": "variadic",
-            "typeParameters": [
+            name: "variadic",
+            typeParameters: [
                 {
-                    "name": "multi",
-                    "typeParameters": [
+                    name: "multi",
+                    typeParameters: [
                         {
-                            "name": "array32",
-                            "typeParameters": []
+                            name: "array32",
+                            typeParameters: [],
                         },
                         {
-                            "name": "u32",
-                            "typeParameters": []
+                            name: "u32",
+                            typeParameters: [],
                         },
                         {
-                            "name": "array64",
-                            "typeParameters": []
-                        }
-                    ]
-                }
-            ]
+                            name: "array64",
+                            typeParameters: [],
+                        },
+                    ],
+                },
+            ],
         });
     });
 
@@ -195,8 +194,6 @@ describe("test parser", () => {
             ],
         });
 
-        // TODO: In a future PR, replace the JSON-based parsing logic with a better one and enable this test.
-        // This test currently fails because JSON key de-duplication takes place: i32 is incorrectly de-duplicated by the parser.
         type = parser.parse("tuple2<i32, i32>");
         assert.deepEqual(type.toJSON(), {
             name: "tuple2",
@@ -222,7 +219,7 @@ describe("test parser", () => {
                         {
                             name: "u64",
                             typeParameters: [],
-                        }
+                        },
                     ],
                 },
                 {
@@ -231,8 +228,73 @@ describe("test parser", () => {
                         {
                             name: "u64",
                             typeParameters: [],
-                        }
+                        },
                     ],
+                },
+            ],
+        });
+    });
+
+    it("should parse <BigUint,BigUint,u64,BigUint>", () => {
+        let type: Type;
+        type = parser.parse("variadic<multi<BigUint,BigUint,u64,BigUint>>");
+        assert.deepEqual(type.toJSON(), {
+            name: "variadic",
+            typeParameters: [
+                {
+                    name: "multi",
+                    typeParameters: [
+                        {
+                            name: "BigUint",
+                            typeParameters: [],
+                        },
+                        {
+                            name: "BigUint",
+                            typeParameters: [],
+                        },
+                        {
+                            name: "u64",
+                            typeParameters: [],
+                        },
+                        {
+                            name: "BigUint",
+                            typeParameters: [],
+                        },
+                    ],
+                },
+            ],
+        });
+    });
+
+    it("should parse multi", () => {
+        const type = parser.parse("multi<u8, utf-8 string, u8, utf-8 string, u8, utf-8 string>");
+
+        assert.deepEqual(type.toJSON(), {
+            name: "multi",
+            typeParameters: [
+                {
+                    name: "u8",
+                    typeParameters: [],
+                },
+                {
+                    name: "utf-8 string",
+                    typeParameters: [],
+                },
+                {
+                    name: "u8",
+                    typeParameters: [],
+                },
+                {
+                    name: "utf-8 string",
+                    typeParameters: [],
+                },
+                {
+                    name: "u8",
+                    typeParameters: [],
+                },
+                {
+                    name: "utf-8 string",
+                    typeParameters: [],
                 },
             ],
         });
@@ -264,14 +326,12 @@ describe("test parser", () => {
                 },
             ],
         });
-
     });
 
     it("should not parse expression", () => {
-        assert.throw(() => parser.parse("<>"), errors.ErrTypingSystem);
-        assert.throw(() => parser.parse("<"), errors.ErrTypingSystem);
-        // TODO: In a future PR replace Json Parsing logic with a better one and enable this test
-        //assert.throw(() => parser.parse("MultiResultVec<MultiResult2<Address, u64>"), errors.ErrTypingSystem);
-        assert.throw(() => parser.parse("a, b"), errors.ErrTypingSystem);
+        assert.throw(() => parser.parse("<>"), ErrTypingSystem);
+        assert.throw(() => parser.parse("<"), ErrTypingSystem);
+        assert.throw(() => parser.parse("MultiResultVec<MultiResult2<Address, u64>"), ErrTypingSystem);
+        assert.throw(() => parser.parse("a, b"), ErrTypingSystem);
     });
 });

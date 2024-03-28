@@ -10,7 +10,12 @@ export class EndpointDefinition {
     readonly output: EndpointParameterDefinition[] = [];
     readonly modifiers: EndpointModifiers;
 
-    constructor(name: string, input: EndpointParameterDefinition[], output: EndpointParameterDefinition[], modifiers: EndpointModifiers) {
+    constructor(
+        name: string,
+        input: EndpointParameterDefinition[],
+        output: EndpointParameterDefinition[],
+        modifiers: EndpointModifiers,
+    ) {
         this.name = name;
         this.input = input || [];
         this.output = output || [];
@@ -22,12 +27,12 @@ export class EndpointDefinition {
     }
 
     static fromJSON(json: {
-        name: string,
-        onlyOwner?: boolean
-        mutability: string,
-        payableInTokens: string[],
-        inputs: any[],
-        outputs: any[]
+        name: string;
+        onlyOwner?: boolean;
+        mutability: string;
+        payableInTokens: string[];
+        inputs: any[];
+        outputs: any[];
     }): EndpointDefinition {
         json.name = json.name == null ? NamePlaceholder : json.name;
         json.onlyOwner = json.onlyOwner || false;
@@ -35,8 +40,8 @@ export class EndpointDefinition {
         json.inputs = json.inputs || [];
         json.outputs = json.outputs || [];
 
-        let input = json.inputs.map(param => EndpointParameterDefinition.fromJSON(param));
-        let output = json.outputs.map(param => EndpointParameterDefinition.fromJSON(param));
+        let input = json.inputs.map((param) => EndpointParameterDefinition.fromJSON(param));
+        let output = json.outputs.map((param) => EndpointParameterDefinition.fromJSON(param));
         let modifiers = new EndpointModifiers(json.mutability, json.payableInTokens, json.onlyOwner);
 
         return new EndpointDefinition(json.name, input, output, modifiers);
@@ -98,8 +103,12 @@ export class EndpointParameterDefinition {
         this.type = type;
     }
 
-    static fromJSON(json: { name?: string, description?: string, type: string }): EndpointParameterDefinition {
+    static fromJSON(json: { name?: string; description?: string; type: string }): EndpointParameterDefinition {
         let parsedType = new TypeExpressionParser().parse(json.type);
-        return new EndpointParameterDefinition(json.name || NamePlaceholder, json.description || DescriptionPlaceholder, parsedType);
+        return new EndpointParameterDefinition(
+            json.name || NamePlaceholder,
+            json.description || DescriptionPlaceholder,
+            parsedType,
+        );
     }
 }

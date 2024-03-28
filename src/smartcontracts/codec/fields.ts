@@ -20,13 +20,13 @@ export class FieldsBinaryCodec {
             let field = new Field(decoded, fieldDefinition.name);
             fields.push(field);
         }
-        
+
         return [fields, totalLength];
     }
 
     encodeNested(fields: ReadonlyArray<Field>): Buffer {
         let buffers: Buffer[] = [];
-        
+
         for (const field of fields) {
             let fieldBuffer = this.binaryCodec.encodeNested(field.value);
             buffers.push(fieldBuffer);

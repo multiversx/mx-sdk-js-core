@@ -3,7 +3,6 @@ import { ErrCannotParseTransactionOutcome } from "../errors";
 import { IAddress } from "../interface";
 import { bufferToBigInt } from "./codec";
 
-
 interface ITransactionOnNetwork {
     hash: string;
     contractResults: IContractResults;
@@ -42,8 +41,7 @@ export interface IRegisterAndSetAllRolesOutcome {
     roles: string[];
 }
 
-export interface IToggleBurnRoleGloballyOutcome {
-}
+export interface IToggleBurnRoleGloballyOutcome {}
 
 export interface ISetSpecialRoleOutcome {
     userAddress: string;
@@ -71,8 +69,7 @@ export interface IBurnOutcome {
     burntSupply: string;
 }
 
-export interface IPausingOutcome {
-}
+export interface IPausingOutcome {}
 
 export interface IFreezingOutcome {
     userAddress: string;
@@ -106,6 +103,9 @@ export interface IBurnQuantityOutcome {
     burntQuantity: string;
 }
 
+/**
+ * @deprecated Use {@link TokenManagementTransactionsOutcomeParser}
+ */
 export class TokenOperationsOutcomeParser {
     parseIssueFungible(transaction: ITransactionOnNetwork): IESDTIssueOutcome {
         this.ensureNoError(transaction);
@@ -146,7 +146,7 @@ export class TokenOperationsOutcomeParser {
         const tokenIdentifier = this.extractTokenIdentifier(eventRegister);
 
         const eventSetRole = this.findSingleEventByIdentifier(transaction, "ESDTSetRole");
-        const roles = eventSetRole.topics.slice(3).map(topic => topic.valueOf().toString());
+        const roles = eventSetRole.topics.slice(3).map((topic) => topic.valueOf().toString());
 
         return { tokenIdentifier, roles };
     }
@@ -167,7 +167,7 @@ export class TokenOperationsOutcomeParser {
         const event = this.findSingleEventByIdentifier(transaction, "ESDTSetRole");
         const userAddress = event.address.toString();
         const tokenIdentifier = this.extractTokenIdentifier(event);
-        const roles = event.topics.slice(3).map(topic => topic.valueOf().toString());
+        const roles = event.topics.slice(3).map((topic) => topic.valueOf().toString());
         return { userAddress, tokenIdentifier, roles };
     }
 
@@ -284,13 +284,16 @@ export class TokenOperationsOutcomeParser {
                 const data = Buffer.from(event.data.substring(1), "hex").toString();
                 const message = event.topics[1]?.valueOf().toString();
 
-                throw new ErrCannotParseTransactionOutcome(transaction.hash, `encountered signalError: ${message} (${data})`);
+                throw new ErrCannotParseTransactionOutcome(
+                    transaction.hash,
+                    `encountered signalError: ${message} (${data})`,
+                );
             }
         }
     }
 
     private findSingleEventByIdentifier(transaction: ITransactionOnNetwork, identifier: string): ITransactionEvent {
-        const events = this.gatherAllEvents(transaction).filter(event => event.identifier == identifier);
+        const events = this.gatherAllEvents(transaction).filter((event) => event.identifier == identifier);
 
         if (events.length == 0) {
             throw new ErrCannotParseTransactionOutcome(transaction.hash, `cannot find event of type ${identifier}`);
@@ -330,4 +333,3 @@ export class TokenOperationsOutcomeParser {
         return Address.fromBuffer(event.topics[3]?.valueOf()).toString();
     }
 }
-

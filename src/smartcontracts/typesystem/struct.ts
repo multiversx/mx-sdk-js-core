@@ -1,5 +1,5 @@
-import { ErrMissingFieldOnStruct, ErrTypingSystem } from "../../errors";
-import { FieldDefinition, Field, Fields } from "./fields";
+import { ErrMissingFieldOnStruct } from "../../errors";
+import { Field, FieldDefinition, Fields } from "./fields";
 import { CustomType, TypedValue } from "./types";
 
 export class StructType extends CustomType {
@@ -15,8 +15,8 @@ export class StructType extends CustomType {
         return StructType.ClassName;
     }
 
-    static fromJSON(json: { name: string, fields: any[] }): StructType {
-        let definitions = (json.fields || []).map(definition => FieldDefinition.fromJSON(definition));
+    static fromJSON(json: { name: string; fields: any[] }): StructType {
+        let definitions = (json.fields || []).map((definition) => FieldDefinition.fromJSON(definition));
         return new StructType(json.name, definitions);
     }
 
@@ -25,7 +25,7 @@ export class StructType extends CustomType {
     }
 
     getFieldDefinition(name: string): FieldDefinition | undefined {
-        return this.fieldsDefinitions.find(item => item.name == name);
+        return this.fieldsDefinitions.find((item) => item.name == name);
     }
 
     getNamesOfDependencies(): string[] {
@@ -44,7 +44,7 @@ export class Struct extends TypedValue {
     constructor(type: StructType, fields: Field[]) {
         super(type);
         this.fields = fields;
-        this.fieldsByName = new Map(fields.map(field => [field.name, field]));
+        this.fieldsByName = new Map(fields.map((field) => [field.name, field]));
 
         this.checkTyping();
     }
@@ -81,7 +81,7 @@ export class Struct extends TypedValue {
 
         return result;
     }
-    
+
     equals(other: Struct): boolean {
         if (!this.getType().equals(other.getType())) {
             return false;

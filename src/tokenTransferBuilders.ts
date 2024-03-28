@@ -2,7 +2,7 @@ import { Address } from "./address";
 import { IAddress, ITokenTransfer } from "./interface";
 import { ArgSerializer } from "./smartcontracts/argSerializer";
 import { AddressValue, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "./smartcontracts/typesystem";
-import { TokenTransfer } from "./tokenTransfer";
+import { TokenTransfer } from "./tokens";
 import { TransactionPayload } from "./transactionPayload";
 
 /**

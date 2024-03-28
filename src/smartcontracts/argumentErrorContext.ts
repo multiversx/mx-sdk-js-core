@@ -13,11 +13,15 @@ export class ArgumentErrorContext {
     }
 
     throwError(specificError: string): never {
-        throw new ErrInvalidArgument(`Error when converting arguments for endpoint (endpoint name: ${this.endpointName}, argument index: ${this.argumentIndex}, name: ${this.parameterDefinition.name}, type: ${this.parameterDefinition.type})\nNested error: ${specificError}`);
+        throw new ErrInvalidArgument(
+            `Error when converting arguments for endpoint (endpoint name: ${this.endpointName}, argument index: ${this.argumentIndex}, name: ${this.parameterDefinition.name}, type: ${this.parameterDefinition.type})\nNested error: ${specificError}`,
+        );
     }
 
     convertError(native: any, typeName: string): never {
-        this.throwError(`Can't convert argument (argument: ${native}, type ${typeof native}), wanted type: ${typeName})`);
+        this.throwError(
+            `Can't convert argument (argument: ${native}, type ${typeof native}), wanted type: ${typeName})`,
+        );
     }
 
     unhandledType(functionName: string, type: Type): never {
@@ -27,14 +31,18 @@ export class ArgumentErrorContext {
     guardSameLength<T>(native: any[], valueTypes: T[]) {
         native = native || [];
         if (native.length != valueTypes.length) {
-            this.throwError(`Incorrect composite type length: have ${native.length}, expected ${valueTypes.length} (argument: ${native})`);
+            this.throwError(
+                `Incorrect composite type length: have ${native.length}, expected ${valueTypes.length} (argument: ${native})`,
+            );
         }
     }
 
     guardHasField(native: any, fieldName: string) {
         native = native || {};
         if (!(fieldName in native)) {
-            this.throwError(`Struct argument does not contain a field named "${fieldName}" (argument: ${JSON.stringify(native)})`);
+            this.throwError(
+                `Struct argument does not contain a field named "${fieldName}" (argument: ${JSON.stringify(native)})`,
+            );
         }
     }
 }

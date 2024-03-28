@@ -50,7 +50,7 @@ describe("fetch transactions from local testnet", function () {
         });
 
         transactionIncrement.setNonce(alice.account.nonce);
-        await alice.signer.sign(transactionIncrement);
+        transactionIncrement.applySignature(await alice.signer.sign(transactionIncrement.serializeForSigning()));
 
         alice.account.incrementNonce();
 
@@ -58,8 +58,8 @@ describe("fetch transactions from local testnet", function () {
         await provider.sendTransaction(transactionDeploy);
         await provider.sendTransaction(transactionIncrement);
 
-        await watcher.awaitCompleted(transactionDeploy);
-        await watcher.awaitCompleted(transactionIncrement);
+        await watcher.awaitCompleted(transactionDeploy.getHash().hex());
+        await watcher.awaitCompleted(transactionIncrement.getHash().hex());
 
         let transactionOnNetworkDeploy = await provider.getTransaction(transactionDeploy.getHash().hex());
         let transactionOnNetworkIncrement = await provider.getTransaction(transactionIncrement.getHash().hex());

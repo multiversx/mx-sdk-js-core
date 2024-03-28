@@ -1,5 +1,4 @@
 import { UserSecretKey, UserSigner } from "@multiversx/sdk-wallet";
-import { UserSigner as UserSignerNext } from "@multiversx/sdk-wallet-next";
 import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";
@@ -24,8 +23,21 @@ export async function syncTestWallets(wallets: Record<string, TestWallet>, provi
 }
 
 export async function loadTestWallets(): Promise<Record<string, TestWallet>> {
-    let walletNames = ["alice", "bob", "carol", "dan", "eve", "frank", "grace", "heidi", "ivan", "judy", "mallory", "mike"];
-    let wallets = await Promise.all(walletNames.map(async name => await loadTestWallet(name)));
+    let walletNames = [
+        "alice",
+        "bob",
+        "carol",
+        "dan",
+        "eve",
+        "frank",
+        "grace",
+        "heidi",
+        "ivan",
+        "judy",
+        "mallory",
+        "mike",
+    ];
+    let wallets = await Promise.all(walletNames.map(async (name) => await loadTestWallet(name)));
     let walletMap: Record<string, TestWallet> = {};
     for (let i in walletNames) {
         walletMap[walletNames[i]] = wallets[i];
@@ -45,11 +57,7 @@ export async function loadTestWallet(name: string): Promise<TestWallet> {
     let jsonContents = JSON.parse(await readTestWalletFileContents(name + ".json"));
     let pemContents = await readTestWalletFileContents(name + ".pem");
     let pemKey = UserSecretKey.fromPem(pemContents);
-    return new TestWallet(
-        new Address(jsonContents.address),
-        pemKey.hex(),
-        jsonContents,
-        pemContents);
+    return new TestWallet(new Address(jsonContents.address), pemKey.hex(), jsonContents, pemContents);
 }
 
 async function readTestWalletFileContents(name: string): Promise<string> {
@@ -73,7 +81,6 @@ export class TestWallet {
     readonly secretKeyHex: string;
     readonly secretKey: Buffer;
     readonly signer: UserSigner;
-    readonly signerNext: UserSignerNext;
     readonly keyFileObject: any;
     readonly pemFileText: any;
     readonly account: Account;
@@ -83,7 +90,6 @@ export class TestWallet {
         this.secretKeyHex = secretKeyHex;
         this.secretKey = Buffer.from(secretKeyHex, "hex");
         this.signer = new UserSigner(UserSecretKey.fromString(secretKeyHex));
-        this.signerNext = new UserSignerNext(UserSecretKey.fromString(secretKeyHex));
         this.keyFileObject = keyFileObject;
         this.pemFileText = pemFileText;
         this.account = new Account(this.address);
@@ -95,7 +101,7 @@ export class TestWallet {
 
     async sync(provider: IAccountFetcher) {
         let accountOnNetwork = await provider.getAccount(this.address);
-        await this.account.update(accountOnNetwork);
+        this.account.update(accountOnNetwork);
         return this;
     }
 }

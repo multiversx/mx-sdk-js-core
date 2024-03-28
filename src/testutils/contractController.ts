@@ -24,7 +24,7 @@ export class ContractController {
         Logger.info(`ContractController.deploy [begin]: transaction = ${transaction.getHash()}`);
 
         await this.provider.sendTransaction(transaction);
-        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction);
+        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction.getHash().hex());
         let bundle = this.parser.parseUntypedOutcome(transactionOnNetwork);
 
         Logger.info(`ContractController.deploy [end]: transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);
@@ -37,7 +37,7 @@ export class ContractController {
         interaction.check();
 
         await this.provider.sendTransaction(transaction);
-        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction);
+        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction.getHash().hex());
         let bundle = this.parser.parseOutcome(transactionOnNetwork, interaction.getEndpoint());
 
         Logger.info(`ContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);

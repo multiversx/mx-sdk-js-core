@@ -6,10 +6,10 @@ on:
       channel:
         type: choice
         description: NPM channel
-        options: 
-        - alpha
-        - beta
-        - previous
+        options:
+          - alpha
+          - beta
+          - previous
 
 permissions:
   contents: write
@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      
+
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -33,7 +33,7 @@ jobs:
 
       - run: npm ci
       - run: npm test
-      
+
       - name: Publish to npmjs
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

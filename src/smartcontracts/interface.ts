@@ -31,7 +31,7 @@ export interface ISmartContract {
 export interface DeployArguments {
     code: ICode;
     codeMetadata?: ICodeMetadata;
-    initArguments?: TypedValue[];
+    initArguments?: any[];
     value?: ITransactionValue;
     gasLimit: IGasLimit;
     gasPrice?: IGasPrice;
@@ -42,7 +42,7 @@ export interface DeployArguments {
 export interface UpgradeArguments {
     code: ICode;
     codeMetadata?: ICodeMetadata;
-    initArguments?: TypedValue[];
+    initArguments?: any[];
     value?: ITransactionValue;
     gasLimit: IGasLimit;
     gasPrice?: IGasPrice;
@@ -52,7 +52,7 @@ export interface UpgradeArguments {
 
 export interface CallArguments {
     func: IContractFunction;
-    args?: TypedValue[];
+    args?: any[];
     value?: ITransactionValue;
     gasLimit: IGasLimit;
     receiver?: IAddress;

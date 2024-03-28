@@ -20,6 +20,7 @@ export interface ITransactionOnNetwork {
     value: string;
     receiver: IAddress;
     sender: IAddress;
+    function?: string;
     data: Buffer;
     status: ITransactionStatus;
     receipt: ITransactionReceipt;
@@ -63,19 +64,13 @@ export interface IContractReturnCode {
 }
 
 export interface ITransactionLogs {
+    address: IAddress;
     events: ITransactionEvent[];
 
-    findSingleOrNoneEvent(identifier: string, predicate?: (event: ITransactionEvent) => boolean): ITransactionEvent | undefined;
-
-    /**
-     * @deprecated Will be removed from the interface (with no replacement). Not used in "sdk-core".
-     */
-    findFirstOrNoneEvent(identifier: string, predicate?: (event: ITransactionEvent) => boolean): ITransactionEvent | undefined;
-
-    /**
-     * @deprecated Will be removed from the interface (with no replacement). Not used in "sdk-core".
-     */
-    findEvents(identifier: string, predicate?: (event: ITransactionEvent) => boolean): ITransactionEvent[];
+    findSingleOrNoneEvent(
+        identifier: string,
+        predicate?: (event: ITransactionEvent) => boolean,
+    ): ITransactionEvent | undefined;
 }
 
 export interface ITransactionEvent {
@@ -83,6 +78,9 @@ export interface ITransactionEvent {
     readonly identifier: string;
     readonly topics: ITransactionEventTopic[];
     readonly data: string;
+    // See https://github.com/multiversx/mx-sdk-js-network-providers/blob/v2.4.0/src/transactionEvents.ts#L13
+    readonly dataPayload?: { valueOf(): Uint8Array };
+    readonly additionalData?: { valueOf(): Uint8Array }[];
 
     findFirstOrNoneTopic(predicate: (topic: ITransactionEventTopic) => boolean): ITransactionEventTopic | undefined;
     getLastTopic(): ITransactionEventTopic;

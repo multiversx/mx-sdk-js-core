@@ -63,7 +63,7 @@ interface IIssueSemiFungibleArgs extends IBaseArgs {
     canAddSpecialRoles: boolean;
 }
 
-interface IIssueNonFungibleArgs extends IIssueSemiFungibleArgs { }
+interface IIssueNonFungibleArgs extends IIssueSemiFungibleArgs {}
 
 interface IRegisterMetaESDT extends IIssueSemiFungibleArgs {
     numDecimals: number;
@@ -176,6 +176,9 @@ interface IBurnQuantityArgs extends IBaseArgs {
     quantityToBurn: BigNumber.Value;
 }
 
+/**
+ * @deprecated Use {@link TokenManagementTransactionsFactory} instead.
+ */
 export class TokenOperationsFactory {
     private readonly config: IConfig;
     private readonly trueAsHex;
@@ -207,7 +210,7 @@ export class TokenOperationsFactory {
             utf8ToHex("canUpgrade"),
             args.canUpgrade ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canAddSpecialRoles"),
-            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return this.createTransaction({
@@ -251,7 +254,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             utf8ToHex("canUpgrade"),
             args.canUpgrade ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canAddSpecialRoles"),
-            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return this.createTransaction({
@@ -286,7 +289,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             utf8ToHex("canUpgrade"),
             args.canUpgrade ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canAddSpecialRoles"),
-            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return this.createTransaction({
@@ -322,7 +325,7 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
             utf8ToHex("canUpgrade"),
             args.canUpgrade ? this.trueAsHex : this.falseAsHex,
             utf8ToHex("canAddSpecialRoles"),
-            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex
+            args.canAddSpecialRoles ? this.trueAsHex : this.falseAsHex,
         ];
 
         return this.createTransaction({

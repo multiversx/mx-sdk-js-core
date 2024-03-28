@@ -2,7 +2,6 @@ import { assert } from "chai";
 import * as errors from "./errors";
 import { AsyncTimer } from "./asyncTimer";
 
-
 describe("test asyncTimer", () => {
     it("should start timer and resolve promise", async () => {
         let timer = new AsyncTimer("test");
@@ -21,7 +20,7 @@ describe("test asyncTimer", () => {
         let longPromise = longTimer.start(42000);
 
         let shortTimerThenAbortLongTimer = shortPromise.then(() => longTimer.abort());
-        let longTimerThenCatchAbort = longPromise.catch(reason => error = reason);
+        let longTimerThenCatchAbort = longPromise.catch((reason) => (error = reason));
 
         await Promise.all([shortTimerThenAbortLongTimer, longTimerThenCatchAbort]);
 

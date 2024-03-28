@@ -5,7 +5,6 @@ import { CompositeType, CompositeValue } from "./composite";
 import { EndpointParameterDefinition } from "./endpoint";
 import { U32Type, U32Value } from "./numerical";
 
-
 describe("test composite", () => {
     const serializer = new ArgSerializer();
 
@@ -21,7 +20,7 @@ describe("test composite", () => {
 
     it("should get valueOf() upon decoding", () => {
         const compositeType = new CompositeType(new U32Type(), new BytesType());
-        const endpointDefinition = new EndpointParameterDefinition("", "", compositeType)
+        const endpointDefinition = new EndpointParameterDefinition("", "", compositeType);
 
         const [compositeValue] = serializer.stringToValues("2a@abba", [endpointDefinition]);
         const values = compositeValue.valueOf();
@@ -43,7 +42,7 @@ describe("test composite", () => {
 
     it("should get valueOf() upon decoding, when items are missing", () => {
         const compositeType = new CompositeType(new U32Type(), new BytesType());
-        const endpointDefinition = new EndpointParameterDefinition("", "", compositeType)
+        const endpointDefinition = new EndpointParameterDefinition("", "", compositeType);
 
         const [compositeValue] = serializer.stringToValues("", [endpointDefinition]);
         const values = compositeValue.valueOf();

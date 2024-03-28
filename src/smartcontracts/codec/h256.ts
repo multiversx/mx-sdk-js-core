@@ -3,7 +3,7 @@ import { H256Value } from "../typesystem/h256";
 export class H256BinaryCodec {
     /**
      * Reads and decodes a H256Value from a given buffer.
-     * 
+     *
      * @param buffer the input buffer
      */
     decodeNested(buffer: Buffer): [H256Value, number] {
@@ -14,11 +14,11 @@ export class H256BinaryCodec {
 
     /**
      * Reads and decodes a H256Value from a given buffer.
-     * 
+     *
      * @param buffer the input buffer
      */
     decodeTopLevel(buffer: Buffer): H256Value {
-        let [decoded, length] = this.decodeNested(buffer);
+        let [decoded, _length] = this.decodeNested(buffer);
         return decoded;
     }
 

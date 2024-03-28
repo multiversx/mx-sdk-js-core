@@ -202,7 +202,7 @@ describe("test smart contract results parser", () => {
     it("should parse contract outcome, on signal error", async () => {
         let transaction = new TransactionOnNetwork({
             logs: new TransactionLogs({
-                address: new Address(),
+                address: Address.empty(),
                 events: [
                     new TransactionEvent({
                         identifier: "signalError",
@@ -222,7 +222,7 @@ describe("test smart contract results parser", () => {
     it("should parse contract outcome, on too much gas warning", async () => {
         let transaction = new TransactionOnNetwork({
             logs: new TransactionLogs({
-                address: new Address(),
+                address: Address.empty(),
                 events: [
                     new TransactionEvent({
                         identifier: "writeLog",

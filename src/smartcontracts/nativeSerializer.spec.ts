@@ -291,7 +291,7 @@ describe("test native serializer", () => {
                     }, {
                         "type": "tuple<u8,Option<bool>>",
                     }, {
-                        "type": "List<tuple<u8,bool>>>",
+                        "type": "List<tuple<u8,bool>>",
                     }, {
                         "type": "u64"
                     }],

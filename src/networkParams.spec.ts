@@ -1,6 +1,9 @@
 import { assert } from "chai";
 import {
-    TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED, TRANSACTION_OPTIONS_TX_HASH_SIGN, TRANSACTION_VERSION_DEFAULT, TRANSACTION_VERSION_WITH_OPTIONS
+    TRANSACTION_OPTIONS_DEFAULT,
+    TRANSACTION_OPTIONS_TX_GUARDED,
+    TRANSACTION_OPTIONS_TX_HASH_SIGN,
+    TRANSACTION_VERSION_DEFAULT,
 } from "./constants";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 
@@ -17,7 +20,7 @@ describe("test transaction version", () => {
         const versionWithOptions = TransactionVersion.withTxOptions();
 
         assert.equal(TRANSACTION_VERSION_DEFAULT, versionDefault.valueOf());
-        assert.equal(TRANSACTION_VERSION_WITH_OPTIONS, versionWithOptions.valueOf());
+        assert.equal(TRANSACTION_VERSION_DEFAULT, versionWithOptions.valueOf());
     });
 });
 
@@ -61,7 +64,10 @@ describe("test transaction options", () => {
         assert.isTrue(optionsWithGuardian.isWithGuardian());
 
         const optionsWithHashSignAndGuardian = TransactionOptions.withOptions({ hashSign: true, guarded: true });
-        assert.equal(optionsWithHashSignAndGuardian.valueOf(), TRANSACTION_OPTIONS_TX_HASH_SIGN | TRANSACTION_OPTIONS_TX_GUARDED);
+        assert.equal(
+            optionsWithHashSignAndGuardian.valueOf(),
+            TRANSACTION_OPTIONS_TX_HASH_SIGN | TRANSACTION_OPTIONS_TX_GUARDED,
+        );
         assert.isTrue(optionsWithHashSignAndGuardian.isWithHashSign());
         assert.isTrue(optionsWithHashSignAndGuardian.isWithGuardian());
     });

@@ -1,13 +1,13 @@
-
+import { WasmVirtualMachine } from "../constants";
 import { TransactionPayload } from "../transactionPayload";
 import { guardValueIsSet } from "../utils";
 import { ArgSerializer } from "./argSerializer";
 import { ICode, ICodeMetadata, IContractFunction } from "./interface";
 import { TypedValue } from "./typesystem";
 
-export const ArwenVirtualMachine = "0500";
-
 /**
+ * @deprecated Use {@link SmartContractTransactionsFactory} instead.
+ *
  * A builder for {@link TransactionPayload} objects, to be used for Smart Contract deployment transactions.
  */
 export class ContractDeployPayloadBuilder {
@@ -55,7 +55,7 @@ export class ContractDeployPayloadBuilder {
 
         let code = this.code!.toString();
         let codeMetadata = this.codeMetadata.toString();
-        let data = `${code}@${ArwenVirtualMachine}@${codeMetadata}`;
+        let data = `${code}@${WasmVirtualMachine}@${codeMetadata}`;
         data = appendArgumentsToString(data, this.arguments);
 
         return new TransactionPayload(data);
@@ -63,6 +63,8 @@ export class ContractDeployPayloadBuilder {
 }
 
 /**
+ * @deprecated Use {@link SmartContractTransactionsFactory} instead.
+ *
  * A builder for {@link TransactionPayload} objects, to be used for Smart Contract upgrade transactions.
  */
 export class ContractUpgradePayloadBuilder {
@@ -118,6 +120,8 @@ export class ContractUpgradePayloadBuilder {
 }
 
 /**
+ * @deprecated Use {@link SmartContractTransactionsFactory} instead.
+ *
  * A builder for {@link TransactionPayload} objects, to be used for Smart Contract execution transactions.
  */
 export class ContractCallPayloadBuilder {

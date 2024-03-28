@@ -18,7 +18,7 @@ export class Query {
         args?: TypedValue[],
         value?: ITransactionValue
     }) {
-        this.caller = obj.caller || new Address();
+        this.caller = obj.caller || Address.empty();
         this.address = obj.address;
         this.func = obj.func;
         this.args = obj.args || [];

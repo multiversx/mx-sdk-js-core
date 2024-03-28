@@ -42,8 +42,8 @@ export class ProtoSerializer {
 
         if (transaction.isGuardedTransaction()) {
             const guardianAddress = transaction.getGuardian();
-            protoTransaction.GuardAddr = new Address(guardianAddress.bech32()).pubkey();
-            protoTransaction.GuardSignature = transaction.getGuardianSignature();
+            protoTransaction.GuardianAddr = new Address(guardianAddress.bech32()).pubkey();
+            protoTransaction.GuardianSignature = transaction.getGuardianSignature();
         }
 
         const encoded = proto.Transaction.encode(protoTransaction).finish();

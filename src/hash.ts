@@ -8,7 +8,7 @@ export class Hash {
 
     /**
      * Creates a new Hash object.
-     * 
+     *
      * @param hash The hash, as a Buffer or a hex-encoded string.
      */
     constructor(hash: Buffer | string) {

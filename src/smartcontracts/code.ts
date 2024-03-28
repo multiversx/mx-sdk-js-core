@@ -1,7 +1,5 @@
-import { Hash } from "../hash";
-
-const createHasher = require('blake2b')
-const CODE_HASH_LENGTH = 32
+const createHasher = require("blake2b");
+const CODE_HASH_LENGTH = 32;
 
 /**
  * Bytecode of a Smart Contract, as an abstraction.
@@ -24,7 +22,7 @@ export class Code {
      * Creates a Code object from a hex-encoded string.
      */
     static fromHex(hex: string): Code {
-        return new Code(hex)
+        return new Code(hex);
     }
 
     /**
@@ -39,10 +37,8 @@ export class Code {
     }
 
     computeHash(): Buffer {
-        const hash = createHasher(CODE_HASH_LENGTH)
-            .update(this.valueOf())
-            .digest();
+        const hash = createHasher(CODE_HASH_LENGTH).update(this.valueOf()).digest();
 
-        return Buffer.from(hash)
+        return Buffer.from(hash);
     }
 }

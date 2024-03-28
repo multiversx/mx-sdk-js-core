@@ -4,7 +4,7 @@ export enum LogLevel {
     Info = 2,
     Warn = 3,
     Error = 4,
-    None = 5
+    None = 5,
 }
 
 export class Logger {
@@ -54,4 +54,3 @@ export class Logger {
         console.error(message, optionalParams);
     }
 }
-

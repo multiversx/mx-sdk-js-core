@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { Address } from "./address";
 import { ErrInvalidRelayedV1BuilderArguments } from "./errors";
 import { IAddress, INonce } from "./interface";
@@ -7,6 +6,11 @@ import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 
+const JSONbig = require("json-bigint");
+
+/**
+ * @deprecated Use {@link RelayedTransactionsFactory} instead.
+ */
 export class RelayedTransactionV1Builder {
     innerTransaction: Transaction | undefined;
     relayerAddress: IAddress | undefined;
@@ -131,7 +135,7 @@ export class RelayedTransactionV1Builder {
             "nonce": this.innerTransaction.getNonce().valueOf(),
             "sender": new Address(this.innerTransaction.getSender().bech32()).pubkey().toString("base64"),
             "receiver": new Address(this.innerTransaction.getReceiver().bech32()).pubkey().toString("base64"),
-            "value": new BigNumber(this.innerTransaction.getValue().toString(), 10).toNumber(),
+            "value": BigInt(this.innerTransaction.getValue().toString()),
             "gasPrice": this.innerTransaction.getGasPrice().valueOf(),
             "gasLimit": this.innerTransaction.getGasLimit().valueOf(),
             "data": this.innerTransaction.getData().valueOf().toString("base64"),
@@ -145,6 +149,6 @@ export class RelayedTransactionV1Builder {
             "rcvUserName": this.innerTransaction.getReceiverUsername() ? Buffer.from(this.innerTransaction.getReceiverUsername()).toString("base64") : undefined,
         };
 
-        return JSON.stringify(txObject);
+        return JSONbig.stringify(txObject);
     }
 }

@@ -15,23 +15,18 @@ describe("test enums", () => {
         ]);
 
         let orangeVariant = new EnumVariantDefinition("Orange", 1, [
-            new FieldDefinition("0", "hex code", new StringType())
+            new FieldDefinition("0", "hex code", new StringType()),
         ]);
 
-        let enumType = new EnumType("Colour", [
-            greenVariant,
-            orangeVariant
-        ]);
+        let enumType = new EnumType("Colour", [greenVariant, orangeVariant]);
 
         let green = new EnumValue(enumType, greenVariant, [
             new Field(new U8Value(0), "0"),
             new Field(new U8Value(255), "1"),
-            new Field(new U8Value(0), "2")
+            new Field(new U8Value(0), "2"),
         ]);
 
-        let orange = new EnumValue(enumType, orangeVariant, [
-            new Field(new StringValue("#FFA500"), "0")
-        ]);
+        let orange = new EnumValue(enumType, orangeVariant, [new Field(new StringValue("#FFA500"), "0")]);
 
         assert.lengthOf(green.getFields(), 3);
         assert.lengthOf(orange.getFields(), 1);
@@ -52,7 +47,7 @@ describe("test enums", () => {
         ]);
 
         let orangeVariant = new EnumVariantDefinition("Orange", 1, [
-            new FieldDefinition("0", "hex code", new StringType())
+            new FieldDefinition("0", "hex code", new StringType()),
         ]);
 
         let yellowVariant = new EnumVariantDefinition("Yellow", 2, [
@@ -62,54 +57,37 @@ describe("test enums", () => {
         ]);
 
         // Define enum type
-        let enumType = new EnumType("Colour", [
-            greenVariant,
-            orangeVariant,
-            yellowVariant
-        ]);
+        let enumType = new EnumType("Colour", [greenVariant, orangeVariant, yellowVariant]);
 
         // Create enum values
         let green = new EnumValue(enumType, greenVariant, [
             new Field(new U8Value(0), "0"),
             new Field(new U8Value(255), "1"),
-            new Field(new U8Value(0), "2")
+            new Field(new U8Value(0), "2"),
         ]);
 
-        let orange = new EnumValue(enumType, orangeVariant, [
-            new Field(new StringValue("#FFA500"), "0")
-        ]);
+        let orange = new EnumValue(enumType, orangeVariant, [new Field(new StringValue("#FFA500"), "0")]);
 
         let yellow = new EnumValue(enumType, yellowVariant, [
             new Field(new U8Value(255), "red"),
             new Field(new U8Value(255), "green"),
-            new Field(new U8Value(0), "blue")
+            new Field(new U8Value(0), "blue"),
         ]);
 
         // Test valueOf()
         assert.deepEqual(green.valueOf(), {
-            "name": "Green",
-            "fields": [
-                new BigNumber(0),
-                new BigNumber(255),
-                new BigNumber(0)
-            ]
+            name: "Green",
+            fields: [new BigNumber(0), new BigNumber(255), new BigNumber(0)],
         });
 
         assert.deepEqual(orange.valueOf(), {
-            "name": "Orange",
-            "fields": [
-                "#FFA500"
-            ]
+            name: "Orange",
+            fields: ["#FFA500"],
         });
 
         assert.deepEqual(yellow.valueOf(), {
-            "name": "Yellow",
-            "fields": [
-                new BigNumber(255),
-                new BigNumber(255),
-                new BigNumber(0)
-            ]
+            name: "Yellow",
+            fields: [new BigNumber(255), new BigNumber(255), new BigNumber(0)],
         });
     });
 });
-

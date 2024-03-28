@@ -5,6 +5,9 @@ import { AddressValue, ArgSerializer, BytesValue, U64Value } from "./smartcontra
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 
+/**
+ * @deprecated Use {@link RelayedTransactionsFactory} instead.
+ */
 export class RelayedTransactionV2Builder {
     innerTransaction: Transaction | undefined;
     innerTransactionGasLimit: IGasLimit | undefined;

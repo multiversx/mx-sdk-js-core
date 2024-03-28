@@ -13,7 +13,7 @@ export class FieldDefinition {
         this.type = type;
     }
 
-    static fromJSON(json: { name: string, description: string, type: string }): FieldDefinition {
+    static fromJSON(json: { name: string; description: string; type: string }): FieldDefinition {
         let parsedType = new TypeExpressionParser().parse(json.type);
         return new FieldDefinition(json.name, json.description, parsedType);
     }
@@ -32,7 +32,9 @@ export class Field {
         const actualType: Type = this.value.getType();
 
         if (!actualType.equals(expectedDefinition.type)) {
-            throw new errors.ErrTypingSystem(`check type of field "${expectedDefinition.name}; expected: ${expectedDefinition.type}, actual: ${actualType}"`);
+            throw new errors.ErrTypingSystem(
+                `check type of field "${expectedDefinition.name}; expected: ${expectedDefinition.type}, actual: ${actualType}"`,
+            );
         }
         if (this.name != expectedDefinition.name) {
             throw new errors.ErrTypingSystem(`check name of field "${expectedDefinition.name}"`);
@@ -53,7 +55,7 @@ export class Fields {
         for (let i = 0; i < fields.length; i++) {
             let field = fields[i];
             let definition = definitions[i];
-            
+
             field.checkTyping(definition);
         }
     }

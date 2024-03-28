@@ -1,7 +1,7 @@
 import * as errors from "../../errors";
 import { assert } from "chai";
 import { BinaryCodec, BinaryCodecConstraints } from "./binary";
-import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue, ArrayVec, ArrayVecType, U16Value, TokenIdentifierType, TokenIdentifierValue, StringValue, StringType } from "../typesystem";
+import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue, ArrayVec, ArrayVecType, U16Value, TokenIdentifierType, TokenIdentifierValue, StringValue, StringType, BigIntValue, I64Value, I32Value, I16Value, I8Value } from "../typesystem";
 import { isMsbOne } from "./utils";
 import { Address } from "../../address";
 import { BytesType, BytesValue } from "../typesystem/bytes";
@@ -83,6 +83,20 @@ describe("test binary codec (basic)", () => {
             assert.instanceOf(decodedTop, NumericalValue);
             assert.isTrue(decodedTop.equals(value));
         }
+    });
+
+    it("should create numeric values, from both bigint and BigNumber.Value", async () => {
+        assert.deepEqual(new BigUIntValue("0xabcdefabcdefabcdef"), new BigUIntValue(BigInt("0xabcdefabcdefabcdef")));
+        assert.deepEqual(new U64Value("0xabcdef"), new U64Value(BigInt(0xabcdef)));
+        assert.deepEqual(new U32Value("0xabcdef"), new U32Value(BigInt(0xabcdef)));
+        assert.deepEqual(new U16Value("0xabcdef"), new U16Value(BigInt(0xabcdef)));
+        assert.deepEqual(new U8Value("0xabcdef"), new U8Value(BigInt(0xabcdef)));
+
+        assert.deepEqual(new BigIntValue(BigInt("0xabcdefabcdefabcdef")), new BigIntValue(BigInt("0xabcdefabcdefabcdef")));
+        assert.deepEqual(new I64Value("0xabcdef"), new I64Value(BigInt(0xabcdef)));
+        assert.deepEqual(new I32Value("0xabcdef"), new I32Value(BigInt(0xabcdef)));
+        assert.deepEqual(new I16Value("0xabcdef"), new I16Value(BigInt(0xabcdef)));
+        assert.deepEqual(new I8Value("0xabcdef"), new I8Value(BigInt(0xabcdef)));
     });
 
     it("should create bytes and strings, encode and decode", async () => {

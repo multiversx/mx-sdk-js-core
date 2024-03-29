@@ -41,7 +41,7 @@ jobs:
 
           npm ci
           npm run api:extract
-          npm run api:document
+          DOCS_OUTPUT_FOLDER=$DOCS_OUTPUT_FOLDER npm run api:document
 
           cd ${GITHUB_WORKSPACE}/docs
           git commit -am "Re-generated docs."

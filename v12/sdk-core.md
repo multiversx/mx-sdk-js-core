@@ -126,7 +126,7 @@ A library for interacting with the MultiversX blockchain (in general) and Smart 
 |  [TokenOperationsOutcomeParser](./sdk-core.tokenoperationsoutcomeparser.md) |  |
 |  [TokenPayment](./sdk-core.tokenpayment.md) |  |
 |  [TokenTransfer](./sdk-core.tokentransfer.md) |  |
-|  [Transaction](./sdk-core.transaction.md) | An abstraction for creating, signing and broadcasting transactions. |
+|  [Transaction](./sdk-core.transaction.md) | An abstraction for creating and signing transactions. |
 |  [TransactionHash](./sdk-core.transactionhash.md) | An abstraction for handling and computing transaction hashes. |
 |  [TransactionOptions](./sdk-core.transactionoptions.md) |  |
 |  [TransactionPayload](./sdk-core.transactionpayload.md) | The "data" field of a Transaction, as an immutable object. |

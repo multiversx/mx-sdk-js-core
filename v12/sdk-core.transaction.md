@@ -4,7 +4,7 @@
 
 ## Transaction class
 
-An abstraction for creating, signing and broadcasting transactions.
+An abstraction for creating and signing transactions.
 
 **Signature:**
 

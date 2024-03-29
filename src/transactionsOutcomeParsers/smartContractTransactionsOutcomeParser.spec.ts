@@ -1,12 +1,129 @@
-import { ContractResultItem, ContractResults, TransactionOnNetwork } from "@multiversx/sdk-network-providers";
+import {
+    ContractResultItem,
+    ContractResults,
+    TransactionEventTopic,
+    TransactionOnNetwork,
+    TransactionEvent as TransactionOnNetworkEvent,
+    TransactionLogs as TransactionOnNetworkLogs,
+} from "@multiversx/sdk-network-providers";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
+import { Address } from "../address";
 import { TransactionsConverter } from "../converters/transactionsConverter";
 import { loadAbiRegistry } from "../testutils";
-import { SmartContractCallOutcome, TransactionOutcome } from "./resources";
+import { SmartContractCallOutcome, TransactionEvent, TransactionLogs, TransactionOutcome } from "./resources";
 import { SmartContractTransactionsOutcomeParser } from "./smartContractTransactionsOutcomeParser";
 
 describe("test smart contract transactions outcome parser", () => {
+    it("parses deploy outcome (minimalistic)", async function () {
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj");
+        const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const codeHash = Buffer.from("abba", "hex");
+
+        const parser = new SmartContractTransactionsOutcomeParser();
+
+        const parsed = parser.parseDeploy({
+            transactionOutcome: new TransactionOutcome({
+                directSmartContractCallOutcome: new SmartContractCallOutcome({
+                    returnCode: "ok",
+                    returnMessage: "ok",
+                }),
+                logs: new TransactionLogs({
+                    events: [
+                        new TransactionEvent({
+                            identifier: "SCDeploy",
+                            topics: [contract.getPublicKey(), deployer.getPublicKey(), codeHash],
+                        }),
+                    ],
+                }),
+            }),
+        });
+
+        assert.equal(parsed.returnCode, "ok");
+        assert.equal(parsed.returnMessage, "ok");
+        assert.deepEqual(parsed.contracts, [
+            {
+                address: contract.toBech32(),
+                ownerAddress: deployer.toBech32(),
+                codeHash: codeHash,
+            },
+        ]);
+    });
+
+    it("parses deploy outcome", async function () {
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj");
+        const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const codeHash = Buffer.from("abba", "hex");
+
+        const parser = new SmartContractTransactionsOutcomeParser();
+        const transactionsConverter = new TransactionsConverter();
+
+        const transactionOnNetwork = new TransactionOnNetwork({
+            nonce: 7,
+            logs: new TransactionOnNetworkLogs({
+                events: [
+                    new TransactionOnNetworkEvent({
+                        identifier: "SCDeploy",
+                        topics: [
+                            new TransactionEventTopic(contract.getPublicKey().toString("base64")),
+                            new TransactionEventTopic(deployer.getPublicKey().toString("base64")),
+                            new TransactionEventTopic(codeHash.toString("base64")),
+                        ],
+                    }),
+                ],
+            }),
+            contractResults: new ContractResults([
+                new ContractResultItem({
+                    nonce: 8,
+                    data: "@6f6b",
+                }),
+            ]),
+        });
+
+        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
+        const parsed = parser.parseDeploy({ transactionOutcome });
+
+        assert.equal(parsed.returnCode, "ok");
+        assert.equal(parsed.returnMessage, "ok");
+        assert.deepEqual(parsed.contracts, [
+            {
+                address: contract.toBech32(),
+                ownerAddress: deployer.toBech32(),
+                codeHash: codeHash,
+            },
+        ]);
+    });
+
+    it("parses deploy outcome (with error)", async function () {
+        const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+
+        const parser = new SmartContractTransactionsOutcomeParser();
+        const transactionsConverter = new TransactionsConverter();
+
+        const transactionOnNetwork = new TransactionOnNetwork({
+            nonce: 7,
+            logs: new TransactionOnNetworkLogs({
+                events: [
+                    new TransactionOnNetworkEvent({
+                        identifier: "signalError",
+                        topics: [
+                            new TransactionEventTopic(deployer.getPublicKey().toString("base64")),
+                            new TransactionEventTopic(Buffer.from("wrong number of arguments").toString("base64")),
+                        ],
+                        data: "@75736572206572726f72",
+                    }),
+                ],
+            }),
+        });
+
+        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
+        const parsed = parser.parseDeploy({ transactionOutcome });
+
+        assert.equal(parsed.returnCode, "user error");
+        assert.equal(parsed.returnMessage, "wrong number of arguments");
+        assert.deepEqual(parsed.contracts, []);
+    });
+
     it("parses execute outcome, without ABI (minimalistic)", function () {
         const parser = new SmartContractTransactionsOutcomeParser();
 

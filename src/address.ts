@@ -1,7 +1,7 @@
 import * as bech32 from "bech32";
-import * as errors from "./errors";
-import { CURRENT_NUMBER_OF_SHARDS_WITHOUT_META, METACHAIN_ID, WasmVirtualMachine } from "./constants";
 import BigNumber from "bignumber.js";
+import { CURRENT_NUMBER_OF_SHARDS_WITHOUT_META, METACHAIN_ID, WasmVirtualMachine } from "./constants";
+import * as errors from "./errors";
 import { bigIntToBuffer } from "./tokenOperations/codec";
 const createKeccakHash = require("keccak");
 
@@ -32,15 +32,15 @@ export class Address {
     /**
      * Creates an address object, given a raw string (whether a hex pubkey or a Bech32 address), a sequence of bytes, or another Address object.
      */
-    public constructor(value: Address | Buffer | string) {
+    public constructor(value: Address | Buffer | Uint8Array | string) {
         if (!value) {
             return;
         }
         if (value instanceof Address) {
             return Address.fromAddress(value);
         }
-        if (value instanceof Buffer) {
-            return Address.fromBuffer(value);
+        if (ArrayBuffer.isView(value)) {
+            return Address.fromBuffer(Buffer.from(value));
         }
         if (typeof value === "string") {
             return Address.fromString(value);

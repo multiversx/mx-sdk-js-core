@@ -5,6 +5,7 @@ MultiversX SDK for JavaScript and TypeScript (written in TypeScript).
 ## Documentation
 
 - [Cookbook](https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook/)
+- [Auto-generated API documentation](https://multiversx.github.io/mx-sdk-js-core/)
 
 ## Distribution
 

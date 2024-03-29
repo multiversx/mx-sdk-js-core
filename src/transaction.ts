@@ -16,7 +16,7 @@ const createTransactionHasher = require("blake2b");
 const TRANSACTION_HASH_LENGTH = 32;
 
 /**
- * An abstraction for creating, signing and broadcasting transactions.
+ * An abstraction for creating and signing transactions.
  */
 export class Transaction {
   /**

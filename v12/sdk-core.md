@@ -4,6 +4,8 @@
 
 ## sdk-core package
 
+A library for interacting with the MultiversX blockchain (in general) and Smart Contracts (in particular).
+
 ## Classes
 
 |  Class | Description |

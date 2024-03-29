@@ -8,5 +8,5 @@
 
 |  Package | Description |
 |  --- | --- |
-|  [@multiversx/sdk-core](./sdk-core.md) |  |
+|  [@multiversx/sdk-core](./sdk-core.md) | A library for interacting with the MultiversX blockchain (in general) and Smart Contracts (in particular). |
 

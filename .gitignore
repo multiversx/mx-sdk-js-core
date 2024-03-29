@@ -5,3 +5,6 @@ out-browser
 out-browser-tests
 node_modules/
 tags
+temp/
+dist/
+etc/

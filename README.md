@@ -4,7 +4,7 @@ MultiversX SDK for JavaScript and TypeScript (written in TypeScript).
 
 ## Documentation
 
- - [Cookbook](https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook/)
+- [Cookbook](https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook/)
 
 ## Distribution
 
@@ -63,4 +63,22 @@ In order to run the tests **in the browser**, do as follows:
 make clean && npm run browser-tests
 ```
 
-For the `localnet` tests, make sure you have a *local testnet* up & running. In order to start a *local testnet*, follow [this](https://docs.multiversx.com/developers/setup-local-testnet/).
+For the `localnet` tests, make sure you have a _local testnet_ up & running. In order to start a _local testnet_, follow [this](https://docs.multiversx.com/developers/setup-local-testnet/).
+
+### Generating the documentation
+
+API documentation is generated from the source code using [api-extractor](https://api-extractor.com).
+
+Prerequisites:
+
+```
+npm install -g @microsoft/api-extractor
+npm install -g @microsoft/api-documenter
+```
+
+In order to (re)generate the documentation, run the following:
+
+```
+npm run api:extract
+npm run api:document
+```

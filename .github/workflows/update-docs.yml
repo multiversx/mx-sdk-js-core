@@ -1,0 +1,36 @@
+name: Update docs
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          ref: "gh-pages"
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          path: "docs"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: https://registry.npmjs.org/
+
+      - name: Create release
+        run: |
+          npm ci
+          npm run api:extract
+          MAJOR_VERSION=v$(node -p "require('./package.json').version.split('.')[0]")
+          DOCS_OUTPUT_FOLDER=${GITHUB_WORKSPACE}/docs/${MAJOR_VERSION}
+
+          mkdir -p $DOCS_OUTPUT_FOLDER
+
+          npm run api:document

@@ -24,7 +24,14 @@ jobs:
           node-version: 18
           registry-url: https://registry.npmjs.org/
 
-      - name: Create release
+      - name: Install dependencies
+        run: |
+          npm install -g @microsoft/api-extractor
+
+          # https://github.com/microsoft/rushstack/issues/4586
+          npm install -g @microsoft/api-documenter@7.23.38
+
+      - name: Re-generate docs
         run: |
           npm ci
           npm run api:extract

@@ -22,7 +22,7 @@
     "pretest": "npm run compile",
     "prepare": "npm run compile",
     "api:extract": "api-extractor run --local --verbose",
-    "api:document": "api-documenter markdown --input-folder temp --output-folder docs"
+    "api:document": "api-documenter markdown --input-folder temp --output-folder $DOCS_OUTPUT_FOLDER"
   },
   "author": "MultiversX",
   "license": "MIT",

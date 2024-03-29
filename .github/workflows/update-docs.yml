@@ -33,11 +33,16 @@ jobs:
 
       - name: Re-generate docs
         run: |
-          npm ci
-          npm run api:extract
           MAJOR_VERSION=v$(node -p "require('./package.json').version.split('.')[0]")
           DOCS_OUTPUT_FOLDER=${GITHUB_WORKSPACE}/docs/${MAJOR_VERSION}
 
+          mkdir -p ./etc
           mkdir -p $DOCS_OUTPUT_FOLDER
 
+          npm ci
+          npm run api:extract
           npm run api:document
+
+          cd ${GITHUB_WORKSPACE}/docs
+          git commit -am "Re-generated docs."
+          git push

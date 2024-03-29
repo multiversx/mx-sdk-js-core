@@ -2,6 +2,8 @@ name: Update docs
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
   release:
     types: [released]
 
@@ -27,22 +29,17 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install -g @microsoft/api-extractor
-
-          # https://github.com/microsoft/rushstack/issues/4586
-          npm install -g @microsoft/api-documenter@7.23.38
+          npm install -g typedoc
 
       - name: Re-generate docs
         run: |
           MAJOR_VERSION=v$(node -p "require('./package.json').version.split('.')[0]")
           DOCS_OUTPUT_FOLDER=${GITHUB_WORKSPACE}/docs/${MAJOR_VERSION}
 
-          mkdir -p ./etc
           mkdir -p $DOCS_OUTPUT_FOLDER
 
           npm ci
-          npm run api:extract
-          DOCS_OUTPUT_FOLDER=$DOCS_OUTPUT_FOLDER npm run api:document
+          typedoc --out $DOCS_OUTPUT_FOLDER src/index.ts --includeVersion
 
           cd ${GITHUB_WORKSPACE}/docs
 

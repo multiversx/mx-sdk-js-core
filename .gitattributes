@@ -2,6 +2,3 @@
 # https://docs.github.com/en/repositories/working-with-files/managing-files/customizing-how-changed-files-appear-on-github
 src/proto/compiled.js linguist-generated
 src/proto/compiled.d.ts linguist-generated
-
-# https://api-extractor.com/pages/setup/invoking/
-*.json  linguist-language=JSON-with-Comments

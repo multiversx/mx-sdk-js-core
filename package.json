@@ -1,6 +1,6 @@
 {
   "name": "@multiversx/sdk-core",
-  "version": "12.19.1",
+  "version": "12.19.2",
   "description": "MultiversX SDK for JavaScript and TypeScript",
   "main": "out/index.js",
   "types": "out/index.d.js",
@@ -20,9 +20,7 @@
     "browser-tests": "make clean && make browser-tests && http-server --port=9876 -o browser-tests/index.html",
     "lint": "tslint --project .",
     "pretest": "npm run compile",
-    "prepare": "npm run compile",
-    "api:extract": "api-extractor run --local --verbose",
-    "api:document": "api-documenter markdown --input-folder temp --output-folder $DOCS_OUTPUT_FOLDER"
+    "prepare": "npm run compile"
   },
   "author": "MultiversX",
   "license": "MIT",

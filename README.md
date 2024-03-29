@@ -73,7 +73,9 @@ Prerequisites:
 
 ```
 npm install -g @microsoft/api-extractor
-npm install -g @microsoft/api-documenter
+
+# https://github.com/microsoft/rushstack/issues/4586
+npm install -g @microsoft/api-documenter@7.23.38
 ```
 
 In order to (re)generate the documentation, run the following:

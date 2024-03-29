@@ -2,6 +2,14 @@
 
 [Home](index.md)
 
+[Test1](sdk-core.md)
+
+[Test2](sdk-core.md)
+
+<p>
+    [Test3](sdk-core.md)
+</p>
+
 ## API Reference
 
 ## Packages
@@ -10,20 +18,16 @@
 
 Package
 
-
 </th><th>
 
 Description
-
 
 </th></tr></thead>
 <tbody><tr><td>
 
 [@multiversx/sdk-core](sdk-core.md)
 
-
 </td><td>
-
 
 </td></tr>
 </tbody></table>

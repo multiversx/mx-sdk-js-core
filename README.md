@@ -5,7 +5,7 @@ MultiversX SDK for JavaScript and TypeScript (written in TypeScript).
 ## Documentation
 
 - [Cookbook](https://docs.multiversx.com/sdk-and-tools/sdk-js/sdk-js-cookbook/)
-- [Auto-generated API documentation](https://multiversx.github.io/mx-sdk-js-core/)
+- [Auto-generated documentation](https://multiversx.github.io/mx-sdk-js-core/)
 
 ## Distribution
 
@@ -65,31 +65,3 @@ make clean && npm run browser-tests
 ```
 
 For the `localnet` tests, make sure you have a _local testnet_ up & running. In order to start a _local testnet_, follow [this](https://docs.multiversx.com/developers/setup-local-testnet/).
-
-### Updating the documentation
-
-API documentation is generated from the source code using [api-extractor](https://api-extractor.com).
-
-Prerequisites:
-
-```
-npm install -g @microsoft/api-extractor
-
-# https://github.com/microsoft/rushstack/issues/4586
-npm install -g @microsoft/api-documenter@7.23.38
-```
-
-In order to (re)generate the documentation, run the following:
-
-```
-rm -rf ~/mx-sdk-js-core-docs
-git clone -b gh-pages --single-branch https://github.com/multiversx/mx-sdk-js-core.git ~/mx-sdk-js-core-docs
-
-npm run compile
-npm run api:extract
-
-MAJOR_VERSION=v$(node -p "require('./package.json').version.split('.')[0]")
-DOCS_OUTPUT_FOLDER=~/mx-sdk-js-core-docs/${MAJOR_VERSION} npm run api:document
-```
-
-Then, commit the changes in ` ~/mx-sdk-js-core-docs` push them to GitHub.

@@ -47,5 +47,6 @@ jobs:
                   # See: https://github.com/actions/checkout/blob/main/README.md#push-a-commit-using-the-built-in-token
                   git config user.name github-actions
                   git config user.email github-actions@github.com
-                  git commit -am "Re-generated docs." --allow-empty
+                  git add .
+                  git commit -m "Re-generated docs." --allow-empty
                   git push

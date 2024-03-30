@@ -10,6 +10,7 @@ export * from "./gasEstimator";
 export * from "./interface";
 export * from "./interfaceOfNetwork";
 export * from "./logger";
+export * from "./message";
 export * from "./networkParams";
 export * from "./relayedTransactionV1Builder";
 export * from "./relayedTransactionV2Builder";

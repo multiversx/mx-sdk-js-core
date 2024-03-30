@@ -4,5 +4,5 @@ For getting started with the SDKs, please follow the [**cookbook**](https://docs
 
 Below you can find a versioned auto-generated documentation:
 
-- [sdk-core v12](./v12)
-- [sdk-core v13](./v13)
+- [sdk-core v12 (latest, stable)](./v12)
+- [sdk-core v13 (next, unstable)](./v13)

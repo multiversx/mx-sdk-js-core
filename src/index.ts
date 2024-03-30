@@ -1,8 +1,10 @@
 require("./globals");
 
 export * from "./account";
+export * from "./adapters";
 export * from "./address";
 export * from "./asyncTimer";
+export * from "./converters";
 export * from "./errors";
 export * from "./gasEstimator";
 export * from "./interface";

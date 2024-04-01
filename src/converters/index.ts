@@ -1,1 +1,1 @@
-export { TransactionsConverter } from "./transactionsConverter";
+export * from "./transactionsConverter";

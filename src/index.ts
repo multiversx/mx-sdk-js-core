@@ -7,13 +7,16 @@
 require("./globals");
 
 export * from "./account";
+export * from "./adapters";
 export * from "./address";
 export * from "./asyncTimer";
+export * from "./converters";
 export * from "./errors";
 export * from "./gasEstimator";
 export * from "./interface";
 export * from "./interfaceOfNetwork";
 export * from "./logger";
+export * from "./message";
 export * from "./networkParams";
 export * from "./relayedTransactionV1Builder";
 export * from "./relayedTransactionV2Builder";

@@ -1,3 +1,4 @@
-# https://github.com/github/linguist#overrides
+# https://github.com/github-linguist/linguist/blob/master/docs/overrides.md
+# https://docs.github.com/en/repositories/working-with-files/managing-files/customizing-how-changed-files-appear-on-github
 src/proto/compiled.js linguist-generated
 src/proto/compiled.d.ts linguist-generated

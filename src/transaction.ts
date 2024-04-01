@@ -23,7 +23,7 @@ import { TransactionPayload } from "./transactionPayload";
 import { TransactionComputer } from "./transactionComputer";
 
 /**
- * An abstraction for creating, signing and broadcasting transactions.
+ * An abstraction for creating and signing transactions.
  */
 export class Transaction {
     /**

@@ -1,0 +1,49 @@
+name: Update docs
+
+on:
+  workflow_dispatch:
+  release:
+    types: [released]
+
+permissions:
+  contents: write
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          ref: "gh-pages"
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          path: "docs"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install dependencies
+        run: |
+          npm install -g typedoc
+
+      - name: Re-generate docs
+        run: |
+          MAJOR_VERSION=v$(node -p "require('./package.json').version.split('.')[0]")
+          DOCS_OUTPUT_FOLDER=${GITHUB_WORKSPACE}/docs/${MAJOR_VERSION}
+
+          mkdir -p $DOCS_OUTPUT_FOLDER
+
+          npm ci
+          typedoc --out $DOCS_OUTPUT_FOLDER src/index.ts --includeVersion
+
+          cd ${GITHUB_WORKSPACE}/docs
+
+          # See: https://github.com/actions/checkout/blob/main/README.md#push-a-commit-using-the-built-in-token
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Re-generated docs." --allow-empty
+          git push

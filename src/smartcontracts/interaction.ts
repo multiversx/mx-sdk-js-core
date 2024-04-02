@@ -100,9 +100,9 @@ export class Interaction {
         const transaction = factory.createTransactionForExecute({
             sender: this.sender,
             contract: this.contract.getAddress(),
-            functionName: this.function.valueOf(),
+            function: this.function.valueOf(),
             gasLimit: BigInt(this.gasLimit.valueOf()),
-            args: this.args,
+            arguments: this.args,
             nativeTransferAmount: BigInt(this.value.toString()),
             tokenTransfers: this.tokenTransfers,
         });

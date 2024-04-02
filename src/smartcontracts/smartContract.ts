@@ -118,23 +118,23 @@ export class SmartContract implements ISmartContract {
             abi: this.abi,
         });
 
-        const bytecode = Buffer.from(code.toString(), 'hex');
+        const bytecode = Buffer.from(code.toString(), "hex");
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
         const transaction = factory.createTransactionForDeploy({
             sender: deployer,
             bytecode: bytecode,
             gasLimit: BigInt(gasLimit.valueOf()),
-            args: initArguments,
+            arguments: initArguments,
             isUpgradeable: metadataAsJson.upgradeable,
             isReadable: metadataAsJson.readable,
             isPayable: metadataAsJson.payable,
-            isPayableBySmartContract: metadataAsJson.payableBySc
+            isPayableBySmartContract: metadataAsJson.payableBySc,
         });
 
         transaction.setChainID(chainID);
         transaction.setValue(value ?? 0);
-        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
+        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE);
 
         return transaction;
     }
@@ -176,7 +176,7 @@ export class SmartContract implements ISmartContract {
             abi: this.abi,
         });
 
-        const bytecode = Uint8Array.from(Buffer.from(code.toString(), 'hex'));
+        const bytecode = Uint8Array.from(Buffer.from(code.toString(), "hex"));
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
         const transaction = factory.createTransactionForUpgrade({
@@ -184,16 +184,16 @@ export class SmartContract implements ISmartContract {
             contract: this.getAddress(),
             bytecode: bytecode,
             gasLimit: BigInt(gasLimit.valueOf()),
-            args: initArguments,
+            arguments: initArguments,
             isUpgradeable: metadataAsJson.upgradeable,
             isReadable: metadataAsJson.readable,
             isPayable: metadataAsJson.payable,
-            isPayableBySmartContract: metadataAsJson.payableBySc
-        })
+            isPayableBySmartContract: metadataAsJson.payableBySc,
+        });
 
         transaction.setChainID(chainID);
         transaction.setValue(value ?? 0);
-        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
+        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE);
 
         return transaction;
     }
@@ -218,14 +218,14 @@ export class SmartContract implements ISmartContract {
         const transaction = factory.createTransactionForExecute({
             sender: caller,
             contract: receiver ? receiver : this.getAddress(),
-            functionName: func.toString(),
+            function: func.toString(),
             gasLimit: BigInt(gasLimit.valueOf()),
-            args: args
-        })
+            arguments: args,
+        });
 
         transaction.setChainID(chainID);
         transaction.setValue(value);
-        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE)
+        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE);
 
         return transaction;
     }

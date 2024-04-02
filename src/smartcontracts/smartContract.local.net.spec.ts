@@ -367,7 +367,7 @@ describe("test on local testnet", function () {
         const smartContractCallTransaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "increment",
+            function: "increment",
             gasLimit: 2000000n,
         });
         smartContractCallTransaction.nonce = BigInt(alice.account.nonce.valueOf());

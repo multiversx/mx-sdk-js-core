@@ -42,7 +42,7 @@ describe("test smart contract transactions factory", function () {
                     sender: sender,
                     bytecode: adderByteCode.valueOf(),
                     gasLimit: gasLimit,
-                    args: args,
+                    arguments: args,
                 }),
             Err,
             "Can't convert args to TypedValues",
@@ -58,14 +58,14 @@ describe("test smart contract transactions factory", function () {
             sender: sender,
             bytecode: adderByteCode.valueOf(),
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
         });
 
         const transactionAbiAware = abiAwareFactory.createTransactionForDeploy({
             sender: sender,
             bytecode: adderByteCode.valueOf(),
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
         });
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -87,17 +87,17 @@ describe("test smart contract transactions factory", function () {
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
         });
 
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
         });
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -119,18 +119,18 @@ describe("test smart contract transactions factory", function () {
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: [new U32Value(7)],
+            arguments: [new U32Value(7)],
             nativeTransferAmount: egldAmount,
         });
 
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: [7],
+            arguments: [7],
             nativeTransferAmount: egldAmount,
         });
 
@@ -155,18 +155,18 @@ describe("test smart contract transactions factory", function () {
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
             tokenTransfers: [transfer],
         });
 
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
             tokenTransfers: [transfer],
         });
 
@@ -194,18 +194,18 @@ describe("test smart contract transactions factory", function () {
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
             tokenTransfers: [fooTransfer, barTransfer],
         });
 
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
             tokenTransfers: [fooTransfer, barTransfer],
         });
 
@@ -238,18 +238,18 @@ describe("test smart contract transactions factory", function () {
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
             tokenTransfers: [transfer],
         });
 
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
             tokenTransfers: [transfer],
         });
 
@@ -285,18 +285,18 @@ describe("test smart contract transactions factory", function () {
         const transaction = smartContractFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
             tokenTransfers: [firstTransfer, secondTransfer],
         });
 
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            functionName: func,
+            function: func,
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
             tokenTransfers: [firstTransfer, secondTransfer],
         });
 
@@ -328,7 +328,7 @@ describe("test smart contract transactions factory", function () {
             contract: contract,
             bytecode: adderByteCode.valueOf(),
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
         });
 
         const transactionAbiAware = abiAwareFactory.createTransactionForUpgrade({
@@ -336,7 +336,7 @@ describe("test smart contract transactions factory", function () {
             contract: contract,
             bytecode: adderByteCode.valueOf(),
             gasLimit: gasLimit,
-            args: args,
+            arguments: args,
         });
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");

@@ -232,10 +232,9 @@ describe("test smart contract queries controller", () => {
                 ],
             });
 
-            const parsed = controller.parseQueryResponse(response);
-            const plainData = parsed[0].valueOf();
+            const [parsed] = controller.parseQueryResponse(response);
 
-            assert.deepEqual(plainData, {
+            assert.deepEqual(parsed, {
                 token_identifier: "lucky-token",
                 ticket_price: new BigNumber("1"),
                 tickets_left: new BigNumber(0),

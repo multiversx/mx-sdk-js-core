@@ -100,6 +100,7 @@ export class SmartContractQueriesController {
         const functionName = response.function;
         const endpoint = this.abi.getEndpoint(functionName);
         const legacyBundle = this.legacyResultsParser.parseQueryResponse(legacyQueryResponse, endpoint);
-        return legacyBundle.values;
+        const nativeValues = legacyBundle.values.map((value) => value.valueOf());
+        return nativeValues;
     }
 }

@@ -21,6 +21,7 @@ export * from "./networkParams";
 export * from "./relayedTransactionV1Builder";
 export * from "./relayedTransactionV2Builder";
 export * from "./signableMessage";
+export * from "./smartContractQueriesController";
 export * from "./smartcontracts";
 export * from "./tokenOperations";
 export * from "./tokens";

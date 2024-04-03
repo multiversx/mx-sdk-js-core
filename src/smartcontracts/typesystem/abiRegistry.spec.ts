@@ -63,20 +63,20 @@ describe("test abi registry", () => {
     it("binary codec correctly decodes perform action result", async () => {
         let bc = new BinaryCodec();
         let buff = Buffer.from(
-            "0588c738a5d26c0e3a2b4f9e8110b540ee9c0b71a3be057569a5a7b0fcb482c8f70000000806f05b59d3b200000000000b68656c6c6f20776f726c6400000000",
+            "0500000000000000000500d006f73c4221216fa679bc559005584c4f1160e569e1000000012a0000000003616464000000010000000107",
             "hex",
         );
 
-        let registry = await loadAbiRegistry("src/testdata/multisig.abi.json");
+        let registry = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
         let performAction = registry.getEndpoint("getActionData");
         assert.equal(performAction.output[0].type.getName(), "Action");
 
         let result = bc.decodeTopLevel(buff, performAction.output[0].type);
         assert.deepEqual(
             JSON.stringify(result.valueOf()),
-            `{"name":"SendTransferExecute","fields":[{"to":{"bech32":"erd13rrn3fwjds8r5260n6q3pd2qa6wqkudrhczh26d957c0edyzermshds0k8","pubkey":"88c738a5d26c0e3a2b4f9e8110b540ee9c0b71a3be057569a5a7b0fcb482c8f7"},"egld_amount":"500000000000000000","endpoint_name":{"type":"Buffer","data":[104,101,108,108,111,32,119,111,114,108,100]},"arguments":[]}]}`,
+            `{"name":"SendTransferExecuteEgld","fields":[{"to":{"bech32":"erd1qqqqqqqqqqqqqpgq6qr0w0zzyysklfneh32eqp2cf383zc89d8sstnkl60","pubkey":"00000000000000000500d006f73c4221216fa679bc559005584c4f1160e569e1"},"egld_amount":"42","opt_gas_limit":null,"endpoint_name":{"type":"Buffer","data":[97,100,100]},"arguments":[{"type":"Buffer","data":[7]}]}]}`,
         );
-        assert.equal(result.valueOf().name, "SendTransferExecute");
+        assert.equal(result.valueOf().name, "SendTransferExecuteEgld");
     });
 
     it("should load ABI containing arrayN and nested structs", async () => {

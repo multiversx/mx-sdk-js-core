@@ -83,6 +83,10 @@ export function findEventsByIdentifier(transactionOutcome: TransactionOutcome, i
     return findEventsByPredicate(transactionOutcome, (event) => event.identifier == identifier);
 }
 
+export function findEventsByFirstTopic(transactionOutcome: TransactionOutcome, topic: string): TransactionEvent[] {
+    return findEventsByPredicate(transactionOutcome, (event) => event.topics[0]?.toString() == topic);
+}
+
 export function gatherAllEvents(transactionOutcome: TransactionOutcome): TransactionEvent[] {
     const allEvents = [];
 

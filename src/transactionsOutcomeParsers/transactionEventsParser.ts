@@ -35,14 +35,14 @@ export class TransactionEventsParser {
 
     parseEvent(options: { event: TransactionEvent }): any {
         const topics = options.event.topics.map((topic) => Buffer.from(topic));
-        const eventIdentifier = this.firstTopicIsIdentifier ? topics[0]?.toString() : options.event.identifier;
+        const abiIdentifier = this.firstTopicIsIdentifier ? topics[0]?.toString() : options.event.identifier;
 
         if (this.firstTopicIsIdentifier) {
             topics.shift();
         }
 
         const dataItems = options.event.dataItems.map((dataItem) => Buffer.from(dataItem));
-        const eventDefinition = this.abi.getEvent(eventIdentifier);
+        const eventDefinition = this.abi.getEvent(abiIdentifier);
 
         const parsedEvent = this.legacyResultsParser.doParseEvent({
             topics: topics,

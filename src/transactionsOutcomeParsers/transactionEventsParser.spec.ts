@@ -102,17 +102,18 @@ describe("test transaction events parser", () => {
                 events: [
                     new TransactionEvent({
                         identifier: "foobar",
+                        topics: [Buffer.from("doFoobar")],
                     }),
                 ],
             });
-        }, "Invariant failed: [event [foobar] not found]");
+        }, "Invariant failed: [event [doFoobar] not found]");
     });
 
     it("parses event (with multi-values)", async function () {
         const abi = AbiRegistry.create({
             events: [
                 {
-                    identifier: "foobar",
+                    identifier: "doFoobar",
                     inputs: [
                         {
                             name: "a",
@@ -139,7 +140,7 @@ describe("test transaction events parser", () => {
             event: new TransactionEvent({
                 identifier: "foobar",
                 topics: [
-                    Buffer.from("foobar"),
+                    Buffer.from("doFoobar"),
                     Buffer.from([42]),
                     Buffer.from("test"),
                     Buffer.from([43]),

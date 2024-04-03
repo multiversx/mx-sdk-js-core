@@ -17,9 +17,9 @@ export class TransactionEventsParser {
 
         // By default, we consider that the first topic is the event identifier.
         // This is true for log entries emitted by smart contracts:
+        // https://github.com/multiversx/mx-chain-vm-go/blob/v1.5.27/vmhost/contexts/output.go#L270
         // https://github.com/multiversx/mx-chain-vm-go/blob/v1.5.27/vmhost/contexts/output.go#L283
-        this.firstTopicIsIdentifier =
-            options.firstTopicIsIdentifier === undefined ? true : options.firstTopicIsIdentifier;
+        this.firstTopicIsIdentifier = options.firstTopicIsIdentifier ?? true;
     }
 
     parseEvents(options: { events: TransactionEvent[] }): any[] {
@@ -35,13 +35,14 @@ export class TransactionEventsParser {
 
     parseEvent(options: { event: TransactionEvent }): any {
         const topics = options.event.topics.map((topic) => Buffer.from(topic));
-        const dataItems = options.event.dataItems.map((dataItem) => Buffer.from(dataItem));
-        const eventDefinition = this.abi.getEvent(options.event.identifier);
+        const eventIdentifier = this.firstTopicIsIdentifier ? topics[0]?.toString() : options.event.identifier;
 
         if (this.firstTopicIsIdentifier) {
-            // Discard the first topic (not useful).
             topics.shift();
         }
+
+        const dataItems = options.event.dataItems.map((dataItem) => Buffer.from(dataItem));
+        const eventDefinition = this.abi.getEvent(eventIdentifier);
 
         const parsedEvent = this.legacyResultsParser.doParseEvent({
             topics: topics,

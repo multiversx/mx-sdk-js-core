@@ -7,7 +7,6 @@ import { ResultsParser } from "./resultsParser";
 import { SmartContract } from "./smartContract";
 import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
-import { TokenComputer } from "../tokens";
 import { promises } from "fs";
 import { TransactionComputer } from "../transactionComputer";
 
@@ -62,14 +61,14 @@ describe("fetch transactions from local testnet", function () {
         alice.account.incrementNonce();
 
         // Broadcast & execute
-        await provider.sendTransaction(transactionDeploy);
-        await provider.sendTransaction(transactionIncrement);
+        const txHashDeploy = await provider.sendTransaction(transactionDeploy);
+        const txHashIncrement = await provider.sendTransaction(transactionIncrement);
 
-        await watcher.awaitCompleted(transactionDeploy.getHash().hex());
-        await watcher.awaitCompleted(transactionIncrement.getHash().hex());
+        await watcher.awaitCompleted(txHashDeploy);
+        await watcher.awaitCompleted(txHashIncrement);
 
-        let transactionOnNetworkDeploy = await provider.getTransaction(transactionDeploy.getHash().hex());
-        let transactionOnNetworkIncrement = await provider.getTransaction(transactionIncrement.getHash().hex());
+        const transactionOnNetworkDeploy = await provider.getTransaction(txHashDeploy);
+        const transactionOnNetworkIncrement = await provider.getTransaction(txHashIncrement);
 
         let bundle = resultsParser.parseUntypedOutcome(transactionOnNetworkDeploy);
         assert.isTrue(bundle.returnCode.isSuccess());
@@ -88,7 +87,7 @@ describe("fetch transactions from local testnet", function () {
         await alice.sync(provider);
 
         const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
-        const factory = new SmartContractTransactionsFactory({ config: config, tokenComputer: new TokenComputer() });
+        const factory = new SmartContractTransactionsFactory({ config: config });
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
 
@@ -110,7 +109,7 @@ describe("fetch transactions from local testnet", function () {
         const smartContractCallTransaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "increment",
+            function: "increment",
             gasLimit: 3000000n,
         });
         smartContractCallTransaction.nonce = BigInt(alice.account.nonce.valueOf());

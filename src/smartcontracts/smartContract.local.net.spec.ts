@@ -118,7 +118,7 @@ describe("test on local testnet", function () {
         await alice.sync(provider);
 
         const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
-        const factory = new SmartContractTransactionsFactory({ config: config, tokenComputer: new TokenComputer() });
+        const factory = new SmartContractTransactionsFactory({ config: config });
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
 
@@ -140,7 +140,7 @@ describe("test on local testnet", function () {
         const smartContractCallTransaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "increment",
+            function: "increment",
             gasLimit: 3000000n,
         });
         smartContractCallTransaction.nonce = BigInt(alice.account.nonce.valueOf());
@@ -152,7 +152,7 @@ describe("test on local testnet", function () {
 
         const simulateOne = factory.createTransactionForExecute({
             sender: alice.address,
-            functionName: "increment",
+            function: "increment",
             contract: contractAddress,
             gasLimit: 100000n,
         });
@@ -166,7 +166,7 @@ describe("test on local testnet", function () {
 
         const simulateTwo = factory.createTransactionForExecute({
             sender: alice.address,
-            functionName: "foobar",
+            function: "foobar",
             contract: contractAddress,
             gasLimit: 500000n,
         });
@@ -271,7 +271,7 @@ describe("test on local testnet", function () {
         await alice.sync(provider);
 
         const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
-        const factory = new SmartContractTransactionsFactory({ config: config, tokenComputer: new TokenComputer() });
+        const factory = new SmartContractTransactionsFactory({ config: config });
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
 
@@ -293,7 +293,7 @@ describe("test on local testnet", function () {
         const firstScCallTransaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "increment",
+            function: "increment",
             gasLimit: 3000000n,
         });
         firstScCallTransaction.nonce = BigInt(alice.account.nonce.valueOf());
@@ -306,7 +306,7 @@ describe("test on local testnet", function () {
         const secondScCallTransaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "increment",
+            function: "increment",
             gasLimit: 3000000n,
         });
         secondScCallTransaction.nonce = BigInt(alice.account.nonce.valueOf());
@@ -435,7 +435,7 @@ describe("test on local testnet", function () {
         await alice.sync(provider);
 
         const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
-        const factory = new SmartContractTransactionsFactory({ config: config, tokenComputer: new TokenComputer() });
+        const factory = new SmartContractTransactionsFactory({ config: config });
 
         const bytecode = await promises.readFile("src/testdata/erc20.wasm");
 
@@ -443,7 +443,7 @@ describe("test on local testnet", function () {
             sender: alice.address,
             bytecode: bytecode,
             gasLimit: 50000000n,
-            args: [new U32Value(10000)],
+            arguments: [new U32Value(10000)],
         });
         deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
         const transactionComputer = new TransactionComputer();
@@ -457,9 +457,9 @@ describe("test on local testnet", function () {
         const transactionMintBob = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "transferToken",
+            function: "transferToken",
             gasLimit: 9000000n,
-            args: [new AddressValue(bob.address), new U32Value(1000)],
+            arguments: [new AddressValue(bob.address), new U32Value(1000)],
         });
         transactionMintBob.nonce = BigInt(alice.account.nonce.valueOf());
         transactionMintBob.signature = await alice.signer.sign(
@@ -471,9 +471,9 @@ describe("test on local testnet", function () {
         const transactionMintCarol = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "transferToken",
+            function: "transferToken",
             gasLimit: 9000000n,
-            args: [new AddressValue(carol.address), new U32Value(1500)],
+            arguments: [new AddressValue(carol.address), new U32Value(1500)],
         });
         transactionMintCarol.nonce = BigInt(alice.account.nonce.valueOf());
         transactionMintCarol.signature = await alice.signer.sign(
@@ -638,7 +638,7 @@ describe("test on local testnet", function () {
             contract: contractAddress,
             function: "start",
             gasLimit: 10000000n,
-            args: [
+            arguments: [
                 BytesValue.fromUTF8("lucky"),
                 new TokenIdentifierValue("EGLD"),
                 new BigUIntValue(1),

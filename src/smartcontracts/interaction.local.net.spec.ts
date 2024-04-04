@@ -10,7 +10,6 @@ import { ReturnCode } from "./returnCode";
 import { SmartContract } from "./smartContract";
 import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
-import { TokenComputer } from "../tokens";
 import { promises } from "fs";
 import { ResultsParser } from "./resultsParser";
 import { TransactionWatcher } from "../transactionWatcher";
@@ -98,7 +97,6 @@ describe("test smart contract interactor", function () {
         const factory = new SmartContractTransactionsFactory({
             config: config,
             abi: abiRegistry,
-            tokenComputer: new TokenComputer(),
         });
 
         const bytecode = await promises.readFile("src/testdata/answer.wasm");
@@ -142,13 +140,13 @@ describe("test smart contract interactor", function () {
         const queryResponse = await queryController.runQuery(query);
         const parsed = queryController.parseQueryResponse(queryResponse);
         assert.lengthOf(parsed, 1);
-        assert.deepEqual(parsed[0].valueOf(), new BigNumber(42));
+        assert.deepEqual(parsed[0], new BigNumber(42));
 
         // Query
         let transaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "getUltimateAnswer",
+            function: "getUltimateAnswer",
             gasLimit: 3000000n,
         });
         transaction.nonce = BigInt(alice.account.nonce.valueOf());
@@ -164,7 +162,7 @@ describe("test smart contract interactor", function () {
         transaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "getUltimateAnswer",
+            function: "getUltimateAnswer",
             gasLimit: 3000000n,
         });
         transaction.nonce = BigInt(alice.account.nonce.valueOf());
@@ -258,7 +256,6 @@ describe("test smart contract interactor", function () {
         const factory = new SmartContractTransactionsFactory({
             config: config,
             abi: abiRegistry,
-            tokenComputer: new TokenComputer(),
         });
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
@@ -295,7 +292,7 @@ describe("test smart contract interactor", function () {
         let incrementTransaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "increment",
+            function: "increment",
             gasLimit: 3000000n,
         });
         incrementTransaction.nonce = BigInt(alice.account.nonce.valueOf());
@@ -314,7 +311,7 @@ describe("test smart contract interactor", function () {
         });
         const queryResponse = await queryController.runQuery(query);
         const parsed = queryController.parseQueryResponse(queryResponse);
-        assert.deepEqual(parsed[0].valueOf(), new BigNumber(1));
+        assert.deepEqual(parsed[0], new BigNumber(1));
 
         const incrementTxHash = await provider.sendTransaction(incrementTransaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(incrementTxHash);
@@ -324,7 +321,7 @@ describe("test smart contract interactor", function () {
         let decrementTransaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "decrement",
+            function: "decrement",
             gasLimit: 3000000n,
         });
         decrementTransaction.nonce = BigInt(alice.account.nonce.valueOf());
@@ -455,7 +452,6 @@ describe("test smart contract interactor", function () {
         const factory = new SmartContractTransactionsFactory({
             config: config,
             abi: abiRegistry,
-            tokenComputer: new TokenComputer(),
         });
 
         const bytecode = await promises.readFile("src/testdata/lottery-esdt.wasm");
@@ -491,8 +487,8 @@ describe("test smart contract interactor", function () {
         let startTransaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "start",
-            args: ["lucky", "EGLD", 1, null, null, 1, null, null],
+            function: "start",
+            arguments: ["lucky", "EGLD", 1, null, null, 1, null, null],
             gasLimit: 30000000n,
         });
         startTransaction.nonce = BigInt(alice.account.nonce.valueOf());
@@ -512,8 +508,8 @@ describe("test smart contract interactor", function () {
         let lotteryStatusTransaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "status",
-            args: ["lucky"],
+            function: "status",
+            arguments: ["lucky"],
             gasLimit: 5000000n,
         });
         lotteryStatusTransaction.nonce = BigInt(alice.account.nonce.valueOf());
@@ -534,8 +530,8 @@ describe("test smart contract interactor", function () {
         let lotteryInfoTransaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "getLotteryInfo",
-            args: ["lucky"],
+            function: "getLotteryInfo",
+            arguments: ["lucky"],
             gasLimit: 5000000n,
         });
         lotteryInfoTransaction.nonce = BigInt(alice.account.nonce.valueOf());

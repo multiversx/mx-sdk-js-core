@@ -1,12 +1,12 @@
 import { ContractQueryResponse } from "@multiversx/sdk-network-providers";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
+import { QueryRunnerAdapter } from "./adapters/queryRunnerAdapter";
 import { SmartContractQueriesController } from "./smartContractQueriesController";
 import { SmartContractQueryResponse } from "./smartContractQuery";
 import { AbiRegistry, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "./smartcontracts";
 import { bigIntToBuffer } from "./smartcontracts/codec/utils";
 import { MockNetworkProvider, loadAbiRegistry } from "./testutils";
-import { QueryRunnerAdapter } from "./adapters/queryRunnerAdapter";
 
 describe("test smart contract queries controller", () => {
     describe("createQuery", () => {
@@ -232,10 +232,9 @@ describe("test smart contract queries controller", () => {
                 ],
             });
 
-            const parsed = controller.parseQueryResponse(response);
-            const plainData = parsed[0].valueOf();
+            const [parsed] = controller.parseQueryResponse(response);
 
-            assert.deepEqual(plainData, {
+            assert.deepEqual(parsed, {
                 token_identifier: "lucky-token",
                 ticket_price: new BigNumber("1"),
                 tickets_left: new BigNumber(0),

@@ -4,7 +4,7 @@ import { Err, ErrBadUsage } from "../errors";
 import { IAddress } from "../interface";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
-import { Token, TokenTransfer } from "../tokens";
+import { TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { byteArrayToHex, utf8ToHex } from "../utils.codec";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
@@ -22,10 +22,6 @@ interface IAbi {
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
 }
 
-interface TokenComputer {
-    isFungible(token: Token): boolean;
-}
-
 /**
  * Use this class to create transactions to deploy, call or upgrade a smart contract.
  */
@@ -35,10 +31,10 @@ export class SmartContractTransactionsFactory {
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
 
-    constructor(options: { config: Config; abi?: IAbi; tokenComputer: TokenComputer }) {
+    constructor(options: { config: Config; abi?: IAbi }) {
         this.config = options.config;
         this.abi = options.abi;
-        this.tokenComputer = options.tokenComputer;
+        this.tokenComputer = new TokenComputer();
         this.dataArgsBuilder = new TokenTransfersDataBuilder();
     }
 
@@ -46,7 +42,7 @@ export class SmartContractTransactionsFactory {
         sender: IAddress;
         bytecode: Uint8Array;
         gasLimit: bigint;
-        args?: any[];
+        arguments?: any[];
         nativeTransferAmount?: bigint;
         isUpgradeable?: boolean;
         isReadable?: boolean;
@@ -58,7 +54,7 @@ export class SmartContractTransactionsFactory {
         const isReadable = options.isReadable ?? true;
         const isPayable = options.isPayable ?? false;
         const isPayableBySmartContract = options.isPayableBySmartContract ?? true;
-        const args = options.args || [];
+        const args = options.arguments || [];
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
         let parts = [byteArrayToHex(options.bytecode), byteArrayToHex(VM_TYPE_WASM_VM), metadata.toString()];
         const preparedArgs = this.argsToDataParts(args, this.abi?.constructorDefinition);
@@ -78,13 +74,13 @@ export class SmartContractTransactionsFactory {
     createTransactionForExecute(options: {
         sender: IAddress;
         contract: IAddress;
-        functionName: string;
+        function: string;
         gasLimit: bigint;
-        args?: any[];
+        arguments?: any[];
         nativeTransferAmount?: bigint;
         tokenTransfers?: TokenTransfer[];
     }): Transaction {
-        const args = options.args || [];
+        const args = options.arguments || [];
         const tokenTransfer = options.tokenTransfers || [];
         const nativeTransferAmount = options.nativeTransferAmount ?? 0n;
         const numberOfTokens = tokenTransfer.length;
@@ -110,8 +106,8 @@ export class SmartContractTransactionsFactory {
             receiver = options.sender;
         }
 
-        dataParts.push(dataParts.length ? utf8ToHex(options.functionName) : options.functionName);
-        dataParts = dataParts.concat(this.argsToDataParts(args, this.abi?.getEndpoint(options.functionName)));
+        dataParts.push(dataParts.length ? utf8ToHex(options.function) : options.function);
+        dataParts = dataParts.concat(this.argsToDataParts(args, this.abi?.getEndpoint(options.function)));
 
         return new TransactionBuilder({
             config: this.config,
@@ -129,7 +125,7 @@ export class SmartContractTransactionsFactory {
         contract: IAddress;
         bytecode: Uint8Array;
         gasLimit: bigint;
-        args?: any[];
+        arguments?: any[];
         nativeTransferAmount?: bigint;
         isUpgradeable?: boolean;
         isReadable?: boolean;
@@ -143,7 +139,7 @@ export class SmartContractTransactionsFactory {
         const isPayable = options.isPayable ?? false;
         const isPayableBySmartContract = options.isPayableBySmartContract ?? true;
 
-        const args = options.args || [];
+        const args = options.arguments || [];
         const metadata = new CodeMetadata(isUpgradeable, isReadable, isPayable, isPayableBySmartContract);
 
         let parts = ["upgradeContract", byteArrayToHex(options.bytecode), metadata.toString()];

@@ -13,7 +13,7 @@ import { Address } from "../address";
 import { TransactionsConverter } from "../converters/transactionsConverter";
 import { AbiRegistry } from "../smartcontracts";
 import { loadAbiRegistry } from "../testutils";
-import { TransactionEvent, findEventsByIdentifier } from "./resources";
+import { TransactionEvent, findEventsByFirstTopic } from "./resources";
 import { TransactionEventsParser } from "./transactionEventsParser";
 
 describe("test transaction events parser", () => {
@@ -39,7 +39,7 @@ describe("test transaction events parser", () => {
         ]);
     });
 
-    it("parses events", async function () {
+    it("parses events (esdt-safe, deposit)", async function () {
         const parser = new TransactionEventsParser({
             abi: await loadAbiRegistry("src/testdata/esdt-safe.abi.json"),
         });
@@ -69,7 +69,7 @@ describe("test transaction events parser", () => {
         });
 
         const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
-        const events = findEventsByIdentifier(transactionOutcome, "deposit");
+        const events = findEventsByFirstTopic(transactionOutcome, "deposit");
         const parsed = parser.parseEvents({ events });
 
         assert.deepEqual(parsed, [
@@ -92,6 +92,65 @@ describe("test transaction events parser", () => {
         ]);
     });
 
+    it("parses events (multisig, startPerformAction)", async function () {
+        const parser = new TransactionEventsParser({
+            abi: await loadAbiRegistry("src/testdata/multisig-full.abi.json"),
+        });
+
+        const transactionsConverter = new TransactionsConverter();
+        const transactionOnNetwork = new TransactionOnNetwork({
+            nonce: 7,
+            contractResults: new ContractResults([
+                new ContractResultItem({
+                    nonce: 8,
+                    data: "@6f6b",
+                }),
+            ]),
+            logs: new TransactionLogsOnNetwork({
+                events: [
+                    new TransactionEventOnNetwork({
+                        identifier: "performAction",
+                        topics: [new TransactionEventTopic("c3RhcnRQZXJmb3JtQWN0aW9u")],
+                        dataPayload: new TransactionEventData(
+                            Buffer.from(
+                                "00000001000000000500000000000000000500d006f73c4221216fa679bc559005584c4f1160e569e1000000000000000003616464000000010000000107000000010139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                                "hex",
+                            ),
+                        ),
+                    }),
+                ],
+            }),
+        });
+
+        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
+        const events = findEventsByFirstTopic(transactionOutcome, "startPerformAction");
+        const parsed = parser.parseEvents({ events });
+
+        assert.deepEqual(parsed, [
+            {
+                data: {
+                    action_id: new BigNumber("1"),
+                    group_id: new BigNumber("0"),
+                    action_data: {
+                        name: "SendTransferExecuteEgld",
+                        fields: [
+                            {
+                                to: Address.fromBech32(
+                                    "erd1qqqqqqqqqqqqqpgq6qr0w0zzyysklfneh32eqp2cf383zc89d8sstnkl60",
+                                ),
+                                egld_amount: new BigNumber("0"),
+                                opt_gas_limit: null,
+                                endpoint_name: Buffer.from("add"),
+                                arguments: [Buffer.from("07", "hex")],
+                            },
+                        ],
+                    },
+                    signers: [Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th")],
+                },
+            },
+        ]);
+    });
+
     it("cannot parse events, when definition is missing", async function () {
         const parser = new TransactionEventsParser({
             abi: await loadAbiRegistry("src/testdata/esdt-safe.abi.json"),
@@ -102,17 +161,18 @@ describe("test transaction events parser", () => {
                 events: [
                     new TransactionEvent({
                         identifier: "foobar",
+                        topics: [Buffer.from("doFoobar")],
                     }),
                 ],
             });
-        }, "Invariant failed: [event [foobar] not found]");
+        }, "Invariant failed: [event [doFoobar] not found]");
     });
 
     it("parses event (with multi-values)", async function () {
         const abi = AbiRegistry.create({
             events: [
                 {
-                    identifier: "foobar",
+                    identifier: "doFoobar",
                     inputs: [
                         {
                             name: "a",
@@ -139,7 +199,7 @@ describe("test transaction events parser", () => {
             event: new TransactionEvent({
                 identifier: "foobar",
                 topics: [
-                    Buffer.from("foobar"),
+                    Buffer.from("doFoobar"),
                     Buffer.from([42]),
                     Buffer.from("test"),
                     Buffer.from([43]),

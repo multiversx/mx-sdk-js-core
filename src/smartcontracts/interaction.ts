@@ -3,7 +3,7 @@ import { Address } from "../address";
 import { Compatibility } from "../compatibility";
 import { TRANSACTION_VERSION_DEFAULT } from "../constants";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenTransfer, ITransactionValue } from "../interface";
-import { TokenComputer, TokenTransfer } from "../tokens";
+import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { SmartContractTransactionsFactory, TransactionsFactoryConfig } from "../transactionsFactories";
 import { ContractFunction } from "./function";
@@ -46,11 +46,7 @@ export class Interaction {
 
     private tokenTransfers: TokenTransfer[];
 
-    constructor(
-        contract: ISmartContractWithinInteraction,
-        func: ContractFunction,
-        args: TypedValue[]
-    ) {
+    constructor(contract: ISmartContractWithinInteraction, func: ContractFunction, args: TypedValue[]) {
         this.contract = contract;
         this.function = func;
         this.args = args;
@@ -90,20 +86,23 @@ export class Interaction {
     }
 
     buildTransaction(): Transaction {
-        Compatibility.guardAddressIsSetAndNonZero(this.sender, "'sender' of interaction", "use interaction.withSender()");
+        Compatibility.guardAddressIsSetAndNonZero(
+            this.sender,
+            "'sender' of interaction",
+            "use interaction.withSender()",
+        );
 
         const factoryConfig = new TransactionsFactoryConfig({ chainID: this.chainID.valueOf() });
         const factory = new SmartContractTransactionsFactory({
             config: factoryConfig,
-            tokenComputer: new TokenComputer(),
         });
 
         const transaction = factory.createTransactionForExecute({
             sender: this.sender,
             contract: this.contract.getAddress(),
-            functionName: this.function.valueOf(),
+            function: this.function.valueOf(),
             gasLimit: BigInt(this.gasLimit.valueOf()),
-            args: this.args,
+            arguments: this.args,
             nativeTransferAmount: BigInt(this.value.toString()),
             tokenTransfers: this.tokenTransfers,
         });

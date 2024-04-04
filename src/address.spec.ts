@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { Address } from "./address";
+import { Address, AddressComputer } from "./address";
 import * as errors from "./errors";
 
 describe("test address", () => {
@@ -9,11 +9,14 @@ describe("test address", () => {
     let bobHex = "8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8";
 
     it("should create address", async () => {
-        let alice = new Address(aliceBech32);
-        let bob = new Address(bobBech32);
+        assert.equal(new Address(aliceBech32).toHex(), aliceHex);
+        assert.equal(new Address(bobBech32).toHex(), bobHex);
 
-        assert.equal(alice.hex(), aliceHex);
-        assert.equal(bob.hex(), bobHex);
+        assert.equal(new Address(Buffer.from(aliceHex, "hex")).toHex(), aliceHex);
+        assert.equal(new Address(Buffer.from(bobHex, "hex")).toHex(), bobHex);
+
+        assert.equal(new Address(new Uint8Array(Buffer.from(aliceHex, "hex"))).toHex(), aliceHex);
+        assert.equal(new Address(new Uint8Array(Buffer.from(bobHex, "hex"))).toHex(), bobHex);
     });
 
     it("should create empty address", async () => {
@@ -66,5 +69,34 @@ describe("test address", () => {
         assert.isTrue(
             Address.fromBech32("erd1qqqqqqqqqqqqqpgqxwakt2g7u9atsnr03gqcgmhcv38pt7mkd94q6shuwt").isSmartContract(),
         );
+    });
+
+    it("should contract address", () => {
+        const addressComputer = new AddressComputer();
+        const deployer = Address.fromBech32("erd1j0hxzs7dcyxw08c4k2nv9tfcaxmqy8rj59meq505w92064x0h40qcxh3ap");
+
+        let contractAddress = addressComputer.computeContractAddress(deployer, 0n);
+        assert.equal(contractAddress.toHex(), "00000000000000000500bb652200ed1f994200ab6699462cab4b1af7b11ebd5e");
+        assert.equal(contractAddress.toBech32(), "erd1qqqqqqqqqqqqqpgqhdjjyq8dr7v5yq9tv6v5vt9tfvd00vg7h40q6779zn");
+
+        contractAddress = addressComputer.computeContractAddress(deployer, 1n);
+        assert.equal(contractAddress.toHex(), "000000000000000005006e4f90488e27342f9a46e1809452c85ee7186566bd5e");
+        assert.equal(contractAddress.toBech32(), "erd1qqqqqqqqqqqqqpgqde8eqjywyu6zlxjxuxqfg5kgtmn3setxh40qen8egy");
+    });
+
+    it("should get address shard", () => {
+        const addressComputer = new AddressComputer();
+
+        let address = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        let shard = addressComputer.getShardOfAddress(address);
+        assert.equal(shard, 1);
+
+        address = Address.fromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+        shard = addressComputer.getShardOfAddress(address);
+        assert.equal(shard, 0);
+
+        address = Address.fromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
+        shard = addressComputer.getShardOfAddress(address);
+        assert.equal(shard, 2);
     });
 });

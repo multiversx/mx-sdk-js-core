@@ -12,7 +12,6 @@ import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifier
 import { BytesValue } from "./typesystem/bytes";
 import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
-import { TokenComputer } from "../tokens";
 import { promises } from "fs";
 import { TransactionComputer } from "../transactionComputer";
 import { QueryRunnerAdapter } from "../adapters/queryRunnerAdapter";
@@ -615,7 +614,7 @@ describe("test on local testnet", function () {
         await alice.sync(provider);
 
         const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
-        const factory = new SmartContractTransactionsFactory({ config: config, tokenComputer: new TokenComputer() });
+        const factory = new SmartContractTransactionsFactory({ config: config });
 
         const bytecode = await promises.readFile("src/testdata/lottery-esdt.wasm");
 
@@ -637,7 +636,7 @@ describe("test on local testnet", function () {
         const startTransaction = factory.createTransactionForExecute({
             sender: alice.address,
             contract: contractAddress,
-            functionName: "start",
+            function: "start",
             gasLimit: 10000000n,
             args: [
                 BytesValue.fromUTF8("lucky"),

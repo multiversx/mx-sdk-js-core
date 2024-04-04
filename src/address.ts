@@ -1,5 +1,9 @@
 import * as bech32 from "bech32";
+import BigNumber from "bignumber.js";
+import { CURRENT_NUMBER_OF_SHARDS_WITHOUT_META, METACHAIN_ID, WasmVirtualMachine } from "./constants";
 import * as errors from "./errors";
+import { bigIntToBuffer } from "./tokenOperations/codec";
+const createKeccakHash = require("keccak");
 
 /**
  * The human-readable-part of the bech32 addresses.
@@ -13,6 +17,11 @@ const PUBKEY_LENGTH = 32;
 
 const SMART_CONTRACT_HEX_PUBKEY_PREFIX = "0".repeat(16);
 
+interface IAddress {
+    getPublicKey(): Buffer;
+    getHrp(): string;
+}
+
 /**
  * An Address, as an immutable object.
  */
@@ -23,15 +32,15 @@ export class Address {
     /**
      * Creates an address object, given a raw string (whether a hex pubkey or a Bech32 address), a sequence of bytes, or another Address object.
      */
-    public constructor(value: Address | Buffer | string) {
+    public constructor(value: Address | Buffer | Uint8Array | string) {
         if (!value) {
             return;
         }
         if (value instanceof Address) {
             return Address.fromAddress(value);
         }
-        if (value instanceof Buffer) {
-            return Address.fromBuffer(value);
+        if (ArrayBuffer.isView(value)) {
+            return Address.fromBuffer(Buffer.from(value));
         }
         if (typeof value === "string") {
             return Address.fromString(value);
@@ -257,5 +266,71 @@ export class Address {
      */
     isSmartContract(): boolean {
         return this.toHex().startsWith(SMART_CONTRACT_HEX_PUBKEY_PREFIX);
+    }
+}
+
+export class AddressComputer {
+    private readonly numberOfShardsWithoutMeta: number;
+
+    constructor(numberOfShardsWithoutMeta?: number) {
+        this.numberOfShardsWithoutMeta = numberOfShardsWithoutMeta || CURRENT_NUMBER_OF_SHARDS_WITHOUT_META;
+    }
+
+    computeContractAddress(deployer: IAddress, deploymentNonce: bigint): Address {
+        const initialPadding = Buffer.alloc(8, 0);
+        const ownerPubkey = deployer.getPublicKey();
+        const shardSelector = ownerPubkey.slice(30);
+        const ownerNonceBytes = Buffer.alloc(8);
+
+        const bigNonce = new BigNumber(deploymentNonce.toString());
+        const bigNonceBuffer = bigIntToBuffer(bigNonce);
+        ownerNonceBytes.write(bigNonceBuffer.reverse().toString("hex"), "hex");
+
+        const bytesToHash = Buffer.concat([ownerPubkey, ownerNonceBytes]);
+        const hash = createKeccakHash("keccak256").update(bytesToHash).digest();
+        const vmTypeBytes = Buffer.from(WasmVirtualMachine, "hex");
+        const addressBytes = Buffer.concat([initialPadding, vmTypeBytes, hash.slice(10, 30), shardSelector]);
+
+        return new Address(addressBytes);
+    }
+
+    getShardOfAddress(address: IAddress): number {
+        return this.getShardOfPubkey(address.getPublicKey(), this.numberOfShardsWithoutMeta);
+    }
+
+    private getShardOfPubkey(pubkey: Uint8Array, numberOfShards: number): number {
+        const maskHigh: number = parseInt("11", 2);
+        const maskLow: number = parseInt("01", 2);
+
+        const lastByteOfPubkey: number = pubkey[31];
+
+        if (this.isPubkeyOfMetachain(pubkey)) {
+            return METACHAIN_ID;
+        }
+
+        let shard: number = lastByteOfPubkey & maskHigh;
+        if (shard > numberOfShards - 1) {
+            shard = lastByteOfPubkey & maskLow;
+        }
+
+        return shard;
+    }
+
+    private isPubkeyOfMetachain(pubkey: Uint8Array): boolean {
+        const metachainPrefix = Buffer.from([
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ]);
+        const pubkeyPrefix = Buffer.from(pubkey).slice(0, metachainPrefix.length);
+
+        if (metachainPrefix.equals(pubkeyPrefix)) {
+            return true;
+        }
+
+        const zeroAddress = Buffer.alloc(32);
+        if (zeroAddress.equals(Buffer.from(pubkey))) {
+            return true;
+        }
+
+        return false;
     }
 }

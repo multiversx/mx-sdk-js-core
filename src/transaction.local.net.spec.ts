@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Logger } from "./logger";
 import { loadTestWallets, TestWallet } from "./testutils";
-import { createLocalnetProvider } from "./testutils/networkProviders";
+import { createLocalnetProvider, INetworkProvider } from "./testutils/networkProviders";
 import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
@@ -18,21 +18,23 @@ describe("test transaction", function () {
         ({ alice, bob } = await loadTestWallets());
     });
 
+    function createTransactionWatcher(provider: INetworkProvider) {
+        return new TransactionWatcher(
+            {
+                getTransaction: async (hash: string) => {
+                    return await provider.getTransaction(hash, true);
+                },
+            },
+            { timeoutMilliseconds: 100000 },
+        );
+    }
+
     it("should send transactions and wait for completion", async function () {
         this.timeout(70000);
 
         let provider = createLocalnetProvider();
-        let watcher = new TransactionWatcher({
-            getTransaction: async (hash: string) => {
-                return await provider.getTransaction(hash, true);
-            },
-        });
+        let watcher = createTransactionWatcher(provider);
         let network = await provider.getNetworkConfig();
-
-        await alice.sync(provider);
-
-        await bob.sync(provider);
-        let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
 
         let transactionOne = new Transaction({
             sender: alice.address,
@@ -49,6 +51,10 @@ describe("test transaction", function () {
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID,
         });
+
+        await alice.sync(provider);
+        await bob.sync(provider);
+        let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
 
         transactionOne.setNonce(alice.account.nonce);
         alice.account.incrementNonce();
@@ -73,17 +79,9 @@ describe("test transaction", function () {
         this.timeout(70000);
 
         let provider = createLocalnetProvider();
-        let watcher = new TransactionWatcher({
-            getTransaction: async (hash: string) => {
-                return await provider.getTransaction(hash, true);
-            },
-        });
+        let watcher = createTransactionWatcher(provider);
 
         let network = await provider.getNetworkConfig();
-
-        await alice.sync(provider);
-        await bob.sync(provider);
-        let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
 
         let transactionOne = new Transaction({
             sender: alice.address,
@@ -92,6 +90,10 @@ describe("test transaction", function () {
             gasLimit: network.MinGasLimit,
             chainID: network.ChainID,
         });
+
+        await alice.sync(provider);
+        await bob.sync(provider);
+        let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
 
         transactionOne.setNonce(alice.account.nonce);
         await signTransaction({ transaction: transactionOne, wallet: alice });
@@ -143,11 +145,7 @@ describe("test transaction", function () {
         this.timeout(70000);
 
         const provider = createLocalnetProvider();
-        const watcher = new TransactionWatcher({
-            getTransaction: async (hash: string) => {
-                return await provider.getTransaction(hash, true);
-            },
-        });
+        const watcher = createTransactionWatcher(provider);
 
         const network = await provider.getNetworkConfig();
 

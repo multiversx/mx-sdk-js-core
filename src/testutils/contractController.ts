@@ -21,26 +21,26 @@ export class ContractController {
     }
 
     async deploy(transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
-        Logger.info(`ContractController.deploy [begin]: transaction = ${transaction.getHash()}`);
-
-        await this.provider.sendTransaction(transaction);
-        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction.getHash().hex());
+        const txHash = await this.provider.sendTransaction(transaction);
+        Logger.info(`ContractController.deploy [begin]: transaction = ${txHash}`);
+    
+        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(txHash);
         let bundle = this.parser.parseUntypedOutcome(transactionOnNetwork);
 
-        Logger.info(`ContractController.deploy [end]: transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);
+        Logger.info(`ContractController.deploy [end]: transaction = ${txHash}, return code = ${bundle.returnCode}`);
         return { transactionOnNetwork, bundle };
     }
 
     async execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }> {
-        Logger.info(`ContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}`);
+        const txHash = await this.provider.sendTransaction(transaction);
+        Logger.info(`ContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${txHash}`);
 
         interaction.check();
 
-        await this.provider.sendTransaction(transaction);
-        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(transaction.getHash().hex());
+        let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(txHash);
         let bundle = this.parser.parseOutcome(transactionOnNetwork, interaction.getEndpoint());
 
-        Logger.info(`ContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${transaction.getHash()}, return code = ${bundle.returnCode}`);
+        Logger.info(`ContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${txHash}, return code = ${bundle.returnCode}`);
         return { transactionOnNetwork, bundle };
     }
 

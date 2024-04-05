@@ -55,6 +55,15 @@ export class TransactionComputer {
         return new Uint8Array(Buffer.from(serialized));
     }
 
+    computeBytesForVerifying(transaction: ITransaction): Uint8Array {
+        const isTxSignedByHash = this.hasOptionsSetForHashSigning(transaction);
+
+        if (isTxSignedByHash) {
+            return this.computeHashForSigning(transaction);
+        }
+        return this.computeBytesForSigning(transaction);
+    }
+
     computeHashForSigning(transaction: ITransaction): Uint8Array {
         const plainTransaction = this.toPlainObjectForSigning(transaction);
         const signable = Buffer.from(JSON.stringify(plainTransaction));

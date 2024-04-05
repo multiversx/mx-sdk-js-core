@@ -4,7 +4,6 @@ import { Interaction } from "../smartcontracts/interaction";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "../smartcontracts/interface";
 import { ResultsParser } from "../smartcontracts/resultsParser";
 import { Transaction } from "../transaction";
-import { TransactionComputer } from "../transactionComputer";
 import { TransactionWatcher } from "../transactionWatcher";
 import { INetworkProvider } from "./networkProviders";
 
@@ -22,10 +21,9 @@ export class ContractController {
     }
 
     async deploy(transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
-        const txHash = this.getTransactionHash(transaction);
+        const txHash = await this.provider.sendTransaction(transaction);
         Logger.info(`ContractController.deploy [begin]: transaction = ${txHash}`);
-
-        await this.provider.sendTransaction(transaction);
+    
         let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(txHash);
         let bundle = this.parser.parseUntypedOutcome(transactionOnNetwork);
 
@@ -34,12 +32,11 @@ export class ContractController {
     }
 
     async execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }> {
-        const txHash = this.getTransactionHash(transaction);
+        const txHash = await this.provider.sendTransaction(transaction);
         Logger.info(`ContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${txHash}`);
 
         interaction.check();
 
-        await this.provider.sendTransaction(transaction);
         let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(txHash);
         let bundle = this.parser.parseOutcome(transactionOnNetwork, interaction.getEndpoint());
 
@@ -57,11 +54,5 @@ export class ContractController {
 
         Logger.debug(`ContractController.query [end]: function = ${interaction.getFunction()}, return code = ${bundle.returnCode}`);
         return bundle;
-    }
-
-    private getTransactionHash(transaction: Transaction): string {
-        const transactionComputer = new TransactionComputer();
-        const txHash = transactionComputer.computeTransactionHash(transaction);
-        return Buffer.from(txHash).toString("hex");
     }
 }

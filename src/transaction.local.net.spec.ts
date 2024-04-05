@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Logger } from "./logger";
 import { loadTestWallets, TestWallet } from "./testutils";
-import { createLocalnetProvider } from "./testutils/networkProviders";
+import { createLocalnetProvider, INetworkProvider } from "./testutils/networkProviders";
 import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
@@ -18,11 +18,8 @@ describe("test transaction", function () {
         ({ alice, bob } = await loadTestWallets());
     });
 
-    it("should send transactions and wait for completion", async function () {
-        this.timeout(70000);
-
-        let provider = createLocalnetProvider();
-        let watcher = new TransactionWatcher(
+    function createTransactionWatcher(provider: INetworkProvider) {
+        return new TransactionWatcher(
             {
                 getTransaction: async (hash: string) => {
                     return await provider.getTransaction(hash, true);
@@ -30,6 +27,13 @@ describe("test transaction", function () {
             },
             { timeoutMilliseconds: 100000 },
         );
+    }
+
+    it("should send transactions and wait for completion", async function () {
+        this.timeout(70000);
+
+        let provider = createLocalnetProvider();
+        let watcher = createTransactionWatcher(provider);
         let network = await provider.getNetworkConfig();
 
         let transactionOne = new Transaction({
@@ -75,14 +79,7 @@ describe("test transaction", function () {
         this.timeout(70000);
 
         let provider = createLocalnetProvider();
-        let watcher = new TransactionWatcher(
-            {
-                getTransaction: async (hash: string) => {
-                    return await provider.getTransaction(hash, true);
-                },
-            },
-            { timeoutMilliseconds: 100000 },
-        );
+        let watcher = createTransactionWatcher(provider);
 
         let network = await provider.getNetworkConfig();
 
@@ -148,14 +145,7 @@ describe("test transaction", function () {
         this.timeout(70000);
 
         const provider = createLocalnetProvider();
-        const watcher = new TransactionWatcher(
-            {
-                getTransaction: async (hash: string) => {
-                    return await provider.getTransaction(hash, true);
-                },
-            },
-            { timeoutMilliseconds: 100000 },
-        );
+        const watcher = createTransactionWatcher(provider);
 
         const network = await provider.getNetworkConfig();
 

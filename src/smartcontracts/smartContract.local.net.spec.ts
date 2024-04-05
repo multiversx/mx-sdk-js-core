@@ -90,16 +90,16 @@ describe("test on local testnet", function () {
         simulateTwo.applySignature(await alice.signer.sign(simulateTwo.serializeForSigning()));
 
         // Broadcast & execute
-        await provider.sendTransaction(transactionDeploy);
-        await provider.sendTransaction(transactionIncrement);
+        const txHashDeploy = await provider.sendTransaction(transactionDeploy);
+        const txHashIncrement = await provider.sendTransaction(transactionIncrement);
 
-        await watcher.awaitCompleted(transactionDeploy.getHash().hex());
-        let transactionOnNetwork = await provider.getTransaction(transactionDeploy.getHash().hex());
+        await watcher.awaitCompleted(txHashDeploy);
+        let transactionOnNetwork = await provider.getTransaction(txHashDeploy);
         let bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 
-        await watcher.awaitCompleted(transactionIncrement.getHash().hex());
-        transactionOnNetwork = await provider.getTransaction(transactionIncrement.getHash().hex());
+        await watcher.awaitCompleted(txHashIncrement);
+        transactionOnNetwork = await provider.getTransaction(txHashIncrement);
         bundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
         assert.isTrue(bundle.returnCode.isSuccess());
 

@@ -704,6 +704,7 @@ describe("test transaction", async () => {
             receiver: wallets.bob.address.toBech32(),
             gasLimit: 50000n,
             chainID: "D",
+            nonce: 7n,
         });
 
         transaction.signature = await wallets.alice.signer.sign(
@@ -732,6 +733,7 @@ describe("test transaction", async () => {
             receiver: wallets.bob.address.toBech32(),
             gasLimit: 50000n,
             chainID: "D",
+            nonce: 7n,
         });
 
         transactionComputer.applyOptionsForHashSigning(transaction);

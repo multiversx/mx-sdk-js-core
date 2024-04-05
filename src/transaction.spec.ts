@@ -9,6 +9,7 @@ import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionComputer } from "./transactionComputer";
 import { TransactionPayload } from "./transactionPayload";
+import { UserPublicKey, UserVerifier } from "@multiversx/sdk-wallet/out";
 
 describe("test transaction", async () => {
     let wallets: Record<string, TestWallet>;
@@ -695,5 +696,63 @@ describe("test transaction", async () => {
 
         assert.equal(transaction.version, 2);
         assert.equal(transaction.options, 3);
+    });
+
+    it("should compute bytes to verify transaction signature", async () => {
+        let transaction = new Transaction({
+            sender: wallets.alice.address.toBech32(),
+            receiver: wallets.bob.address.toBech32(),
+            gasLimit: 50000n,
+            chainID: "D",
+            nonce: 7n,
+        });
+
+        transaction.signature = await wallets.alice.signer.sign(
+            transactionComputer.computeBytesForSigning(transaction),
+        );
+
+        const userVerifier = new UserVerifier(new UserPublicKey(wallets.alice.address.getPublicKey()));
+        const isSignedByAlice = userVerifier.verify(
+            transactionComputer.computeBytesForVerifying(transaction),
+            transaction.signature,
+        );
+
+        const wrongVerifier = new UserVerifier(new UserPublicKey(wallets.bob.address.getPublicKey()));
+        const isSignedByBob = wrongVerifier.verify(
+            transactionComputer.computeBytesForVerifying(transaction),
+            transaction.signature,
+        );
+
+        assert.equal(isSignedByAlice, true);
+        assert.equal(isSignedByBob, false);
+    });
+
+    it("should compute bytes to verify transaction signature (signed by hash)", async () => {
+        let transaction = new Transaction({
+            sender: wallets.alice.address.toBech32(),
+            receiver: wallets.bob.address.toBech32(),
+            gasLimit: 50000n,
+            chainID: "D",
+            nonce: 7n,
+        });
+
+        transactionComputer.applyOptionsForHashSigning(transaction);
+
+        transaction.signature = await wallets.alice.signer.sign(transactionComputer.computeHashForSigning(transaction));
+
+        const userVerifier = new UserVerifier(new UserPublicKey(wallets.alice.address.getPublicKey()));
+        const isSignedByAlice = userVerifier.verify(
+            transactionComputer.computeBytesForVerifying(transaction),
+            transaction.signature,
+        );
+
+        const wrongVerifier = new UserVerifier(new UserPublicKey(wallets.bob.address.getPublicKey()));
+        const isSignedByBob = wrongVerifier.verify(
+            transactionComputer.computeBytesForVerifying(transaction),
+            transaction.signature,
+        );
+
+        assert.equal(isSignedByAlice, true);
+        assert.equal(isSignedByBob, false);
     });
 });

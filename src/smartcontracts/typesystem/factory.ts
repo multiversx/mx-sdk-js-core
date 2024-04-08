@@ -4,13 +4,13 @@ import { List } from "./generic";
 import { TokenIdentifierValue } from "./tokenIdentifier";
 
 export function createListOfAddresses(addresses: Address[]): List {
-    let addressesTyped = addresses.map(address => new AddressValue(address));
+    let addressesTyped = addresses.map((address) => new AddressValue(address));
     let list = List.fromItems(addressesTyped);
     return list;
 }
 
 export function createListOfTokenIdentifiers(identifiers: string[]): List {
-    let identifiersTyped = identifiers.map(identifier => new TokenIdentifierValue(identifier));
+    let identifiersTyped = identifiers.map((identifier) => new TokenIdentifierValue(identifier));
     let list = List.fromItems(identifiersTyped);
     return list;
 }

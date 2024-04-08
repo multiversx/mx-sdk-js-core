@@ -21,7 +21,7 @@ import {
     U16Type,
     U32Type,
     U64Type,
-    U8Type
+    U8Type,
 } from "./numerical";
 import { StringType } from "./string";
 import { StructType } from "./struct";
@@ -99,7 +99,7 @@ export class TypeMapper {
             ["EgldOrEsdtTokenIdentifier", new TokenIdentifierType()],
             ["CodeMetadata", new CodeMetadataType()],
             ["nothing", new NothingType()],
-            ["AsyncCall", new NothingType()]
+            ["AsyncCall", new NothingType()],
         ]);
 
         this.learnedTypesMap = new Map<string, Type>();
@@ -180,8 +180,8 @@ export class TypeMapper {
                 new EnumVariantDefinition(
                     variant.name,
                     variant.discriminant,
-                    this.mappedFields(variant.getFieldsDefinitions())
-                )
+                    this.mappedFields(variant.getFieldsDefinitions()),
+                ),
         );
         let mappedEnum = new EnumType(type.getName(), variants);
         return mappedEnum;
@@ -189,7 +189,7 @@ export class TypeMapper {
 
     private mappedFields(definitions: FieldDefinition[]): FieldDefinition[] {
         return definitions.map(
-            (definition) => new FieldDefinition(definition.name, definition.description, this.mapType(definition.type))
+            (definition) => new FieldDefinition(definition.name, definition.description, this.mapType(definition.type)),
         );
     }
 

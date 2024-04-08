@@ -1,8 +1,16 @@
-import { TransactionDecoder, TransactionMetadata } from "@multiversx/sdk-transaction-decoder/lib/src/transaction.decoder";
+import {
+    TransactionDecoder,
+    TransactionMetadata,
+} from "@multiversx/sdk-transaction-decoder/lib/src/transaction.decoder";
 import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
 import { IAddress } from "../interface";
-import { IContractQueryResponse, IContractResults, ITransactionLogs, ITransactionOnNetwork } from "../interfaceOfNetwork";
+import {
+    IContractQueryResponse,
+    IContractResults,
+    ITransactionLogs,
+    ITransactionOnNetwork,
+} from "../interfaceOfNetwork";
 import { Logger } from "../logger";
 import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "./interface";
@@ -51,6 +59,11 @@ const defaultResultsParserOptions: IResultsParserOptions = {
 };
 
 /**
+ * Legacy component.
+ * For parsing contract query responses, use the "SmartContractQueriesController" instead.
+ * For parsing smart contract outcome (return data), use the "SmartContractTransactionsOutcomeParser" instead.
+ * For parding smart contract events, use the "TransactionEventsParser" instead.
+ *
  * Parses contract query responses and smart contract results.
  * The parsing involves some heuristics, in order to handle slight inconsistencies (e.g. some SCRs are present on API, but missing on Gateway).
  */
@@ -62,6 +75,9 @@ export class ResultsParser {
         this.argsSerializer = options.argsSerializer;
     }
 
+    /**
+     * Legacy method, use "SmartContractQueriesController.parseQueryResponse()" instead.
+     */
     parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: { output: IParameterDefinition[] }): TypedOutcomeBundle {
         let parts = queryResponse.getReturnDataParts();
         let values = this.argsSerializer.buffersToValues(parts, endpoint.output);
@@ -78,6 +94,9 @@ export class ResultsParser {
         };
     }
 
+    /**
+     * Legacy method, use "SmartContractQueriesController.parseQueryResponse()" instead.
+     */
     parseUntypedQueryResponse(queryResponse: IContractQueryResponse): UntypedOutcomeBundle {
         let returnCode = new ReturnCode(queryResponse.returnCode.toString())
 
@@ -88,13 +107,25 @@ export class ResultsParser {
         };
     }
 
+    /**
+     * Legacy method, use "SmartContractTransactionsOutcomeParser.parseExecute()" instead.
+     */
     parseOutcome(transaction: ITransactionOnNetwork, endpoint: { output: IParameterDefinition[] }): TypedOutcomeBundle {
-        let untypedBundle = this.parseUntypedOutcome(transaction);
-        let values = this.argsSerializer.buffersToValues(untypedBundle.values, endpoint.output);
+        const untypedBundle = this.parseUntypedOutcome(transaction);
+        const typedBundle = this.parseOutcomeFromUntypedBundle(untypedBundle, endpoint);
+        return typedBundle;
+    }
+
+    /**
+     * @internal
+     * For internal use only.
+     */
+    parseOutcomeFromUntypedBundle(bundle: UntypedOutcomeBundle, endpoint: { output: IParameterDefinition[] }) {
+        const values = this.argsSerializer.buffersToValues(bundle.values, endpoint.output);
 
         return {
-            returnCode: untypedBundle.returnCode,
-            returnMessage: untypedBundle.returnMessage,
+            returnCode: bundle.returnCode,
+            returnMessage: bundle.returnMessage,
             values: values,
             firstValue: values[0],
             secondValue: values[1],
@@ -103,12 +134,15 @@ export class ResultsParser {
         };
     }
 
+    /**
+     * Legacy method, use "SmartContractTransactionsOutcomeParser.parseExecute()" instead.
+     */
     parseUntypedOutcome(transaction: ITransactionOnNetwork): UntypedOutcomeBundle {
         let bundle: UntypedOutcomeBundle | null;
 
         let transactionMetadata = this.parseTransactionMetadata(transaction);
 
-        bundle = this.createBundleOnSimpleMoveBalance(transaction)
+        bundle = this.createBundleOnSimpleMoveBalance(transaction);
         if (bundle) {
             Logger.trace("parseUntypedOutcome(): on simple move balance");
             return bundle;
@@ -249,7 +283,7 @@ export class ResultsParser {
         return {
             returnCode: returnCode,
             returnMessage: returnMessage,
-            values: returnDataParts
+            values: returnDataParts,
         };
     }
 
@@ -308,7 +342,7 @@ export class ResultsParser {
         return null;
     }
 
-    private sliceDataFieldInParts(data: string): { returnCode: ReturnCode, returnDataParts: Buffer[] } {
+    protected sliceDataFieldInParts(data: string): { returnCode: ReturnCode, returnDataParts: Buffer[] } {
         // By default, skip the first part, which is usually empty (e.g. "[empty]@6f6b")
         let startingIndex = 1;
 
@@ -332,34 +366,54 @@ export class ResultsParser {
         return { returnCode, returnDataParts };
     }
 
+    /**
+     * Legacy method, use "TransactionEventsParser.parseEvent()" instead.
+     */
     parseEvent(transactionEvent: ITransactionEvent, eventDefinition: { inputs: IEventInputDefinition[] }): any {
-        const result: any = {};
+        // We skip the first topic, because, for log entries emitted by smart contracts, that's the same as the event identifier. See:
+        // https://github.com/multiversx/mx-chain-vm-go/blob/v1.5.27/vmhost/contexts/output.go#L283
+        const topics = transactionEvent.topics.map((topic) => Buffer.from(topic.valueOf())).slice(1);
 
-        // We skip the first topic, because that's the event identifier.
-        const topics = transactionEvent.topics.map(topic => Buffer.from(topic.valueOf())).slice(1);
-        // < Sirius.
+        // Before Sirius, there was no "additionalData" field on transaction logs.
+        // After Sirius, the "additionalData" field includes the "data" field, as well (as the first element):
+        // https://github.com/multiversx/mx-chain-go/blob/v1.6.18/process/transactionLog/process.go#L159
+        // Right now, the logic below is duplicated (see "TransactionsConverter"). However, "ResultsParser" will be deprecated & removed at a later time.
         const legacyData = transactionEvent.dataPayload?.valueOf() || Buffer.from([]);
-        // >= Sirius.
-        const additionalData = transactionEvent.additionalData?.map(data => Buffer.from(data.valueOf())) || [];
+        const dataItems = transactionEvent.additionalData?.map((data) => Buffer.from(data.valueOf())) || [];
 
-        // < Sirius.
-        if (additionalData.length == 0) {
-            if (legacyData.length > 0) {
-                additionalData.push(Buffer.from(legacyData));
+        if (dataItems.length === 0) {
+            if (legacyData.length) {
+                dataItems.push(Buffer.from(legacyData));
             }
         }
 
+        return this.doParseEvent({ topics, dataItems, eventDefinition });
+    }
+
+    /**
+     * @internal
+     * For internal use only.
+     *
+     * Once the legacy "ResultParser" is deprecated & removed, this logic will be absorbed into "TransactionEventsParser".
+     */
+    doParseEvent(options: {
+        topics: Buffer[];
+        dataItems: Buffer[];
+        eventDefinition: { inputs: IEventInputDefinition[] };
+    }): any {
+        const result: any = {};
+
         // "Indexed" ABI "event.inputs" correspond to "event.topics[1:]":
-        const indexedInputs = eventDefinition.inputs.filter(input => input.indexed);
-        const decodedTopics = this.argsSerializer.buffersToValues(topics, indexedInputs);
+        const indexedInputs = options.eventDefinition.inputs.filter((input) => input.indexed);
+        const decodedTopics = this.argsSerializer.buffersToValues(options.topics, indexedInputs);
 
         for (let i = 0; i < indexedInputs.length; i++) {
             result[indexedInputs[i].name] = decodedTopics[i].valueOf();
         }
 
         // "Non-indexed" ABI "event.inputs" correspond to "event.data":
-        const nonIndexedInputs = eventDefinition.inputs.filter(input => !input.indexed);
-        const decodedDataParts = this.argsSerializer.buffersToValues(additionalData, nonIndexedInputs);
+        const nonIndexedInputs = options.eventDefinition.inputs.filter((input) => !input.indexed);
+        const decodedDataParts = this.argsSerializer.buffersToValues(options.dataItems, nonIndexedInputs);
 
         for (let i = 0; i < nonIndexedInputs.length; i++) {
             result[nonIndexedInputs[i].name] = decodedDataParts[i].valueOf();

@@ -1,9 +1,9 @@
 import { assert } from "chai";
 import { Address } from "./address";
 import { GasEstimator } from "./gasEstimator";
-import { TokenTransfer } from "./tokenTransfer";
+import { TokenTransfer } from "./tokens";
 import { TransactionPayload } from "./transactionPayload";
-import { TransferTransactionsFactory } from "./transferTransactionsFactory";
+import { TransferTransactionsFactory } from "./transactionsFactories/transferTransactionsFactory";
 
 describe("test transaction factory", () => {
     const factory = new TransferTransactionsFactory(new GasEstimator());

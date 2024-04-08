@@ -24,7 +24,7 @@ export class TokenIdentifierValue extends PrimitiveValue {
     }
 
     static egld(): TokenIdentifierValue {
-        return new TokenIdentifierValue(EGLDTokenIdentifier)
+        return new TokenIdentifierValue(EGLDTokenIdentifier);
     }
 
     static esdtTokenIdentifier(identifier: string): TokenIdentifierValue {
@@ -46,7 +46,7 @@ export class TokenIdentifierValue extends PrimitiveValue {
         if (this.getLength() != other.getLength()) {
             return false;
         }
-        
+
         return this.value == other.value;
     }
 

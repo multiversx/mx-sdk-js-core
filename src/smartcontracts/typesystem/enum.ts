@@ -35,8 +35,8 @@ export class EnumType extends CustomType {
         return variants.map((variant, index) => {
             return {
                 ...variant,
-                discriminant: index
-            }
+                discriminant: index,
+            };
         });
     }
 
@@ -71,7 +71,7 @@ export class EnumVariantDefinition {
     constructor(name: string, discriminant: number, fieldsDefinitions: FieldDefinition[] = []) {
         guardTrue(
             discriminant < SimpleEnumMaxDiscriminant,
-            `discriminant for simple enum should be less than ${SimpleEnumMaxDiscriminant}`
+            `discriminant for simple enum should be less than ${SimpleEnumMaxDiscriminant}`,
         );
 
         this.name = name;
@@ -89,7 +89,7 @@ export class EnumVariantDefinition {
     }
 
     getFieldDefinition(name: string): FieldDefinition | undefined {
-        return this.fieldsDefinitions.find(item => item.name == name);
+        return this.fieldsDefinitions.find((item) => item.name == name);
     }
 
     getNamesOfDependencies(): string[] {
@@ -109,7 +109,7 @@ export class EnumValue extends TypedValue {
         this.name = variant.name;
         this.discriminant = variant.discriminant;
         this.fields = fields;
-        this.fieldsByName = new Map(fields.map(field => [field.name, field]));
+        this.fieldsByName = new Map(fields.map((field) => [field.name, field]));
 
         let definitions = variant.getFieldsDefinitions();
         Fields.checkTyping(this.fields, definitions);

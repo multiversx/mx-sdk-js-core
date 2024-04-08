@@ -15,7 +15,7 @@ export class OptionType extends Type {
     }
 
     isAssignableFrom(type: Type): boolean {
-        if (!(type.hasExactClass(OptionType.ClassName))) {
+        if (!type.hasExactClass(OptionType.ClassName)) {
             return false;
         }
 

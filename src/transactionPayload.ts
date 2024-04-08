@@ -1,5 +1,3 @@
-import { ContractCallPayloadBuilder, ContractDeployPayloadBuilder, ContractUpgradePayloadBuilder } from "./smartcontracts/transactionPayloadBuilders";
-
 /**
  * The "data" field of a Transaction, as an immutable object.
  */

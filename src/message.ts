@@ -1,5 +1,5 @@
 import { IAddress } from "./interface";
-import { DEFAULT_MESSAGE_VERSION, MESSAGE_PREFIX, SDK_JS_SIGNER } from "./constants";
+import { DEFAULT_MESSAGE_VERSION, MESSAGE_PREFIX, SDK_JS_SIGNER, UNKNOWN_SIGNER } from "./constants";
 import { Address } from "./address";
 
 const createKeccakHash = require("keccak");
@@ -37,7 +37,7 @@ export class Message {
         this.signature = options.signature;
         this.address = options.address;
         this.version = options.version || DEFAULT_MESSAGE_VERSION;
-        this.signer = options.signer ?? SDK_JS_SIGNER;
+        this.signer = options.signer || SDK_JS_SIGNER;
     }
 }
 
@@ -67,8 +67,8 @@ export class MessageComputer {
             message: Buffer.from(message.data).toString("hex"),
             signature: message.signature ? Buffer.from(message.signature).toString("hex") : "",
             address: message.address ? message.address.bech32() : "",
-            version: message.version ? message.version : DEFAULT_MESSAGE_VERSION,
-            signer: message.signer ? message.signer : SDK_JS_SIGNER,
+            version: message.version,
+            signer: message.signer,
         };
     }
 
@@ -91,7 +91,7 @@ export class MessageComputer {
         }
 
         const version = packedMessage.version || DEFAULT_MESSAGE_VERSION;
-        const signer = packedMessage.signer ?? "unknown";
+        const signer = packedMessage.signer || UNKNOWN_SIGNER;
 
         return new Message({
             data: data,

@@ -1,6 +1,6 @@
 import { UserVerifier } from "@multiversx/sdk-wallet";
 import { assert } from "chai";
-import { DEFAULT_MESSAGE_VERSION } from "./constants";
+import { DEFAULT_MESSAGE_VERSION, SDK_JS_SIGNER } from "./constants";
 import { Message, MessageComputer } from "./message";
 import { TestWallet, loadTestWallets } from "./testutils";
 
@@ -49,6 +49,7 @@ describe("test message", () => {
             signature:
                 "7aff43cd6e3d880a65033bf0a1b16274854fd7dfa9fe5faa7fa9a665ee851afd4c449310f5f1697d348e42d1819eaef69080e33e7652d7393521ed50d7427a0e",
             version: 1,
+            signer: SDK_JS_SIGNER,
         });
 
         const unpackedMessage = messageComputer.unpackMessage(packedMessage);
@@ -56,6 +57,7 @@ describe("test message", () => {
         assert.deepEqual(unpackedMessage.data, message.data);
         assert.deepEqual(unpackedMessage.signature, message.signature);
         assert.deepEqual(unpackedMessage.version, message.version);
+        assert.deepEqual(unpackedMessage.signer, message.signer);
 
         const verifier = UserVerifier.fromAddress(alice.getAddress());
         const isValid = verifier.verify(
@@ -83,5 +85,6 @@ describe("test message", () => {
             "b16847437049986f936dd4a0917c869730cbf29e40a0c0821ca70db33f44758c3d41bcbea446dee70dea13d50942343bb78e74979dc434bbb2b901e0f4fd1809",
         );
         assert.deepEqual(message.version, DEFAULT_MESSAGE_VERSION);
+        assert.equal(message.signer, "ErdJS");
     });
 });

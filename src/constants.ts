@@ -22,3 +22,5 @@ export const BECH32_ADDRESS_LENGTH = 62;
 export const CURRENT_NUMBER_OF_SHARDS_WITHOUT_META = 3;
 export const WasmVirtualMachine = "0500";
 export const METACHAIN_ID = 4294967295;
+export const SDK_JS_SIGNER = "sdk-js";
+export const UNKNOWN_SIGNER = "unknown";

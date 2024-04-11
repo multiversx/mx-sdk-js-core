@@ -87,4 +87,23 @@ describe("test message", () => {
         assert.deepEqual(message.version, DEFAULT_MESSAGE_VERSION);
         assert.equal(message.signer, "ErdJS");
     });
+
+    it("should unpack message", async () => {
+        const packedMessage = {
+            address: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+            message: "0x7468697320697320612074657374206d657373616765",
+            signature:
+                "0xb16847437049986f936dd4a0917c869730cbf29e40a0c0821ca70db33f44758c3d41bcbea446dee70dea13d50942343bb78e74979dc434bbb2b901e0f4fd1809",
+        };
+
+        const message = messageComputer.unpackMessage(packedMessage);
+        assert.deepEqual(message.address, alice.getAddress());
+        assert.deepEqual(Buffer.from(message.data).toString(), "this is a test message");
+        assert.deepEqual(
+            Buffer.from(message.signature!).toString("hex"),
+            "b16847437049986f936dd4a0917c869730cbf29e40a0c0821ca70db33f44758c3d41bcbea446dee70dea13d50942343bb78e74979dc434bbb2b901e0f4fd1809",
+        );
+        assert.deepEqual(message.version, DEFAULT_MESSAGE_VERSION);
+        assert.equal(message.signer, "unknown");
+    });
 });

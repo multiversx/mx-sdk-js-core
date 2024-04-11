@@ -91,7 +91,7 @@ export class MessageComputer {
         }
 
         const version = packedMessage.version || DEFAULT_MESSAGE_VERSION;
-        const signer = packedMessage.signer ?? SDK_JS_SIGNER;
+        const signer = packedMessage.signer ?? "unknown";
 
         return new Message({
             data: data,

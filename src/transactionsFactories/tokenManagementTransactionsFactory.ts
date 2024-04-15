@@ -299,11 +299,13 @@ export class TokenManagementTransactionsFactory {
         tokenIdentifier: string;
         addRoleLocalMint: boolean;
         addRoleLocalBurn: boolean;
+        addRoleESDTTransferRole?: boolean;
     }): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
         options.addRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
         options.addRoleLocalBurn ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
+        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 

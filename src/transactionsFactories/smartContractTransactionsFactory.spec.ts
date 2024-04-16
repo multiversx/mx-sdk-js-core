@@ -368,4 +368,41 @@ describe("test smart contract transactions factory", function () {
 
         assert.equal(Buffer.from(transaction.data!).toString(), `upgradeContract@${adderByteCode}@0504@07`);
     });
+
+    it("should create 'Transaction' for claiming developer rewards", async function () {
+        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+
+        const transaction = smartContractFactory.createTransactionForClaimingDeveloperRewards({
+            sender: sender,
+            contract: contract,
+        });
+
+        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.equal(Buffer.from(transaction.data).toString(), "ClaimDeveloperRewards");
+        assert.equal(transaction.gasLimit, 6000000n);
+        assert.equal(transaction.value, 0n);
+    });
+
+    it("should create 'Transaction' for changing owner address", async function () {
+        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        const newOwner = Address.fromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+
+        const transaction = smartContractFactory.createTransactionForChangingOwnerAddress({
+            sender: sender,
+            contract: contract,
+            newOwner: newOwner,
+        });
+
+        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.equal(
+            Buffer.from(transaction.data).toString(),
+            "ChangeOwnerAddress@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8",
+        );
+        assert.equal(transaction.gasLimit, 6000000n);
+        assert.equal(transaction.value, 0n);
+    });
 });

@@ -29,6 +29,14 @@ export class TransactionsFactoryConfig {
     gasLimitESDTTransfer: bigint;
     gasLimitESDTNFTTransfer: bigint;
     gasLimitMultiESDTNFTTransfer: bigint;
+    gasLimitSaveKeyValue: bigint;
+    gasLimitPersistPerByte: bigint;
+    gasLimitSetGuardian: bigint;
+    gasLimitGuardAccount: bigint;
+    gasLimitUnguardAccount: bigint;
+    extraGasLimitForGuardedTransaction: bigint;
+    gasLimitClaimDeveloperRewards: bigint;
+    gasLimitChangeOwnerAddress: bigint;
 
     constructor(options: { chainID: string }) {
         // General-purpose configuration
@@ -50,7 +58,7 @@ export class TransactionsFactoryConfig {
         this.gasLimitEsdtNftUpdateAttributes = 1000000n;
         this.gasLimitEsdtNftAddQuantity = 1000000n;
         this.gasLimitEsdtNftBurn = 1000000n;
-        this.gasLimitStorePerByte = 50000n;
+        this.gasLimitStorePerByte = 10000n;
         this.issueCost = 50000000000000000n;
 
         // Configuration for delegation operations
@@ -62,9 +70,21 @@ export class TransactionsFactoryConfig {
         this.additionalGasLimitPerValidatorNode = 6000000n;
         this.additionalGasLimitForDelegationOperations = 10000000n;
 
+        // Configuration for account operations
+        this.gasLimitSaveKeyValue = 100000n;
+        this.gasLimitPersistPerByte = 1000n;
+        this.gasLimitSetGuardian = 250000n;
+        this.gasLimitGuardAccount = 250000n;
+        this.gasLimitUnguardAccount = 250000n;
+        this.extraGasLimitForGuardedTransaction = 50000n;
+
         // Configuration for token transfers
         this.gasLimitESDTTransfer = 200000n;
         this.gasLimitESDTNFTTransfer = 200000n;
         this.gasLimitMultiESDTNFTTransfer = 200000n;
+
+        // Configuration for smart contract operations
+        this.gasLimitClaimDeveloperRewards = 6000000n;
+        this.gasLimitChangeOwnerAddress = 6000000n;
     }
 }

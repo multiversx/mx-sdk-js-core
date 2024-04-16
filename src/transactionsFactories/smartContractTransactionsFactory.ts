@@ -10,10 +10,12 @@ import { byteArrayToHex, utf8ToHex } from "../utils.codec";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
 import { TransactionBuilder } from "./transactionBuilder";
 
-interface Config {
+interface IConfig {
     chainID: string;
     minGasLimit: bigint;
     gasLimitPerByte: bigint;
+    gasLimitClaimDeveloperRewards: bigint;
+    gasLimitChangeOwnerAddress: bigint;
 }
 
 interface IAbi {
@@ -26,12 +28,12 @@ interface IAbi {
  * Use this class to create transactions to deploy, call or upgrade a smart contract.
  */
 export class SmartContractTransactionsFactory {
-    private readonly config: Config;
+    private readonly config: IConfig;
     private readonly abi?: IAbi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
 
-    constructor(options: { config: Config; abi?: IAbi }) {
+    constructor(options: { config: IConfig; abi?: IAbi }) {
         this.config = options.config;
         this.abi = options.abi;
         this.tokenComputer = new TokenComputer();
@@ -154,6 +156,36 @@ export class SmartContractTransactionsFactory {
             gasLimit: options.gasLimit,
             addDataMovementGas: false,
             amount: nativeTransferAmount,
+        }).build();
+    }
+
+    createTransactionForClaimingDeveloperRewards(options: { sender: IAddress; contract: IAddress }): Transaction {
+        const dataParts = ["ClaimDeveloperRewards"];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.contract,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitClaimDeveloperRewards,
+            addDataMovementGas: false,
+        }).build();
+    }
+
+    createTransactionForChangingOwnerAddress(options: {
+        sender: IAddress;
+        contract: IAddress;
+        newOwner: IAddress;
+    }): Transaction {
+        const dataParts = ["ChangeOwnerAddress", Address.fromBech32(options.newOwner.bech32()).toHex()];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.contract,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitChangeOwnerAddress,
+            addDataMovementGas: false,
         }).build();
     }
 

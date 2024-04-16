@@ -133,7 +133,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
-    it("should create 'Transaction' for setting spcial role on fungible token", () => {
+    it("should create 'Transaction' for setting special role on fungible token", () => {
         const transaction = tokenManagementFactory.createTransactionForSettingSpecialRoleOnFungibleToken({
             sender: frank.address,
             user: grace.address,
@@ -153,7 +153,7 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.value, 0n);
     });
 
-    it("should create 'Transaction' for setting all spcial roles on fungible token", () => {
+    it("should create 'Transaction' for setting all special roles on fungible token", () => {
         const transaction = tokenManagementFactory.createTransactionForSettingSpecialRoleOnFungibleToken({
             sender: frank.address,
             user: grace.address,
@@ -174,7 +174,7 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.value, 0n);
     });
 
-    it("should create 'Transaction' for setting spcial role on non-fungible token", () => {
+    it("should create 'Transaction' for setting special role on non-fungible token", () => {
         const transaction = tokenManagementFactory.createTransactionForSettingSpecialRoleOnNonFungibleToken({
             sender: frank.address,
             user: grace.address,

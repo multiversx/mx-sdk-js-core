@@ -34,7 +34,6 @@ export class TransactionsFactoryConfig {
     gasLimitSetGuardian: bigint;
     gasLimitGuardAccount: bigint;
     gasLimitUnguardAccount: bigint;
-    extraGasLimitForGuardedTransaction: bigint;
     gasLimitClaimDeveloperRewards: bigint;
     gasLimitChangeOwnerAddress: bigint;
 
@@ -76,7 +75,6 @@ export class TransactionsFactoryConfig {
         this.gasLimitSetGuardian = 250000n;
         this.gasLimitGuardAccount = 250000n;
         this.gasLimitUnguardAccount = 250000n;
-        this.extraGasLimitForGuardedTransaction = 50000n;
 
         // Configuration for token transfers
         this.gasLimitESDTTransfer = 200000n;

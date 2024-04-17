@@ -9,7 +9,7 @@ describe("test account transactions factory", function () {
 
     it("should create 'Transaction' for saving key value", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        const keyValuePairs = new Map([[Buffer.from("6b657930", "hex"), Buffer.from("76616c756530", "hex")]]);
+        const keyValuePairs = new Map([[Buffer.from("key0"), Buffer.from("value0")]]);
 
         const transaction = factory.createTransactionForSavingKeyValue({
             sender: sender,
@@ -18,7 +18,7 @@ describe("test account transactions factory", function () {
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.deepEqual(Buffer.from(transaction.data).toString(), "SaveKeyValue@6b657930@76616c756530");
+        assert.equal(Buffer.from(transaction.data).toString(), "SaveKeyValue@6b657930@76616c756530");
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
         assert.equal(transaction.gasLimit, 271000n);
@@ -37,13 +37,13 @@ describe("test account transactions factory", function () {
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.deepEqual(
+        assert.equal(
             Buffer.from(transaction.data).toString(),
             "SetGuardian@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@4d756c7469766572735854435353657276696365",
         );
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
-        assert.equal(transaction.gasLimit, 525500n);
+        assert.equal(transaction.gasLimit, 475500n);
     });
 
     it("should create 'Transaction' for guarding account", async function () {
@@ -55,10 +55,10 @@ describe("test account transactions factory", function () {
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.deepEqual(Buffer.from(transaction.data).toString(), "GuardAccount");
+        assert.equal(Buffer.from(transaction.data).toString(), "GuardAccount");
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
-        assert.equal(transaction.gasLimit, 368000n);
+        assert.equal(transaction.gasLimit, 318000n);
     });
 
     it("should create 'Transaction' for unguarding account", async function () {
@@ -70,9 +70,9 @@ describe("test account transactions factory", function () {
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.deepEqual(Buffer.from(transaction.data).toString(), "UnGuardAccount");
+        assert.equal(Buffer.from(transaction.data).toString(), "UnGuardAccount");
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
-        assert.equal(transaction.gasLimit, 371000n);
+        assert.equal(transaction.gasLimit, 321000n);
     });
 });

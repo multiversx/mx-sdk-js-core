@@ -13,7 +13,6 @@ interface IConfig {
     gasLimitSetGuardian: bigint;
     gasLimitGuardAccount: bigint;
     gasLimitUnguardAccount: bigint;
-    extraGasLimitForGuardedTransaction: bigint;
 }
 
 export class AccountTransactionsFactory {
@@ -42,60 +41,6 @@ export class AccountTransactionsFactory {
         }).build();
     }
 
-    createTransactionForSettingGuardian(options: {
-        sender: IAddress;
-        guardianAddress: IAddress;
-        serviceID: string;
-    }): Transaction {
-        const dataParts = [
-            "SetGuardian",
-            Address.fromBech32(options.guardianAddress.bech32()).toHex(),
-            Buffer.from(options.serviceID).toString("hex"),
-        ];
-
-        const gasLimit = this.config.gasLimitSetGuardian + this.config.extraGasLimitForGuardedTransaction;
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: gasLimit,
-            addDataMovementGas: true,
-        }).build();
-    }
-
-    createTransactionForGuardingAccount(options: { sender: IAddress }): Transaction {
-        const dataParts = ["GuardAccount"];
-        const gasLimit = this.config.gasLimitGuardAccount + this.config.extraGasLimitForGuardedTransaction;
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: gasLimit,
-            addDataMovementGas: true,
-        }).build();
-    }
-
-    createTransactionForUnguardingAccount(options: { sender: IAddress }): Transaction {
-        const dataParts = ["UnGuardAccount"];
-        const gasLimit = this.config.gasLimitUnguardAccount + this.config.extraGasLimitForGuardedTransaction;
-
-        const transaction = new TransactionBuilder({
-            config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
-            dataParts: dataParts,
-            gasLimit: gasLimit,
-            addDataMovementGas: true,
-        }).build();
-        transaction.options = 2;
-
-        return transaction;
-    }
-
     private computeExtraGasForSavingKeyValue(keyValuePairs: Map<Uint8Array, Uint8Array>): bigint {
         let extraGas = 0n;
 
@@ -109,12 +54,59 @@ export class AccountTransactionsFactory {
     }
 
     private computeDataPartsForSavingKeyValue(keyValuePairs: Map<Uint8Array, Uint8Array>): string[] {
-        let dataParts: string[] = [];
+        const dataParts: string[] = [];
 
         keyValuePairs.forEach((value, key) => {
             dataParts.push(...[Buffer.from(key).toString("hex"), Buffer.from(value).toString("hex")]);
         });
 
         return dataParts;
+    }
+
+    createTransactionForSettingGuardian(options: {
+        sender: IAddress;
+        guardianAddress: IAddress;
+        serviceID: string;
+    }): Transaction {
+        const dataParts = [
+            "SetGuardian",
+            Address.fromBech32(options.guardianAddress.bech32()).toHex(),
+            Buffer.from(options.serviceID).toString("hex"),
+        ];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitSetGuardian,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForGuardingAccount(options: { sender: IAddress }): Transaction {
+        const dataParts = ["GuardAccount"];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitGuardAccount,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForUnguardingAccount(options: { sender: IAddress }): Transaction {
+        const dataParts = ["UnGuardAccount"];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitUnguardAccount,
+            addDataMovementGas: true,
+        }).build();
     }
 }

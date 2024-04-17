@@ -1,14 +1,20 @@
 import { TransactionStatus } from "@multiversx/sdk-network-providers";
 import { assert } from "chai";
 import { Address } from "../address";
-import { loadTestWallets, MarkCompleted, MockNetworkProvider, setupUnitTestWatcherTimeouts, TestWallet, Wait } from "../testutils";
+import {
+    loadTestWallets,
+    MarkCompleted,
+    MockNetworkProvider,
+    setupUnitTestWatcherTimeouts,
+    TestWallet,
+    Wait,
+} from "../testutils";
 import { TransactionWatcher } from "../transactionWatcher";
 import { Code } from "./code";
 import { ContractFunction } from "./function";
 import { SmartContract } from "./smartContract";
 import { U32Value } from "./typesystem";
 import { BytesValue } from "./typesystem/bytes";
-
 
 describe("test contract", () => {
     let provider = new MockNetworkProvider();
@@ -38,10 +44,10 @@ describe("test contract", () => {
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
             gasLimit: 1000000,
             chainID: chainID,
-            deployer: alice.address
+            deployer: alice.address,
         });
 
-        provider.mockUpdateAccount(alice.address, account => {
+        provider.mockUpdateAccount(alice.address, (account) => {
             account.nonce = 42;
         });
 
@@ -63,8 +69,14 @@ describe("test contract", () => {
         let hash = await provider.sendTransaction(deployTransaction);
 
         await Promise.all([
-            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
-            watcher.awaitCompleted(deployTransaction.getHash().hex())
+            provider.mockTransactionTimeline(deployTransaction, [
+                new Wait(40),
+                new TransactionStatus("pending"),
+                new Wait(40),
+                new TransactionStatus("executed"),
+                new MarkCompleted(),
+            ]),
+            watcher.awaitCompleted(deployTransaction.getHash().hex()),
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hash)).isExecuted());
@@ -74,10 +86,12 @@ describe("test contract", () => {
         setupUnitTestWatcherTimeouts();
         let watcher = new TransactionWatcher(provider);
 
-        let contract = new SmartContract({ address: new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3") });
+        let contract = new SmartContract({
+            address: new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3"),
+        });
 
-        provider.mockUpdateAccount(alice.address, account => {
-            account.nonce = 42
+        provider.mockUpdateAccount(alice.address, (account) => {
+            account.nonce = 42;
         });
 
         let callTransactionOne = contract.call({
@@ -85,7 +99,7 @@ describe("test contract", () => {
             args: [new U32Value(5), BytesValue.fromHex("0123")],
             gasLimit: 150000,
             chainID: chainID,
-            caller: alice.address
+            caller: alice.address,
         });
 
         let callTransactionTwo = contract.call({
@@ -93,7 +107,7 @@ describe("test contract", () => {
             args: [new U32Value(5), BytesValue.fromHex("0123")],
             gasLimit: 1500000,
             chainID: chainID,
-            caller: alice.address
+            caller: alice.address,
         });
 
         await alice.sync(provider);
@@ -116,10 +130,22 @@ describe("test contract", () => {
         let hashTwo = await provider.sendTransaction(callTransactionTwo);
 
         await Promise.all([
-            provider.mockTransactionTimeline(callTransactionOne, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
-            provider.mockTransactionTimeline(callTransactionTwo, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
+            provider.mockTransactionTimeline(callTransactionOne, [
+                new Wait(40),
+                new TransactionStatus("pending"),
+                new Wait(40),
+                new TransactionStatus("executed"),
+                new MarkCompleted(),
+            ]),
+            provider.mockTransactionTimeline(callTransactionTwo, [
+                new Wait(40),
+                new TransactionStatus("pending"),
+                new Wait(40),
+                new TransactionStatus("executed"),
+                new MarkCompleted(),
+            ]),
             watcher.awaitCompleted(callTransactionOne.getHash().hex()),
-            watcher.awaitCompleted(callTransactionTwo.getHash().hex())
+            watcher.awaitCompleted(callTransactionTwo.getHash().hex()),
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hashOne)).isExecuted());
@@ -131,16 +157,16 @@ describe("test contract", () => {
         let watcher = new TransactionWatcher(provider);
 
         let contract = new SmartContract();
-        contract.setAddress(Address.fromBech32("erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q"))
+        contract.setAddress(Address.fromBech32("erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q"));
 
         let deployTransaction = contract.upgrade({
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
             gasLimit: 1000000,
             chainID: chainID,
-            caller: alice.address
+            caller: alice.address,
         });
 
-        provider.mockUpdateAccount(alice.address, account => {
+        provider.mockUpdateAccount(alice.address, (account) => {
             account.nonce = 42;
         });
 
@@ -158,8 +184,14 @@ describe("test contract", () => {
         let hash = await provider.sendTransaction(deployTransaction);
 
         await Promise.all([
-            provider.mockTransactionTimeline(deployTransaction, [new Wait(40), new TransactionStatus("pending"), new Wait(40), new TransactionStatus("executed"), new MarkCompleted()]),
-            watcher.awaitCompleted(deployTransaction.getHash().hex())
+            provider.mockTransactionTimeline(deployTransaction, [
+                new Wait(40),
+                new TransactionStatus("pending"),
+                new Wait(40),
+                new TransactionStatus("executed"),
+                new MarkCompleted(),
+            ]),
+            watcher.awaitCompleted(deployTransaction.getHash().hex()),
         ]);
 
         assert.isTrue((await provider.getTransactionStatus(hash)).isExecuted());

@@ -7,7 +7,7 @@ import {
     loadTestWallets,
     MockNetworkProvider,
     setupUnitTestWatcherTimeouts,
-    TestWallet
+    TestWallet,
 } from "../testutils";
 import { ContractController } from "../testutils/contractController";
 import { Token, TokenTransfer } from "../tokens";
@@ -53,13 +53,14 @@ describe("test smart contract interactor", function () {
 
         const TokenFoo = (amount: BigNumber.Value) => TokenTransfer.fungibleFromAmount("FOO-6ce17b", amount, 0);
         const TokenBar = (amount: BigNumber.Value) => TokenTransfer.fungibleFromAmount("BAR-5bc08f", amount, 3);
-        const LKMEX = (nonce: number, amount: BigNumber.Value) => TokenTransfer.metaEsdtFromAmount("LKMEX-aab910", nonce, amount, 18);
-        const Strămoși = (nonce: number) => TokenTransfer.nonFungible("MOS-b9b4b2", nonce);
+        const LKMEX = (nonce: number, amount: BigNumber.Value) =>
+            TokenTransfer.metaEsdtFromAmount("LKMEX-aab910", nonce, amount, 18);
+        const nonFungibleToken = (nonce: number) => TokenTransfer.nonFungible("MOS-b9b4b2", nonce);
 
         const hexFoo = "464f4f2d366365313762";
         const hexBar = "4241522d356263303866";
         const hexLKMEX = "4c4b4d45582d616162393130";
-        const hexStrămoși = "4d4f532d623962346232";
+        const hexNFT = "4d4f532d623962346232";
         const hexContractAddress = new Address(contract.getAddress().bech32()).hex();
         const hexDummyFunction = "64756d6d79";
 
@@ -79,7 +80,10 @@ describe("test smart contract interactor", function () {
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
         assert.equal(transaction.getReceiver().bech32(), alice.bech32());
-        assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`);
+        assert.equal(
+            transaction.getData().toString(),
+            `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`,
+        );
 
         // Meta ESDT (special SFT), single, but using "withSender()" (recommended)
         transaction = new Interaction(contract, dummyFunction, [])
@@ -89,27 +93,36 @@ describe("test smart contract interactor", function () {
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
         assert.equal(transaction.getReceiver().bech32(), alice.bech32());
-        assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`);
+        assert.equal(
+            transaction.getData().toString(),
+            `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`,
+        );
 
         // NFT, single
         transaction = new Interaction(contract, dummyFunction, [])
             .withSender(alice)
-            .withSingleESDTNFTTransfer(Strămoși(1))
+            .withSingleESDTNFTTransfer(nonFungibleToken(1))
             .buildTransaction();
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
         assert.equal(transaction.getReceiver().bech32(), alice.bech32());
-        assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexStrămoși}@01@01@${hexContractAddress}@${hexDummyFunction}`);
+        assert.equal(
+            transaction.getData().toString(),
+            `ESDTNFTTransfer@${hexNFT}@01@01@${hexContractAddress}@${hexDummyFunction}`,
+        );
 
         // NFT, single, but using "withSender()" (recommended)
         transaction = new Interaction(contract, dummyFunction, [])
-            .withSingleESDTNFTTransfer(Strămoși(1))
+            .withSingleESDTNFTTransfer(nonFungibleToken(1))
             .withSender(alice)
             .buildTransaction();
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
         assert.equal(transaction.getReceiver().bech32(), alice.bech32());
-        assert.equal(transaction.getData().toString(), `ESDTNFTTransfer@${hexStrămoși}@01@01@${hexContractAddress}@${hexDummyFunction}`);
+        assert.equal(
+            transaction.getData().toString(),
+            `ESDTNFTTransfer@${hexNFT}@01@01@${hexContractAddress}@${hexDummyFunction}`,
+        );
 
         // ESDT, multiple
         transaction = new Interaction(contract, dummyFunction, [])
@@ -119,7 +132,10 @@ describe("test smart contract interactor", function () {
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
         assert.equal(transaction.getReceiver().bech32(), alice.bech32());
-        assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexFoo}@@03@${hexBar}@@0c44@${hexDummyFunction}`);
+        assert.equal(
+            transaction.getData().toString(),
+            `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexFoo}@@03@${hexBar}@@0c44@${hexDummyFunction}`,
+        );
 
         // ESDT, multiple, but using "withSender()" (recommended)
         transaction = new Interaction(contract, dummyFunction, [])
@@ -129,21 +145,27 @@ describe("test smart contract interactor", function () {
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
         assert.equal(transaction.getReceiver().bech32(), alice.bech32());
-        assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexFoo}@@03@${hexBar}@@0c44@${hexDummyFunction}`);
+        assert.equal(
+            transaction.getData().toString(),
+            `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexFoo}@@03@${hexBar}@@0c44@${hexDummyFunction}`,
+        );
 
         // NFT, multiple
         transaction = new Interaction(contract, dummyFunction, [])
             .withSender(alice)
-            .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)])
+            .withMultiESDTNFTTransfer([nonFungibleToken(1), nonFungibleToken(42)])
             .buildTransaction();
 
         assert.equal(transaction.getSender().bech32(), alice.bech32());
         assert.equal(transaction.getReceiver().bech32(), alice.bech32());
-        assert.equal(transaction.getData().toString(), `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexStrămoși}@01@01@${hexStrămoși}@2a@01@${hexDummyFunction}`);
+        assert.equal(
+            transaction.getData().toString(),
+            `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexNFT}@01@01@${hexNFT}@2a@01@${hexDummyFunction}`,
+        );
 
         // NFT, multiple, but using "withSender()" (recommended)
         transaction = new Interaction(contract, dummyFunction, [])
-            .withMultiESDTNFTTransfer([Strămoși(1), Strămoși(42)])
+            .withMultiESDTNFTTransfer([nonFungibleToken(1), nonFungibleToken(42)])
             .withSender(alice)
             .buildTransaction();
 
@@ -188,9 +210,7 @@ describe("test smart contract interactor", function () {
         let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new ContractController(provider);
 
-        let interaction = <Interaction>(
-            contract.methods.getUltimateAnswer().withGasLimit(543210).withChainID("T")
-        );
+        let interaction = <Interaction>contract.methods.getUltimateAnswer().withGasLimit(543210).withChainID("T");
 
         assert.equal(contract.getAddress(), dummyAddress);
         assert.deepEqual(interaction.getFunction(), new ContractFunction("getUltimateAnswer"));
@@ -199,13 +219,15 @@ describe("test smart contract interactor", function () {
 
         provider.mockQueryContractOnFunction(
             "getUltimateAnswer",
-            new ContractQueryResponse({ returnData: [Buffer.from([42]).toString("base64")], returnCode: "ok" })
+            new ContractQueryResponse({ returnData: [Buffer.from([42]).toString("base64")], returnCode: "ok" }),
         );
 
         // Query
-        let { values: queryValues, firstValue: queryAnwser, returnCode: queryCode } = await controller.query(
-            interaction
-        );
+        let {
+            values: queryValues,
+            firstValue: queryAnwser,
+            returnCode: queryCode,
+        } = await controller.query(interaction);
         assert.lengthOf(queryValues, 1);
         assert.deepEqual(queryAnwser!.valueOf(), new BigNumber(42));
         assert.isTrue(queryCode.equals(ReturnCode.Ok));
@@ -219,7 +241,7 @@ describe("test smart contract interactor", function () {
         assert.equal(transaction.getData().toString(), "getUltimateAnswer");
         assert.equal(
             transaction.getHash().toString(),
-            "3579ad09099feb9755c860ddd225251170806d833342e912fccdfe2ed5c3a364"
+            "3579ad09099feb9755c860ddd225251170806d833342e912fccdfe2ed5c3a364",
         );
 
         transaction = interaction.withNonce(1).buildTransaction();
@@ -229,7 +251,7 @@ describe("test smart contract interactor", function () {
         assert.equal(transaction.getNonce().valueOf(), 1);
         assert.equal(
             transaction.getHash().toString(),
-            "ad513ce7c5d371d30e48f073326899766736eac1ac231d847d45bc3facbcb496"
+            "ad513ce7c5d371d30e48f073326899766736eac1ac231d847d45bc3facbcb496",
         );
 
         // Execute, and wait for execution
@@ -258,7 +280,7 @@ describe("test smart contract interactor", function () {
         // For "get()", return fake 7
         provider.mockQueryContractOnFunction(
             "get",
-            new ContractQueryResponse({ returnData: [Buffer.from([7]).toString("base64")], returnCode: "ok" })
+            new ContractQueryResponse({ returnData: [Buffer.from([7]).toString("base64")], returnCode: "ok" }),
         );
 
         // Query "get()"
@@ -267,23 +289,25 @@ describe("test smart contract interactor", function () {
         assert.deepEqual(counterValue!.valueOf(), new BigNumber(7));
 
         let incrementTransaction = incrementInteraction
-        .withSender(alice.address)
-        .withNonce(14)
-        .withChainID("mock")
-        .buildTransaction();
+            .withSender(alice.address)
+            .withNonce(14)
+            .withChainID("mock")
+            .buildTransaction();
 
         incrementTransaction.applySignature(await alice.signer.sign(incrementTransaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@08");
-        let { bundle: { firstValue: valueAfterIncrement } } = await controller.execute(incrementInteraction, incrementTransaction);
+        let {
+            bundle: { firstValue: valueAfterIncrement },
+        } = await controller.execute(incrementInteraction, incrementTransaction);
         assert.deepEqual(valueAfterIncrement!.valueOf(), new BigNumber(8));
 
         // Decrement three times (simulate three parallel broadcasts). Wait for execution of the latter (third transaction). Return fake "5".
         // Decrement #1
         let decrementTransaction = decrementInteraction
-        .withSender(alice.address)
-        .withNonce(15)
-        .withChainID("mock")
-        .buildTransaction();
+            .withSender(alice.address)
+            .withNonce(15)
+            .withChainID("mock")
+            .buildTransaction();
 
         decrementTransaction.applySignature(await alice.signer.sign(decrementTransaction.serializeForSigning()));
         await provider.sendTransaction(decrementTransaction);
@@ -296,7 +320,9 @@ describe("test smart contract interactor", function () {
         decrementTransaction = decrementInteraction.withNonce(17).buildTransaction();
         decrementTransaction.applySignature(await alice.signer.sign(decrementTransaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@05");
-        let { bundle: { firstValue: valueAfterDecrement } } = await controller.execute(decrementInteraction, decrementTransaction);
+        let {
+            bundle: { firstValue: valueAfterDecrement },
+        } = await controller.execute(decrementInteraction, decrementTransaction);
         assert.deepEqual(valueAfterDecrement!.valueOf(), new BigNumber(5));
     });
 
@@ -307,56 +333,57 @@ describe("test smart contract interactor", function () {
         let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new ContractController(provider);
 
-        let startInteraction = <Interaction>(
-            contract.methodsExplicit
-                .start([
-                    BytesValue.fromUTF8("lucky"),
-                    new TokenIdentifierValue("lucky-token"),
-                    new BigUIntValue(1),
-                    OptionValue.newMissing(),
-                    OptionValue.newMissing(),
-                    OptionValue.newProvided(new U32Value(1)),
-                    OptionValue.newMissing(),
-                    OptionValue.newMissing(),
-                    OptionalValue.newMissing()
-                ])
-                .withGasLimit(5000000)
-                .check()
-        );
+        let startInteraction = <Interaction>contract.methodsExplicit
+            .start([
+                BytesValue.fromUTF8("lucky"),
+                new TokenIdentifierValue("lucky-token"),
+                new BigUIntValue(1),
+                OptionValue.newMissing(),
+                OptionValue.newMissing(),
+                OptionValue.newProvided(new U32Value(1)),
+                OptionValue.newMissing(),
+                OptionValue.newMissing(),
+                OptionalValue.newMissing(),
+            ])
+            .withGasLimit(5000000)
+            .check();
 
-        let statusInteraction = <Interaction>(
-            contract.methods.status(["lucky"]).withGasLimit(5000000)
-        );
+        let statusInteraction = <Interaction>contract.methods.status(["lucky"]).withGasLimit(5000000);
 
-        let getLotteryInfoInteraction = <Interaction>(
-            contract.methods.getLotteryInfo(["lucky"]).withGasLimit(5000000)
-        );
+        let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo(["lucky"]).withGasLimit(5000000);
 
         // start()
         let startTransaction = startInteraction
-        .withSender(alice.address)
-        .withNonce(14)
-        .withChainID("mock")
-        .buildTransaction();
+            .withSender(alice.address)
+            .withNonce(14)
+            .withChainID("mock")
+            .buildTransaction();
 
         startTransaction.applySignature(await alice.signer.sign(startTransaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b");
-        let { bundle: { returnCode: startReturnCode, values: startReturnValues } } = await controller.execute(startInteraction, startTransaction);
+        let {
+            bundle: { returnCode: startReturnCode, values: startReturnValues },
+        } = await controller.execute(startInteraction, startTransaction);
 
-        assert.equal(startTransaction.getData().toString(), "start@6c75636b79@6c75636b792d746f6b656e@01@@@0100000001@@");
+        assert.equal(
+            startTransaction.getData().toString(),
+            "start@6c75636b79@6c75636b792d746f6b656e@01@@@0100000001@@",
+        );
         assert.isTrue(startReturnCode.equals(ReturnCode.Ok));
         assert.lengthOf(startReturnValues, 0);
 
         // status() (this is a view function, but for the sake of the test, we'll execute it)
         let statusTransaction = statusInteraction
-        .withSender(alice.address)
-        .withNonce(15)
-        .withChainID("mock")
-        .buildTransaction();
+            .withSender(alice.address)
+            .withNonce(15)
+            .withChainID("mock")
+            .buildTransaction();
 
         statusTransaction.applySignature(await alice.signer.sign(statusTransaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@01");
-        let { bundle: { returnCode: statusReturnCode, values: statusReturnValues, firstValue: statusFirstValue } } = await controller.execute(statusInteraction, statusTransaction);
+        let {
+            bundle: { returnCode: statusReturnCode, values: statusReturnValues, firstValue: statusFirstValue },
+        } = await controller.execute(statusInteraction, statusTransaction);
 
         assert.equal(statusTransaction.getData().toString(), "status@6c75636b79");
         assert.isTrue(statusReturnCode.equals(ReturnCode.Ok));
@@ -365,14 +392,20 @@ describe("test smart contract interactor", function () {
 
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
         let getLotteryInfoTransaction = getLotteryInfoInteraction
-        .withSender(alice.address)
-        .withNonce(15)
-        .withChainID("mock")
-        .buildTransaction();
-        
-        getLotteryInfoTransaction.applySignature(await alice.signer.sign(getLotteryInfoTransaction.serializeForSigning()));
-        provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@0000000b6c75636b792d746f6b656e000000010100000000000000005fc2b9dbffffffff00000001640000000a140ec80fa7ee88000000");
-        let { bundle: { returnCode: infoReturnCode, values: infoReturnValues, firstValue: infoFirstValue } } = await controller.execute(getLotteryInfoInteraction, getLotteryInfoTransaction);
+            .withSender(alice.address)
+            .withNonce(15)
+            .withChainID("mock")
+            .buildTransaction();
+
+        getLotteryInfoTransaction.applySignature(
+            await alice.signer.sign(getLotteryInfoTransaction.serializeForSigning()),
+        );
+        provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult(
+            "@6f6b@0000000b6c75636b792d746f6b656e000000010100000000000000005fc2b9dbffffffff00000001640000000a140ec80fa7ee88000000",
+        );
+        let {
+            bundle: { returnCode: infoReturnCode, values: infoReturnValues, firstValue: infoFirstValue },
+        } = await controller.execute(getLotteryInfoInteraction, getLotteryInfoTransaction);
 
         assert.equal(getLotteryInfoTransaction.getData().toString(), "getLotteryInfo@6c75636b79");
         assert.isTrue(infoReturnCode.equals(ReturnCode.Ok));
@@ -385,7 +418,7 @@ describe("test smart contract interactor", function () {
             deadline: new BigNumber("0x000000005fc2b9db", 16),
             max_entries_per_user: new BigNumber(0xffffffff),
             prize_distribution: Buffer.from([0x64]),
-            prize_pool: new BigNumber("94720000000000000000000")
+            prize_pool: new BigNumber("94720000000000000000000"),
         });
     });
 });

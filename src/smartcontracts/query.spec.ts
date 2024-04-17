@@ -15,8 +15,8 @@ describe("test smart contract queries", () => {
                 new U32Value(100),
                 BytesValue.fromUTF8("!"),
                 BytesValue.fromHex("abba"),
-                new BigUIntValue(new BigNumber("1000000000000000000000000000000000"))
-            ]
+                new BigUIntValue(new BigNumber("1000000000000000000000000000000000")),
+            ],
         });
 
         let args = query.getEncodedArguments();

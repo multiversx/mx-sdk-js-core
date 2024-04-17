@@ -20,11 +20,11 @@ import { Type, TypedValue } from "./typesystem";
 enum WellKnownEvents {
     OnTransactionCompleted = "completedTxEvent",
     OnSignalError = "signalError",
-    OnWriteLog = "writeLog"
+    OnWriteLog = "writeLog",
 }
 
 enum WellKnownTopics {
-    TooMuchGas = "@too much gas provided for processing"
+    TooMuchGas = "@too much gas provided for processing",
 }
 
 interface IResultsParserOptions {
@@ -55,7 +55,7 @@ interface IArgsSerializer {
 // TODO: perhaps move default construction options to a factory (ResultsParserFactory), instead of referencing them in the constructor
 // (postpone as much as possible, breaking change)
 const defaultResultsParserOptions: IResultsParserOptions = {
-    argsSerializer: new ArgSerializer()
+    argsSerializer: new ArgSerializer(),
 };
 
 /**
@@ -78,7 +78,10 @@ export class ResultsParser {
     /**
      * Legacy method, use "SmartContractQueriesController.parseQueryResponse()" instead.
      */
-    parseQueryResponse(queryResponse: IContractQueryResponse, endpoint: { output: IParameterDefinition[] }): TypedOutcomeBundle {
+    parseQueryResponse(
+        queryResponse: IContractQueryResponse,
+        endpoint: { output: IParameterDefinition[] },
+    ): TypedOutcomeBundle {
         let parts = queryResponse.getReturnDataParts();
         let values = this.argsSerializer.buffersToValues(parts, endpoint.output);
         let returnCode = new ReturnCode(queryResponse.returnCode.toString());
@@ -90,7 +93,7 @@ export class ResultsParser {
             firstValue: values[0],
             secondValue: values[1],
             thirdValue: values[2],
-            lastValue: values[values.length - 1]
+            lastValue: values[values.length - 1],
         };
     }
 
@@ -98,12 +101,12 @@ export class ResultsParser {
      * Legacy method, use "SmartContractQueriesController.parseQueryResponse()" instead.
      */
     parseUntypedQueryResponse(queryResponse: IContractQueryResponse): UntypedOutcomeBundle {
-        let returnCode = new ReturnCode(queryResponse.returnCode.toString())
+        let returnCode = new ReturnCode(queryResponse.returnCode.toString());
 
         return {
             returnCode: returnCode,
             returnMessage: queryResponse.returnMessage,
-            values: queryResponse.getReturnDataParts()
+            values: queryResponse.getReturnDataParts(),
         };
     }
 
@@ -130,7 +133,7 @@ export class ResultsParser {
             firstValue: values[0],
             secondValue: values[1],
             thirdValue: values[2],
-            lastValue: values[values.length - 1]
+            lastValue: values[values.length - 1],
         };
     }
 
@@ -198,7 +201,7 @@ export class ResultsParser {
             sender: transaction.sender.bech32(),
             receiver: transaction.receiver.bech32(),
             data: transaction.data.toString("base64"),
-            value: transaction.value.toString()
+            value: transaction.value.toString(),
         });
     }
 
@@ -210,7 +213,7 @@ export class ResultsParser {
             return {
                 returnCode: ReturnCode.None,
                 returnMessage: ReturnCode.None.toString(),
-                values: []
+                values: [],
             };
         }
 
@@ -223,7 +226,7 @@ export class ResultsParser {
                 return {
                     returnCode: ReturnCode.OutOfFunds,
                     returnMessage: transaction.receipt.data,
-                    values: []
+                    values: [],
                 };
             }
 
@@ -234,7 +237,9 @@ export class ResultsParser {
     }
 
     private createBundleOnEasilyFoundResultWithReturnData(results: IContractResults): UntypedOutcomeBundle | null {
-        let resultItemWithReturnData = results.items.find(item => item.nonce.valueOf() != 0 && item.data.startsWith("@"));
+        let resultItemWithReturnData = results.items.find(
+            (item) => item.nonce.valueOf() != 0 && item.data.startsWith("@"),
+        );
         if (!resultItemWithReturnData) {
             return null;
         }
@@ -245,7 +250,7 @@ export class ResultsParser {
         return {
             returnCode: returnCode,
             returnMessage: returnMessage,
-            values: returnDataParts
+            values: returnDataParts,
         };
     }
 
@@ -262,14 +267,16 @@ export class ResultsParser {
         return {
             returnCode: returnCode,
             returnMessage: returnMessage,
-            values: returnDataParts
+            values: returnDataParts,
         };
     }
 
     private createBundleOnTooMuchGasWarning(logs: ITransactionLogs): UntypedOutcomeBundle | null {
         let eventTooMuchGas = logs.findSingleOrNoneEvent(
             WellKnownEvents.OnWriteLog,
-            event => event.findFirstOrNoneTopic(topic => topic.toString().startsWith(WellKnownTopics.TooMuchGas)) != undefined
+            (event) =>
+                event.findFirstOrNoneTopic((topic) => topic.toString().startsWith(WellKnownTopics.TooMuchGas)) !=
+                undefined,
         );
 
         if (!eventTooMuchGas) {
@@ -287,12 +294,15 @@ export class ResultsParser {
         };
     }
 
-    private createBundleOnWriteLogWhereFirstTopicEqualsAddress(logs: ITransactionLogs, address: IAddress): UntypedOutcomeBundle | null {
+    private createBundleOnWriteLogWhereFirstTopicEqualsAddress(
+        logs: ITransactionLogs,
+        address: IAddress,
+    ): UntypedOutcomeBundle | null {
         let hexAddress = new Address(address.bech32()).hex();
 
         let eventWriteLogWhereTopicIsSender = logs.findSingleOrNoneEvent(
             WellKnownEvents.OnWriteLog,
-            event => event.findFirstOrNoneTopic(topic => topic.hex() == hexAddress) != undefined
+            (event) => event.findFirstOrNoneTopic((topic) => topic.hex() == hexAddress) != undefined,
         );
 
         if (!eventWriteLogWhereTopicIsSender) {
@@ -305,23 +315,29 @@ export class ResultsParser {
         return {
             returnCode: returnCode,
             returnMessage: returnMessage,
-            values: returnDataParts
+            values: returnDataParts,
         };
     }
 
     /**
      * Override this method (in a subclass of {@link ResultsParser}) if the basic heuristics of the parser are not sufficient.
      */
-    protected createBundleWithCustomHeuristics(_transaction: ITransactionOnNetwork, _transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
+    protected createBundleWithCustomHeuristics(
+        _transaction: ITransactionOnNetwork,
+        _transactionMetadata: TransactionMetadata,
+    ): UntypedOutcomeBundle | null {
         return null;
     }
 
-    private createBundleWithFallbackHeuristics(transaction: ITransactionOnNetwork, transactionMetadata: TransactionMetadata): UntypedOutcomeBundle | null {
+    private createBundleWithFallbackHeuristics(
+        transaction: ITransactionOnNetwork,
+        transactionMetadata: TransactionMetadata,
+    ): UntypedOutcomeBundle | null {
         let contractAddress = new Address(transactionMetadata.receiver);
 
         // Search the nested logs for matching events (writeLog):
         for (const resultItem of transaction.contractResults.items) {
-            let writeLogWithReturnData = resultItem.logs.findSingleOrNoneEvent(WellKnownEvents.OnWriteLog, event => {
+            let writeLogWithReturnData = resultItem.logs.findSingleOrNoneEvent(WellKnownEvents.OnWriteLog, (event) => {
                 let addressIsSender = event.address.bech32() == transaction.sender.bech32();
                 let firstTopicIsContract = event.topics[0]?.hex() == contractAddress.hex();
                 return addressIsSender && firstTopicIsContract;
@@ -334,7 +350,7 @@ export class ResultsParser {
                 return {
                     returnCode: returnCode,
                     returnMessage: returnMessage,
-                    values: returnDataParts
+                    values: returnDataParts,
                 };
             }
         }
@@ -342,7 +358,7 @@ export class ResultsParser {
         return null;
     }
 
-    protected sliceDataFieldInParts(data: string): { returnCode: ReturnCode, returnDataParts: Buffer[] } {
+    protected sliceDataFieldInParts(data: string): { returnCode: ReturnCode; returnDataParts: Buffer[] } {
         // By default, skip the first part, which is usually empty (e.g. "[empty]@6f6b")
         let startingIndex = 1;
 

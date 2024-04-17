@@ -32,7 +32,9 @@ export class InteractionChecker {
         let numActualArguments = actualArguments.length;
 
         if (numFormalArguments != numActualArguments) {
-            throw new errors.ErrContractInteraction(`bad arguments, expected: ${numFormalArguments}, got: ${numActualArguments}`);
+            throw new errors.ErrContractInteraction(
+                `bad arguments, expected: ${numFormalArguments}, got: ${numActualArguments}`,
+            );
         }
 
         // TODO: discuss again, possibly redesign the handling of covariance / contravariance.
@@ -45,7 +47,9 @@ export class InteractionChecker {
             let ok = expectedType.isAssignableFrom(actualType);
 
             if (!ok) {
-                throw new errors.ErrContractInteraction(`type mismatch at index ${i}, expected: ${expectedType}, got: ${actualType}`);
+                throw new errors.ErrContractInteraction(
+                    `type mismatch at index ${i}, expected: ${expectedType}, got: ${actualType}`,
+                );
             }
         }
     }

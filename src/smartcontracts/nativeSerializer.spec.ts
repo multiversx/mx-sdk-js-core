@@ -3,7 +3,35 @@ import { assert } from "chai";
 import { Address } from "../address";
 import { ErrInvalidArgument } from "../errors";
 import { NativeSerializer } from "./nativeSerializer";
-import { AbiRegistry, AddressType, AddressValue, BigUIntType, BooleanType, BooleanValue, CompositeType, CompositeValue, EndpointDefinition, EndpointModifiers, EndpointParameterDefinition, ListType, NullType, OptionalType, OptionalValue, OptionType, OptionValue, TupleType, TypePlaceholder, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
+import {
+    AbiRegistry,
+    AddressType,
+    AddressValue,
+    BigUIntType,
+    BooleanType,
+    BooleanValue,
+    CompositeType,
+    CompositeValue,
+    EndpointDefinition,
+    EndpointModifiers,
+    EndpointParameterDefinition,
+    ListType,
+    NullType,
+    OptionalType,
+    OptionalValue,
+    OptionType,
+    OptionValue,
+    TupleType,
+    TypePlaceholder,
+    U32Type,
+    U32Value,
+    U64Type,
+    U64Value,
+    U8Type,
+    U8Value,
+    VariadicType,
+    VariadicValue,
+} from "./typesystem";
 import { BytesType, BytesValue } from "./typesystem/bytes";
 
 describe("test native serializer", () => {
@@ -16,12 +44,15 @@ describe("test native serializer", () => {
             new EndpointParameterDefinition("", "", new BytesType()),
             new EndpointParameterDefinition("", "", new OptionType(new U32Type())),
             new EndpointParameterDefinition("", "", new OptionType(new U32Type())),
-            new EndpointParameterDefinition("", "", new OptionalType(new BytesType()))
+            new EndpointParameterDefinition("", "", new OptionalType(new BytesType())),
         ];
         const endpoint = new EndpointDefinition("foo", inputParameters, [], endpointModifiers);
 
         const p0 = 42;
-        const p1 = [new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"), new Address("erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede")];
+        const p1 = [
+            new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha"),
+            new Address("erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede"),
+        ];
         const p2 = Buffer.from("abba", "hex");
         const p3 = Number(0xabba);
         const p4 = null;
@@ -60,18 +91,28 @@ describe("test native serializer", () => {
         const endpointModifiers = new EndpointModifiers("", []);
         const inputParameters = [
             new EndpointParameterDefinition("", "", new VariadicType(new U32Type(), true)),
-            new EndpointParameterDefinition("", "", new VariadicType(new BytesType(), true))
+            new EndpointParameterDefinition("", "", new VariadicType(new BytesType(), true)),
         ];
         const endpoint = new EndpointDefinition("foo", inputParameters, [], endpointModifiers);
 
         // Implicit counted-variadic (not supported).
-        assert.throws(() => NativeSerializer.nativeToTypedValues([8, 9, 10, "a", "b", "c"], endpoint), ErrInvalidArgument);
+        assert.throws(
+            () => NativeSerializer.nativeToTypedValues([8, 9, 10, "a", "b", "c"], endpoint),
+            ErrInvalidArgument,
+        );
 
         // Explicit, non-empty counted-variadic.
-        let typedValues = NativeSerializer.nativeToTypedValues([
-            VariadicValue.fromItemsCounted(new U32Value(8), new U32Value(9), new U32Value(10)),
-            VariadicValue.fromItemsCounted(BytesValue.fromUTF8("a"), BytesValue.fromUTF8("b"), BytesValue.fromUTF8("c"))
-        ], endpoint);
+        let typedValues = NativeSerializer.nativeToTypedValues(
+            [
+                VariadicValue.fromItemsCounted(new U32Value(8), new U32Value(9), new U32Value(10)),
+                VariadicValue.fromItemsCounted(
+                    BytesValue.fromUTF8("a"),
+                    BytesValue.fromUTF8("b"),
+                    BytesValue.fromUTF8("c"),
+                ),
+            ],
+            endpoint,
+        );
 
         assert.lengthOf(typedValues, 2);
         assert.deepEqual(typedValues[0].getType(), new VariadicType(new U32Type(), true));
@@ -80,10 +121,10 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[1].valueOf(), [Buffer.from("a"), Buffer.from("b"), Buffer.from("c")]);
 
         // Explicit, empty counted-variadic.
-        typedValues = NativeSerializer.nativeToTypedValues([
-            VariadicValue.fromItemsCounted(),
-            VariadicValue.fromItemsCounted()
-        ], endpoint);
+        typedValues = NativeSerializer.nativeToTypedValues(
+            [VariadicValue.fromItemsCounted(), VariadicValue.fromItemsCounted()],
+            endpoint,
+        );
 
         assert.lengthOf(typedValues, 2);
         assert.deepEqual(typedValues[0].getType(), new VariadicType(new TypePlaceholder(), true));
@@ -96,7 +137,7 @@ describe("test native serializer", () => {
         const endpointModifiers = new EndpointModifiers("", []);
         const inputParameters = [
             new EndpointParameterDefinition("", "", new VariadicType(new U32Type(), true)),
-            new EndpointParameterDefinition("", "", new VariadicType(new BytesType(), false))
+            new EndpointParameterDefinition("", "", new VariadicType(new BytesType(), false)),
         ];
         const endpoint = new EndpointDefinition("foo", inputParameters, [], endpointModifiers);
 
@@ -104,9 +145,10 @@ describe("test native serializer", () => {
         assert.throws(() => NativeSerializer.nativeToTypedValues([8, 9, 10], endpoint), ErrInvalidArgument);
 
         // Explicit counted-variadic, empty implicit regular variadic.
-        let typedValues = NativeSerializer.nativeToTypedValues([
-            VariadicValue.fromItemsCounted(new U32Value(8), new U32Value(9), new U32Value(10))
-        ], endpoint);
+        let typedValues = NativeSerializer.nativeToTypedValues(
+            [VariadicValue.fromItemsCounted(new U32Value(8), new U32Value(9), new U32Value(10))],
+            endpoint,
+        );
 
         assert.lengthOf(typedValues, 2);
         assert.deepEqual(typedValues[0].getType(), new VariadicType(new U32Type(), true));
@@ -115,10 +157,10 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[1].valueOf(), []);
 
         // Explicit counted-variadic, non-empty implicit regular variadic.
-        typedValues = NativeSerializer.nativeToTypedValues([
-            VariadicValue.fromItemsCounted(new U32Value(8), new U32Value(9), new U32Value(10)),
-            "a", "b", "c"
-        ], endpoint);
+        typedValues = NativeSerializer.nativeToTypedValues(
+            [VariadicValue.fromItemsCounted(new U32Value(8), new U32Value(9), new U32Value(10)), "a", "b", "c"],
+            endpoint,
+        );
 
         assert.lengthOf(typedValues, 2);
         assert.deepEqual(typedValues[0].getType(), new VariadicType(new U32Type(), true));
@@ -129,20 +171,23 @@ describe("test native serializer", () => {
 
     it("should should handle optionals in a strict manner (but it does not)", async () => {
         const endpoint = AbiRegistry.create({
-            "endpoints": [
+            endpoints: [
                 {
-                    "name": "foo",
-                    "inputs": [{
-                        "type": "optional<bool>"
-                    }],
-                    "outputs": []
-                }
-            ]
+                    name: "foo",
+                    inputs: [
+                        {
+                            type: "optional<bool>",
+                        },
+                    ],
+                    outputs: [],
+                },
+            ],
         }).getEndpoint("foo");
 
-        let typedValues = NativeSerializer.nativeToTypedValues([
-            new OptionalValue(new BooleanType(), new BooleanValue(true))
-        ], endpoint);
+        let typedValues = NativeSerializer.nativeToTypedValues(
+            [new OptionalValue(new BooleanType(), new BooleanValue(true))],
+            endpoint,
+        );
 
         // Isn't this a bug? Shouldn't it be be OptionalType(BooleanType()), instead?
         assert.deepEqual(typedValues[0].getType(), new BooleanType());
@@ -156,7 +201,7 @@ describe("test native serializer", () => {
         let inputParameters = [
             new EndpointParameterDefinition("a", "a", new BigUIntType()),
             new EndpointParameterDefinition("b", "b", new ListType(new AddressType())),
-            new EndpointParameterDefinition("c", "c", new BytesType())
+            new EndpointParameterDefinition("c", "c", new BytesType()),
         ];
         let endpoint = new EndpointDefinition("foo", inputParameters, [], endpointModifiers);
 
@@ -176,29 +221,27 @@ describe("test native serializer", () => {
 
     it("should accept a mix between typed values and regular JavaScript objects (variadic, optionals)", async () => {
         const endpoint = AbiRegistry.create({
-            "endpoints": [
+            endpoints: [
                 {
-                    "name": "foo",
-                    "inputs": [{
-                        "type": "bool"
-                    }, {
-                        "type": "optional<bool>"
-                    }, {
-                        "type": "variadic<bool>"
-                    }],
-                    "outputs": []
-                }
-            ]
+                    name: "foo",
+                    inputs: [
+                        {
+                            type: "bool",
+                        },
+                        {
+                            type: "optional<bool>",
+                        },
+                        {
+                            type: "variadic<bool>",
+                        },
+                    ],
+                    outputs: [],
+                },
+            ],
         }).getEndpoint("foo");
 
         // Using only native JavaScript objects
-        let typedValues = NativeSerializer.nativeToTypedValues([
-            true,
-            null,
-            true,
-            false,
-            true
-        ], endpoint);
+        let typedValues = NativeSerializer.nativeToTypedValues([true, null, true, false, true], endpoint);
 
         assert.deepEqual(typedValues[0].getType(), new BooleanType());
         assert.deepEqual(typedValues[0].valueOf(), true);
@@ -208,11 +251,14 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[2].valueOf(), [true, false, true]);
 
         // Using both native JavaScript objects and typed values
-        typedValues = NativeSerializer.nativeToTypedValues([
-            true,
-            null,
-            VariadicValue.fromItems(new BooleanValue(true), new BooleanValue(false), new BooleanValue(true)),
-        ], endpoint);
+        typedValues = NativeSerializer.nativeToTypedValues(
+            [
+                true,
+                null,
+                VariadicValue.fromItems(new BooleanValue(true), new BooleanValue(false), new BooleanValue(true)),
+            ],
+            endpoint,
+        );
 
         assert.deepEqual(typedValues[0].getType(), new BooleanType());
         assert.deepEqual(typedValues[0].valueOf(), true);
@@ -224,15 +270,17 @@ describe("test native serializer", () => {
 
     it("should accept a mix between typed values and regular JavaScript objects (composite, optionals)", async () => {
         const endpoint = AbiRegistry.create({
-            "endpoints": [
+            endpoints: [
                 {
-                    "name": "foo",
-                    "inputs": [{
-                        "type": "optional<multi<Address,u64>>",
-                    }],
-                    "outputs": []
-                }
-            ]
+                    name: "foo",
+                    inputs: [
+                        {
+                            type: "optional<multi<Address,u64>>",
+                        },
+                    ],
+                    outputs: [],
+                },
+            ],
         }).getEndpoint("foo");
 
         const compositeType = new CompositeType(new AddressType(), new U64Type());
@@ -256,25 +304,24 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[0].valueOf(), [address, new BigNumber(42)]);
 
         // Pass only typed values
-        typedValues = NativeSerializer.nativeToTypedValues([new OptionalValue(optionalCompositeType, compositeValue)], endpoint);
+        typedValues = NativeSerializer.nativeToTypedValues(
+            [new OptionalValue(optionalCompositeType, compositeValue)],
+            endpoint,
+        );
 
         assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
         assert.deepEqual(typedValues[0], optionalCompositeValue);
         assert.deepEqual(typedValues[0].valueOf(), [address, new BigNumber(42)]);
 
         // Pass a mix of native and typed values
-        typedValues = NativeSerializer.nativeToTypedValues([
-            [new AddressValue(address), 42]
-        ], endpoint);
+        typedValues = NativeSerializer.nativeToTypedValues([[new AddressValue(address), 42]], endpoint);
 
         assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
         assert.deepEqual(typedValues[0], optionalCompositeValue);
         assert.deepEqual(typedValues[0].valueOf(), [address, new BigNumber(42)]);
 
         // Pass a mix of native and typed values
-        typedValues = NativeSerializer.nativeToTypedValues([
-            [addressBech32, new U64Value(42)],
-        ], endpoint);
+        typedValues = NativeSerializer.nativeToTypedValues([[addressBech32, new U64Value(42)]], endpoint);
 
         assert.deepEqual(typedValues[0].getType(), optionalCompositeType);
         assert.deepEqual(typedValues[0], optionalCompositeValue);
@@ -283,79 +330,99 @@ describe("test native serializer", () => {
 
     it("should accept a mix between typed values and regular JavaScript objects (tuples)", async () => {
         const endpoint = AbiRegistry.create({
-            "endpoints": [
+            endpoints: [
                 {
-                    "name": "foo",
-                    "inputs": [{
-                        "type": "tuple<u64,bool>",
-                    }, {
-                        "type": "tuple<u8,Option<bool>>",
-                    }, {
-                        "type": "List<tuple<u8,bool>>",
-                    }, {
-                        "type": "u64"
-                    }],
-                    "outputs": []
-                }
-            ]
+                    name: "foo",
+                    inputs: [
+                        {
+                            type: "tuple<u64,bool>",
+                        },
+                        {
+                            type: "tuple<u8,Option<bool>>",
+                        },
+                        {
+                            type: "List<tuple<u8,bool>>",
+                        },
+                        {
+                            type: "u64",
+                        },
+                    ],
+                    outputs: [],
+                },
+            ],
         }).getEndpoint("foo");
 
         // Pass only native values
-        let typedValues = NativeSerializer.nativeToTypedValues([
-            [42, true],
-            [43, false],
-            [[44, false], [45, true]],
-            46
-        ], endpoint);
+        let typedValues = NativeSerializer.nativeToTypedValues(
+            [
+                [42, true],
+                [43, false],
+                [
+                    [44, false],
+                    [45, true],
+                ],
+                46,
+            ],
+            endpoint,
+        );
 
         assert.deepEqual(typedValues[0].getType(), new TupleType(new U64Type(), new BooleanType()));
         assert.deepEqual(typedValues[0].valueOf(), { field0: new BigNumber(42), field1: true });
         assert.deepEqual(typedValues[1].getType(), new TupleType(new U8Type(), new OptionType(new BooleanType())));
         assert.deepEqual(typedValues[1].valueOf(), { field0: new BigNumber(43), field1: false });
         assert.deepEqual(typedValues[2].getType(), new ListType(new TupleType(new U8Type(), new BooleanType())));
-        assert.deepEqual(typedValues[2].valueOf(), [{ field0: new BigNumber(44), field1: false }, { field0: new BigNumber(45), field1: true }]);
+        assert.deepEqual(typedValues[2].valueOf(), [
+            { field0: new BigNumber(44), field1: false },
+            { field0: new BigNumber(45), field1: true },
+        ]);
 
         // Pass a mix of native and typed values
-        typedValues = NativeSerializer.nativeToTypedValues([
-            [new U64Value(42), true],
-            [43, OptionValue.newProvided(new BooleanValue(false))],
-            [[new U8Value(44), false], [45, new BooleanValue(true)]],
-            46
-        ], endpoint);
+        typedValues = NativeSerializer.nativeToTypedValues(
+            [
+                [new U64Value(42), true],
+                [43, OptionValue.newProvided(new BooleanValue(false))],
+                [
+                    [new U8Value(44), false],
+                    [45, new BooleanValue(true)],
+                ],
+                46,
+            ],
+            endpoint,
+        );
 
         assert.deepEqual(typedValues[0].getType(), new TupleType(new U64Type(), new BooleanType()));
         assert.deepEqual(typedValues[0].valueOf(), { field0: new BigNumber(42), field1: true });
         assert.deepEqual(typedValues[1].getType(), new TupleType(new U8Type(), new OptionType(new BooleanType())));
         assert.deepEqual(typedValues[1].valueOf(), { field0: new BigNumber(43), field1: false });
         assert.deepEqual(typedValues[2].getType(), new ListType(new TupleType(new U8Type(), new BooleanType())));
-        assert.deepEqual(typedValues[2].valueOf(), [{ field0: new BigNumber(44), field1: false }, { field0: new BigNumber(45), field1: true }]);
+        assert.deepEqual(typedValues[2].valueOf(), [
+            { field0: new BigNumber(44), field1: false },
+            { field0: new BigNumber(45), field1: true },
+        ]);
     });
 
-    it('should accept no value for variadic types', async () => {
+    it("should accept no value for variadic types", async () => {
         const endpoint = AbiRegistry.create({
             endpoints: [
                 {
-                    name: 'foo',
+                    name: "foo",
                     inputs: [
                         {
-                            type: 'u64',
+                            type: "u64",
                         },
                         {
-                            name: 'features',
-                            type: 'variadic<bytes>',
+                            name: "features",
+                            type: "variadic<bytes>",
                             multi_arg: true,
                         },
                     ],
                     outputs: [],
                 },
             ],
-        }).getEndpoint('foo');
+        }).getEndpoint("foo");
 
         // Using both native JavaScript objects and typed values
-        const typedValues = NativeSerializer.nativeToTypedValues(
-            [42],
-            endpoint
-        );
+        const typedValues = NativeSerializer.nativeToTypedValues([42], endpoint);
 
         assert.deepEqual(typedValues[0].getType(), new U64Type());
         assert.deepEqual(typedValues[0].valueOf(), new BigNumber(42));
@@ -365,56 +432,61 @@ describe("test native serializer", () => {
 
     it("should perform type inference (enums)", async () => {
         const abiRegistry = AbiRegistry.create({
-            "endpoints": [
+            endpoints: [
                 {
-                    "name": "foo",
-                    "inputs": [{
-                        "type": "MyEnum",
-                    }, {
-                        "type": "MyEnum",
-                    }, {
-                        "type": "MyEnum",
-                    }, {
-                        "type": "MyEnum",
-                    }],
-                    "outputs": []
-                }
+                    name: "foo",
+                    inputs: [
+                        {
+                            type: "MyEnum",
+                        },
+                        {
+                            type: "MyEnum",
+                        },
+                        {
+                            type: "MyEnum",
+                        },
+                        {
+                            type: "MyEnum",
+                        },
+                    ],
+                    outputs: [],
+                },
             ],
-            "types": {
-                "MyEnum": {
-                    "type": "enum",
-                    "variants": [
+            types: {
+                MyEnum: {
+                    type: "enum",
+                    variants: [
                         {
-                            "name": "Nothing",
-                            "discriminant": 0
+                            name: "Nothing",
+                            discriminant: 0,
                         },
                         {
-                            "name": "Something",
-                            "discriminant": 1,
-                            "fields": [
+                            name: "Something",
+                            discriminant: 1,
+                            fields: [
                                 {
-                                    "name": "0",
-                                    "type": "Address"
-                                }
-                            ]
+                                    name: "0",
+                                    type: "Address",
+                                },
+                            ],
                         },
                         {
-                            "name": "Else",
-                            "discriminant": 2,
-                            "fields": [
+                            name: "Else",
+                            discriminant: 2,
+                            fields: [
                                 {
-                                    "name": "x",
-                                    "type": "u64"
+                                    name: "x",
+                                    type: "u64",
                                 },
                                 {
-                                    "name": "y",
-                                    "type": "u64"
-                                }
-                            ]
-                        }
-                    ]
+                                    name: "y",
+                                    type: "u64",
+                                },
+                            ],
+                        },
+                    ],
                 },
-            }
+            },
         });
 
         const endpoint = abiRegistry.getEndpoint("foo");
@@ -423,11 +495,14 @@ describe("test native serializer", () => {
         // Simple enum by discriminant
         const p0 = 0;
         // Simple enum by name
-        const p1 = 'Nothing';
+        const p1 = "Nothing";
         // Enum with a single field
-        const p2 = { name: 'Something', fields: { 0: 'erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha' } };
+        const p2 = {
+            name: "Something",
+            fields: { 0: "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha" },
+        };
         // Enum with multiple fields
-        const p3 = { name: 'Else', fields: { x: 42, y: 43 } };
+        const p3 = { name: "Else", fields: { x: 42, y: 43 } };
 
         const typedValues = NativeSerializer.nativeToTypedValues([p0, p1, p2, p3], endpoint);
 
@@ -436,8 +511,11 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[1].getType(), enumType);
         assert.deepEqual(typedValues[1].valueOf(), { name: "Nothing", fields: [] });
         assert.deepEqual(typedValues[2].getType(), enumType);
-        assert.deepEqual(typedValues[2].valueOf(), { name: 'Something', fields: [new Address('erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha')] });
+        assert.deepEqual(typedValues[2].valueOf(), {
+            name: "Something",
+            fields: [new Address("erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha")],
+        });
         assert.deepEqual(typedValues[3].getType(), enumType);
-        assert.deepEqual(typedValues[3].valueOf(), { name: 'Else', fields: [new BigNumber(42), new BigNumber(43)] });
+        assert.deepEqual(typedValues[3].valueOf(), { name: "Else", fields: [new BigNumber(42), new BigNumber(43)] });
     });
 });

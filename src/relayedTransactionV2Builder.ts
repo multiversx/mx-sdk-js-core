@@ -76,7 +76,13 @@ export class RelayedTransactionV2Builder {
      * @return Transaction
      */
     build(): Transaction {
-        if (!this.innerTransaction || !this.innerTransactionGasLimit || !this.relayerAddress || !this.netConfig || !this.innerTransaction.getSignature()) {
+        if (
+            !this.innerTransaction ||
+            !this.innerTransactionGasLimit ||
+            !this.relayerAddress ||
+            !this.netConfig ||
+            !this.innerTransaction.getSignature()
+        ) {
             throw new ErrInvalidRelayedV2BuilderArguments();
         }
         if (this.innerTransaction.getGasLimit() != 0) {
@@ -87,7 +93,7 @@ export class RelayedTransactionV2Builder {
             new AddressValue(this.innerTransaction.getReceiver()),
             new U64Value(this.innerTransaction.getNonce().valueOf()),
             new BytesValue(this.innerTransaction.getData().valueOf()),
-            new BytesValue(this.innerTransaction.getSignature())
+            new BytesValue(this.innerTransaction.getSignature()),
         ]);
 
         const data = `relayedTxV2@${argumentsString}`;
@@ -98,11 +104,13 @@ export class RelayedTransactionV2Builder {
             receiver: this.innerTransaction.getSender(),
             value: 0,
             gasLimit:
-                this.innerTransactionGasLimit.valueOf() + this.netConfig.MinGasLimit + this.netConfig.GasPerDataByte * payload.length(),
+                this.innerTransactionGasLimit.valueOf() +
+                this.netConfig.MinGasLimit +
+                this.netConfig.GasPerDataByte * payload.length(),
             data: payload,
             chainID: this.netConfig.ChainID,
             version: this.innerTransaction.getVersion(),
-            options: this.innerTransaction.getOptions()
+            options: this.innerTransaction.getOptions(),
         });
 
         if (this.relayerNonce) {

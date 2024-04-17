@@ -56,7 +56,7 @@ export class ESDTNFTTransferPayloadBuilder {
             // The transferred quantity
             new BigUIntValue(this.payment.valueOf()),
             // The destination address
-            new AddressValue(this.destination)
+            new AddressValue(this.destination),
         ];
 
         let { argumentsString } = new ArgSerializer().valuesToString(args);
@@ -87,18 +87,20 @@ export class MultiESDTNFTTransferPayloadBuilder {
             // The destination address
             new AddressValue(this.destination),
             // Number of tokens
-            new U16Value(this.payments.length)
+            new U16Value(this.payments.length),
         ];
 
         for (const payment of this.payments) {
-            args.push(...[
-                // The token identifier
-                BytesValue.fromUTF8(payment.tokenIdentifier),
-                // The nonce of the token
-                new U64Value(payment.nonce),
-                // The transfered quantity
-                new BigUIntValue(payment.valueOf())
-            ]);
+            args.push(
+                ...[
+                    // The token identifier
+                    BytesValue.fromUTF8(payment.tokenIdentifier),
+                    // The nonce of the token
+                    new U64Value(payment.nonce),
+                    // The transfered quantity
+                    new BigUIntValue(payment.valueOf()),
+                ],
+            );
         }
 
         let { argumentsString } = new ArgSerializer().valuesToString(args);

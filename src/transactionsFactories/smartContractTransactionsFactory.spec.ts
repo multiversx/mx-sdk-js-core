@@ -321,7 +321,7 @@ describe("test smart contract transactions factory", function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const gasLimit = 6000000n;
-        const args = [new U32Value(0)];
+        const args = [new U32Value(7)];
 
         const transaction = smartContractFactory.createTransactionForUpgrade({
             sender: sender,
@@ -341,11 +341,32 @@ describe("test smart contract transactions factory", function () {
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        assert.isTrue(Buffer.from(transaction.data!).toString().startsWith("upgradeContract@"));
+        assert.equal(Buffer.from(transaction.data!).toString(), `upgradeContract@${adderByteCode}@0504@07`);
         assert.equal(transaction.gasLimit, gasLimit);
         assert.equal(transaction.value, 0n);
 
         assert.deepEqual(transaction, transactionAbiAware);
+    });
+
+    it("should create 'Transaction' for upgrade, when ABI is available, but it doesn't contain a definition for 'upgrade'", async function () {
+        const abi = await loadAbiRegistry("src/testdata/adder.abi.json");
+        // Remove all endpoints (for the sake of the test).
+        abi.endpoints.length = 0;
+
+        const factory = new SmartContractTransactionsFactory({
+            config: config,
+            abi: abi,
+        });
+
+        const transaction = factory.createTransactionForUpgrade({
+            sender: Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            contract: Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4"),
+            bytecode: adderByteCode.valueOf(),
+            gasLimit: 6000000n,
+            arguments: [new U32Value(7)],
+        });
+
+        assert.equal(Buffer.from(transaction.data!).toString(), `upgradeContract@${adderByteCode}@0504@07`);
     });
 
     it("should create 'Transaction' for claiming developer rewards", async function () {

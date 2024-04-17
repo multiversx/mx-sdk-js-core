@@ -10,7 +10,14 @@ import { guardValueIsSet } from "../utils";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
-import { CallArguments, DeployArguments, ICodeMetadata, ISmartContract, QueryArguments, UpgradeArguments } from "./interface";
+import {
+    CallArguments,
+    DeployArguments,
+    ICodeMetadata,
+    ISmartContract,
+    QueryArguments,
+    UpgradeArguments,
+} from "./interface";
 import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
 import { EndpointDefinition, TypedValue } from "./typesystem";
@@ -38,8 +45,8 @@ export class SmartContract implements ISmartContract {
     /**
      * This object contains a function for each endpoint defined by the contract.
      * (a bit similar to web3js's "contract.methods").
-     * 
-     * This is an alternative to {@link methodsExplicit}. 
+     *
+     * This is an alternative to {@link methodsExplicit}.
      * Unlike {@link methodsExplicit}, automatic type inference (wrt. ABI) is applied when using {@link methods}.
      */
     public readonly methods: { [key: string]: (args?: any[]) => Interaction } = {};
@@ -47,7 +54,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Create a SmartContract object by providing its address on the Network.
      */
-    constructor(options: { address?: IAddress, abi?: IAbi } = {}) {
+    constructor(options: { address?: IAddress; abi?: IAbi } = {}) {
         this.address = options.address || Address.empty();
         this.abi = options.abi;
 
@@ -109,8 +116,21 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
      */
-    deploy({ deployer, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: DeployArguments): Transaction {
-        Compatibility.guardAddressIsSetAndNonZero(deployer, "'deployer' of SmartContract.deploy()", "pass the actual address to deploy()");
+    deploy({
+        deployer,
+        code,
+        codeMetadata,
+        initArguments,
+        value,
+        gasLimit,
+        gasPrice,
+        chainID,
+    }: DeployArguments): Transaction {
+        Compatibility.guardAddressIsSetAndNonZero(
+            deployer,
+            "'deployer' of SmartContract.deploy()",
+            "pass the actual address to deploy()",
+        );
 
         const config = new TransactionsFactoryConfig({ chainID: chainID.valueOf() });
         const factory = new SmartContractTransactionsFactory({
@@ -140,23 +160,22 @@ export class SmartContract implements ISmartContract {
     }
 
     private getMetadataPropertiesAsObject(codeMetadata?: ICodeMetadata): {
-        upgradeable: boolean,
-        readable: boolean,
-        payable: boolean,
-        payableBySc: boolean
+        upgradeable: boolean;
+        readable: boolean;
+        payable: boolean;
+        payableBySc: boolean;
     } {
         let metadata: CodeMetadata;
         if (codeMetadata) {
             metadata = CodeMetadata.fromBytes(Buffer.from(codeMetadata.toString(), "hex"));
-        }
-        else {
+        } else {
             metadata = new CodeMetadata();
         }
         const metadataAsJson = metadata.toJSON() as {
-            upgradeable: boolean,
-            readable: boolean,
-            payable: boolean,
-            payableBySc: boolean
+            upgradeable: boolean;
+            readable: boolean;
+            payable: boolean;
+            payableBySc: boolean;
         };
 
         return metadataAsJson;
@@ -165,8 +184,21 @@ export class SmartContract implements ISmartContract {
     /**
      * Creates a {@link Transaction} for upgrading the Smart Contract on the Network.
      */
-    upgrade({ caller, code, codeMetadata, initArguments, value, gasLimit, gasPrice, chainID }: UpgradeArguments): Transaction {
-        Compatibility.guardAddressIsSetAndNonZero(caller, "'caller' of SmartContract.upgrade()", "pass the actual address to upgrade()");
+    upgrade({
+        caller,
+        code,
+        codeMetadata,
+        initArguments,
+        value,
+        gasLimit,
+        gasPrice,
+        chainID,
+    }: UpgradeArguments): Transaction {
+        Compatibility.guardAddressIsSetAndNonZero(
+            caller,
+            "'caller' of SmartContract.upgrade()",
+            "pass the actual address to upgrade()",
+        );
 
         this.ensureHasAddress();
 
@@ -202,7 +234,11 @@ export class SmartContract implements ISmartContract {
      * Creates a {@link Transaction} for calling (a function of) the Smart Contract.
      */
     call({ func, args, value, gasLimit, receiver, gasPrice, chainID, caller }: CallArguments): Transaction {
-        Compatibility.guardAddressIsSetAndNonZero(caller, "'caller' of SmartContract.call()", "pass the actual address to call()");
+        Compatibility.guardAddressIsSetAndNonZero(
+            caller,
+            "'caller' of SmartContract.call()",
+            "pass the actual address to call()",
+        );
 
         this.ensureHasAddress();
 
@@ -238,7 +274,7 @@ export class SmartContract implements ISmartContract {
             func: func,
             args: args,
             value: value,
-            caller: caller
+            caller: caller,
         });
     }
 
@@ -249,9 +285,9 @@ export class SmartContract implements ISmartContract {
     }
 
     /**
-     * Computes the address of a Smart Contract. 
+     * Computes the address of a Smart Contract.
      * The address is computed deterministically, from the address of the owner and the nonce of the deployment transaction.
-     * 
+     *
      * @param owner The owner of the Smart Contract
      * @param nonce The owner nonce used for the deployment transaction
      */

@@ -438,6 +438,47 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[2].getType(), enumType);
         assert.deepEqual(typedValues[2].valueOf(), { name: 'Something', fields: [new Address('erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha')] });
         assert.deepEqual(typedValues[3].getType(), enumType);
-        assert.deepEqual(typedValues[3].valueOf(), { name: 'Else', fields: [new BigNumber(42), new BigNumber(43)] });
+        assert.deepEqual(typedValues[3].valueOf(), { name: "Else", fields: [new BigNumber(42), new BigNumber(43)] });
+    });
+
+    it.only("issue 435", async () => {
+        const abi = AbiRegistry.create({
+            endpoints: [
+                {
+                    name: "foo",
+                    inputs: [
+                        {
+                            type: "optional<variadic<MyEnum>>",
+                        },
+                    ],
+                    outputs: [],
+                },
+            ],
+            types: {
+                MyEnum: {
+                    type: "enum",
+                    variants: [
+                        {
+                            name: "a",
+                            discriminant: 0,
+                        },
+                        {
+                            name: "b",
+                            discriminant: 1,
+                        },
+                        {
+                            name: "c",
+                            discriminant: 2,
+                        },
+                    ],
+                },
+            },
+        });
+
+        const endpoint = abi.getEndpoint("foo");
+
+        NativeSerializer.nativeToTypedValues([], endpoint);
+        NativeSerializer.nativeToTypedValues([["a"]], endpoint);
+        NativeSerializer.nativeToTypedValues([[0]], endpoint);
     });
 });

@@ -53,7 +53,7 @@ export class TransactionPayload {
     }
 
     getRawArguments(): Buffer[] {
-        return this.getEncodedArguments().map(argument => Buffer.from(argument, "hex"));
+        return this.getEncodedArguments().map((argument) => Buffer.from(argument, "hex"));
     }
 
     /**

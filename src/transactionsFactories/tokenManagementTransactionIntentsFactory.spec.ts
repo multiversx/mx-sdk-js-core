@@ -140,6 +140,7 @@ describe("test token management transactions factory", () => {
             tokenIdentifier: "FRANK-11ce3e",
             addRoleLocalMint: true,
             addRoleLocalBurn: false,
+            addRoleESDTTransferRole: false,
         });
 
         assert.deepEqual(

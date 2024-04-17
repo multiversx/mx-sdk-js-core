@@ -2,18 +2,19 @@
     "buildInfo": {
         "rustc": {
             "version": "1.71.0-nightly",
-            "commitHash": "7f94b314cead7059a71a265a8b64905ef2511796",
-            "commitDate": "2023-04-23",
+            "commitHash": "a2b1646c597329d0a25efa3889b66650f65de1de",
+            "commitDate": "2023-05-25",
             "channel": "Nightly",
-            "short": "rustc 1.71.0-nightly (7f94b314c 2023-04-23)"
+            "short": "rustc 1.71.0-nightly (a2b1646c5 2023-05-25)"
         },
         "contractCrate": {
             "name": "adder",
-            "version": "0.0.0"
+            "version": "0.0.0",
+            "gitVersion": "v0.45.2.1-reproducible-169-g37d970c"
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.41.3"
+            "version": "0.47.2"
         }
     },
     "docs": [
@@ -42,11 +43,25 @@
             ]
         },
         {
+            "name": "upgrade",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "new_value",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
             "docs": [
                 "Add desired amount to the storage variable."
             ],
             "name": "add",
             "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
             "inputs": [
                 {
                     "name": "value",
@@ -56,7 +71,7 @@
             "outputs": []
         }
     ],
-    "events": [],
+    "esdtAttributes": [],
     "hasCallback": false,
     "types": {}
 }

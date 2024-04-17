@@ -1,3 +1,3 @@
-if ( !global.Buffer ) {
-  global.Buffer = require('buffer').Buffer;
+if (!global.Buffer) {
+    global.Buffer = require("buffer").Buffer;
 }

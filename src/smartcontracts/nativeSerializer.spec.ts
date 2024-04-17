@@ -518,4 +518,68 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[3].getType(), enumType);
         assert.deepEqual(typedValues[3].valueOf(), { name: "Else", fields: [new BigNumber(42), new BigNumber(43)] });
     });
+
+    it("should getArgumentsCardinality", async () => {
+        const abi = AbiRegistry.create({
+            endpoints: [
+                {
+                    name: "a",
+                    inputs: [
+                        {
+                            type: "u8",
+                        },
+                    ],
+                },
+                {
+                    name: "b",
+                    inputs: [
+                        {
+                            type: "variadic<u8>",
+                        },
+                    ],
+                },
+                {
+                    name: "c",
+                    inputs: [
+                        {
+                            type: "optional<u8>",
+                        },
+                    ],
+                },
+                {
+                    name: "d",
+                    inputs: [
+                        {
+                            type: "optional<variadic<u8>>",
+                        },
+                    ],
+                },
+            ],
+        });
+
+        assert.deepEqual(NativeSerializer.getArgumentsCardinality(abi.getEndpoint("a").input), {
+            min: 1,
+            max: 1,
+            variadic: false,
+        });
+
+        assert.deepEqual(NativeSerializer.getArgumentsCardinality(abi.getEndpoint("b").input), {
+            min: 0,
+            max: Infinity,
+            variadic: true,
+        });
+
+        assert.deepEqual(NativeSerializer.getArgumentsCardinality(abi.getEndpoint("c").input), {
+            min: 0,
+            max: 1,
+            variadic: false,
+        });
+
+        assert.deepEqual(NativeSerializer.getArgumentsCardinality(abi.getEndpoint("d").input), {
+            min: 0,
+            max: 1,
+            // This is somehow a limitation of the current implementation.
+            variadic: false,
+        });
+    });
 });

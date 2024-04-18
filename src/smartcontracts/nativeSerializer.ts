@@ -1,14 +1,67 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
 import { ErrInvalidArgument } from "../errors";
 import { IAddress } from "../interface";
 import { numberToPaddedHex } from "../utils.codec";
 import { ArgumentErrorContext } from "./argumentErrorContext";
-import { AddressType, AddressValue, BigIntType, BigIntValue, BigUIntType, BigUIntValue, BooleanType, BooleanValue, BytesType, BytesValue, CompositeType, CompositeValue, EndpointDefinition, EndpointParameterDefinition, EnumType, EnumValue, Field, I16Type, I16Value, I32Type, I32Value, I64Type, I64Value, I8Type, I8Value, List, ListType, NumericalType, OptionalType, OptionalValue, OptionType, OptionValue, PrimitiveType, Struct, StructType, TokenIdentifierType, TokenIdentifierValue, Tuple, TupleType, Type, TypedValue, U16Type, U16Value, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, VariadicType, VariadicValue } from "./typesystem";
+import {
+    AddressType,
+    AddressValue,
+    BigIntType,
+    BigIntValue,
+    BigUIntType,
+    BigUIntValue,
+    BooleanType,
+    BooleanValue,
+    BytesType,
+    BytesValue,
+    CompositeType,
+    CompositeValue,
+    EndpointDefinition,
+    EndpointParameterDefinition,
+    EnumType,
+    EnumValue,
+    Field,
+    I16Type,
+    I16Value,
+    I32Type,
+    I32Value,
+    I64Type,
+    I64Value,
+    I8Type,
+    I8Value,
+    List,
+    ListType,
+    NumericalType,
+    OptionalType,
+    OptionalValue,
+    OptionType,
+    OptionValue,
+    PrimitiveType,
+    Struct,
+    StructType,
+    TokenIdentifierType,
+    TokenIdentifierValue,
+    Tuple,
+    TupleType,
+    Type,
+    TypedValue,
+    U16Type,
+    U16Value,
+    U32Type,
+    U32Value,
+    U64Type,
+    U64Value,
+    U8Type,
+    U8Value,
+    VariadicType,
+    VariadicValue,
+} from "./typesystem";
 
 export namespace NativeTypes {
     export type NativeBuffer = Buffer | string;
-    export type NativeBytes = Buffer | { valueOf(): Buffer; } | string;
+    export type NativeBytes = Buffer | { valueOf(): Buffer } | string;
     export type NativeAddress = string | Buffer | IAddress | { getAddress(): IAddress };
 }
 
@@ -46,7 +99,9 @@ export namespace NativeSerializer {
         const { min, max } = getArgumentsCardinality(endpoint.input);
 
         if (!(min <= args.length && args.length <= max)) {
-            throw new ErrInvalidArgument(`Wrong number of arguments for endpoint ${endpoint.name}: expected between ${min} and ${max} arguments, have ${args.length}`);
+            throw new ErrInvalidArgument(
+                `Wrong number of arguments for endpoint ${endpoint.name}: expected between ${min} and ${max} arguments, have ${args.length}`,
+            );
         }
     }
 
@@ -67,7 +122,9 @@ export namespace NativeSerializer {
         if (argAtIndex?.belongsToTypesystem) {
             const isVariadicValue = argAtIndex.hasClassOrSuperclass(VariadicValue.ClassName);
             if (!isVariadicValue) {
-                throw new ErrInvalidArgument(`Wrong argument type for endpoint ${endpoint.name}: typed value provided; expected variadic type, have ${argAtIndex.getClassName()}`);
+                throw new ErrInvalidArgument(
+                    `Wrong argument type for endpoint ${endpoint.name}: typed value provided; expected variadic type, have ${argAtIndex.getClassName()}`,
+                );
             }
 
             // Do not repack.
@@ -82,21 +139,31 @@ export namespace NativeSerializer {
     // f(arg1, arg2, optional<arg3>, optional<arg4>) returns { min: 2, max: 4, variadic: false }
     // f(arg1, variadic<bytes>) returns { min: 1, max: Infinity, variadic: true }
     // f(arg1, arg2, optional<arg3>, arg4, optional<arg5>, variadic<bytes>) returns { min: 2, max: Infinity, variadic: true }
-    function getArgumentsCardinality(parameters: EndpointParameterDefinition[]): { min: number, max: number, variadic: boolean } {
+    export function getArgumentsCardinality(parameters: EndpointParameterDefinition[]): {
+        min: number;
+        max: number;
+        variadic: boolean;
+    } {
         let reversed = [...parameters].reverse(); // keep the original unchanged
         let min = parameters.length;
         let max = parameters.length;
         let variadic = false;
+
         if (reversed.length > 0 && reversed[0].type.getCardinality().isComposite()) {
             max = Infinity;
             variadic = true;
         }
+
         for (let parameter of reversed) {
+            // It's a single-value, not a multi-value parameter. Thus, cardinality isn't affected.
             if (parameter.type.getCardinality().isSingular()) {
                 break;
             }
+
+            // It's a multi-value parameter: optional, variadic etc.
             min -= 1;
         }
+
         return { min, max, variadic };
     }
 
@@ -154,7 +221,9 @@ export namespace NativeSerializer {
 
     function toVariadicValue(native: any, type: VariadicType, errorContext: ArgumentErrorContext): TypedValue {
         if (type.isCounted) {
-            throw new ErrInvalidArgument(`Counted variadic arguments must be explicitly typed. E.g. use "VariadicValue.fromItemsCounted()" or "new VariadicValue()"`);
+            throw new ErrInvalidArgument(
+                `Counted variadic arguments must be explicitly typed. E.g. use "VariadicValue.fromItemsCounted()" or "new VariadicValue()"`,
+            );
         }
 
         if (native == null) {
@@ -278,7 +347,7 @@ export namespace NativeSerializer {
             return new BytesValue(innerValue);
         }
         if (typeof innerValue === "number") {
-            return BytesValue.fromHex(numberToPaddedHex(innerValue))
+            return BytesValue.fromHex(numberToPaddedHex(innerValue));
         }
 
         errorContext.convertError(native, "BytesValue");
@@ -299,7 +368,10 @@ export namespace NativeSerializer {
     }
 
     // TODO: move logic to typesystem/address.ts
-    export function convertNativeToAddress(native: NativeTypes.NativeAddress, errorContext: ArgumentErrorContext): IAddress {
+    export function convertNativeToAddress(
+        native: NativeTypes.NativeAddress,
+        errorContext: ArgumentErrorContext,
+    ): IAddress {
         if ((<any>native).bech32) {
             return <IAddress>native;
         }

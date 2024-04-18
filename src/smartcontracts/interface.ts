@@ -65,7 +65,7 @@ export interface QueryArguments {
     func: IContractFunction;
     args?: TypedValue[];
     value?: ITransactionValue;
-    caller?: IAddress
+    caller?: IAddress;
 }
 
 export interface TypedOutcomeBundle {

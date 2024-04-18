@@ -6,7 +6,7 @@ import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, StringValue } fr
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "./transactionBuilder";
 
-interface Config {
+interface IConfig {
     chainID: string;
     minGasLimit: bigint;
     gasLimitPerByte: bigint;
@@ -32,12 +32,12 @@ type RegisterAndSetAllRolesTokenType = "NFT" | "SFT" | "META" | "FNG";
  * Use this class to create token management transactions like issuing ESDTs, creating NFTs, setting roles, etc.
  */
 export class TokenManagementTransactionsFactory {
-    private readonly config: Config;
+    private readonly config: IConfig;
     private readonly argSerializer: ArgSerializer;
     private readonly trueAsString: string;
     private readonly falseAsString: string;
 
-    constructor(options: { config: Config }) {
+    constructor(options: { config: IConfig }) {
         this.config = options.config;
         this.argSerializer = new ArgSerializer();
         this.trueAsString = "true";
@@ -299,11 +299,13 @@ export class TokenManagementTransactionsFactory {
         tokenIdentifier: string;
         addRoleLocalMint: boolean;
         addRoleLocalBurn: boolean;
+        addRoleESDTTransferRole: boolean;
     }): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
         options.addRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
         options.addRoleLocalBurn ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
+        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -412,7 +414,7 @@ export class TokenManagementTransactionsFactory {
 
         // Note that the following is an approximation (a reasonable one):
         const nftData = options.name + options.hash + options.attributes + options.uris.join("");
-        const storageGasLimit = this.config.gasLimitPerByte + BigInt(nftData.length);
+        const storageGasLimit = this.config.gasLimitStorePerByte + BigInt(nftData.length);
 
         return new TransactionBuilder({
             config: this.config,

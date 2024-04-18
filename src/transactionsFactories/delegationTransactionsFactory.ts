@@ -6,7 +6,7 @@ import { ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../smartco
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "./transactionBuilder";
 
-interface Config {
+interface IConfig {
     chainID: string;
     minGasLimit: bigint;
     gasLimitPerByte: bigint;
@@ -27,10 +27,10 @@ interface IValidatorPublicKey {
  * Use this class to create delegation related transactions like creating a new delegation contract or adding nodes.
  */
 export class DelegationTransactionsFactory {
-    private readonly config: Config;
+    private readonly config: IConfig;
     private readonly argSerializer: ArgSerializer;
 
-    constructor(options: { config: Config }) {
+    constructor(options: { config: IConfig }) {
         this.config = options.config;
         this.argSerializer = new ArgSerializer();
     }

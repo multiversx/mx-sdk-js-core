@@ -11,13 +11,13 @@ export class CodeMetadata {
     static ByteZero = {
         Upgradeable: 1,
         Reserved2: 2,
-        Readable: 4
+        Readable: 4,
     };
 
     static ByteOne = {
         Reserved1: 1,
         Payable: 2,
-        PayableBySc: 4
+        PayableBySc: 4,
     };
 
     /**
@@ -28,11 +28,16 @@ export class CodeMetadata {
      * @param payable Whether the contract is payable
      * @param payableBySc Whether the contract is payable by other smart contracts
      */
-    constructor(upgradeable: boolean = true, readable: boolean = false, payable: boolean = false, payableBySc: boolean = false) {
+    constructor(
+        upgradeable: boolean = true,
+        readable: boolean = false,
+        payable: boolean = false,
+        payableBySc: boolean = false,
+    ) {
         this.upgradeable = upgradeable;
         this.readable = readable;
         this.payable = payable;
-        this.payableBySc = payableBySc
+        this.payableBySc = payableBySc;
     }
 
     static fromBytes(bytes: Uint8Array): CodeMetadata {
@@ -44,7 +49,7 @@ export class CodeMetadata {
      */
     static fromBuffer(buffer: Buffer): CodeMetadata {
         if (buffer.length < this.codeMetadataLength) {
-            throw new Error('Buffer is too short.');
+            throw new Error("Buffer is too short.");
         }
 
         const byteZero = buffer[0];
@@ -124,14 +129,16 @@ export class CodeMetadata {
             upgradeable: this.upgradeable,
             readable: this.readable,
             payable: this.payable,
-            payableBySc: this.payableBySc
+            payableBySc: this.payableBySc,
         };
     }
 
     equals(other: CodeMetadata): boolean {
-        return this.upgradeable == other.upgradeable &&
+        return (
+            this.upgradeable == other.upgradeable &&
             this.readable == other.readable &&
             this.payable == other.payable &&
-            this.payableBySc == other.payableBySc;
+            this.payableBySc == other.payableBySc
+        );
     }
 }

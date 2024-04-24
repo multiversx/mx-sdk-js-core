@@ -80,7 +80,7 @@ class TypeScriptGenerator {
 
         await this.generateClass();
         this.saveFile(filePath);
-        Logger.info(`Successfully generated ${fileName} at location ${filePath}`);
+        Logger.info(`Successfully generated ${fileName} at location ${filePath}.`);
     }
 
     async generateClass() {
@@ -125,7 +125,7 @@ class TypeScriptGenerator {
 
     private createImportStatement(name: string, from?: string) {
         const module = from ? from : PACKAGE;
-        return `import { ${name} } from "${module}";\n`;
+        return `import { ${name} } from "@${module}";\n`;
     }
 
     private prepareClassName(): string {

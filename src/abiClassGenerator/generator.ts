@@ -84,20 +84,11 @@ class TypeScriptGenerator {
     private customTypes: string;
     private customTypesImports: string;
     private customClasses: string;
+    // private generatedClassImports: [string, string][];
 
     constructor(options: { abi: any; contractAddress: Address; chainID: string; outputPath: string }) {
         this.plainAbi = options.abi;
         this.abiRegistry = AbiRegistry.create(this.plainAbi);
-
-        // const type = <StructType>this.abiRegistry.getCustomType("ActionStatus");
-        // console.log(type);
-        // console.log("--------------------");
-
-        // for (const tp of type.getFieldsDefinitions()) {
-        //     console.log(tp.name);
-        //     console.log(tp.type);
-        // }
-
         this.contractAddress = options.contractAddress;
         this.chainID = options.chainID;
         this.generatedClass = "";
@@ -107,31 +98,12 @@ class TypeScriptGenerator {
         this.customTypes = "";
         this.customTypesImports = "";
         this.customClasses = ``;
+        // this.generatedClassImports = [];
     }
 
     async generate() {
         const fileName = this.prepareFileName();
         const filePath = path.join(this.outputPath, fileName);
-        // return;
-        // const endpoint = this.abiRegistry.getEndpoint("proposeTransferExecuteEsdt");
-        // console.log(endpoint);
-        // console.log("-----------------------");
-        // console.log(endpoint.input);
-        // console.log("-----------------------");
-        // // console.log(endpoint.input[0].type.getTypeParameters());
-        // console.log(endpoint.input[1].type.getTypeParameters());
-        // // console.log(endpoint.input[2].type.getTypeParameters());
-        // // console.log(endpoint.input[3].type.getTypeParameters());
-        // // const res = this.prepareMethod(endpoint);
-        // // for (let item of res) {
-        // //     console.log(item);
-        // // }
-        // const a = this.abiRegistry.getStruct("CallActionData");
-        // console.log(a);
-        // console.log("-----------------");
-        // console.log(a.getFieldsDefinitions()[2]);
-        // return;
-        // return;
         await this.generateClass();
         this.saveFile(filePath, this.generatedClass);
 
@@ -185,7 +157,9 @@ class TypeScriptGenerator {
             this.createImportStatement(SMART_CONTRACT_FACTORY) +
             this.createImportStatement(FACTORY_CONFIG) +
             this.createImportStatement("Address") +
-            this.createImportStatement("AbiRegistry");
+            this.createImportStatement("AbiRegistry") +
+            this.createImportStatement("Transaction") +
+            this.createImportStatement("CodeMetadata");
 
         for (let customType of this.abiRegistry.customTypes) {
             this.generatedClass += this.createImportStatement(customType.getName(), `./${CUSTOM_TYPES_FILE_NAME}`);
@@ -226,8 +200,46 @@ class TypeScriptGenerator {
 
         const methodName = endpoint.name;
         const methodArgs = this.getMethodParameters(endpoint.input);
-        const body = "test";
+        const body = this.prepareMethodBody(endpoint, methodArgs);
         return this.prepareMethodDefinition(methodName, methodArgs, body);
+    }
+
+    private prepareMethodBody(endpoint: EndpointDefinition, preparedArgs: [string, string][]): string {
+        let body = `let args: any = [];\n\n`;
+        const contractFunction = endpoint.name;
+
+        if (preparedArgs.length) {
+            for (const arg of preparedArgs) {
+                let argName = arg[0];
+
+                if (argName.endsWith("?")) {
+                    argName = arg[0].slice(0, arg[0].length - 1);
+
+                    body += `if (options.${argName}){
+                        args.push(options.${argName});
+                    }\n\n`;
+                    // optionalArgs.push(argName);
+                } else {
+                    // args.push(`options.${argName}`);
+                    body += `args.push(options.${argName});\n`;
+                }
+            }
+        }
+
+        body += `\n`;
+
+        body += `const tx = this.factory.createTransactionForExecute({
+            address: Address.Empty(),
+            contract: this.contractAddress,
+            function: "${contractFunction}",
+            gasLimit: 0n,
+            arguments: args,
+        });
+
+        return tx;
+        ;\n`;
+
+        return body;
     }
 
     private prepareMethodDefinition(name: string, parameters: [string, string][], body: string) {
@@ -249,8 +261,6 @@ class TypeScriptGenerator {
         }
         return `options: {${params}}`;
     }
-
-    private prepareMethodBody() {}
 
     // prepares vm-query
     private prepareReadonlyMethod(endpoint: EndpointDefinition) {
@@ -344,20 +354,25 @@ class TypeScriptGenerator {
             const fields = variant.getFieldsDefinitions();
             if (fields.length) {
                 const properties = this.getFieldsAsClassProperties(fields);
-                enumClasses += this.prepareClassDefinitionForEnum(variant.name, properties);
+
+                const preparedClassProperties = this.prepareClassProperties(properties);
+                const preparedConstructorDefinition = this.prepareConstructorDefinition(properties);
+                const preparedConstructorBody = this.prepareConstructorBody(properties);
+
+                enumClasses += this.prepareClassDefinitionForEnum(
+                    variant.name,
+                    preparedClassProperties,
+                    preparedConstructorDefinition,
+                    preparedConstructorBody,
+                );
             } else {
-                const properties: ClassProperty = {
-                    access: "readonly",
-                    name: variant.name,
-                    type: "string",
-                };
-                enumClasses += this.prepareClassDefinitionForEnum(variant.name, [properties]);
+                enumClasses += this.prepareClassDefinitionForEnum(variant.name, "", "constructor()", "");
             }
         }
         this.customClasses = enumClasses;
 
         const variantsAsString = variantsNames.join(" | ");
-        return `export type ${enumName} = ${variantsAsString};`;
+        return `export type ${enumName} = ${variantsAsString}; \n\n`;
     }
 
     private getFieldsAsClassProperties(fields: FieldDefinition[]): ClassProperty[] {
@@ -383,29 +398,59 @@ class TypeScriptGenerator {
         return properties;
     }
 
-    private prepareClassDefinitionForEnum(name: string, classProperties: ClassProperty[]): string {
+    private prepareClassProperties(classProperties: ClassProperty[]): string {
         let classMembers = ``;
-        let constructorParams = ``;
-        let constructorBody = ``;
 
         for (const property of classProperties) {
             classMembers += `${property.access} ${property.name}: ${property.type};\n`;
-            constructorParams += `${property.name}: ${property.type},\n`;
-
-            constructorBody += `this.${property.name} = options.${property.name};\n`;
         }
 
-        const a = `export class ${name} {
-            readonly name: string;
-            ${classMembers}
+        return classMembers;
+    }
 
-            constructor(options: {${constructorParams}}) {
+    private prepareConstructorDefinition(classProperties: ClassProperty[]): string {
+        let constructorParams = ``;
+
+        for (const property of classProperties) {
+            constructorParams += `${property.name}: ${property.type},\n`;
+        }
+
+        if (!constructorParams.length) {
+            return `constructor()`;
+        }
+
+        return `constructor(options: { ${constructorParams} })`;
+    }
+
+    private prepareConstructorBody(classProperties: ClassProperty[]): string {
+        let constructorBody = ``;
+
+        for (const property of classProperties) {
+            if (!isNaN(Number(property.name))) {
+                constructorBody += `this[${property.name}] = options[${property.name}];\n`;
+            } else {
+                constructorBody += `this.${property.name} = options.${property.name};\n`;
+            }
+        }
+
+        return constructorBody;
+    }
+
+    private prepareClassDefinitionForEnum(
+        name: string,
+        classProperties: string,
+        constructorDefinition: string,
+        constructorBody: string,
+    ): string {
+        return `export class ${name} {
+            readonly name: string;
+            ${classProperties}
+
+            ${constructorDefinition} {
                 this.name = "${name}"
                 ${constructorBody}
             }
         }\n\n`;
-        console.log(a);
-        return a;
     }
 
     private isEnumHeterogeneous(customType: EnumType): boolean {

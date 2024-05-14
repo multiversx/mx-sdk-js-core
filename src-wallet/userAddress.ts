@@ -18,21 +18,21 @@ export class UserAddress {
         this.hrp = hrp || DEFAULT_HRP;
     }
 
+    /**
+     * Creates an address object from a bech32-encoded string
+     */
+    static newFromBech32(value: string): UserAddress {
+        const { hrp, pubkey } = decodeFromBech32({ value, allowCustomHrp: true });
+        return new UserAddress(pubkey, hrp);
+    }
+
+    /**
+     * Use {@link newFromBech32} instead.
+     */
     static fromBech32(value: string): UserAddress {
-        let decoded;
-
-        try {
-            decoded = bech32.decode(value);
-        } catch (err: any) {
-            throw new ErrBadAddress(value, err);
-        }
-
-        if (decoded.prefix != DEFAULT_HRP) {
-            throw new ErrBadAddress(value);
-        }
-
-        let pubkey = Buffer.from(bech32.fromWords(decoded.words));
-        return new UserAddress(pubkey, decoded.prefix);
+        // On this legacy flow, we do not accept addresses with custom hrp (in order to avoid behavioral breaking changes).
+        const { hrp, pubkey } = decodeFromBech32({ value, allowCustomHrp: false });
+        return new UserAddress(pubkey, hrp);
     }
 
     /**
@@ -81,4 +81,28 @@ export class UserAddress {
             pubkey: this.hex()
         };
     }
+}
+
+function decodeFromBech32(options: { value: string; allowCustomHrp: boolean }): { hrp: string; pubkey: Buffer } {
+    const value = options.value;
+    const allowCustomHrp = options.allowCustomHrp;
+
+    let hrp: string;
+    let pubkey: Buffer;
+
+    try {
+        const decoded = bech32.decode(value);
+
+        hrp = decoded.prefix;
+        pubkey = Buffer.from(bech32.fromWords(decoded.words));
+    } catch (err: any) {
+        throw new ErrBadAddress(value, err);
+    }
+
+    // Workaround, in order to avoid behavioral breaking changes on legacy flows.
+    if (!allowCustomHrp && hrp != DEFAULT_HRP) {
+        throw new ErrBadAddress(value);
+    }
+
+    return { hrp, pubkey };
 }

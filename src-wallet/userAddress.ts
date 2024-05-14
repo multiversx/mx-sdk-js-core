@@ -7,7 +7,8 @@ import { ErrBadAddress } from "./errors";
 const DEFAULT_HRP = "erd";
 
 /**
- * A user Address, as an immutable object.
+ * @internal
+ * For internal use only.
  */
 export class UserAddress {
     private readonly buffer: Buffer;
@@ -18,16 +19,14 @@ export class UserAddress {
         this.hrp = hrp || DEFAULT_HRP;
     }
 
-    /**
-     * Creates an address object from a bech32-encoded string
-     */
     static newFromBech32(value: string): UserAddress {
         const { hrp, pubkey } = decodeFromBech32({ value, allowCustomHrp: true });
         return new UserAddress(pubkey, hrp);
     }
 
     /**
-     * Use {@link newFromBech32} instead.
+     * @internal
+     * For internal use only.
      */
     static fromBech32(value: string): UserAddress {
         // On this legacy flow, we do not accept addresses with custom hrp (in order to avoid behavioral breaking changes).
@@ -57,14 +56,7 @@ export class UserAddress {
     pubkey(): Buffer {
         return this.buffer;
     }
-
-    /**
-     * Returns the human-readable-part of the bech32 addresses.
-     */
-    getHrp(): string {
-        return this.hrp;
-    }
-
+    
     /**
      * Returns the bech32 representation of the address
      */

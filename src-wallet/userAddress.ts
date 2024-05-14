@@ -26,7 +26,7 @@ export class UserAddress {
 
     /**
      * @internal
-     * For internal use only.
+     * @deprecated
      */
     static fromBech32(value: string): UserAddress {
         // On this legacy flow, we do not accept addresses with custom hrp (in order to avoid behavioral breaking changes).

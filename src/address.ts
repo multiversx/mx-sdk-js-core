@@ -5,10 +5,7 @@ import * as errors from "./errors";
 import { bigIntToBuffer } from "./tokenOperations/codec";
 const createKeccakHash = require("keccak");
 
-/**
- * The human-readable-part of the bech32 addresses.
- */
-const HRP = "erd";
+const DEFAULT_HRP = "erd";
 
 /**
  * The length (in bytes) of a public key (from which a bech32 address can be obtained).
@@ -26,77 +23,131 @@ interface IAddress {
  * An Address, as an immutable object.
  */
 export class Address {
-    // We keep a hex-encoded string as the "backing" value
-    private valueHex: string = "";
+    private readonly publicKey: Buffer;
+    private readonly hrp: string;
 
     /**
      * Creates an address object, given a raw string (whether a hex pubkey or a Bech32 address), a sequence of bytes, or another Address object.
      */
-    public constructor(value: Address | Buffer | Uint8Array | string) {
+    public constructor(value: Address | Uint8Array | string, hrp?: string) {
+        // Legacy flow.
         if (!value) {
+            this.publicKey = Buffer.from([]);
+            this.hrp = hrp || DEFAULT_HRP;
+
             return;
         }
-        if (value instanceof Address) {
-            return Address.fromAddress(value);
-        }
+
+        // The only flow that's following the specs.
         if (ArrayBuffer.isView(value)) {
-            return Address.fromBuffer(Buffer.from(value));
+            if (value.length != PUBKEY_LENGTH) {
+                throw new errors.ErrAddressCannotCreate(value);
+            }
+
+            this.publicKey = Buffer.from(value);
+            this.hrp = hrp || DEFAULT_HRP;
+
+            return;
         }
+
+        // Legacy flow.
+        if (value instanceof Address) {
+            if (hrp) {
+                throw new errors.ErrInvalidArgument(
+                    "this variant of the Address constructor does not accept the 'hrp' argument",
+                );
+            }
+
+            this.publicKey = value.publicKey;
+            this.hrp = value.hrp;
+
+            return;
+        }
+
+        // Legacy flow.
         if (typeof value === "string") {
-            return Address.fromString(value);
+            if (Address.isValidHex(value)) {
+                this.publicKey = Buffer.from(value, "hex");
+                this.hrp = hrp || DEFAULT_HRP;
+
+                return;
+            }
+
+            if (hrp) {
+                throw new errors.ErrInvalidArgument(
+                    "this variant of the Address constructor does not accept the 'hrp' argument",
+                );
+            }
+
+            // On this legacy flow, we do not accept addresses with custom hrp (in order to avoid behavioral breaking changes).
+            const { hrp: decodedHrp, pubkey } = decodeFromBech32({ value, allowCustomHrp: false });
+            this.publicKey = pubkey;
+            this.hrp = decodedHrp;
+
+            return;
         }
 
         throw new errors.ErrAddressCannotCreate(value);
     }
 
     /**
-     * Creates an address object from another address object
+     * Creates an address object from a bech32-encoded string
      */
-    static fromAddress(address: Address): Address {
-        return Address.fromValidHex(address.valueHex);
-    }
-
-    private static fromValidHex(value: string): Address {
-        let result = Address.empty();
-        result.valueHex = value;
-        return result;
+    static newFromBech32(value: string): Address {
+        const { hrp, pubkey } = decodeFromBech32({ value, allowCustomHrp: true });
+        return new Address(pubkey, hrp);
     }
 
     /**
-     * Creates an address object from a Buffer
+     * Use {@link newFromBech32} instead.
      */
-    static fromBuffer(buffer: Buffer): Address {
-        if (buffer.length != PUBKEY_LENGTH) {
-            throw new errors.ErrAddressCannotCreate(buffer);
-        }
-
-        return Address.fromValidHex(buffer.toString("hex"));
-    }
-
-    /**
-     * Creates an address object from a string (hex or bech32)
-     */
-    static fromString(value: string): Address {
-        if (Address.isValidHex(value)) {
-            return Address.fromValidHex(value);
-        }
-
-        return Address.fromBech32(value);
-    }
-
-    private static isValidHex(value: string) {
-        return Buffer.from(value, "hex").length == PUBKEY_LENGTH;
+    static fromBech32(value: string): Address {
+        // On this legacy flow, we do not accept addresses with custom hrp (in order to avoid behavioral breaking changes).
+        const { hrp, pubkey } = decodeFromBech32({ value, allowCustomHrp: false });
+        return new Address(pubkey, hrp);
     }
 
     /**
      * Creates an address object from a hex-encoded string
      */
-    static fromHex(value: string): Address {
+    static newFromHex(value: string, hrp?: string): Address {
         if (!Address.isValidHex(value)) {
             throw new errors.ErrAddressCannotCreate(value);
         }
 
-        return Address.fromValidHex(value);
+        return new Address(Buffer.from(value, "hex"), hrp);
+    }
+
+    /**
+     * Use {@link newFromHex} instead.
+     */
+    static fromHex(value: string, hrp?: string): Address {
+        return Address.newFromHex(value, hrp);
+    }
+
+    /**
+     * @deprecated Constructing an address object from another object is deprecated.
+     */
+    static fromAddress(address: Address): Address {
+        return new Address(address);
+    }
+
+    /**
+     * @deprecated Use the constructor, instead.
+     */
+    static fromBuffer(buffer: Buffer, hrp?: string): Address {
+        return new Address(buffer, hrp);
+    }
+
+    /**
+     * @deprecated Use {@link newFromBech32} or {@link newFromHex}.
+     */
+    static fromString(value: string, hrp?: string): Address {
+        return new Address(value, hrp);
+    }
+
+    private static isValidHex(value: string) {
+        return Buffer.from(value, "hex").length == PUBKEY_LENGTH;
     }
 
     /**
@@ -108,31 +159,6 @@ export class Address {
     }
 
     /**
-     * Creates an address object from a bech32-encoded string
-     */
-    static fromBech32(value: string): Address {
-        let decoded;
-
-        try {
-            decoded = bech32.decode(value);
-        } catch (err: any) {
-            throw new errors.ErrAddressCannotCreate(value, err);
-        }
-
-        const prefix = decoded.prefix;
-        if (prefix != HRP) {
-            throw new errors.ErrAddressBadHrp(HRP, prefix);
-        }
-
-        const pubkey = Buffer.from(bech32.fromWords(decoded.words));
-        if (pubkey.length != PUBKEY_LENGTH) {
-            throw new errors.ErrAddressCannotCreate(value);
-        }
-
-        return Address.fromValidHex(pubkey.toString("hex"));
-    }
-
-    /**
      * Performs address validation without throwing errors
      */
     static isValid(value: string): boolean {
@@ -140,7 +166,7 @@ export class Address {
         const prefix = decoded?.prefix;
         const pubkey = decoded ? Buffer.from(bech32.fromWords(decoded.words)) : undefined;
 
-        if (prefix !== HRP || pubkey?.length !== PUBKEY_LENGTH) {
+        if (prefix !== DEFAULT_HRP || pubkey?.length !== PUBKEY_LENGTH) {
             return false;
         }
 
@@ -162,7 +188,7 @@ export class Address {
             return "";
         }
 
-        return this.valueHex;
+        return this.publicKey.toString("hex");
     }
 
     /**
@@ -181,7 +207,7 @@ export class Address {
         }
 
         let words = bech32.toWords(this.pubkey());
-        let address = bech32.encode(HRP, words);
+        let address = bech32.encode(this.hrp, words);
         return address;
     }
 
@@ -196,26 +222,21 @@ export class Address {
      * Returns the pubkey as raw bytes (buffer)
      */
     getPublicKey(): Buffer {
-        if (this.isEmpty()) {
-            return Buffer.from([]);
-        }
-
-        return Buffer.from(this.valueHex, "hex");
+        return this.publicKey;
     }
 
     /**
      * Returns the human-readable-part of the bech32 addresses.
-     * The HRP is currently hardcoded to "erd".
      */
     getHrp(): string {
-        return HRP;
+        return this.hrp;
     }
 
     /**
      * Returns whether the address is empty.
      */
     isEmpty() {
-        return !this.valueHex;
+        return this.publicKey.length == 0;
     }
 
     /**
@@ -226,7 +247,7 @@ export class Address {
             return false;
         }
 
-        return this.valueHex == other.valueHex;
+        return this.publicKey.toString() == other.publicKey.toString();
     }
 
     /**
@@ -333,4 +354,28 @@ export class AddressComputer {
 
         return false;
     }
+}
+
+function decodeFromBech32(options: { value: string; allowCustomHrp: boolean }): { hrp: string; pubkey: Buffer } {
+    const value = options.value;
+    const allowCustomHrp = options.allowCustomHrp;
+
+    let hrp: string;
+    let pubkey: Buffer;
+
+    try {
+        const decoded = bech32.decode(value);
+
+        hrp = decoded.prefix;
+        pubkey = Buffer.from(bech32.fromWords(decoded.words));
+    } catch (err: any) {
+        throw new errors.ErrAddressCannotCreate(value, err);
+    }
+
+    // Workaround, in order to avoid behavioral breaking changes on legacy flows.
+    if (!allowCustomHrp && hrp != DEFAULT_HRP) {
+        throw new errors.ErrAddressBadHrp(DEFAULT_HRP, hrp);
+    }
+
+    return { hrp, pubkey };
 }

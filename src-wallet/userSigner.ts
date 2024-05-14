@@ -9,9 +9,8 @@ interface IUserSecretKey {
 }
 
 interface IUserPublicKey {
-    toAddress(): { bech32(): string; };
+    toAddress(hrp?: string): { bech32(): string; };
 }
-
 
 /**
  * ed25519 signer
@@ -45,8 +44,8 @@ export class UserSigner {
     /**
      * Gets the address of the signer.
      */
-    getAddress(): UserAddress {
-        const bech32 = this.secretKey.generatePublicKey().toAddress().bech32();
+    getAddress(hrp?: string): UserAddress {
+        const bech32 = this.secretKey.generatePublicKey().toAddress(hrp).bech32();
         return UserAddress.fromBech32(bech32);
     }
 }

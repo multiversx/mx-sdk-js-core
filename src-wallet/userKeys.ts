@@ -73,8 +73,8 @@ export class UserPublicKey {
         return this.buffer.toString("hex");
     }
 
-    toAddress(): UserAddress {
-        return new UserAddress(this.buffer);
+    toAddress(hrp?: string): UserAddress {
+        return new UserAddress(this.buffer, hrp);
     }
 
     valueOf(): Buffer {

@@ -4,16 +4,18 @@ import { ErrBadAddress } from "./errors";
 /**
  * The human-readable-part of the bech32 addresses.
  */
-const HRP = "erd";
+const DEFAULT_HRP = "erd";
 
 /**
  * A user Address, as an immutable object.
  */
 export class UserAddress {
     private readonly buffer: Buffer;
+    private readonly hrp: string;
 
-    public constructor(buffer: Buffer) {
+    public constructor(buffer: Buffer, hrp?: string) {
         this.buffer = buffer;
+        this.hrp = hrp || DEFAULT_HRP;
     }
 
     static fromBech32(value: string): UserAddress {
@@ -25,12 +27,12 @@ export class UserAddress {
             throw new ErrBadAddress(value, err);
         }
 
-        if (decoded.prefix != HRP) {
+        if (decoded.prefix != DEFAULT_HRP) {
             throw new ErrBadAddress(value);
         }
 
         let pubkey = Buffer.from(bech32.fromWords(decoded.words));
-        return new UserAddress(pubkey);
+        return new UserAddress(pubkey, decoded.prefix);
     }
 
     /**
@@ -44,8 +46,8 @@ export class UserAddress {
      * Returns the bech32 representation of the address
      */
     bech32(): string {
-        let words = bech32.toWords(this.pubkey());
-        let address = bech32.encode(HRP, words);
+        const words = bech32.toWords(this.pubkey());
+        const address = bech32.encode(this.hrp, words);
         return address;
     }
 
@@ -54,6 +56,13 @@ export class UserAddress {
      */
     pubkey(): Buffer {
         return this.buffer;
+    }
+
+    /**
+     * Returns the human-readable-part of the bech32 addresses.
+     */
+    getHrp(): string {
+        return this.hrp;
     }
 
     /**

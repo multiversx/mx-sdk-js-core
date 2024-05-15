@@ -371,6 +371,7 @@ function decodeFromBech32(options: { value: string; allowCustomHrp: boolean }): 
     }
 
     // Workaround, in order to avoid behavioral breaking changes on legacy flows.
+    // In a future major release, we should drop this constraint (not exactly useful, validation should be performed in other ways)
     if (!allowCustomHrp && hrp != DEFAULT_HRP) {
         throw new errors.ErrAddressBadHrp(DEFAULT_HRP, hrp);
     }

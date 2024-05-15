@@ -54,10 +54,11 @@ export async function loadPassword(): Promise<string> {
 }
 
 export async function loadTestWallet(name: string): Promise<TestWallet> {
-    let jsonContents = JSON.parse(await readTestWalletFileContents(name + ".json"));
-    let pemContents = await readTestWalletFileContents(name + ".pem");
-    let pemKey = UserSecretKey.fromPem(pemContents);
-    return new TestWallet(new Address(jsonContents.address), pemKey.hex(), jsonContents, pemContents);
+    const jsonContents = JSON.parse(await readTestWalletFileContents(name + ".json"));
+    const pemContents = await readTestWalletFileContents(name + ".pem");
+    const secretKey = UserSecretKey.fromPem(pemContents);
+    const publicKey = secretKey.generatePublicKey().valueOf();
+    return new TestWallet(new Address(publicKey), secretKey.hex(), jsonContents, pemContents);
 }
 
 async function readTestWalletFileContents(name: string): Promise<string> {

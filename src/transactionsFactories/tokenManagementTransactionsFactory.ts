@@ -1,5 +1,5 @@
 import { Address } from "../address";
-import { ESDT_CONTRACT_ADDRESS } from "../constants";
+import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
 import { IAddress } from "../interface";
 import { Logger } from "../logger";
 import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../smartcontracts";
@@ -8,6 +8,7 @@ import { TransactionBuilder } from "./transactionBuilder";
 
 interface IConfig {
     chainID: string;
+    addressHrp: string;
     minGasLimit: bigint;
     gasLimitPerByte: bigint;
     gasLimitIssue: bigint;
@@ -36,12 +37,14 @@ export class TokenManagementTransactionsFactory {
     private readonly argSerializer: ArgSerializer;
     private readonly trueAsString: string;
     private readonly falseAsString: string;
+    private readonly esdtContractAddress: Address;
 
     constructor(options: { config: IConfig }) {
         this.config = options.config;
         this.argSerializer = new ArgSerializer();
         this.trueAsString = "true";
         this.falseAsString = "false";
+        this.esdtContractAddress = Address.fromHex(ESDT_CONTRACT_ADDRESS_HEX, this.config.addressHrp);
     }
 
     createTransactionForIssuingFungible(options: {
@@ -83,7 +86,7 @@ export class TokenManagementTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            receiver: Address.fromHex(ESDT_CONTRACT_ADDRESS_HEX, this.config.addressHrp),
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
@@ -129,7 +132,7 @@ export class TokenManagementTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            receiver: this.esdtContractAddress,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
@@ -175,7 +178,7 @@ export class TokenManagementTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            receiver: this.esdtContractAddress,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
@@ -223,7 +226,7 @@ export class TokenManagementTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            receiver: this.esdtContractAddress,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
@@ -253,7 +256,7 @@ export class TokenManagementTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            receiver: this.esdtContractAddress,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,
@@ -270,7 +273,7 @@ export class TokenManagementTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            receiver: this.esdtContractAddress,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitToggleBurnRoleGlobally,
             addDataMovementGas: true,
@@ -286,7 +289,7 @@ export class TokenManagementTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            receiver: this.esdtContractAddress,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitToggleBurnRoleGlobally,
             addDataMovementGas: true,
@@ -312,7 +315,7 @@ export class TokenManagementTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            receiver: this.esdtContractAddress,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitSetSpecialRole,
             addDataMovementGas: true,
@@ -340,7 +343,7 @@ export class TokenManagementTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            receiver: this.esdtContractAddress,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitSetSpecialRole,
             addDataMovementGas: true,
@@ -382,7 +385,7 @@ export class TokenManagementTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(ESDT_CONTRACT_ADDRESS),
+            receiver: this.esdtContractAddress,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitSetSpecialRole,
             addDataMovementGas: true,

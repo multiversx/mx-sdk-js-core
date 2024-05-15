@@ -1,11 +1,9 @@
 import * as bech32 from "bech32";
 import BigNumber from "bignumber.js";
-import { CURRENT_NUMBER_OF_SHARDS_WITHOUT_META, METACHAIN_ID, WasmVirtualMachine } from "./constants";
+import { CURRENT_NUMBER_OF_SHARDS_WITHOUT_META, DEFAULT_HRP, METACHAIN_ID, WasmVirtualMachine } from "./constants";
 import * as errors from "./errors";
 import { bigIntToBuffer } from "./tokenOperations/codec";
 const createKeccakHash = require("keccak");
-
-const DEFAULT_HRP = "erd";
 
 /**
  * The length (in bytes) of a public key (from which a bech32 address can be obtained).

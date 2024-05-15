@@ -36,7 +36,6 @@ export class TypeScriptGenerator {
     private readonly abiRegistry: AbiRegistry;
     private readonly contractAddress: Address;
     private readonly chainID: string;
-    private generatedClass: string;
     private outputPath: string;
     private customEnums: string;
     private customStructs: string;
@@ -50,21 +49,19 @@ export class TypeScriptGenerator {
         this.abiRegistry = AbiRegistry.create(this.plainAbi);
         this.contractAddress = options.contractAddress;
         this.chainID = options.chainID;
-        this.generatedClass = "";
         this.outputPath = options.outputPath;
         this.customEnums = "";
         this.customStructs = "";
         this.customTypes = "";
         this.customTypesImports = "";
         this.customClasses = ``;
-        // this.generatedClassImports = [];
     }
 
     async generate() {
         const fileName = this.prepareFileName();
         const filePath = path.join(this.outputPath, fileName);
-        await this.generateClass();
-        this.saveFile(filePath, this.generatedClass);
+        const generatedClass = await this.generateClass();
+        this.saveFile(filePath, generatedClass);
 
         await this.generateCustomTypes();
         const typesPath = path.join(this.outputPath, CUSTOM_TYPES_FILE_NAME);
@@ -95,24 +92,24 @@ export class TypeScriptGenerator {
     async generateClass() {
         const className = this.prepareClassName();
 
-        this.addImports();
-        this.addClassDefinition(className);
+        let generatedClass = this.addImports();
+        generatedClass += this.addClassDefinition(className);
 
         for (const endpoint of this.abiRegistry.getEndpoints()) {
-            this.generatedClass += this.addMethodDefinition(endpoint);
+            generatedClass += this.addMethodDefinition(endpoint);
         }
 
-        this.addEndClassCurlyBracket();
+        generatedClass += this.addEndClassCurlyBracket();
 
-        this.generatedClass = await this.formatUsingPrettier(this.generatedClass);
+        return await this.formatUsingPrettier(generatedClass);
     }
 
     saveFile(output: string, content: string) {
         fs.writeFileSync(output, content);
     }
 
-    addImports() {
-        this.generatedClass +=
+    addImports(): string {
+        let imports =
             this.createImportStatement(SMART_CONTRACT_FACTORY) +
             this.createImportStatement(FACTORY_CONFIG) +
             this.createImportStatement("Address") +
@@ -121,12 +118,14 @@ export class TypeScriptGenerator {
             this.createImportStatement("CodeMetadata");
 
         for (let customType of this.abiRegistry.customTypes) {
-            this.generatedClass += this.createImportStatement(customType.getName(), `./${CUSTOM_TYPES_FILE_NAME}`);
+            imports += this.createImportStatement(customType.getName(), `./${CUSTOM_TYPES_FILE_NAME}`);
         }
+
+        return imports;
     }
 
-    addClassDefinition(className: string) {
-        const classDefinition = `
+    addClassDefinition(className: string): string {
+        return `
         export class ${className} {
             private readonly factory: ${SMART_CONTRACT_FACTORY};
             private readonly abi: ${ABI_REGISTRY};
@@ -139,11 +138,9 @@ export class TypeScriptGenerator {
                 this.contractAddress = Address.fromBech32("${this.contractAddress.bech32()}");
             }\n
         `;
-
-        this.generatedClass += classDefinition;
     }
 
-    addMethodDefinition(endpoint: EndpointDefinition) {
+    addMethodDefinition(endpoint: EndpointDefinition): string {
         let method = this.createDocString(endpoint);
         method += this.prepareMethod(endpoint);
         return method;
@@ -613,7 +610,7 @@ export class TypeScriptGenerator {
     }
 
     private addEndClassCurlyBracket() {
-        this.generatedClass += "}\n";
+        return "}\n";
     }
 
     private async formatUsingPrettier(code: string) {

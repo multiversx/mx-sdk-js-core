@@ -1,10 +1,6 @@
 import * as bech32 from "bech32";
+import { LibraryConfig } from "./config";
 import { ErrBadAddress } from "./errors";
-
-/**
- * The human-readable-part of the bech32 addresses.
- */
-const DEFAULT_HRP = "erd";
 
 /**
  * @internal
@@ -16,7 +12,7 @@ export class UserAddress {
 
     public constructor(buffer: Buffer, hrp?: string) {
         this.buffer = buffer;
-        this.hrp = hrp || DEFAULT_HRP;
+        this.hrp = hrp || LibraryConfig.DefaultAddressHrp;
     }
 
     static newFromBech32(value: string): UserAddress {
@@ -92,7 +88,7 @@ function decodeFromBech32(options: { value: string; allowCustomHrp: boolean }): 
     }
 
     // Workaround, in order to avoid behavioral breaking changes on legacy flows.
-    if (!allowCustomHrp && hrp != DEFAULT_HRP) {
+    if (!allowCustomHrp && hrp != LibraryConfig.DefaultAddressHrp) {
         throw new ErrBadAddress(value);
     }
 

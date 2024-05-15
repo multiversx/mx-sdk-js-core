@@ -1,6 +1,7 @@
 import * as bech32 from "bech32";
 import BigNumber from "bignumber.js";
-import { CURRENT_NUMBER_OF_SHARDS_WITHOUT_META, DEFAULT_HRP, METACHAIN_ID, WasmVirtualMachine } from "./constants";
+import { LibraryConfig } from "./config";
+import { CURRENT_NUMBER_OF_SHARDS_WITHOUT_META, METACHAIN_ID, WasmVirtualMachine } from "./constants";
 import * as errors from "./errors";
 import { bigIntToBuffer } from "./tokenOperations/codec";
 const createKeccakHash = require("keccak");
@@ -31,7 +32,7 @@ export class Address {
         // Legacy flow.
         if (!value) {
             this.publicKey = Buffer.from([]);
-            this.hrp = hrp || DEFAULT_HRP;
+            this.hrp = hrp || LibraryConfig.DefaultAddressHrp;
 
             return;
         }
@@ -43,7 +44,7 @@ export class Address {
             }
 
             this.publicKey = Buffer.from(value);
-            this.hrp = hrp || DEFAULT_HRP;
+            this.hrp = hrp || LibraryConfig.DefaultAddressHrp;
 
             return;
         }
@@ -66,7 +67,7 @@ export class Address {
         if (typeof value === "string") {
             if (Address.isValidHex(value)) {
                 this.publicKey = Buffer.from(value, "hex");
-                this.hrp = hrp || DEFAULT_HRP;
+                this.hrp = hrp || LibraryConfig.DefaultAddressHrp;
 
                 return;
             }
@@ -164,7 +165,7 @@ export class Address {
         const prefix = decoded?.prefix;
         const pubkey = decoded ? Buffer.from(bech32.fromWords(decoded.words)) : undefined;
 
-        if (prefix !== DEFAULT_HRP || pubkey?.length !== PUBKEY_LENGTH) {
+        if (prefix !== LibraryConfig.DefaultAddressHrp || pubkey?.length !== PUBKEY_LENGTH) {
             return false;
         }
 
@@ -372,8 +373,8 @@ function decodeFromBech32(options: { value: string; allowCustomHrp: boolean }): 
 
     // Workaround, in order to avoid behavioral breaking changes on legacy flows.
     // In a future major release, we should drop this constraint (not exactly useful, validation should be performed in other ways)
-    if (!allowCustomHrp && hrp != DEFAULT_HRP) {
-        throw new errors.ErrAddressBadHrp(DEFAULT_HRP, hrp);
+    if (!allowCustomHrp && hrp != LibraryConfig.DefaultAddressHrp) {
+        throw new errors.ErrAddressBadHrp(LibraryConfig.DefaultAddressHrp, hrp);
     }
 
     return { hrp, pubkey };

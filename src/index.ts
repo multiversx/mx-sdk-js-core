@@ -10,6 +10,7 @@ export * from "./account";
 export * from "./adapters";
 export * from "./address";
 export * from "./asyncTimer";
+export * from "./config";
 export * from "./converters";
 export * from "./errors";
 export * from "./gasEstimator";

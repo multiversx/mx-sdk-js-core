@@ -11,8 +11,6 @@ export const MULTI_ESDTNFT_TRANSFER_FUNCTION_NAME = "MultiESDTNFTTransfer";
 export const ESDT_TRANSFER_VALUE = "0";
 export const ARGUMENTS_SEPARATOR = "@";
 export const VM_TYPE_WASM_VM = new Uint8Array([0x05, 0x00]);
-export const DEFAULT_HRP = "erd";
-
 export const CONTRACT_DEPLOY_ADDRESS_HEX = "0000000000000000000000000000000000000000000000000000000000000000";
 export const DELEGATION_MANAGER_SC_ADDRESS_HEX = "000000000000000000010000000000000000000000000000000000000004ffff";
 export const ESDT_CONTRACT_ADDRESS_HEX = "000000000000000000010000000000000000000000000000000000000002ffff";
@@ -26,6 +24,11 @@ export const WasmVirtualMachine = "0500";
 export const METACHAIN_ID = 4294967295;
 export const SDK_JS_SIGNER = "sdk-js";
 export const UNKNOWN_SIGNER = "unknown";
+
+/**
+ * @deprecated
+ */
+export const DEFAULT_HRP = "erd";
 
 /**
  * @deprecated

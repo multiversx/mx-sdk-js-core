@@ -8,5 +8,8 @@
  * Only alter the configuration (if needed) within an (end) application that uses this library.
  */
 export class LibraryConfig {
+    /**
+     * The human-readable-part of the bech32 addresses.
+     */
     public static DefaultAddressHrp: string = "erd";
 }

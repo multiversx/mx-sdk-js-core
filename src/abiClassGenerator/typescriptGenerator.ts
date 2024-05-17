@@ -5,6 +5,7 @@ import {
     EndpointParameterDefinition,
     EnumType,
     FieldDefinition,
+    PrimitiveType,
     StructType,
     Type,
 } from "../smartcontracts";
@@ -36,13 +37,10 @@ export class TypeScriptGenerator {
     private readonly abiRegistry: AbiRegistry;
     private readonly contractAddress: Address;
     private readonly chainID: string;
-    private outputPath: string;
-    private customEnums: string;
-    private customStructs: string;
-    private customTypes: string;
+    private readonly outputPath: string;
+
     private customTypesImports: string;
     private customClasses: string;
-    // private generatedClassImports: [string, string][];
 
     constructor(options: { abi: any; contractAddress: Address; chainID: string; outputPath: string }) {
         this.plainAbi = options.abi;
@@ -50,9 +48,6 @@ export class TypeScriptGenerator {
         this.contractAddress = options.contractAddress;
         this.chainID = options.chainID;
         this.outputPath = options.outputPath;
-        this.customEnums = "";
-        this.customStructs = "";
-        this.customTypes = "";
         this.customTypesImports = "";
         this.customClasses = ``;
     }
@@ -62,21 +57,22 @@ export class TypeScriptGenerator {
         const filePath = path.join(this.outputPath, fileName);
         const generatedClass = await this.generateClass();
         this.saveFile(filePath, generatedClass);
-
-        await this.generateCustomTypes();
-        const typesPath = path.join(this.outputPath, CUSTOM_TYPES_FILE_NAME);
-        this.saveFile(typesPath, this.customTypes);
-
         Logger.info(`Successfully generated ${fileName} at location ${filePath}.`);
+
+        if (this.hasAnyCustomTypesInAbi()) {
+            const generatedCustomTypes = await this.generateCustomTypes();
+            const typesPath = path.join(this.outputPath, CUSTOM_TYPES_FILE_NAME);
+            this.saveFile(typesPath, generatedCustomTypes);
+            Logger.info(`Successfully generated ${CUSTOM_TYPES_FILE_NAME} at location ${typesPath}.`);
+        }
     }
 
-    async generateCustomTypes() {
-        this.createCustomTypes();
-        const types = await this.formatUsingPrettier(
-            this.customEnums + "\n" + this.customStructs + "\n" + this.customClasses,
-        );
+    async generateCustomTypes(): Promise<string> {
+        let { enums, structs } = this.createCustomTypes();
+
+        const types = await this.formatUsingPrettier(structs + "\n" + enums + "\n" + this.customClasses);
         this.ensureImportStatementForCustomTypes(types);
-        this.customTypes = this.customTypesImports + "\n" + types;
+        return this.customTypesImports + "\n" + types;
     }
 
     private ensureImportStatementForCustomTypes(customTypes: string) {
@@ -96,6 +92,9 @@ export class TypeScriptGenerator {
         generatedClass += this.addClassDefinition(className);
 
         for (const endpoint of this.abiRegistry.getEndpoints()) {
+            if (endpoint.name === "upgrade") {
+                continue;
+            }
             generatedClass += this.addMethodDefinition(endpoint);
         }
 
@@ -117,8 +116,10 @@ export class TypeScriptGenerator {
             this.createImportStatement("Transaction") +
             this.createImportStatement("CodeMetadata");
 
-        for (let customType of this.abiRegistry.customTypes) {
-            imports += this.createImportStatement(customType.getName(), `./${CUSTOM_TYPES_FILE_NAME}`);
+        if (this.hasAnyCustomTypesInAbi()) {
+            for (let customType of this.abiRegistry.customTypes) {
+                imports += this.createImportStatement(customType.getName(), `./${CUSTOM_TYPES_FILE_NAME}`);
+            }
         }
 
         return imports;
@@ -132,7 +133,8 @@ export class TypeScriptGenerator {
             private readonly contractAddress: Address;
 
             constructor () {
-                this.abi = ${ABI_REGISTRY}.create(${JSON.stringify(this.plainAbi)});
+                const plainAbi: any = ${JSON.stringify(this.plainAbi)};
+                this.abi = ${ABI_REGISTRY}.create(plainAbi);
                 const config = new ${FACTORY_CONFIG}({ chainID: "${this.chainID}" });
                 this.factory = new ${SMART_CONTRACT_FACTORY}({ config: config, abi: this.abi });
                 this.contractAddress = Address.fromBech32("${this.contractAddress.bech32()}");
@@ -171,12 +173,10 @@ export class TypeScriptGenerator {
                 if (argName.endsWith("?")) {
                     argName = arg[0].slice(0, arg[0].length - 1);
 
-                    body += `if (options.${argName}){
+                    body += `\nif (options.${argName}){
                         args.push(options.${argName});
                     }\n\n`;
-                    // optionalArgs.push(argName);
                 } else {
-                    // args.push(`options.${argName}`);
                     body += `args.push(options.${argName});\n`;
                 }
             }
@@ -185,7 +185,7 @@ export class TypeScriptGenerator {
         body += `\n`;
 
         body += `const tx = this.factory.createTransactionForExecute({
-            address: Address.Empty(),
+            sender: Address.empty(),
             contract: this.contractAddress,
             function: "${contractFunction}",
             gasLimit: 0n,
@@ -236,47 +236,30 @@ export class TypeScriptGenerator {
     private getMethodParameters(inputs: EndpointParameterDefinition[]): [string, string][] {
         let inputTuple: [string, string][] = [];
         for (const input of inputs) {
-            let paramName = this.formatFieldName(input.name);
-            let paramType = input.type;
-
-            if (this.isTypeInCustomTypes(paramType)) {
-                // let params = `options: {}`;
-                inputTuple.push([paramName, paramType.getName()]);
-            } else if (paramType.isGenericType()) {
-                const nativeType = this.mapOpenTypeToNativeType(paramType.getName());
-
-                if (paramType.getName() === "Option" || paramType.getName() === "Optional") {
-                    paramName = this.formatFieldName(paramName, true);
-                }
-
-                inputTuple.push([paramName, nativeType]);
-            } else {
-                const nativeType = this.mapClosedTypeToNativeType(paramType.getName());
-
-                if (nativeType === "nothing") {
-                    continue;
-                }
-
-                inputTuple.push([paramName, nativeType]);
-            }
+            inputTuple.push(this.getTypeMember(input));
         }
         return inputTuple;
     }
 
-    createCustomTypes() {
+    createCustomTypes(): { enums: string; structs: string } {
         const contractTypes = this.abiRegistry.customTypes;
+        let customEnums = ``;
+        let customStructs = ``;
 
         for (const type of contractTypes) {
             if (type instanceof EnumType) {
-                const customEnum = this.createEnum(type);
-                this.customEnums += customEnum;
+                customEnums += this.createEnum(type);
             } else if (type instanceof StructType) {
-                const customStruct = this.createStruct(type);
-                this.customStructs += customStruct;
+                customStructs += this.createStruct(type);
             } else {
                 throw new Error(`Custom type of type ${typeof type} not supported`);
             }
         }
+
+        return {
+            enums: customEnums,
+            structs: customStructs,
+        };
     }
 
     private createEnum(customType: EnumType): string {
@@ -333,16 +316,9 @@ export class TypeScriptGenerator {
 
     private getFieldsAsClassProperties(fields: FieldDefinition[]): ClassProperty[] {
         let properties: ClassProperty[] = [];
-        let type: string;
 
         for (const field of fields) {
-            if (field.type.isGenericType()) {
-                type = this.mapOpenTypeToNativeType(field.type.getName());
-            } else if (field.type instanceof EnumType) {
-                type = field.type.getName();
-            } else {
-                type = this.mapClosedTypeToNativeType(field.type.getName());
-            }
+            const type = this.getNativeType(field.type);
             const classProperty: ClassProperty = {
                 access: "readonly",
                 name: field.name,
@@ -426,31 +402,60 @@ export class TypeScriptGenerator {
 
         let items: string = ``;
         for (const field of fields) {
-            if (field.type.isGenericType()) {
-                const nativeType = this.mapOpenTypeToNativeType(field.type.getName());
-
-                let fieldName: string;
-                if (field.type.getName() === "Option" || field.type.getName() === "Optional") {
-                    fieldName = this.formatFieldName(field.name, true);
-                } else {
-                    fieldName = this.formatFieldName(field.name);
-                }
-
-                items += `${fieldName}: ${nativeType};\n`;
-            } else if (field.type instanceof EnumType) {
-                items += `${this.formatFieldName(field.name)}: ${field.type.getName()};\n`;
-            } else {
-                const nativeType = this.mapClosedTypeToNativeType(field.type.getName());
-
-                if (nativeType === "nothing") {
-                    continue;
-                }
-
-                items += `${this.formatFieldName(field.name)}: ${nativeType};\n`;
+            const member = this.getTypeMember(field);
+            // check to see if native type is ""; don't add as member if true
+            if (!member[1]) {
+                continue;
             }
+            items += `${member[0]}: ${member[1]};\n`;
         }
 
         return this.prepareTypeDefinition(structName, items);
+    }
+
+    private getTypeMember(field: FieldDefinition | EndpointParameterDefinition): [string, string] {
+        let fieldName: string;
+
+        if (field.type.getName() === "Option" || field.type.getName() === "Optional") {
+            fieldName = this.formatFieldName(field.name, true);
+        } else {
+            fieldName = this.formatFieldName(field.name);
+        }
+
+        const nativeType = this.getNativeType(field.type);
+        return [fieldName, nativeType];
+    }
+
+    private getNativeType(type: Type): string {
+        let nativeType = ``;
+
+        if (type.isGenericType()) {
+            let typedParamsOfType = type.getTypeParameters();
+
+            if (typedParamsOfType.length > 1) {
+                nativeType = "any";
+            } else if (typedParamsOfType.length === 1) {
+                const param = typedParamsOfType[0];
+
+                if (param instanceof PrimitiveType) {
+                    nativeType = this.mapClosedTypeToNativeType(param.getName());
+                } else {
+                    nativeType = param.getName();
+                }
+            }
+
+            nativeType += this.mapOpenTypeToNativeType(type.getName());
+        } else if (type instanceof EnumType || type instanceof StructType) {
+            nativeType = type.getName();
+        } else {
+            nativeType = this.mapClosedTypeToNativeType(type.getName());
+
+            if (nativeType === "nothing") {
+                nativeType = "";
+            }
+        }
+
+        return nativeType;
     }
 
     private isTypeInCustomTypes(type: Type): boolean {
@@ -547,18 +552,26 @@ export class TypeScriptGenerator {
     private mapOpenTypeToNativeType(openType: string): string {
         switch (openType) {
             case "List":
-                return "any[]";
+                return "[]";
             case "Option":
-                return "any";
+                return "";
             case "Optional":
-                return "any";
+                return "";
             case "Tuple":
-                return "any[]";
+                return "[]";
             case "Variadic":
-                return "any[]";
+                return "[]";
             default:
-                return "any";
+                return "";
         }
+    }
+
+    private hasAnyCustomTypesInAbi(): boolean {
+        if (this.abiRegistry.customTypes.length) {
+            return true;
+        }
+
+        return false;
     }
 
     private createDocString(endpoint: EndpointDefinition): string {

@@ -21,8 +21,8 @@ const ABI_REGISTRY = "AbiRegistry";
 const CORE_PACKAGE = "@multiversx/sdk-core";
 const CUSTOM_TYPES_FILE_NAME = "customTypes.ts";
 
-type ClassProperty = {
-    access: string;
+type Property = {
+    access?: string;
     name: string;
     type: string;
 };
@@ -162,16 +162,16 @@ export class TypeScriptGenerator {
         return this.prepareMethodDefinition(methodName, methodArgs, body);
     }
 
-    private prepareMethodBody(endpoint: EndpointDefinition, preparedArgs: [string, string][]): string {
+    private prepareMethodBody(endpoint: EndpointDefinition, preparedArgs: Property[]): string {
         let body = `let args: any = [];\n\n`;
         const contractFunction = endpoint.name;
 
         if (preparedArgs.length) {
             for (const arg of preparedArgs) {
-                let argName = arg[0];
+                let argName = arg.name;
 
                 if (argName.endsWith("?")) {
-                    argName = arg[0].slice(0, arg[0].length - 1);
+                    argName = arg.name.slice(0, arg.name.length - 1);
 
                     body += `\nif (options.${argName}){
                         args.push(options.${argName});
@@ -198,18 +198,18 @@ export class TypeScriptGenerator {
         return body;
     }
 
-    private prepareMethodDefinition(name: string, parameters: [string, string][], body: string) {
+    private prepareMethodDefinition(name: string, parameters: Property[], body: string) {
         const params = this.prepareMethodParameters(parameters);
         return `${name}(${params}): Transaction {
             ${body}
         }\n\n`;
     }
 
-    private prepareMethodParameters(parameters: [string, string][]): string {
+    private prepareMethodParameters(parameters: Property[]): string {
         let params = ``;
 
         for (let i = 0; i < parameters.length; i++) {
-            params += `${parameters[i][0]}: ${parameters[i][1]};`;
+            params += `${parameters[i].name}: ${parameters[i].type};`;
         }
 
         if (!params.length) {
@@ -226,15 +226,15 @@ export class TypeScriptGenerator {
         return this.prepareViewMethodDefinition(methodName, methodArgs, body);
     }
 
-    private prepareViewMethodDefinition(name: string, parameters: [string, string][], body: string) {
+    private prepareViewMethodDefinition(name: string, parameters: Property[], body: string) {
         const params = this.prepareMethodParameters(parameters);
         return `${name}(${params}): SmartContractQuery {
             ${body}
         }\n\n`;
     }
 
-    private getMethodParameters(inputs: EndpointParameterDefinition[]): [string, string][] {
-        let inputTuple: [string, string][] = [];
+    private getMethodParameters(inputs: EndpointParameterDefinition[]): Property[] {
+        let inputTuple: Property[] = [];
         for (const input of inputs) {
             inputTuple.push(this.getTypeMember(input));
         }
@@ -314,12 +314,12 @@ export class TypeScriptGenerator {
         return `export type ${enumName} = ${variantsAsString}; \n\n`;
     }
 
-    private getFieldsAsClassProperties(fields: FieldDefinition[]): ClassProperty[] {
-        let properties: ClassProperty[] = [];
+    private getFieldsAsClassProperties(fields: FieldDefinition[]): Property[] {
+        let properties: Property[] = [];
 
         for (const field of fields) {
             const type = this.getNativeType(field.type);
-            const classProperty: ClassProperty = {
+            const classProperty: Property = {
                 access: "readonly",
                 name: field.name,
                 type: type,
@@ -330,7 +330,7 @@ export class TypeScriptGenerator {
         return properties;
     }
 
-    private prepareClassProperties(classProperties: ClassProperty[]): string {
+    private prepareClassProperties(classProperties: Property[]): string {
         let classMembers = ``;
 
         for (const property of classProperties) {
@@ -340,7 +340,7 @@ export class TypeScriptGenerator {
         return classMembers;
     }
 
-    private prepareConstructorDefinition(classProperties: ClassProperty[]): string {
+    private prepareConstructorDefinition(classProperties: Property[]): string {
         let constructorParams = ``;
 
         for (const property of classProperties) {
@@ -354,7 +354,7 @@ export class TypeScriptGenerator {
         return `constructor(options: { ${constructorParams} })`;
     }
 
-    private prepareConstructorBody(classProperties: ClassProperty[]): string {
+    private prepareConstructorBody(classProperties: Property[]): string {
         let constructorBody = ``;
 
         for (const property of classProperties) {
@@ -404,16 +404,16 @@ export class TypeScriptGenerator {
         for (const field of fields) {
             const member = this.getTypeMember(field);
             // check to see if native type is ""; don't add as member if true
-            if (!member[1]) {
+            if (!member.type) {
                 continue;
             }
-            items += `${member[0]}: ${member[1]};\n`;
+            items += `${member.name}: ${member.type};\n`;
         }
 
         return this.prepareTypeDefinition(structName, items);
     }
 
-    private getTypeMember(field: FieldDefinition | EndpointParameterDefinition): [string, string] {
+    private getTypeMember(field: FieldDefinition | EndpointParameterDefinition): Property {
         let fieldName: string;
 
         if (field.type.getName() === "Option" || field.type.getName() === "Optional") {
@@ -423,7 +423,7 @@ export class TypeScriptGenerator {
         }
 
         const nativeType = this.getNativeType(field.type);
-        return [fieldName, nativeType];
+        return { name: fieldName, type: nativeType };
     }
 
     private getNativeType(type: Type): string {

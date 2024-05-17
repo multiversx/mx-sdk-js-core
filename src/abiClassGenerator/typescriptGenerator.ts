@@ -7,6 +7,7 @@ import {
     FieldDefinition,
     PrimitiveType,
     StructType,
+    TupleType,
     Type,
 } from "../smartcontracts";
 import { Logger } from "../logger";
@@ -32,6 +33,16 @@ type Import = {
     source?: string;
 };
 
+type CustomTypes = {
+    enums: Enum[];
+    structs: string;
+};
+
+type Enum = {
+    type: string;
+    customClasses?: string;
+};
+
 export class TypeScriptGenerator {
     private readonly plainAbi: any;
     private readonly abiRegistry: AbiRegistry;
@@ -40,7 +51,8 @@ export class TypeScriptGenerator {
     private readonly outputPath: string;
 
     private customTypesImports: string;
-    private customClasses: string;
+    private customTypesNames: string[];
+    private generatedContractClassImports: Import[];
 
     constructor(options: { abi: any; contractAddress: Address; chainID: string; outputPath: string }) {
         this.plainAbi = options.abi;
@@ -49,28 +61,37 @@ export class TypeScriptGenerator {
         this.chainID = options.chainID;
         this.outputPath = options.outputPath;
         this.customTypesImports = "";
-        this.customClasses = ``;
+        this.customTypesNames = [];
+        this.generatedContractClassImports = [];
     }
 
     async generate() {
-        const fileName = this.prepareFileName();
-        const filePath = path.join(this.outputPath, fileName);
-        const generatedClass = await this.generateClass();
-        this.saveFile(filePath, generatedClass);
-        Logger.info(`Successfully generated ${fileName} at location ${filePath}.`);
-
         if (this.hasAnyCustomTypesInAbi()) {
             const generatedCustomTypes = await this.generateCustomTypes();
             const typesPath = path.join(this.outputPath, CUSTOM_TYPES_FILE_NAME);
             this.saveFile(typesPath, generatedCustomTypes);
             Logger.info(`Successfully generated ${CUSTOM_TYPES_FILE_NAME} at location ${typesPath}.`);
         }
+
+        const fileName = this.prepareFileName();
+        const filePath = path.join(this.outputPath, fileName);
+        const generatedClass = await this.generateContractClass();
+        this.saveFile(filePath, generatedClass);
+        Logger.info(`Successfully generated ${fileName} at location ${filePath}.`);
     }
 
     async generateCustomTypes(): Promise<string> {
         let { enums, structs } = this.createCustomTypes();
 
-        const types = await this.formatUsingPrettier(structs + "\n" + enums + "\n" + this.customClasses);
+        let allEnums = ``;
+        for (const e of enums) {
+            allEnums += e.type + "\n";
+            if (e.customClasses) {
+                allEnums += e.customClasses + "\n";
+            }
+        }
+
+        const types = await this.formatUsingPrettier(structs + "\n" + allEnums + "\n");
         this.ensureImportStatementForCustomTypes(types);
         return this.customTypesImports + "\n" + types;
     }
@@ -85,11 +106,9 @@ export class TypeScriptGenerator {
         }
     }
 
-    async generateClass() {
+    async generateContractClass() {
         const className = this.prepareClassName();
-
-        let generatedClass = this.addImports();
-        generatedClass += this.addClassDefinition(className);
+        let generatedClass = this.addClassDefinition(className);
 
         for (const endpoint of this.abiRegistry.getEndpoints()) {
             if (endpoint.name === "upgrade") {
@@ -99,8 +118,9 @@ export class TypeScriptGenerator {
         }
 
         generatedClass += this.addEndClassCurlyBracket();
+        const imports = this.addImports();
 
-        return await this.formatUsingPrettier(generatedClass);
+        return await this.formatUsingPrettier(imports + "\n" + generatedClass);
     }
 
     saveFile(output: string, content: string) {
@@ -112,14 +132,10 @@ export class TypeScriptGenerator {
             this.createImportStatement(SMART_CONTRACT_FACTORY) +
             this.createImportStatement(FACTORY_CONFIG) +
             this.createImportStatement("Address") +
-            this.createImportStatement("AbiRegistry") +
-            this.createImportStatement("Transaction") +
-            this.createImportStatement("CodeMetadata");
+            this.createImportStatement("AbiRegistry");
 
-        if (this.hasAnyCustomTypesInAbi()) {
-            for (let customType of this.abiRegistry.customTypes) {
-                imports += this.createImportStatement(customType.getName(), `./${CUSTOM_TYPES_FILE_NAME}`);
-            }
+        for (let imp of this.generatedContractClassImports) {
+            imports += this.createImportStatement(imp.name, imp.source);
         }
 
         return imports;
@@ -149,7 +165,6 @@ export class TypeScriptGenerator {
     }
 
     private prepareMethod(endpoint: EndpointDefinition) {
-        // const inputs = endpoint.input;
         const mutability = endpoint.modifiers.mutability;
 
         if (mutability === "readonly") {
@@ -158,6 +173,20 @@ export class TypeScriptGenerator {
 
         const methodName = endpoint.name;
         const methodArgs = this.getMethodParameters(endpoint.input);
+
+        for (const arg of methodArgs) {
+            const typeExists = this.customTypesNames.find((elem) => {
+                return elem == arg.name;
+            });
+
+            if (typeExists) {
+                this.ensureImportForGeneratedContractClass({
+                    name: arg.name,
+                    source: this.getImportModuleFromFileName(CUSTOM_TYPES_FILE_NAME),
+                });
+            }
+        }
+
         const body = this.prepareMethodBody(endpoint, methodArgs);
         return this.prepareMethodDefinition(methodName, methodArgs, body);
     }
@@ -192,13 +221,15 @@ export class TypeScriptGenerator {
             arguments: args,
         });
 
-        return tx;
-        ;\n`;
+        return tx;\n`;
 
         return body;
     }
 
     private prepareMethodDefinition(name: string, parameters: Property[], body: string) {
+        // if this code executes it means we need to import `Transaction` in the generated contract class
+        this.ensureImportForGeneratedContractClass({ name: "Transaction" });
+
         const params = this.prepareMethodParameters(parameters);
         return `${name}(${params}): Transaction {
             ${body}
@@ -227,6 +258,9 @@ export class TypeScriptGenerator {
     }
 
     private prepareViewMethodDefinition(name: string, parameters: Property[], body: string) {
+        // if this code executes it means we need to import `SmartContractQuery` in the generated contract class
+        this.ensureImportForGeneratedContractClass({ name: "SmartContractQuery" });
+
         const params = this.prepareMethodParameters(parameters);
         return `${name}(${params}): SmartContractQuery {
             ${body}
@@ -241,16 +275,18 @@ export class TypeScriptGenerator {
         return inputTuple;
     }
 
-    createCustomTypes(): { enums: string; structs: string } {
+    createCustomTypes(): CustomTypes {
         const contractTypes = this.abiRegistry.customTypes;
-        let customEnums = ``;
+        let customEnums: Enum[] = [];
         let customStructs = ``;
 
         for (const type of contractTypes) {
+            this.customTypesNames.push(type.getName());
+
             if (type instanceof EnumType) {
-                customEnums += this.createEnum(type);
+                customEnums.push(this.createEnum(type));
             } else if (type instanceof StructType) {
-                customStructs += this.createStruct(type);
+                customStructs += this.createCustomTypeStruct(type);
             } else {
                 throw new Error(`Custom type of type ${typeof type} not supported`);
             }
@@ -262,7 +298,7 @@ export class TypeScriptGenerator {
         };
     }
 
-    private createEnum(customType: EnumType): string {
+    private createEnum(customType: EnumType): Enum {
         if (!this.isEnumHeterogeneous(customType)) {
             return this.createNonHeterogeneousEnum(customType);
         }
@@ -270,20 +306,30 @@ export class TypeScriptGenerator {
         return this.createaHeterogeneousEnum(customType);
     }
 
-    private createNonHeterogeneousEnum(customType: EnumType): string {
+    private createNonHeterogeneousEnum(customType: EnumType): Enum {
         const enumName = customType.getName();
-        const variants = customType.variants;
+        this.ensureImportForGeneratedContractClass({
+            name: enumName,
+            source: this.getImportModuleFromFileName(CUSTOM_TYPES_FILE_NAME),
+        });
 
+        const variants = customType.variants;
         let items: string = ``;
+
         for (const item of variants) {
             items += `${item.name} = ${item.discriminant},\n`;
         }
 
-        return this.prepareNonHeterogeneousEnumDefinition(enumName, items);
+        return { type: this.prepareNonHeterogeneousEnumDefinition(enumName, items) };
     }
 
-    private createaHeterogeneousEnum(customType: EnumType) {
+    private createaHeterogeneousEnum(customType: EnumType): Enum {
         const enumName = customType.getName();
+        this.ensureImportForGeneratedContractClass({
+            name: enumName,
+            source: this.getImportModuleFromFileName(CUSTOM_TYPES_FILE_NAME),
+        });
+
         const variants = customType.variants;
         let variantsNames: string[] = [];
 
@@ -308,10 +354,13 @@ export class TypeScriptGenerator {
                 enumClasses += this.prepareClassDefinitionForEnum(variant.name, "", "constructor()", "");
             }
         }
-        this.customClasses = enumClasses;
 
         const variantsAsString = variantsNames.join(" | ");
-        return `export type ${enumName} = ${variantsAsString}; \n\n`;
+        const type = `export type ${enumName} = ${variantsAsString}; \n\n`;
+        return {
+            type: type,
+            customClasses: enumClasses,
+        };
     }
 
     private getFieldsAsClassProperties(fields: FieldDefinition[]): Property[] {
@@ -396,7 +445,7 @@ export class TypeScriptGenerator {
         return false;
     }
 
-    private createStruct(customType: StructType): string {
+    private createCustomTypeStruct(customType: StructType): string {
         const structName = customType.getName();
         const fields = customType.getFieldsDefinitions();
 
@@ -436,11 +485,14 @@ export class TypeScriptGenerator {
                 nativeType = "any";
             } else if (typedParamsOfType.length === 1) {
                 const param = typedParamsOfType[0];
-
-                if (param instanceof PrimitiveType) {
-                    nativeType = this.mapClosedTypeToNativeType(param.getName());
+                if (param instanceof TupleType) {
+                    nativeType = "any";
                 } else {
-                    nativeType = param.getName();
+                    if (param instanceof PrimitiveType) {
+                        nativeType = this.mapClosedTypeToNativeType(param.getName());
+                    } else {
+                        nativeType = param.getName();
+                    }
                 }
             }
 
@@ -449,10 +501,10 @@ export class TypeScriptGenerator {
             nativeType = type.getName();
         } else {
             nativeType = this.mapClosedTypeToNativeType(type.getName());
+        }
 
-            if (nativeType === "nothing") {
-                nativeType = "";
-            }
+        if (nativeType === "nothing") {
+            nativeType = "";
         }
 
         return nativeType;
@@ -624,6 +676,27 @@ export class TypeScriptGenerator {
 
     private addEndClassCurlyBracket() {
         return "}\n";
+    }
+
+    private ensureImportForGeneratedContractClass(customTypesImports: Import) {
+        const imp = this.generatedContractClassImports.find((elem) => {
+            return elem.name === customTypesImports.name;
+        });
+
+        if (imp === undefined) {
+            this.generatedContractClassImports.push(customTypesImports);
+        }
+    }
+
+    private getImportModuleFromFileName(filename: string): string {
+        let module: string;
+        if (filename.endsWith(".ts")) {
+            module = filename.slice(0, filename.length - 4);
+        } else {
+            module = filename;
+        }
+
+        return "./" + module;
     }
 
     private async formatUsingPrettier(code: string) {

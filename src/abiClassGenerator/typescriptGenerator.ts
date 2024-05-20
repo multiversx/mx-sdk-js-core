@@ -35,12 +35,12 @@ type Import = {
 
 type CustomTypes = {
     enums: Enum[];
-    structs: string;
+    structs: string; // represents the generated types from the custom structs of the contract
 };
 
 type Enum = {
-    type: string;
-    customClasses?: string;
+    type: string; // represents a generated type from a custom enum in the contract
+    customClasses?: string; // if enum is heterogeneous this represents the generated classes from the variants; undefined if enum is non-heterogeneous
 };
 
 export class TypeScriptGenerator {
@@ -51,7 +51,6 @@ export class TypeScriptGenerator {
     private readonly outputPath: string;
 
     private customTypesImports: string;
-    private customTypesNames: string[];
     private generatedContractClassImports: Import[];
 
     constructor(options: { abi: any; contractAddress: Address; chainID: string; outputPath: string }) {
@@ -61,7 +60,6 @@ export class TypeScriptGenerator {
         this.chainID = options.chainID;
         this.outputPath = options.outputPath;
         this.customTypesImports = "";
-        this.customTypesNames = [];
         this.generatedContractClassImports = [];
     }
 
@@ -174,21 +172,32 @@ export class TypeScriptGenerator {
         const methodName = endpoint.name;
         const methodArgs = this.getMethodParameters(endpoint.input);
 
-        for (const arg of methodArgs) {
-            const typeExists = this.customTypesNames.find((elem) => {
-                return elem == arg.name;
-            });
-
-            if (typeExists) {
-                this.ensureImportForGeneratedContractClass({
-                    name: arg.name,
-                    source: this.getImportModuleFromFileName(CUSTOM_TYPES_FILE_NAME),
-                });
-            }
-        }
+        this.addImportsForMethodArgsTypes(methodArgs);
 
         const body = this.prepareMethodBody(endpoint, methodArgs);
         return this.prepareMethodDefinition(methodName, methodArgs, body);
+    }
+
+    /**
+     * Takes care of importing both the created custom types and "CodeMetadata" in case it's needed.
+     */
+    private addImportsForMethodArgsTypes(methodArgs: Property[]) {
+        const customTypes = this.abiRegistry.customTypes;
+
+        for (const arg of methodArgs) {
+            for (const type of customTypes) {
+                if (arg.type.includes(type.getName())) {
+                    this.ensureImportForGeneratedContractClass({
+                        name: type.getName(),
+                        source: this.getImportModuleFromFileName(CUSTOM_TYPES_FILE_NAME),
+                    });
+                } else if (arg.type.includes("CodeMetadata")) {
+                    this.ensureImportForGeneratedContractClass({
+                        name: "CodeMetadata",
+                    });
+                }
+            }
+        }
     }
 
     private prepareMethodBody(endpoint: EndpointDefinition, preparedArgs: Property[]): string {
@@ -253,6 +262,7 @@ export class TypeScriptGenerator {
     private prepareReadonlyMethod(endpoint: EndpointDefinition) {
         const methodName = endpoint.name;
         const methodArgs = this.getMethodParameters(endpoint.input);
+        this.addImportsForMethodArgsTypes(methodArgs);
         const body = `// test for vm-queries`;
         return this.prepareViewMethodDefinition(methodName, methodArgs, body);
     }
@@ -281,8 +291,6 @@ export class TypeScriptGenerator {
         let customStructs = ``;
 
         for (const type of contractTypes) {
-            this.customTypesNames.push(type.getName());
-
             if (type instanceof EnumType) {
                 customEnums.push(this.createEnum(type));
             } else if (type instanceof StructType) {
@@ -308,11 +316,6 @@ export class TypeScriptGenerator {
 
     private createNonHeterogeneousEnum(customType: EnumType): Enum {
         const enumName = customType.getName();
-        this.ensureImportForGeneratedContractClass({
-            name: enumName,
-            source: this.getImportModuleFromFileName(CUSTOM_TYPES_FILE_NAME),
-        });
-
         const variants = customType.variants;
         let items: string = ``;
 
@@ -452,7 +455,7 @@ export class TypeScriptGenerator {
         let items: string = ``;
         for (const field of fields) {
             const member = this.getTypeMember(field);
-            // check to see if native type is ""; don't add as member if true
+            // check if native type is ""; don't add as member if true
             if (!member.type) {
                 continue;
             }
@@ -691,7 +694,7 @@ export class TypeScriptGenerator {
     private getImportModuleFromFileName(filename: string): string {
         let module: string;
         if (filename.endsWith(".ts")) {
-            module = filename.slice(0, filename.length - 4);
+            module = filename.slice(0, filename.length - 3);
         } else {
             module = filename;
         }

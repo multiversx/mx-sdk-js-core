@@ -7,6 +7,7 @@ export class Generator {
     private readonly plainAbi: any;
     private readonly contractAddress: Address;
     private readonly chainID: string;
+    private readonly networkProviderUrl: string;
     private readonly targetLanguage: string;
     private readonly outputPath: string;
 
@@ -14,12 +15,14 @@ export class Generator {
         abi: any;
         contractAddress: Address;
         chainID: string;
+        networkProviderUrl: string;
         targetLanguage: string;
         outputPath: string;
     }) {
         this.plainAbi = options.abi;
         this.contractAddress = options.contractAddress;
         this.chainID = options.chainID;
+        this.networkProviderUrl = options.networkProviderUrl;
         this.targetLanguage = options.targetLanguage;
         this.outputPath = options.outputPath;
     }
@@ -41,6 +44,7 @@ export class Generator {
             abi: this.plainAbi,
             contractAddress: this.contractAddress,
             chainID: this.chainID,
+            networkProviderUrl: this.networkProviderUrl,
             outputPath: this.outputPath,
         });
     }

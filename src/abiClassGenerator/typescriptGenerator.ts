@@ -48,16 +48,24 @@ export class TypeScriptGenerator {
     private readonly abiRegistry: AbiRegistry;
     private readonly contractAddress: Address;
     private readonly chainID: string;
+    private readonly networkProviderUrl: string;
     private readonly outputPath: string;
 
     private customTypesImports: string;
     private generatedContractClassImports: Import[];
 
-    constructor(options: { abi: any; contractAddress: Address; chainID: string; outputPath: string }) {
+    constructor(options: {
+        abi: any;
+        contractAddress: Address;
+        chainID: string;
+        networkProviderUrl: string;
+        outputPath: string;
+    }) {
         this.plainAbi = options.abi;
         this.abiRegistry = AbiRegistry.create(this.plainAbi);
         this.contractAddress = options.contractAddress;
         this.chainID = options.chainID;
+        this.networkProviderUrl = options.networkProviderUrl;
         this.outputPath = options.outputPath;
         this.customTypesImports = "";
         this.generatedContractClassImports = [];
@@ -95,11 +103,11 @@ export class TypeScriptGenerator {
     }
 
     private ensureImportStatementForCustomTypes(customTypes: string) {
-        if (customTypes.includes(": Address;")) {
+        if (customTypes.includes(": Address")) {
             this.customTypesImports += this.createImportStatement("Address");
         }
 
-        if (customTypes.includes(": CodeMetadata;")) {
+        if (customTypes.includes(": CodeMetadata")) {
             this.customTypesImports += this.createImportStatement("CodeMetadata");
         }
     }
@@ -130,7 +138,10 @@ export class TypeScriptGenerator {
             this.createImportStatement(SMART_CONTRACT_FACTORY) +
             this.createImportStatement(FACTORY_CONFIG) +
             this.createImportStatement("Address") +
-            this.createImportStatement("AbiRegistry");
+            this.createImportStatement("AbiRegistry") +
+            this.createImportStatement("ApiNetworkProvider", "@multiversx/sdk-network-providers") +
+            this.createImportStatement("QueryRunnerAdapter") +
+            this.createImportStatement("SmartContractQueriesController");
 
         for (let imp of this.generatedContractClassImports) {
             imports += this.createImportStatement(imp.name, imp.source);
@@ -145,13 +156,18 @@ export class TypeScriptGenerator {
             private readonly factory: ${SMART_CONTRACT_FACTORY};
             private readonly abi: ${ABI_REGISTRY};
             private readonly contractAddress: Address;
+            private readonly queryController: SmartContractQueriesController;
 
             constructor () {
                 const plainAbi: any = ${JSON.stringify(this.plainAbi)};
                 this.abi = ${ABI_REGISTRY}.create(plainAbi);
                 const config = new ${FACTORY_CONFIG}({ chainID: "${this.chainID}" });
                 this.factory = new ${SMART_CONTRACT_FACTORY}({ config: config, abi: this.abi });
-                this.contractAddress = Address.fromBech32("${this.contractAddress.bech32()}");
+                this.contractAddress = Address.fromBech32("${this.contractAddress.toBech32()}");
+
+                const api = new ApiNetworkProvider("${this.networkProviderUrl}");
+                const queryRunner = new QueryRunnerAdapter({ networkProvider: api });
+                this.queryController = new SmartContractQueriesController({ queryRunner: queryRunner });
             }\n
         `;
     }
@@ -174,7 +190,7 @@ export class TypeScriptGenerator {
 
         this.addImportsForMethodArgsTypes(methodArgs);
 
-        const body = this.prepareMethodBody(endpoint, methodArgs);
+        const body = this.prepareMethodBody(methodName, methodArgs);
         return this.prepareMethodDefinition(methodName, methodArgs, body);
     }
 
@@ -200,9 +216,24 @@ export class TypeScriptGenerator {
         }
     }
 
-    private prepareMethodBody(endpoint: EndpointDefinition, preparedArgs: Property[]): string {
+    private prepareMethodBody(functionName: string, preparedArgs: Property[]): string {
+        let body = this.prepareArgsInsideBody(preparedArgs);
+
+        body += `\nconst tx = this.factory.createTransactionForExecute({
+            sender: Address.empty(),
+            contract: this.contractAddress,
+            function: "${functionName}",
+            gasLimit: 0n,
+            arguments: args,
+        });
+
+        return tx;\n`;
+
+        return body;
+    }
+
+    private prepareArgsInsideBody(preparedArgs: Property[]): string {
         let body = `let args: any = [];\n\n`;
-        const contractFunction = endpoint.name;
 
         if (preparedArgs.length) {
             for (const arg of preparedArgs) {
@@ -219,18 +250,6 @@ export class TypeScriptGenerator {
                 }
             }
         }
-
-        body += `\n`;
-
-        body += `const tx = this.factory.createTransactionForExecute({
-            sender: Address.empty(),
-            contract: this.contractAddress,
-            function: "${contractFunction}",
-            gasLimit: 0n,
-            arguments: args,
-        });
-
-        return tx;\n`;
 
         return body;
     }
@@ -262,9 +281,26 @@ export class TypeScriptGenerator {
     private prepareReadonlyMethod(endpoint: EndpointDefinition) {
         const methodName = endpoint.name;
         const methodArgs = this.getMethodParameters(endpoint.input);
+
         this.addImportsForMethodArgsTypes(methodArgs);
-        const body = `// test for vm-queries`;
+
+        const body = this.prepareViewMethodBody(endpoint, methodArgs);
         return this.prepareViewMethodDefinition(methodName, methodArgs, body);
+    }
+
+    private prepareViewMethodBody(endpoint: EndpointDefinition, methodArgs: Property[]): string {
+        let body = this.prepareArgsInsideBody(methodArgs);
+
+        body += `\nconst query = this.queryController.createQuery({
+            contract: this.contractAddress.toBech32(),
+            function: "${endpoint.name}",
+            arguments: args,
+        });
+        
+        return query;
+        `;
+
+        return body;
     }
 
     private prepareViewMethodDefinition(name: string, parameters: Property[], body: string) {
@@ -513,16 +549,6 @@ export class TypeScriptGenerator {
         return nativeType;
     }
 
-    private isTypeInCustomTypes(type: Type): boolean {
-        const customTypes = this.abiRegistry.customTypes;
-
-        const item = customTypes.find((customType) => {
-            return customType.getName() === type.getName();
-        });
-
-        return item !== undefined;
-    }
-
     private formatFieldName(name: string, isOptional?: boolean): string {
         let formattedName = name;
 
@@ -640,7 +666,7 @@ export class TypeScriptGenerator {
         let docString = "/**\n";
 
         if (endpoint.modifiers.mutability === "readonly") {
-            docString += `* This is a view method. This will do a vm-query.\n`;
+            docString += `* This is a view method. This will create a query.\n`;
         }
 
         for (const line of docs) {

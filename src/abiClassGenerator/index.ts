@@ -26,9 +26,9 @@ function setupCli(program: any) {
         .description("Create a new class from an `abi.json` file")
         .requiredOption("--abi <string>", "path to the abi file")
         .requiredOption("--contract <bech32 address>", "contract address in the bech32 representation")
-        .requiredOption("--chainID <chainID>", "the chain ID of the network")
+        .requiredOption("--chain <chainID>", "the chain ID of the network")
+        .requiredOption("--network-provider <API/PROXY>", "the url of a network-provider")
         .option("--target <string>", "the programming language in which the class will be generated", "ts")
-        .option("--no-use-abi", "whether to use an `AbiRegistry` object inside the generated class")
         .option("--path <string>", "where to save the output file")
         .action(generate);
 }
@@ -36,15 +36,16 @@ function setupCli(program: any) {
 async function generate(cmdObj: any) {
     const abi = await loadAbi(asUserPath(cmdObj.abi));
     const contract = Address.fromBech32(cmdObj.contract);
-    const chainID = String(cmdObj.chainID);
+    const chainID = String(cmdObj.chain);
+    const url = String(cmdObj.networkProvider);
     const target = String(cmdObj.target);
     const outputPath = String(cmdObj.path || process.cwd());
-    const useAbiObject = cmdObj.useAbi;
 
     const generator = new Generator({
         abi: abi,
         contractAddress: contract,
         chainID: chainID,
+        networkProviderUrl: url,
         targetLanguage: target,
         outputPath: outputPath,
     });

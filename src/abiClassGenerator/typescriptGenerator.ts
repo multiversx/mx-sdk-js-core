@@ -523,7 +523,7 @@ export class TypeScriptGenerator {
                 nativeType = "any";
             } else if (typedParamsOfType.length === 1) {
                 const param = typedParamsOfType[0];
-                if (param instanceof TupleType) {
+                if (param instanceof TupleType || param.isGenericType()) {
                     nativeType = "any";
                 } else {
                     if (param instanceof PrimitiveType) {

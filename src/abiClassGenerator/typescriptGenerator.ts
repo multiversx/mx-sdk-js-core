@@ -20,7 +20,6 @@ const SMART_CONTRACT_FACTORY = "SmartContractTransactionsFactory";
 const FACTORY_CONFIG = "TransactionsFactoryConfig";
 const ABI_REGISTRY = "AbiRegistry";
 const CORE_PACKAGE = "@multiversx/sdk-core";
-const CUSTOM_TYPES_FILE_NAME = "customTypes.ts";
 
 type Property = {
     access?: string;
@@ -53,6 +52,7 @@ export class TypeScriptGenerator {
 
     private customTypesImports: string;
     private generatedContractClassImports: Import[];
+    private customTypesFileName: string;
 
     constructor(options: {
         abi: any;
@@ -69,14 +69,15 @@ export class TypeScriptGenerator {
         this.outputPath = options.outputPath;
         this.customTypesImports = "";
         this.generatedContractClassImports = [];
+        this.customTypesFileName = this.prepareNameForCustomTypes();
     }
 
     async generate() {
         if (this.hasAnyCustomTypesInAbi()) {
             const generatedCustomTypes = await this.generateCustomTypes();
-            const typesPath = path.join(this.outputPath, CUSTOM_TYPES_FILE_NAME);
+            const typesPath = path.join(this.outputPath, this.customTypesFileName);
             this.saveFile(typesPath, generatedCustomTypes);
-            Logger.info(`Successfully generated ${CUSTOM_TYPES_FILE_NAME} at location ${typesPath}.`);
+            Logger.info(`Successfully generated ${this.customTypesFileName} at location ${typesPath}.`);
         }
 
         const fileName = this.prepareFileName();
@@ -205,7 +206,7 @@ export class TypeScriptGenerator {
                 if (arg.type.includes(type.getName())) {
                     this.ensureImportForGeneratedContractClass({
                         name: type.getName(),
-                        source: this.getImportModuleFromFileName(CUSTOM_TYPES_FILE_NAME),
+                        source: this.getImportModuleFromFileName(this.customTypesFileName),
                     });
                 } else if (arg.type.includes("CodeMetadata")) {
                     this.ensureImportForGeneratedContractClass({
@@ -297,18 +298,16 @@ export class TypeScriptGenerator {
             arguments: args,
         });
         
-        return query;
+        const response = await this.queryController.runQuery(query);
+        return this.queryController.parseQueryResponse(response);
         `;
 
         return body;
     }
 
     private prepareViewMethodDefinition(name: string, parameters: Property[], body: string) {
-        // if this code executes it means we need to import `SmartContractQuery` in the generated contract class
-        this.ensureImportForGeneratedContractClass({ name: "SmartContractQuery" });
-
         const params = this.prepareMethodParameters(parameters);
-        return `${name}(${params}): SmartContractQuery {
+        return `async ${name}(${params}): Promise<any[]> {
             ${body}
         }\n\n`;
     }
@@ -366,7 +365,7 @@ export class TypeScriptGenerator {
         const enumName = customType.getName();
         this.ensureImportForGeneratedContractClass({
             name: enumName,
-            source: this.getImportModuleFromFileName(CUSTOM_TYPES_FILE_NAME),
+            source: this.getImportModuleFromFileName(this.customTypesFileName),
         });
 
         const variants = customType.variants;
@@ -660,13 +659,16 @@ export class TypeScriptGenerator {
 
         const docs: string[] = result?.docs || [];
         if (!docs.length) {
+            if (endpoint.modifiers.mutability === "readonly") {
+                return `/**\n *This is a view method. This will make a vm-query.\n*/\n`;
+            }
             return "";
         }
 
         let docString = "/**\n";
 
         if (endpoint.modifiers.mutability === "readonly") {
-            docString += `* This is a view method. This will create a query.\n`;
+            docString += `* This is a view method. This will make a vm-query.\n`;
         }
 
         for (const line of docs) {
@@ -701,6 +703,17 @@ export class TypeScriptGenerator {
         }
 
         return name.charAt(0).toLowerCase() + name.slice(1) + ".ts";
+    }
+
+    private prepareNameForCustomTypes(): string {
+        let name = this.abiRegistry.name ? this.abiRegistry.name : undefined;
+
+        if (!name) {
+            Logger.warn("Can't find `name` property inside abi file. Will name file `customTypes.ts`.");
+            return "customTypes.ts";
+        }
+
+        return name.charAt(0).toLowerCase() + name.slice(1) + "customTypes.ts";
     }
 
     private addEndClassCurlyBracket() {

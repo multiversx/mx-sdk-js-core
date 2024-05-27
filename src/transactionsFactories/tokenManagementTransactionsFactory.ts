@@ -86,7 +86,7 @@ export class TokenManagementTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromHex(ESDT_CONTRACT_ADDRESS_HEX, this.config.addressHrp),
+            receiver: this.esdtContractAddress,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitIssue,
             addDataMovementGas: true,

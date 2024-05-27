@@ -2,6 +2,7 @@ import { Err } from "./errors";
 import { IContractQueryResponse } from "./interfaceOfNetwork";
 import { SmartContractQuery, SmartContractQueryResponse } from "./smartContractQuery";
 import { ArgSerializer, ContractFunction, EndpointDefinition, NativeSerializer, ResultsParser } from "./smartcontracts";
+import { isTyped } from "./smartcontracts/typesystem";
 
 interface IAbi {
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
@@ -62,13 +63,7 @@ export class SmartContractQueriesController {
     }
 
     private areArgsOfTypedValue(args: any[]): boolean {
-        for (const arg of args) {
-            if (!arg.belongsToTypesystem) {
-                return false;
-            }
-        }
-
-        return true;
+        return args.every((arg) => isTyped(arg));
     }
 
     private areArgsBuffers(args: any[]): boolean {

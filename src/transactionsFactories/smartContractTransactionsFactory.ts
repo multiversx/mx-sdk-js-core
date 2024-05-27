@@ -5,6 +5,7 @@ import { IAddress } from "../interface";
 import { Logger } from "../logger";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
+import { isTyped } from "../smartcontracts/typesystem";
 import { TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { byteArrayToHex, utf8ToHex } from "../utils.codec";
@@ -236,12 +237,6 @@ export class SmartContractTransactionsFactory {
     }
 
     private areArgsOfTypedValue(args: any[]): boolean {
-        for (const arg of args) {
-            if (!arg.belongsToTypesystem) {
-                return false;
-            }
-        }
-
-        return true;
+        return args.every((arg) => isTyped(arg));
     }
 }

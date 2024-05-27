@@ -31,6 +31,7 @@ import {
     I64Value,
     I8Type,
     I8Value,
+    isTyped,
     List,
     ListType,
     NumericalType,
@@ -168,7 +169,7 @@ export namespace NativeSerializer {
     }
 
     function convertToTypedValue(value: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
-        if (value && value.belongsToTypesystem) {
+        if (value && isTyped(value)) {
             // Value is already typed, no need to convert it.
             return value;
         }

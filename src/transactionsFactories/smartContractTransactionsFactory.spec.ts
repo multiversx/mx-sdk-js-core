@@ -401,7 +401,7 @@ describe("test smart contract transactions factory", function () {
             contract: receiver,
             bytecode: bytecode,
             gasLimit: gasLimit,
-            arguments: [new U32Value(42), new U32Value(42), new U32Value(42)],
+            arguments: [42, 42, 42],
         });
 
         assert.equal(Buffer.from(tx1.data!).toString(), `upgradeContract@abba@0504@2a@2a@2a`);
@@ -414,7 +414,7 @@ describe("test smart contract transactions factory", function () {
             contract: receiver,
             bytecode: bytecode,
             gasLimit: gasLimit,
-            arguments: [new U32Value(42), new U32Value(42)],
+            arguments: [42, 42],
         });
 
         assert.equal(Buffer.from(tx2.data!).toString(), `upgradeContract@abba@0504@2a@2a`);
@@ -427,10 +427,25 @@ describe("test smart contract transactions factory", function () {
             contract: receiver,
             bytecode: bytecode,
             gasLimit: gasLimit,
-            arguments: [new U32Value(42)],
+            arguments: [42],
         });
 
         assert.equal(Buffer.from(tx3.data!).toString(), `upgradeContract@abba@0504@2a`);
+
+        // No fallbacks.
+        (<any>abi).constructorDefinition = undefined;
+
+        assert.throws(
+            () =>
+                factory.createTransactionForUpgrade({
+                    sender: sender,
+                    contract: receiver,
+                    bytecode: bytecode,
+                    gasLimit: gasLimit,
+                    arguments: [42],
+                }),
+            "Can't convert args to TypedValues",
+        );
     });
 
     it("should create 'Transaction' for claiming developer rewards", async function () {

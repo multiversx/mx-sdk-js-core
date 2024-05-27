@@ -22,6 +22,7 @@ interface IConfig {
 
 interface IAbi {
     constructorDefinition: EndpointDefinition;
+    upgradeConstructorDefinition?: EndpointDefinition;
 
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
 }
@@ -172,6 +173,10 @@ export class SmartContractTransactionsFactory {
     private getEndpointForUpgrade(): EndpointDefinition | undefined {
         if (!this.abi) {
             return undefined;
+        }
+
+        if (this.abi.upgradeConstructorDefinition) {
+            return this.abi.upgradeConstructorDefinition;
         }
 
         try {

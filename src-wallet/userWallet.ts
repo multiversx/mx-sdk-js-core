@@ -146,15 +146,15 @@ export class UserWallet {
     /**
      * Converts the encrypted keyfile to plain JavaScript object.
      */
-    toJSON(): any {
+    toJSON(addressHrp?: string): any {
         if (this.kind == UserWalletKind.SecretKey) {
-            return this.toJSONWhenKindIsSecretKey();
+            return this.toJSONWhenKindIsSecretKey(addressHrp);
         }
 
         return this.toJSONWhenKindIsMnemonic();
     }
 
-    private toJSONWhenKindIsSecretKey(): any {
+    private toJSONWhenKindIsSecretKey(addressHrp?: string): any {
         if (!this.publicKeyWhenKindIsSecretKey) {
             throw new Err("Public key isn't available");
         }
@@ -166,7 +166,7 @@ export class UserWallet {
             kind: this.kind,
             id: this.encryptedData.id,
             address: this.publicKeyWhenKindIsSecretKey.hex(),
-            bech32: this.publicKeyWhenKindIsSecretKey.toAddress().toString(),
+            bech32: this.publicKeyWhenKindIsSecretKey.toAddress(addressHrp).toString(),
             crypto: cryptoSection
         };
 

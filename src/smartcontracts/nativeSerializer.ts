@@ -204,7 +204,7 @@ export namespace NativeSerializer {
     }
 
     function toOptionValue(native: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
-        if (native == null) {
+        if (native == null || native === undefined) {
             return OptionValue.newMissing();
         }
         let converted = convertToTypedValue(native, type.getFirstTypeParameter(), errorContext);
@@ -212,7 +212,7 @@ export namespace NativeSerializer {
     }
 
     function toOptionalValue(native: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
-        if (native == null) {
+        if (native == null || native === undefined) {
             return new OptionalValue(type);
         }
         let converted = convertToTypedValue(native, type.getFirstTypeParameter(), errorContext);

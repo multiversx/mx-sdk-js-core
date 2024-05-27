@@ -430,6 +430,34 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[1].valueOf(), []);
     });
 
+    it("should accept null or undefined for option types and optionals", async () => {
+        const endpoint = AbiRegistry.create({
+            endpoints: [
+                {
+                    name: "foo",
+                    inputs: [
+                        {
+                            type: "Option<bytes>",
+                        },
+                        {
+                            type: "optional<u32>",
+                        },
+                    ],
+                    outputs: [],
+                },
+            ],
+        }).getEndpoint("foo");
+
+        const typedValuesUsingNull = NativeSerializer.nativeToTypedValues([null, null], endpoint);
+        const typedValuesUsingUndefined = NativeSerializer.nativeToTypedValues([undefined, undefined], endpoint);
+
+        assert.deepEqual(typedValuesUsingNull, typedValuesUsingUndefined);
+        assert.deepEqual(typedValuesUsingNull[0].getType(), new OptionType(new NullType()));
+        assert.deepEqual(typedValuesUsingNull[0].valueOf(), null);
+        assert.deepEqual(typedValuesUsingNull[1].getType(), new OptionalType(new U32Type()));
+        assert.deepEqual(typedValuesUsingNull[1].valueOf(), null);
+    });
+
     it("should perform type inference (enums)", async () => {
         const abiRegistry = AbiRegistry.create({
             endpoints: [

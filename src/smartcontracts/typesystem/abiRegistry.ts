@@ -12,6 +12,7 @@ const interfaceNamePlaceholder = "?";
 export class AbiRegistry {
     readonly name: string;
     readonly constructorDefinition: EndpointDefinition;
+    readonly upgradeConstructorDefinition?: EndpointDefinition;
     readonly endpoints: EndpointDefinition[] = [];
     readonly customTypes: CustomType[] = [];
     readonly events: EventDefinition[] = [];
@@ -19,12 +20,14 @@ export class AbiRegistry {
     private constructor(options: {
         name: string;
         constructorDefinition: EndpointDefinition;
+        upgradeConstructorDefinition?: EndpointDefinition;
         endpoints: EndpointDefinition[];
         customTypes: CustomType[];
         events?: EventDefinition[];
     }) {
         this.name = options.name;
         this.constructorDefinition = options.constructorDefinition;
+        this.upgradeConstructorDefinition = options.upgradeConstructorDefinition;
         this.endpoints = options.endpoints;
         this.customTypes = options.customTypes;
         this.events = options.events || [];
@@ -33,18 +36,25 @@ export class AbiRegistry {
     static create(options: {
         name?: string;
         constructor?: any;
+        upgradeConstructor?: any;
         endpoints?: any[];
         types?: Record<string, any>;
         events?: any[];
     }): AbiRegistry {
         const name = options.name || interfaceNamePlaceholder;
         const constructor = options.constructor || {};
+        const upgradeConstructor = options.upgradeConstructor || {};
         const endpoints = options.endpoints || [];
         const types = options.types || {};
         const events = options.events || [];
 
         // Load arbitrary input parameters into properly-defined objects (e.g. EndpointDefinition and CustomType).
         const constructorDefinition = EndpointDefinition.fromJSON({ name: "constructor", ...constructor });
+        const upgradeConstructorDefinition = EndpointDefinition.fromJSON({
+            name: "upgradeConstructor",
+            ...upgradeConstructor,
+        });
+
         const endpointDefinitions = endpoints.map((item) => EndpointDefinition.fromJSON(item));
         const customTypes: CustomType[] = [];
 
@@ -65,6 +75,7 @@ export class AbiRegistry {
         const registry = new AbiRegistry({
             name: name,
             constructorDefinition: constructorDefinition,
+            upgradeConstructorDefinition: upgradeConstructorDefinition,
             endpoints: endpointDefinitions,
             customTypes: customTypes,
             events: eventDefinitions,

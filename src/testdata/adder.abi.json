@@ -1,20 +1,20 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.71.0-nightly",
-            "commitHash": "a2b1646c597329d0a25efa3889b66650f65de1de",
-            "commitDate": "2023-05-25",
+            "version": "1.76.0-nightly",
+            "commitHash": "d86d65bbc19b928387f68427fcc3a0da498d8a19",
+            "commitDate": "2023-12-10",
             "channel": "Nightly",
-            "short": "rustc 1.71.0-nightly (a2b1646c5 2023-05-25)"
+            "short": "rustc 1.76.0-nightly (d86d65bbc 2023-12-10)"
         },
         "contractCrate": {
             "name": "adder",
             "version": "0.0.0",
-            "gitVersion": "v0.45.2.1-reproducible-169-g37d970c"
+            "gitVersion": "v0.50.1-3-gbed74682a"
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.47.2"
+            "version": "0.50.1"
         }
     },
     "docs": [
@@ -23,6 +23,15 @@
     ],
     "name": "Adder",
     "constructor": {
+        "inputs": [
+            {
+                "name": "initial_value",
+                "type": "BigUint"
+            }
+        ],
+        "outputs": []
+    },
+    "upgradeConstructor": {
         "inputs": [
             {
                 "name": "initial_value",
@@ -43,25 +52,9 @@
             ]
         },
         {
-            "name": "upgrade",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "new_value",
-                    "type": "BigUint"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "docs": [
-                "Add desired amount to the storage variable."
-            ],
+            "docs": ["Add desired amount to the storage variable."],
             "name": "add",
             "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
             "inputs": [
                 {
                     "name": "value",

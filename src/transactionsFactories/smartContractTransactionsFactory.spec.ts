@@ -348,25 +348,89 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(transaction, transactionAbiAware);
     });
 
-    it("should create 'Transaction' for upgrade, when ABI is available, but it doesn't contain a definition for 'upgrade'", async function () {
-        const abi = await loadAbiRegistry("src/testdata/adder.abi.json");
-        // Remove all endpoints (for the sake of the test).
-        abi.endpoints.length = 0;
+    it("should create 'Transaction' for upgrade, when ABI is available (with fallbacks)", async function () {
+        const abi = AbiRegistry.create({
+            upgradeConstructor: {
+                inputs: [
+                    {
+                        type: "u32",
+                    },
+                    {
+                        type: "u32",
+                    },
+                    {
+                        type: "u32",
+                    },
+                ],
+            },
+            endpoints: [
+                {
+                    name: "upgrade",
+                    inputs: [
+                        {
+                            type: "u32",
+                        },
+                        {
+                            type: "u32",
+                        },
+                    ],
+                },
+            ],
+            constructor: {
+                inputs: [
+                    {
+                        type: "u32",
+                    },
+                ],
+            },
+        });
 
         const factory = new SmartContractTransactionsFactory({
             config: config,
             abi: abi,
         });
 
-        const transaction = factory.createTransactionForUpgrade({
-            sender: Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
-            contract: Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4"),
-            bytecode: adderByteCode.valueOf(),
-            gasLimit: 6000000n,
-            arguments: [new U32Value(7)],
+        const bytecode = Buffer.from("abba", "hex");
+        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const receiver = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        const gasLimit = 6000000n;
+
+        // By default, use the upgrade constructor.
+        const tx1 = factory.createTransactionForUpgrade({
+            sender: sender,
+            contract: receiver,
+            bytecode: bytecode,
+            gasLimit: gasLimit,
+            arguments: [new U32Value(42), new U32Value(42), new U32Value(42)],
         });
 
-        assert.equal(Buffer.from(transaction.data!).toString(), `upgradeContract@${adderByteCode}@0504@07`);
+        assert.equal(Buffer.from(tx1.data!).toString(), `upgradeContract@abba@0504@2a@2a@2a`);
+
+        // Fallback to the "upgrade" endpoint.
+        (<any>abi).upgradeConstructorDefinition = undefined;
+
+        const tx2 = factory.createTransactionForUpgrade({
+            sender: sender,
+            contract: receiver,
+            bytecode: bytecode,
+            gasLimit: gasLimit,
+            arguments: [new U32Value(42), new U32Value(42)],
+        });
+
+        assert.equal(Buffer.from(tx2.data!).toString(), `upgradeContract@abba@0504@2a@2a`);
+
+        // Fallback to the constructor.
+        (<any>abi).endpoints.length = 0;
+
+        const tx3 = factory.createTransactionForUpgrade({
+            sender: sender,
+            contract: receiver,
+            bytecode: bytecode,
+            gasLimit: gasLimit,
+            arguments: [new U32Value(42)],
+        });
+
+        assert.equal(Buffer.from(tx3.data!).toString(), `upgradeContract@abba@0504@2a`);
     });
 
     it("should create 'Transaction' for claiming developer rewards", async function () {

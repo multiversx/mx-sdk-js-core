@@ -150,8 +150,11 @@ export class AbiRegistry {
             throw new errors.ErrTypingSystem("Did not re-map all custom types");
         }
 
-        // Let's remap the constructor:
+        // Let's remap the constructor(s):
         const newConstructor = mapEndpoint(this.constructorDefinition, mapper);
+        const newUpgradeConstructor = this.upgradeConstructorDefinition
+            ? mapEndpoint(this.upgradeConstructorDefinition, mapper)
+            : undefined;
 
         // Then, remap types of all endpoint parameters.
         // The mapper learned all necessary types in the previous step.
@@ -167,6 +170,7 @@ export class AbiRegistry {
         const newRegistry = new AbiRegistry({
             name: this.name,
             constructorDefinition: newConstructor,
+            upgradeConstructorDefinition: newUpgradeConstructor,
             endpoints: newEndpoints,
             customTypes: newCustomTypes,
             events: newEvents,

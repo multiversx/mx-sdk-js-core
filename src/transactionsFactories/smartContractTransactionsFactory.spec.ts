@@ -1,6 +1,5 @@
 import { assert, expect } from "chai";
 import { Address } from "../address";
-import { CONTRACT_DEPLOY_ADDRESS } from "../constants";
 import { Err } from "../errors";
 import { U32Value } from "../smartcontracts";
 import { Code } from "../smartcontracts/code";
@@ -69,7 +68,7 @@ describe("test smart contract transactions factory", function () {
         });
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, CONTRACT_DEPLOY_ADDRESS);
+        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu");
         expect(transaction.data.length).to.be.greaterThan(0);
         assert.equal(transaction.gasLimit.valueOf(), gasLimit);
         assert.equal(transaction.value, 0n);

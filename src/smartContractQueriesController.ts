@@ -1,4 +1,4 @@
-import { Err } from "./errors";
+import { Err, ErrSmartContractQuery } from "./errors";
 import { IContractQueryResponse } from "./interfaceOfNetwork";
 import { SmartContractQuery, SmartContractQueryResponse } from "./smartContractQuery";
 import { ArgSerializer, ContractFunction, EndpointDefinition, NativeSerializer, ResultsParser } from "./smartcontracts";
@@ -21,6 +21,26 @@ export class SmartContractQueriesController {
         this.abi = options.abi;
         this.queryRunner = options.queryRunner;
         this.legacyResultsParser = new ResultsParser();
+    }
+
+    async query(options: {
+        contract: string;
+        caller?: string;
+        value?: bigint;
+        function: string;
+        arguments: any[];
+    }): Promise<any[]> {
+        const query = this.createQuery(options);
+        const queryResponse = await this.runQuery(query);
+        this.raiseForStatus(queryResponse);
+        return this.parseQueryResponse(queryResponse);
+    }
+
+    private raiseForStatus(queryResponse: SmartContractQueryResponse): void {
+        const isOk = queryResponse.returnCode === "ok";
+        if (!isOk) {
+            throw new ErrSmartContractQuery(queryResponse.returnCode, queryResponse.returnMessage);
+        }
     }
 
     createQuery(options: {

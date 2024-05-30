@@ -372,3 +372,15 @@ export class ErrParseTransactionOutcome extends Err {
         super(message);
     }
 }
+
+/**
+ * Signals an error when querying a smart contract.
+ */
+export class ErrSmartContractQuery extends Err {
+    public returnCode: string;
+
+    public constructor(returnCode: string, message: string) {
+        super(message);
+        this.returnCode = returnCode;
+    }
+}

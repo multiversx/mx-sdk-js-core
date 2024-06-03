@@ -33,6 +33,8 @@ export interface ITransactionStatus {
     isFailed(): boolean;
     isInvalid(): boolean;
     isExecuted(): boolean;
+    isSuccessful(): boolean;
+    valueOf(): string;
 }
 
 export interface ITransactionReceipt {

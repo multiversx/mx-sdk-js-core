@@ -1,4 +1,4 @@
-import { assert, expect } from "chai";
+import { assert } from "chai";
 import { Address } from "../address";
 import { Err } from "../errors";
 import { U32Value } from "../smartcontracts";
@@ -11,22 +11,22 @@ import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test smart contract transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });
-    let smartContractFactory: SmartContractTransactionsFactory;
+    let factory: SmartContractTransactionsFactory;
     let abiAwareFactory: SmartContractTransactionsFactory;
-    let adderByteCode: Code;
-    let abiRegistry: AbiRegistry;
+    let bytecode: Code;
+    let abi: AbiRegistry;
 
     before(async function () {
-        smartContractFactory = new SmartContractTransactionsFactory({
+        factory = new SmartContractTransactionsFactory({
             config: config,
         });
 
-        adderByteCode = await loadContractCode("src/testdata/adder.wasm");
-        abiRegistry = await loadAbiRegistry("src/testdata/adder.abi.json");
+        bytecode = await loadContractCode("src/testdata/adder.wasm");
+        abi = await loadAbiRegistry("src/testdata/adder.abi.json");
 
         abiAwareFactory = new SmartContractTransactionsFactory({
             config: config,
-            abi: abiRegistry,
+            abi: abi,
         });
     });
 
@@ -37,9 +37,9 @@ describe("test smart contract transactions factory", function () {
 
         assert.throws(
             () =>
-                smartContractFactory.createTransactionForDeploy({
+                factory.createTransactionForDeploy({
                     sender: sender,
-                    bytecode: adderByteCode.valueOf(),
+                    bytecode: bytecode.valueOf(),
                     gasLimit: gasLimit,
                     arguments: args,
                 }),
@@ -51,25 +51,25 @@ describe("test smart contract transactions factory", function () {
     it("should create 'Transaction' for deploy", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const gasLimit = 6000000n;
-        const args = [new U32Value(0)];
+        const args = [new U32Value(1)];
 
-        const transaction = smartContractFactory.createTransactionForDeploy({
+        const transaction = factory.createTransactionForDeploy({
             sender: sender,
-            bytecode: adderByteCode.valueOf(),
+            bytecode: bytecode.valueOf(),
             gasLimit: gasLimit,
             arguments: args,
         });
 
         const transactionAbiAware = abiAwareFactory.createTransactionForDeploy({
             sender: sender,
-            bytecode: adderByteCode.valueOf(),
+            bytecode: bytecode.valueOf(),
             gasLimit: gasLimit,
             arguments: args,
         });
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu");
-        expect(transaction.data.length).to.be.greaterThan(0);
+        assert.deepEqual(transaction.data, Buffer.from(`${bytecode}@0500@0504@01`));
         assert.equal(transaction.gasLimit.valueOf(), gasLimit);
         assert.equal(transaction.value, 0n);
 
@@ -83,7 +83,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const args = [new U32Value(7)];
 
-        const transaction = smartContractFactory.createTransactionForExecute({
+        const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             function: func,
@@ -115,7 +115,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const egldAmount = 1000000000000000000n;
 
-        const transaction = smartContractFactory.createTransactionForExecute({
+        const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             function: func,
@@ -151,7 +151,7 @@ describe("test smart contract transactions factory", function () {
         const token = new Token({ identifier: "FOO-6ce17b", nonce: 0n });
         const transfer = new TokenTransfer({ token, amount: 10n });
 
-        const transaction = smartContractFactory.createTransactionForExecute({
+        const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             function: func,
@@ -190,7 +190,7 @@ describe("test smart contract transactions factory", function () {
         const barToken = new Token({ identifier: "BAR-5bc08f", nonce: 0n });
         const barTransfer = new TokenTransfer({ token: barToken, amount: 3140n });
 
-        const transaction = smartContractFactory.createTransactionForExecute({
+        const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             function: func,
@@ -234,7 +234,7 @@ describe("test smart contract transactions factory", function () {
         const token = new Token({ identifier: "NFT-123456", nonce: 1n });
         const transfer = new TokenTransfer({ token, amount: 1n });
 
-        const transaction = smartContractFactory.createTransactionForExecute({
+        const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             function: func,
@@ -281,7 +281,7 @@ describe("test smart contract transactions factory", function () {
         const secondToken = new Token({ identifier: "NFT-123456", nonce: 42n });
         const secondTransfer = new TokenTransfer({ token: secondToken, amount: 1n });
 
-        const transaction = smartContractFactory.createTransactionForExecute({
+        const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
             function: func,
@@ -322,10 +322,10 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const args = [new U32Value(7)];
 
-        const transaction = smartContractFactory.createTransactionForUpgrade({
+        const transaction = factory.createTransactionForUpgrade({
             sender: sender,
             contract: contract,
-            bytecode: adderByteCode.valueOf(),
+            bytecode: bytecode.valueOf(),
             gasLimit: gasLimit,
             arguments: args,
         });
@@ -333,14 +333,14 @@ describe("test smart contract transactions factory", function () {
         const transactionAbiAware = abiAwareFactory.createTransactionForUpgrade({
             sender: sender,
             contract: contract,
-            bytecode: adderByteCode.valueOf(),
+            bytecode: bytecode.valueOf(),
             gasLimit: gasLimit,
             arguments: args,
         });
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        assert.equal(Buffer.from(transaction.data!).toString(), `upgradeContract@${adderByteCode}@0504@07`);
+        assert.deepEqual(transaction.data!, Buffer.from(`upgradeContract@${bytecode}@0504@07`));
         assert.equal(transaction.gasLimit, gasLimit);
         assert.equal(transaction.value, 0n);
 
@@ -451,7 +451,7 @@ describe("test smart contract transactions factory", function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
 
-        const transaction = smartContractFactory.createTransactionForClaimingDeveloperRewards({
+        const transaction = factory.createTransactionForClaimingDeveloperRewards({
             sender: sender,
             contract: contract,
         });
@@ -468,7 +468,7 @@ describe("test smart contract transactions factory", function () {
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const newOwner = Address.fromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
-        const transaction = smartContractFactory.createTransactionForChangingOwnerAddress({
+        const transaction = factory.createTransactionForChangingOwnerAddress({
             sender: sender,
             contract: contract,
             newOwner: newOwner,

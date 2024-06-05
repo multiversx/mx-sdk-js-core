@@ -1,7 +1,49 @@
 import * as errors from "../../errors";
 import { assert } from "chai";
 import { BinaryCodec, BinaryCodecConstraints } from "./binary";
-import { AddressType, AddressValue, BigIntType, BigUIntType, BigUIntValue, BooleanType, BooleanValue, I16Type, I32Type, I64Type, I8Type, NumericalType, NumericalValue, Struct, Field, StructType, TypedValue, U16Type, U32Type, U32Value, U64Type, U64Value, U8Type, U8Value, List, ListType, EnumType, EnumVariantDefinition, EnumValue, ArrayVec, ArrayVecType, U16Value, TokenIdentifierType, TokenIdentifierValue, StringValue, StringType, BigIntValue, I64Value, I32Value, I16Value, I8Value } from "../typesystem";
+import {
+    AddressType,
+    AddressValue,
+    BigIntType,
+    BigUIntType,
+    BigUIntValue,
+    BooleanType,
+    BooleanValue,
+    I16Type,
+    I32Type,
+    I64Type,
+    I8Type,
+    NumericalType,
+    NumericalValue,
+    Struct,
+    Field,
+    StructType,
+    TypedValue,
+    U16Type,
+    U32Type,
+    U32Value,
+    U64Type,
+    U64Value,
+    U8Type,
+    U8Value,
+    List,
+    ListType,
+    EnumType,
+    EnumVariantDefinition,
+    EnumValue,
+    ArrayVec,
+    ArrayVecType,
+    U16Value,
+    TokenIdentifierType,
+    TokenIdentifierValue,
+    StringValue,
+    StringType,
+    BigIntValue,
+    I64Value,
+    I32Value,
+    I16Value,
+    I8Value,
+} from "../typesystem";
 import { isMsbOne } from "./utils";
 import { Address } from "../../address";
 import { BytesType, BytesValue } from "../typesystem/bytes";
@@ -24,47 +66,55 @@ describe("test binary codec (basic)", () => {
 
             let [decodedNested, nestedLength] = codec.decodeNested<BooleanValue>(Buffer.from(nested), type);
             assert.instanceOf(decodedNested, BooleanValue);
-            assert.isTrue((decodedNested).equals(value));
+            assert.isTrue(decodedNested.equals(value));
             assert.equal(nestedLength, 1);
 
             let decodedTop = codec.decodeTopLevel<BooleanValue>(Buffer.from(topLevel), type);
             assert.instanceOf(decodedTop, BooleanValue);
-            assert.isTrue((decodedTop).equals(value));
+            assert.isTrue(decodedTop.equals(value));
         }
     });
 
     it("should create numeric values, encode and decode", async () => {
-
         // Small int
 
-        checkNumerical(BigInt(42), new U8Type(), [0x2A], [0x2A]);
-        checkNumerical(BigInt(42), new U16Type(), [0x00, 0x2A], [0x2A]);
-        checkNumerical(BigInt(42), new U64Type(), [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2A], [0x2A]);
-        checkNumerical(BigInt(-10), new I8Type(), [0xF6], [0xF6]);
-        checkNumerical(BigInt(-10), new I16Type(), [0xFF, 0xF6], [0xF6]);
+        checkNumerical(BigInt(42), new U8Type(), [0x2a], [0x2a]);
+        checkNumerical(BigInt(42), new U16Type(), [0x00, 0x2a], [0x2a]);
+        checkNumerical(BigInt(42), new U64Type(), [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2a], [0x2a]);
+        checkNumerical(BigInt(-10), new I8Type(), [0xf6], [0xf6]);
+        checkNumerical(BigInt(-10), new I16Type(), [0xff, 0xf6], [0xf6]);
 
         // BigInt
 
         checkNumerical(BigInt(0), new BigIntType(), [0, 0, 0, 0], []);
         checkNumerical(BigInt(1), new BigIntType(), [0, 0, 0, 1, 0x01], [0x01]);
-        checkNumerical(BigInt(-1), new BigIntType(), [0, 0, 0, 1, 0xFF], [0xFF]);
-        checkNumerical(BigInt(-2), new BigIntType(), [0, 0, 0, 1, 0xFE], [0xFE]);
-        checkNumerical(BigInt(127), new BigIntType(), [0, 0, 0, 1, 0x7F], [0x7F]);
+        checkNumerical(BigInt(-1), new BigIntType(), [0, 0, 0, 1, 0xff], [0xff]);
+        checkNumerical(BigInt(-2), new BigIntType(), [0, 0, 0, 1, 0xfe], [0xfe]);
+        checkNumerical(BigInt(127), new BigIntType(), [0, 0, 0, 1, 0x7f], [0x7f]);
         checkNumerical(BigInt(128), new BigIntType(), [0, 0, 0, 2, 0x00, 0x80], [0x00, 0x80]);
-        checkNumerical(BigInt(255), new BigIntType(), [0, 0, 0, 2, 0x00, 0xFF], [0x00, 0xFF]);
+        checkNumerical(BigInt(255), new BigIntType(), [0, 0, 0, 2, 0x00, 0xff], [0x00, 0xff]);
         checkNumerical(BigInt(256), new BigIntType(), [0, 0, 0, 2, 0x01, 0x00], [0x01, 0x00]);
-        checkNumerical(BigInt(-255), new BigIntType(), [0, 0, 0, 2, 0xFF, 0x01], [0xFF, 0x01]);
-        checkNumerical(BigInt(-257), new BigIntType(), [0, 0, 0, 2, 0xFE, 0xFF], [0xFE, 0xFF]);
+        checkNumerical(BigInt(-255), new BigIntType(), [0, 0, 0, 2, 0xff, 0x01], [0xff, 0x01]);
+        checkNumerical(BigInt(-257), new BigIntType(), [0, 0, 0, 2, 0xfe, 0xff], [0xfe, 0xff]);
 
         // Zero, fixed-size
 
-        [new U8Type(), new I8Type(), new U16Type(), new I16Type(), new U32Type(), new I32Type(), new U64Type(), new I64Type()].forEach(type => {
+        [
+            new U8Type(),
+            new I8Type(),
+            new U16Type(),
+            new I16Type(),
+            new U32Type(),
+            new I32Type(),
+            new U64Type(),
+            new I64Type(),
+        ].forEach((type) => {
             checkNumerical(BigInt(0), type, Array(type.sizeInBytes!).fill(0), []);
         });
 
         // Zero, arbitrary-size (big)
 
-        [new BigIntType(), new BigUIntType()].forEach(type => {
+        [new BigIntType(), new BigUIntType()].forEach((type) => {
             checkNumerical(BigInt(0), type, [0, 0, 0, 0], []);
         });
 
@@ -92,7 +142,10 @@ describe("test binary codec (basic)", () => {
         assert.deepEqual(new U16Value("0xabcdef"), new U16Value(BigInt(0xabcdef)));
         assert.deepEqual(new U8Value("0xabcdef"), new U8Value(BigInt(0xabcdef)));
 
-        assert.deepEqual(new BigIntValue(BigInt("0xabcdefabcdefabcdef")), new BigIntValue(BigInt("0xabcdefabcdefabcdef")));
+        assert.deepEqual(
+            new BigIntValue(BigInt("0xabcdefabcdefabcdef")),
+            new BigIntValue(BigInt("0xabcdefabcdefabcdef")),
+        );
         assert.deepEqual(new I64Value("0xabcdef"), new I64Value(BigInt(0xabcdef)));
         assert.deepEqual(new I32Value("0xabcdef"), new I32Value(BigInt(0xabcdef)));
         assert.deepEqual(new I16Value("0xabcdef"), new I16Value(BigInt(0xabcdef)));
@@ -108,12 +161,18 @@ describe("test binary codec (basic)", () => {
 
         assert.deepEqual(codec.encodeNested(bytesValue), Buffer.from([...length, ...payload]));
         assert.deepEqual(codec.encodeTopLevel(bytesValue), Buffer.from(payload));
-        assert.deepEqual(codec.decodeNested<BytesValue>(Buffer.from([...length, ...payload]), new BytesType()), [bytesValue, 8]);
+        assert.deepEqual(codec.decodeNested<BytesValue>(Buffer.from([...length, ...payload]), new BytesType()), [
+            bytesValue,
+            8,
+        ]);
         assert.deepEqual(codec.decodeTopLevel<BytesValue>(Buffer.from(payload), new BytesType()), bytesValue);
 
         assert.deepEqual(codec.encodeNested(stringValue), Buffer.from([...length, ...payload]));
         assert.deepEqual(codec.encodeTopLevel(stringValue), Buffer.from(payload));
-        assert.deepEqual(codec.decodeNested<StringValue>(Buffer.from([...length, ...payload]), new StringType()), [stringValue, 8]);
+        assert.deepEqual(codec.decodeNested<StringValue>(Buffer.from([...length, ...payload]), new StringType()), [
+            stringValue,
+            8,
+        ]);
         assert.deepEqual(codec.decodeTopLevel<StringValue>(Buffer.from(payload), new StringType()), stringValue);
     });
 });
@@ -121,20 +180,21 @@ describe("test binary codec (basic)", () => {
 describe("test binary codec (advanced)", () => {
     it("should encode / decode lists", async () => {
         let codec = new BinaryCodec();
-        let list = new List(
-            new ListType(new AddressType()),
-            [
-                new AddressValue(new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th")),
-                new AddressValue(new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx")),
-                new AddressValue(new Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"))
-            ]);
+        let list = new List(new ListType(new AddressType()), [
+            new AddressValue(new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th")),
+            new AddressValue(new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx")),
+            new AddressValue(new Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8")),
+        ]);
 
         let bufferNested = codec.encodeNested(list);
         let bufferTopLevel = codec.encodeTopLevel(list);
         assert.equal(bufferNested.length, 4 + list.getLength() * 32);
         assert.equal(bufferTopLevel.length, list.getLength() * 32);
 
-        let [decodedNested, decodedNestedLength] = codec.decodeNested<List>(bufferNested, new ListType(new AddressType()));
+        let [decodedNested, decodedNestedLength] = codec.decodeNested<List>(
+            bufferNested,
+            new ListType(new AddressType()),
+        );
         let decodedTopLevel = codec.decodeTopLevel<List>(bufferTopLevel, new ListType(new AddressType()));
         assert.equal(decodedNestedLength, bufferNested.length);
         assert.equal(decodedNested.getLength(), 3);
@@ -156,21 +216,31 @@ describe("test binary codec (advanced)", () => {
 
         let list = new List(new ListType(new U32Type()), items);
 
-        assert.throws(() => {
-            codec.encodeNested(list);
-        }, errors.ErrCodec, `List too large: ${numItems} > ${codec.constraints.maxListLength}`);
+        assert.throws(
+            () => {
+                codec.encodeNested(list);
+            },
+            errors.ErrCodec,
+            `List too large: ${numItems} > ${codec.constraints.maxListLength}`,
+        );
 
-        assert.throws(() => {
-            codec.encodeTopLevel(list);
-        }, errors.ErrCodec, `List too large: ${numItems} > ${codec.constraints.maxListLength}`);
+        assert.throws(
+            () => {
+                codec.encodeTopLevel(list);
+            },
+            errors.ErrCodec,
+            `List too large: ${numItems} > ${codec.constraints.maxListLength}`,
+        );
     });
 
     it("benchmark: should work well with large lists", async function () {
         let numItems = 2 ** 12;
-        let codec = new BinaryCodec(new BinaryCodecConstraints({
-            maxListLength: numItems,
-            maxBufferLength: numItems * 4 + 4
-        }));
+        let codec = new BinaryCodec(
+            new BinaryCodecConstraints({
+                maxListLength: numItems,
+                maxBufferLength: numItems * 4 + 4,
+            }),
+        );
 
         let items: TypedValue[] = [];
 
@@ -198,10 +268,7 @@ describe("test binary codec (advanced)", () => {
         let length = 20;
         let sizeOfItem = 2; // u16
         let arrayType = new ArrayVecType(length, new U16Type());
-        let array = new ArrayVec(
-            arrayType,
-            Array(length).fill(new U16Value(0xABBA))
-        );
+        let array = new ArrayVec(arrayType, Array(length).fill(new U16Value(0xabba)));
 
         let bufferNested = codec.encodeNested(array);
         let bufferTopLevel = codec.encodeTopLevel(array);
@@ -221,18 +288,15 @@ describe("test binary codec (advanced)", () => {
 
     it("should encode / decode structs", async () => {
         let codec = new BinaryCodec();
-        let fooType = new StructType(
-            "Foo",
-            [
-                new FieldDefinition("token_identifier", "", new TokenIdentifierType()),
-                new FieldDefinition("ticket_price", "", new BigUIntType()),
-                new FieldDefinition("tickets_left", "", new U32Type()),
-                new FieldDefinition("deadline", "", new U64Type()),
-                new FieldDefinition("max_entries_per_user", "", new U32Type()),
-                new FieldDefinition("prize_distribution", "", new BytesType()),
-                new FieldDefinition("prize_pool", "", new BigUIntType())
-            ]
-        );
+        let fooType = new StructType("Foo", [
+            new FieldDefinition("token_identifier", "", new TokenIdentifierType()),
+            new FieldDefinition("ticket_price", "", new BigUIntType()),
+            new FieldDefinition("tickets_left", "", new U32Type()),
+            new FieldDefinition("deadline", "", new U64Type()),
+            new FieldDefinition("max_entries_per_user", "", new U32Type()),
+            new FieldDefinition("prize_distribution", "", new BytesType()),
+            new FieldDefinition("prize_pool", "", new BigUIntType()),
+        ]);
 
         let fooStruct = new Struct(fooType, [
             new Field(new TokenIdentifierValue("lucky-token"), "token_identifier"),
@@ -241,10 +305,12 @@ describe("test binary codec (advanced)", () => {
             new Field(new U64Value(new BigNumber("0x000000005fc2b9db")), "deadline"),
             new Field(new U32Value(0xffffffff), "max_entries_per_user"),
             new Field(new BytesValue(Buffer.from([0x64])), "prize_distribution"),
-            new Field(new BigUIntValue(new BigNumber("94720000000000000000000")), "prize_pool")
+            new Field(new BigUIntValue(new BigNumber("94720000000000000000000")), "prize_pool"),
         ]);
 
-        let encodedExpected = serialized("[0000000b|6c75636b792d746f6b656e] [00000001|01] [00000000] [000000005fc2b9db] [ffffffff] [00000001|64] [0000000a|140ec80fa7ee88000000]");
+        let encodedExpected = serialized(
+            "[0000000b|6c75636b792d746f6b656e] [00000001|01] [00000000] [000000005fc2b9db] [ffffffff] [00000001|64] [0000000a|140ec80fa7ee88000000]",
+        );
         let encoded = codec.encodeNested(fooStruct);
         assert.deepEqual(encoded, encodedExpected);
 
@@ -260,28 +326,27 @@ describe("test binary codec (advanced)", () => {
             deadline: new BigNumber("0x000000005fc2b9db", 16),
             max_entries_per_user: new BigNumber(0xffffffff),
             prize_distribution: Buffer.from([0x64]),
-            prize_pool: new BigNumber("94720000000000000000000")
+            prize_pool: new BigNumber("94720000000000000000000"),
         });
     });
 
     it("should encode / decode structs containing a TokenIdentifier", async () => {
         let codec = new BinaryCodec();
-        let paymentType = new StructType(
-            "Payment",
-            [
-                new FieldDefinition("token_identifier", "", new TokenIdentifierType()),
-                new FieldDefinition("nonce", "", new U64Type()),
-                new FieldDefinition("amount", "", new BigUIntType()),
-            ]
-        );
+        let paymentType = new StructType("Payment", [
+            new FieldDefinition("token_identifier", "", new TokenIdentifierType()),
+            new FieldDefinition("nonce", "", new U64Type()),
+            new FieldDefinition("amount", "", new BigUIntType()),
+        ]);
 
         let paymentStruct = new Struct(paymentType, [
             new Field(new TokenIdentifierValue("TEST-1234"), "token_identifier"),
             new Field(new U64Value(new BigNumber(42)), "nonce"),
-            new Field(new BigUIntValue(new BigNumber("123450000000000000000")), "amount")
+            new Field(new BigUIntValue(new BigNumber("123450000000000000000")), "amount"),
         ]);
 
-        let encodedExpected = serialized("[00000009|544553542d31323334] [000000000000002a] [00000009|06b13680ef11f90000]");
+        let encodedExpected = serialized(
+            "[00000009|544553542d31323334] [000000000000002a] [00000009|06b13680ef11f90000]",
+        );
         let encoded = codec.encodeNested(paymentStruct);
         assert.deepEqual(encoded, encodedExpected);
 
@@ -302,29 +367,29 @@ describe("test binary codec (advanced)", () => {
         let enumType = new EnumType("Colour", [
             new EnumVariantDefinition("Orange", 0),
             new EnumVariantDefinition("Green", 1),
-            new EnumVariantDefinition("Blue", 255)
+            new EnumVariantDefinition("Blue", 255),
         ]);
 
         let orange = EnumValue.fromName(enumType, "Orange");
         let green = EnumValue.fromName(enumType, "Green");
-        let blue = EnumValue.fromName(enumType, "Blue")
+        let blue = EnumValue.fromName(enumType, "Blue");
 
         assert.deepEqual(codec.encodeNested(orange), Buffer.from([0x00]));
         assert.deepEqual(codec.encodeTopLevel(orange), Buffer.from([]));
         assert.deepEqual(codec.encodeNested(green), Buffer.from([0x01]));
         assert.deepEqual(codec.encodeTopLevel(green), Buffer.from([0x01]));
-        assert.deepEqual(codec.encodeNested(blue), Buffer.from([0xFF]));
-        assert.deepEqual(codec.encodeTopLevel(blue), Buffer.from([0xFF]));
+        assert.deepEqual(codec.encodeNested(blue), Buffer.from([0xff]));
+        assert.deepEqual(codec.encodeTopLevel(blue), Buffer.from([0xff]));
 
         assert.isTrue(orange.equals(<EnumValue>codec.decodeTopLevel(Buffer.from([]), enumType)));
         assert.isTrue(green.equals(<EnumValue>codec.decodeTopLevel(Buffer.from([0x01]), enumType)));
-        assert.isTrue(blue.equals(<EnumValue>codec.decodeTopLevel(Buffer.from([0xFF]), enumType)));
+        assert.isTrue(blue.equals(<EnumValue>codec.decodeTopLevel(Buffer.from([0xff]), enumType)));
 
         let [decoded] = codec.decodeNested(Buffer.from([0x00]), enumType);
         assert.deepEqual(decoded, orange);
         [decoded] = codec.decodeNested(Buffer.from([0x01]), enumType);
         assert.deepEqual(decoded, green);
-        [decoded] = codec.decodeNested(Buffer.from([0xFF]), enumType);
+        [decoded] = codec.decodeNested(Buffer.from([0xff]), enumType);
         assert.deepEqual(decoded, blue);
     });
 
@@ -337,35 +402,40 @@ describe("test binary codec (advanced)", () => {
             new FieldDefinition("1", "green component", new U8Type()),
             new FieldDefinition("2", "blue component", new U8Type()),
             new FieldDefinition("3", "hex code", new BytesType()),
-            new FieldDefinition("4", "fruits", typeOfListOfStrings)
+            new FieldDefinition("4", "fruits", typeOfListOfStrings),
         ]);
 
         let blueVariant = new EnumVariantDefinition("Blue", 1, [
             new FieldDefinition("0", "hex code", new BytesType()),
-            new FieldDefinition("1", "fruits", typeOfListOfStrings)
+            new FieldDefinition("1", "fruits", typeOfListOfStrings),
         ]);
 
-        let enumType = new EnumType("Colour", [
-            orangeVariant,
-            blueVariant
-        ]);
+        let enumType = new EnumType("Colour", [orangeVariant, blueVariant]);
 
         let orange = new EnumValue(enumType, orangeVariant, [
             new Field(new U8Value(255), "0"),
             new Field(new U8Value(165), "1"),
             new Field(new U8Value(0), "2"),
             new Field(BytesValue.fromUTF8("#FFA500"), "3"),
-            new Field(new List(typeOfListOfStrings, [BytesValue.fromUTF8("orange"), BytesValue.fromUTF8("persimmon")]), "4")
+            new Field(
+                new List(typeOfListOfStrings, [BytesValue.fromUTF8("orange"), BytesValue.fromUTF8("persimmon")]),
+                "4",
+            ),
         ]);
 
         let blue = new EnumValue(enumType, blueVariant, [
             new Field(BytesValue.fromUTF8("#0000FF"), "0"),
-            new Field(new List(typeOfListOfStrings, [BytesValue.fromUTF8("blueberry"), BytesValue.fromUTF8("plum")]), "1")
+            new Field(
+                new List(typeOfListOfStrings, [BytesValue.fromUTF8("blueberry"), BytesValue.fromUTF8("plum")]),
+                "1",
+            ),
         ]);
 
         // Orange
         // [[discriminant = 0]] [R] [G] [B] [bytes for hex code] [list of 2 elements (fruits)]
-        let orangeEncodedNested = serialized("[[00]] [ff] [a5] [00] [00000007 | 23464641353030] [00000002 | [00000006|6f72616e6765] [00000009|70657273696d6d6f6e]]");
+        let orangeEncodedNested = serialized(
+            "[[00]] [ff] [a5] [00] [00000007 | 23464641353030] [00000002 | [00000006|6f72616e6765] [00000009|70657273696d6d6f6e]]",
+        );
         let orangeEncodedTopLevel = orangeEncodedNested;
         assert.deepEqual(codec.encodeNested(orange), orangeEncodedNested);
         assert.deepEqual(codec.encodeTopLevel(orange), orangeEncodedTopLevel);
@@ -377,7 +447,9 @@ describe("test binary codec (advanced)", () => {
 
         // Blue
         // [[discriminant = 01]] [bytes for hex code] [list of 2 elements (fruits)]
-        let blueEncodedNested = serialized("[[01]] [00000007 | 23303030304646] [ 00000002 | [00000009|626c75656265727279] [00000004|706c756d]]");
+        let blueEncodedNested = serialized(
+            "[[01]] [00000007 | 23303030304646] [ 00000002 | [00000009|626c75656265727279] [00000004|706c756d]]",
+        );
         let blueEncodedTopLevel = blueEncodedNested;
         assert.deepEqual(codec.encodeNested(blue), blueEncodedNested);
         assert.deepEqual(codec.encodeTopLevel(blue), blueEncodedTopLevel);
@@ -397,9 +469,9 @@ function serialized(prettyHex: string): Buffer {
 
 describe("test codec utilities", () => {
     it("should check whether isMsbOne", async () => {
-        assert.isTrue(isMsbOne(Buffer.from([0xFF]), 0));
-        assert.isTrue(isMsbOne(Buffer.from([0x00, 0xFF]), 1));
-        assert.isTrue(isMsbOne(Buffer.from([0x00, 0xFF, 0xFF]), 2));
+        assert.isTrue(isMsbOne(Buffer.from([0xff]), 0));
+        assert.isTrue(isMsbOne(Buffer.from([0x00, 0xff]), 1));
+        assert.isTrue(isMsbOne(Buffer.from([0x00, 0xff, 0xff]), 2));
 
         assert.isFalse(isMsbOne(Buffer.from([1])));
         assert.isFalse(isMsbOne(Buffer.from([2])));

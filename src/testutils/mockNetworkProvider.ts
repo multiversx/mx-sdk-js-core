@@ -35,9 +35,15 @@ export class MockNetworkProvider {
         this.transactions = new Map<string, ITransactionOnNetwork>();
         this.accounts = new Map<string, IAccountOnNetwork>();
 
-        this.accounts.set(MockNetworkProvider.AddressOfAlice.bech32(), { nonce: 0, balance: createAccountBalance(1000) });
+        this.accounts.set(MockNetworkProvider.AddressOfAlice.bech32(), {
+            nonce: 0,
+            balance: createAccountBalance(1000),
+        });
         this.accounts.set(MockNetworkProvider.AddressOfBob.bech32(), { nonce: 5, balance: createAccountBalance(500) });
-        this.accounts.set(MockNetworkProvider.AddressOfCarol.bech32(), { nonce: 42, balance: createAccountBalance(300) });
+        this.accounts.set(MockNetworkProvider.AddressOfCarol.bech32(), {
+            nonce: 42,
+            balance: createAccountBalance(300),
+        });
     }
 
     mockUpdateAccount(address: Address, mutate: (item: IAccountOnNetwork) => void) {

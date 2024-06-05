@@ -28,8 +28,8 @@ export class CountedVariadicType extends Type {
 
 /**
  * An abstraction that represents a sequence of values held under the umbrella of a variadic input / output parameter.
- * 
- * Since at the time of constructing input parameters or decoding output parameters, the length is known, 
+ *
+ * Since at the time of constructing input parameters or decoding output parameters, the length is known,
  * this TypedValue behaves similar to a List.
  */
 export class VariadicValue extends TypedValue {
@@ -37,7 +37,7 @@ export class VariadicValue extends TypedValue {
     private readonly items: TypedValue[];
 
     /**
-     * 
+     *
      * @param type the type of this TypedValue (an instance of VariadicType), not the type parameter of the VariadicType
      * @param items the items, having the type type.getFirstTypeParameter()
      */
@@ -75,7 +75,7 @@ export class VariadicValue extends TypedValue {
     }
 
     valueOf(): any[] {
-        return this.items.map(item => item.valueOf());
+        return this.items.map((item) => item.valueOf());
     }
 
     equals(other: VariadicValue): boolean {

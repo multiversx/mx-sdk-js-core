@@ -21,10 +21,10 @@ describe("test parsers", () => {
                         address: frank.address,
                         identifier: "issue",
                         topics: [createTopic(Buffer.from("FOOBAR"))],
-                        data: ""
-                    }
-                ]
-            }
+                        data: "",
+                    },
+                ],
+            },
         });
 
         assert.equal(outcome.tokenIdentifier, "FOOBAR");
@@ -44,12 +44,12 @@ describe("test parsers", () => {
                             createTopic(Buffer.from("")),
                             createTopic(Buffer.from("")),
                             createTopic(Buffer.from("ESDTRoleLocalMint")),
-                            createTopic(Buffer.from("ESDTRoleLocalBurn"))
+                            createTopic(Buffer.from("ESDTRoleLocalBurn")),
                         ],
-                        data: ""
-                    }
-                ]
-            }
+                        data: "",
+                    },
+                ],
+            },
         });
 
         assert.equal(outcome.tokenIdentifier, "FOOBAR");
@@ -71,10 +71,10 @@ describe("test parsers", () => {
                             createTopic(Buffer.from("")),
                             createTopic(bigIntToBuffer("200")),
                         ],
-                        data: ""
-                    }
-                ]
-            }
+                        data: "",
+                    },
+                ],
+            },
         });
 
         assert.equal(outcome.tokenIdentifier, "FOOBAR");
@@ -97,10 +97,10 @@ describe("test parsers", () => {
                             createTopic(bigIntToBuffer("42")),
                             createTopic(bigIntToBuffer("1")),
                         ],
-                        data: ""
-                    }
-                ]
-            }
+                        data: "",
+                    },
+                ],
+            },
         });
 
         assert.equal(outcome.tokenIdentifier, "FOOBAR");
@@ -110,7 +110,7 @@ describe("test parsers", () => {
 
     function createTopic(value: Buffer): any {
         return {
-            valueOf: () => value
+            valueOf: () => value,
         };
     }
 });

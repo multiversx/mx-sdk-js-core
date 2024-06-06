@@ -1,10 +1,11 @@
 import { Address } from "../address";
-import { CONTRACT_DEPLOY_ADDRESS, VM_TYPE_WASM_VM } from "../constants";
+import { CONTRACT_DEPLOY_ADDRESS_HEX, VM_TYPE_WASM_VM } from "../constants";
 import { Err, ErrBadUsage } from "../errors";
 import { IAddress } from "../interface";
 import { Logger } from "../logger";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
+import { isTyped } from "../smartcontracts/typesystem";
 import { TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { byteArrayToHex, utf8ToHex } from "../utils.codec";
@@ -13,6 +14,7 @@ import { TransactionBuilder } from "./transactionBuilder";
 
 interface IConfig {
     chainID: string;
+    addressHrp: string;
     minGasLimit: bigint;
     gasLimitPerByte: bigint;
     gasLimitClaimDeveloperRewards: bigint;
@@ -21,6 +23,7 @@ interface IConfig {
 
 interface IAbi {
     constructorDefinition: EndpointDefinition;
+    upgradeConstructorDefinition?: EndpointDefinition;
 
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
 }
@@ -33,12 +36,14 @@ export class SmartContractTransactionsFactory {
     private readonly abi?: IAbi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
+    private readonly contractDeployAddress: Address;
 
     constructor(options: { config: IConfig; abi?: IAbi }) {
         this.config = options.config;
         this.abi = options.abi;
         this.tokenComputer = new TokenComputer();
         this.dataArgsBuilder = new TokenTransfersDataBuilder();
+        this.contractDeployAddress = Address.fromHex(CONTRACT_DEPLOY_ADDRESS_HEX, this.config.addressHrp);
     }
 
     createTransactionForDeploy(options: {
@@ -68,7 +73,7 @@ export class SmartContractTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(CONTRACT_DEPLOY_ADDRESS),
+            receiver: this.contractDeployAddress,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
             addDataMovementGas: false,
@@ -171,6 +176,10 @@ export class SmartContractTransactionsFactory {
             return undefined;
         }
 
+        if (this.abi.upgradeConstructorDefinition) {
+            return this.abi.upgradeConstructorDefinition;
+        }
+
         try {
             return this.abi.getEndpoint("upgrade");
         } catch (error) {
@@ -228,12 +237,6 @@ export class SmartContractTransactionsFactory {
     }
 
     private areArgsOfTypedValue(args: any[]): boolean {
-        for (const arg of args) {
-            if (!arg.belongsToTypesystem) {
-                return false;
-            }
-        }
-
-        return true;
+        return args.every((arg) => isTyped(arg));
     }
 }

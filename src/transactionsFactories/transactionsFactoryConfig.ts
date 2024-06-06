@@ -1,4 +1,4 @@
-import { DEFAULT_HRP } from "../constants";
+import { LibraryConfig } from "../config";
 
 export class TransactionsFactoryConfig {
     chainID: string;
@@ -40,7 +40,7 @@ export class TransactionsFactoryConfig {
     constructor(options: { chainID: string }) {
         // General-purpose configuration
         this.chainID = options.chainID;
-        this.addressHrp = DEFAULT_HRP;
+        this.addressHrp = LibraryConfig.DefaultAddressHrp;
         this.minGasLimit = 50000n;
         this.gasLimitPerByte = 1500n;
 

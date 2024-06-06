@@ -1,15 +1,14 @@
-import { INetworkConfig } from "./interfaceOfNetwork";
-import * as errors from "./errors";
 import BigNumber from "bignumber.js";
-import { ITransaction } from "./interface";
-import { ProtoSerializer } from "./proto";
-import { Transaction } from "./transaction";
 import {
-    BECH32_ADDRESS_LENGTH,
     MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS,
     TRANSACTION_OPTIONS_TX_GUARDED,
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
 } from "./constants";
+import * as errors from "./errors";
+import { ITransaction } from "./interface";
+import { INetworkConfig } from "./interfaceOfNetwork";
+import { ProtoSerializer } from "./proto";
+import { Transaction } from "./transaction";
 
 const createTransactionHasher = require("blake2b");
 const createKeccakHash = require("keccak");
@@ -125,14 +124,6 @@ export class TransactionComputer {
     }
 
     private ensureValidTransactionFields(transaction: ITransaction) {
-        if (transaction.sender.length !== BECH32_ADDRESS_LENGTH) {
-            throw new errors.ErrBadUsage("Invalid `sender` field. Should be the bech32 address of the sender.");
-        }
-
-        if (transaction.receiver.length !== BECH32_ADDRESS_LENGTH) {
-            throw new errors.ErrBadUsage("Invalid `receiver` field. Should be the bech32 address of the receiver.");
-        }
-
         if (!transaction.chainID.length) {
             throw new errors.ErrBadUsage("The `chainID` field is not set");
         }

@@ -25,7 +25,7 @@ export class TokenOperationsFactoryConfig {
     gasLimitStorePerByte: IGasLimit = 50000;
     issueCost: BigNumber.Value = "50000000000000000";
     esdtContractAddress: IAddress = Address.fromBech32(
-        "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
+        "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
     );
 
     constructor(chainID: IChainID) {

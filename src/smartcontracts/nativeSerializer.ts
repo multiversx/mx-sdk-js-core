@@ -31,6 +31,7 @@ import {
     I64Value,
     I8Type,
     I8Value,
+    isTyped,
     List,
     ListType,
     NumericalType,
@@ -63,6 +64,7 @@ export namespace NativeTypes {
     export type NativeBuffer = Buffer | string;
     export type NativeBytes = Buffer | { valueOf(): Buffer } | string;
     export type NativeAddress = string | Buffer | IAddress | { getAddress(): IAddress };
+    export type NativeBigNumber = BigNumber.Value | bigint;
 }
 
 export namespace NativeSerializer {
@@ -168,7 +170,7 @@ export namespace NativeSerializer {
     }
 
     function convertToTypedValue(value: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
-        if (value && value.belongsToTypesystem) {
+        if (value && isTyped(value)) {
             // Value is already typed, no need to convert it.
             return value;
         }
@@ -284,7 +286,7 @@ export namespace NativeSerializer {
 
     function toPrimitive(native: any, type: Type, errorContext: ArgumentErrorContext): TypedValue {
         if (type instanceof NumericalType) {
-            let number = new BigNumber(native);
+            const number = new BigNumber(native);
             return convertNumericalType(number, type, errorContext);
         }
         if (type instanceof BytesType) {
@@ -389,7 +391,11 @@ export namespace NativeSerializer {
     }
 
     // TODO: move logic to typesystem/numerical.ts
-    function convertNumericalType(number: BigNumber.Value, type: Type, errorContext: ArgumentErrorContext): TypedValue {
+    function convertNumericalType(
+        number: NativeTypes.NativeBigNumber,
+        type: Type,
+        errorContext: ArgumentErrorContext,
+    ): TypedValue {
         switch (type.constructor) {
             case U8Type:
                 return new U8Value(number);

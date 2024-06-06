@@ -1,5 +1,5 @@
 import { Address } from "../address";
-import { DELEGATION_MANAGER_SC_ADDRESS } from "../constants";
+import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../constants";
 import { Err } from "../errors";
 import { IAddress } from "../interface";
 import { ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../smartcontracts";
@@ -8,6 +8,7 @@ import { TransactionBuilder } from "./transactionBuilder";
 
 interface IConfig {
     chainID: string;
+    addressHrp: string;
     minGasLimit: bigint;
     gasLimitPerByte: bigint;
     gasLimitStake: bigint;
@@ -29,10 +30,12 @@ interface IValidatorPublicKey {
 export class DelegationTransactionsFactory {
     private readonly config: IConfig;
     private readonly argSerializer: ArgSerializer;
+    private readonly delegationManagerAddress: Address;
 
     constructor(options: { config: IConfig }) {
         this.config = options.config;
         this.argSerializer = new ArgSerializer();
+        this.delegationManagerAddress = Address.fromHex(DELEGATION_MANAGER_SC_ADDRESS_HEX, this.config.addressHrp);
     }
 
     createTransactionForNewDelegationContract(options: {
@@ -55,7 +58,7 @@ export class DelegationTransactionsFactory {
         return new TransactionBuilder({
             config: this.config,
             sender: options.sender,
-            receiver: Address.fromBech32(DELEGATION_MANAGER_SC_ADDRESS),
+            receiver: this.delegationManagerAddress,
             dataParts: dataParts,
             gasLimit: executionGasLimit,
             addDataMovementGas: true,

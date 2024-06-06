@@ -1,3 +1,4 @@
+import { UserPublicKey, UserVerifier } from "@multiversx/sdk-wallet";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "./address";
@@ -9,7 +10,6 @@ import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionComputer } from "./transactionComputer";
 import { TransactionPayload } from "./transactionPayload";
-import { UserPublicKey, UserVerifier } from "@multiversx/sdk-wallet/out";
 
 describe("test transaction", async () => {
     let wallets: Record<string, TestWallet>;
@@ -673,10 +673,6 @@ describe("test transaction", async () => {
             gasLimit: 50000n,
             chainID: "",
         });
-
-        assert.throws(() => {
-            transactionComputer.computeBytesForSigning(transaction);
-        }, "Invalid `sender` field. Should be the bech32 address of the sender.");
 
         transaction.sender = wallets.alice.address.toBech32();
 

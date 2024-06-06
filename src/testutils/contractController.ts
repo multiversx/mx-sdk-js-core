@@ -16,14 +16,18 @@ export class ContractController {
         this.parser = new ResultsParser();
         this.provider = provider;
         this.transactionCompletionAwaiter = new TransactionWatcher({
-            getTransaction: async (hash: string) => { return await provider.getTransaction(hash, true) }
+            getTransaction: async (hash: string) => {
+                return await provider.getTransaction(hash, true);
+            },
         });
     }
 
-    async deploy(transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: UntypedOutcomeBundle }> {
+    async deploy(
+        transaction: Transaction,
+    ): Promise<{ transactionOnNetwork: ITransactionOnNetwork; bundle: UntypedOutcomeBundle }> {
         const txHash = await this.provider.sendTransaction(transaction);
         Logger.info(`ContractController.deploy [begin]: transaction = ${txHash}`);
-    
+
         let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(txHash);
         let bundle = this.parser.parseUntypedOutcome(transactionOnNetwork);
 
@@ -31,16 +35,23 @@ export class ContractController {
         return { transactionOnNetwork, bundle };
     }
 
-    async execute(interaction: Interaction, transaction: Transaction): Promise<{ transactionOnNetwork: ITransactionOnNetwork, bundle: TypedOutcomeBundle }> {
+    async execute(
+        interaction: Interaction,
+        transaction: Transaction,
+    ): Promise<{ transactionOnNetwork: ITransactionOnNetwork; bundle: TypedOutcomeBundle }> {
         const txHash = await this.provider.sendTransaction(transaction);
-        Logger.info(`ContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${txHash}`);
+        Logger.info(
+            `ContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${txHash}`,
+        );
 
         interaction.check();
 
         let transactionOnNetwork = await this.transactionCompletionAwaiter.awaitCompleted(txHash);
         let bundle = this.parser.parseOutcome(transactionOnNetwork, interaction.getEndpoint());
 
-        Logger.info(`ContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${txHash}, return code = ${bundle.returnCode}`);
+        Logger.info(
+            `ContractController.execute [end]: function = ${interaction.getFunction()}, transaction = ${txHash}, return code = ${bundle.returnCode}`,
+        );
         return { transactionOnNetwork, bundle };
     }
 
@@ -52,7 +63,9 @@ export class ContractController {
         let queryResponse = await this.provider.queryContract(interaction.buildQuery());
         let bundle = this.parser.parseQueryResponse(queryResponse, interaction.getEndpoint());
 
-        Logger.debug(`ContractController.query [end]: function = ${interaction.getFunction()}, return code = ${bundle.returnCode}`);
+        Logger.debug(
+            `ContractController.query [end]: function = ${interaction.getFunction()}, return code = ${bundle.returnCode}`,
+        );
         return bundle;
     }
 }

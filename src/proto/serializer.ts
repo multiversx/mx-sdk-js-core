@@ -25,15 +25,19 @@ export class ProtoSerializer {
             Nonce: transaction.getNonce().valueOf() ? transaction.getNonce().valueOf() : undefined,
             Value: this.serializeTransactionValue(transaction.getValue()),
             RcvAddr: receiverPubkey,
-            RcvUserName: transaction.getReceiverUsername() ? Buffer.from(transaction.getReceiverUsername()).toString("base64") : undefined,
+            RcvUserName: transaction.getReceiverUsername()
+                ? Buffer.from(transaction.getReceiverUsername()).toString("base64")
+                : undefined,
             SndAddr: senderPubkey,
-            SndUserName: transaction.getSenderUsername() ? Buffer.from(transaction.getSenderUsername()).toString("base64") : undefined,
+            SndUserName: transaction.getSenderUsername()
+                ? Buffer.from(transaction.getSenderUsername()).toString("base64")
+                : undefined,
             GasPrice: transaction.getGasPrice().valueOf(),
             GasLimit: transaction.getGasLimit().valueOf(),
             Data: transaction.getData().length() == 0 ? null : transaction.getData().valueOf(),
             ChainID: Buffer.from(transaction.getChainID().valueOf()),
             Version: transaction.getVersion().valueOf(),
-            Signature: transaction.getSignature()
+            Signature: transaction.getSignature(),
         });
 
         if (transaction.getOptions().valueOf() !== TRANSACTION_OPTIONS_DEFAULT) {

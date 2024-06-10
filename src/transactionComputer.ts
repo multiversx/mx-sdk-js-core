@@ -116,7 +116,38 @@ export class TransactionComputer {
             version: transaction.version,
             options: transaction.options ? transaction.options : undefined,
             guardian: transaction.guardian ? transaction.guardian : undefined,
+            relayer: transaction.relayer ? transaction.relayer : undefined,
+            innerTransactions: transaction.innerTransactions.length
+                ? transaction.innerTransactions.map((tx) => this.toPlainObject(tx))
+                : undefined,
         };
+    }
+
+    private toPlainObject(transaction: ITransaction): any {
+        return {
+            nonce: Number(transaction.nonce),
+            value: transaction.value.toString(),
+            receiver: transaction.receiver,
+            sender: transaction.sender,
+            senderUsername: this.toBase64OrUndefined(transaction.senderUsername),
+            receiverUsername: this.toBase64OrUndefined(transaction.receiverUsername),
+            gasPrice: Number(transaction.gasPrice),
+            gasLimit: Number(transaction.gasLimit),
+            data: this.toBase64OrUndefined(transaction.data),
+            signature: this.toHexOrUndefined(transaction.signature),
+            chainID: transaction.chainID.valueOf(),
+            version: transaction.version,
+            options: transaction.options == 0 ? undefined : transaction.options,
+            guardian: transaction.guardian ? transaction.guardian : undefined,
+            relayer: transaction.relayer ? transaction.relayer : undefined,
+            innerTransactions: transaction.innerTransactions.length
+                ? transaction.innerTransactions.map((tx) => this.toPlainObject(tx))
+                : undefined,
+        };
+    }
+
+    private toHexOrUndefined(value?: Uint8Array) {
+        return value && value.length ? Buffer.from(value).toString("hex") : undefined;
     }
 
     private toBase64OrUndefined(value?: string | Uint8Array) {

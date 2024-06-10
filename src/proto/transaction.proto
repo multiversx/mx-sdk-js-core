@@ -26,5 +26,5 @@ message Transaction {
 	bytes    GuardianAddr                  = 14;
 	bytes    GuardianSignature             = 15;
     bytes    Relayer                       = 16;
-    repeated Transaction InnerTransactions = 17;
+	repeated Transaction InnerTransactions = 17;
 }

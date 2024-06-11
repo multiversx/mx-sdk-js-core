@@ -5,7 +5,7 @@ import { TransactionComputer } from "../transactionComputer";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
-describe("test relayed v1 transaction builder", function () {
+describe("test relayed transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "T" });
     const factory = new RelayedTransactionsFactory({ config: config });
     const transactionComputer = new TransactionComputer();
@@ -300,9 +300,9 @@ describe("test relayed v1 transaction builder", function () {
 
         assert.equal(
             Buffer.from(relayedTransaction.signature).toString("hex"),
-            "6bd446e1f531db190de97adeab7bae3ed332a83d93e47dc29299a0a6868b966b002d0f4395eee450fc89c7677516d7448c6d01245a3fc5c6c65e0bf8dca9540e",
+            "88b9bce6fe62a641fca593f95c12ad09032a44b34c9e5cf16d070f0563b1695bf9d452a9df52bce3373fd5e10ed96c3d65cd189f5873e3a3184a89f4980c9e0c",
         );
-        assert.equal(relayedTransaction.gasLimit, 150000n);
+        assert.equal(relayedTransaction.gasLimit, 100000n);
     });
 
     it("should fail to create relayed v3 transaction", async function () {

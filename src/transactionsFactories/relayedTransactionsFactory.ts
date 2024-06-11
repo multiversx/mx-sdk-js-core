@@ -103,7 +103,7 @@ export class RelayedTransactionsFactory {
         }
 
         const moveBalanceGas = this.config.minGasLimit * BigInt(options.innerTransactions.length);
-        const gasLimit = this.config.minGasLimit + moveBalanceGas + innerTransactionsGasLimit;
+        const gasLimit = moveBalanceGas + innerTransactionsGasLimit;
 
         return new Transaction({
             sender: options.relayerAddress.bech32(),

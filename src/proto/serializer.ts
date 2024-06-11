@@ -1,8 +1,8 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
-import { TRANSACTION_OPTIONS_DEFAULT } from "../constants";
+import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED } from "../constants";
 import * as errors from "../errors";
-import { ITransactionValue } from "../interface";
+import { ITransaction, ITransactionValue } from "../interface";
 import { bigIntToBuffer } from "../smartcontracts/codec/utils";
 import { Transaction } from "../transaction";
 
@@ -17,43 +17,56 @@ export class ProtoSerializer {
      */
     serializeTransaction(transaction: Transaction): Buffer {
         const proto = require("./compiled").proto;
-        const receiverPubkey = new Address(transaction.getReceiver().bech32()).pubkey();
-        const senderPubkey = new Address(transaction.getSender().bech32()).pubkey();
 
-        let protoTransaction = new proto.Transaction({
-            // mx-chain-go's serializer handles nonce == 0 differently, thus we treat 0 as "undefined".
-            Nonce: transaction.getNonce().valueOf() ? transaction.getNonce().valueOf() : undefined,
-            Value: this.serializeTransactionValue(transaction.getValue()),
-            RcvAddr: receiverPubkey,
-            RcvUserName: transaction.getReceiverUsername()
-                ? Buffer.from(transaction.getReceiverUsername()).toString("base64")
-                : undefined,
-            SndAddr: senderPubkey,
-            SndUserName: transaction.getSenderUsername()
-                ? Buffer.from(transaction.getSenderUsername()).toString("base64")
-                : undefined,
-            GasPrice: transaction.getGasPrice().valueOf(),
-            GasLimit: transaction.getGasLimit().valueOf(),
-            Data: transaction.getData().length() == 0 ? null : transaction.getData().valueOf(),
-            ChainID: Buffer.from(transaction.getChainID().valueOf()),
-            Version: transaction.getVersion().valueOf(),
-            Signature: transaction.getSignature(),
-        });
-
-        if (transaction.getOptions().valueOf() !== TRANSACTION_OPTIONS_DEFAULT) {
-            protoTransaction.Options = transaction.getOptions().valueOf();
-        }
-
-        if (transaction.isGuardedTransaction()) {
-            const guardianAddress = transaction.getGuardian();
-            protoTransaction.GuardianAddr = new Address(guardianAddress.bech32()).pubkey();
-            protoTransaction.GuardianSignature = transaction.getGuardianSignature();
-        }
-
+        const protoTransaction = this.convertToProtoMessage(transaction);
         const encoded = proto.Transaction.encode(protoTransaction).finish();
         const buffer = Buffer.from(encoded);
 
         return buffer;
+    }
+
+    private convertToProtoMessage(transaction: ITransaction) {
+        const proto = require("./compiled").proto;
+
+        const receiverPubkey = new Address(transaction.receiver).getPublicKey();
+        const senderPubkey = new Address(transaction.sender).getPublicKey();
+
+        let protoTransaction = new proto.Transaction({
+            // mx-chain-go's serializer handles nonce == 0 differently, thus we treat 0 as "undefined".
+            Nonce: Number(transaction.nonce) ? Number(transaction.nonce) : undefined,
+            Value: this.serializeTransactionValue(transaction.value),
+            RcvAddr: receiverPubkey,
+            RcvUserName: transaction.receiverUsername
+                ? Buffer.from(transaction.receiverUsername).toString("base64")
+                : undefined,
+            SndAddr: senderPubkey,
+            SndUserName: transaction.senderUsername
+                ? Buffer.from(transaction.senderUsername).toString("base64")
+                : undefined,
+            GasPrice: Number(transaction.gasPrice),
+            GasLimit: Number(transaction.gasLimit),
+            Data: transaction.data.length == 0 ? null : transaction.data,
+            ChainID: Buffer.from(transaction.chainID),
+            Version: transaction.version,
+            Signature: transaction.signature,
+        });
+
+        if (transaction.options !== TRANSACTION_OPTIONS_DEFAULT) {
+            protoTransaction.Options = transaction.options;
+        }
+
+        if (this.isGuardedTransaction(transaction)) {
+            protoTransaction.GuardianAddr = new Address(transaction.guardian).getPublicKey();
+            protoTransaction.GuardianSignature = transaction.guardianSignature;
+        }
+
+        if (transaction.relayer) {
+            protoTransaction.Relayer = new Address(transaction.relayer).getPublicKey();
+        }
+
+        protoTransaction.InnerTransactions = transaction.innerTransactions.map((tx) => this.convertToProtoMessage(tx));
+
+        return protoTransaction;
     }
 
     /**
@@ -70,6 +83,16 @@ export class ProtoSerializer {
         // We prepend the "positive" sign marker, in order to be compatible with mx-chain-go's "sign & magnitude" proto-representation (a custom one).
         buffer = Buffer.concat([Buffer.from([0x00]), buffer]);
         return buffer;
+    }
+
+    private isGuardedTransaction(transaction: ITransaction): boolean {
+        const hasGuardian = transaction.guardian.length > 0;
+        const hasGuardianSignature = transaction.guardianSignature.length > 0;
+        return this.isWithGuardian(transaction) && hasGuardian && hasGuardianSignature;
+    }
+
+    private isWithGuardian(transaction: ITransaction): boolean {
+        return (transaction.options & TRANSACTION_OPTIONS_TX_GUARDED) == TRANSACTION_OPTIONS_TX_GUARDED;
     }
 
     deserializeTransaction(_buffer: Buffer): Transaction {

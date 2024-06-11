@@ -49,7 +49,7 @@ export class TransactionComputer {
     computeBytesForSigning(transaction: ITransaction): Uint8Array {
         this.ensureValidTransactionFields(transaction);
 
-        const plainTransaction = this.toPlainObjectForSigning(transaction);
+        const plainTransaction = this.toPlainObject(transaction);
         const serialized = JSON.stringify(plainTransaction);
         return new Uint8Array(Buffer.from(serialized));
     }
@@ -64,7 +64,7 @@ export class TransactionComputer {
     }
 
     computeHashForSigning(transaction: ITransaction): Uint8Array {
-        const plainTransaction = this.toPlainObjectForSigning(transaction);
+        const plainTransaction = this.toPlainObject(transaction);
         const signable = Buffer.from(JSON.stringify(plainTransaction));
         return createKeccakHash("keccak256").update(signable).digest();
     }
@@ -101,8 +101,8 @@ export class TransactionComputer {
         transaction.options = transaction.options | TRANSACTION_OPTIONS_TX_HASH_SIGN;
     }
 
-    private toPlainObjectForSigning(transaction: ITransaction) {
-        return {
+    private toPlainObject(transaction: ITransaction, withSignature?: boolean) {
+        let obj: any = {
             nonce: Number(transaction.nonce),
             value: transaction.value.toString(),
             receiver: transaction.receiver,
@@ -112,11 +112,26 @@ export class TransactionComputer {
             gasPrice: Number(transaction.gasPrice),
             gasLimit: Number(transaction.gasLimit),
             data: this.toBase64OrUndefined(transaction.data),
-            chainID: transaction.chainID,
-            version: transaction.version,
-            options: transaction.options ? transaction.options : undefined,
-            guardian: transaction.guardian ? transaction.guardian : undefined,
         };
+
+        if (withSignature) {
+            obj.signature = this.toHexOrUndefined(transaction.signature);
+        }
+
+        obj.chainID = transaction.chainID;
+        obj.version = transaction.version;
+        obj.options = transaction.options ? transaction.options : undefined;
+        obj.guardian = transaction.guardian ? transaction.guardian : undefined;
+        obj.relayer = transaction.relayer ? transaction.relayer : undefined;
+        obj.innerTransactions = transaction.innerTransactions.length
+            ? transaction.innerTransactions.map((tx) => this.toPlainObject(tx, true))
+            : undefined;
+
+        return obj;
+    }
+
+    private toHexOrUndefined(value?: Uint8Array) {
+        return value && value.length ? Buffer.from(value).toString("hex") : undefined;
     }
 
     private toBase64OrUndefined(value?: string | Uint8Array) {

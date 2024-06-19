@@ -1,5 +1,6 @@
 import { Address } from "../address";
 import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
+import { ErrInvalidArgument } from "../errors";
 import { IAddress } from "../interface";
 import { Logger } from "../logger";
 import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../smartcontracts";
@@ -402,6 +403,10 @@ export class TokenManagementTransactionsFactory {
         attributes: Uint8Array;
         uris: string[];
     }): Transaction {
+        if (!options.uris.length) {
+            throw new ErrInvalidArgument("'uris'. Minimum one uri must be provided.");
+        }
+
         const dataParts = [
             "ESDTNFTCreate",
             ...this.argSerializer.valuesToStrings([

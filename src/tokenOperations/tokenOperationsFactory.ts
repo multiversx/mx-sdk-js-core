@@ -6,6 +6,7 @@ import { TransactionOptions, TransactionVersion } from "../networkParams";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { addressToHex, bigIntToHex, bufferToHex, utf8ToHex } from "./codec";
+import { ErrInvalidArgument } from "../errors";
 
 interface IConfig {
     chainID: IChainID;
@@ -461,6 +462,10 @@ Once the token is registered, you can unset this role by calling "unsetBurnRoleG
     }
 
     nftCreate(args: INFTCreateArgs): Transaction {
+        if (!args.uris.length) {
+            throw new ErrInvalidArgument("'uris'. Minimum one uri must be provided.");
+        }
+
         const parts = [
             "ESDTNFTCreate",
             utf8ToHex(args.tokenIdentifier),

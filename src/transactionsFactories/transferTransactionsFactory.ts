@@ -1,3 +1,4 @@
+import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
 import { Err, ErrBadUsage } from "../errors";
 import {
     IAddress,
@@ -18,7 +19,7 @@ import {
     U16Value,
     U64Value,
 } from "../smartcontracts";
-import { TokenComputer, TokenTransfer } from "../tokens";
+import { Token, TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
@@ -53,7 +54,7 @@ export class TransferTransactionsFactory {
     private readonly gasEstimator?: IGasEstimator;
 
     /**
-     * Should be instantiated using `Config` and `TokenComputer`.
+     * Should be instantiated using `Config`.
      * Instantiating this class using GasEstimator represents the legacy version of this class.
      * The legacy version contains methods like `createEGLDTransfer`, `createESDTTransfer`, `createESDTNFTTransfer` and `createMultiESDTNFTTransfer`.
      * This was done in order to minimize breaking changes in client code.
@@ -82,17 +83,9 @@ export class TransferTransactionsFactory {
         return this.gasEstimator !== undefined;
     }
 
-    private ensureMembersAreDefined() {
+    private ensureConfigIsDefined() {
         if (this.config === undefined) {
             throw new Err("'config' is not defined");
-        }
-
-        if (this.tokenTransfersDataBuilder === undefined) {
-            throw new Err("`dataArgsBuilder is not defined`");
-        }
-
-        if (this.tokenComputer === undefined) {
-            throw new Err("`tokenComputer is not defined`");
         }
     }
 
@@ -102,7 +95,7 @@ export class TransferTransactionsFactory {
         nativeAmount: bigint;
         data?: Uint8Array;
     }): Transaction {
-        this.ensureMembersAreDefined();
+        this.ensureConfigIsDefined();
 
         const data = options.data || new Uint8Array();
 
@@ -121,7 +114,7 @@ export class TransferTransactionsFactory {
         receiver: IAddress;
         tokenTransfers: TokenTransfer[];
     }): Transaction {
-        this.ensureMembersAreDefined();
+        this.ensureConfigIsDefined();
 
         const numberOfTransfers = options.tokenTransfers.length;
 
@@ -150,6 +143,53 @@ export class TransferTransactionsFactory {
             gasLimit: extraGasForTransfer,
             addDataMovementGas: true,
         }).build();
+    }
+
+    createTransactionForTokenTransfer(options: {
+        sender: IAddress;
+        receiver: IAddress;
+        nativeAmount?: bigint;
+        tokenTransfers?: TokenTransfer[];
+        data?: Uint8Array;
+    }): Transaction {
+        if (!options.nativeAmount && !options.tokenTransfers?.length) {
+            throw new ErrBadUsage("No native token amount or token transfers provided");
+        }
+
+        if (options.tokenTransfers?.length && options.data?.length) {
+            throw new ErrBadUsage("Can't set data field when sending esdt tokens");
+        }
+
+        if (options.nativeAmount && !options.tokenTransfers) {
+            return this.createTransactionForNativeTokenTransfer({
+                sender: options.sender,
+                receiver: options.receiver,
+                nativeAmount: options.nativeAmount,
+                data: options.data,
+            });
+        }
+
+        if (options.tokenTransfers?.length && !options.nativeAmount) {
+            return this.createTransactionForESDTTokenTransfer({
+                sender: options.sender,
+                receiver: options.receiver,
+                tokenTransfers: options.tokenTransfers,
+            });
+        }
+
+        //  if the method does not return until here it means both nativeAmount and tokenTransfers have been provided
+        const nativeAmount = options.nativeAmount || 0n;
+        let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
+
+        const nativeToken = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
+        const nativeTransfer = new TokenTransfer({ token: nativeToken, amount: nativeAmount });
+
+        tokenTransfers.push(nativeTransfer);
+        return this.createTransactionForESDTTokenTransfer({
+            sender: options.sender,
+            receiver: options.receiver,
+            tokenTransfers: tokenTransfers,
+        });
     }
 
     /**
@@ -336,7 +376,7 @@ export class TransferTransactionsFactory {
         receiver: IAddress;
         tokenTransfers: TokenTransfer[];
     }): Transaction {
-        this.ensureMembersAreDefined();
+        this.ensureConfigIsDefined();
 
         let dataParts: string[] = [];
         const transfer = options.tokenTransfers[0];

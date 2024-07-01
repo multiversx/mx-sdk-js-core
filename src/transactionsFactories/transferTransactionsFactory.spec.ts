@@ -121,7 +121,7 @@ describe("test transfer transactions factory", function () {
 
     it("should fail to create transaction for token transfers", async () => {
         assert.throws(() => {
-            transferFactory.createTransactionForTokenTransfer({
+            transferFactory.createTransactionForTransfer({
                 sender: alice,
                 receiver: bob,
             });
@@ -131,7 +131,7 @@ describe("test transfer transactions factory", function () {
             const nft = new Token({ identifier: "NFT-123456", nonce: 10n });
             const transfer = new TokenTransfer({ token: nft, amount: 1n });
 
-            transferFactory.createTransactionForTokenTransfer({
+            transferFactory.createTransactionForTransfer({
                 sender: alice,
                 receiver: bob,
                 tokenTransfers: [transfer],
@@ -147,7 +147,7 @@ describe("test transfer transactions factory", function () {
         const secondNft = new Token({ identifier: "TEST-987654", nonce: 1n });
         const secondTransfer = new TokenTransfer({ token: secondNft, amount: 1n });
 
-        const transaction = transferFactory.createTransactionForTokenTransfer({
+        const transaction = transferFactory.createTransactionForTransfer({
             sender: alice,
             receiver: bob,
             nativeAmount: 1000000000000000000n,

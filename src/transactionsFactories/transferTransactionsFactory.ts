@@ -145,7 +145,7 @@ export class TransferTransactionsFactory {
         }).build();
     }
 
-    createTransactionForTokenTransfer(options: {
+    createTransactionForTransfer(options: {
         sender: IAddress;
         receiver: IAddress;
         nativeAmount?: bigint;
@@ -169,27 +169,25 @@ export class TransferTransactionsFactory {
             });
         }
 
-        if (options.tokenTransfers?.length && !options.nativeAmount) {
-            return this.createTransactionForESDTTokenTransfer({
-                sender: options.sender,
-                receiver: options.receiver,
-                tokenTransfers: options.tokenTransfers,
-            });
-        }
-
-        //  if the method does not return until here it means both nativeAmount and tokenTransfers have been provided
-        const nativeAmount = options.nativeAmount || 0n;
         let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
 
-        const nativeToken = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
-        const nativeTransfer = new TokenTransfer({ token: nativeToken, amount: nativeAmount });
+        const nativeTransfer = this.createNativeTransfer(options.nativeAmount);
+        nativeTransfer ? tokenTransfers.push(nativeTransfer) : null;
 
-        tokenTransfers.push(nativeTransfer);
         return this.createTransactionForESDTTokenTransfer({
             sender: options.sender,
             receiver: options.receiver,
             tokenTransfers: tokenTransfers,
         });
+    }
+
+    private createNativeTransfer(nativeAmount?: bigint): TokenTransfer | undefined {
+        if (!nativeAmount) {
+            return undefined;
+        }
+
+        const nativeToken = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
+        return new TokenTransfer({ token: nativeToken, amount: nativeAmount });
     }
 
     /**

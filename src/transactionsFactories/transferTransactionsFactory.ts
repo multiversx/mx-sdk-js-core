@@ -171,7 +171,7 @@ export class TransferTransactionsFactory {
 
         let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
 
-        const nativeTransfer = this.createNativeTransfer(options.nativeAmount);
+        const nativeTransfer = options.nativeAmount ? TokenTransfer.newFromEgldAmount(options.nativeAmount) : undefined;
         nativeTransfer ? tokenTransfers.push(nativeTransfer) : null;
 
         return this.createTransactionForESDTTokenTransfer({
@@ -179,15 +179,6 @@ export class TransferTransactionsFactory {
             receiver: options.receiver,
             tokenTransfers: tokenTransfers,
         });
-    }
-
-    private createNativeTransfer(nativeAmount?: bigint): TokenTransfer | undefined {
-        if (!nativeAmount) {
-            return undefined;
-        }
-
-        const nativeToken = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
-        return new TokenTransfer({ token: nativeToken, amount: nativeAmount });
     }
 
     /**

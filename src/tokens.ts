@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 import { ErrInvalidArgument, ErrInvalidTokenIdentifier } from "./errors";
+import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "./constants";
 
 // Legacy constants:
 const EGLDTokenIdentifier = "EGLD";
@@ -82,6 +83,11 @@ export class TokenTransfer {
             this.amountAsBigInteger = new BigNumber(this.amount.toString());
             this.numDecimals = 0;
         }
+    }
+
+    static newFromEgldAmount(amount: bigint): TokenTransfer {
+        const token = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
+        return new TokenTransfer({ token, amount });
     }
 
     private isLegacyTokenTransferOptions(options: any): options is ILegacyTokenTransferOptions {

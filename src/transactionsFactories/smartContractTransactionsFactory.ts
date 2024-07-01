@@ -96,8 +96,7 @@ export class SmartContractTransactionsFactory {
         let numberOfTokens = tokenTransfers.length;
 
         if (nativeTransferAmount && numberOfTokens) {
-            const nativeToken = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
-            const nativeTransfer = new TokenTransfer({ token: nativeToken, amount: nativeTransferAmount });
+            const nativeTransfer = TokenTransfer.newFromEgldAmount(nativeTransferAmount);
             tokenTransfers.push(nativeTransfer);
 
             nativeTransferAmount = 0n;

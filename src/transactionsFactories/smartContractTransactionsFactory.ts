@@ -1,12 +1,12 @@
 import { Address } from "../address";
-import { CONTRACT_DEPLOY_ADDRESS_HEX, EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER, VM_TYPE_WASM_VM } from "../constants";
+import { CONTRACT_DEPLOY_ADDRESS_HEX, VM_TYPE_WASM_VM } from "../constants";
 import { Err } from "../errors";
 import { IAddress } from "../interface";
 import { Logger } from "../logger";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
 import { NativeSerializer } from "../smartcontracts/nativeSerializer";
 import { isTyped } from "../smartcontracts/typesystem";
-import { Token, TokenComputer, TokenTransfer } from "../tokens";
+import { TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { byteArrayToHex, utf8ToHex } from "../utils.codec";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";

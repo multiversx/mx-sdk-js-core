@@ -1,4 +1,3 @@
-import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
 import { Err, ErrBadUsage } from "../errors";
 import {
     IAddress,
@@ -19,7 +18,7 @@ import {
     U16Value,
     U64Value,
 } from "../smartcontracts";
-import { Token, TokenComputer, TokenTransfer } from "../tokens";
+import { TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";

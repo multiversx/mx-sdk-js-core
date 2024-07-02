@@ -151,26 +151,28 @@ export class TransferTransactionsFactory {
         tokenTransfers?: TokenTransfer[];
         data?: Uint8Array;
     }): Transaction {
-        if (!options.nativeAmount && !options.tokenTransfers?.length) {
+        const nativeAmount = options.nativeAmount ?? 0n;
+        let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
+        const numberOfTokens = tokenTransfers.length;
+
+        if (!nativeAmount && !numberOfTokens) {
             throw new ErrBadUsage("No native token amount or token transfers provided");
         }
 
-        if (options.tokenTransfers?.length && options.data?.length) {
+        if (numberOfTokens && options.data?.length) {
             throw new ErrBadUsage("Can't set data field when sending esdt tokens");
         }
 
-        if (options.nativeAmount && !options.tokenTransfers) {
+        if (nativeAmount && !tokenTransfers) {
             return this.createTransactionForNativeTokenTransfer({
                 sender: options.sender,
                 receiver: options.receiver,
-                nativeAmount: options.nativeAmount,
+                nativeAmount: nativeAmount,
                 data: options.data,
             });
         }
 
-        let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
-
-        const nativeTransfer = options.nativeAmount ? TokenTransfer.newFromEgldAmount(options.nativeAmount) : undefined;
+        const nativeTransfer = nativeAmount ? TokenTransfer.newFromEgldAmount(nativeAmount) : undefined;
         nativeTransfer ? tokenTransfers.push(nativeTransfer) : null;
 
         return this.createTransactionForESDTTokenTransfer({

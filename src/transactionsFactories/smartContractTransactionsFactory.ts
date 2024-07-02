@@ -91,7 +91,7 @@ export class SmartContractTransactionsFactory {
         tokenTransfers?: TokenTransfer[];
     }): Transaction {
         const args = options.arguments || [];
-        let tokenTransfers = options.tokenTransfers || [];
+        let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
         let nativeTransferAmount = options.nativeTransferAmount ?? 0n;
         let numberOfTokens = tokenTransfers.length;
 

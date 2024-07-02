@@ -316,6 +316,55 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(transaction, transactionAbiAware);
     });
 
+    it("should create 'Transaction' for execute and transfer native and nfts", async function () {
+        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        const func = "add";
+        const gasLimit = 6000000n;
+        const args = [new U32Value(7)];
+
+        const firstToken = new Token({ identifier: "NFT-123456", nonce: 1n });
+        const firstTransfer = new TokenTransfer({ token: firstToken, amount: 1n });
+        const secondToken = new Token({ identifier: "NFT-123456", nonce: 42n });
+        const secondTransfer = new TokenTransfer({ token: secondToken, amount: 1n });
+
+        const transaction = factory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            function: func,
+            gasLimit: gasLimit,
+            arguments: args,
+            nativeTransferAmount: 1000000000000000000n,
+            tokenTransfers: [firstTransfer, secondTransfer],
+        });
+
+        const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
+            sender: sender,
+            contract: contract,
+            function: func,
+            gasLimit: gasLimit,
+            arguments: args,
+            nativeTransferAmount: 1000000000000000000n,
+            tokenTransfers: [firstTransfer, secondTransfer],
+        });
+
+        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+
+        assert.isDefined(transaction.data);
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from(
+                "MultiESDTNFTTransfer@00000000000000000500b9353fe8407f87310c87e12fa1ac807f0485da39d152@03@4e46542d313233343536@01@01@4e46542d313233343536@2a@01@45474c442d303030303030@@0de0b6b3a7640000@616464@07",
+            ),
+        );
+
+        assert.equal(transaction.gasLimit, gasLimit);
+        assert.equal(transaction.value, 0n);
+
+        assert.deepEqual(transaction, transactionAbiAware);
+    });
+
     it("should create 'Transaction' for upgrade", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");

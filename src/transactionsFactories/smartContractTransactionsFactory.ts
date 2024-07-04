@@ -96,9 +96,7 @@ export class SmartContractTransactionsFactory {
         let numberOfTokens = tokenTransfers.length;
 
         if (nativeTransferAmount && numberOfTokens) {
-            const nativeTransfer = TokenTransfer.newFromEgldAmount(nativeTransferAmount);
-            tokenTransfers.push(nativeTransfer);
-
+            tokenTransfers.push(TokenTransfer.newFromEgldAmount(nativeTransferAmount));
             nativeTransferAmount = 0n;
             numberOfTokens++;
         }

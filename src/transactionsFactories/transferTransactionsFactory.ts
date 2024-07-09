@@ -155,15 +155,11 @@ export class TransferTransactionsFactory {
         let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
         const numberOfTokens = tokenTransfers.length;
 
-        if (!nativeAmount && numberOfTokens === 0) {
-            throw new ErrBadUsage("No native token amount or token transfers provided");
-        }
-
         if (numberOfTokens && options.data?.length) {
             throw new ErrBadUsage("Can't set data field when sending esdt tokens");
         }
 
-        if (nativeAmount && numberOfTokens === 0) {
+        if ((nativeAmount && numberOfTokens === 0) || options.data) {
             return this.createTransactionForNativeTokenTransfer({
                 sender: options.sender,
                 receiver: options.receiver,

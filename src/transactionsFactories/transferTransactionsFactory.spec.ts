@@ -117,16 +117,17 @@ describe("test transfer transactions factory", function () {
             transaction.data.toString(),
             "MultiESDTNFTTransfer@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@02@4e46542d313233343536@0a@01@544553542d393837363534@01@01",
         );
+
+        const secondTransaction = transferFactory.createTransactionForTransfer({
+            sender: alice,
+            receiver: bob,
+            tokenTransfers: [firstTransfer, secondTransfer],
+        });
+
+        assert.deepEqual(transaction, secondTransaction);
     });
 
     it("should fail to create transaction for token transfers", async () => {
-        assert.throws(() => {
-            transferFactory.createTransactionForTransfer({
-                sender: alice,
-                receiver: bob,
-            });
-        }, "No native token amount or token transfers provided");
-
         assert.throws(() => {
             const nft = new Token({ identifier: "NFT-123456", nonce: 10n });
             const transfer = new TokenTransfer({ token: nft, amount: 1n });
@@ -140,7 +141,48 @@ describe("test transfer transactions factory", function () {
         }, "Can't set data field when sending esdt tokens");
     });
 
-    it("should create 'Transaction' for token transfers", async () => {
+    it("should create transaction for native transfers", async () => {
+        const transaction = transferFactory.createTransactionForTransfer({
+            sender: alice,
+            receiver: bob,
+            nativeAmount: 1000000000000000000n,
+        });
+
+        assert.equal(transaction.sender, alice.toBech32());
+        assert.equal(transaction.receiver, bob.toBech32());
+        assert.equal(transaction.value.valueOf(), 1000000000000000000n);
+        assert.equal(transaction.gasLimit.valueOf(), 50000n);
+    });
+
+    it("should create transaction for native transfers and set data field", async () => {
+        const transaction = transferFactory.createTransactionForTransfer({
+            sender: alice,
+            receiver: bob,
+            nativeAmount: 1000000000000000000n,
+            data: Buffer.from("hello"),
+        });
+
+        assert.equal(transaction.sender, alice.toBech32());
+        assert.equal(transaction.receiver, bob.toBech32());
+        assert.equal(transaction.value.valueOf(), 1000000000000000000n);
+        assert.equal(transaction.gasLimit.valueOf(), 57500n);
+        assert.deepEqual(transaction.data, Buffer.from("hello"));
+    });
+
+    it("should create transaction for notarizing", async () => {
+        const transaction = transferFactory.createTransactionForTransfer({
+            sender: alice,
+            receiver: bob,
+            data: Buffer.from("hello"),
+        });
+
+        assert.equal(transaction.sender, alice.toBech32());
+        assert.equal(transaction.receiver, bob.toBech32());
+        assert.equal(transaction.gasLimit.valueOf(), 57500n);
+        assert.deepEqual(transaction.data, Buffer.from("hello"));
+    });
+
+    it("should create transaction for token transfers", async () => {
         const firstNft = new Token({ identifier: "NFT-123456", nonce: 10n });
         const firstTransfer = new TokenTransfer({ token: firstNft, amount: 1n });
 

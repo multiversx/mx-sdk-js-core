@@ -5,7 +5,7 @@ name: Build and Test
 
 on:
   pull_request:
-    branches: [ main, development, feat/* ]
+    branches: [ main, development, feat/*, release/* ]
   workflow_dispatch:
 
 jobs:
@@ -25,5 +25,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run compile
+    - run: npm install esmify
     - run: npm run compile-browser
     - run: npm test

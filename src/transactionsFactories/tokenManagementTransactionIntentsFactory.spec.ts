@@ -1,8 +1,9 @@
 import { assert } from "chai";
-import { ESDT_CONTRACT_ADDRESS } from "../constants";
+import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { TokenManagementTransactionsFactory } from "./tokenManagementTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
+import { Address } from "../address";
 
 describe("test token management transactions factory", () => {
     let frank: TestWallet, grace: TestWallet;
@@ -53,7 +54,7 @@ describe("test token management transactions factory", () => {
             ),
         );
         assert.equal(transaction.sender, frank.address.toString());
-        assert.equal(transaction.receiver, ESDT_CONTRACT_ADDRESS);
+        assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
@@ -78,7 +79,7 @@ describe("test token management transactions factory", () => {
             ),
         );
         assert.equal(transaction.sender, frank.address.toString());
-        assert.equal(transaction.receiver, ESDT_CONTRACT_ADDRESS);
+        assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
@@ -103,7 +104,7 @@ describe("test token management transactions factory", () => {
             ),
         );
         assert.equal(transaction.sender, frank.address.toString());
-        assert.equal(transaction.receiver, ESDT_CONTRACT_ADDRESS);
+        assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
@@ -129,7 +130,7 @@ describe("test token management transactions factory", () => {
             ),
         );
         assert.equal(transaction.sender, frank.address.toString());
-        assert.equal(transaction.receiver, ESDT_CONTRACT_ADDRESS);
+        assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
@@ -150,7 +151,7 @@ describe("test token management transactions factory", () => {
             ),
         );
         assert.equal(transaction.sender, frank.address.toString());
-        assert.equal(transaction.receiver, ESDT_CONTRACT_ADDRESS);
+        assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
         assert.equal(transaction.value, 0n);
     });
 
@@ -171,7 +172,7 @@ describe("test token management transactions factory", () => {
             ),
         );
         assert.equal(transaction.sender, frank.address.toString());
-        assert.equal(transaction.receiver, ESDT_CONTRACT_ADDRESS);
+        assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
         assert.equal(transaction.value, 0n);
     });
 
@@ -194,7 +195,7 @@ describe("test token management transactions factory", () => {
             ),
         );
         assert.equal(transaction.sender, frank.address.toString());
-        assert.equal(transaction.receiver, ESDT_CONTRACT_ADDRESS);
+        assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
         assert.equal(transaction.value, 0n);
     });
 
@@ -217,5 +218,159 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.sender, grace.address.toString());
         assert.equal(transaction.receiver, grace.address.toString());
         assert.equal(transaction.value, 0n);
+    });
+
+    it("should create 'Transaction' for modifying royalties", () => {
+        const transaction = tokenManagementFactory.createTransactionForModifyingRoyalties({
+            sender: grace.address,
+            tokenIdentifier: "TEST-123456",
+            tokenNonce: 1n,
+            royalties: 1234n,
+        });
+
+        assert.deepEqual(transaction.data, Buffer.from("ESDTModifyRoyalties@544553542d313233343536@01@04d2"));
+        assert.equal(transaction.sender, grace.address.toString());
+        assert.equal(transaction.receiver, grace.address.toString());
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.gasLimit, 60125000n);
+    });
+
+    it("should create 'Transaction' for setting new uris", () => {
+        const transaction = tokenManagementFactory.createTransactionForSettingNewUris({
+            sender: grace.address,
+            tokenIdentifier: "TEST-123456",
+            tokenNonce: 1n,
+            uris: ["firstURI", "secondURI"],
+        });
+
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from("ESDTSetNewURIs@544553542d313233343536@01@6669727374555249@7365636f6e64555249"),
+        );
+        assert.equal(transaction.sender, grace.address.toString());
+        assert.equal(transaction.receiver, grace.address.toString());
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.gasLimit, 60164000n);
+    });
+
+    it("should create 'Transaction' for modifying creator", () => {
+        const transaction = tokenManagementFactory.createTransactionForModifyingCreator({
+            sender: grace.address,
+            tokenIdentifier: "TEST-123456",
+            tokenNonce: 1n,
+        });
+
+        assert.deepEqual(transaction.data, Buffer.from("ESDTModifyCreator@544553542d313233343536@01"));
+        assert.equal(transaction.sender, grace.address.toString());
+        assert.equal(transaction.receiver, grace.address.toString());
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.gasLimit, 60114500n);
+    });
+
+    it("should create 'Transaction' for updating metadata", () => {
+        const transaction = tokenManagementFactory.createTransactionForUpdatingMetadata({
+            sender: grace.address,
+            tokenIdentifier: "TEST-123456",
+            tokenNonce: 1n,
+            tokenName: "Test",
+            royalties: 1234n,
+            hash: "abba",
+            attributes: Buffer.from("test"),
+            uris: ["firstURI", "secondURI"],
+        });
+
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from(
+                "ESDTMetaDataUpdate@544553542d313233343536@01@54657374@04d2@61626261@74657374@6669727374555249@7365636f6e64555249",
+            ),
+        );
+        assert.equal(transaction.sender, grace.address.toString());
+        assert.equal(transaction.receiver, grace.address.toString());
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.gasLimit, 60218000n);
+    });
+
+    it("should create 'Transaction' for recreating metadata", () => {
+        const transaction = tokenManagementFactory.createTransactionForNftMetadataRecreate({
+            sender: grace.address,
+            tokenIdentifier: "TEST-123456",
+            tokenNonce: 1n,
+            tokenName: "Test",
+            royalties: 1234n,
+            hash: "abba",
+            attributes: Buffer.from("test"),
+            uris: ["firstURI", "secondURI"],
+        });
+
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from(
+                "ESDTMetaDataRecreate@544553542d313233343536@01@54657374@04d2@61626261@74657374@6669727374555249@7365636f6e64555249",
+            ),
+        );
+        assert.equal(transaction.sender, grace.address.toString());
+        assert.equal(transaction.receiver, grace.address.toString());
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.gasLimit, 60221000n);
+    });
+
+    it("should create 'Transaction' for changing to dynamic", () => {
+        const transaction = tokenManagementFactory.createTransactionForMakingTokenDynamic({
+            sender: grace.address,
+            tokenIdentifier: "TEST-123456",
+        });
+
+        assert.deepEqual(transaction.data, Buffer.from("changeToDynamic@544553542d313233343536"));
+        assert.equal(transaction.sender, grace.address.toString());
+        assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.gasLimit, 60107000n);
+    });
+
+    it("should create 'Transaction' for updating token id", () => {
+        const transaction = tokenManagementFactory.createTransactionForUpdatingTokenId({
+            sender: grace.address,
+            tokenIdentifier: "TEST-123456",
+        });
+
+        assert.deepEqual(transaction.data, Buffer.from("updateTokenID@544553542d313233343536"));
+        assert.equal(transaction.sender, grace.address.toString());
+        assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.gasLimit, 60104000n);
+    });
+
+    it("should create 'Transaction' for registering dynamic", () => {
+        const transaction = tokenManagementFactory.createTransactionForRegisteringDynamicToken({
+            sender: grace.address,
+            tokenName: "Test",
+            tokenTicker: "TEST-123456",
+            tokenType: "FNG",
+        });
+
+        assert.deepEqual(transaction.data, Buffer.from("registerDynamic@54657374@544553542d313233343536@464e47"));
+        assert.equal(transaction.sender, grace.address.toString());
+        assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.gasLimit, 60131000n);
+    });
+
+    it("should create 'Transaction' for registering and setting all roles", () => {
+        const transaction = tokenManagementFactory.createTransactionForRegisteringDynamicAndSettingRoles({
+            sender: grace.address,
+            tokenName: "Test",
+            tokenTicker: "TEST-123456",
+            tokenType: "FNG",
+        });
+
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from("registerAndSetAllRolesDynamic@54657374@544553542d313233343536@464e47"),
+        );
+        assert.equal(transaction.sender, grace.address.toString());
+        assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.gasLimit, 60152000n);
     });
 });

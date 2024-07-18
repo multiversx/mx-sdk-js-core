@@ -25,5 +25,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run compile
+    - run: npm install esmify
     - run: npm run compile-browser
     - run: npm test

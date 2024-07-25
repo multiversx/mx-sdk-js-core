@@ -186,12 +186,14 @@ describe("test token management transactions factory", () => {
             addRoleNFTUpdateAttributes: true,
             addRoleNFTAddURI: true,
             addRoleESDTTransferRole: false,
+            addRoleESDTModifyCreator: true,
+            addRoleNFTRecreate: true,
         });
 
         assert.deepEqual(
             transaction.data,
             Buffer.from(
-                "setSpecialRole@4652414e4b2d313163653365@1e8a8b6b49de5b7be10aaa158a5a6a4abb4b56cc08f524bb5e6cd5f211ad3e13@45534454526f6c654e4654437265617465@45534454526f6c654e465455706461746541747472696275746573@45534454526f6c654e4654416464555249",
+                "setSpecialRole@4652414e4b2d313163653365@1e8a8b6b49de5b7be10aaa158a5a6a4abb4b56cc08f524bb5e6cd5f211ad3e13@45534454526f6c654e4654437265617465@45534454526f6c654e465455706461746541747472696275746573@45534454526f6c654e4654416464555249@45534454526f6c654d6f6469667943726561746f72@45534454526f6c654e46545265637265617465",
             ),
         );
         assert.equal(transaction.sender, frank.address.toString());
@@ -225,7 +227,7 @@ describe("test token management transactions factory", () => {
             sender: grace.address,
             tokenIdentifier: "TEST-123456",
             tokenNonce: 1n,
-            royalties: 1234n,
+            newRoyalties: 1234n,
         });
 
         assert.deepEqual(transaction.data, Buffer.from("ESDTModifyRoyalties@544553542d313233343536@01@04d2"));
@@ -235,12 +237,12 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.gasLimit, 60125000n);
     });
 
-    it("should create 'Transaction' for setting new uris", () => {
+    it("should create 'Transaction' for setting new URIs", () => {
         const transaction = tokenManagementFactory.createTransactionForSettingNewUris({
             sender: grace.address,
             tokenIdentifier: "TEST-123456",
             tokenNonce: 1n,
-            uris: ["firstURI", "secondURI"],
+            newUris: ["firstURI", "secondURI"],
         });
 
         assert.deepEqual(
@@ -272,11 +274,11 @@ describe("test token management transactions factory", () => {
             sender: grace.address,
             tokenIdentifier: "TEST-123456",
             tokenNonce: 1n,
-            tokenName: "Test",
-            royalties: 1234n,
-            hash: "abba",
-            attributes: Buffer.from("test"),
-            uris: ["firstURI", "secondURI"],
+            newTokenName: "Test",
+            newRoyalties: 1234n,
+            newHash: "abba",
+            newAttributes: Buffer.from("test"),
+            newUris: ["firstURI", "secondURI"],
         });
 
         assert.deepEqual(
@@ -292,15 +294,15 @@ describe("test token management transactions factory", () => {
     });
 
     it("should create 'Transaction' for recreating metadata", () => {
-        const transaction = tokenManagementFactory.createTransactionForNftMetadataRecreate({
+        const transaction = tokenManagementFactory.createTransactionForMetadataRecreate({
             sender: grace.address,
             tokenIdentifier: "TEST-123456",
             tokenNonce: 1n,
-            tokenName: "Test",
-            royalties: 1234n,
-            hash: "abba",
-            attributes: Buffer.from("test"),
-            uris: ["firstURI", "secondURI"],
+            newTokenName: "Test",
+            newRoyalties: 1234n,
+            newHash: "abba",
+            newAttributes: Buffer.from("test"),
+            newUris: ["firstURI", "secondURI"],
         });
 
         assert.deepEqual(
@@ -316,7 +318,7 @@ describe("test token management transactions factory", () => {
     });
 
     it("should create 'Transaction' for changing to dynamic", () => {
-        const transaction = tokenManagementFactory.createTransactionForMakingTokenDynamic({
+        const transaction = tokenManagementFactory.createTransactionForChangingTokenToDynamic({
             sender: grace.address,
             tokenIdentifier: "TEST-123456",
         });

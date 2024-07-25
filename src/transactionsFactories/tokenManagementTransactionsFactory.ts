@@ -36,8 +36,7 @@ interface IConfig {
     issueCost: bigint;
 }
 
-type RegisterAndSetAllRolesTokenType = "NFT" | "SFT" | "META" | "FNG";
-type TokenTypes = "NFT" | "SFT" | "META" | "FNG";
+type TokenType = "NFT" | "SFT" | "META" | "FNG";
 
 /**
  * Use this class to create token management transactions like issuing ESDTs, creating NFTs, setting roles, etc.
@@ -248,7 +247,7 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
-        tokenType: RegisterAndSetAllRolesTokenType;
+        tokenType: TokenType;
         numDecimals: bigint;
     }): Transaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
@@ -385,6 +384,8 @@ export class TokenManagementTransactionsFactory {
         addRoleESDTTransferRole: boolean;
         addRoleESDTModifyCreator?: boolean;
         addRoleNFTRecreate?: boolean;
+        addRoleESDTSetNewURI?: boolean;
+        addRoleESDTModifyRoyalties?: boolean;
     }): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
@@ -395,6 +396,8 @@ export class TokenManagementTransactionsFactory {
         options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
         options.addRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
         options.addRoleNFTRecreate ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
+        options.addRoleESDTSetNewURI ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
+        options.addRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -418,10 +421,6 @@ export class TokenManagementTransactionsFactory {
         attributes: Uint8Array;
         uris: string[];
     }): Transaction {
-        if (!options.uris.length) {
-            throw new ErrBadUsage("");
-        }
-
         const dataParts = [
             "ESDTNFTCreate",
             ...this.argSerializer.valuesToStrings([
@@ -664,14 +663,14 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenIdentifier: string;
         tokenNonce: bigint;
-        royalties: bigint;
+        newRoyalties: bigint;
     }): Transaction {
         const dataParts = [
             "ESDTModifyRoyalties",
             ...this.argSerializer.valuesToStrings([
                 new StringValue(options.tokenIdentifier),
                 new BigUIntValue(options.tokenNonce),
-                new BigUIntValue(options.royalties),
+                new BigUIntValue(options.newRoyalties),
             ]),
         ];
 
@@ -689,10 +688,10 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenIdentifier: string;
         tokenNonce: bigint;
-        uris: string[];
+        newUris: string[];
     }): Transaction {
-        if (!options.uris.length) {
-            throw new ErrBadUsage("");
+        if (!options.newUris.length) {
+            throw new ErrBadUsage("No URIs provided");
         }
 
         const dataParts = [
@@ -700,7 +699,7 @@ export class TokenManagementTransactionsFactory {
             ...this.argSerializer.valuesToStrings([
                 new StringValue(options.tokenIdentifier),
                 new BigUIntValue(options.tokenNonce),
-                ...options.uris.map((uri) => new StringValue(uri)),
+                ...options.newUris.map((uri) => new StringValue(uri)),
             ]),
         ];
 
@@ -741,22 +740,22 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenIdentifier: string;
         tokenNonce: bigint;
-        tokenName: string;
-        royalties: bigint;
-        hash: string;
-        attributes: Uint8Array;
-        uris: string[];
+        newTokenName?: string;
+        newRoyalties?: bigint;
+        newHash?: string;
+        newAttributes?: Uint8Array;
+        newUris?: string[];
     }): Transaction {
         const dataParts = [
             "ESDTMetaDataUpdate",
             ...this.argSerializer.valuesToStrings([
                 new StringValue(options.tokenIdentifier),
                 new BigUIntValue(options.tokenNonce),
-                new StringValue(options.tokenName),
-                new BigUIntValue(options.royalties),
-                new StringValue(options.hash),
-                new BytesValue(Buffer.from(options.attributes)),
-                ...options.uris.map((uri) => new StringValue(uri)),
+                ...(options.newTokenName ? [new StringValue(options.newTokenName)] : []),
+                ...(options.newRoyalties ? [new BigUIntValue(options.newRoyalties)] : []),
+                ...(options.newHash ? [new StringValue(options.newHash)] : []),
+                ...(options.newAttributes ? [new BytesValue(Buffer.from(options.newAttributes))] : []),
+                ...(options.newUris ? options.newUris.map((uri) => new StringValue(uri)) : []),
             ]),
         ];
 
@@ -770,26 +769,26 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForNftMetadataRecreate(options: {
+    createTransactionForMetadataRecreate(options: {
         sender: IAddress;
         tokenIdentifier: string;
         tokenNonce: bigint;
-        tokenName: string;
-        royalties: bigint;
-        hash: string;
-        attributes: Uint8Array;
-        uris: string[];
+        newTokenName: string;
+        newRoyalties: bigint;
+        newHash: string;
+        newAttributes: Uint8Array;
+        newUris: string[];
     }): Transaction {
         const dataParts = [
             "ESDTMetaDataRecreate",
             ...this.argSerializer.valuesToStrings([
                 new StringValue(options.tokenIdentifier),
                 new BigUIntValue(options.tokenNonce),
-                new StringValue(options.tokenName),
-                new BigUIntValue(options.royalties),
-                new StringValue(options.hash),
-                new BytesValue(Buffer.from(options.attributes)),
-                ...options.uris.map((uri) => new StringValue(uri)),
+                ...(options.newTokenName ? [new StringValue(options.newTokenName)] : []),
+                ...(options.newRoyalties ? [new BigUIntValue(options.newRoyalties)] : []),
+                ...(options.newHash ? [new StringValue(options.newHash)] : []),
+                ...(options.newAttributes ? [new BytesValue(Buffer.from(options.newAttributes))] : []),
+                ...(options.newUris ? options.newUris.map((uri) => new StringValue(uri)) : []),
             ]),
         ];
 
@@ -803,7 +802,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForMakingTokenDynamic(options: { sender: IAddress; tokenIdentifier: string }): Transaction {
+    createTransactionForChangingTokenToDynamic(options: { sender: IAddress; tokenIdentifier: string }): Transaction {
         const dataParts = [
             "changeToDynamic",
             ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
@@ -839,7 +838,7 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
-        tokenType: TokenTypes;
+        tokenType: TokenType;
     }): Transaction {
         const dataParts = [
             "registerDynamic",
@@ -864,7 +863,7 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
-        tokenType: TokenTypes;
+        tokenType: TokenType;
     }): Transaction {
         const dataParts = [
             "registerAndSetAllRolesDynamic",

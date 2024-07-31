@@ -239,8 +239,10 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(10000);
 
         let identifier = "CHOCOLATE-daf625";
+
         let apiResponse = await apiProvider.getDefinitionOfFungibleToken(identifier);
         let proxyResponse = await proxyProvider.getDefinitionOfFungibleToken(identifier);
+
         // Assets are only present on API responses, thus we ignore them for comparison.
         apiResponse.assets = {};
 

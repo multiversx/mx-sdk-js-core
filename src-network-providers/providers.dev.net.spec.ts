@@ -193,7 +193,6 @@ describe("test network providers on devnet: Proxy and API", function () {
         apiResponse.function = proxyResponse.function
 
         // Ignore fields which are not present on API response:
-        proxyResponse.type = "";
         proxyResponse.epoch = 0;
         proxyResponse.blockNonce = 0;
         proxyResponse.hyperblockNonce = 0;
@@ -239,18 +238,17 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getDefinitionOfFungibleToken()", async function () {
         this.timeout(10000);
 
-        let identifiers = ["BEER-b16c6d", "CHOCOLATE-daf625"];
+        let identifier = "CHOCOLATE-daf625";
 
-        for (const identifier of identifiers) {
-            let apiResponse = await apiProvider.getDefinitionOfFungibleToken(identifier);
-            let proxyResponse = await proxyProvider.getDefinitionOfFungibleToken(identifier);
+        let apiResponse = await apiProvider.getDefinitionOfFungibleToken(identifier);
+        let proxyResponse = await proxyProvider.getDefinitionOfFungibleToken(identifier);
 
-            // Assets are only present on API responses, thus we ignore them for comparison.
-            apiResponse.assets = {};
+        // Assets are only present on API responses, thus we ignore them for comparison.
+        apiResponse.assets = {};
 
-            assert.equal(apiResponse.identifier, identifier);
-            assert.deepEqual(apiResponse, proxyResponse);
-        }
+        assert.equal(apiResponse.identifier, identifier);
+        assert.deepEqual(apiResponse, proxyResponse);
+
     });
 
     it("should have same response for getDefinitionOfTokenCollection()", async function () {

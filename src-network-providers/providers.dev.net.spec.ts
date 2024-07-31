@@ -235,7 +235,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         }
     });
 
-    it.only("should have same response for getDefinitionOfFungibleToken()", async function () {
+    it("should have same response for getDefinitionOfFungibleToken()", async function () {
         this.timeout(10000);
 
         let identifier = "CHOCOLATE-daf625";

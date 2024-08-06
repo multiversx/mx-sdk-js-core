@@ -296,7 +296,8 @@ export namespace NativeSerializer {
             return new AddressValue(convertNativeToAddress(native, errorContext));
         }
         if (type instanceof BooleanType) {
-            return new BooleanValue(native);
+            const boolValue = native.toString().toLowerCase() === "true" || native.toString() === "1";
+            return new BooleanValue(boolValue);
         }
         if (type instanceof TokenIdentifierType) {
             return new TokenIdentifierValue(convertNativeToString(native, errorContext));

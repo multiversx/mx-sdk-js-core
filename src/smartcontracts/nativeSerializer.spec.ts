@@ -611,7 +611,7 @@ describe("test native serializer", () => {
         });
     });
 
-    it.only("should accept a mixed of values for boolen type", async () => {
+    it("should accept a mixed of values for boolen type", async () => {
         const endpoint = AbiRegistry.create({
             endpoints: [
                 {
@@ -651,7 +651,7 @@ describe("test native serializer", () => {
         }).getEndpoint("foo");
 
         let typedValues = NativeSerializer.nativeToTypedValues(
-            [true, "true", "TRUE", 1, false, "false", "falseString", 0, 5],
+            [true, "true", "TRUE", 1, false, "false", "falseBar", 0, 5],
             endpoint,
         );
 

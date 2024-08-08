@@ -1,5 +1,6 @@
 import { Address } from "../address";
 import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
+import { ErrBadUsage } from "../errors";
 import { IAddress } from "../interface";
 import { Logger } from "../logger";
 import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../smartcontracts";
@@ -24,10 +25,18 @@ interface IConfig {
     gasLimitEsdtNftAddQuantity: bigint;
     gasLimitEsdtNftBurn: bigint;
     gasLimitStorePerByte: bigint;
+    gasLimitEsdtModifyRoyalties: bigint;
+    gasLimitEsdtModifyCreator: bigint;
+    gasLimitEsdtMetadataUpdate: bigint;
+    gasLimitSetNewUris: bigint;
+    gasLimitNftMetadataRecreate: bigint;
+    gasLimitNftChangeToDynamic: bigint;
+    gasLimitUpdateTokenId: bigint;
+    gasLimitRegisterDynamic: bigint;
     issueCost: bigint;
 }
 
-type RegisterAndSetAllRolesTokenType = "NFT" | "SFT" | "META" | "FNG";
+type TokenType = "NFT" | "SFT" | "META" | "FNG";
 
 /**
  * Use this class to create token management transactions like issuing ESDTs, creating NFTs, setting roles, etc.
@@ -238,7 +247,7 @@ export class TokenManagementTransactionsFactory {
         sender: IAddress;
         tokenName: string;
         tokenTicker: string;
-        tokenType: RegisterAndSetAllRolesTokenType;
+        tokenType: TokenType;
         numDecimals: bigint;
     }): Transaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
@@ -330,6 +339,7 @@ export class TokenManagementTransactionsFactory {
         addRoleNFTBurn: boolean;
         addRoleNFTAddQuantity: boolean;
         addRoleESDTTransferRole: boolean;
+        addRoleESDTModifyCreator?: boolean;
     }): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
@@ -337,6 +347,7 @@ export class TokenManagementTransactionsFactory {
         options.addRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
         options.addRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
         options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        options.addRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -371,6 +382,10 @@ export class TokenManagementTransactionsFactory {
         addRoleNFTUpdateAttributes: boolean;
         addRoleNFTAddURI: boolean;
         addRoleESDTTransferRole: boolean;
+        addRoleESDTModifyCreator?: boolean;
+        addRoleNFTRecreate?: boolean;
+        addRoleESDTSetNewURI?: boolean;
+        addRoleESDTModifyRoyalties?: boolean;
     }): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
@@ -379,6 +394,10 @@ export class TokenManagementTransactionsFactory {
         options.addRoleNFTUpdateAttributes ? args.push(new StringValue("ESDTRoleNFTUpdateAttributes")) : 0;
         options.addRoleNFTAddURI ? args.push(new StringValue("ESDTRoleNFTAddURI")) : 0;
         options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        options.addRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
+        options.addRoleNFTRecreate ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
+        options.addRoleESDTSetNewURI ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
+        options.addRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -636,6 +655,231 @@ export class TokenManagementTransactionsFactory {
             receiver: options.sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitEsdtNftBurn,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForModifyingRoyalties(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+        tokenNonce: bigint;
+        newRoyalties: bigint;
+    }): Transaction {
+        const dataParts = [
+            "ESDTModifyRoyalties",
+            ...this.argSerializer.valuesToStrings([
+                new StringValue(options.tokenIdentifier),
+                new BigUIntValue(options.tokenNonce),
+                new BigUIntValue(options.newRoyalties),
+            ]),
+        ];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitEsdtModifyRoyalties,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForSettingNewUris(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+        tokenNonce: bigint;
+        newUris: string[];
+    }): Transaction {
+        if (!options.newUris.length) {
+            throw new ErrBadUsage("No URIs provided");
+        }
+
+        const dataParts = [
+            "ESDTSetNewURIs",
+            ...this.argSerializer.valuesToStrings([
+                new StringValue(options.tokenIdentifier),
+                new BigUIntValue(options.tokenNonce),
+                ...options.newUris.map((uri) => new StringValue(uri)),
+            ]),
+        ];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitSetNewUris,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForModifyingCreator(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+        tokenNonce: bigint;
+    }): Transaction {
+        const dataParts = [
+            "ESDTModifyCreator",
+            ...this.argSerializer.valuesToStrings([
+                new StringValue(options.tokenIdentifier),
+                new BigUIntValue(options.tokenNonce),
+            ]),
+        ];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitEsdtModifyCreator,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForUpdatingMetadata(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+        tokenNonce: bigint;
+        newTokenName?: string;
+        newRoyalties?: bigint;
+        newHash?: string;
+        newAttributes?: Uint8Array;
+        newUris?: string[];
+    }): Transaction {
+        const dataParts = [
+            "ESDTMetaDataUpdate",
+            ...this.argSerializer.valuesToStrings([
+                new StringValue(options.tokenIdentifier),
+                new BigUIntValue(options.tokenNonce),
+                ...(options.newTokenName ? [new StringValue(options.newTokenName)] : []),
+                ...(options.newRoyalties ? [new BigUIntValue(options.newRoyalties)] : []),
+                ...(options.newHash ? [new StringValue(options.newHash)] : []),
+                ...(options.newAttributes ? [new BytesValue(Buffer.from(options.newAttributes))] : []),
+                ...(options.newUris ? options.newUris.map((uri) => new StringValue(uri)) : []),
+            ]),
+        ];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitEsdtMetadataUpdate,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForMetadataRecreate(options: {
+        sender: IAddress;
+        tokenIdentifier: string;
+        tokenNonce: bigint;
+        newTokenName: string;
+        newRoyalties: bigint;
+        newHash: string;
+        newAttributes: Uint8Array;
+        newUris: string[];
+    }): Transaction {
+        const dataParts = [
+            "ESDTMetaDataRecreate",
+            ...this.argSerializer.valuesToStrings([
+                new StringValue(options.tokenIdentifier),
+                new BigUIntValue(options.tokenNonce),
+                ...(options.newTokenName ? [new StringValue(options.newTokenName)] : []),
+                ...(options.newRoyalties ? [new BigUIntValue(options.newRoyalties)] : []),
+                ...(options.newHash ? [new StringValue(options.newHash)] : []),
+                ...(options.newAttributes ? [new BytesValue(Buffer.from(options.newAttributes))] : []),
+                ...(options.newUris ? options.newUris.map((uri) => new StringValue(uri)) : []),
+            ]),
+        ];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: options.sender,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitNftMetadataRecreate,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForChangingTokenToDynamic(options: { sender: IAddress; tokenIdentifier: string }): Transaction {
+        const dataParts = [
+            "changeToDynamic",
+            ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
+        ];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: this.esdtContractAddress,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitNftChangeToDynamic,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForUpdatingTokenId(options: { sender: IAddress; tokenIdentifier: string }): Transaction {
+        const dataParts = [
+            "updateTokenID",
+            ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
+        ];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: this.esdtContractAddress,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitUpdateTokenId,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForRegisteringDynamicToken(options: {
+        sender: IAddress;
+        tokenName: string;
+        tokenTicker: string;
+        tokenType: TokenType;
+    }): Transaction {
+        const dataParts = [
+            "registerDynamic",
+            ...this.argSerializer.valuesToStrings([
+                new StringValue(options.tokenName),
+                new StringValue(options.tokenTicker),
+                new StringValue(options.tokenType),
+            ]),
+        ];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: this.esdtContractAddress,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitRegisterDynamic,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForRegisteringDynamicAndSettingRoles(options: {
+        sender: IAddress;
+        tokenName: string;
+        tokenTicker: string;
+        tokenType: TokenType;
+    }): Transaction {
+        const dataParts = [
+            "registerAndSetAllRolesDynamic",
+            ...this.argSerializer.valuesToStrings([
+                new StringValue(options.tokenName),
+                new StringValue(options.tokenTicker),
+                new StringValue(options.tokenType),
+            ]),
+        ];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: options.sender,
+            receiver: this.esdtContractAddress,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitRegisterDynamic,
             addDataMovementGas: true,
         }).build();
     }

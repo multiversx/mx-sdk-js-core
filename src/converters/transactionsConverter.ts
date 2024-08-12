@@ -28,6 +28,10 @@ export class TransactionsConverter {
             guardian: transaction.guardian ? transaction.guardian : undefined,
             signature: this.toHexOrUndefined(transaction.signature),
             guardianSignature: this.toHexOrUndefined(transaction.guardianSignature),
+            relayer: transaction.relayer ? transaction.relayer : undefined,
+            innerTransactions: transaction.innerTransactions.length
+                ? transaction.innerTransactions.map((tx) => this.transactionToPlainObject(tx))
+                : undefined,
         };
 
         return plainObject;
@@ -58,6 +62,10 @@ export class TransactionsConverter {
             options: Number(object.options),
             signature: this.bufferFromHex(object.signature),
             guardianSignature: this.bufferFromHex(object.guardianSignature),
+            relayer: object.relayer,
+            innerTransactions: object.innerTransactions
+                ? object.innerTransactions.map((tx) => this.plainObjectToTransaction(tx))
+                : undefined,
         });
 
         return transaction;

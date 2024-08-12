@@ -24,6 +24,8 @@ export interface IPlainTransactionObject {
     options?: number;
     signature?: string;
     guardianSignature?: string;
+    relayer?: string;
+    innerTransactions?: IPlainTransactionObject[];
 }
 
 export interface ISignature {
@@ -104,4 +106,6 @@ export interface ITransaction {
     guardian: string;
     signature: Uint8Array;
     guardianSignature: Uint8Array;
+    relayer: string;
+    innerTransactions: ITransaction[];
 }

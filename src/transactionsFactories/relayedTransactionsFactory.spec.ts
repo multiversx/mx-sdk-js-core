@@ -5,7 +5,7 @@ import { TransactionComputer } from "../transactionComputer";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
-describe("test relayed v1 transaction builder", function () {
+describe("test relayed transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "T" });
     const factory = new RelayedTransactionsFactory({ config: config });
     const transactionComputer = new TransactionComputer();
@@ -274,5 +274,70 @@ describe("test relayed v1 transaction builder", function () {
             Buffer.from(relayedTransaction.data).toString(),
             "relayedTxV2@000000000000000000010000000000000000000000000000000000000002ffff@0f@676574436f6e7472616374436f6e666967@fc3ed87a51ee659f937c1a1ed11c1ae677e99629fae9cc289461f033e6514d1a8cfad1144ae9c1b70f28554d196bd6ba1604240c1c1dc19c959e96c1c3b62d0c",
         );
+    });
+
+    it("should create relayed v3 transaction", async function () {
+        let innerTransaction = new Transaction({
+            sender: bob.address.toBech32(),
+            receiver: bob.address.toBech32(),
+            gasLimit: 50000n,
+            chainID: config.chainID,
+            nonce: 0n,
+            version: 2,
+            relayer: alice.address.toBech32(),
+        });
+
+        const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
+        innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
+
+        const relayedTransaction = factory.createRelayedV3Transaction({
+            relayerAddress: alice.address,
+            innerTransactions: [innerTransaction],
+        });
+
+        const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
+        relayedTransaction.signature = await alice.signer.sign(serializedRelayedTransaction);
+
+        assert.equal(
+            Buffer.from(relayedTransaction.signature).toString("hex"),
+            "88b9bce6fe62a641fca593f95c12ad09032a44b34c9e5cf16d070f0563b1695bf9d452a9df52bce3373fd5e10ed96c3d65cd189f5873e3a3184a89f4980c9e0c",
+        );
+        assert.equal(relayedTransaction.gasLimit, 100000n);
+    });
+
+    it("should fail to create relayed v3 transaction", async function () {
+        assert.throws(() => {
+            factory.createRelayedV3Transaction({
+                relayerAddress: alice.address,
+                innerTransactions: [],
+            });
+        }, "No inner transctions provided");
+
+        const innerTransaction = new Transaction({
+            sender: bob.address.toBech32(),
+            receiver: bob.address.toBech32(),
+            gasLimit: 50000n,
+            chainID: config.chainID,
+            nonce: 0n,
+            version: 2,
+            relayer: carol.address.toBech32(),
+        });
+
+        assert.throws(() => {
+            factory.createRelayedV3Transaction({
+                relayerAddress: alice.address,
+                innerTransactions: [innerTransaction],
+            });
+        }, "Inner transaction is not signed");
+
+        const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
+        innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
+
+        assert.throws(() => {
+            factory.createRelayedV3Transaction({
+                relayerAddress: alice.address,
+                innerTransactions: [innerTransaction],
+            });
+        }, "The inner transaction has an incorrect relayer address");
     });
 });

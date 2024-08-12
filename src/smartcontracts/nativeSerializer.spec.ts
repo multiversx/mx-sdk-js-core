@@ -169,7 +169,7 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[1].valueOf(), [Buffer.from("a"), Buffer.from("b"), Buffer.from("c")]);
     });
 
-    it("should should handle optionals in a strict manner (but it does not)", async () => {
+    it("should handle optionals in a strict manner (but it does not)", async () => {
         const endpoint = AbiRegistry.create({
             endpoints: [
                 {
@@ -609,5 +609,60 @@ describe("test native serializer", () => {
             // This is somehow a limitation of the current implementation.
             variadic: false,
         });
+    });
+
+    it("should accept a mixed of values for boolen type", async () => {
+        const endpoint = AbiRegistry.create({
+            endpoints: [
+                {
+                    name: "foo",
+                    inputs: [
+                        {
+                            type: "bool",
+                        },
+                        {
+                            type: "bool",
+                        },
+                        {
+                            type: "bool",
+                        },
+                        {
+                            type: "bool",
+                        },
+                        {
+                            type: "bool",
+                        },
+                        {
+                            type: "bool",
+                        },
+                        {
+                            type: "bool",
+                        },
+                        {
+                            type: "bool",
+                        },
+                        {
+                            type: "bool",
+                        },
+                    ],
+                    outputs: [],
+                },
+            ],
+        }).getEndpoint("foo");
+
+        let typedValues = NativeSerializer.nativeToTypedValues(
+            [true, "true", "TRUE", 1, false, "false", "falseBar", 0, 5],
+            endpoint,
+        );
+
+        assert.deepEqual(typedValues[0].valueOf(), true);
+        assert.deepEqual(typedValues[1].valueOf(), true);
+        assert.deepEqual(typedValues[2].valueOf(), true);
+        assert.deepEqual(typedValues[3].valueOf(), true);
+        assert.deepEqual(typedValues[4].valueOf(), false);
+        assert.deepEqual(typedValues[5].valueOf(), false);
+        assert.deepEqual(typedValues[6].valueOf(), false);
+        assert.deepEqual(typedValues[7].valueOf(), false);
+        assert.deepEqual(typedValues[8].valueOf(), false);
     });
 });

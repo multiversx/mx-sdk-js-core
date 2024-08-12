@@ -5,7 +5,7 @@ name: Build and Test
 
 on:
   pull_request:
-    branches: [ main, development, feat/* ]
+    branches: [ main, development, feat/*, release/* ]
   workflow_dispatch:
 
 jobs:
@@ -26,5 +26,5 @@ jobs:
     - run: npm ci
     - run: npm run lint
     - run: npm run compile
-    - run: npm run compile-browser
+    - run: npm install esmify && npm run compile-browser
     - run: npm test

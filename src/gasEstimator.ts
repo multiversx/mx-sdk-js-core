@@ -27,6 +27,9 @@ const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 // and for eventual increases in gas requirements (thus avoid fast-breaking changes in clients of the library).
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
 
+/**
+ * @deprecated This will be remove with the next release as the only place where it is used is a deprecated constructor.
+ */
 export class GasEstimator {
     private readonly gasConfiguration: IGasConfiguration;
 

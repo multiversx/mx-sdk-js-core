@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosHeaders, AxiosRequestConfig } from "axios";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig } from "./config";
 import { EsdtContractAddress } from "./constants";
@@ -19,10 +19,24 @@ import { TransactionStatus } from "./transactionStatus";
 export class ProxyNetworkProvider implements INetworkProvider {
     private url: string;
     private config: AxiosRequestConfig;
+    private userAgentPrefix = 'sdk-network-providers/proxy'
 
-    constructor(url: string, config?: AxiosRequestConfig) {
+    constructor(url: string, config?: AxiosRequestConfig, clientName?: string) {
         this.url = url;
         this.config = { ...defaultAxiosConfig, ...config };
+        this.setUserAgent(config, clientName);
+    }
+
+    private setUserAgent(config: AxiosRequestConfig<any> | undefined, clientName: string | undefined) {
+        if (!config?.headers) return;
+
+        const headers = AxiosHeaders.from(config.headers as AxiosHeaders).normalize(true);
+        const resolvedClientName = clientName || 'unknown';
+
+        const currentUserAgent = headers.hasUserAgent() ? headers.getUserAgent() : '';
+        const newUserAgent = `${currentUserAgent} ${this.userAgentPrefix}${resolvedClientName}`.trim();
+
+        headers.setUserAgent(newUserAgent, true);
     }
 
     async getNetworkConfig(): Promise<NetworkConfig> {

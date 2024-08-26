@@ -29,6 +29,7 @@ describe("test abi registry", () => {
         let start = registry.getEndpoint("start");
         let getStatus = registry.getEndpoint("status");
         let getLotteryInfo = registry.getEndpoint("getLotteryInfo");
+        let returnDecimal = registry.getEndpoint("returns_egld_decimal");
 
         assert.isFalse(start.modifiers.isReadonly());
         assert.isTrue(getStatus.modifiers.isReadonly());
@@ -54,6 +55,7 @@ describe("test abi registry", () => {
         assert.instanceOf(getLotteryInfo.input[0].type, BytesType);
         assert.instanceOf(getLotteryInfo.output[0].type, StructType);
         assert.equal(getLotteryInfo.output[0].type.getName(), "LotteryInfo");
+        assert.equal(returnDecimal.output[0].type.getName(), "ManagedDecimal");
 
         let fieldDefinitions = (<StructType>getLotteryInfo.output[0].type).getFieldsDefinitions();
         assert.instanceOf(fieldDefinitions[0].type, TokenIdentifierType);

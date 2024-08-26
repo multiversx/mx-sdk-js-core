@@ -10,6 +10,7 @@ import { FieldDefinition } from "./fields";
 import { ListType, OptionType } from "./generic";
 import { ArrayVecType } from "./genericArray";
 import { H256Type } from "./h256";
+import { ManagedDecimalType } from "./managedDecimal";
 import { NothingType } from "./nothing";
 import {
     BigIntType,
@@ -74,6 +75,7 @@ export class TypeMapper {
             ["array64", (...typeParameters: Type[]) => new ArrayVecType(64, typeParameters[0])],
             ["array128", (...typeParameters: Type[]) => new ArrayVecType(128, typeParameters[0])],
             ["array256", (...typeParameters: Type[]) => new ArrayVecType(256, typeParameters[0])],
+            ["ManagedDecimal", (...metadata: any) => new ManagedDecimalType(parseInt(metadata))],
         ]);
 
         // For closed types, we hold actual type instances instead of type constructors / factories (no type parameters needed).
@@ -134,6 +136,7 @@ export class TypeMapper {
 
     private mapTypeRecursively(type: Type): Type | null {
         let isGeneric = type.isGenericType();
+        let hasMetadata = type.hasMetadata();
 
         let previouslyLearnedType = this.learnedTypesMap.get(type.getName());
         if (previouslyLearnedType) {
@@ -155,7 +158,7 @@ export class TypeMapper {
             return this.mapStructType(<StructType>type);
         }
 
-        if (isGeneric) {
+        if (isGeneric || hasMetadata) {
             // This will call mapType() recursively, for all the type parameters.
             return this.mapGenericType(type);
         }

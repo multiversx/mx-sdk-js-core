@@ -16,6 +16,8 @@ import {
     Tuple,
     ArrayVecType,
     ArrayVec,
+    ManagedDecimalType,
+    ManagedDecimalValue,
 } from "../typesystem";
 import { guardTrue } from "../../utils";
 import { OptionValueBinaryCodec } from "./option";
@@ -25,6 +27,7 @@ import { StructBinaryCodec } from "./struct";
 import { EnumBinaryCodec } from "./enum";
 import { TupleBinaryCodec } from "./tuple";
 import { ArrayVecBinaryCodec } from "./arrayVec";
+import { ManagedDecimalCodec } from "./managedDecimal";
 
 export class BinaryCodec {
     readonly constraints: BinaryCodecConstraints;
@@ -35,6 +38,7 @@ export class BinaryCodec {
     private readonly structCodec: StructBinaryCodec;
     private readonly tupleCodec: TupleBinaryCodec;
     private readonly enumCodec: EnumBinaryCodec;
+    private readonly managedDecimalCodec: ManagedDecimalCodec;
 
     constructor(constraints: BinaryCodecConstraints | null = null) {
         this.constraints = constraints || new BinaryCodecConstraints();
@@ -45,6 +49,7 @@ export class BinaryCodec {
         this.structCodec = new StructBinaryCodec(this);
         this.tupleCodec = new TupleBinaryCodec(this);
         this.enumCodec = new EnumBinaryCodec(this);
+        this.managedDecimalCodec = new ManagedDecimalCodec(this);
     }
 
     decodeTopLevel<TResult extends TypedValue = TypedValue>(buffer: Buffer, type: Type): TResult {
@@ -58,6 +63,7 @@ export class BinaryCodec {
             onStruct: () => this.structCodec.decodeTopLevel(buffer, <StructType>type),
             onTuple: () => this.tupleCodec.decodeTopLevel(buffer, <TupleType>type),
             onEnum: () => this.enumCodec.decodeTopLevel(buffer, <EnumType>type),
+            onManagedDecimal: () => this.managedDecimalCodec.decodeTopLevel(buffer, <ManagedDecimalType>type),
         });
 
         return <TResult>typedValue;
@@ -74,6 +80,7 @@ export class BinaryCodec {
             onStruct: () => this.structCodec.decodeNested(buffer, <StructType>type),
             onTuple: () => this.tupleCodec.decodeNested(buffer, <TupleType>type),
             onEnum: () => this.enumCodec.decodeNested(buffer, <EnumType>type),
+            onManagedDecimal: () => this.managedDecimalCodec.decodeNested(buffer, <ManagedDecimalType>type),
         });
 
         return [<TResult>typedResult, decodedLength];
@@ -90,6 +97,7 @@ export class BinaryCodec {
             onStruct: () => this.structCodec.encodeNested(<Struct>typedValue),
             onTuple: () => this.tupleCodec.encodeNested(<Tuple>typedValue),
             onEnum: () => this.enumCodec.encodeNested(<EnumValue>typedValue),
+            onManagedDecimal: () => this.managedDecimalCodec.encodeNested(<ManagedDecimalValue>typedValue),
         });
     }
 
@@ -104,6 +112,7 @@ export class BinaryCodec {
             onStruct: () => this.structCodec.encodeTopLevel(<Struct>typedValue),
             onTuple: () => this.tupleCodec.encodeTopLevel(<Tuple>typedValue),
             onEnum: () => this.enumCodec.encodeTopLevel(<EnumValue>typedValue),
+            onManagedDecimal: () => this.managedDecimalCodec.encodeTopLevel(<ManagedDecimalValue>typedValue),
         });
     }
 }

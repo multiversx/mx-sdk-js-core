@@ -83,7 +83,11 @@ export class TypeFormulaParser {
     private acquireTypeWithParameters(stack: any[]): TypeFormula {
         const typeParameters = this.acquireTypeParameters(stack);
         const typeName = stack.pop();
-        const typeFormula = new TypeFormula(typeName, typeParameters.reverse());
+        if (typeName === "ManagedDecimal" || "ManagedDecimalSigned") {
+            const typeFormula = new TypeFormula(typeName, [], typeParameters[0].name);
+            return typeFormula;
+        }
+        const typeFormula = new TypeFormula(typeName, typeParameters);
         return typeFormula;
     }
 

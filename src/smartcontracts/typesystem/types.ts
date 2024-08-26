@@ -10,18 +10,21 @@ export class Type {
 
     private readonly name: string;
     private readonly typeParameters: Type[];
-    protected readonly cardinality: TypeCardinality;
+    protected readonly metadata: any;
+    private readonly cardinality: TypeCardinality;
 
     public constructor(
         name: string,
         typeParameters: Type[] = [],
         cardinality: TypeCardinality = TypeCardinality.fixed(1),
+        metadata?: any,
     ) {
         guardValueIsSet("name", name);
 
         this.name = name;
         this.typeParameters = typeParameters;
         this.cardinality = cardinality;
+        this.metadata = metadata;
     }
 
     getName(): string {
@@ -66,6 +69,10 @@ export class Type {
 
     isGenericType(): boolean {
         return this.typeParameters.length > 0;
+    }
+
+    hasMetadata(): boolean {
+        return this.metadata !== null && this.metadata !== undefined;
     }
 
     getFirstTypeParameter(): Type {

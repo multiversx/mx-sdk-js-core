@@ -1,4 +1,4 @@
-import axios, { AxiosHeaders, AxiosRequestConfig } from "axios";
+import axios from "axios";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig } from "./config";
 import { EsdtContractAddress } from "./constants";
@@ -14,29 +14,19 @@ import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwor
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
+import { setUserAgent } from "./userAgent";
+import { ExtendedAxiosRequestConfig } from "./NetworkProviderConfig";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ProxyNetworkProvider implements INetworkProvider {
     private url: string;
-    private config: AxiosRequestConfig;
+    private config: ExtendedAxiosRequestConfig;
     private userAgentPrefix = 'sdk-network-providers/proxy'
 
-    constructor(url: string, config?: AxiosRequestConfig, clientName?: string) {
+    constructor(url: string, config?: ExtendedAxiosRequestConfig) {
         this.url = url;
         this.config = { ...defaultAxiosConfig, ...config };
-        this.setUserAgent(config, clientName);
-    }
-
-    private setUserAgent(config: AxiosRequestConfig<any> | undefined, clientName: string | undefined) {
-        if (!config?.headers) return;
-
-        const headers = AxiosHeaders.from(config.headers as AxiosHeaders).normalize(true);
-        const resolvedClientName = clientName || 'unknown';
-
-        const currentUserAgent = headers.hasUserAgent() ? headers.getUserAgent() : '';
-        const newUserAgent = `${currentUserAgent} ${this.userAgentPrefix}${resolvedClientName}`.trim();
-
-        headers.setUserAgent(newUserAgent, true);
+        setUserAgent(this.userAgentPrefix, this.config);
     }
 
     async getNetworkConfig(): Promise<NetworkConfig> {

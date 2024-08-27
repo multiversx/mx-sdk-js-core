@@ -1,7 +1,7 @@
 import axios from "axios";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig } from "./config";
-import { EsdtContractAddress, MetricsPrefix } from "./constants";
+import { EsdtContractAddress, BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { ErrContractQuery, ErrNetworkProvider } from "./errors";
@@ -21,7 +21,7 @@ import { NetworkProviderConfig } from "./networkProviderConfig";
 export class ProxyNetworkProvider implements INetworkProvider {
     private url: string;
     private config: NetworkProviderConfig;
-    private userAgentPrefix = `${MetricsPrefix}/proxy`
+    private userAgentPrefix = `${BaseUserAgent}/proxy`
 
     constructor(url: string, config?: NetworkProviderConfig) {
         this.url = url;

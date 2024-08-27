@@ -18,14 +18,14 @@ import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "./trans
 import { TransactionStatus } from "./transactionStatus";
 import { extendUserAgent } from "./userAgent";
 import { NetworkProviderConfig } from "./networkProviderConfig";
-import { MetricsPrefix } from "./constants";
+import { BaseUserAgent } from "./constants";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ApiNetworkProvider implements INetworkProvider {
     private url: string;
     private config: NetworkProviderConfig;
     private backingProxyNetworkProvider;
-    private userAgentPrefix = `${MetricsPrefix}/api`
+    private userAgentPrefix = `${BaseUserAgent}/api`
 
     constructor(url: string, config?: NetworkProviderConfig) {
         this.url = url;

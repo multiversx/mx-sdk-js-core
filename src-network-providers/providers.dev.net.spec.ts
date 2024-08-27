@@ -1,4 +1,4 @@
-import { assert } from "chai";
+import { assert, expect } from "chai";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { INetworkProvider, ITransactionNext } from "./interface";
 import { Address } from "./primitives";
@@ -7,6 +7,7 @@ import { MockQuery } from "./testscommon/dummyQuery";
 import { NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionEventData } from "./transactionEvents";
 import { TransactionOnNetwork } from "./transactions";
+import { AxiosHeaders } from "axios";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -14,14 +15,47 @@ describe("test network providers on devnet: Proxy and API", function () {
     let dan = new Address("erd1kyaqzaprcdnv4luvanah0gfxzzsnpaygsy6pytrexll2urtd05ts9vegu7");
     const MAX_NUMBER_OF_ITEMS_BY_DEFAULT = 20;
 
-    let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com", { timeout: 10000 });
-    let proxyProvider: INetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", { timeout: 10000 });
+    let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com", { timeout: 10000, clientName: 'test' });
+    let proxyProvider: INetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", { timeout: 10000, clientName: 'test' });
 
     it("should have same response for getNetworkConfig()", async function () {
         let apiResponse = await apiProvider.getNetworkConfig();
         let proxyResponse = await proxyProvider.getNetworkConfig();
 
         assert.deepEqual(apiResponse, proxyResponse);
+    });
+
+    it("should add userAgent unknown for clientName when no clientName passed", async function () {
+        const expectedApiUserAgent = "multiversx-sdk/api/unknown"
+        const expectedProxyUserAgent = "multiversx-sdk/proxy/unknown"
+
+        let localApiProvider: any = new ApiNetworkProvider("https://devnet-api.multiversx.com", { timeout: 10000 });
+        let localProxyProvider: any = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", { timeout: 10000 });
+
+        assert.equal(localApiProvider.config.headers.getUserAgent(), expectedApiUserAgent);
+        assert.equal(localProxyProvider.config.headers.getUserAgent(), expectedProxyUserAgent);
+    });
+
+    it("should set userAgent with specified clientName ", async function () {
+        const expectedApiUserAgent = "multiversx-sdk/api/test"
+        const expectedProxyUserAgent = "multiversx-sdk/proxy/test"
+
+        let localApiProvider: any = new ApiNetworkProvider("https://devnet-api.multiversx.com", { timeout: 10000, clientName: 'test' });
+        let localProxyProvider: any = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", { timeout: 10000, clientName: 'test' });
+
+        assert.equal(localApiProvider.config.headers.getUserAgent(), expectedApiUserAgent);
+        assert.equal(localProxyProvider.config.headers.getUserAgent(), expectedProxyUserAgent);
+    });
+
+    it("should keep the set userAgent and add the sdk to it", async function () {
+        const expectedApiUserAgent = "Client-info multiversx-sdk/api/test"
+        const expectedProxyUserAgent = "Client-info multiversx-sdk/proxy/test"
+
+        let localApiProvider: any = new ApiNetworkProvider("https://devnet-api.multiversx.com", { timeout: 10000, headers: new AxiosHeaders({ "User-Agent": "Client-info" }), clientName: 'test' });
+        let localProxyProvider: any = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", { timeout: 10000, headers: new AxiosHeaders({ "User-Agent": "Client-info" }), clientName: 'test' });
+
+        assert.equal(localApiProvider.config.headers.getUserAgent(), expectedApiUserAgent);
+        assert.equal(localProxyProvider.config.headers.getUserAgent(), expectedProxyUserAgent);
     });
 
     it("should have same response for getNetworkStatus()", async function () {

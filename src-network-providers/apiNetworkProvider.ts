@@ -29,10 +29,16 @@ export class ApiNetworkProvider implements INetworkProvider {
 
     constructor(url: string, config?: NetworkProviderConfig) {
         this.url = url;
+        let proxyConfig = this.getProxyConfig(config);
         this.config = { ...defaultAxiosConfig, ...config };
-        const proxyConfig = JSON.parse(JSON.stringify(this.config));
         this.backingProxyNetworkProvider = new ProxyNetworkProvider(url, proxyConfig);
         extendUserAgent(this.userAgentPrefix, this.config);
+    }
+
+    private getProxyConfig(config: NetworkProviderConfig | undefined) {
+        let proxyConfig = JSON.parse(JSON.stringify(config));
+        proxyConfig = { ...defaultAxiosConfig, ...proxyConfig };
+        return proxyConfig;
     }
 
     async getNetworkConfig(): Promise<NetworkConfig> {

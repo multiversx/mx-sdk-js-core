@@ -1,7 +1,19 @@
 {
   "name": "@multiversx/sdk-core",
-  "version": "13.4.1",
+  "version": "13.4.2",
   "description": "MultiversX SDK for JavaScript and TypeScript",
+  "author": "MultiversX",
+  "homepage": "https://multiversx.com",
+  "license": "MIT",
+  "repository": "github:multiversx/mx-sdk-js-core",
+  "bugs": {
+    "url": "https://github.com/multiversx/mx-sdk-js-core/issues"
+  },
+  "keywords": [
+    "multiversx",
+    "sdk",
+    "blockchain"
+  ],
   "main": "out/index.js",
   "types": "out/index.d.js",
   "files": [
@@ -23,8 +35,6 @@
     "pretest": "npm run compile",
     "prepare": "npm run compile"
   },
-  "author": "MultiversX",
-  "license": "MIT",
   "dependencies": {
     "@multiversx/sdk-transaction-decoder": "1.0.2",
     "json-bigint": "1.0.0",
@@ -35,7 +45,7 @@
   },
   "devDependencies": {
     "@multiversx/sdk-network-providers": "2.6.0",
-    "@multiversx/sdk-wallet": "4.5.0",
+    "@multiversx/sdk-wallet": "4.5.1",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",
     "@types/mocha": "9.1.0",

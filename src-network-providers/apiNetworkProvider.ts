@@ -1,12 +1,14 @@
 import axios from "axios";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig, defaultPagination } from "./config";
+import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { ErrContractQuery, ErrNetworkProvider } from "./errors";
 import { IAddress, IContractQuery, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
+import { NetworkProviderConfig } from "./networkProviderConfig";
 import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
 import { PairOnNetwork } from "./pairs";
@@ -17,8 +19,6 @@ import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } f
 import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { extendUserAgent } from "./userAgent";
-import { NetworkProviderConfig } from "./networkProviderConfig";
-import { BaseUserAgent } from "./constants";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ApiNetworkProvider implements INetworkProvider {
@@ -36,7 +36,7 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     private getProxyConfig(config: NetworkProviderConfig | undefined) {
-        let proxyConfig = JSON.parse(JSON.stringify(config));
+        let proxyConfig = JSON.parse(JSON.stringify(config || {}));
         proxyConfig = { ...defaultAxiosConfig, ...proxyConfig };
         return proxyConfig;
     }

@@ -1,4 +1,5 @@
-import { assert, expect } from "chai";
+import { AxiosHeaders } from "axios";
+import { assert } from "chai";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { INetworkProvider, ITransactionNext } from "./interface";
 import { Address } from "./primitives";
@@ -7,7 +8,6 @@ import { MockQuery } from "./testscommon/dummyQuery";
 import { NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionEventData } from "./transactionEvents";
 import { TransactionOnNetwork } from "./transactions";
-import { AxiosHeaders } from "axios";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -17,6 +17,17 @@ describe("test network providers on devnet: Proxy and API", function () {
 
     let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com", { timeout: 10000, clientName: 'test' });
     let proxyProvider: INetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", { timeout: 10000, clientName: 'test' });
+
+    it("should create providers without configuration", async function () {
+        const apiProviderWithoutConfig = new ApiNetworkProvider("https://devnet-api.multiversx.com");
+        const proxyProviderWithoutConfig = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
+
+        const apiResponse = await apiProviderWithoutConfig.getNetworkConfig();
+        const proxyResponse = await proxyProviderWithoutConfig.getNetworkConfig();
+        
+        assert.equal(apiResponse.ChainID, "D");
+        assert.equal(proxyResponse.ChainID, "D");
+    });
 
     it("should have same response for getNetworkConfig()", async function () {
         let apiResponse = await apiProvider.getNetworkConfig();

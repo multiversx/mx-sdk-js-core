@@ -8,6 +8,7 @@ export * from "./address";
 export * from "./algebraic";
 export * from "./boolean";
 export * from "./bytes";
+export * from "./codeMetadata";
 export * from "./composite";
 export * from "./endpoint";
 export * from "./enum";

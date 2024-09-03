@@ -20,7 +20,6 @@ export class Type {
         metadata?: any,
     ) {
         guardValueIsSet("name", name);
-
         this.name = name;
         this.typeParameters = typeParameters;
         this.cardinality = cardinality;
@@ -65,6 +64,10 @@ export class Type {
 
     getTypeParameters(): Type[] {
         return this.typeParameters;
+    }
+
+    getMetadata(): any {
+        return this.metadata;
     }
 
     isGenericType(): boolean {

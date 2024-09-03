@@ -13,6 +13,10 @@ export class ManagedDecimalType extends Type {
     getClassName(): string {
         return ManagedDecimalType.ClassName;
     }
+
+    getScale(): number {
+        return this.scale;
+    }
 }
 
 export class ManagedDecimalValue extends TypedValue {
@@ -28,6 +32,10 @@ export class ManagedDecimalValue extends TypedValue {
 
     getClassName(): string {
         return ManagedDecimalValue.ClassName;
+    }
+
+    getScale(): number {
+        return this.scale;
     }
 
     getPrecision(): number {
@@ -50,7 +58,7 @@ export class ManagedDecimalValue extends TypedValue {
     }
 
     toString(): string {
-        return this.value.toString();
+        return this.value.toFixed(this.scale);
     }
 }
 
@@ -65,6 +73,10 @@ export class ManagedDecimalSignedType extends Type {
 
     getClassName(): string {
         return ManagedDecimalType.ClassName;
+    }
+
+    getScale(): number {
+        return this.scale;
     }
 }
 

@@ -1,6 +1,5 @@
 import BigNumber from "bignumber.js";
-import { ManagedDecimalType, ManagedDecimalValue, NumericalValue } from "../typesystem";
-import { BytesValue } from "../typesystem/bytes";
+import { BigUIntValue, ManagedDecimalType, ManagedDecimalValue, U64Value } from "../typesystem";
 import { BinaryCodec } from "./binary";
 import { cloneBuffer } from "./utils";
 
@@ -12,43 +11,42 @@ export class ManagedDecimalCodec {
     }
 
     decodeNested(buffer: Buffer, type: ManagedDecimalType): [ManagedDecimalValue, number] {
-        let [bytesValue, length] = this.binaryCodec.decodeNested(buffer);
-        console.log({ bytesValue, length });
+        let [bytesValue, length] = this.binaryCodec.decodeNested(buffer, type);
+        console.log(11111, { bytesValue });
         return [new ManagedDecimalValue(new BigNumber(1), 1), length];
     }
 
     decodeTopLevel(buffer: Buffer, type: ManagedDecimalType): ManagedDecimalValue {
         let payload = cloneBuffer(buffer);
-
         let empty = buffer.length == 0;
         if (empty) {
-            return new ManagedDecimalValue(new BigNumber(0));
+            return new ManagedDecimalValue(new BigNumber(0), type.getScale());
         }
 
-        let isPositive = !type.withSign || isMsbZero(payload);
-        if (isPositive) {
-            let value = bufferToBigInt(payload);
-            return new NumericalValue(type, value);
-        }
+        console.log({ bsc: type });
+        const decimalBuff = Buffer.from(this.binaryCodec.encodeTopLevel(new U64Value(type.getScale())));
+        const bigUintSize = buffer.length - decimalBuff.length; // Remaining bytes are for BigUInt
+        console.log({ buffer, l: buffer.length, d: decimalBuff.length, bigUintSize, decimalBuff, sc: type });
 
-        // Also see: https://github.com/multiversx/mx-components-big-int/blob/master/twos-complement/twos2bigint.go
-        flipBufferBitsInPlace(payload);
-        let value = bufferToBigInt(payload);
-        let negativeValue = value.multipliedBy(new BigNumber(-1));
-        let negativeValueMinusOne = negativeValue.minus(new BigNumber(1));
+        // Read BigUInt (dynamic size)
+        const bigUintBuffer = payload.slice(0, bigUintSize);
+        const u64Buffer = payload.slice(bigUintSize, payload.length);
+        const bigUint = new BigNumber(bigUintBuffer.toString("hex"), 16);
+        console.log({ payload, bigUintBuffer, u64Buffer });
+        const u64Value = new U64Value(u64Buffer.toString("hex")).toString();
 
-        return new NumericalValue(type, negativeValueMinusOne);
-        let bytesValue = this.binaryCodec.decodeTopLevel(buffer);
-        console.log({ bytesValue });
-        return new ManagedDecimalValue(new BigNumber(1), 1);
+        console.log({ payload, bigUintBuffer, u64Buffer, u64Value });
+        return new ManagedDecimalValue(bigUint, type.getScale());
     }
 
     encodeNested(value: ManagedDecimalValue): Buffer {
-        let bytesValue = new BytesValue(Buffer.from(value));
-        return this.binaryCodec.encodeNested(bytesValue);
+        let buffers: Buffer[] = [];
+        buffers.push(Buffer.from(this.binaryCodec.encodeTopLevel(new BigUIntValue(value.valueOf()))));
+        buffers.push(Buffer.from(this.binaryCodec.encodeTopLevel(new U64Value(value.getScale()))));
+        return Buffer.concat(buffers);
     }
 
-    encodeTopLevel(tokenIdentifier: ManagedDecimalValue): Buffer {
-        return Buffer.from(tokenIdentifier.valueOf());
+    encodeTopLevel(value: ManagedDecimalValue): Buffer {
+        return this.encodeNested(value);
     }
 }

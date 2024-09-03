@@ -65,6 +65,25 @@
             ]
         },
         {
+            "name": "managed_decimal_subtraction",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "first",
+                    "type": "ManagedDecimal<2>"
+                },
+                {
+                    "name": "second",
+                    "type": "ManagedDecimal<2>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<2>"
+                }
+            ]
+        },
+        {
             "docs": [
                 "Add desired amount to the storage variable."
             ],

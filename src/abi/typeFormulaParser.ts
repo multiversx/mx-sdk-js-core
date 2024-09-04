@@ -12,7 +12,6 @@ export class TypeFormulaParser {
 
     parseExpression(expression: string): TypeFormula {
         expression = expression.trim();
-
         const tokens = this.tokenizeExpression(expression).filter((token) => token !== TypeFormulaParser.COMMA);
         const stack: any[] = [];
 
@@ -31,8 +30,9 @@ export class TypeFormulaParser {
                 // It's a type name. We push it as a simple string.
                 stack.push(token);
             }
+            console.log({ stack });
         }
-
+        console.log({ stack: JSON.stringify(stack) });
         if (stack.length !== 1) {
             throw new Error(`Unexpected stack length at end of parsing: ${stack.length}`);
         }
@@ -83,6 +83,7 @@ export class TypeFormulaParser {
     private acquireTypeWithParameters(stack: any[]): TypeFormula {
         const typeParameters = this.acquireTypeParameters(stack);
         const typeName = stack.pop();
+
         if (typeName === "ManagedDecimal" || typeName === "ManagedDecimalSigned") {
             const typeFormula = new TypeFormula(typeName, [], typeParameters[0].name);
             return typeFormula;
@@ -96,7 +97,7 @@ export class TypeFormulaParser {
 
         while (true) {
             const item = stack.pop();
-
+            console.log({ item });
             if (item === undefined) {
                 throw new Error("Badly specified type parameters");
             }

@@ -42,7 +42,6 @@ export class ManagedDecimalCodec {
     encodeNested(value: ManagedDecimalValue): Buffer {
         let buffers: Buffer[] = [];
         buffers.push(Buffer.from(this.binaryCodec.encodeTopLevel(new BigUIntValue(value.valueOf()))));
-        buffers.push(Buffer.from(this.binaryCodec.encodeTopLevel(new U64Value(value.getScale()))));
         return Buffer.concat(buffers);
     }
 

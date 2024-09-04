@@ -1,0 +1,334 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.80.0",
+            "commitHash": "051478957371ee0084a7c0913941d2a8c4757bb9",
+            "commitDate": "2024-07-21",
+            "channel": "Stable",
+            "short": "rustc 1.80.0 (051478957 2024-07-21)"
+        },
+        "contractCrate": {
+            "name": "basic-features",
+            "version": "0.0.0",
+            "gitVersion": "v0.52.3-10-gd1f19c0d4"
+        },
+        "framework": {
+            "name": "multiversx-sc",
+            "version": "0.52.3"
+        }
+    },
+    "name": "BasicFeatures",
+    "constructor": {
+        "inputs": [],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "managed_decimal_addition",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "first",
+                    "type": "ManagedDecimal<2>"
+                },
+                {
+                    "name": "second",
+                    "type": "ManagedDecimal<2>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<2>"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_subtraction",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "first",
+                    "type": "ManagedDecimal<2>"
+                },
+                {
+                    "name": "second",
+                    "type": "ManagedDecimal<2>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<2>"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_eq",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "first",
+                    "type": "ManagedDecimal<2>"
+                },
+                {
+                    "name": "second",
+                    "type": "ManagedDecimal<2>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_trunc",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_into_raw_units",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_ln",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "ManagedDecimal<9>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimalSigned<9>"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_log2",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "ManagedDecimal<9>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimalSigned<9>"
+                }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "identifier": "event_err_topic",
+            "inputs": [
+                {
+                    "name": "err_topic",
+                    "type": "CodecErrorTestType",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "event_err_data",
+            "inputs": [
+                {
+                    "name": "data",
+                    "type": "CodecErrorTestType"
+                }
+            ]
+        },
+        {
+            "identifier": "event_a",
+            "inputs": [
+                {
+                    "name": "data",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "identifier": "event_b",
+            "inputs": [
+                {
+                    "name": "arg1",
+                    "type": "BigUint",
+                    "indexed": true
+                },
+                {
+                    "name": "arg2",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "data",
+                    "type": "List<bytes>"
+                }
+            ]
+        }
+    ],
+    "esdtAttributes": [],
+    "hasCallback": true,
+    "types": {
+        "CodecErrorTestType": {
+            "type": "struct",
+            "docs": [
+                "Helper type to explore encode/decode errors."
+            ]
+        },
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "ExampleEnumSimple": {
+            "type": "enum",
+            "docs": [
+                "Copied from multiversx-sc serialization tests."
+            ],
+            "variants": [
+                {
+                    "docs": [
+                        "Variant 0 doc comment.",
+                        "This will show up in the ABI."
+                    ],
+                    "name": "Variant0",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Variant1",
+                    "discriminant": 1
+                },
+                {
+                    "docs": [
+                        "One line is enough. The one above doesn't have any."
+                    ],
+                    "name": "Variant2",
+                    "discriminant": 2
+                }
+            ]
+        },
+        "ExampleEnumWithFields": {
+            "type": "enum",
+            "docs": [
+                "Copied from multiversx-sc serialization tests."
+            ],
+            "variants": [
+                {
+                    "name": "Unit",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Newtype",
+                    "discriminant": 1,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "u32"
+                        }
+                    ]
+                },
+                {
+                    "name": "Tuple",
+                    "discriminant": 2,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "u32"
+                        },
+                        {
+                            "name": "1",
+                            "type": "u32"
+                        }
+                    ]
+                },
+                {
+                    "name": "Struct",
+                    "discriminant": 3,
+                    "fields": [
+                        {
+                            "name": "a",
+                            "type": "u32"
+                        }
+                    ]
+                }
+            ]
+        },
+        "ExampleStructManaged": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "big_uint",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "int",
+                    "type": "u32"
+                },
+                {
+                    "name": "bytes",
+                    "type": "bytes"
+                }
+            ]
+        },
+        "RgbColor": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "r",
+                    "type": "u8"
+                },
+                {
+                    "name": "g",
+                    "type": "u8"
+                },
+                {
+                    "name": "b",
+                    "type": "u8"
+                }
+            ]
+        },
+        "TokenAttributesStruct": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "field_biguint",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "field_u64",
+                    "type": "u64"
+                },
+                {
+                    "name": "field_vec_u32",
+                    "type": "List<u32>"
+                }
+            ]
+        }
+    }
+}

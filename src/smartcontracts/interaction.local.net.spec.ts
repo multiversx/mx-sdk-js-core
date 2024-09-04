@@ -15,6 +15,7 @@ import { ResultsParser } from "./resultsParser";
 import { TransactionWatcher } from "../transactionWatcher";
 import { SmartContractQueriesController } from "../smartContractQueriesController";
 import { QueryRunnerAdapter } from "../adapters/queryRunnerAdapter";
+import { ManagedDecimalValue } from "./typesystem";
 
 describe("test smart contract interactor", function () {
     let provider = createLocalnetProvider();
@@ -182,6 +183,86 @@ describe("test smart contract interactor", function () {
         assert.lengthOf(typedBundle.values, 1);
         assert.deepEqual(typedBundle.firstValue!.valueOf(), new BigNumber(42));
         assert.isTrue(typedBundle.returnCode.equals(ReturnCode.Ok));
+    });
+
+    it.only("should interact with 'basic-features' (local testnet) using the SmartContractTransactionsFactory", async function () {
+        this.timeout(140000);
+
+        let abiRegistry = await loadAbiRegistry("src/testdata/basic-features.abi.json");
+        let contract = new SmartContract({ abi: abiRegistry });
+        let controller = new ContractController(provider);
+
+        let network = await provider.getNetworkConfig();
+        await alice.sync(provider);
+
+        // Deploy the contract
+        let deployTransaction = await prepareDeployment({
+            contract: contract,
+            deployer: alice,
+            codePath: "src/testdata/basic-features.wasm",
+            gasLimit: 600000000,
+            initArguments: [],
+            chainID: network.ChainID,
+        });
+
+        let {
+            bundle: { returnCode },
+        } = await controller.deploy(deployTransaction);
+        assert.isTrue(returnCode.isSuccess());
+
+        // let startInteraction = <Interaction>(
+        //     contract.methods
+        //         .returns_egld_decimal([])
+        //         .withGasLimit(8000000)
+        //         .withChainID(network.ChainID)
+        //         .withSender(alice.address)
+        //         .withValue(1)
+        // );
+
+        // // start()
+        // let startTransaction = startInteraction
+        //     .withSender(alice.address)
+        //     .useThenIncrementNonceOf(alice.account)
+        //     .buildTransaction();
+
+        let additionInteraction = <Interaction>contract.methods
+            .managed_decimal_addition([new ManagedDecimalValue(122, 5), new ManagedDecimalValue(3, 6)])
+            .withGasLimit(10000000)
+            .withChainID(network.ChainID)
+            .withSender(alice.address)
+            .withValue(0);
+
+        // addition()
+        let additionTransaction = additionInteraction
+            .withSender(alice.address)
+            .useThenIncrementNonceOf(alice.account)
+            .buildTransaction();
+
+        // let mdLnInteraction = <Interaction>contract.methods
+        //     .managed_decimal_ln([new ManagedDecimalValue(23, 9)])
+        //     .withGasLimit(10000000)
+        //     .withChainID(network.ChainID)
+        //     .withSender(alice.address)
+        //     .withValue(0);
+
+        // // mdLn()
+        // let mdLnTransaction = mdLnInteraction
+        //     .withSender(alice.address)
+        //     .useThenIncrementNonceOf(alice.account)
+        //     .buildTransaction();
+
+        // await signTransaction({ transaction: startTransaction, wallet: alice });
+        // let { bundle: bundleStart } = await controller.execute(startInteraction, startTransaction);
+        // assert.isTrue(bundleStart.returnCode.equals(ReturnCode.Ok));
+        // assert.lengthOf(bundleStart.values, 1);
+        // assert.deepEqual(bundleStart.values[0], new ManagedDecimalValue(1, 18));
+
+        await signTransaction({ transaction: additionTransaction, wallet: alice });
+        let { bundle: bundleAddition } = await controller.execute(additionInteraction, additionTransaction);
+        assert.isTrue(bundleAddition.returnCode.equals(ReturnCode.Ok));
+        assert.lengthOf(bundleAddition.values, 1);
+        assert.deepEqual(bundleAddition.values[0], new ManagedDecimalValue(new BigNumber(5), 2));
+        // assert.deepEqual(bundleAddition.values[0], new ManagedDecimalValue(new BigNumber(3.135553845), 9));
     });
 
     it("should interact with 'counter' (local testnet)", async function () {

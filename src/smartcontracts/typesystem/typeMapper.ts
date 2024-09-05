@@ -174,7 +174,7 @@ export class TypeMapper {
 
     private learnType(type: Type): void {
         if (type.getName() === "ManagedDecimal" || type.getName() === "ManagedDecimalSigned") {
-            this.learnedTypesMap.delete(type.getName());
+            this.learnedTypesMap.delete(`${type.getName()}_${type.getMetadata()}`);
             this.learnedTypesMap.set(`${type.getName()}_${type.getMetadata()}`, type);
         } else {
             this.learnedTypesMap.delete(type.getName());

@@ -16,6 +16,10 @@ export class ManagedDecimalType extends Type {
     getMetadata(): string {
         return this.metadata;
     }
+
+    isVariable(): boolean {
+        return this.metadata == "usize";
+    }
 }
 
 export class ManagedDecimalValue extends TypedValue {
@@ -38,7 +42,7 @@ export class ManagedDecimalValue extends TypedValue {
     }
 
     getPrecision(): number {
-        return this.value.toString(this.scale).replace(".", "").length;
+        return this.value.toFixed(this.scale).replace(".", "").length;
     }
 
     /**

@@ -44,13 +44,18 @@ export class Type {
      * Gets the fully qualified name of the type, to allow for better (efficient and non-ambiguous) type comparison within the custom typesystem.
      */
     getFullyQualifiedName(): string {
-        let joinedTypeParameters = this.getTypeParameters()
-            .map((type) => type.getFullyQualifiedName())
-            .join(", ");
+        return this.isGenericType() ? this.getFullNameForGeneric() : `multiversx:types:${this.getName()}`;
+    }
 
-        return this.isGenericType()
-            ? `multiversx:types:${this.getName()}<${joinedTypeParameters}>`
-            : `multiversx:types:${this.getName()}`;
+    private getFullNameForGeneric(): string {
+        const hasTypeParameters = this.getTypeParameters.length > 0;
+        const joinedTypeParameters = hasTypeParameters
+            ? `${this.getTypeParameters()
+                  .map((type) => type.getFullyQualifiedName())
+                  .join(", ")}`
+            : "";
+        const baseName = `multiversx:types:${this.getName()}${joinedTypeParameters}`;
+        return this.metadata !== undefined ? `${baseName}*${this.metadata}*` : baseName;
     }
 
     hasExactClass(className: string): boolean {
@@ -75,7 +80,7 @@ export class Type {
     }
 
     hasMetadata(): boolean {
-        return this.metadata !== null && this.metadata !== undefined;
+        return !!this.metadata;
     }
 
     getFirstTypeParameter(): Type {

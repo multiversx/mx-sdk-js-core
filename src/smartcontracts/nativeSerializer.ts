@@ -339,10 +339,7 @@ export namespace NativeSerializer {
 
     function toManagedDecimal(native: any, type: ManagedDecimalType, errorContext: ArgumentErrorContext): TypedValue {
         if (typeof native === "object") {
-            if (type.getMetadata() == "usize") {
-                return new ManagedDecimalValue(native[0], native[1], true);
-            }
-            return new ManagedDecimalValue(native[0], native[1]);
+            return new ManagedDecimalValue(native[0], native[1], type.isVariable());
         }
         errorContext.throwError(`(function: toManagedDecimal) unsupported native type ${typeof native}`);
     }

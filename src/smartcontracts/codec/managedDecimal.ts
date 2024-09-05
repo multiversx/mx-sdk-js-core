@@ -2,6 +2,7 @@ import BigNumber from "bignumber.js";
 import { BigUIntValue, ManagedDecimalType, ManagedDecimalValue, U32Value } from "../typesystem";
 import { BinaryCodec } from "./binary";
 import { bufferToBigInt } from "./utils";
+import { SizeOfU32 } from "./constants";
 
 export class ManagedDecimalCodec {
     private readonly binaryCodec: BinaryCodec;
@@ -20,28 +21,27 @@ export class ManagedDecimalCodec {
 
     decodeTopLevel(buffer: Buffer, type: ManagedDecimalType): ManagedDecimalValue {
         if (buffer.length === 0) {
-            return new ManagedDecimalValue(new BigNumber(0), 2);
+            return new ManagedDecimalValue(new BigNumber(0), 0);
         }
 
-        const isUsize = type.getMetadata() == "usize";
+        if (type.isVariable()) {
+            const bigUintSize = buffer.length - SizeOfU32;
 
-        if (isUsize) {
-            const u32Size = 4;
-            const bigUintSize = buffer.length - u32Size;
+            const value = new BigNumber(buffer.slice(0, bigUintSize).toString("hex"), 16);
+            const scale = buffer.readUInt32BE(bigUintSize);
 
-            const bigUint = new BigNumber(buffer.slice(0, bigUintSize).toString("hex"), 16);
-            const u32 = buffer.readUInt32BE(bigUintSize);
-
-            return new ManagedDecimalValue(bigUint, u32);
+            return new ManagedDecimalValue(value, scale);
         }
 
         const value = bufferToBigInt(buffer);
-        return new ManagedDecimalValue(value, parseInt(type.getMetadata()));
+        const scale = parseInt(type.getMetadata());
+        return new ManagedDecimalValue(value, scale);
     }
 
     encodeNested(value: ManagedDecimalValue): Buffer {
         let buffers: Buffer[] = [];
-        if (value.getType().getMetadata() == "usize") {
+        const managedDecimalType = value.getType() as ManagedDecimalType;
+        if (managedDecimalType.isVariable()) {
             buffers.push(Buffer.from(this.binaryCodec.encodeNested(new BigUIntValue(value.valueOf()))));
             buffers.push(Buffer.from(this.binaryCodec.encodeNested(new U32Value(value.getScale()))));
         } else {

@@ -52,38 +52,6 @@
             ]
         },
         {
-            "name": "returns_egld_decimal",
-            "mutability": "mutable",
-            "payableInTokens": [
-                "EGLD"
-            ],
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "ManagedDecimal<18>"
-                }
-            ]
-        },
-        {
-            "name": "managed_decimal_subtraction",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "first",
-                    "type": "ManagedDecimal<2>"
-                },
-                {
-                    "name": "second",
-                    "type": "ManagedDecimal<2>"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "ManagedDecimal<2>"
-                }
-            ]
-        },
-        {
             "docs": [
                 "Add desired amount to the storage variable."
             ],

@@ -180,19 +180,6 @@
                     "multi_result": true
                 }
             ]
-        },
-        {
-            "name": "returns_egld_decimal",
-            "mutability": "mutable",
-            "payableInTokens": [
-                "EGLD"
-            ],
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "ManagedDecimal<18>"
-                }
-            ]
         }
     ],
     "hasCallback": false,

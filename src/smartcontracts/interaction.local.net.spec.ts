@@ -185,7 +185,7 @@ describe("test smart contract interactor", function () {
         assert.isTrue(typedBundle.returnCode.equals(ReturnCode.Ok));
     });
 
-    it.only("should interact with 'basic-features' (local testnet) using the SmartContractTransactionsFactory", async function () {
+    it("should interact with 'basic-features' (local testnet) using the SmartContractTransactionsFactory", async function () {
         this.timeout(140000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/basic-features.abi.json");

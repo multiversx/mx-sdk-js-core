@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
-import { BigUIntValue, ManagedDecimalType, ManagedDecimalValue, U32Value, U64Value } from "../typesystem";
+import { BigUIntValue, ManagedDecimalType, ManagedDecimalValue, U32Value } from "../typesystem";
 import { BinaryCodec } from "./binary";
-import { bufferToBigInt, cloneBuffer } from "./utils";
+import { bufferToBigInt } from "./utils";
 
 export class ManagedDecimalCodec {
     private readonly binaryCodec: BinaryCodec;
@@ -11,34 +11,33 @@ export class ManagedDecimalCodec {
     }
 
     decodeNested(buffer: Buffer, type: ManagedDecimalType): [ManagedDecimalValue, number] {
-        let offset = 0;
-        let length = buffer.readUInt32BE(0);
+        const length = buffer.readUInt32BE(0);
+        const payload = buffer.slice(0, length);
 
-        let payload = buffer.slice(offset, offset + length);
-        let result = this.decodeTopLevel(payload, type);
-        let decodedLength = length + offset;
+        const result = this.decodeTopLevel(payload, type);
+        const decodedLength = length;
+
         return [result, decodedLength];
     }
 
     decodeTopLevel(buffer: Buffer, type: ManagedDecimalType): ManagedDecimalValue {
-        let payload = cloneBuffer(buffer);
-        let empty = buffer.length == 0;
-        if (empty) {
+        if (buffer.length === 0) {
             return new ManagedDecimalValue(new BigNumber(0), 2);
         }
 
-        if (type.getMetadata() == "usize") {
+        const isUsize = type.getMetadata() === "usize";
+
+        if (isUsize) {
             const u32Size = 4;
             const bigUintSize = buffer.length - u32Size;
 
-            const bigUintBuffer = buffer.slice(0, bigUintSize);
-            const bigUint = new BigNumber(bigUintBuffer.toString("hex"), 16);
+            const bigUint = new BigNumber(buffer.slice(0, bigUintSize).toString("hex"), 16);
+            const u32 = buffer.readUInt32BE(bigUintSize);
 
-            const u32Offset = bigUintSize;
-            const u32 = buffer.readUInt32BE(u32Offset);
-            return new ManagedDecimalValue(bigUint, parseInt(u32.toString()));
+            return new ManagedDecimalValue(bigUint, u32);
         }
-        let value = bufferToBigInt(payload);
+
+        const value = bufferToBigInt(buffer);
         return new ManagedDecimalValue(value, parseInt(type.getMetadata()));
     }
 

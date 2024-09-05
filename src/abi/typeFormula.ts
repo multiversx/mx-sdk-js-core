@@ -10,18 +10,12 @@ export class TypeFormula {
     }
 
     toString(): string {
-        if (this.typeParameters.length > 0) {
-            const typeParameters = this.typeParameters.map((typeParameter) => typeParameter.toString()).join(", ");
-            const name = `${this.name}<${typeParameters}>`;
-            if (this.metadata !== undefined) {
-                return `${name}*${this.metadata}*`;
-            }
-            return name;
-        } else {
-            if (this.metadata !== undefined) {
-                return `${this.name}*${this.metadata}*`;
-            }
-            return this.name;
-        }
+        const hasTypeParameters = this.typeParameters.length > 0;
+        const typeParameters = hasTypeParameters
+            ? `<${this.typeParameters.map((tp) => tp.toString()).join(", ")}>`
+            : "";
+        const baseName = `${this.name}${typeParameters}`;
+
+        return this.metadata !== undefined ? `${baseName}*${this.metadata}*` : baseName;
     }
 }

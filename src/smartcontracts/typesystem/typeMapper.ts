@@ -76,8 +76,8 @@ export class TypeMapper {
             ["array64", (...typeParameters: Type[]) => new ArrayVecType(64, typeParameters[0])],
             ["array128", (...typeParameters: Type[]) => new ArrayVecType(128, typeParameters[0])],
             ["array256", (...typeParameters: Type[]) => new ArrayVecType(256, typeParameters[0])],
-            ["ManagedDecimal", (...metadata: any) => new ManagedDecimalType(parseInt(metadata))],
-            ["ManagedDecimalSigned", (...metadata: any) => new ManagedDecimalSignedType(parseInt(metadata))],
+            ["ManagedDecimal", (...metadata: any) => new ManagedDecimalType(metadata)],
+            ["ManagedDecimalSigned", (...metadata: any) => new ManagedDecimalSignedType(metadata)],
         ]);
 
         // For closed types, we hold actual type instances instead of type constructors / factories (no type parameters needed).

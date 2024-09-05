@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
-import { BigUIntValue, ManagedDecimalType, ManagedDecimalValue, U64Value } from "../typesystem";
+import { BigUIntValue, ManagedDecimalType, ManagedDecimalValue, U32Value, U64Value } from "../typesystem";
 import { BinaryCodec } from "./binary";
-import { cloneBuffer } from "./utils";
+import { bufferToBigInt, cloneBuffer } from "./utils";
 
 export class ManagedDecimalCodec {
     private readonly binaryCodec: BinaryCodec;
@@ -12,7 +12,6 @@ export class ManagedDecimalCodec {
 
     decodeNested(buffer: Buffer, type: ManagedDecimalType): [ManagedDecimalValue, number] {
         let [bytesValue, length] = this.binaryCodec.decodeNested(buffer, type);
-        console.log(11111, { bytesValue });
         return [new ManagedDecimalValue(new BigNumber(1), 1), length];
     }
 
@@ -20,28 +19,34 @@ export class ManagedDecimalCodec {
         let payload = cloneBuffer(buffer);
         let empty = buffer.length == 0;
         if (empty) {
-            return new ManagedDecimalValue(new BigNumber(0), type.getScale());
+            return new ManagedDecimalValue(new BigNumber(0), 2);
         }
 
-        console.log({ bsc: type });
-        const decimalBuff = Buffer.from(this.binaryCodec.encodeTopLevel(new U64Value(type.getScale())));
-        const bigUintSize = buffer.length - decimalBuff.length; // Remaining bytes are for BigUInt
-        console.log({ buffer, l: buffer.length, d: decimalBuff.length, bigUintSize, decimalBuff, sc: type });
+        if (type.getMetadata() == "usize") {
+            const u32Size = 4;
+            const bigUintSize = buffer.length - u32Size;
 
-        // Read BigUInt (dynamic size)
-        const bigUintBuffer = payload.slice(0, bigUintSize);
-        const u64Buffer = payload.slice(bigUintSize, payload.length);
-        const bigUint = new BigNumber(bigUintBuffer.toString("hex"), 16);
-        console.log({ payload, bigUintBuffer, u64Buffer });
-        const u64Value = new U64Value(u64Buffer.toString("hex")).toString();
+            // Read BigUInt (dynamic size)
+            const bigUintBuffer = buffer.slice(0, bigUintSize);
+            const bigUint = new BigNumber(bigUintBuffer.toString("hex"), 16);
 
-        console.log({ payload, bigUintBuffer, u64Buffer, u64Value });
-        return new ManagedDecimalValue(bigUint, type.getScale());
+            const u32Offset = bigUintSize;
+            const u32 = buffer.readUInt32BE(u32Offset);
+            return new ManagedDecimalValue(bigUint, parseInt(u32.toString()));
+        }
+        let value = bufferToBigInt(payload);
+        return new ManagedDecimalValue(value, parseInt(type.getMetadata()));
     }
 
     encodeNested(value: ManagedDecimalValue): Buffer {
+        value.getType().getMetadata();
         let buffers: Buffer[] = [];
-        buffers.push(Buffer.from(this.binaryCodec.encodeTopLevel(new BigUIntValue(value.valueOf()))));
+        if (value.getType().getMetadata() == "usize") {
+            buffers.push(Buffer.from(this.binaryCodec.encodeNested(new BigUIntValue(value.valueOf()))));
+            buffers.push(Buffer.from(this.binaryCodec.encodeNested(new U32Value(value.getScale()))));
+        } else {
+            buffers.push(Buffer.from(this.binaryCodec.encodeTopLevel(new BigUIntValue(value.valueOf()))));
+        }
         return Buffer.concat(buffers);
     }
 

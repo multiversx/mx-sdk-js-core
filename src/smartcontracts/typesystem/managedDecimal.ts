@@ -3,19 +3,18 @@ import { Type, TypedValue } from "./types";
 
 export class ManagedDecimalType extends Type {
     static ClassName = "ManagedDecimalType";
-    private readonly scale: number;
+    private readonly scale: any;
 
-    constructor(scale: number) {
-        super("ManagedDecimal", undefined, undefined, scale);
-        this.scale = scale;
+    constructor(metadata: any) {
+        super("ManagedDecimal", undefined, undefined, metadata);
     }
 
     getClassName(): string {
         return ManagedDecimalType.ClassName;
     }
 
-    getScale(): number {
-        return this.scale;
+    getMetadata(): string {
+        return this.metadata;
     }
 }
 
@@ -24,8 +23,8 @@ export class ManagedDecimalValue extends TypedValue {
     private readonly value: BigNumber;
     private readonly scale: number;
 
-    constructor(value: BigNumber.Value, scale: number) {
-        super(new ManagedDecimalType(scale));
+    constructor(value: BigNumber.Value, scale: number, isVar: boolean = false) {
+        super(new ManagedDecimalType(isVar ? "usize" : scale));
         this.value = new BigNumber(value);
         this.scale = scale;
     }
@@ -85,9 +84,9 @@ export class ManagedDecimalSignedValue extends TypedValue {
     private readonly value: BigNumber;
     private readonly scale: number;
 
-    constructor(value: BigNumber, scale: number) {
+    constructor(value: BigNumber.Value, scale: number) {
         super(new ManagedDecimalType(scale));
-        this.value = value;
+        this.value = new BigNumber(value);
         this.scale = scale;
     }
 

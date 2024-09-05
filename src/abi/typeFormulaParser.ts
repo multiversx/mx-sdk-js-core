@@ -30,9 +30,7 @@ export class TypeFormulaParser {
                 // It's a type name. We push it as a simple string.
                 stack.push(token);
             }
-            console.log({ stack });
         }
-        console.log({ stack: JSON.stringify(stack) });
         if (stack.length !== 1) {
             throw new Error(`Unexpected stack length at end of parsing: ${stack.length}`);
         }
@@ -88,7 +86,7 @@ export class TypeFormulaParser {
             const typeFormula = new TypeFormula(typeName, [], typeParameters[0].name);
             return typeFormula;
         }
-        const typeFormula = new TypeFormula(typeName, typeParameters);
+        const typeFormula = new TypeFormula(typeName, typeParameters.reverse());
         return typeFormula;
     }
 
@@ -97,7 +95,6 @@ export class TypeFormulaParser {
 
         while (true) {
             const item = stack.pop();
-            console.log({ item });
             if (item === undefined) {
                 throw new Error("Badly specified type parameters");
             }

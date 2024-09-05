@@ -344,7 +344,7 @@ export namespace NativeSerializer {
             }
             return new ManagedDecimalValue(native[0], native[1]);
         }
-        errorContext.throwError(`(function: toEnumValue) unsupported native type ${typeof native}`);
+        errorContext.throwError(`(function: toManagedDecimal) unsupported native type ${typeof native}`);
     }
 
     // TODO: move logic to typesystem/bytes.ts

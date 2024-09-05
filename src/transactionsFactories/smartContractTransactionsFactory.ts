@@ -1,6 +1,6 @@
 import { Address } from "../address";
 import { CONTRACT_DEPLOY_ADDRESS_HEX, VM_TYPE_WASM_VM } from "../constants";
-import { Err, ErrBadUsage } from "../errors";
+import { Err } from "../errors";
 import { IAddress } from "../interface";
 import { Logger } from "../logger";
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
@@ -91,19 +91,21 @@ export class SmartContractTransactionsFactory {
         tokenTransfers?: TokenTransfer[];
     }): Transaction {
         const args = options.arguments || [];
-        const tokenTransfer = options.tokenTransfers || [];
-        const nativeTransferAmount = options.nativeTransferAmount ?? 0n;
-        const numberOfTokens = tokenTransfer.length;
+        let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
+        let nativeTransferAmount = options.nativeTransferAmount ?? 0n;
+        let numberOfTokens = tokenTransfers.length;
 
         if (nativeTransferAmount && numberOfTokens) {
-            throw new ErrBadUsage("Can't send both native tokens and custom tokens(ESDT/NFT)");
+            tokenTransfers.push(TokenTransfer.newFromEgldAmount(nativeTransferAmount));
+            nativeTransferAmount = 0n;
+            numberOfTokens++;
         }
 
         let receiver = options.contract;
         let dataParts: string[] = [];
 
         if (numberOfTokens === 1) {
-            const transfer = tokenTransfer[0];
+            const transfer = tokenTransfers[0];
 
             if (this.tokenComputer.isFungible(transfer.token)) {
                 dataParts = this.dataArgsBuilder.buildDataPartsForESDTTransfer(transfer);
@@ -112,7 +114,7 @@ export class SmartContractTransactionsFactory {
                 receiver = options.sender;
             }
         } else if (numberOfTokens > 1) {
-            dataParts = this.dataArgsBuilder.buildDataPartsForMultiESDTNFTTransfer(receiver, tokenTransfer);
+            dataParts = this.dataArgsBuilder.buildDataPartsForMultiESDTNFTTransfer(receiver, tokenTransfers);
             receiver = options.sender;
         }
 

@@ -1,7 +1,19 @@
 {
   "name": "@multiversx/sdk-core",
-  "version": "13.3.0",
+  "version": "13.5.0",
   "description": "MultiversX SDK for JavaScript and TypeScript",
+  "author": "MultiversX",
+  "homepage": "https://multiversx.com",
+  "license": "MIT",
+  "repository": "github:multiversx/mx-sdk-js-core",
+  "bugs": {
+    "url": "https://github.com/multiversx/mx-sdk-js-core/issues"
+  },
+  "keywords": [
+    "multiversx",
+    "sdk",
+    "blockchain"
+  ],
   "main": "out/index.js",
   "types": "out/index.d.js",
   "files": [
@@ -23,8 +35,6 @@
     "pretest": "npm run compile",
     "prepare": "npm run compile"
   },
-  "author": "MultiversX",
-  "license": "MIT",
   "dependencies": {
     "@multiversx/sdk-transaction-decoder": "1.0.2",
     "json-bigint": "1.0.0",
@@ -34,14 +44,14 @@
     "keccak": "3.0.2"
   },
   "devDependencies": {
-    "@multiversx/sdk-network-providers": "2.4.3",
-    "@multiversx/sdk-wallet": "4.5.0",
+    "@multiversx/sdk-network-providers": "2.6.0",
+    "@multiversx/sdk-wallet": "4.5.1",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",
     "@types/mocha": "9.1.0",
     "@types/node": "13.13.2",
     "assert": "2.0.0",
-    "axios": "1.6.5",
+    "axios": "^1.7.4",
     "browserify": "17.0.0",
     "chai": "4.2.0",
     "mocha": "9.2.2",

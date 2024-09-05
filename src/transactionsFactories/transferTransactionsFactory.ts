@@ -53,7 +53,7 @@ export class TransferTransactionsFactory {
     private readonly gasEstimator?: IGasEstimator;
 
     /**
-     * Should be instantiated using `Config` and `TokenComputer`.
+     * Should be instantiated using `Config`.
      * Instantiating this class using GasEstimator represents the legacy version of this class.
      * The legacy version contains methods like `createEGLDTransfer`, `createESDTTransfer`, `createESDTNFTTransfer` and `createMultiESDTNFTTransfer`.
      * This was done in order to minimize breaking changes in client code.
@@ -82,17 +82,9 @@ export class TransferTransactionsFactory {
         return this.gasEstimator !== undefined;
     }
 
-    private ensureMembersAreDefined() {
+    private ensureConfigIsDefined() {
         if (this.config === undefined) {
             throw new Err("'config' is not defined");
-        }
-
-        if (this.tokenTransfersDataBuilder === undefined) {
-            throw new Err("`dataArgsBuilder is not defined`");
-        }
-
-        if (this.tokenComputer === undefined) {
-            throw new Err("`tokenComputer is not defined`");
         }
     }
 
@@ -102,7 +94,7 @@ export class TransferTransactionsFactory {
         nativeAmount: bigint;
         data?: Uint8Array;
     }): Transaction {
-        this.ensureMembersAreDefined();
+        this.ensureConfigIsDefined();
 
         const data = options.data || new Uint8Array();
 
@@ -121,7 +113,7 @@ export class TransferTransactionsFactory {
         receiver: IAddress;
         tokenTransfers: TokenTransfer[];
     }): Transaction {
-        this.ensureMembersAreDefined();
+        this.ensureConfigIsDefined();
 
         const numberOfTransfers = options.tokenTransfers.length;
 
@@ -150,6 +142,42 @@ export class TransferTransactionsFactory {
             gasLimit: extraGasForTransfer,
             addDataMovementGas: true,
         }).build();
+    }
+
+    createTransactionForTransfer(options: {
+        sender: IAddress;
+        receiver: IAddress;
+        nativeAmount?: bigint;
+        tokenTransfers?: TokenTransfer[];
+        data?: Uint8Array;
+    }): Transaction {
+        const nativeAmount = options.nativeAmount ?? 0n;
+        let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
+        const numberOfTokens = tokenTransfers.length;
+
+        if (numberOfTokens && options.data?.length) {
+            throw new ErrBadUsage("Can't set data field when sending esdt tokens");
+        }
+
+        if ((nativeAmount && numberOfTokens === 0) || options.data) {
+            return this.createTransactionForNativeTokenTransfer({
+                sender: options.sender,
+                receiver: options.receiver,
+                nativeAmount: nativeAmount,
+                data: options.data,
+            });
+        }
+
+        const nativeTransfer = nativeAmount ? TokenTransfer.newFromEgldAmount(nativeAmount) : undefined;
+        if (nativeTransfer) {
+            tokenTransfers.push(nativeTransfer);
+        }
+
+        return this.createTransactionForESDTTokenTransfer({
+            sender: options.sender,
+            receiver: options.receiver,
+            tokenTransfers: tokenTransfers,
+        });
     }
 
     /**
@@ -336,7 +364,7 @@ export class TransferTransactionsFactory {
         receiver: IAddress;
         tokenTransfers: TokenTransfer[];
     }): Transaction {
-        this.ensureMembersAreDefined();
+        this.ensureConfigIsDefined();
 
         let dataParts: string[] = [];
         const transfer = options.tokenTransfers[0];

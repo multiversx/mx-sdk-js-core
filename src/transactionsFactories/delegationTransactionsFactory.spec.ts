@@ -176,13 +176,14 @@ describe("test delegation transactions factory", function () {
             sender: sender,
             delegationContract: delegationContract,
             publicKeys: [publicKey],
+            amount: 25000000000000000000n,
         });
 
         assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("unJailNodes@61626261"));
-        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.value, 25000000000000000000n);
     });
 
     it("should create 'Transaction' for changing service fee", async function () {

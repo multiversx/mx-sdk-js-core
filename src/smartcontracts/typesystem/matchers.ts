@@ -2,6 +2,7 @@ import * as errors from "../../errors";
 import { AddressType, AddressValue } from "./address";
 import { BooleanType, BooleanValue } from "./boolean";
 import { BytesType, BytesValue } from "./bytes";
+import { CodeMetadataType, CodeMetadataValue } from "./codeMetadata";
 import { EnumType, EnumValue } from "./enum";
 import { OptionType, OptionValue, List, ListType } from "./generic";
 import { H256Type, H256Value } from "./h256";
@@ -120,6 +121,7 @@ export function onPrimitiveValueSelect<TResult>(
         onString: () => TResult;
         onH256: () => TResult;
         onTypeIdentifier: () => TResult;
+        onCodeMetadata: () => TResult;
         onNothing: () => TResult;
         onOther?: () => TResult;
     },
@@ -145,6 +147,9 @@ export function onPrimitiveValueSelect<TResult>(
     if (value.hasExactClass(TokenIdentifierValue.ClassName)) {
         return selectors.onTypeIdentifier();
     }
+    if (value.hasExactClass(CodeMetadataValue.ClassName)) {
+        return selectors.onCodeMetadata();
+    }
     if (value.hasExactClass(NothingValue.ClassName)) {
         return selectors.onNothing();
     }
@@ -166,6 +171,7 @@ export function onPrimitiveTypeSelect<TResult>(
         onString: () => TResult;
         onH256: () => TResult;
         onTokenIndetifier: () => TResult;
+        onCodeMetadata: () => TResult;
         onNothing: () => TResult;
         onOther?: () => TResult;
     },
@@ -190,6 +196,9 @@ export function onPrimitiveTypeSelect<TResult>(
     }
     if (type.hasExactClass(TokenIdentifierType.ClassName)) {
         return selectors.onTokenIndetifier();
+    }
+    if (type.hasExactClass(CodeMetadataType.ClassName)) {
+        return selectors.onCodeMetadata();
     }
     if (type.hasExactClass(NothingType.ClassName)) {
         return selectors.onNothing();

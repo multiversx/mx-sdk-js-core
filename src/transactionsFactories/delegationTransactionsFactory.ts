@@ -205,6 +205,7 @@ export class DelegationTransactionsFactory {
         sender: IAddress;
         delegationContract: IAddress;
         publicKeys: IValidatorPublicKey[];
+        amount: bigint;
     }): Transaction {
         const dataParts = ["unJailNodes"];
 
@@ -220,6 +221,7 @@ export class DelegationTransactionsFactory {
             dataParts: dataParts,
             gasLimit: this.computeExecutionGasLimitForNodesManagement(numNodes),
             addDataMovementGas: true,
+            amount: options.amount,
         }).build();
     }
 

@@ -25,6 +25,8 @@ export const METACHAIN_ID = 4294967295;
 export const SDK_JS_SIGNER = "sdk-js";
 export const UNKNOWN_SIGNER = "unknown";
 
+export const EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER = "EGLD-000000";
+
 /**
  * @deprecated
  */

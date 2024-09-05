@@ -29,7 +29,7 @@ Feel free to skip this section if you are not a contributor.
 
 ```
 npm install --global browserify
-npm install esmify
+npm install esmify --no-save
 ```
 
 ### Building the library

@@ -240,7 +240,7 @@ describe("test smart contract interactor", function () {
 
         // log
         let mdLnInteraction = <Interaction>contract.methods
-            .managed_decimal_ln([new ManagedDecimalValue(23, 9)])
+            .managed_decimal_ln([new ManagedDecimalValue(23000000000, 9)])
             .withGasLimit(10000000)
             .withChainID(network.ChainID)
             .withSender(alice.address)
@@ -287,7 +287,7 @@ describe("test smart contract interactor", function () {
         let { bundle: bundleMDLn } = await controller.execute(mdLnInteraction, mdLnTransaction);
         assert.isTrue(bundleMDLn.returnCode.equals(ReturnCode.Ok));
         assert.lengthOf(bundleMDLn.values, 1);
-        assert.deepEqual(bundleMDLn.values[0], new ManagedDecimalSignedValue(3.135553845, 9));
+        assert.deepEqual(bundleMDLn.values[0], new ManagedDecimalSignedValue(3135553845, 9));
 
         // addition with var decimals
         await signTransaction({ transaction: additionVarTransaction, wallet: alice });
@@ -357,7 +357,7 @@ describe("test smart contract interactor", function () {
         assert.deepEqual(valueAfterDecrement!.valueOf(), new BigNumber(0));
     });
 
-    it("should interact with 'counter' (local testnet) using the SmartContractTransactionsFactory", async function () {
+    it("should interact with 'basic-features' (local testnet) and use managed Decimal", async function () {
         this.timeout(120000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/counter.abi.json");

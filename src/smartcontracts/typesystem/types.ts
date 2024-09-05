@@ -10,7 +10,7 @@ export class Type {
 
     private readonly name: string;
     private readonly typeParameters: Type[];
-    protected readonly metadata: any;
+    protected readonly metadata: string;
     private readonly cardinality: TypeCardinality;
 
     public constructor(

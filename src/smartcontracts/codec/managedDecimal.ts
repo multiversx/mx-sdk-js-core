@@ -25,7 +25,7 @@ export class ManagedDecimalCodec {
             return new ManagedDecimalValue(new BigNumber(0), 2);
         }
 
-        const isUsize = type.getMetadata() === "usize";
+        const isUsize = type.getMetadata() == "usize";
 
         if (isUsize) {
             const u32Size = 4;

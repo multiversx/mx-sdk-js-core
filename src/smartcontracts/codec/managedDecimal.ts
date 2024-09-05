@@ -15,9 +15,7 @@ export class ManagedDecimalCodec {
         const payload = buffer.slice(0, length);
 
         const result = this.decodeTopLevel(payload, type);
-        const decodedLength = length;
-
-        return [result, decodedLength];
+        return [result, length];
     }
 
     decodeTopLevel(buffer: Buffer, type: ManagedDecimalType): ManagedDecimalValue {

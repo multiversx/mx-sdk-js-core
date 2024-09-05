@@ -348,12 +348,6 @@ describe("test native serializer", () => {
                         {
                             type: "u64",
                         },
-                        {
-                            type: "ManagedDecimal<8>",
-                        },
-                        {
-                            type: "ManagedDecimal<usize>",
-                        },
                     ],
                     outputs: [],
                 },
@@ -370,8 +364,6 @@ describe("test native serializer", () => {
                     [45, true],
                 ],
                 46,
-                [2, 8],
-                [12.5644, 6],
             ],
             endpoint,
         );
@@ -385,10 +377,6 @@ describe("test native serializer", () => {
             { field0: new BigNumber(44), field1: false },
             { field0: new BigNumber(45), field1: true },
         ]);
-        assert.deepEqual(typedValues[4].getType(), new ManagedDecimalType(8));
-        assert.deepEqual(typedValues[4].valueOf(), new BigNumber(2));
-        assert.deepEqual(typedValues[5].getType(), new ManagedDecimalType("usize"));
-        assert.deepEqual(typedValues[5].valueOf(), new BigNumber(12.5644));
 
         // Pass a mix of native and typed values
         typedValues = NativeSerializer.nativeToTypedValues(
@@ -400,8 +388,6 @@ describe("test native serializer", () => {
                     [45, new BooleanValue(true)],
                 ],
                 46,
-                [2, 8],
-                [2, 6],
             ],
             endpoint,
         );

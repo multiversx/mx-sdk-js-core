@@ -34,6 +34,8 @@ import {
     isTyped,
     List,
     ListType,
+    ManagedDecimalType,
+    ManagedDecimalValue,
     NumericalType,
     OptionalType,
     OptionalValue,
@@ -99,7 +101,6 @@ export namespace NativeSerializer {
         // With respect to the notes of "repackNonCountedVariadicParameters", "getArgumentsCardinality" will not be needed anymore.
         // Currently, it is used only for a arguments count check, which will become redundant.
         const { min, max } = getArgumentsCardinality(endpoint.input);
-
         if (!(min <= args.length && args.length <= max)) {
             throw new ErrInvalidArgument(
                 `Wrong number of arguments for endpoint ${endpoint.name}: expected between ${min} and ${max} arguments, have ${args.length}`,
@@ -201,6 +202,9 @@ export namespace NativeSerializer {
         }
         if (type instanceof EnumType) {
             return toEnumValue(value, type, errorContext);
+        }
+        if (type instanceof ManagedDecimalType) {
+            return toManagedDecimal(value, type, errorContext);
         }
         errorContext.throwError(`convertToTypedValue: unhandled type ${type}`);
     }
@@ -329,6 +333,16 @@ export namespace NativeSerializer {
             }
 
             return new EnumValue(type, variant, fieldValues);
+        }
+        errorContext.throwError(`(function: toEnumValue) unsupported native type ${typeof native}`);
+    }
+
+    function toManagedDecimal(native: any, type: ManagedDecimalType, errorContext: ArgumentErrorContext): TypedValue {
+        if (typeof native === "object") {
+            if (type.getMetadata() == "usize") {
+                return new ManagedDecimalValue(native[0], native[1], true);
+            }
+            return new ManagedDecimalValue(native[0], native[1]);
         }
         errorContext.throwError(`(function: toEnumValue) unsupported native type ${typeof native}`);
     }

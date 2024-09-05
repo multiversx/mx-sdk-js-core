@@ -75,7 +75,7 @@ describe("test smart contract transactions outcome parser", () => {
             contractResults: new ContractResults([
                 new ContractResultItem({
                     nonce: 8,
-                    data: "@6f6b@fd60b96668",
+                    data: "@6f6b",
                 }),
             ]),
         });

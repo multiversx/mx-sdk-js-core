@@ -114,6 +114,6 @@ export class ManagedDecimalSignedValue extends TypedValue {
     }
 
     toString(): string {
-        return this.value.toString();
+        return this.value.toFixed(this.scale);
     }
 }

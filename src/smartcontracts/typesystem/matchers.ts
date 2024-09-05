@@ -52,6 +52,7 @@ export function onTypeSelect<TResult>(
     if (type.hasExactClass(EnumType.ClassName)) {
         return selectors.onEnum();
     }
+
     if (type.hasExactClass(ManagedDecimalType.ClassName)) {
         return selectors.onManagedDecimal();
     }

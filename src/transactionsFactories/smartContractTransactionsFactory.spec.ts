@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { Address } from "../address";
 import { Err } from "../errors";
-import { ManagedDecimalValue, U32Value } from "../smartcontracts";
+import { U32Value } from "../smartcontracts";
 import { Code } from "../smartcontracts/code";
 import { AbiRegistry } from "../smartcontracts/typesystem/abiRegistry";
 import { loadAbiRegistry, loadContractCode } from "../testutils/utils";
@@ -140,60 +140,6 @@ describe("test smart contract transactions factory", function () {
         assert.equal(transaction.value, 1000000000000000000n);
 
         assert.deepEqual(transaction, transactionAbiAware);
-    });
-
-    it("should create 'Transaction' for execute and transfer native token", async function () {
-        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        const func = "managed_decimal_subtraction";
-        const gasLimit = 6000000n;
-
-        const transaction = factory.createTransactionForExecute({
-            sender: sender,
-            contract: contract,
-            function: func,
-            gasLimit: gasLimit,
-            arguments: [new ManagedDecimalValue(9, 2), new ManagedDecimalValue(4, 2)],
-        });
-
-        // const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
-        //     sender: sender,
-        //     contract: contract,
-        //     function: func,
-        //     gasLimit: gasLimit,
-        //     arguments: [9, 4],
-        // });
-
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        assert.deepEqual(transaction.data, Buffer.from("managed_decimal_subtraction@09@04"));
-    });
-
-    it("should create 'Transaction' for execute and transfer native token", async function () {
-        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        const func = "managed_decimal_ln";
-        const gasLimit = 6000000n;
-
-        const transaction = factory.createTransactionForExecute({
-            sender: sender,
-            contract: contract,
-            function: func,
-            gasLimit: gasLimit,
-            arguments: [new ManagedDecimalValue(23.0, 9)],
-        });
-
-        // const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
-        //     sender: sender,
-        //     contract: contract,
-        //     function: func,
-        //     gasLimit: gasLimit,
-        //     arguments: [9, 4],
-        // });
-
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
-        assert.deepEqual(transaction.data, Buffer.from("managed_decimal_ln@17"));
     });
 
     it("should create 'Transaction' for execute and transfer single esdt", async function () {

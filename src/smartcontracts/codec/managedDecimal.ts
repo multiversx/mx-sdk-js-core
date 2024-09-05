@@ -11,8 +11,13 @@ export class ManagedDecimalCodec {
     }
 
     decodeNested(buffer: Buffer, type: ManagedDecimalType): [ManagedDecimalValue, number] {
-        let [bytesValue, length] = this.binaryCodec.decodeNested(buffer, type);
-        return [new ManagedDecimalValue(new BigNumber(1), 1), length];
+        let offset = 0;
+        let length = buffer.readUInt32BE(0);
+
+        let payload = buffer.slice(offset, offset + length);
+        let result = this.decodeTopLevel(payload, type);
+        let decodedLength = length + offset;
+        return [result, decodedLength];
     }
 
     decodeTopLevel(buffer: Buffer, type: ManagedDecimalType): ManagedDecimalValue {
@@ -26,7 +31,6 @@ export class ManagedDecimalCodec {
             const u32Size = 4;
             const bigUintSize = buffer.length - u32Size;
 
-            // Read BigUInt (dynamic size)
             const bigUintBuffer = buffer.slice(0, bigUintSize);
             const bigUint = new BigNumber(bigUintBuffer.toString("hex"), 16);
 
@@ -39,7 +43,6 @@ export class ManagedDecimalCodec {
     }
 
     encodeNested(value: ManagedDecimalValue): Buffer {
-        value.getType().getMetadata();
         let buffers: Buffer[] = [];
         if (value.getType().getMetadata() == "usize") {
             buffers.push(Buffer.from(this.binaryCodec.encodeNested(new BigUIntValue(value.valueOf()))));

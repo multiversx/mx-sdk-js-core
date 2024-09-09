@@ -9,6 +9,7 @@ import { I64Type, NumericalValue, U16Type, U32Type, U32Value } from "./numerical
 import { StringType } from "./string";
 import { TypeExpressionParser } from "./typeExpressionParser";
 import { NullType, PrimitiveType, Type } from "./types";
+import { ManagedDecimalSignedType, ManagedDecimalType } from "./managedDecimal";
 
 describe("test types", () => {
     let parser = new TypeExpressionParser();
@@ -63,6 +64,8 @@ describe("test types", () => {
             parser.parse("Option<u32>").getFullyQualifiedName(),
             "multiversx:types:Option<multiversx:types:u32>",
         );
+        assert.equal(new ManagedDecimalType("8").getFullyQualifiedName(), "multiversx:types:ManagedDecimal*8*");
+        assert.equal(new ManagedDecimalSignedType("8").getFullyQualifiedName(), "multiversx:types:ManagedDecimal*8*");
     });
 
     it("types and values should have correct JavaScript class hierarchy", () => {

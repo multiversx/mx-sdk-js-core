@@ -41,9 +41,7 @@ export class ManagedDecimalValue extends TypedValue {
     }
 
     getPrecision(): number {
-        const response = this.value.toFixed(this.scale).replace(".", "").length;
-        console.log({ response, c: this.value, t: this.scale }, this.value.toFixed(), this.value.toFixed(this.scale));
-        return response;
+        return this.value.toFixed(this.scale).replace(".", "").length;
     }
 
     /**

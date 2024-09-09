@@ -65,7 +65,10 @@ describe("test types", () => {
             "multiversx:types:Option<multiversx:types:u32>",
         );
         assert.equal(new ManagedDecimalType("8").getFullyQualifiedName(), "multiversx:types:ManagedDecimal*8*");
-        assert.equal(new ManagedDecimalSignedType("8").getFullyQualifiedName(), "multiversx:types:ManagedDecimal*8*");
+        assert.equal(
+            new ManagedDecimalSignedType("8").getFullyQualifiedName(),
+            "multiversx:types:ManagedDecimalSigned*8*",
+        );
     });
 
     it("types and values should have correct JavaScript class hierarchy", () => {

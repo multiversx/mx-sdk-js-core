@@ -357,7 +357,7 @@ describe("test smart contract interactor", function () {
         assert.deepEqual(valueAfterDecrement!.valueOf(), new BigNumber(0));
     });
 
-    it("should interact with 'basic-features' (local testnet) and use managed Decimal", async function () {
+    it("should interact with 'counter' (local testnet) using the SmartContractTransactionsFactory", async function () {
         this.timeout(120000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/counter.abi.json");

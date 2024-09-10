@@ -38,7 +38,7 @@ describe("test managed decimal", () => {
         assert.isFalse(firstValue.equals(secondValue));
     });
 
-    it.only("should compare correctly two managed decimals even with different scale", () => {
+    it("should compare correctly two managed decimals even with different scale", () => {
         const firstValue = new ManagedDecimalValue("1.234", 3, false);
         const secondValue = new ManagedDecimalValue("1.234", 3, false);
 

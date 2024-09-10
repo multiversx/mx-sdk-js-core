@@ -52,7 +52,9 @@
             ]
         },
         {
-            "docs": ["Add desired amount to the storage variable."],
+            "docs": [
+                "Add desired amount to the storage variable."
+            ],
             "name": "add",
             "mutability": "mutable",
             "inputs": [

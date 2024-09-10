@@ -26,6 +26,6 @@ export class TypeExpressionParser {
 
     private typeFormulaToType(typeFormula: TypeFormula): Type {
         const typeParameters = typeFormula.typeParameters.map((typeFormula) => this.typeFormulaToType(typeFormula));
-        return new Type(typeFormula.name, typeParameters);
+        return new Type(typeFormula.name, typeParameters, undefined, typeFormula.metadata);
     }
 }

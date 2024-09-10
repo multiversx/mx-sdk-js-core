@@ -28,3 +28,4 @@ export * from "./typeExpressionParser";
 export * from "./typeMapper";
 export * from "./types";
 export * from "./variadic";
+export * from "./managedDecimal";

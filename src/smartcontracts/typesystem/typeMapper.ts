@@ -10,6 +10,7 @@ import { FieldDefinition } from "./fields";
 import { ListType, OptionType } from "./generic";
 import { ArrayVecType } from "./genericArray";
 import { H256Type } from "./h256";
+import { ManagedDecimalSignedType, ManagedDecimalType } from "./managedDecimal";
 import { NothingType } from "./nothing";
 import {
     BigIntType,
@@ -31,14 +32,15 @@ import { CustomType, Type } from "./types";
 import { VariadicType } from "./variadic";
 
 type TypeFactory = (...typeParameters: Type[]) => Type;
+type TypeWithMetadataFactory = (...metadata: any) => Type;
 
 export class TypeMapper {
-    private readonly openTypesFactories: Map<string, TypeFactory>;
+    private readonly openTypesFactories: Map<string, TypeFactory | TypeWithMetadataFactory>;
     private readonly closedTypesMap: Map<string, Type>;
     private readonly learnedTypesMap: Map<string, Type>;
 
     constructor(learnedTypes: CustomType[] = []) {
-        this.openTypesFactories = new Map<string, TypeFactory>([
+        this.openTypesFactories = new Map<string, TypeFactory | TypeWithMetadataFactory>([
             ["Option", (...typeParameters: Type[]) => new OptionType(typeParameters[0])],
             ["List", (...typeParameters: Type[]) => new ListType(typeParameters[0])],
             // For the following open generics, we use a slightly different typing than the one defined by mx-sdk-rs (temporary workaround).
@@ -74,6 +76,8 @@ export class TypeMapper {
             ["array64", (...typeParameters: Type[]) => new ArrayVecType(64, typeParameters[0])],
             ["array128", (...typeParameters: Type[]) => new ArrayVecType(128, typeParameters[0])],
             ["array256", (...typeParameters: Type[]) => new ArrayVecType(256, typeParameters[0])],
+            ["ManagedDecimal", (...metadata: any) => new ManagedDecimalType(metadata)],
+            ["ManagedDecimalSigned", (...metadata: any) => new ManagedDecimalSignedType(metadata)],
         ]);
 
         // For closed types, we hold actual type instances instead of type constructors / factories (no type parameters needed).
@@ -106,7 +110,11 @@ export class TypeMapper {
 
         // Boostrap from previously learned types, if any.
         for (const type of learnedTypes) {
-            this.learnedTypesMap.set(type.getName(), type);
+            if (type.getName() === "ManagedDecimal" || type.getName() === "ManagedDecimalSigned") {
+                this.learnedTypesMap.set(`${type.getName()}_${type.getMetadata()}`, type);
+            } else {
+                this.learnedTypesMap.set(type.getName(), type);
+            }
         }
     }
 
@@ -134,6 +142,7 @@ export class TypeMapper {
 
     private mapTypeRecursively(type: Type): Type | null {
         let isGeneric = type.isGenericType();
+        let hasMetadata = type.hasMetadata();
 
         let previouslyLearnedType = this.learnedTypesMap.get(type.getName());
         if (previouslyLearnedType) {
@@ -155,7 +164,7 @@ export class TypeMapper {
             return this.mapStructType(<StructType>type);
         }
 
-        if (isGeneric) {
+        if (isGeneric || hasMetadata) {
             // This will call mapType() recursively, for all the type parameters.
             return this.mapGenericType(type);
         }
@@ -164,8 +173,15 @@ export class TypeMapper {
     }
 
     private learnType(type: Type): void {
-        this.learnedTypesMap.delete(type.getName());
-        this.learnedTypesMap.set(type.getName(), type);
+        if (type.getName() === "ManagedDecimal" || type.getName() === "ManagedDecimalSigned") {
+            const learnedTypeKey = `${type.getName()}_${type.getMetadata()}`;
+            this.learnedTypesMap.delete(learnedTypeKey);
+            this.learnedTypesMap.set(learnedTypeKey, type);
+        } else {
+            const learnedTypeKey = type.getName();
+            this.learnedTypesMap.delete(learnedTypeKey);
+            this.learnedTypesMap.set(learnedTypeKey, type);
+        }
     }
 
     private mapStructType(type: StructType): StructType {
@@ -200,6 +216,9 @@ export class TypeMapper {
         let factory = this.openTypesFactories.get(type.getName());
         if (!factory) {
             throw new errors.ErrTypingSystem(`Cannot map the generic type "${type.getName()}" to a known type`);
+        }
+        if (type.hasMetadata()) {
+            return factory(type.getMetadata());
         }
 
         return factory(...mappedTypeParameters);

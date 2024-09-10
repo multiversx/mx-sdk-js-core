@@ -4,7 +4,7 @@ import { Type, TypedValue } from "./types";
 export class ManagedDecimalType extends Type {
     static ClassName = "ManagedDecimalType";
 
-    constructor(metadata: any) {
+    constructor(metadata: number | "usize") {
         super("ManagedDecimal", undefined, undefined, metadata);
     }
 
@@ -12,7 +12,7 @@ export class ManagedDecimalType extends Type {
         return ManagedDecimalType.ClassName;
     }
 
-    getMetadata(): string {
+    getMetadata(): number | "usize" {
         return this.metadata;
     }
 
@@ -25,11 +25,13 @@ export class ManagedDecimalValue extends TypedValue {
     static ClassName = "ManagedDecimalValue";
     private readonly value: BigNumber;
     private readonly scale: number;
+    private readonly variable: boolean;
 
-    constructor(value: BigNumber.Value, scale: number, isVar: boolean = false) {
-        super(new ManagedDecimalType(isVar ? "usize" : scale));
+    constructor(value: BigNumber.Value, scale: number, isVariable: boolean = false) {
+        super(new ManagedDecimalType(isVariable ? "usize" : scale));
         this.value = new BigNumber(value);
         this.scale = scale;
+        this.variable = isVariable;
     }
 
     getClassName(): string {
@@ -52,7 +54,7 @@ export class ManagedDecimalValue extends TypedValue {
             return false;
         }
 
-        return this.value == other.value;
+        return new BigNumber(this.value).eq(other.value);
     }
 
     valueOf(): BigNumber {
@@ -62,12 +64,16 @@ export class ManagedDecimalValue extends TypedValue {
     toString(): string {
         return this.value.toFixed(this.scale);
     }
+
+    isVariable(): boolean {
+        return this.variable;
+    }
 }
 
 export class ManagedDecimalSignedType extends Type {
     static ClassName = "ManagedDecimalSignedType";
 
-    constructor(metadata: any) {
+    constructor(metadata: number | "usize") {
         super("ManagedDecimalSigned", undefined, undefined, metadata);
     }
 
@@ -75,7 +81,7 @@ export class ManagedDecimalSignedType extends Type {
         return ManagedDecimalType.ClassName;
     }
 
-    getMetadata(): string {
+    getMetadata(): number | "usize" {
         return this.metadata;
     }
 
@@ -88,11 +94,13 @@ export class ManagedDecimalSignedValue extends TypedValue {
     static ClassName = "ManagedDecimalSignedValue";
     private readonly value: BigNumber;
     private readonly scale: number;
+    private readonly variable: boolean;
 
-    constructor(value: BigNumber.Value, scale: number, isVariableDecimals: boolean = false) {
-        super(new ManagedDecimalSignedType(isVariableDecimals ? "usize" : scale));
+    constructor(value: BigNumber.Value, scale: number, isVariable: boolean = false) {
+        super(new ManagedDecimalSignedType(isVariable ? "usize" : scale));
         this.value = new BigNumber(value);
         this.scale = scale;
+        this.variable = isVariable;
     }
 
     getClassName(): string {
@@ -111,7 +119,7 @@ export class ManagedDecimalSignedValue extends TypedValue {
             return false;
         }
 
-        return this.value == other.value;
+        return new BigNumber(this.value).eq(other.value);
     }
 
     valueOf(): BigNumber {
@@ -120,5 +128,9 @@ export class ManagedDecimalSignedValue extends TypedValue {
 
     toString(): string {
         return this.value.toFixed(this.scale);
+    }
+
+    isVariable(): boolean {
+        return this.variable;
     }
 }

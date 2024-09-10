@@ -1,7 +1,7 @@
 import { TypeFormula } from "../../abi/typeFormula";
 import { TypeFormulaParser } from "../../abi/typeFormulaParser";
 import { ErrTypingSystem } from "../../errors";
-import { Type, TypeCardinality } from "./types";
+import { Type } from "./types";
 
 export class TypeExpressionParser {
     private readonly backingTypeFormulaParser: TypeFormulaParser;
@@ -26,6 +26,6 @@ export class TypeExpressionParser {
 
     private typeFormulaToType(typeFormula: TypeFormula): Type {
         const typeParameters = typeFormula.typeParameters.map((typeFormula) => this.typeFormulaToType(typeFormula));
-        return new Type(typeFormula.name, typeParameters, TypeCardinality.fixed(1), typeFormula.metadata);
+        return new Type(typeFormula.name, typeParameters, undefined, typeFormula.metadata);
     }
 }

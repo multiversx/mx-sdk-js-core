@@ -34,14 +34,14 @@ export class ManagedDecimalCodec {
         }
 
         const value = bufferToBigInt(buffer);
-        const scale = parseInt(type.getMetadata());
+        const metadata = type.getMetadata();
+        const scale = typeof metadata === "number" ? metadata : 0;
         return new ManagedDecimalValue(value, scale);
     }
 
     encodeNested(value: ManagedDecimalValue): Buffer {
         let buffers: Buffer[] = [];
-        const managedDecimalType = value.getType() as ManagedDecimalType;
-        if (managedDecimalType.isVariable()) {
+        if (value.isVariable()) {
             buffers.push(Buffer.from(this.binaryCodec.encodeNested(new BigUIntValue(value.valueOf()))));
             buffers.push(Buffer.from(this.binaryCodec.encodeNested(new U32Value(value.getScale()))));
         } else {

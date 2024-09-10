@@ -10,6 +10,9 @@ import BigNumber from "bignumber.js";
  *  - errors related to calling "non-payable" functions with some value provided
  *  - gas estimation errors (not yet implemented)
  */
+/**
+ * @deprecated The Interaction checker is deprecated due to lack of use.
+ */
 export class InteractionChecker {
     checkInteraction(interaction: Interaction, definition: EndpointDefinition): void {
         this.checkPayable(interaction, definition);

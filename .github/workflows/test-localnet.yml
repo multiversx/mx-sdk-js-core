@@ -24,7 +24,7 @@ jobs:
       # Step 3: Install mxpy (MultiversX Python SDK)
       - name: Install mxpy (MultiversX SDK)
         run: |
-          pip install mx-sdk-cli
+          pip install mx-sdk-cli --force
 
       # Step 4: Set up MultiversX localnet using mxpy
       - name: Set up MultiversX localnet

@@ -21,10 +21,17 @@ jobs:
         with:
           python-version: '3.x'
 
+     # Step 2: Set up Python environment
+      - name: Set up pipx
+        run: |
+          apt update
+          apt install pipx
+          pipx ensurepath
+
       # Step 3: Install mxpy (MultiversX Python SDK)
       - name: Install mxpy (MultiversX SDK)
         run: |
-          pip install mx-sdk-cli --force
+          pipx install multiversx-sdk-cli --force
 
       # Step 4: Set up MultiversX localnet using mxpy
       - name: Set up MultiversX localnet

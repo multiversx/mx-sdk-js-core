@@ -1,0 +1,61 @@
+name: MultiversX Integration Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  integration_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python environment
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # Step 3: Install mxpy (MultiversX Python SDK)
+      - name: Install mxpy (MultiversX SDK)
+        run: |
+          pip install mx-sdk-cli
+
+      # Step 4: Set up MultiversX localnet using mxpy
+      - name: Set up MultiversX localnet
+        run: |
+          # Start the local testnet with mxpy
+          mkdir -p ~/localnet && cd ~/localnet
+          mxpy localnet setup
+          mxpy localnet start
+          sleep 60 # Allow time for the testnet to fully start
+
+      # Step 5: Verify that testnet is running using mxpy CLI
+      - name: Verify localnet running
+        run: |
+          mxpy localnet status
+
+      # Step 6: Install Node.js and dependencies
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Install Node.js dependencies
+        run: npm install
+
+      # Step 7: Run integration tests
+      - name: Run integration tests
+        run: |
+          npm run tests-localnet
+
+      # Step 8: Stop the testnet
+      - name: Stop MultiversX local localnet
+        if: success() || failure()
+        run: |
+          mxpy localnet stop

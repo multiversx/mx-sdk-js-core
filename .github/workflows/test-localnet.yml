@@ -21,12 +21,14 @@ jobs:
         with:
           python-version: '3.x'
 
-     # Step 2: Set up Python environment
-      - name: Set up pipx
+    # Step 3: Install pipx (to manage Python tools)
+      - name: Install pipx
         run: |
-          apt update
-          apt install pipx
-          pipx ensurepath
+          python3 -m pip install --user pipx
+          python3 -m pipx ensurepath
+          # Add the pipx binary location to PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+        shell: bash
 
       # Step 3: Install mxpy (MultiversX Python SDK)
       - name: Install mxpy (MultiversX SDK)

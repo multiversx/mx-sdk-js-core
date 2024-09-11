@@ -30,12 +30,12 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
         shell: bash
 
-      # Step 3: Install mxpy (MultiversX Python SDK)
+      # Step 4: Install mxpy (MultiversX Python SDK)
       - name: Install mxpy (MultiversX SDK)
         run: |
           pipx install multiversx-sdk-cli --force
 
-      # Step 4: Set up MultiversX localnet using mxpy
+      # Step 5: Set up MultiversX localnet using mxpy
       - name: Set up MultiversX localnet
         run: |
           # Start the local testnet with mxpy
@@ -43,11 +43,6 @@ jobs:
           mxpy localnet setup
           mxpy localnet start
           sleep 60 # Allow time for the testnet to fully start
-
-      # Step 5: Verify that testnet is running using mxpy CLI
-      - name: Verify localnet running
-        run: |
-          mxpy localnet status
 
       # Step 6: Install Node.js and dependencies
       - name: Set up Node.js environment

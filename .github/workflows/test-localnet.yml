@@ -62,4 +62,4 @@ jobs:
       - name: Stop MultiversX local localnet
         if: success() || failure()
         run: |
-          mxpy localnet stop
+          mxpy localnet clean

@@ -1,15 +1,15 @@
 import BigNumber from "bignumber.js";
 import { Type, TypedValue } from "./types";
 
-export class ManagedDecimalType extends Type {
-    static ClassName = "ManagedDecimalType";
+export class ManagedDecimalSignedType extends Type {
+    static ClassName = "ManagedDecimalSignedType";
 
     constructor(metadata: number | "usize") {
-        super("ManagedDecimal", undefined, undefined, metadata);
+        super("ManagedDecimalSigned", undefined, undefined, metadata);
     }
 
     getClassName(): string {
-        return ManagedDecimalType.ClassName;
+        return ManagedDecimalSignedType.ClassName;
     }
 
     getMetadata(): number | "usize" {
@@ -21,35 +21,35 @@ export class ManagedDecimalType extends Type {
     }
 }
 
-export class ManagedDecimalValue extends TypedValue {
-    static ClassName = "ManagedDecimalValue";
+export class ManagedDecimalSignedValue extends TypedValue {
+    static ClassName = "ManagedDecimalSignedValue";
     private readonly value: BigNumber;
     private readonly scale: number;
     private readonly variable: boolean;
 
     constructor(value: BigNumber.Value, scale: number, isVariable: boolean = false) {
-        super(new ManagedDecimalType(isVariable ? "usize" : scale));
+        super(new ManagedDecimalSignedType(isVariable ? "usize" : scale));
         this.value = new BigNumber(value);
         this.scale = scale;
         this.variable = isVariable;
     }
 
     getClassName(): string {
-        return ManagedDecimalValue.ClassName;
-    }
-
-    getScale(): number {
-        return this.scale;
+        return ManagedDecimalSignedValue.ClassName;
     }
 
     getPrecision(): number {
         return this.value.toFixed(this.scale).replace(".", "").length;
     }
 
+    getScale(): number {
+        return this.scale;
+    }
+
     /**
      * Returns whether two objects have the same value.
      */
-    equals(other: ManagedDecimalValue): boolean {
+    equals(other: ManagedDecimalSignedValue): boolean {
         if (this.getPrecision() != other.getPrecision()) {
             return false;
         }

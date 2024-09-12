@@ -9,7 +9,8 @@ import { I64Type, NumericalValue, U16Type, U32Type, U32Value } from "./numerical
 import { StringType } from "./string";
 import { TypeExpressionParser } from "./typeExpressionParser";
 import { NullType, PrimitiveType, Type } from "./types";
-import { ManagedDecimalSignedType, ManagedDecimalType } from "./managedDecimal";
+import { ManagedDecimalType } from "./managedDecimal";
+import { ManagedDecimalSignedType } from "./managedDecimalSigned";
 
 describe("test types", () => {
     let parser = new TypeExpressionParser();

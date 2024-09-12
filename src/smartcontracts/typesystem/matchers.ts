@@ -16,6 +16,7 @@ import { ArrayVec, ArrayVecType } from "./genericArray";
 import { TypedValue } from "./types";
 import { StringType, StringValue } from "./string";
 import { ManagedDecimalType, ManagedDecimalValue } from "./managedDecimal";
+import { ManagedDecimalSignedType, ManagedDecimalSignedValue } from "./managedDecimalSigned";
 
 // TODO: Extend functionality or rename wrt. restricted / reduced functionality (not all types are handled: composite, variadic).
 export function onTypeSelect<TResult>(
@@ -29,6 +30,7 @@ export function onTypeSelect<TResult>(
         onTuple: () => TResult;
         onEnum: () => TResult;
         onManagedDecimal: () => TResult;
+        onManagedDecimalSigned: () => TResult;
         onOther?: () => TResult;
     },
 ): TResult {
@@ -58,6 +60,10 @@ export function onTypeSelect<TResult>(
         return selectors.onManagedDecimal();
     }
 
+    if (type.hasExactClass(ManagedDecimalSignedType.ClassName)) {
+        return selectors.onManagedDecimalSigned();
+    }
+
     if (selectors.onOther) {
         return selectors.onOther();
     }
@@ -76,6 +82,7 @@ export function onTypedValueSelect<TResult>(
         onTuple: () => TResult;
         onEnum: () => TResult;
         onManagedDecimal: () => TResult;
+        onManagedDecimalSigned: () => TResult;
         onOther?: () => TResult;
     },
 ): TResult {
@@ -102,6 +109,9 @@ export function onTypedValueSelect<TResult>(
     }
     if (value.hasExactClass(ManagedDecimalValue.ClassName)) {
         return selectors.onManagedDecimal();
+    }
+    if (value.hasExactClass(ManagedDecimalSignedValue.ClassName)) {
+        return selectors.onManagedDecimalSigned();
     }
 
     if (selectors.onOther) {

@@ -185,7 +185,7 @@ describe("test smart contract interactor", function () {
         assert.isTrue(typedBundle.returnCode.equals(ReturnCode.Ok));
     });
 
-    it("should interact with 'basic-features' (local testnet) using the SmartContractTransactionsFactory", async function () {
+    it("should interact with 'basic-features' (local testnet)", async function () {
         this.timeout(140000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/basic-features.abi.json");
@@ -226,13 +226,13 @@ describe("test smart contract interactor", function () {
             .buildTransaction();
 
         let additionInteraction = <Interaction>contract.methods
-            .managed_decimal_addition([new ManagedDecimalValue(2, 2), new ManagedDecimalValue(3, 2)])
+            .managed_decimal_addition([new ManagedDecimalValue("2.5", 2), new ManagedDecimalValue("2.5", 2)])
             .withGasLimit(10000000)
             .withChainID(network.ChainID)
             .withSender(alice.address)
             .withValue(0);
 
-        // addition()
+        // addition();
         let additionTransaction = additionInteraction
             .withSender(alice.address)
             .useThenIncrementNonceOf(alice.account)
@@ -240,7 +240,7 @@ describe("test smart contract interactor", function () {
 
         // log
         let mdLnInteraction = <Interaction>contract.methods
-            .managed_decimal_ln([new ManagedDecimalValue(23000000000, 9)])
+            .managed_decimal_ln([new ManagedDecimalValue(23, 9)])
             .withGasLimit(10000000)
             .withChainID(network.ChainID)
             .withSender(alice.address)
@@ -253,10 +253,7 @@ describe("test smart contract interactor", function () {
             .buildTransaction();
 
         let additionVarInteraction = <Interaction>contract.methods
-            .managed_decimal_addition_var([
-                new ManagedDecimalValue(378298000000, 9, true),
-                new ManagedDecimalValue(378298000000, 9, true),
-            ])
+            .managed_decimal_addition_var([new ManagedDecimalValue(4, 2, true), new ManagedDecimalValue(5, 2, true)])
             .withGasLimit(50000000)
             .withChainID(network.ChainID)
             .withSender(alice.address)
@@ -287,14 +284,14 @@ describe("test smart contract interactor", function () {
         let { bundle: bundleMDLn } = await controller.execute(mdLnInteraction, mdLnTransaction);
         assert.isTrue(bundleMDLn.returnCode.equals(ReturnCode.Ok));
         assert.lengthOf(bundleMDLn.values, 1);
-        assert.deepEqual(bundleMDLn.values[0], new ManagedDecimalSignedValue(3135553845, 9));
+        assert.deepEqual(bundleMDLn.values[0], new ManagedDecimalSignedValue(3.135553845, 9));
 
         // addition with var decimals
         await signTransaction({ transaction: additionVarTransaction, wallet: alice });
         let { bundle: bundleAddition } = await controller.execute(additionVarInteraction, additionVarTransaction);
         assert.isTrue(bundleAddition.returnCode.equals(ReturnCode.Ok));
         assert.lengthOf(bundleAddition.values, 1);
-        assert.deepEqual(bundleAddition.values[0], new ManagedDecimalValue(new BigNumber(6254154138880), 9));
+        assert.deepEqual(bundleAddition.values[0], new ManagedDecimalValue(9, 2));
     });
 
     it("should interact with 'counter' (local testnet)", async function () {

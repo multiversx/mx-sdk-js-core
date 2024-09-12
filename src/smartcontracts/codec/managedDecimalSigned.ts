@@ -25,10 +25,10 @@ export class ManagedDecimalSignedCodec {
         }
 
         if (type.isVariable()) {
-            const bigUintSize = buffer.length - SizeOfU32;
+            const bigintSize = buffer.length - SizeOfU32;
 
-            const [value] = this.binaryCodec.decodeNested(buffer.slice(0, bigUintSize), new BigIntType());
-            const scale = buffer.readUInt32BE(bigUintSize);
+            const [value] = this.binaryCodec.decodeNested(buffer.slice(0, bigintSize), new BigIntType());
+            const scale = buffer.readUInt32BE(bigintSize);
 
             return new ManagedDecimalSignedValue(value.valueOf().shiftedBy(-scale), scale);
         }

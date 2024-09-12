@@ -29,7 +29,7 @@ export class ManagedDecimalCodec {
 
             const [value] = this.binaryCodec.decodeNested(buffer.slice(0, bigUintSize), new BigUIntType());
             const scale = buffer.readUInt32BE(bigUintSize);
-            return new ManagedDecimalValue(value.valueOf(), scale);
+            return new ManagedDecimalValue(value.valueOf().shiftedBy(-scale), scale);
         }
 
         const value = bufferToBigInt(buffer);
@@ -41,7 +41,11 @@ export class ManagedDecimalCodec {
     encodeNested(value: ManagedDecimalValue): Buffer {
         let buffers: Buffer[] = [];
         if (value.isVariable()) {
-            buffers.push(Buffer.from(this.binaryCodec.encodeNested(new BigUIntValue(value.valueOf()))));
+            buffers.push(
+                Buffer.from(
+                    this.binaryCodec.encodeNested(new BigUIntValue(value.valueOf().shiftedBy(value.getScale()))),
+                ),
+            );
             buffers.push(Buffer.from(this.binaryCodec.encodeNested(new U32Value(value.getScale()))));
         } else {
             buffers.push(

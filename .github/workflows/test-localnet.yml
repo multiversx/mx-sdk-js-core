@@ -41,7 +41,7 @@ jobs:
           # Start the local testnet with mxpy
           mkdir -p ~/localnet && cd ~/localnet
           mxpy localnet setup
-          nohup mxpy localnet start &
+          nohup mxpy localnet start > localnet.log 2>&1 & echo $! > localnet.pid
           sleep 60 # Allow time for the testnet to fully start
 
       # Step 6: Install Node.js and dependencies
@@ -58,8 +58,8 @@ jobs:
         run: |
           npm run tests-localnet
 
-      # Step 8: Stop the testnet
-      - name: Stop MultiversX local localnet
+      # Step 8: Stop the testnet using the stored PID
+      - name: Stop MultiversX local testnet
         if: success() || failure()
         run: |
-          mxpy localnet clean
+          kill $(cat localnet.pid) || echo "Testnet already stopped"

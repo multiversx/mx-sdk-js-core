@@ -232,7 +232,7 @@ describe("test smart contract interactor", function () {
             .withSender(alice.address)
             .withValue(0);
 
-        // addition();
+        // addition()
         let additionTransaction = additionInteraction
             .withSender(alice.address)
             .useThenIncrementNonceOf(alice.account)

@@ -40,17 +40,12 @@ export class ManagedDecimalCodec {
 
     encodeNested(value: ManagedDecimalValue): Buffer {
         let buffers: Buffer[] = [];
+        const rawValue = new BigUIntValue(value.valueOf().shiftedBy(value.getScale()));
         if (value.isVariable()) {
-            buffers.push(
-                Buffer.from(
-                    this.binaryCodec.encodeNested(new BigUIntValue(value.valueOf().shiftedBy(value.getScale()))),
-                ),
-            );
+            buffers.push(Buffer.from(this.binaryCodec.encodeNested(rawValue)));
             buffers.push(Buffer.from(this.binaryCodec.encodeNested(new U32Value(value.getScale()))));
         } else {
-            buffers.push(
-                this.binaryCodec.encodeTopLevel(new BigUIntValue(value.valueOf().shiftedBy(value.getScale()))),
-            );
+            buffers.push(this.binaryCodec.encodeTopLevel(rawValue));
         }
         return Buffer.concat(buffers);
     }

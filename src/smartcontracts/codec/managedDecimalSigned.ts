@@ -41,21 +41,12 @@ export class ManagedDecimalSignedCodec {
 
     encodeNested(value: ManagedDecimalSignedValue): Buffer {
         let buffers: Buffer[] = [];
+        const rawValue = new BigIntValue(value.valueOf().shiftedBy(value.getScale()));
         if (value.isVariable()) {
-            buffers.push(
-                Buffer.from(
-                    this.binaryCodec.encodeNested(
-                        new BigIntValue(new BigNumber(value.valueOf().shiftedBy(value.getScale()))),
-                    ),
-                ),
-            );
+            buffers.push(Buffer.from(this.binaryCodec.encodeNested(rawValue)));
             buffers.push(Buffer.from(this.binaryCodec.encodeNested(new U32Value(value.getScale()))));
         } else {
-            buffers.push(
-                Buffer.from(
-                    this.binaryCodec.encodeTopLevel(new BigIntValue(value.valueOf().shiftedBy(value.getScale()))),
-                ),
-            );
+            buffers.push(Buffer.from(this.binaryCodec.encodeTopLevel(rawValue)));
         }
         return Buffer.concat(buffers);
     }

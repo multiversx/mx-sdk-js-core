@@ -1,17 +1,17 @@
 import BigNumber from "bignumber.js";
-import { BigUIntType, BigUIntValue, ManagedDecimalType, ManagedDecimalValue, U32Value } from "../typesystem";
+import { BigIntType, BigIntValue, ManagedDecimalSignedType, ManagedDecimalSignedValue, U32Value } from "../typesystem";
 import { BinaryCodec } from "./binary";
 import { bufferToBigInt } from "./utils";
 import { SizeOfU32 } from "./constants";
 
-export class ManagedDecimalCodec {
+export class ManagedDecimalSignedCodec {
     private readonly binaryCodec: BinaryCodec;
 
     constructor(binaryCodec: BinaryCodec) {
         this.binaryCodec = binaryCodec;
     }
 
-    decodeNested(buffer: Buffer, type: ManagedDecimalType): [ManagedDecimalValue, number] {
+    decodeNested(buffer: Buffer, type: ManagedDecimalSignedType): [ManagedDecimalSignedValue, number] {
         const length = buffer.readUInt32BE(0);
         const payload = buffer.slice(0, length);
 
@@ -19,38 +19,39 @@ export class ManagedDecimalCodec {
         return [result, length];
     }
 
-    decodeTopLevel(buffer: Buffer, type: ManagedDecimalType): ManagedDecimalValue {
+    decodeTopLevel(buffer: Buffer, type: ManagedDecimalSignedType): ManagedDecimalSignedValue {
         if (buffer.length === 0) {
-            return new ManagedDecimalValue(new BigNumber(0), 0);
+            return new ManagedDecimalSignedValue(new BigNumber(0), 0);
         }
 
         if (type.isVariable()) {
-            const bigUintSize = buffer.length - SizeOfU32;
+            const bigintSize = buffer.length - SizeOfU32;
 
-            const [value] = this.binaryCodec.decodeNested(buffer.slice(0, bigUintSize), new BigUIntType());
-            const scale = buffer.readUInt32BE(bigUintSize);
-            return new ManagedDecimalValue(value.valueOf().shiftedBy(-scale), scale);
+            const [value] = this.binaryCodec.decodeNested(buffer.slice(0, bigintSize), new BigIntType());
+            const scale = buffer.readUInt32BE(bigintSize);
+
+            return new ManagedDecimalSignedValue(value.valueOf().shiftedBy(-scale), scale);
         }
 
         const value = bufferToBigInt(buffer);
         const metadata = type.getMetadata();
         const scale = metadata !== "usize" ? parseInt(metadata.toString()) : 0;
-        return new ManagedDecimalValue(value.shiftedBy(-scale), scale);
+        return new ManagedDecimalSignedValue(value.shiftedBy(-scale), scale);
     }
 
-    encodeNested(value: ManagedDecimalValue): Buffer {
+    encodeNested(value: ManagedDecimalSignedValue): Buffer {
         let buffers: Buffer[] = [];
-        const rawValue = new BigUIntValue(value.valueOf().shiftedBy(value.getScale()));
+        const rawValue = new BigIntValue(value.valueOf().shiftedBy(value.getScale()));
         if (value.isVariable()) {
             buffers.push(Buffer.from(this.binaryCodec.encodeNested(rawValue)));
             buffers.push(Buffer.from(this.binaryCodec.encodeNested(new U32Value(value.getScale()))));
         } else {
-            buffers.push(this.binaryCodec.encodeTopLevel(rawValue));
+            buffers.push(Buffer.from(this.binaryCodec.encodeTopLevel(rawValue)));
         }
         return Buffer.concat(buffers);
     }
 
-    encodeTopLevel(value: ManagedDecimalValue): Buffer {
+    encodeTopLevel(value: ManagedDecimalSignedValue): Buffer {
         return this.encodeNested(value);
     }
 }

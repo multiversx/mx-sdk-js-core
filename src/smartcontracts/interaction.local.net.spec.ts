@@ -185,7 +185,7 @@ describe("test smart contract interactor", function () {
         assert.isTrue(typedBundle.returnCode.equals(ReturnCode.Ok));
     });
 
-    it("should interact with 'basic-features' (local testnet) using the SmartContractTransactionsFactory", async function () {
+    it("should interact with 'basic-features' (local testnet)", async function () {
         this.timeout(140000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/basic-features.abi.json");
@@ -226,7 +226,7 @@ describe("test smart contract interactor", function () {
             .buildTransaction();
 
         let additionInteraction = <Interaction>contract.methods
-            .managed_decimal_addition([new ManagedDecimalValue(2, 2), new ManagedDecimalValue(3, 2)])
+            .managed_decimal_addition([new ManagedDecimalValue("2.5", 2), new ManagedDecimalValue("2.7", 2)])
             .withGasLimit(10000000)
             .withChainID(network.ChainID)
             .withSender(alice.address)
@@ -240,7 +240,7 @@ describe("test smart contract interactor", function () {
 
         // log
         let mdLnInteraction = <Interaction>contract.methods
-            .managed_decimal_ln([new ManagedDecimalValue(23000000000, 9)])
+            .managed_decimal_ln([new ManagedDecimalValue("23", 9)])
             .withGasLimit(10000000)
             .withChainID(network.ChainID)
             .withSender(alice.address)
@@ -254,8 +254,8 @@ describe("test smart contract interactor", function () {
 
         let additionVarInteraction = <Interaction>contract.methods
             .managed_decimal_addition_var([
-                new ManagedDecimalValue(378298000000, 9, true),
-                new ManagedDecimalValue(378298000000, 9, true),
+                new ManagedDecimalValue("4", 2, true),
+                new ManagedDecimalValue("5", 2, true),
             ])
             .withGasLimit(50000000)
             .withChainID(network.ChainID)
@@ -268,33 +268,53 @@ describe("test smart contract interactor", function () {
             .useThenIncrementNonceOf(alice.account)
             .buildTransaction();
 
+        let lnVarInteraction = <Interaction>contract.methods
+            .managed_decimal_ln_var([new ManagedDecimalValue("23", 9, true)])
+            .withGasLimit(50000000)
+            .withChainID(network.ChainID)
+            .withSender(alice.address)
+            .withValue(0);
+
+        // managed_decimal_ln_var()
+        let lnVarTransaction = lnVarInteraction
+            .withSender(alice.address)
+            .useThenIncrementNonceOf(alice.account)
+            .buildTransaction();
+
         // returnEgld()
         await signTransaction({ transaction: returnEgldTransaction, wallet: alice });
         let { bundle: bundleEgld } = await controller.execute(returnEgldInteraction, returnEgldTransaction);
         assert.isTrue(bundleEgld.returnCode.equals(ReturnCode.Ok));
         assert.lengthOf(bundleEgld.values, 1);
-        assert.deepEqual(bundleEgld.values[0], new ManagedDecimalValue(1, 18));
+        assert.deepEqual(bundleEgld.values[0], new ManagedDecimalValue("0.000000000000000001", 18));
 
         // addition with const decimals()
         await signTransaction({ transaction: additionTransaction, wallet: alice });
         let { bundle: bundleAdditionConst } = await controller.execute(additionInteraction, additionTransaction);
         assert.isTrue(bundleAdditionConst.returnCode.equals(ReturnCode.Ok));
         assert.lengthOf(bundleAdditionConst.values, 1);
-        assert.deepEqual(bundleAdditionConst.values[0], new ManagedDecimalValue(5, 2));
+        assert.deepEqual(bundleAdditionConst.values[0], new ManagedDecimalValue("5.2", 2));
 
         // log
         await signTransaction({ transaction: mdLnTransaction, wallet: alice });
         let { bundle: bundleMDLn } = await controller.execute(mdLnInteraction, mdLnTransaction);
         assert.isTrue(bundleMDLn.returnCode.equals(ReturnCode.Ok));
         assert.lengthOf(bundleMDLn.values, 1);
-        assert.deepEqual(bundleMDLn.values[0], new ManagedDecimalSignedValue(3135553845, 9));
+        assert.deepEqual(bundleMDLn.values[0], new ManagedDecimalSignedValue("3.135553845", 9));
 
         // addition with var decimals
         await signTransaction({ transaction: additionVarTransaction, wallet: alice });
         let { bundle: bundleAddition } = await controller.execute(additionVarInteraction, additionVarTransaction);
         assert.isTrue(bundleAddition.returnCode.equals(ReturnCode.Ok));
         assert.lengthOf(bundleAddition.values, 1);
-        assert.deepEqual(bundleAddition.values[0], new ManagedDecimalValue(new BigNumber(6254154138880), 9));
+        assert.deepEqual(bundleAddition.values[0], new ManagedDecimalValue("9", 2));
+
+        // log
+        await signTransaction({ transaction: lnVarTransaction, wallet: alice });
+        let { bundle: bundleLnVar } = await controller.execute(lnVarInteraction, lnVarTransaction);
+        assert.isTrue(bundleLnVar.returnCode.equals(ReturnCode.Ok));
+        assert.lengthOf(bundleLnVar.values, 1);
+        assert.deepEqual(bundleLnVar.values[0], new ManagedDecimalSignedValue("3.135553845", 9));
     });
 
     it("should interact with 'counter' (local testnet)", async function () {

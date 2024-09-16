@@ -29,3 +29,4 @@ export * from "./typeMapper";
 export * from "./types";
 export * from "./variadic";
 export * from "./managedDecimal";
+export * from "./managedDecimalSigned";

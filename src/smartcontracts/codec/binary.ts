@@ -18,6 +18,8 @@ import {
     ArrayVec,
     ManagedDecimalType,
     ManagedDecimalValue,
+    ManagedDecimalSignedType,
+    ManagedDecimalSignedValue,
 } from "../typesystem";
 import { guardTrue } from "../../utils";
 import { OptionValueBinaryCodec } from "./option";
@@ -28,6 +30,7 @@ import { EnumBinaryCodec } from "./enum";
 import { TupleBinaryCodec } from "./tuple";
 import { ArrayVecBinaryCodec } from "./arrayVec";
 import { ManagedDecimalCodec } from "./managedDecimal";
+import { ManagedDecimalSignedCodec } from "./managedDecimalSigned";
 
 export class BinaryCodec {
     readonly constraints: BinaryCodecConstraints;
@@ -39,6 +42,7 @@ export class BinaryCodec {
     private readonly tupleCodec: TupleBinaryCodec;
     private readonly enumCodec: EnumBinaryCodec;
     private readonly managedDecimalCodec: ManagedDecimalCodec;
+    private readonly managedDecimalSignedCodec: ManagedDecimalSignedCodec;
 
     constructor(constraints: BinaryCodecConstraints | null = null) {
         this.constraints = constraints || new BinaryCodecConstraints();
@@ -50,6 +54,7 @@ export class BinaryCodec {
         this.tupleCodec = new TupleBinaryCodec(this);
         this.enumCodec = new EnumBinaryCodec(this);
         this.managedDecimalCodec = new ManagedDecimalCodec(this);
+        this.managedDecimalSignedCodec = new ManagedDecimalSignedCodec(this);
     }
 
     decodeTopLevel<TResult extends TypedValue = TypedValue>(buffer: Buffer, type: Type): TResult {
@@ -64,6 +69,8 @@ export class BinaryCodec {
             onTuple: () => this.tupleCodec.decodeTopLevel(buffer, <TupleType>type),
             onEnum: () => this.enumCodec.decodeTopLevel(buffer, <EnumType>type),
             onManagedDecimal: () => this.managedDecimalCodec.decodeTopLevel(buffer, <ManagedDecimalType>type),
+            onManagedDecimalSigned: () =>
+                this.managedDecimalSignedCodec.decodeTopLevel(buffer, <ManagedDecimalSignedType>type),
         });
 
         return <TResult>typedValue;
@@ -81,6 +88,8 @@ export class BinaryCodec {
             onTuple: () => this.tupleCodec.decodeNested(buffer, <TupleType>type),
             onEnum: () => this.enumCodec.decodeNested(buffer, <EnumType>type),
             onManagedDecimal: () => this.managedDecimalCodec.decodeNested(buffer, <ManagedDecimalType>type),
+            onManagedDecimalSigned: () =>
+                this.managedDecimalSignedCodec.decodeNested(buffer, <ManagedDecimalSignedType>type),
         });
 
         return [<TResult>typedResult, decodedLength];
@@ -98,6 +107,8 @@ export class BinaryCodec {
             onTuple: () => this.tupleCodec.encodeNested(<Tuple>typedValue),
             onEnum: () => this.enumCodec.encodeNested(<EnumValue>typedValue),
             onManagedDecimal: () => this.managedDecimalCodec.encodeNested(<ManagedDecimalValue>typedValue),
+            onManagedDecimalSigned: () =>
+                this.managedDecimalSignedCodec.encodeNested(<ManagedDecimalSignedValue>typedValue),
         });
     }
 
@@ -113,6 +124,8 @@ export class BinaryCodec {
             onTuple: () => this.tupleCodec.encodeTopLevel(<Tuple>typedValue),
             onEnum: () => this.enumCodec.encodeTopLevel(<EnumValue>typedValue),
             onManagedDecimal: () => this.managedDecimalCodec.encodeTopLevel(<ManagedDecimalValue>typedValue),
+            onManagedDecimalSigned: () =>
+                this.managedDecimalSignedCodec.encodeTopLevel(<ManagedDecimalSignedValue>typedValue),
         });
     }
 }

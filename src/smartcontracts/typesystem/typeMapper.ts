@@ -10,7 +10,8 @@ import { FieldDefinition } from "./fields";
 import { ListType, OptionType } from "./generic";
 import { ArrayVecType } from "./genericArray";
 import { H256Type } from "./h256";
-import { ManagedDecimalSignedType, ManagedDecimalType } from "./managedDecimal";
+import { ManagedDecimalType } from "./managedDecimal";
+import { ManagedDecimalSignedType } from "./managedDecimalSigned";
 import { NothingType } from "./nothing";
 import {
     BigIntType,

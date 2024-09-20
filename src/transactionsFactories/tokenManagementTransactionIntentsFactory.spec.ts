@@ -1,9 +1,9 @@
 import { assert } from "chai";
+import { Address } from "../address";
 import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { TokenManagementTransactionsFactory } from "./tokenManagementTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
-import { Address } from "../address";
 
 describe("test token management transactions factory", () => {
     let frank: TestWallet, grace: TestWallet;
@@ -354,7 +354,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(transaction.data, Buffer.from("registerDynamic@54657374@544553542d313233343536@464e47"));
         assert.equal(transaction.sender, grace.address.toString());
         assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
-        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.value, 50000000000000000n);
         assert.equal(transaction.gasLimit, 60131000n);
     });
 
@@ -372,7 +372,7 @@ describe("test token management transactions factory", () => {
         );
         assert.equal(transaction.sender, grace.address.toString());
         assert.equal(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp).toBech32());
-        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.value, 50000000000000000n);
         assert.equal(transaction.gasLimit, 60152000n);
     });
 });

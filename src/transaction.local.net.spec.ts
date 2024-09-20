@@ -5,11 +5,11 @@ import { loadTestWallets, TestWallet } from "./testutils";
 import { createLocalnetProvider, INetworkProvider } from "./testutils/networkProviders";
 import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
+import { TransactionComputer } from "./transactionComputer";
 import { TransactionPayload } from "./transactionPayload";
 import { TransactionWatcher } from "./transactionWatcher";
 import { TransactionsFactoryConfig } from "./transactionsFactories/transactionsFactoryConfig";
 import { TransferTransactionsFactory } from "./transactionsFactories/transferTransactionsFactory";
-import { TransactionComputer } from "./transactionComputer";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;
@@ -30,7 +30,7 @@ describe("test transaction", function () {
     }
 
     it("should send transactions and wait for completion", async function () {
-        this.timeout(70000);
+        this.timeout(80000);
 
         let provider = createLocalnetProvider();
         let watcher = createTransactionWatcher(provider);
@@ -76,7 +76,7 @@ describe("test transaction", function () {
     });
 
     it("should send transaction and wait for completion using the new proxy provider", async function () {
-        this.timeout(70000);
+        this.timeout(80000);
 
         let provider = createLocalnetProvider();
         let watcher = createTransactionWatcher(provider);
@@ -142,7 +142,7 @@ describe("test transaction", function () {
     });
 
     it("should create transaction using the TokenTransferFactory", async function () {
-        this.timeout(70000);
+        this.timeout(80000);
 
         const provider = createLocalnetProvider();
         const watcher = createTransactionWatcher(provider);

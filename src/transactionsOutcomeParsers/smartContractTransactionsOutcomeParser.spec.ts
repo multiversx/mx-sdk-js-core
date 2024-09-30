@@ -3,9 +3,9 @@ import {
     ContractResults,
     TransactionEventTopic,
     TransactionOnNetwork,
-    TransactionEvent as TransactionOnNetworkEvent,
-    TransactionLogs as TransactionOnNetworkLogs,
-} from "@multiversx/sdk-network-providers";
+    TransactionEventOnNetwork,
+    TransactionLogsOnNetwork,
+} from "../networkProviders";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
@@ -60,9 +60,9 @@ describe("test smart contract transactions outcome parser", () => {
 
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
-            logs: new TransactionOnNetworkLogs({
+            logs: new TransactionLogsOnNetwork({
                 events: [
-                    new TransactionOnNetworkEvent({
+                    new TransactionEventOnNetwork({
                         identifier: "SCDeploy",
                         topics: [
                             new TransactionEventTopic(contract.getPublicKey().toString("base64")),
@@ -102,9 +102,9 @@ describe("test smart contract transactions outcome parser", () => {
 
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
-            logs: new TransactionOnNetworkLogs({
+            logs: new TransactionLogsOnNetwork({
                 events: [
-                    new TransactionOnNetworkEvent({
+                    new TransactionEventOnNetwork({
                         identifier: "signalError",
                         topics: [
                             new TransactionEventTopic(deployer.getPublicKey().toString("base64")),

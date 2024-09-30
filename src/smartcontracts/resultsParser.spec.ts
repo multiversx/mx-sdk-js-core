@@ -2,12 +2,12 @@ import {
     ContractQueryResponse,
     ContractResultItem,
     ContractResults,
-    TransactionEvent,
+    TransactionEventOnNetwork,
     TransactionEventTopic,
-    TransactionLogs,
+    TransactionLogsOnNetwork,
     TransactionOnNetwork,
-} from "@multiversx/sdk-network-providers";
-import { TransactionEventData } from "@multiversx/sdk-network-providers/out/transactionEvents";
+    TransactionEventData,
+} from "../networkProviders";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import * as fs from "fs";
@@ -220,10 +220,10 @@ describe("test smart contract results parser", () => {
 
     it("should parse contract outcome, on signal error", async () => {
         let transaction = new TransactionOnNetwork({
-            logs: new TransactionLogs({
+            logs: new TransactionLogsOnNetwork({
                 address: Address.empty(),
                 events: [
-                    new TransactionEvent({
+                    new TransactionEventOnNetwork({
                         identifier: "signalError",
                         topics: [new TransactionEventTopic(Buffer.from("something happened").toString("base64"))],
                         data: `@${Buffer.from("user error").toString("hex")}@07`,
@@ -240,10 +240,10 @@ describe("test smart contract results parser", () => {
 
     it("should parse contract outcome, on too much gas warning", async () => {
         let transaction = new TransactionOnNetwork({
-            logs: new TransactionLogs({
+            logs: new TransactionLogsOnNetwork({
                 address: Address.empty(),
                 events: [
-                    new TransactionEvent({
+                    new TransactionEventOnNetwork({
                         identifier: "writeLog",
                         topics: [
                             new TransactionEventTopic(
@@ -269,7 +269,7 @@ describe("test smart contract results parser", () => {
         const abiRegistry = await loadAbiRegistry("src/testdata/esdt-safe.abi.json");
         const eventDefinition = abiRegistry.getEvent("deposit");
 
-        const event = new TransactionEvent({
+        const event = new TransactionEventOnNetwork({
             topics: [
                 new TransactionEventTopic("ZGVwb3NpdA=="),
                 new TransactionEventTopic("cmzC1LRt1r10pMhNAnFb+FyudjGMq4G8CefCYdQUmmc="),

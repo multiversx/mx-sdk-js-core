@@ -2,11 +2,11 @@ import {
     ContractResultItem,
     ContractResults,
     TransactionEventData,
-    TransactionEvent as TransactionEventOnNetwork,
+    TransactionEventOnNetwork,
     TransactionEventTopic,
-    TransactionLogs as TransactionLogsOnNetwork,
+    TransactionLogsOnNetwork,
     TransactionOnNetwork,
-} from "@multiversx/sdk-network-providers";
+} from "../networkProviders";
 import { assert } from "chai";
 import { Address } from "../address";
 import { Transaction } from "../transaction";

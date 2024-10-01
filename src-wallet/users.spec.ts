@@ -26,6 +26,26 @@ describe("test user wallets", () => {
         assert.lengthOf(words, 24);
     });
 
+    it("should convert entropy to mnemonic and back", () => {
+        function testConversion(text: string, entropyHex: string) {
+            const entropyFromMnemonic = Mnemonic.fromString(text).getEntropy();
+            const mnemonicFromEntropy = Mnemonic.fromEntropy(Buffer.from(entropyHex, "hex"));
+
+            assert.equal(Buffer.from(entropyFromMnemonic).toString("hex"), entropyHex);
+            assert.equal(mnemonicFromEntropy.toString(), text);
+        }
+
+        testConversion(
+            "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+            "00000000000000000000000000000000",
+        );
+
+        testConversion(
+            "moral volcano peasant pass circle pen over picture flat shop clap goat never lyrics gather prepare woman film husband gravity behind test tiger improve",
+            "8fbeb688d0529344e77d225898d4a73209510ad81d4ffceac9bfb30149bf387b",
+        );
+    });
+
     it("should derive keys", async () => {
         let mnemonic = Mnemonic.fromString(DummyMnemonic);
 

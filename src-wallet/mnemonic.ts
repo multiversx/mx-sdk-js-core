@@ -32,8 +32,12 @@ export class Mnemonic {
     }
 
     static fromEntropy(entropy: Uint8Array): Mnemonic {
-        const text = entropyToMnemonic(Buffer.from(entropy));
-        return new Mnemonic(text);
+        try {
+            const text = entropyToMnemonic(Buffer.from(entropy));
+            return new Mnemonic(text);
+        } catch (err: any) {
+            throw new ErrBadMnemonicEntropy(err);
+        }
     }
 
     public static assertTextIsValid(text: string) {

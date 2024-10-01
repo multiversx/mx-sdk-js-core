@@ -29,6 +29,15 @@ export class ErrWrongMnemonic extends Err {
 }
 
 /**
+ * Signals a bad mnemonic entropy.
+ */
+export class ErrBadMnemonicEntropy extends Err {
+    public constructor(inner: Error) {
+        super("Bad mnemonic entropy", inner);
+    }
+}
+
+/**
  * Signals a bad PEM file.
  */
 export class ErrBadPEM extends Err {
@@ -49,7 +58,7 @@ export class ErrSignerCannotSign extends Err {
 /**
  * Signals a bad address.
  */
- export class ErrBadAddress extends Err {
+export class ErrBadAddress extends Err {
     public constructor(value: string, inner?: Error) {
         super(`Bad address: ${value}`, inner);
     }

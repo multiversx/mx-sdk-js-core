@@ -44,6 +44,14 @@ describe("test user wallets", () => {
             "moral volcano peasant pass circle pen over picture flat shop clap goat never lyrics gather prepare woman film husband gravity behind test tiger improve",
             "8fbeb688d0529344e77d225898d4a73209510ad81d4ffceac9bfb30149bf387b",
         );
+
+        assert.throws(
+            () => {
+                Mnemonic.fromEntropy(Buffer.from("abba", "hex"));
+            },
+            ErrBadMnemonicEntropy,
+            `Bad mnemonic entropy`,
+        );
     });
 
     it("should derive keys", async () => {

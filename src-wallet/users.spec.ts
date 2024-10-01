@@ -1,10 +1,17 @@
 import { assert } from "chai";
 import { Randomness } from "./crypto";
-import { ErrInvariantFailed } from "./errors";
+import { ErrBadMnemonicEntropy, ErrInvariantFailed } from "./errors";
 import { Mnemonic } from "./mnemonic";
 import { TestMessage } from "./testutils/message";
 import { TestTransaction } from "./testutils/transaction";
-import { DummyMnemonic, DummyMnemonicOf12Words, DummyPassword, loadTestKeystore, loadTestWallet, TestWallet } from "./testutils/wallets";
+import {
+    DummyMnemonic,
+    DummyMnemonicOf12Words,
+    DummyPassword,
+    loadTestKeystore,
+    loadTestWallet,
+    TestWallet,
+} from "./testutils/wallets";
 import { UserSecretKey } from "./userKeys";
 import { UserSigner } from "./userSigner";
 import { UserVerifier } from "./userVerifier";

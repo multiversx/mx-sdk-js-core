@@ -1,12 +1,6 @@
-import {
-    entropyToMnemonic,
-    generateMnemonic,
-    mnemonicToEntropy,
-    mnemonicToSeedSync,
-    validateMnemonic,
-} from "bip39";
+import { entropyToMnemonic, generateMnemonic, mnemonicToEntropy, mnemonicToSeedSync, validateMnemonic } from "bip39";
 import { derivePath } from "ed25519-hd-key";
-import { ErrWrongMnemonic } from "./errors";
+import { ErrBadMnemonicEntropy, ErrWrongMnemonic } from "./errors";
 import { UserSecretKey } from "./userKeys";
 
 const MNEMONIC_STRENGTH = 256;

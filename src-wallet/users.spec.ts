@@ -1,10 +1,17 @@
 import { assert } from "chai";
 import { Randomness } from "./crypto";
-import { ErrInvariantFailed } from "./errors";
+import { ErrBadMnemonicEntropy, ErrInvariantFailed } from "./errors";
 import { Mnemonic } from "./mnemonic";
 import { TestMessage } from "./testutils/message";
 import { TestTransaction } from "./testutils/transaction";
-import { DummyMnemonic, DummyMnemonicOf12Words, DummyPassword, loadTestKeystore, loadTestWallet, TestWallet } from "./testutils/wallets";
+import {
+    DummyMnemonic,
+    DummyMnemonicOf12Words,
+    DummyPassword,
+    loadTestKeystore,
+    loadTestWallet,
+    TestWallet,
+} from "./testutils/wallets";
 import { UserSecretKey } from "./userKeys";
 import { UserSigner } from "./userSigner";
 import { UserVerifier } from "./userVerifier";
@@ -24,6 +31,34 @@ describe("test user wallets", () => {
         let mnemonic = Mnemonic.generate();
         let words = mnemonic.getWords();
         assert.lengthOf(words, 24);
+    });
+
+    it("should convert entropy to mnemonic and back", () => {
+        function testConversion(text: string, entropyHex: string) {
+            const entropyFromMnemonic = Mnemonic.fromString(text).getEntropy();
+            const mnemonicFromEntropy = Mnemonic.fromEntropy(Buffer.from(entropyHex, "hex"));
+
+            assert.equal(Buffer.from(entropyFromMnemonic).toString("hex"), entropyHex);
+            assert.equal(mnemonicFromEntropy.toString(), text);
+        }
+
+        testConversion(
+            "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+            "00000000000000000000000000000000",
+        );
+
+        testConversion(
+            "moral volcano peasant pass circle pen over picture flat shop clap goat never lyrics gather prepare woman film husband gravity behind test tiger improve",
+            "8fbeb688d0529344e77d225898d4a73209510ad81d4ffceac9bfb30149bf387b",
+        );
+
+        assert.throws(
+            () => {
+                Mnemonic.fromEntropy(Buffer.from("abba", "hex"));
+            },
+            ErrBadMnemonicEntropy,
+            `Bad mnemonic entropy`,
+        );
     });
 
     it("should derive keys", async () => {

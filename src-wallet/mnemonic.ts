@@ -1,6 +1,6 @@
-import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from "bip39";
+import { entropyToMnemonic, generateMnemonic, mnemonicToEntropy, mnemonicToSeedSync, validateMnemonic } from "bip39";
 import { derivePath } from "ed25519-hd-key";
-import { ErrWrongMnemonic } from "./errors";
+import { ErrBadMnemonicEntropy, ErrWrongMnemonic } from "./errors";
 import { UserSecretKey } from "./userKeys";
 
 const MNEMONIC_STRENGTH = 256;
@@ -14,7 +14,7 @@ export class Mnemonic {
     }
 
     static generate(): Mnemonic {
-        let text = generateMnemonic(MNEMONIC_STRENGTH);
+        const text = generateMnemonic(MNEMONIC_STRENGTH);
         return new Mnemonic(text);
     }
 
@@ -23,6 +23,15 @@ export class Mnemonic {
 
         Mnemonic.assertTextIsValid(text);
         return new Mnemonic(text);
+    }
+
+    static fromEntropy(entropy: Uint8Array): Mnemonic {
+        try {
+            const text = entropyToMnemonic(Buffer.from(entropy));
+            return new Mnemonic(text);
+        } catch (err: any) {
+            throw new ErrBadMnemonicEntropy(err);
+        }
     }
 
     public static assertTextIsValid(text: string) {
@@ -43,6 +52,11 @@ export class Mnemonic {
 
     getWords(): string[] {
         return this.text.split(" ");
+    }
+
+    getEntropy(): Uint8Array {
+        const entropy = mnemonicToEntropy(this.text);
+        return Buffer.from(entropy, "hex");
     }
 
     toString(): string {

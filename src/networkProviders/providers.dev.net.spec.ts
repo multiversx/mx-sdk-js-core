@@ -4,10 +4,10 @@ import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { INetworkProvider, ITransactionNext } from "./interface";
 import { Address } from "./primitives";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
-import { MockQuery } from "./testscommon/dummyQuery";
 import { NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionEventData } from "./transactionEvents";
 import { TransactionOnNetwork } from "./transactions";
+import { MockQuery } from "../testutils/dummyQuery";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -15,8 +15,14 @@ describe("test network providers on devnet: Proxy and API", function () {
     let dan = new Address("erd1kyaqzaprcdnv4luvanah0gfxzzsnpaygsy6pytrexll2urtd05ts9vegu7");
     const MAX_NUMBER_OF_ITEMS_BY_DEFAULT = 20;
 
-    let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com", { timeout: 10000, clientName: 'test' });
-    let proxyProvider: INetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", { timeout: 10000, clientName: 'test' });
+    let apiProvider: INetworkProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com", {
+        timeout: 10000,
+        clientName: "test",
+    });
+    let proxyProvider: INetworkProvider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", {
+        timeout: 10000,
+        clientName: "test",
+    });
 
     it("should create providers without configuration", async function () {
         const apiProviderWithoutConfig = new ApiNetworkProvider("https://devnet-api.multiversx.com");
@@ -24,7 +30,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         const apiResponse = await apiProviderWithoutConfig.getNetworkConfig();
         const proxyResponse = await proxyProviderWithoutConfig.getNetworkConfig();
-        
+
         assert.equal(apiResponse.ChainID, "D");
         assert.equal(proxyResponse.ChainID, "D");
     });
@@ -37,33 +43,49 @@ describe("test network providers on devnet: Proxy and API", function () {
     });
 
     it("should add userAgent unknown for clientName when no clientName passed", async function () {
-        const expectedApiUserAgent = "multiversx-sdk/api/unknown"
-        const expectedProxyUserAgent = "multiversx-sdk/proxy/unknown"
+        const expectedApiUserAgent = "multiversx-sdk/api/unknown";
+        const expectedProxyUserAgent = "multiversx-sdk/proxy/unknown";
 
         let localApiProvider: any = new ApiNetworkProvider("https://devnet-api.multiversx.com", { timeout: 10000 });
-        let localProxyProvider: any = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", { timeout: 10000 });
+        let localProxyProvider: any = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", {
+            timeout: 10000,
+        });
 
         assert.equal(localApiProvider.config.headers.getUserAgent(), expectedApiUserAgent);
         assert.equal(localProxyProvider.config.headers.getUserAgent(), expectedProxyUserAgent);
     });
 
     it("should set userAgent with specified clientName ", async function () {
-        const expectedApiUserAgent = "multiversx-sdk/api/test"
-        const expectedProxyUserAgent = "multiversx-sdk/proxy/test"
+        const expectedApiUserAgent = "multiversx-sdk/api/test";
+        const expectedProxyUserAgent = "multiversx-sdk/proxy/test";
 
-        let localApiProvider: any = new ApiNetworkProvider("https://devnet-api.multiversx.com", { timeout: 10000, clientName: 'test' });
-        let localProxyProvider: any = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", { timeout: 10000, clientName: 'test' });
+        let localApiProvider: any = new ApiNetworkProvider("https://devnet-api.multiversx.com", {
+            timeout: 10000,
+            clientName: "test",
+        });
+        let localProxyProvider: any = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", {
+            timeout: 10000,
+            clientName: "test",
+        });
 
         assert.equal(localApiProvider.config.headers.getUserAgent(), expectedApiUserAgent);
         assert.equal(localProxyProvider.config.headers.getUserAgent(), expectedProxyUserAgent);
     });
 
     it("should keep the set userAgent and add the sdk to it", async function () {
-        const expectedApiUserAgent = "Client-info multiversx-sdk/api/test"
-        const expectedProxyUserAgent = "Client-info multiversx-sdk/proxy/test"
+        const expectedApiUserAgent = "Client-info multiversx-sdk/api/test";
+        const expectedProxyUserAgent = "Client-info multiversx-sdk/proxy/test";
 
-        let localApiProvider: any = new ApiNetworkProvider("https://devnet-api.multiversx.com", { timeout: 10000, headers: new AxiosHeaders({ "User-Agent": "Client-info" }), clientName: 'test' });
-        let localProxyProvider: any = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", { timeout: 10000, headers: new AxiosHeaders({ "User-Agent": "Client-info" }), clientName: 'test' });
+        let localApiProvider: any = new ApiNetworkProvider("https://devnet-api.multiversx.com", {
+            timeout: 10000,
+            headers: new AxiosHeaders({ "User-Agent": "Client-info" }),
+            clientName: "test",
+        });
+        let localProxyProvider: any = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com", {
+            timeout: 10000,
+            headers: new AxiosHeaders({ "User-Agent": "Client-info" }),
+            clientName: "test",
+        });
 
         assert.equal(localApiProvider.config.headers.getUserAgent(), expectedApiUserAgent);
         assert.equal(localProxyProvider.config.headers.getUserAgent(), expectedProxyUserAgent);
@@ -111,8 +133,14 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(30000);
 
         for (const user of [carol, dan]) {
-            let apiResponse = (await apiProvider.getFungibleTokensOfAccount(user)).slice(0, MAX_NUMBER_OF_ITEMS_BY_DEFAULT);
-            let proxyResponse = (await proxyProvider.getFungibleTokensOfAccount(user)).slice(0, MAX_NUMBER_OF_ITEMS_BY_DEFAULT);
+            let apiResponse = (await apiProvider.getFungibleTokensOfAccount(user)).slice(
+                0,
+                MAX_NUMBER_OF_ITEMS_BY_DEFAULT,
+            );
+            let proxyResponse = (await proxyProvider.getFungibleTokensOfAccount(user)).slice(
+                0,
+                MAX_NUMBER_OF_ITEMS_BY_DEFAULT,
+            );
 
             for (let i = 0; i < apiResponse.length; i++) {
                 assert.equal(apiResponse[i].identifier, proxyResponse[i].identifier);
@@ -124,8 +152,14 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should have same response for getNonFungibleTokensOfAccount(), getNonFungibleTokenOfAccount", async function () {
         this.timeout(30000);
 
-        let apiResponse = (await apiProvider.getNonFungibleTokensOfAccount(dan)).slice(0, MAX_NUMBER_OF_ITEMS_BY_DEFAULT);
-        let proxyResponse = (await proxyProvider.getNonFungibleTokensOfAccount(dan)).slice(0, MAX_NUMBER_OF_ITEMS_BY_DEFAULT);
+        let apiResponse = (await apiProvider.getNonFungibleTokensOfAccount(dan)).slice(
+            0,
+            MAX_NUMBER_OF_ITEMS_BY_DEFAULT,
+        );
+        let proxyResponse = (await proxyProvider.getNonFungibleTokensOfAccount(dan)).slice(
+            0,
+            MAX_NUMBER_OF_ITEMS_BY_DEFAULT,
+        );
 
         assert.isTrue(apiResponse.length > 0, "For the sake of the test, there should be at least one item.");
         assert.equal(apiResponse.length, proxyResponse.length);
@@ -145,7 +179,10 @@ describe("test network providers on devnet: Proxy and API", function () {
     });
 
     // TODO: Strive to have as little differences as possible between Proxy and API.
-    function removeInconsistencyForNonFungibleTokenOfAccount(apiResponse: NonFungibleTokenOfAccountOnNetwork, proxyResponse: NonFungibleTokenOfAccountOnNetwork) {
+    function removeInconsistencyForNonFungibleTokenOfAccount(
+        apiResponse: NonFungibleTokenOfAccountOnNetwork,
+        proxyResponse: NonFungibleTokenOfAccountOnNetwork,
+    ) {
         // unset unconsistent fields
         apiResponse.type = "";
         proxyResponse.type = "";
@@ -162,47 +199,49 @@ describe("test network providers on devnet: Proxy and API", function () {
             {
                 toSendable: function () {
                     return {
-                        "nonce": 42,
-                        "value": "1",
-                        "receiver": "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
-                        "sender": "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
-                        "gasPrice": 1000000000,
-                        "gasLimit": 50000,
-                        "chainID": "D",
-                        "version": 1,
-                        "signature": "c8eb539e486db7d703d8c70cab3b7679113f77c4685d8fcc94db027ceacc6b8605115034355386dffd7aa12e63dbefa03251a2f1b1d971f52250187298d12900"
-                    }
-                }
+                        nonce: 42,
+                        value: "1",
+                        receiver: "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
+                        sender: "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
+                        gasPrice: 1000000000,
+                        gasLimit: 50000,
+                        chainID: "D",
+                        version: 1,
+                        signature:
+                            "c8eb539e486db7d703d8c70cab3b7679113f77c4685d8fcc94db027ceacc6b8605115034355386dffd7aa12e63dbefa03251a2f1b1d971f52250187298d12900",
+                    };
+                },
             },
             {
                 toSendable: function () {
                     return {
-                        "nonce": 43,
-                        "value": "1",
-                        "receiver": "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
-                        "sender": "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
-                        "gasPrice": 1000000000,
-                        "gasLimit": 50000,
-                        "chainID": "D",
-                        "version": 1,
-                        "signature": "9c4c22d0ae1b5a10c39583a5ab9020b00b27aa69d4ac8ab4922620dbf0df4036ed890f9946d38a9d0c85d6ac485c0d9b2eac0005e752f249fd0ad863b0471d02"
-                    }
-                }
+                        nonce: 43,
+                        value: "1",
+                        receiver: "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
+                        sender: "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
+                        gasPrice: 1000000000,
+                        gasLimit: 50000,
+                        chainID: "D",
+                        version: 1,
+                        signature:
+                            "9c4c22d0ae1b5a10c39583a5ab9020b00b27aa69d4ac8ab4922620dbf0df4036ed890f9946d38a9d0c85d6ac485c0d9b2eac0005e752f249fd0ad863b0471d02",
+                    };
+                },
             },
             {
                 toSendable: function () {
                     return {
-                        "nonce": 44
-                    }
-                }
-            }
+                        nonce: 44,
+                    };
+                },
+            },
         ];
 
         const expectedHashes = [
             "6e2fa63ea02937f00d7549f3e4eb9af241e4ac13027aa65a5300816163626c01",
             "37d7e84313a5baea2a61c6ab10bb29b52bc54f7ac9e3918a9faeb1e08f42081c",
-            null
-        ]
+            null,
+        ];
 
         assert.equal(await apiProvider.sendTransaction(txs[0]), expectedHashes[0]);
         assert.equal(await proxyProvider.sendTransaction(txs[1]), expectedHashes[1]);
@@ -216,7 +255,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         let hashes = [
             "08acf8cbd71306a56eb58f9593cb2e23f109c94e27acdd906c82a5c3a5f84d9d",
-            "410efb1db2ab86678b8dbc503beb695b5b7d52754fb0de86c09cbb433de5f6a8"
+            "410efb1db2ab86678b8dbc503beb695b5b7d52754fb0de86c09cbb433de5f6a8",
         ];
 
         for (const hash of hashes) {
@@ -233,9 +272,12 @@ describe("test network providers on devnet: Proxy and API", function () {
     });
 
     // TODO: Strive to have as little differences as possible between Proxy and API.
-    function ignoreKnownTransactionDifferencesBetweenProviders(apiResponse: TransactionOnNetwork, proxyResponse: TransactionOnNetwork) {
+    function ignoreKnownTransactionDifferencesBetweenProviders(
+        apiResponse: TransactionOnNetwork,
+        proxyResponse: TransactionOnNetwork,
+    ) {
         // Proxy and API exhibit differences in the "function" field, in case of move-balance transactions.
-        apiResponse.function = proxyResponse.function
+        apiResponse.function = proxyResponse.function;
 
         // Ignore fields which are not present on API response:
         proxyResponse.epoch = 0;
@@ -252,16 +294,22 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         assert.exists(apiResponse.logs);
         assert.exists(proxyResponse.logs);
-        assert.exists(apiResponse.logs.events)
-        assert.exists(proxyResponse.logs.events)
-        assert.equal(apiResponse.logs.events[0].topics[0].hex(), "414c4943452d353632376631")
-        assert.equal(apiResponse.logs.events[0].topics[1].hex(), "")
-        assert.equal(apiResponse.logs.events[0].topics[2].hex(), "01")
-        assert.equal(apiResponse.logs.events[0].topics[3].hex(), "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1")
-        assert.equal(proxyResponse.logs.events[0].topics[0].hex(), "414c4943452d353632376631")
-        assert.equal(proxyResponse.logs.events[0].topics[1].hex(), "")
-        assert.equal(proxyResponse.logs.events[0].topics[2].hex(), "01")
-        assert.equal(proxyResponse.logs.events[0].topics[3].hex(), "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1")
+        assert.exists(apiResponse.logs.events);
+        assert.exists(proxyResponse.logs.events);
+        assert.equal(apiResponse.logs.events[0].topics[0].hex(), "414c4943452d353632376631");
+        assert.equal(apiResponse.logs.events[0].topics[1].hex(), "");
+        assert.equal(apiResponse.logs.events[0].topics[2].hex(), "01");
+        assert.equal(
+            apiResponse.logs.events[0].topics[3].hex(),
+            "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1",
+        );
+        assert.equal(proxyResponse.logs.events[0].topics[0].hex(), "414c4943452d353632376631");
+        assert.equal(proxyResponse.logs.events[0].topics[1].hex(), "");
+        assert.equal(proxyResponse.logs.events[0].topics[2].hex(), "01");
+        assert.equal(
+            proxyResponse.logs.events[0].topics[3].hex(),
+            "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1",
+        );
     });
 
     it("should have same response for getTransactionStatus()", async function () {
@@ -269,7 +317,7 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         let hashes = [
             "08acf8cbd71306a56eb58f9593cb2e23f109c94e27acdd906c82a5c3a5f84d9d",
-            "410efb1db2ab86678b8dbc503beb695b5b7d52754fb0de86c09cbb433de5f6a8"
+            "410efb1db2ab86678b8dbc503beb695b5b7d52754fb0de86c09cbb433de5f6a8",
         ];
 
         for (const hash of hashes) {
@@ -293,7 +341,6 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         assert.equal(apiResponse.identifier, identifier);
         assert.deepEqual(apiResponse, proxyResponse);
-
     });
 
     it("should have same response for getDefinitionOfTokenCollection()", async function () {
@@ -332,7 +379,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         // Query: get sum (of adder contract)
         let query = new MockQuery({
             address: new Address("erd1qqqqqqqqqqqqqpgqfzydqmdw7m2vazsp6u5p95yxz76t2p9rd8ss0zp9ts"),
-            func: "getSum"
+            func: "getSum",
         });
 
         let apiResponse = await apiProvider.queryContract(query);
@@ -349,8 +396,12 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should handle events 'data' and 'additionalData'", async function () {
         this.timeout(50000);
 
-        const apiResponse = await apiProvider.getTransaction("a419271407a2ec217739811805e3a751e30dbc72ae0777e3b4c825f036995184");
-        const proxyResponse = await proxyProvider.getTransaction("a419271407a2ec217739811805e3a751e30dbc72ae0777e3b4c825f036995184");
+        const apiResponse = await apiProvider.getTransaction(
+            "a419271407a2ec217739811805e3a751e30dbc72ae0777e3b4c825f036995184",
+        );
+        const proxyResponse = await proxyProvider.getTransaction(
+            "a419271407a2ec217739811805e3a751e30dbc72ae0777e3b4c825f036995184",
+        );
 
         assert.equal(apiResponse.logs.events[0].data, Buffer.from("test").toString());
         assert.equal(proxyResponse.logs.events[0].data, Buffer.from("test").toString());
@@ -368,18 +419,19 @@ describe("test network providers on devnet: Proxy and API", function () {
         const transaction = {
             toSendable: function () {
                 return {
-                    "nonce": 7,
-                    "value": "0",
-                    "receiver": "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
-                    "sender": "erd1zztjf9fhwvuvquzsllknq4qcmffwad6n0hjtn5dyzytr5tgz7uas0mkgrq",
-                    "gasPrice": 1000000000,
-                    "gasLimit": 50000,
-                    "chainID": "D",
-                    "version": 2,
-                    "signature": "149f1d8296efcb9489c5b3142ae659aacfa3a7daef3645f1d3747a96dc9cee377070dd8b83b322997c15ba3c305ac18daaee0fd25760eba334b14a9272b34802"
-                }
-            }
-        }
+                    nonce: 7,
+                    value: "0",
+                    receiver: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+                    sender: "erd1zztjf9fhwvuvquzsllknq4qcmffwad6n0hjtn5dyzytr5tgz7uas0mkgrq",
+                    gasPrice: 1000000000,
+                    gasLimit: 50000,
+                    chainID: "D",
+                    version: 2,
+                    signature:
+                        "149f1d8296efcb9489c5b3142ae659aacfa3a7daef3645f1d3747a96dc9cee377070dd8b83b322997c15ba3c305ac18daaee0fd25760eba334b14a9272b34802",
+                };
+            },
+        };
 
         const transactionNext: ITransactionNext = {
             nonce: BigInt(8),
@@ -391,13 +443,16 @@ describe("test network providers on devnet: Proxy and API", function () {
             gasLimit: BigInt(80000),
             chainID: "D",
             version: 2,
-            signature: Buffer.from("3fa42d97b4f85442850340a11411a3cbd63885e06ff3f84c7a75d0ef59c780f7a18aa4f331cf460300bc8bd99352aea10b7c3bc17e40287337ae9f9842470205", "hex"),
+            signature: Buffer.from(
+                "3fa42d97b4f85442850340a11411a3cbd63885e06ff3f84c7a75d0ef59c780f7a18aa4f331cf460300bc8bd99352aea10b7c3bc17e40287337ae9f9842470205",
+                "hex",
+            ),
             senderUsername: "",
             receiverUsername: "",
             guardian: "",
             guardianSignature: new Uint8Array(),
-            options: 0
-        }
+            options: 0,
+        };
 
         const apiLegacyTxHash = await apiProvider.sendTransaction(transaction);
         const apiTxNextHash = await apiProvider.sendTransaction(transactionNext);

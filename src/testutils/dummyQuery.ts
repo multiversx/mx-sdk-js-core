@@ -1,5 +1,6 @@
-import { IAddress, IContractQuery } from "../interface";
-import { Address } from "../primitives";
+import { Address } from "../address";
+import { IAddress } from "../interface";
+import { IContractQuery } from "../networkProviders/interface";
 
 export class MockQuery implements IContractQuery {
     caller: IAddress = new Address("");

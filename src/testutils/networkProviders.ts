@@ -1,4 +1,4 @@
-import { ApiNetworkProvider, ProxyNetworkProvider } from "@multiversx/sdk-network-providers";
+import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
 import { IAddress } from "../interface";
 import {
     IAccountOnNetwork,

@@ -1,4 +1,4 @@
-import { ContractQueryResponse } from "@multiversx/sdk-network-providers";
+import { ContractQueryResponse } from "../networkProviders";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";

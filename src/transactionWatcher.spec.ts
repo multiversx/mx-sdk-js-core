@@ -1,4 +1,4 @@
-import { TransactionOnNetwork, TransactionStatus } from "@multiversx/sdk-network-providers";
+import { TransactionOnNetwork, TransactionStatus } from "./networkProviders";
 import { assert } from "chai";
 import { MarkCompleted, MockNetworkProvider, Wait } from "./testutils";
 import { TransactionHash } from "./transaction";

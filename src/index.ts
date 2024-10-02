@@ -33,3 +33,4 @@ export * from "./transactionWatcher";
 export * from "./transactionsFactories";
 export * from "./transactionsOutcomeParsers";
 export * from "./utils";
+export * from "./networkProviders";

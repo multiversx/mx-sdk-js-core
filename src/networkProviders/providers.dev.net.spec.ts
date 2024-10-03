@@ -271,6 +271,49 @@ describe("test network providers on devnet: Proxy and API", function () {
         }
     });
 
+    it("should have same response for getTransaction() (relayed V3)", async function () {
+        this.timeout(20000);
+
+        // Transaction was sent using mxpy, as follows:
+        // mxpy tx new --pem=~/multiversx-sdk/testwallets/latest/users/alice.pem --receiver=erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx --value=1000000000000000000 --gas-limit=50000 --recall-nonce --relayer=erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede --inner-transactions-outfile=inner.json --proxy=https://devnet-gateway.multiversx.com
+        // mxpy tx new --pem=~/multiversx-sdk/testwallets/latest/users/grace.pem --receiver=erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede --gas-limit=100000 --recall-nonce --chain=D --inner-transactions=inner.json --proxy=https://devnet-gateway.multiversx.com --send
+
+        const txHash = "8cdfb790be8cd4b331da486ba014ed56d0dbac70c1cfbadf11db2edd48d0e437";
+        const apiResponse = await apiProvider.getTransaction(txHash);
+        const proxyResponse = await proxyProvider.getTransaction(txHash, true);
+
+        assert.deepEqual(proxyResponse.innerTransactions, [
+            {
+                nonce: BigInt(9340),
+                value: BigInt("1000000000000000000"),
+                receiver: "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+                sender: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+                data: Buffer.from([]),
+                gasPrice: BigInt(1000000000),
+                gasLimit: BigInt(50000),
+                chainID: "D",
+                version: 2,
+                signature: Buffer.from(
+                    "0993c2f3a47c01cf8330e54571ea9340aae481d0d5212af31b62eb7194e199231f105134aae28a75bb48b53a3dff09d6c6208843c8e0376617cf62d3bfb60204",
+                    "hex",
+                ),
+                senderUsername: "",
+                receiverUsername: "",
+                guardian: "",
+                guardianSignature: Buffer.from([]),
+                options: 0,
+                relayer: "erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede",
+            },
+        ]);
+
+        ignoreKnownTransactionDifferencesBetweenProviders(apiResponse, proxyResponse);
+        assert.deepEqual(apiResponse, proxyResponse);
+
+        // Also assert completion
+        assert.isTrue(apiResponse.isCompleted);
+        assert.isTrue(proxyResponse.isCompleted);
+    });
+
     // TODO: Strive to have as little differences as possible between Proxy and API.
     function ignoreKnownTransactionDifferencesBetweenProviders(
         apiResponse: TransactionOnNetwork,
@@ -284,7 +327,67 @@ describe("test network providers on devnet: Proxy and API", function () {
         proxyResponse.blockNonce = 0;
         proxyResponse.hyperblockNonce = 0;
         proxyResponse.hyperblockHash = "";
+
+        // API does not provide "innerTransactions" (Spica), for the moment.
+        proxyResponse.innerTransactions = [];
     }
+
+    it("should send `TransactionNext` (as relayed V3)", async function () {
+        this.timeout(50000);
+
+        // Transaction was created using mxpy, as follows:
+        // mxpy tx new --pem=~/multiversx-sdk/testwallets/latest/users/alice.pem --receiver=erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx --value=1000000000000000000 --gas-limit=50000 --nonce=7 --chain=D --relayer=erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede --inner-transactions-outfile=inner.json
+        // mxpy tx new --pem=~/multiversx-sdk/testwallets/latest/users/grace.pem --receiver=erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede --gas-limit=100000 --nonce=42 --chain=D --inner-transactions=inner.json
+
+        const transactionNext: ITransactionNext = {
+            nonce: BigInt(42),
+            value: BigInt(0),
+            receiver: "erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede",
+            sender: "erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede",
+            data: new Uint8Array(),
+            gasPrice: BigInt(1000000000),
+            gasLimit: BigInt(100000),
+            chainID: "D",
+            version: 2,
+            signature: Buffer.from(
+                "c623854967c954d13681035d5b24be68a5a58d25e7efdc75c7d59b5c389e1ad6c9d21a6f41149ec6e8bd051d74f3636a60ce047062f05c748600c36348238e0b",
+                "hex",
+            ),
+            senderUsername: "",
+            receiverUsername: "",
+            guardian: "",
+            guardianSignature: new Uint8Array(),
+            options: 0,
+            innerTransactions: [
+                {
+                    nonce: BigInt(7),
+                    value: BigInt("1000000000000000000"),
+                    receiver: "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+                    sender: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+                    data: new Uint8Array(),
+                    gasPrice: BigInt(1000000000),
+                    gasLimit: BigInt(50000),
+                    chainID: "D",
+                    version: 2,
+                    signature: Buffer.from(
+                        "40808231154b9924c0d5f885d320f4ab666308f7443ea128ac26029b1de07abfcee6412e1249a9c0fcf79638d9691be3c9fe75dd7c85462082f9b86c4008b30e",
+                        "hex",
+                    ),
+                    senderUsername: "",
+                    receiverUsername: "",
+                    guardian: "",
+                    guardianSignature: new Uint8Array(),
+                    options: 0,
+                    relayer: "erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede",
+                },
+            ],
+        };
+
+        const apiTxNextHash = await apiProvider.sendTransaction(transactionNext);
+        const proxyTxNextHash = await proxyProvider.sendTransaction(transactionNext);
+
+        assert.equal(apiTxNextHash, proxyTxNextHash);
+    });
 
     it("should have the same response for transactions with events", async function () {
         const hash = "1b04eb849cf87f2d3086c77b4b825d126437b88014327bbf01437476751cb040";

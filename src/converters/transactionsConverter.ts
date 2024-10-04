@@ -165,8 +165,16 @@ export class TransactionsConverter {
                 index,
             );
 
-            const outcome = this.transactionOnNetworkToOutcome(innerTransactionAsTransactionOnNetwork);
-            outcomes.push(outcome);
+            try {
+                const outcome = this.transactionOnNetworkToOutcome(innerTransactionAsTransactionOnNetwork);
+                outcomes.push(outcome);
+            } catch (error) {
+                console.warn(
+                    `Failed to convert inner transaction #${index} of ${transactionOnNetwork.hash} to outcome: ${error}`,
+                );
+
+                outcomes.push(new TransactionOutcome({}));
+            }
         }
 
         return outcomes;
@@ -208,6 +216,7 @@ export class TransactionsConverter {
         );
 
         return {
+            // Artificially created hash.
             hash: `${parentTransactionOnNetwork.hash}-${innerTransactionIndex}`,
             // The legacy ResultsParser does not use "type".
             type: "",

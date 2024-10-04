@@ -355,6 +355,25 @@ export class ResultsParser {
             }
         }
 
+        // Additional fallback heuristics (alter search constraints):
+        for (const resultItem of transaction.contractResults.items) {
+            let writeLogWithReturnData = resultItem.logs.findSingleOrNoneEvent(WellKnownEvents.OnWriteLog, (event) => {
+                const addressIsContract = event.address.bech32() == contractAddress.toBech32();
+                return addressIsContract;
+            });
+
+            if (writeLogWithReturnData) {
+                const { returnCode, returnDataParts } = this.sliceDataFieldInParts(writeLogWithReturnData.data);
+                const returnMessage = returnCode.toString();
+
+                return {
+                    returnCode: returnCode,
+                    returnMessage: returnMessage,
+                    values: returnDataParts,
+                };
+            }
+        }
+
         return null;
     }
 

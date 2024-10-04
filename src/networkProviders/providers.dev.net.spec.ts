@@ -1,5 +1,6 @@
 import { AxiosHeaders } from "axios";
 import { assert } from "chai";
+import { MockQuery } from "../testutils/dummyQuery";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { INetworkProvider, ITransactionNext } from "./interface";
 import { Address } from "./primitives";
@@ -7,7 +8,6 @@ import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionEventData } from "./transactionEvents";
 import { TransactionOnNetwork } from "./transactions";
-import { MockQuery } from "../testutils/dummyQuery";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -303,6 +303,7 @@ describe("test network providers on devnet: Proxy and API", function () {
                 guardianSignature: Buffer.from([]),
                 options: 0,
                 relayer: "erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede",
+                innerTransactions: [],
             },
         ]);
 
@@ -358,6 +359,7 @@ describe("test network providers on devnet: Proxy and API", function () {
             guardian: "",
             guardianSignature: new Uint8Array(),
             options: 0,
+            relayer: "",
             innerTransactions: [
                 {
                     nonce: BigInt(7),
@@ -379,6 +381,7 @@ describe("test network providers on devnet: Proxy and API", function () {
                     guardianSignature: new Uint8Array(),
                     options: 0,
                     relayer: "erd1r69gk66fmedhhcg24g2c5kn2f2a5k4kvpr6jfw67dn2lyydd8cfswy6ede",
+                    innerTransactions: [],
                 },
             ],
         };
@@ -555,6 +558,8 @@ describe("test network providers on devnet: Proxy and API", function () {
             guardian: "",
             guardianSignature: new Uint8Array(),
             options: 0,
+            relayer: "",
+            innerTransactions: [],
         };
 
         const apiLegacyTxHash = await apiProvider.sendTransaction(transaction);

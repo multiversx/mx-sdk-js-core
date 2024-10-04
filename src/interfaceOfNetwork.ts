@@ -1,4 +1,4 @@
-import { IAccountBalance, IAddress } from "./interface";
+import { IAccountBalance, IAddress, ITransaction } from "./interface";
 
 export interface IAccountOnNetwork {
     nonce: number;
@@ -26,6 +26,10 @@ export interface ITransactionOnNetwork {
     receipt: ITransactionReceipt;
     contractResults: IContractResults;
     logs: ITransactionLogs;
+
+    // TODO: In a future major release, make these required (empty is allowed).
+    relayer?: string;
+    innerTransactions?: ITransaction[];
 }
 
 export interface ITransactionStatus {
@@ -53,6 +57,7 @@ export interface IContractResultItem {
     data: string;
     returnMessage: string;
     logs: ITransactionLogs;
+    previousHash?: string;
 }
 
 export interface IContractQueryResponse {

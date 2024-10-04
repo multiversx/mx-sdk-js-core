@@ -1,5 +1,7 @@
+import { Address } from "../address";
 import { IPlainTransactionObject, ITransaction } from "../interface";
 import { IContractResultItem, ITransactionEvent, ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { TransactionReceipt, TransactionStatus } from "../networkProviders";
 import { ResultsParser } from "../smartcontracts";
 import { Transaction } from "../transaction";
 import {
@@ -79,6 +81,12 @@ export class TransactionsConverter {
         return Buffer.from(value || "", "hex");
     }
 
+    /**
+     * Summarizes the outcome of a transaction on the network, and maps it to the "standard" resources (according to the sdk-specs).
+     *
+     * In the future, this converter function will become obsolete,
+     * as the impedance mismatch between the network components and the "core" components will be reduced.
+     */
     public transactionOnNetworkToOutcome(transactionOnNetwork: ITransactionOnNetwork): TransactionOutcome {
         // In the future, this will not be needed because the transaction, as returned from the API,
         // will hold the data corresponding to the direct smart contract call outcome (in case of smart contract calls).
@@ -140,5 +148,80 @@ export class TransactionsConverter {
             topics: eventOnNetwork.topics.map((topic) => Buffer.from(topic.hex(), "hex")),
             dataItems: dataItems,
         });
+    }
+
+    /**
+     * Generally speaking, useful for Relayed V3 transactions.
+     */
+    public transactionOnNetworkToOutcomesOfInnerTransactions(
+        transactionOnNetwork: ITransactionOnNetwork,
+    ): TransactionOutcome[] {
+        const innerTransactions = transactionOnNetwork.innerTransactions || [];
+        const outcomes: TransactionOutcome[] = [];
+
+        for (let index = 0; index < innerTransactions.length; index++) {
+            const innerTransactionAsTransactionOnNetwork = this.convertInnerTransactionToTransactionOnNetwork(
+                transactionOnNetwork,
+                index,
+            );
+
+            const outcome = this.transactionOnNetworkToOutcome(innerTransactionAsTransactionOnNetwork);
+            outcomes.push(outcome);
+        }
+
+        return outcomes;
+    }
+
+    /**
+     * Artificially converts an inner transaction (of a relayed V3) to a transaction on the network,
+     * by matching the inner transaction with its corresponding smart contract result.
+     */
+    private convertInnerTransactionToTransactionOnNetwork(
+        parentTransactionOnNetwork: ITransactionOnNetwork,
+        innerTransactionIndex: number,
+    ): ITransactionOnNetwork {
+        if (
+            !parentTransactionOnNetwork.innerTransactions ||
+            parentTransactionOnNetwork.innerTransactions.length <= innerTransactionIndex
+        ) {
+            throw new Error("Inner transaction index is out of bounds");
+        }
+
+        const innerTransaction = parentTransactionOnNetwork.innerTransactions[innerTransactionIndex];
+
+        const rootSmartContractResultCandidates = parentTransactionOnNetwork.contractResults.items.filter(
+            (result, _index) =>
+                result.previousHash === parentTransactionOnNetwork.hash &&
+                result.sender.bech32() == innerTransaction.sender &&
+                result.nonce == Number(innerTransaction.nonce),
+        );
+
+        if (rootSmartContractResultCandidates.length !== 1) {
+            throw new Error(
+                `Failed to find the root smart contract result for inner transaction ${innerTransactionIndex}`,
+            );
+        }
+
+        const rootSmartContractResult = rootSmartContractResultCandidates[0];
+        const remainingSmartContractResults = parentTransactionOnNetwork.contractResults.items.filter(
+            (result, _index) => result.previousHash === rootSmartContractResult.hash,
+        );
+
+        return {
+            hash: `${parentTransactionOnNetwork.hash}-${innerTransactionIndex}`,
+            // The legacy ResultsParser does not use "type".
+            type: "",
+            // The legacy ResultsParser uses "status" to detect invalid transactions.
+            // Though, for the moment, we don't pass a proper status (a bit harder to infer, technical debt).
+            status: TransactionStatus.createUnknown(),
+            value: innerTransaction.value.toString(),
+            receiver: Address.newFromBech32(innerTransaction.receiver),
+            sender: Address.newFromBech32(innerTransaction.sender),
+            data: Buffer.from(innerTransaction.data),
+            contractResults: { items: remainingSmartContractResults },
+            // As "logs", we attach the ones from the root smart contract result.
+            logs: rootSmartContractResult.logs,
+            receipt: new TransactionReceipt(),
+        };
     }
 }

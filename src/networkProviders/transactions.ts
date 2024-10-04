@@ -144,6 +144,7 @@ export class TransactionOnNetwork {
                 ? Buffer.from(resource.guardianSignature, "hex")
                 : Buffer.from([]),
             relayer: resource.relayer,
+            innerTransactions: [],
         };
     }
 

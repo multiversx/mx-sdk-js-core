@@ -333,7 +333,9 @@ export class SmartContractTransactionsOutcomeParser {
         const [event] = eligibleEvents;
         const data = event.dataPayload?.valueOf().toString() || "";
         const lastTopic = event.getLastTopic()?.toString();
-        const [_ignored, returnCode, ..._ignoredReturnedDataParts] = argSerializer.stringToBuffers(data);
+        const parts = argSerializer.stringToBuffers(data);
+        // Assumption: the last part is the return code.
+        const returnCode = parts[parts.length - 1];
 
         return new SmartContractCallOutcome({
             function: transactionOnNetwork.function,

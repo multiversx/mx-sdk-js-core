@@ -1,7 +1,7 @@
 import { Address } from "../address";
 import { IPlainTransactionObject, ITransaction } from "../interface";
 import { IContractResultItem, ITransactionEvent, ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { TransactionReceipt, TransactionStatus } from "../networkProviders";
+import { TransactionLogsOnNetwork, TransactionReceipt, TransactionStatus } from "../networkProviders";
 import { ResultsParser } from "../smartcontracts";
 import { Transaction } from "../transaction";
 import {
@@ -205,9 +205,22 @@ export class TransactionsConverter {
         );
 
         if (rootSmartContractResultCandidates.length !== 1) {
-            throw new Error(
-                `Failed to find the root smart contract result for inner transaction ${innerTransactionIndex}`,
+            console.warn(
+                `Failed to find the root smart contract result for inner transaction #${innerTransactionIndex} of ${parentTransactionOnNetwork.hash}.`,
             );
+
+            return {
+                hash: `${parentTransactionOnNetwork.hash}-${innerTransactionIndex}`,
+                type: "",
+                status: TransactionStatus.createUnknown(),
+                value: innerTransaction.value.toString(),
+                receiver: Address.newFromBech32(innerTransaction.receiver),
+                sender: Address.newFromBech32(innerTransaction.sender),
+                data: Buffer.from(innerTransaction.data),
+                contractResults: { items: [] },
+                logs: new TransactionLogsOnNetwork({}),
+                receipt: new TransactionReceipt(),
+            };
         }
 
         const rootSmartContractResult = rootSmartContractResultCandidates[0];

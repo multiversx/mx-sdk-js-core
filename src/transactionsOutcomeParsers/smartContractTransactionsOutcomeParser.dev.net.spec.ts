@@ -3,7 +3,7 @@ import { TransactionsConverter } from "../converters/transactionsConverter";
 import { createDevnetProvider } from "../testutils/networkProviders";
 import { SmartContractTransactionsOutcomeParser } from "./smartContractTransactionsOutcomeParser";
 
-describe("test smart contract transactions outcome parser", () => {
+describe("test smart contract transactions outcome parser on devnet", () => {
     const networkProvider = createDevnetProvider();
     const parser = new SmartContractTransactionsOutcomeParser();
     const transactionsConverter = new TransactionsConverter();

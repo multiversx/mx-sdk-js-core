@@ -28,6 +28,13 @@ export function createDevnetProvider(): INetworkProvider {
     });
 }
 
+export function createMainnetProvider(): INetworkProvider {
+    return new ProxyNetworkProvider("https://gateway.multiversx.com", {
+        timeout: 10000,
+        clientName: "mx-sdk-js-core/tests",
+    });
+}
+
 export interface INetworkProvider {
     getNetworkConfig(): Promise<INetworkConfig>;
     getAccount(address: IAddress): Promise<IAccountOnNetwork>;

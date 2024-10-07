@@ -1,8 +1,9 @@
 import { Address } from "../address";
+import { ARGUMENTS_SEPARATOR } from "../constants";
 import { IPlainTransactionObject, ITransaction } from "../interface";
 import { IContractResultItem, ITransactionEvent, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { TransactionLogsOnNetwork, TransactionReceipt, TransactionStatus } from "../networkProviders";
-import { ResultsParser } from "../smartcontracts";
+import { ArgSerializer } from "../smartcontracts";
 import { Transaction } from "../transaction";
 import {
     SmartContractCallOutcome,
@@ -88,17 +89,7 @@ export class TransactionsConverter {
      * as the impedance mismatch between the network components and the "core" components will be reduced.
      */
     public transactionOnNetworkToOutcome(transactionOnNetwork: ITransactionOnNetwork): TransactionOutcome {
-        // In the future, this will not be needed because the transaction, as returned from the API,
-        // will hold the data corresponding to the direct smart contract call outcome (in case of smart contract calls).
-        const legacyResultsParser = new ResultsParser();
-        const callOutcomeBundle = legacyResultsParser.parseUntypedOutcome(transactionOnNetwork);
-        const callOutcome = new SmartContractCallOutcome({
-            function: transactionOnNetwork.function,
-            returnCode: callOutcomeBundle.returnCode.toString(),
-            returnMessage: callOutcomeBundle.returnMessage,
-            returnDataParts: callOutcomeBundle.values,
-        });
-
+        const callOutcome = this.findDirectSmartContractCallOutcome(transactionOnNetwork);
         const contractResults = transactionOnNetwork.contractResults.items.map((result) =>
             this.smartContractResultOnNetworkToSmartContractResult(result),
         );
@@ -112,6 +103,165 @@ export class TransactionsConverter {
             logs: logs,
             smartContractResults: contractResults,
             directSmartContractCallOutcome: callOutcome,
+        });
+    }
+
+    protected findDirectSmartContractCallOutcome(
+        transactionOnNetwork: ITransactionOnNetwork,
+    ): SmartContractCallOutcome {
+        let outcome = this.findDirectSmartContractCallOutcomeWithinSmartContractResults(transactionOnNetwork);
+        if (outcome) {
+            return outcome;
+        }
+
+        outcome = this.findDirectSmartContractCallOutcomeIfError(transactionOnNetwork);
+        if (outcome) {
+            return outcome;
+        }
+
+        outcome = this.findDirectSmartContractCallOutcomeWithinWriteLogEvents(transactionOnNetwork);
+        if (outcome) {
+            return outcome;
+        }
+
+        return new SmartContractCallOutcome({
+            function: transactionOnNetwork.function,
+            returnCode: "",
+            returnMessage: "",
+            returnDataParts: [],
+        });
+    }
+
+    protected findDirectSmartContractCallOutcomeWithinSmartContractResults(
+        transactionOnNetwork: ITransactionOnNetwork,
+    ): SmartContractCallOutcome | null {
+        const argSerializer = new ArgSerializer();
+        const eligibleResults: IContractResultItem[] = [];
+
+        for (const result of transactionOnNetwork.contractResults.items) {
+            const matchesCriteriaOnData = result.data.startsWith(ARGUMENTS_SEPARATOR);
+            const matchesCriteriaOnSender = result.sender.bech32() === transactionOnNetwork.sender.bech32();
+            const matchesCriteriaOnPreviousHash = result.previousHash === transactionOnNetwork.hash;
+
+            const matchesCriteria = matchesCriteriaOnData && matchesCriteriaOnSender && matchesCriteriaOnPreviousHash;
+            if (matchesCriteria) {
+                eligibleResults.push(result);
+            }
+        }
+
+        if (eligibleResults.length === 0) {
+            return null;
+        }
+
+        if (eligibleResults.length > 1) {
+            throw new Error(
+                `More than one smart contract result (holding the return data) found for transaction: ${transactionOnNetwork.hash}`,
+            );
+        }
+
+        const [result] = eligibleResults;
+        const [_ignored, returnCode, ...returnDataParts] = argSerializer.stringToBuffers(result.data);
+
+        return new SmartContractCallOutcome({
+            function: transactionOnNetwork.function,
+            returnCode: returnCode?.toString(),
+            returnMessage: result.returnMessage || returnCode?.toString(),
+            returnDataParts: returnDataParts,
+        });
+    }
+
+    protected findDirectSmartContractCallOutcomeIfError(
+        transactionOnNetwork: ITransactionOnNetwork,
+    ): SmartContractCallOutcome | null {
+        const argSerializer = new ArgSerializer();
+        const eventIdentifier = "signalError";
+        const eligibleEvents: ITransactionEvent[] = [];
+
+        // First, look in "logs":
+        for (const event of transactionOnNetwork.logs.events) {
+            if (event.identifier === eventIdentifier) {
+                eligibleEvents.push(event);
+            }
+        }
+
+        // Then, look in "logs" of "contractResults":
+        for (const result of transactionOnNetwork.contractResults.items) {
+            for (const event of result.logs.events) {
+                if (result.previousHash === result.hash) {
+                    if (event.identifier === eventIdentifier) {
+                        eligibleEvents.push(event);
+                    }
+                }
+            }
+        }
+
+        if (eligibleEvents.length === 0) {
+            return null;
+        }
+
+        if (eligibleEvents.length > 1) {
+            throw new Error(
+                `More than one "${eventIdentifier}" event found for transaction: ${transactionOnNetwork.hash}`,
+            );
+        }
+
+        const [event] = eligibleEvents;
+        const data = event.dataPayload?.valueOf().toString() || "";
+        const lastTopic = event.getLastTopic().toString();
+        const [_ignored, returnCode, ...returnDataParts] = argSerializer.stringToBuffers(data);
+
+        return new SmartContractCallOutcome({
+            function: transactionOnNetwork.function,
+            returnCode: returnCode?.toString(),
+            returnMessage: lastTopic || returnCode?.toString(),
+            returnDataParts: returnDataParts,
+        });
+    }
+
+    protected findDirectSmartContractCallOutcomeWithinWriteLogEvents(
+        transactionOnNetwork: ITransactionOnNetwork,
+    ): SmartContractCallOutcome | null {
+        const argSerializer = new ArgSerializer();
+        const eventIdentifier = "writeLog";
+        const eligibleEvents: ITransactionEvent[] = [];
+
+        // First, look in "logs":
+        for (const event of transactionOnNetwork.logs.events) {
+            if (event.identifier === eventIdentifier) {
+                eligibleEvents.push(event);
+            }
+        }
+
+        // Then, look in "logs" of "contractResults":
+        for (const result of transactionOnNetwork.contractResults.items) {
+            for (const event of result.logs.events) {
+                if (result.previousHash === result.hash) {
+                    if (event.identifier === eventIdentifier) {
+                        eligibleEvents.push(event);
+                    }
+                }
+            }
+        }
+
+        if (eligibleEvents.length === 0) {
+            return null;
+        }
+
+        if (eligibleEvents.length > 1) {
+            throw new Error(
+                `More than one "${eventIdentifier}" event found for transaction: ${transactionOnNetwork.hash}`,
+            );
+        }
+
+        const [event] = eligibleEvents;
+        const data = event.dataPayload?.valueOf().toString() || "";
+        const [_ignored, returnCode, ...returnDataParts] = argSerializer.stringToBuffers(data);
+
+        return new SmartContractCallOutcome({
+            function: transactionOnNetwork.function,
+            returnCode: returnCode?.toString(),
+            returnMessage: returnCode?.toString(),
+            returnDataParts: returnDataParts,
         });
     }
 
@@ -231,10 +381,7 @@ export class TransactionsConverter {
         return {
             // Artificially created hash.
             hash: `${parentTransactionOnNetwork.hash}-${innerTransactionIndex}`,
-            // The legacy ResultsParser does not use "type".
             type: "",
-            // The legacy ResultsParser uses "status" to detect invalid transactions.
-            // Though, for the moment, we don't pass a proper status (a bit harder to infer, technical debt).
             status: TransactionStatus.createUnknown(),
             value: innerTransaction.value.toString(),
             receiver: Address.newFromBech32(innerTransaction.receiver),

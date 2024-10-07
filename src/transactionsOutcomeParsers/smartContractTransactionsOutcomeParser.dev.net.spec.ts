@@ -19,7 +19,8 @@ describe("test smart contract transactions outcome parser", () => {
         assert.equal(parsed.returnMessage, "ok");
     });
 
-    it("should parse outcome of relayed V3 inner transactions (2)", async () => {
+    // Will work upon the fix on Node's side (so that SCRs have as "originalTxHash" the inner transaction itself).
+    it.skip("should parse outcome of relayed V3 inner transactions (2)", async () => {
         const transactionHash = "eaf80014f1b413191ac6a04a81c3751c5563aff246021f4f7c4ba9723fa3b536";
         const transactionOnNetwork = await networkProvider.getTransaction(transactionHash);
         const outcomes = transactionsConverter.transactionOnNetworkToOutcomesOfInnerTransactions(transactionOnNetwork);
@@ -69,4 +70,3 @@ describe("test smart contract transactions outcome parser", () => {
         assert.equal(parsed.returnMessage, "ok");
     });
 });
-

@@ -1,4 +1,4 @@
-import { UserSecretKey, UserSigner } from "@multiversx/sdk-wallet";
+import { UserSecretKey, UserSigner } from "./../wallet";
 import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";

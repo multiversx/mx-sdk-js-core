@@ -53,7 +53,6 @@
     "uuid": "8.3.2"
   },
   "devDependencies": {
-    "@multiversx/sdk-wallet": "4.5.1",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",
     "@types/ed2curve": "0.2.2",

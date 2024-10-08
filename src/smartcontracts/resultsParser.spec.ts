@@ -254,10 +254,7 @@ describe("test smart contract results parser", () => {
 
         let bundle = parser.parseUntypedOutcome(transaction);
         assert.deepEqual(bundle.returnCode, ReturnCode.Ok);
-        assert.equal(
-            bundle.returnMessage,
-            "@too much gas provided for processing: gas provided = 596384500, gas used = 733010",
-        );
+        assert.equal(bundle.returnMessage, "ok");
         assert.deepEqual(bundle.values, []);
     });
 

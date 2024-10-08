@@ -284,12 +284,10 @@ export class ResultsParser {
         }
 
         let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventTooMuchGas.data);
-        let lastTopic = eventTooMuchGas.getLastTopic();
-        let returnMessage = lastTopic?.toString() || returnCode.toString();
 
         return {
             returnCode: returnCode,
-            returnMessage: returnMessage,
+            returnMessage: returnCode.toString(),
             values: returnDataParts,
         };
     }
@@ -346,6 +344,25 @@ export class ResultsParser {
             if (writeLogWithReturnData) {
                 let { returnCode, returnDataParts } = this.sliceDataFieldInParts(writeLogWithReturnData.data);
                 let returnMessage = returnCode.toString();
+
+                return {
+                    returnCode: returnCode,
+                    returnMessage: returnMessage,
+                    values: returnDataParts,
+                };
+            }
+        }
+
+        // Additional fallback heuristics (alter search constraints):
+        for (const resultItem of transaction.contractResults.items) {
+            let writeLogWithReturnData = resultItem.logs.findSingleOrNoneEvent(WellKnownEvents.OnWriteLog, (event) => {
+                const addressIsContract = event.address.bech32() == contractAddress.toBech32();
+                return addressIsContract;
+            });
+
+            if (writeLogWithReturnData) {
+                const { returnCode, returnDataParts } = this.sliceDataFieldInParts(writeLogWithReturnData.data);
+                const returnMessage = returnCode.toString();
 
                 return {
                     returnCode: returnCode,

@@ -2,7 +2,7 @@ import { guardLength } from "./assertions";
 import { ErrInvariantFailed } from "./errors";
 import { parseValidatorKey } from "./pem";
 
-const bls = require('@multiversx/sdk-bls-wasm');
+const bls = require("@multiversx/sdk-bls-wasm");
 
 export const VALIDATOR_SECRETKEY_LENGTH = 32;
 export const VALIDATOR_PUBKEY_LENGTH = 96;
@@ -22,7 +22,9 @@ export class BLS {
 
     static guardInitialized() {
         if (!BLS.isInitialized) {
-            throw new ErrInvariantFailed("BLS modules are not initalized. Make sure that 'await BLS.initIfNecessary()' is called correctly.");
+            throw new ErrInvariantFailed(
+                "BLS modules are not initalized. Make sure that 'await BLS.initIfNecessary()' is called correctly.",
+            );
         }
     }
 }

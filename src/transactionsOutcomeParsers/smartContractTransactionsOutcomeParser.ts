@@ -1,7 +1,14 @@
 import { Address } from "../address";
 import { Err } from "../errors";
+import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { EndpointDefinition, ResultsParser, ReturnCode, Type, UntypedOutcomeBundle } from "../smartcontracts";
-import { TransactionEvent, TransactionOutcome, findEventsByIdentifier } from "./resources";
+import { TransactionOutcome, findEventsByIdentifier } from "./resources";
+
+enum Events {
+    SCDeploy = "SCDeploy",
+    SignalError = "signalError",
+    WriteLog = "writeLog",
+}
 
 interface IAbi {
     getEndpoint(name: string): EndpointDefinition;
@@ -28,15 +35,12 @@ export class SmartContractTransactionsOutcomeParser {
 
     constructor(options?: { abi?: IAbi; legacyResultsParser?: ILegacyResultsParser }) {
         this.abi = options?.abi;
-
-        // Prior v13, we've advertised that people can override the "ResultsParser" to alter it's behavior in case of exotic flows.
-        // Now, since the new "SmartContractTransactionsOutcomeParser" (still) depends on the legacy "ResultsParser",
-        // at least until "return data parts of direct outcome of contract call" are included on API & Proxy responses (on GET transaction),
-        // we have to allow the same level of customization (for exotic flows).
         this.legacyResultsParser = options?.legacyResultsParser || new ResultsParser();
     }
 
-    parseDeploy(options: { transactionOutcome: TransactionOutcome }): {
+    parseDeploy(
+        options: { transactionOutcome: TransactionOutcome } | { transactionOnNetwork: ITransactionOnNetwork },
+    ): {
         returnCode: string;
         returnMessage: string;
         contracts: {
@@ -45,8 +49,27 @@ export class SmartContractTransactionsOutcomeParser {
             codeHash: Uint8Array;
         }[];
     } {
-        const directCallOutcome = options.transactionOutcome.directSmartContractCallOutcome;
-        const events = findEventsByIdentifier(options.transactionOutcome, "SCDeploy");
+        if ("transactionOutcome" in options) {
+            return this.parseDeployGivenTransactionOutcome(options.transactionOutcome);
+        }
+
+        return this.parseDeployGivenTransactionOnNetwork(options.transactionOnNetwork);
+    }
+
+    /**
+     * Legacy approach.
+     */
+    protected parseDeployGivenTransactionOutcome(transactionOutcome: TransactionOutcome): {
+        returnCode: string;
+        returnMessage: string;
+        contracts: {
+            address: string;
+            ownerAddress: string;
+            codeHash: Uint8Array;
+        }[];
+    } {
+        const directCallOutcome = transactionOutcome.directSmartContractCallOutcome;
+        const events = findEventsByIdentifier(transactionOutcome, Events.SCDeploy);
         const contracts = events.map((event) => this.parseScDeployEvent(event));
 
         return {
@@ -56,7 +79,19 @@ export class SmartContractTransactionsOutcomeParser {
         };
     }
 
-    private parseScDeployEvent(event: TransactionEvent): {
+    protected parseDeployGivenTransactionOnNetwork(_transactionOnNetwork: ITransactionOnNetwork): {
+        returnCode: string;
+        returnMessage: string;
+        contracts: {
+            address: string;
+            ownerAddress: string;
+            codeHash: Uint8Array;
+        }[];
+    } {
+        throw new Error("Not implemented.");
+    }
+
+    private parseScDeployEvent(event: { topics: Uint8Array[] }): {
         address: string;
         ownerAddress: string;
         codeHash: Uint8Array;
@@ -76,12 +111,34 @@ export class SmartContractTransactionsOutcomeParser {
         };
     }
 
-    parseExecute(options: { transactionOutcome: TransactionOutcome; function?: string }): {
+    parseExecute(
+        options:
+            | { transactionOutcome: TransactionOutcome; function?: string }
+            | { transactionOnNetwork: ITransactionOnNetwork; function?: string },
+    ): {
         values: any[];
         returnCode: string;
         returnMessage: string;
     } {
-        const directCallOutcome = options.transactionOutcome.directSmartContractCallOutcome;
+        if ("transactionOutcome" in options) {
+            return this.parseExecuteGivenTransactionOutcome(options.transactionOutcome, options.function);
+        }
+
+        return this.parseExecuteGivenTransactionOnNetwork(options.transactionOnNetwork, options.function);
+    }
+
+    /**
+     * Legacy approach.
+     */
+    protected parseExecuteGivenTransactionOutcome(
+        transactionOutcome: TransactionOutcome,
+        functionName?: string,
+    ): {
+        values: any[];
+        returnCode: string;
+        returnMessage: string;
+    } {
+        const directCallOutcome = transactionOutcome.directSmartContractCallOutcome;
 
         if (!this.abi) {
             return {
@@ -91,7 +148,7 @@ export class SmartContractTransactionsOutcomeParser {
             };
         }
 
-        const functionName = options.function || directCallOutcome.function;
+        functionName = functionName || directCallOutcome.function;
 
         if (!functionName) {
             throw new Err(
@@ -114,5 +171,16 @@ export class SmartContractTransactionsOutcomeParser {
             returnCode: legacyTypedBundle.returnCode.toString(),
             returnMessage: legacyTypedBundle.returnMessage,
         };
+    }
+
+    protected parseExecuteGivenTransactionOnNetwork(
+        _transactionOnNetwork: ITransactionOnNetwork,
+        _functionName?: string,
+    ): {
+        values: any[];
+        returnCode: string;
+        returnMessage: string;
+    } {
+        throw new Error("Not implemented.");
     }
 }

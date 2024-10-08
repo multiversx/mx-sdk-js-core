@@ -1,6 +1,6 @@
 # Testdata
 
-## Files `transactions_N.mainnet.json`
+## Files `transactions.mainnet.json`
 
 Transactions were sampled from the mainnet BigQuery dataset:
 

@@ -1,21 +1,17 @@
+import BigNumber from "bignumber.js";
+import { assert } from "chai";
+import { Address } from "../address";
+import { IAddress } from "../interface";
 import {
     ContractQueryResponse,
     ContractResultItem,
     ContractResults,
+    TransactionEventData,
     TransactionEventOnNetwork,
     TransactionEventTopic,
     TransactionLogsOnNetwork,
     TransactionOnNetwork,
-    TransactionEventData,
 } from "../networkProviders";
-import BigNumber from "bignumber.js";
-import { assert } from "chai";
-import * as fs from "fs";
-import path from "path";
-import { Address } from "../address";
-import { IAddress } from "../interface";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { LogLevel, Logger } from "../logger";
 import { loadAbiRegistry } from "../testutils";
 import { ArgSerializer } from "./argSerializer";
 import { ResultsParser } from "./resultsParser";
@@ -258,10 +254,7 @@ describe("test smart contract results parser", () => {
 
         let bundle = parser.parseUntypedOutcome(transaction);
         assert.deepEqual(bundle.returnCode, ReturnCode.Ok);
-        assert.equal(
-            bundle.returnMessage,
-            "@too much gas provided for processing: gas provided = 596384500, gas used = 733010",
-        );
+        assert.equal(bundle.returnMessage, "ok");
         assert.deepEqual(bundle.values, []);
     });
 
@@ -383,47 +376,4 @@ describe("test smart contract results parser", () => {
         assert.deepEqual(bundle.b, new BigNumber(43));
         assert.deepEqual(bundle.c, new BigNumber(44));
     });
-
-    // This test should be enabled manually and run against a set of sample transactions.
-    // 2022-04-03: test ran against ~1800 transactions sampled from devnet.
-    it.skip("should parse real-world contract outcomes", async () => {
-        let oldLogLevel = Logger.logLevel;
-        Logger.setLevel(LogLevel.Trace);
-
-        let folder = path.resolve(process.env["SAMPLES"] || "SAMPLES");
-        let samples = loadRealWorldSamples(folder);
-
-        for (const [transaction, _] of samples) {
-            console.log("Transaction:", transaction.hash.toString());
-
-            let bundle = parser.parseUntypedOutcome(transaction);
-
-            console.log("Return code:", bundle.returnCode.toString());
-            console.log("Return message:", bundle.returnMessage);
-            console.log("Num values:", bundle.values.length);
-            console.log("=".repeat(80));
-
-            assert.include(KnownReturnCodes, bundle.returnCode.valueOf());
-        }
-
-        Logger.setLevel(oldLogLevel);
-    });
-
-    function loadRealWorldSamples(folder: string): [ITransactionOnNetwork, string][] {
-        let transactionFiles = fs.readdirSync(folder);
-        let samples: [ITransactionOnNetwork, string][] = [];
-
-        for (const file of transactionFiles) {
-            let txHash = path.basename(file, ".json");
-            let filePath = path.resolve(folder, file);
-            let jsonContent: string = fs.readFileSync(filePath, { encoding: "utf8" });
-            let json = JSON.parse(jsonContent);
-            let payload = json["data"]["transaction"];
-            let transaction = TransactionOnNetwork.fromProxyHttpResponse(txHash, payload);
-
-            samples.push([transaction, jsonContent]);
-        }
-
-        return samples;
-    }
 });

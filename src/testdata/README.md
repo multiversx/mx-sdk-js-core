@@ -1,6 +1,6 @@
 # Testdata
 
-## Files `transactions_N.mainnet.json`
+## Files `transactions.mainnet.json`
 
 Transactions were sampled from the mainnet BigQuery dataset:
 
@@ -9,21 +9,6 @@ DECLARE
   TIMESTAMP_START DATE DEFAULT '2024-09-01';
 DECLARE
   TIMESTAMP_END DATE DEFAULT '2024-09-03';
-  -- Simple move balance
-  (
-  SELECT
-    `_id` `hash`,
-    'simple_move_balance' `kind`
-  FROM
-    `multiversx-blockchain-etl.crypto_multiversx_mainnet_eu.transactions`
-  WHERE
-    DATE(`timestamp`) >= TIMESTAMP_START
-    AND DATE(`timestamp`) <= TIMESTAMP_END
-    AND LENGTH(`data`) = 0
-    AND RAND() < 0.25
-  LIMIT
-    10 )
-UNION ALL
   -- Contract execute, with success
   (
   SELECT

@@ -38,7 +38,7 @@ describe("test relayed transactions factory (on localnet)", function () {
         ({ alice, carol, heidi, judy } = await loadTestWallets());
     });
 
-    it.only("should create relayed v3 transaction", async function () {
+    it("should create relayed v3 transaction", async function () {
         this.timeout(60000);
 
         await alice.sync(networkProvider);

@@ -1,5 +1,5 @@
+import { Address } from "../address";
 import { ErrSignerCannotSign } from "./errors";
-import { UserAddress } from "./userAddress";
 import { UserSecretKey } from "./userKeys";
 import { UserWallet } from "./userWallet";
 
@@ -9,7 +9,7 @@ interface IUserSecretKey {
 }
 
 interface IUserPublicKey {
-    toAddress(hrp?: string): { bech32(): string; };
+    toAddress(hrp?: string): { bech32(): string };
 }
 
 /**
@@ -44,8 +44,8 @@ export class UserSigner {
     /**
      * Gets the address of the signer.
      */
-    getAddress(hrp?: string): UserAddress {
+    getAddress(hrp?: string): Address {
         const bech32 = this.secretKey.generatePublicKey().toAddress(hrp).bech32();
-        return UserAddress.newFromBech32(bech32);
+        return Address.newFromBech32(bech32);
     }
 }

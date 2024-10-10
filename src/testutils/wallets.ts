@@ -1,4 +1,3 @@
-import { UserSecretKey, UserSigner } from "./../wallet";
 import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";
@@ -6,7 +5,11 @@ import { Account } from "../account";
 import { Address } from "../address";
 import { IAddress } from "../interface";
 import { IAccountOnNetwork } from "../interfaceOfNetwork";
+import { UserSecretKey, UserSigner } from "./../wallet";
+import { readTestFile } from "./files";
 import { isOnBrowserTests } from "./utils";
+
+export const DummyMnemonicOf12Words = "matter trumpet twenty parade fame north lift sail valve salon foster cinnamon";
 
 interface IAccountFetcher {
     getAccount(address: IAddress): Promise<IAccountOnNetwork>;
@@ -45,6 +48,13 @@ export async function loadTestWallets(): Promise<Record<string, TestWallet>> {
     return walletMap;
 }
 
+export async function loadTestKeystore(file: string): Promise<any> {
+    const testdataPath = path.resolve(__dirname, "..", "testdata/testwallets");
+    const keystorePath = path.resolve(testdataPath, file);
+    const json = await readTestFile(keystorePath);
+    return JSON.parse(json);
+}
+
 export async function loadMnemonic(): Promise<string> {
     return await readTestWalletFileContents("mnemonic.txt");
 }
@@ -62,7 +72,7 @@ export async function loadTestWallet(name: string): Promise<TestWallet> {
 }
 
 async function readTestWalletFileContents(name: string): Promise<string> {
-    let filePath = path.join("src", "testutils", "testwallets", name);
+    let filePath = path.join("src", "testdata", "testwallets", name);
 
     if (isOnBrowserTests()) {
         return await downloadTextFile(filePath);

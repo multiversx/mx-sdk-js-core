@@ -35,7 +35,7 @@ export class ESDTTransferPayloadBuilder {
  */
 export class ESDTNFTTransferPayloadBuilder {
     payment: ITokenTransfer = TokenTransfer.nonFungible("", 0);
-    destination: IAddress = new Address("");
+    destination: IAddress = Address.empty();
 
     setPayment(payment: ITokenTransfer): ESDTNFTTransferPayloadBuilder {
         this.payment = payment;
@@ -70,7 +70,7 @@ export class ESDTNFTTransferPayloadBuilder {
  */
 export class MultiESDTNFTTransferPayloadBuilder {
     payments: ITokenTransfer[] = [];
-    destination: IAddress = new Address("");
+    destination: IAddress = Address.empty();
 
     setPayments(payments: ITokenTransfer[]): MultiESDTNFTTransferPayloadBuilder {
         this.payments = payments;

@@ -1,9 +1,9 @@
-import {Address} from "./primitives";
-import {IAddress} from "./interface";
 import BigNumber from "bignumber.js";
+import { Address } from "../address";
+import { IAddress } from "./interface";
 
 export class PairOnNetwork {
-    address: IAddress = new Address("");
+    address: IAddress = Address.empty();
     id: string = "";
     symbol: string = "";
     name: string = "";

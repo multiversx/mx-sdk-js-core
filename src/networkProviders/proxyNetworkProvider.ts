@@ -1,13 +1,14 @@
 import axios from "axios";
+import { ErrContractQuery, ErrNetworkProvider } from "../errors";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig } from "./config";
-import { EsdtContractAddress, BaseUserAgent } from "./constants";
+import { BaseUserAgent, EsdtContractAddress } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { ContractQueryResponse } from "./contractQueryResponse";
-import { ErrContractQuery, ErrNetworkProvider } from "./errors";
 import { IAddress, IContractQuery, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
+import { NetworkProviderConfig } from "./networkProviderConfig";
 import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
@@ -15,13 +16,12 @@ import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } f
 import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 import { extendUserAgent } from "./userAgent";
-import { NetworkProviderConfig } from "./networkProviderConfig";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ProxyNetworkProvider implements INetworkProvider {
     private url: string;
     private config: NetworkProviderConfig;
-    private userAgentPrefix = `${BaseUserAgent}/proxy`
+    private userAgentPrefix = `${BaseUserAgent}/proxy`;
 
     constructor(url: string, config?: NetworkProviderConfig) {
         this.url = url;
@@ -65,40 +65,57 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return accountGuardian;
     }
 
-    async getFungibleTokensOfAccount(address: IAddress, _pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]> {
+    async getFungibleTokensOfAccount(
+        address: IAddress,
+        _pagination?: IPagination,
+    ): Promise<FungibleTokenOfAccountOnNetwork[]> {
         let url = `address/${address.bech32()}/esdt`;
         let response = await this.doGetGeneric(url);
         let responseItems: any[] = Object.values(response.esdts);
         // Skip NFTs / SFTs.
-        let responseItemsFiltered = responseItems.filter(item => !item.nonce);
-        let tokens = responseItemsFiltered.map(item => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
+        let responseItemsFiltered = responseItems.filter((item) => !item.nonce);
+        let tokens = responseItemsFiltered.map((item) => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
 
         // TODO: Fix sorting
         tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(address: IAddress, _pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+    async getNonFungibleTokensOfAccount(
+        address: IAddress,
+        _pagination?: IPagination,
+    ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
         let url = `address/${address.bech32()}/esdt`;
         let response = await this.doGetGeneric(url);
         let responseItems: any[] = Object.values(response.esdts);
         // Skip fungible tokens.
-        let responseItemsFiltered = responseItems.filter(item => item.nonce >= 0);
-        let tokens = responseItemsFiltered.map(item => NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponse(item));
+        let responseItemsFiltered = responseItems.filter((item) => item.nonce >= 0);
+        let tokens = responseItemsFiltered.map((item) =>
+            NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponse(item),
+        );
 
         // TODO: Fix sorting
         tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
         return tokens;
     }
 
-    async getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
+    async getFungibleTokenOfAccount(
+        address: IAddress,
+        tokenIdentifier: string,
+    ): Promise<FungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`address/${address.bech32()}/esdt/${tokenIdentifier}`);
         let tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response.tokenData);
         return tokenData;
     }
 
-    async getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork> {
-        let response = await this.doGetGeneric(`address/${address.bech32()}/nft/${collection}/nonce/${nonce.valueOf()}`);
+    async getNonFungibleTokenOfAccount(
+        address: IAddress,
+        collection: string,
+        nonce: number,
+    ): Promise<NonFungibleTokenOfAccountOnNetwork> {
+        let response = await this.doGetGeneric(
+            `address/${address.bech32()}/nft/${collection}/nonce/${nonce.valueOf()}`,
+        );
         let tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponseByNonce(response.tokenData);
         return tokenData;
     }
@@ -133,7 +150,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async sendTransactions(txs: (ITransaction | ITransactionNext)[]): Promise<string[]> {
-        const data = (txs).map((tx) => prepareTransactionForBroadcasting(tx));
+        const data = txs.map((tx) => prepareTransactionForBroadcasting(tx));
 
         const response = await this.doPostGeneric("transaction/send-multiple", data);
         const hashes = Array(txs.length).fill(null);
@@ -163,7 +180,10 @@ export class ProxyNetworkProvider implements INetworkProvider {
 
     async getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
         let properties = await this.getTokenProperties(tokenIdentifier);
-        let definition = DefinitionOfFungibleTokenOnNetwork.fromResponseOfGetTokenProperties(tokenIdentifier, properties);
+        let definition = DefinitionOfFungibleTokenOnNetwork.fromResponseOfGetTokenProperties(
+            tokenIdentifier,
+            properties,
+        );
         return definition;
     }
 
@@ -173,7 +193,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         let queryResponse = await this.queryContract({
             address: EsdtContractAddress,
             func: "getTokenProperties",
-            getEncodedArguments: () => [encodedIdentifier]
+            getEncodedArguments: () => [encodedIdentifier],
         });
 
         let properties = queryResponse.getReturnDataParts();

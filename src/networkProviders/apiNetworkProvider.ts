@@ -1,10 +1,10 @@
 import axios from "axios";
+import { ErrContractQuery, ErrNetworkProvider } from "../errors";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig, defaultPagination } from "./config";
 import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { ContractQueryResponse } from "./contractQueryResponse";
-import { ErrContractQuery, ErrNetworkProvider } from "./errors";
 import { IAddress, IContractQuery, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
@@ -25,7 +25,7 @@ export class ApiNetworkProvider implements INetworkProvider {
     private url: string;
     private config: NetworkProviderConfig;
     private backingProxyNetworkProvider;
-    private userAgentPrefix = `${BaseUserAgent}/api`
+    private userAgentPrefix = `${BaseUserAgent}/api`;
 
     constructor(url: string, config?: NetworkProviderConfig) {
         this.url = url;
@@ -71,37 +71,50 @@ export class ApiNetworkProvider implements INetworkProvider {
         return await this.backingProxyNetworkProvider.getGuardianData(address);
     }
 
-    async getFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]> {
+    async getFungibleTokensOfAccount(
+        address: IAddress,
+        pagination?: IPagination,
+    ): Promise<FungibleTokenOfAccountOnNetwork[]> {
         pagination = pagination || defaultPagination;
 
         let url = `accounts/${address.bech32()}/tokens?${this.buildPaginationParams(pagination)}`;
         let response: any[] = await this.doGetGeneric(url);
-        let tokens = response.map(item => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
+        let tokens = response.map((item) => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
 
         // TODO: Fix sorting
         tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+    async getNonFungibleTokensOfAccount(
+        address: IAddress,
+        pagination?: IPagination,
+    ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
         pagination = pagination || defaultPagination;
 
         let url = `accounts/${address.bech32()}/nfts?${this.buildPaginationParams(pagination)}`;
         let response: any[] = await this.doGetGeneric(url);
-        let tokens = response.map(item => NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(item));
+        let tokens = response.map((item) => NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(item));
 
         // TODO: Fix sorting
         tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
         return tokens;
     }
 
-    async getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
+    async getFungibleTokenOfAccount(
+        address: IAddress,
+        tokenIdentifier: string,
+    ): Promise<FungibleTokenOfAccountOnNetwork> {
         let response = await this.doGetGeneric(`accounts/${address.bech32()}/tokens/${tokenIdentifier}`);
         let tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response);
         return tokenData;
     }
 
-    async getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork> {
+    async getNonFungibleTokenOfAccount(
+        address: IAddress,
+        collection: string,
+        nonce: number,
+    ): Promise<NonFungibleTokenOfAccountOnNetwork> {
         let nonceAsHex = new Nonce(nonce).hex();
         let response = await this.doGetGeneric(`accounts/${address.bech32()}/nfts/${collection}-${nonceAsHex}`);
         let tokenData = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);
@@ -116,7 +129,7 @@ export class ApiNetworkProvider implements INetworkProvider {
 
         let response: any[] = await this.doGetGeneric(url);
 
-        return response.map(item => PairOnNetwork.fromApiHttpResponse(item));
+        return response.map((item) => PairOnNetwork.fromApiHttpResponse(item));
     }
 
     async getTransaction(txHash: string): Promise<TransactionOnNetwork> {

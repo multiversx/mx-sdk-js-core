@@ -1,6 +1,6 @@
-import { ErrBadPEM } from "./errors";
-import { UserSecretKey, USER_PUBKEY_LENGTH, USER_SEED_LENGTH } from "./userKeys";
-import { ValidatorSecretKey, VALIDATOR_SECRETKEY_LENGTH } from "./validatorKeys";
+import { ErrBadPEM } from "../errors";
+import { USER_PUBKEY_LENGTH, USER_SEED_LENGTH, UserSecretKey } from "./userKeys";
+import { VALIDATOR_SECRETKEY_LENGTH, ValidatorSecretKey } from "./validatorKeys";
 
 export function parseUserKey(text: string, index: number = 0): UserSecretKey {
     let keys = parseUserKeys(text);
@@ -10,7 +10,7 @@ export function parseUserKey(text: string, index: number = 0): UserSecretKey {
 export function parseUserKeys(text: string): UserSecretKey[] {
     // The user PEM files encode both the seed and the pubkey in their payloads.
     let buffers = parse(text, USER_SEED_LENGTH + USER_PUBKEY_LENGTH);
-    return buffers.map(buffer => new UserSecretKey(buffer.slice(0, USER_SEED_LENGTH)));
+    return buffers.map((buffer) => new UserSecretKey(buffer.slice(0, USER_SEED_LENGTH)));
 }
 
 export function parseValidatorKey(text: string, index: number = 0): ValidatorSecretKey {
@@ -20,12 +20,15 @@ export function parseValidatorKey(text: string, index: number = 0): ValidatorSec
 
 export function parseValidatorKeys(text: string): ValidatorSecretKey[] {
     let buffers = parse(text, VALIDATOR_SECRETKEY_LENGTH);
-    return buffers.map(buffer => new ValidatorSecretKey(buffer));
+    return buffers.map((buffer) => new ValidatorSecretKey(buffer));
 }
 
 export function parse(text: string, expectedLength: number): Buffer[] {
     // Split by newlines, trim whitespace, then discard remaining empty lines.
-    let lines = text.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+    let lines = text
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
     let buffers: Buffer[] = [];
     let linesAccumulator: string[] = [];
 

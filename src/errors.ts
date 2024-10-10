@@ -13,7 +13,7 @@ export class Err extends Error {
      * Returns a pretty, friendly summary for the error or for the chain of errros (if appropriate).
      */
     summary(): any[] {
-        let result = [];
+        const result = [];
 
         result.push({ name: this.name, message: this.message });
 
@@ -77,7 +77,7 @@ export class ErrUnexpectedCondition extends Err {
  */
 export class ErrAddressCannotCreate extends Err {
     public constructor(input: any, inner?: Error) {
-        let message = `Cannot create address from: ${input}`;
+        const message = `Cannot create address from: ${input}`;
         super(message, inner);
     }
 }
@@ -141,7 +141,7 @@ export class ErrTransactionOptionsInvalid extends Err {
  */
 export class ErrSignatureCannotCreate extends Err {
     public constructor(input: any, inner?: Error) {
-        let message = `Cannot create signature from: ${input}`;
+        const message = `Cannot create signature from: ${input}`;
         super(message, inner);
     }
 }
@@ -382,5 +382,69 @@ export class ErrSmartContractQuery extends Err {
     public constructor(returnCode: string, message: string) {
         super(message);
         this.returnCode = returnCode;
+    }
+}
+
+/**
+ * Signals a wrong mnemonic format.
+ */
+export class ErrWrongMnemonic extends Err {
+    public constructor() {
+        super("Wrong mnemonic format");
+    }
+}
+
+/**
+ * Signals a bad mnemonic entropy.
+ */
+export class ErrBadMnemonicEntropy extends Err {
+    public constructor(inner: Error) {
+        super("Bad mnemonic entropy", inner);
+    }
+}
+
+/**
+ * Signals a bad PEM file.
+ */
+export class ErrBadPEM extends Err {
+    public constructor(message?: string) {
+        super(message ? `Bad PEM: ${message}` : `Bad PEM`);
+    }
+}
+
+/**
+ * Signals an error related to signing a message (a transaction).
+ */
+export class ErrSignerCannotSign extends Err {
+    public constructor(inner: Error) {
+        super(`Cannot sign`, inner);
+    }
+}
+
+/**
+ * Signals a bad address.
+ */
+export class ErrBadAddress extends Err {
+    public constructor(value: string, inner?: Error) {
+        super(`Bad address: ${value}`, inner);
+    }
+}
+
+/**
+ * Signals an error that happened during a request against the Network.
+ */
+export class ErrNetworkProvider extends Err {
+    public constructor(url: string, error: string, inner?: Error) {
+        const message = `Request error on url [${url}]: [${error}]`;
+        super(message, inner);
+    }
+}
+
+/**
+ * Signals a generic error in the context of querying Smart Contracts.
+ */
+export class ErrContractQuery extends Err {
+    public constructor(originalError: Error) {
+        super(originalError.message.replace("executeQuery:", ""));
     }
 }

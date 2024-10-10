@@ -1,5 +1,5 @@
+import { ErrInvariantFailed } from "../errors";
 import { guardLength } from "./assertions";
-import { ErrInvariantFailed } from "./errors";
 import { parseValidatorKey } from "./pem";
 
 const bls = require("@multiversx/sdk-bls-wasm");

@@ -1,5 +1,5 @@
 import { Address } from "../address";
-import { ErrSignerCannotSign } from "./errors";
+import { ErrSignerCannotSign } from "../errors";
 import { UserSecretKey } from "./userKeys";
 import { UserWallet } from "./userWallet";
 

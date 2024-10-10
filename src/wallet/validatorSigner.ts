@@ -1,4 +1,4 @@
-import { ErrSignerCannotSign } from "./errors";
+import { ErrSignerCannotSign } from "../errors";
 import { BLS, ValidatorSecretKey } from "./validatorKeys";
 
 /**

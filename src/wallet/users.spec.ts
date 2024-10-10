@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import { ErrBadMnemonicEntropy, ErrInvariantFailed } from "../errors";
 import { TestMessage } from "./../testutils/message";
 import { TestTransaction } from "./../testutils/transaction";
 import {
@@ -10,7 +11,6 @@ import {
     TestWallet,
 } from "./../testutils/wallets";
 import { Randomness } from "./crypto";
-import { ErrBadMnemonicEntropy, ErrInvariantFailed } from "./errors";
 import { Mnemonic } from "./mnemonic";
 import { UserSecretKey } from "./userKeys";
 import { UserSigner } from "./userSigner";

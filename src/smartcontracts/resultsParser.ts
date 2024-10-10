@@ -151,6 +151,12 @@ export class ResultsParser {
             return bundle;
         }
 
+        bundle = this.createBundleOnHasInnerTransactions(transaction);
+        if (bundle) {
+            Logger.trace("parseUntypedOutcome(): on inner transactions");
+            return bundle;
+        }
+
         bundle = this.createBundleOnInvalidTransaction(transaction);
         if (bundle) {
             Logger.trace("parseUntypedOutcome(): on invalid transaction");
@@ -231,6 +237,18 @@ export class ResultsParser {
             }
 
             // If there's no receipt message, let other heuristics to handle the outcome (most probably, a log with "signalError" is emitted).
+        }
+
+        return null;
+    }
+
+    protected createBundleOnHasInnerTransactions(transaction: ITransactionOnNetwork): UntypedOutcomeBundle | null {
+        if (transaction.innerTransactions) {
+            return {
+                returnCode: ReturnCode.None,
+                returnMessage: ReturnCode.None.toString(),
+                values: [],
+            };
         }
 
         return null;

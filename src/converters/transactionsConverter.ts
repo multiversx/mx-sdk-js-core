@@ -1,7 +1,5 @@
-import { Address } from "../address";
 import { IPlainTransactionObject, ITransaction } from "../interface";
 import { IContractResultItem, ITransactionEvent, ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { TransactionLogsOnNetwork, TransactionReceipt, TransactionStatus } from "../networkProviders";
 import { ResultsParser } from "../smartcontracts";
 import { Transaction } from "../transaction";
 import {
@@ -149,99 +147,5 @@ export class TransactionsConverter {
             topics: eventOnNetwork.topics.map((topic) => Buffer.from(topic.hex(), "hex")),
             dataItems: dataItems,
         });
-    }
-
-    /**
-     * Generally speaking, useful for Relayed V3 transactions.
-     */
-    public transactionOnNetworkToOutcomesOfInnerTransactions(
-        transactionOnNetwork: ITransactionOnNetwork,
-    ): TransactionOutcome[] {
-        const innerTransactions = transactionOnNetwork.innerTransactions || [];
-        const outcomes: TransactionOutcome[] = [];
-
-        for (let index = 0; index < innerTransactions.length; index++) {
-            const innerTransactionAsTransactionOnNetwork = this.convertInnerTransactionToTransactionOnNetwork(
-                transactionOnNetwork,
-                index,
-            );
-
-            try {
-                const outcome = this.transactionOnNetworkToOutcome(innerTransactionAsTransactionOnNetwork);
-                outcomes.push(outcome);
-            } catch (error) {
-                console.warn(
-                    `Failed to convert inner transaction #${index} of ${transactionOnNetwork.hash} to outcome: ${error}`,
-                );
-
-                outcomes.push(new TransactionOutcome({}));
-            }
-        }
-
-        return outcomes;
-    }
-
-    /**
-     * Artificially converts an inner transaction (of a relayed V3) to a transaction on the network,
-     * by matching the inner transaction with its corresponding smart contract result.
-     */
-    private convertInnerTransactionToTransactionOnNetwork(
-        parentTransactionOnNetwork: ITransactionOnNetwork,
-        innerTransactionIndex: number,
-    ): ITransactionOnNetwork {
-        if (
-            !parentTransactionOnNetwork.innerTransactions ||
-            parentTransactionOnNetwork.innerTransactions.length <= innerTransactionIndex
-        ) {
-            throw new Error("Inner transaction index is out of bounds");
-        }
-
-        const innerTransaction = parentTransactionOnNetwork.innerTransactions[innerTransactionIndex];
-
-        const rootSmartContractResultCandidates = parentTransactionOnNetwork.contractResults.items.filter(
-            (result, _index) =>
-                result.previousHash === parentTransactionOnNetwork.hash &&
-                result.sender.bech32() == innerTransaction.sender &&
-                result.nonce == Number(innerTransaction.nonce),
-        );
-
-        if (rootSmartContractResultCandidates.length !== 1) {
-            console.warn(
-                `Failed to find the root smart contract result for inner transaction #${innerTransactionIndex} of ${parentTransactionOnNetwork.hash}.`,
-            );
-
-            return {
-                hash: `${parentTransactionOnNetwork.hash}-${innerTransactionIndex}`,
-                type: "",
-                status: TransactionStatus.createUnknown(),
-                value: innerTransaction.value.toString(),
-                receiver: Address.newFromBech32(innerTransaction.receiver),
-                sender: Address.newFromBech32(innerTransaction.sender),
-                data: Buffer.from(innerTransaction.data),
-                contractResults: { items: [] },
-                logs: new TransactionLogsOnNetwork({}),
-                receipt: new TransactionReceipt(),
-            };
-        }
-
-        const rootSmartContractResult = rootSmartContractResultCandidates[0];
-        const remainingSmartContractResults = parentTransactionOnNetwork.contractResults.items.filter(
-            (result, _index) => result.previousHash === rootSmartContractResult.hash,
-        );
-
-        return {
-            // Artificially created hash.
-            hash: `${parentTransactionOnNetwork.hash}-${innerTransactionIndex}`,
-            type: "",
-            status: TransactionStatus.createUnknown(),
-            value: innerTransaction.value.toString(),
-            receiver: Address.newFromBech32(innerTransaction.receiver),
-            sender: Address.newFromBech32(innerTransaction.sender),
-            data: Buffer.from(innerTransaction.data),
-            contractResults: { items: remainingSmartContractResults },
-            // As "logs", we attach the ones from the root smart contract result.
-            logs: rootSmartContractResult.logs,
-            receipt: new TransactionReceipt(),
-        };
     }
 }

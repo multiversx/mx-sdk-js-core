@@ -30,14 +30,14 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getNetworkConfig(): Promise<NetworkConfig> {
-        let response = await this.doGetGeneric("network/config");
-        let networkConfig = NetworkConfig.fromHttpResponse(response.config);
+        const response = await this.doGetGeneric("network/config");
+        const networkConfig = NetworkConfig.fromHttpResponse(response.config);
         return networkConfig;
     }
 
     async getNetworkStatus(): Promise<NetworkStatus> {
-        let response = await this.doGetGeneric("network/status/4294967295");
-        let networkStatus = NetworkStatus.fromHttpResponse(response.status);
+        const response = await this.doGetGeneric("network/status/4294967295");
+        const networkStatus = NetworkStatus.fromHttpResponse(response.status);
         return networkStatus;
     }
 
@@ -54,8 +54,8 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getAccount(address: IAddress): Promise<AccountOnNetwork> {
-        let response = await this.doGetGeneric(`address/${address.bech32()}`);
-        let account = AccountOnNetwork.fromHttpResponse(response.account);
+        const response = await this.doGetGeneric(`address/${address.bech32()}`);
+        const account = AccountOnNetwork.fromHttpResponse(response.account);
         return account;
     }
 
@@ -69,12 +69,12 @@ export class ProxyNetworkProvider implements INetworkProvider {
         address: IAddress,
         _pagination?: IPagination,
     ): Promise<FungibleTokenOfAccountOnNetwork[]> {
-        let url = `address/${address.bech32()}/esdt`;
-        let response = await this.doGetGeneric(url);
-        let responseItems: any[] = Object.values(response.esdts);
+        const url = `address/${address.bech32()}/esdt`;
+        const response = await this.doGetGeneric(url);
+        const responseItems: any[] = Object.values(response.esdts);
         // Skip NFTs / SFTs.
-        let responseItemsFiltered = responseItems.filter((item) => !item.nonce);
-        let tokens = responseItemsFiltered.map((item) => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
+        const responseItemsFiltered = responseItems.filter((item) => !item.nonce);
+        const tokens = responseItemsFiltered.map((item) => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
 
         // TODO: Fix sorting
         tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
@@ -85,12 +85,12 @@ export class ProxyNetworkProvider implements INetworkProvider {
         address: IAddress,
         _pagination?: IPagination,
     ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
-        let url = `address/${address.bech32()}/esdt`;
-        let response = await this.doGetGeneric(url);
-        let responseItems: any[] = Object.values(response.esdts);
+        const url = `address/${address.bech32()}/esdt`;
+        const response = await this.doGetGeneric(url);
+        const responseItems: any[] = Object.values(response.esdts);
         // Skip fungible tokens.
-        let responseItemsFiltered = responseItems.filter((item) => item.nonce >= 0);
-        let tokens = responseItemsFiltered.map((item) =>
+        const responseItemsFiltered = responseItems.filter((item) => item.nonce >= 0);
+        const tokens = responseItemsFiltered.map((item) =>
             NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponse(item),
         );
 
@@ -103,8 +103,8 @@ export class ProxyNetworkProvider implements INetworkProvider {
         address: IAddress,
         tokenIdentifier: string,
     ): Promise<FungibleTokenOfAccountOnNetwork> {
-        let response = await this.doGetGeneric(`address/${address.bech32()}/esdt/${tokenIdentifier}`);
-        let tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response.tokenData);
+        const response = await this.doGetGeneric(`address/${address.bech32()}/esdt/${tokenIdentifier}`);
+        const tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response.tokenData);
         return tokenData;
     }
 
@@ -113,10 +113,10 @@ export class ProxyNetworkProvider implements INetworkProvider {
         collection: string,
         nonce: number,
     ): Promise<NonFungibleTokenOfAccountOnNetwork> {
-        let response = await this.doGetGeneric(
+        const response = await this.doGetGeneric(
             `address/${address.bech32()}/nft/${collection}/nonce/${nonce.valueOf()}`,
         );
-        let tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponseByNonce(response.tokenData);
+        const tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponseByNonce(response.tokenData);
         return tokenData;
     }
 
@@ -127,8 +127,8 @@ export class ProxyNetworkProvider implements INetworkProvider {
             processStatusPromise = this.getTransactionStatus(txHash);
         }
 
-        let url = this.buildUrlWithQueryParameters(`transaction/${txHash}`, { withResults: "true" });
-        let response = await this.doGetGeneric(url);
+        const url = this.buildUrlWithQueryParameters(`transaction/${txHash}`, { withResults: "true" });
+        const response = await this.doGetGeneric(url);
 
         if (processStatusPromise) {
             const processStatus = await processStatusPromise;
@@ -138,8 +138,8 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
-        let response = await this.doGetGeneric(`transaction/${txHash}/process-status`);
-        let status = new TransactionStatus(response.status);
+        const response = await this.doGetGeneric(`transaction/${txHash}/process-status`);
+        const status = new TransactionStatus(response.status);
         return status;
     }
 
@@ -170,8 +170,8 @@ export class ProxyNetworkProvider implements INetworkProvider {
 
     async queryContract(query: IContractQuery): Promise<ContractQueryResponse> {
         try {
-            let request = new ContractQueryRequest(query).toHttpRequest();
-            let response = await this.doPostGeneric("vm-values/query", request);
+            const request = new ContractQueryRequest(query).toHttpRequest();
+            const response = await this.doPostGeneric("vm-values/query", request);
             return ContractQueryResponse.fromHttpResponse(response.data);
         } catch (error: any) {
             throw new ErrContractQuery(error);
@@ -179,8 +179,8 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
-        let properties = await this.getTokenProperties(tokenIdentifier);
-        let definition = DefinitionOfFungibleTokenOnNetwork.fromResponseOfGetTokenProperties(
+        const properties = await this.getTokenProperties(tokenIdentifier);
+        const definition = DefinitionOfFungibleTokenOnNetwork.fromResponseOfGetTokenProperties(
             tokenIdentifier,
             properties,
         );
@@ -188,21 +188,24 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     private async getTokenProperties(identifier: string): Promise<Buffer[]> {
-        let encodedIdentifier = Buffer.from(identifier).toString("hex");
+        const encodedIdentifier = Buffer.from(identifier).toString("hex");
 
-        let queryResponse = await this.queryContract({
+        const queryResponse = await this.queryContract({
             address: EsdtContractAddress,
             func: "getTokenProperties",
             getEncodedArguments: () => [encodedIdentifier],
         });
 
-        let properties = queryResponse.getReturnDataParts();
+        const properties = queryResponse.getReturnDataParts();
         return properties;
     }
 
     async getDefinitionOfTokenCollection(collection: string): Promise<DefinitionOfTokenCollectionOnNetwork> {
-        let properties = await this.getTokenProperties(collection);
-        let definition = DefinitionOfTokenCollectionOnNetwork.fromResponseOfGetTokenProperties(collection, properties);
+        const properties = await this.getTokenProperties(collection);
+        const definition = DefinitionOfTokenCollectionOnNetwork.fromResponseOfGetTokenProperties(
+            collection,
+            properties,
+        );
         return definition;
     }
 
@@ -211,21 +214,21 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async doGetGeneric(resourceUrl: string): Promise<any> {
-        let response = await this.doGet(resourceUrl);
+        const response = await this.doGet(resourceUrl);
         return response;
     }
 
     async doPostGeneric(resourceUrl: string, payload: any): Promise<any> {
-        let response = await this.doPost(resourceUrl, payload);
+        const response = await this.doPost(resourceUrl, payload);
         return response;
     }
 
     private async doGet(resourceUrl: string): Promise<any> {
-        let url = `${this.url}/${resourceUrl}`;
+        const url = `${this.url}/${resourceUrl}`;
 
         try {
-            let response = await axios.get(url, this.config);
-            let payload = response.data.data;
+            const response = await axios.get(url, this.config);
+            const payload = response.data.data;
             return payload;
         } catch (error) {
             this.handleApiError(error, resourceUrl);
@@ -233,17 +236,17 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     private async doPost(resourceUrl: string, payload: any): Promise<any> {
-        let url = `${this.url}/${resourceUrl}`;
+        const url = `${this.url}/${resourceUrl}`;
 
         try {
-            let response = await axios.post(url, payload, {
+            const response = await axios.post(url, payload, {
                 ...this.config,
                 headers: {
                     "Content-Type": "application/json",
                     ...this.config.headers,
                 },
             });
-            let responsePayload = response.data.data;
+            const responsePayload = response.data.data;
             return responsePayload;
         } catch (error) {
             this.handleApiError(error, resourceUrl);
@@ -251,7 +254,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     private buildUrlWithQueryParameters(endpoint: string, params: Record<string, string>): string {
-        let searchParams = new URLSearchParams();
+        const searchParams = new URLSearchParams();
 
         for (let [key, value] of Object.entries(params)) {
             if (value) {

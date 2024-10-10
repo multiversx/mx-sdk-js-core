@@ -13,7 +13,7 @@ export class Err extends Error {
      * Returns a pretty, friendly summary for the error or for the chain of errros (if appropriate).
      */
     summary(): any[] {
-        let result = [];
+        const result = [];
 
         result.push({ name: this.name, message: this.message });
 
@@ -77,7 +77,7 @@ export class ErrUnexpectedCondition extends Err {
  */
 export class ErrAddressCannotCreate extends Err {
     public constructor(input: any, inner?: Error) {
-        let message = `Cannot create address from: ${input}`;
+        const message = `Cannot create address from: ${input}`;
         super(message, inner);
     }
 }
@@ -141,7 +141,7 @@ export class ErrTransactionOptionsInvalid extends Err {
  */
 export class ErrSignatureCannotCreate extends Err {
     public constructor(input: any, inner?: Error) {
-        let message = `Cannot create signature from: ${input}`;
+        const message = `Cannot create signature from: ${input}`;
         super(message, inner);
     }
 }
@@ -435,7 +435,7 @@ export class ErrBadAddress extends Err {
  */
 export class ErrNetworkProvider extends Err {
     public constructor(url: string, error: string, inner?: Error) {
-        let message = `Request error on url [${url}]: [${error}]`;
+        const message = `Request error on url [${url}]: [${error}]`;
         super(message, inner);
     }
 }

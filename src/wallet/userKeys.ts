@@ -1,8 +1,8 @@
 import * as ed from "@noble/ed25519";
 import { sha512 } from "@noble/hashes/sha512";
+import { Address } from "../address";
 import { guardLength } from "./assertions";
 import { parseUserKey } from "./pem";
-import { UserAddress } from "./userAddress";
 
 export const USER_SEED_LENGTH = 32;
 export const USER_PUBKEY_LENGTH = 32;
@@ -73,8 +73,8 @@ export class UserPublicKey {
         return this.buffer.toString("hex");
     }
 
-    toAddress(hrp?: string): UserAddress {
-        return new UserAddress(this.buffer, hrp);
+    toAddress(hrp?: string): Address {
+        return new Address(this.buffer, hrp);
     }
 
     valueOf(): Buffer {

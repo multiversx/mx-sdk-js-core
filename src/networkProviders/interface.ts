@@ -1,3 +1,4 @@
+import { ITransaction as ITransactionAsInSpecs } from "../interface";
 import { AccountOnNetwork } from "./accounts";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { NetworkConfig } from "./networkConfig";
@@ -135,6 +136,9 @@ export interface IPagination {
     size: number;
 }
 
+/**
+ * @deprecated This will be remove in the next major release (replaced by the `ITransaction` interface from "src/interface.ts").
+ */
 export interface ITransaction {
     toSendable(): any;
 }
@@ -143,22 +147,7 @@ export interface IAddress {
     bech32(): string;
 }
 
-export interface ITransactionNext {
-    sender: string;
-    receiver: string;
-    gasLimit: bigint;
-    chainID: string;
-    nonce: bigint;
-    value: bigint;
-    senderUsername: string;
-    receiverUsername: string;
-    gasPrice: bigint;
-    data: Uint8Array;
-    version: number;
-    options: number;
-    guardian: string;
-    signature: Uint8Array;
-    guardianSignature: Uint8Array;
-    relayer?: string;
-    innerTransactions?: ITransactionNext[];
-}
+/**
+ * @deprecated This will be remove with the next release (replaced by the `ITransaction` interface from "src/interface.ts").
+ */
+export type ITransactionNext = ITransactionAsInSpecs;

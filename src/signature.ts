@@ -8,7 +8,7 @@ const SIGNATURE_LENGTH = 64;
 export class Signature {
     private valueHex: string = "";
 
-    constructor(value?: string | Buffer) {
+    constructor(value?: string | Buffer | Uint8Array) {
         if (!value) {
             return;
         }

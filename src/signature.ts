@@ -15,8 +15,9 @@ export class Signature {
         if (typeof value === "string") {
             return Signature.fromHex(value);
         }
-        if (value instanceof Buffer) {
-            return Signature.fromBuffer(value);
+
+        if (ArrayBuffer.isView(value)) {
+            return Signature.fromBuffer(Buffer.from(value));
         }
     }
 

@@ -243,7 +243,7 @@ export class ResultsParser {
     }
 
     protected createBundleOnHasInnerTransactions(transaction: ITransactionOnNetwork): UntypedOutcomeBundle | null {
-        if (transaction.innerTransactions) {
+        if (transaction.innerTransactions?.length) {
             return {
                 returnCode: ReturnCode.None,
                 returnMessage: ReturnCode.None.toString(),

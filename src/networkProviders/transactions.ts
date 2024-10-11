@@ -97,7 +97,7 @@ export class TransactionOnNetwork {
     private static fromHttpResponse(txHash: string, response: any): TransactionOnNetwork {
         let result = new TransactionOnNetwork();
 
-        result.hash = txHash;
+        result.hash = txHash || response.hash || response.txHash;
         result.type = response.type || "";
         result.nonce = response.nonce || 0;
         result.round = response.round;
@@ -118,7 +118,9 @@ export class TransactionOnNetwork {
 
         result.receipt = TransactionReceipt.fromHttpResponse(response.receipt || {});
         result.logs = TransactionLogs.fromHttpResponse(response.logs || {});
-        result.innerTransactions = (response.innerTransactions || []).map(TransactionOnNetwork.fromHttpResponse);
+        result.innerTransactions = (response.innerTransactions || []).map((item: any) =>
+            TransactionOnNetwork.fromHttpResponse(item.hash, item),
+        );
 
         return result;
     }

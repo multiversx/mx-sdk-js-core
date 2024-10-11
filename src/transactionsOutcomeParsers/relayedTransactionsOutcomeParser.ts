@@ -4,14 +4,11 @@ export class RelayedTransactionsOutcomeParser {
     constructor() {}
 
     parseRelayedV3Transaction(parentTransaction: ITransactionOnNetwork): {
-        innerTransactionsHashes: string[];
         innerTransactions: ITransactionOnNetwork[];
     } {
         const innerTransactions = this.transactionOnNetworkToInnerTransactionsOnNetwork(parentTransaction);
-        const hashes = innerTransactions.map((item) => item.hash);
 
         return {
-            innerTransactionsHashes: hashes,
             innerTransactions: innerTransactions,
         };
     }

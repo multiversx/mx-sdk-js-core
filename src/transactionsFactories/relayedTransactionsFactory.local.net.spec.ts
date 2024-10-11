@@ -81,6 +81,9 @@ describe("test relayed transactions factory (on localnet)", function () {
             }),
         );
 
+        console.log("transactionHashDeployOfAlice", transactionHashDeployOfAlice);
+        console.log("transactionHashDeployOfJudy", transactionHashDeployOfJudy);
+
         await transactionWatcher.awaitCompleted(transactionHashDeployOfAlice);
         await transactionWatcher.awaitCompleted(transactionHashDeployOfJudy);
 
@@ -158,48 +161,32 @@ describe("test relayed transactions factory (on localnet)", function () {
             relayedWithCrossShardCallsTransactionHash,
         );
 
-        const { innerTransactionsHashes: innerTransactionsHashesOfRelayedWithIntraShardCalls } =
+        console.log("relayedWithIntraShardCallsTransactionHash", relayedWithIntraShardCallsTransactionHash);
+        console.log("relayedWithCrossShardCallsTransactionHash", relayedWithCrossShardCallsTransactionHash);
+
+        const { innerTransactions: innerTransactionsOfRelayedWithIntraShardCalls } =
             relayedTransactionsOutcomeParser.parseRelayedV3Transaction(relayedWithIntraShardCallsTransactionOnNetwork);
 
-        const { innerTransactionsHashes: innerTransactionsHashesOfRelayedWithCrossShardCalls } =
+        const { innerTransactions: innerTransactionsOfRelayedWithCrossShardCalls } =
             relayedTransactionsOutcomeParser.parseRelayedV3Transaction(relayedWithCrossShardCallsTransactionOnNetwork);
 
-        console.log(
-            "innerTransactionsHashesOfRelayedWithIntraShardCalls",
-            innerTransactionsHashesOfRelayedWithIntraShardCalls,
-        );
-        console.log(
-            "innerTransactionsHashesOfRelayedWithCrossShardCalls",
-            innerTransactionsHashesOfRelayedWithCrossShardCalls,
-        );
-
         // Carol to Judy's contract
-        let innerTransactionOnNetwork = await transactionWatcher.awaitCompleted(
-            innerTransactionsHashesOfRelayedWithIntraShardCalls[0],
-        );
-
+        let innerTransactionOnNetwork = innerTransactionsOfRelayedWithIntraShardCalls[0];
         let outcome = smartContractTransactionsParser.parseExecute({ transactionOnNetwork: innerTransactionOnNetwork });
         assert.deepEqual(outcome.values, [Buffer.from([2])]);
 
         // Judy to Judy's contract
-        innerTransactionOnNetwork = await transactionWatcher.awaitCompleted(
-            innerTransactionsHashesOfRelayedWithIntraShardCalls[1],
-        );
-
+        innerTransactionOnNetwork = innerTransactionsOfRelayedWithIntraShardCalls[1];
         outcome = smartContractTransactionsParser.parseExecute({ transactionOnNetwork: innerTransactionOnNetwork });
         assert.deepEqual(outcome.values, [Buffer.from([3])]);
 
         // Carol to Alice's contract
-        innerTransactionOnNetwork = await transactionWatcher.awaitCompleted(
-            innerTransactionsHashesOfRelayedWithCrossShardCalls[0],
-        );
+        innerTransactionOnNetwork = innerTransactionsOfRelayedWithCrossShardCalls[0];
         outcome = smartContractTransactionsParser.parseExecute({ transactionOnNetwork: innerTransactionOnNetwork });
         assert.deepEqual(outcome.values, [Buffer.from([2])]);
 
         // Judy to Alice's contract
-        innerTransactionOnNetwork = await transactionWatcher.awaitCompleted(
-            innerTransactionsHashesOfRelayedWithCrossShardCalls[1],
-        );
+        innerTransactionOnNetwork = innerTransactionsOfRelayedWithCrossShardCalls[1];
         outcome = smartContractTransactionsParser.parseExecute({ transactionOnNetwork: innerTransactionOnNetwork });
         assert.deepEqual(outcome.values, [Buffer.from([3])]);
     });

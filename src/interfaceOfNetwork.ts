@@ -1,4 +1,4 @@
-import { IAccountBalance, IAddress, ITransaction } from "./interface";
+import { IAccountBalance, IAddress } from "./interface";
 
 export interface IAccountOnNetwork {
     nonce: number;
@@ -28,8 +28,9 @@ export interface ITransactionOnNetwork {
     logs: ITransactionLogs;
 
     // TODO: In a future major release, make these required (empty is allowed).
+    nonce?: number;
     relayer?: string;
-    innerTransactions?: ITransaction[];
+    innerTransactions?: ITransactionOnNetwork[];
 }
 
 export interface ITransactionStatus {

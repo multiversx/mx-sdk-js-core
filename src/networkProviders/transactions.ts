@@ -1,9 +1,9 @@
-import { TransactionStatus } from "./transactionStatus";
 import { ContractResults } from "./contractResults";
-import { Address } from "./primitives";
 import { IAddress, ITransaction, ITransactionNext } from "./interface";
+import { Address } from "./primitives";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
+import { TransactionStatus } from "./transactionStatus";
 
 export function prepareTransactionForBroadcasting(transaction: ITransaction | ITransactionNext): any {
     if ("toSendable" in transaction) {
@@ -65,7 +65,7 @@ export class TransactionOnNetwork {
     receipt: TransactionReceipt = new TransactionReceipt();
     contractResults: ContractResults = new ContractResults([]);
     logs: TransactionLogs = new TransactionLogs();
-    innerTransactions: ITransactionNext[] = [];
+    innerTransactions: TransactionOnNetwork[] = [];
 
     constructor(init?: Partial<TransactionOnNetwork>) {
         Object.assign(this, init);
@@ -118,34 +118,9 @@ export class TransactionOnNetwork {
 
         result.receipt = TransactionReceipt.fromHttpResponse(response.receipt || {});
         result.logs = TransactionLogs.fromHttpResponse(response.logs || {});
-        result.innerTransactions = (response.innerTransactions || []).map(this.innerTransactionFromHttpResource);
+        result.innerTransactions = (response.innerTransactions || []).map(TransactionOnNetwork.fromHttpResponse);
 
         return result;
-    }
-
-    private static innerTransactionFromHttpResource(resource: any): ITransactionNext {
-        return {
-            nonce: BigInt(resource.nonce || 0),
-            value: BigInt(resource.value || 0),
-            receiver: resource.receiver,
-            sender: resource.sender,
-            // We discard "senderUsername" and "receiverUsername" (to avoid future discrepancies between Proxy and API):
-            senderUsername: "",
-            receiverUsername: "",
-            gasPrice: BigInt(resource.gasPrice),
-            gasLimit: BigInt(resource.gasLimit),
-            data: Buffer.from(resource.data || "", "base64"),
-            chainID: resource.chainID,
-            version: resource.version,
-            options: resource.options || 0,
-            guardian: resource.guardian || "",
-            signature: Buffer.from(resource.signature, "hex"),
-            guardianSignature: resource.guardianSignature
-                ? Buffer.from(resource.guardianSignature, "hex")
-                : Buffer.from([]),
-            relayer: resource.relayer,
-            innerTransactions: [],
-        };
     }
 
     getDateTime(): Date {

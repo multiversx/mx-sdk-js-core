@@ -1,32 +1,69 @@
-import { TransactionsConverter } from "../converters/transactionsConverter";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { TransactionOutcome, findEventsByIdentifier } from "./resources";
+import { IContractResultItem, ITransactionOnNetwork } from "../interfaceOfNetwork";
 
 export class RelayedTransactionsOutcomeParser {
     constructor() {}
 
-    parseRelayedV3Transaction(transaction: TransactionOutcome | ITransactionOnNetwork): {
+    parseRelayedV3Transaction(parentTransaction: ITransactionOnNetwork): {
         innerTransactionsHashes: string[];
+        innerTransactions: ITransactionOnNetwork[];
     } {
-        transaction = this.ensureTransactionOutcome(transaction);
-
-        const events = findEventsByIdentifier(transaction, "completedTxEvent");
-        const topics = events.flatMap((event) => event.topics);
-        const hashes = topics.map((topic) => Buffer.from(topic).toString("hex"));
+        const innerTransactions = this.transactionOnNetworkToInnerTransactionsOnNetwork(parentTransaction);
+        const hashes = innerTransactions.map((item) => item.hash);
 
         return {
             innerTransactionsHashes: hashes,
+            innerTransactions: innerTransactions,
         };
     }
 
+    protected transactionOnNetworkToInnerTransactionsOnNetwork(
+        transactionOnNetwork: ITransactionOnNetwork,
+    ): ITransactionOnNetwork[] {
+        const innerTransactions = transactionOnNetwork.innerTransactions || [];
+        const innerTransactionsOnNetwork: ITransactionOnNetwork[] = innerTransactions.map((_, index) =>
+            this.convertInnerTransactionToTransactionOnNetwork(transactionOnNetwork, index),
+        );
+
+        return innerTransactionsOnNetwork;
+    }
+
     /**
-     * Temporary workaround, until "TransactionOnNetwork" completely replaces "TransactionOutcome".
+     * Recovers the structure of an inner transaction from the parent transaction,
+     * by matching the inner transaction with its corresponding smart contract results (and logs).
      */
-    private ensureTransactionOutcome(transaction: TransactionOutcome | ITransactionOnNetwork): TransactionOutcome {
-        if ("hash" in transaction) {
-            return new TransactionsConverter().transactionOnNetworkToOutcome(transaction);
+    protected convertInnerTransactionToTransactionOnNetwork(
+        parentTransactionOnNetwork: ITransactionOnNetwork,
+        innerTransactionIndex: number,
+    ): ITransactionOnNetwork {
+        if (
+            !parentTransactionOnNetwork.innerTransactions ||
+            parentTransactionOnNetwork.innerTransactions.length <= innerTransactionIndex
+        ) {
+            throw new Error("Inner transaction index is out of bounds");
         }
 
-        return transaction;
+        const innerTransaction = structuredClone(parentTransactionOnNetwork.innerTransactions[innerTransactionIndex]);
+        const innerTransactionHash = innerTransaction.hash;
+
+        function isResultOfInnerTransaction(result: IContractResultItem): boolean {
+            if (result.previousHash == innerTransactionHash) {
+                return true;
+            }
+
+            const previous = parentTransactionOnNetwork.contractResults.items.find(
+                (item) => item.hash === result.previousHash,
+            );
+
+            if (!previous) {
+                return false;
+            }
+
+            return isResultOfInnerTransaction(previous);
+        }
+
+        const resultsOfInner = parentTransactionOnNetwork.contractResults.items.filter(isResultOfInnerTransaction);
+        innerTransaction.contractResults = { items: resultsOfInner };
+
+        return innerTransaction;
     }
 }

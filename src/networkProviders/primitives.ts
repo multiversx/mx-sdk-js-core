@@ -1,10 +1,11 @@
 import * as bech32 from "bech32";
-import { LibraryConfig } from "../config";
 import { IAddress } from "./interface";
 
 /**
- * @deprecated Use the `Address` class from src/address.ts instead.
+ * The human-readable-part of the bech32 addresses.
  */
+const HRP = "erd";
+
 export class Address implements IAddress {
     private readonly value: string;
 
@@ -14,7 +15,7 @@ export class Address implements IAddress {
 
     static fromPubkey(pubkey: Buffer): IAddress {
         let words = bech32.toWords(pubkey);
-        let address = bech32.encode(LibraryConfig.DefaultAddressHrp, words);
+        let address = bech32.encode(HRP, words);
         return new Address(address);
     }
 
@@ -27,9 +28,6 @@ export class Address implements IAddress {
     }
 }
 
-/**
- * @deprecated Will be removed in the next major version.
- */
 export class Nonce {
     private readonly value: number;
 

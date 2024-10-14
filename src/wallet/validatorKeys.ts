@@ -2,6 +2,7 @@ import { ErrInvariantFailed } from "../errors";
 import { guardLength } from "./assertions";
 import { parseValidatorKey } from "./pem";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const bls = require("@multiversx/sdk-bls-wasm");
 
 export const VALIDATOR_SECRETKEY_LENGTH = 32;

@@ -5,7 +5,6 @@ import { TestWallet, loadTestWallets } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { RelayedTransactionsOutcomeParser } from "../transactionsOutcomeParsers/relayedTransactionsOutcomeParser";
 import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomeParsers/smartContractTransactionsOutcomeParser";
 import { TransactionWatcher } from "../transactionWatcher";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
@@ -22,7 +21,6 @@ describe("test relayed transactions factory (on localnet)", function () {
 
     const config = new TransactionsFactoryConfig({ chainID: "localnet" });
     const relayedTransactionsFactory = new RelayedTransactionsFactory({ config: config });
-    const relayedTransactionsOutcomeParser = new RelayedTransactionsOutcomeParser();
     const smartContractTransactionsFactory = new SmartContractTransactionsFactory({ config: config });
     const smartContractTransactionsParser = new SmartContractTransactionsOutcomeParser();
     const transactionComputer = new TransactionComputer();
@@ -164,30 +162,34 @@ describe("test relayed transactions factory (on localnet)", function () {
         console.log("relayedWithIntraShardCallsTransactionHash", relayedWithIntraShardCallsTransactionHash);
         console.log("relayedWithCrossShardCallsTransactionHash", relayedWithCrossShardCallsTransactionHash);
 
-        const { innerTransactions: innerTransactionsOfRelayedWithIntraShardCalls } =
-            relayedTransactionsOutcomeParser.parseRelayedV3Transaction(relayedWithIntraShardCallsTransactionOnNetwork);
+        const innerTransactionsOfRelayedWithIntraShardCalls =
+            relayedWithIntraShardCallsTransactionOnNetwork.innerTransactions || [];
 
-        const { innerTransactions: innerTransactionsOfRelayedWithCrossShardCalls } =
-            relayedTransactionsOutcomeParser.parseRelayedV3Transaction(relayedWithCrossShardCallsTransactionOnNetwork);
+        const innerTransactionsOfRelayedWithCrossShardCalls =
+            relayedWithCrossShardCallsTransactionOnNetwork.innerTransactions || [];
 
         // Carol to Judy's contract
-        let innerTransactionOnNetwork = innerTransactionsOfRelayedWithIntraShardCalls[0];
-        let outcome = smartContractTransactionsParser.parseExecute({ transactionOnNetwork: innerTransactionOnNetwork });
+        let outcome = smartContractTransactionsParser.parseExecute({
+            transactionOnNetwork: innerTransactionsOfRelayedWithIntraShardCalls[0],
+        });
         assert.deepEqual(outcome.values, [Buffer.from([2])]);
 
         // Judy to Judy's contract
-        innerTransactionOnNetwork = innerTransactionsOfRelayedWithIntraShardCalls[1];
-        outcome = smartContractTransactionsParser.parseExecute({ transactionOnNetwork: innerTransactionOnNetwork });
+        outcome = smartContractTransactionsParser.parseExecute({
+            transactionOnNetwork: innerTransactionsOfRelayedWithIntraShardCalls[1],
+        });
         assert.deepEqual(outcome.values, [Buffer.from([3])]);
 
         // Carol to Alice's contract
-        innerTransactionOnNetwork = innerTransactionsOfRelayedWithCrossShardCalls[0];
-        outcome = smartContractTransactionsParser.parseExecute({ transactionOnNetwork: innerTransactionOnNetwork });
+        outcome = smartContractTransactionsParser.parseExecute({
+            transactionOnNetwork: innerTransactionsOfRelayedWithCrossShardCalls[0],
+        });
         assert.deepEqual(outcome.values, [Buffer.from([2])]);
 
         // Judy to Alice's contract
-        innerTransactionOnNetwork = innerTransactionsOfRelayedWithCrossShardCalls[1];
-        outcome = smartContractTransactionsParser.parseExecute({ transactionOnNetwork: innerTransactionOnNetwork });
+        outcome = smartContractTransactionsParser.parseExecute({
+            transactionOnNetwork: innerTransactionsOfRelayedWithCrossShardCalls[1],
+        });
         assert.deepEqual(outcome.values, [Buffer.from([3])]);
     });
 

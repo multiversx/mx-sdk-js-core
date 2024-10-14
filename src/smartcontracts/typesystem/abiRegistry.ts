@@ -214,7 +214,7 @@ function mapEndpoint(endpoint: EndpointDefinition, mapper: TypeMapper): Endpoint
         (e) => new EndpointParameterDefinition(e.name, e.description, mapper.mapType(e.type)),
     );
 
-    return new EndpointDefinition(endpoint.name, newInput, newOutput, endpoint.modifiers);
+    return new EndpointDefinition(endpoint.name, newInput, newOutput, endpoint.modifiers, endpoint.title);
 }
 
 function mapEvent(event: EventDefinition, mapper: TypeMapper): EventDefinition {

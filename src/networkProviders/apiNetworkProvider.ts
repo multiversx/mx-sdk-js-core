@@ -1,5 +1,5 @@
-import axios from "axios";
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
+import { getAxios } from "../utils";
 import { numberToPaddedHex } from "../utils.codec";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig, defaultPagination } from "./config";
@@ -202,10 +202,12 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     private async doGet(resourceUrl: string): Promise<any> {
+        let axios = await getAxios();
+
         const url = `${this.url}/${resourceUrl}`;
 
         try {
-            const response = await axios.get(url, this.config);
+            const response = await axios.default.get(url, this.config);
             return response.data;
         } catch (error) {
             this.handleApiError(error, resourceUrl);
@@ -213,10 +215,11 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     private async doPost(resourceUrl: string, payload: any): Promise<any> {
+        let axios = await getAxios();
         const url = `${this.url}/${resourceUrl}`;
 
         try {
-            const response = await axios.post(url, payload, {
+            const response = await axios.default.post(url, payload, {
                 ...this.config,
                 headers: {
                     "Content-Type": "application/json",

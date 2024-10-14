@@ -1,7 +1,7 @@
 import { Buffer } from "buffer";
 import { assert } from "chai";
+import { ErrBadPEM } from "../errors";
 import { loadTestWallet, TestWallet } from "./../testutils/wallets";
-import { ErrBadPEM } from "./errors";
 import { parse, parseUserKey, parseValidatorKey } from "./pem";
 import { BLS } from "./validatorKeys";
 

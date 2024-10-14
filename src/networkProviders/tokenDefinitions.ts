@@ -1,12 +1,12 @@
 import BigNumber from "bignumber.js";
+import { Address } from "../address";
 import { IAddress } from "./interface";
-import { Address } from "./primitives";
 
 export class DefinitionOfFungibleTokenOnNetwork {
     identifier: string = "";
     name: string = "";
     ticker: string = "";
-    owner: IAddress = new Address("");
+    owner: IAddress = Address.empty();
     decimals: number = 0;
     supply: BigNumber = new BigNumber(0);
     isPaused: boolean = false;
@@ -55,7 +55,7 @@ export class DefinitionOfFungibleTokenOnNetwork {
         result.identifier = identifier;
         result.name = tokenName.toString();
         result.ticker = identifier;
-        result.owner = Address.fromPubkey(owner);
+        result.owner = new Address(owner);
         result.decimals = properties.NumDecimals.toNumber();
         result.supply = new BigNumber(supply.toString()).shiftedBy(-result.decimals);
         result.isPaused = properties.IsPaused;
@@ -76,7 +76,7 @@ export class DefinitionOfTokenCollectionOnNetwork {
     type: string = "";
     name: string = "";
     ticker: string = "";
-    owner: IAddress = new Address("");
+    owner: IAddress = Address.empty();
     decimals: number = 0;
     canPause: boolean = false;
     canFreeze: boolean = false;
@@ -120,7 +120,7 @@ export class DefinitionOfTokenCollectionOnNetwork {
         result.type = tokenType.toString();
         result.name = tokenName.toString();
         result.ticker = collection;
-        result.owner = Address.fromPubkey(owner);
+        result.owner = new Address(owner);
         result.decimals = properties.NumDecimals.toNumber() ?? 0;
         result.canPause = properties.CanPause || false;
         result.canFreeze = properties.CanFreeze || false;
@@ -150,8 +150,11 @@ function parseTokenProperties(propertiesBuffers: Buffer[]): Record<string, any> 
 // This only handles booleans and numbers.
 function parseValueOfTokenProperty(value: string): any {
     switch (value) {
-        case "true": return true;
-        case "false": return false;
-        default: return new BigNumber(value);
+        case "true":
+            return true;
+        case "false":
+            return false;
+        default:
+            return new BigNumber(value);
     }
 }

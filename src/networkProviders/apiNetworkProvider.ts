@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
+import { numberToPaddedHex } from "../utils.codec";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig, defaultPagination } from "./config";
 import { BaseUserAgent } from "./constants";
@@ -12,7 +13,6 @@ import { NetworkProviderConfig } from "./networkProviderConfig";
 import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
 import { PairOnNetwork } from "./pairs";
-import { Nonce } from "./primitives";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
@@ -115,7 +115,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         collection: string,
         nonce: number,
     ): Promise<NonFungibleTokenOfAccountOnNetwork> {
-        const nonceAsHex = new Nonce(nonce).hex();
+        const nonceAsHex = numberToPaddedHex(nonce);
         const response = await this.doGetGeneric(`accounts/${address.bech32()}/nfts/${collection}-${nonceAsHex}`);
         const tokenData = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);
         return tokenData;
@@ -181,7 +181,7 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     async getNonFungibleToken(collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork> {
-        const nonceAsHex = new Nonce(nonce).hex();
+        const nonceAsHex = numberToPaddedHex(nonce);
         const response = await this.doGetGeneric(`nfts/${collection}-${nonceAsHex}`);
         const token = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);
         return token;

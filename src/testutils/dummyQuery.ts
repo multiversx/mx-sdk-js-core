@@ -3,8 +3,8 @@ import { IAddress } from "../interface";
 import { IContractQuery } from "../networkProviders/interface";
 
 export class MockQuery implements IContractQuery {
-    caller: IAddress = new Address("");
-    address: IAddress = new Address("");
+    caller: IAddress = Address.empty();
+    address: IAddress = Address.empty();
     func: string = "";
     args: string[] = [];
     value: string = "";

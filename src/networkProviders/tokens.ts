@@ -1,5 +1,6 @@
 import { BigNumber } from "bignumber.js";
-import { Address, Nonce } from "./primitives";
+import { Address } from "../address";
+import { numberToPaddedHex } from "../utils.codec";
 import { IAddress } from "./interface";
 
 export class FungibleTokenOfAccountOnNetwork {
@@ -26,7 +27,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
     nonce: number = 0;
     type: string = "";
     name: string = "";
-    creator: IAddress = new Address("");
+    creator: IAddress = Address.empty();
     supply: BigNumber = new BigNumber(0);
     decimals: number = 0;
     royalties: BigNumber = new BigNumber(0);
@@ -49,7 +50,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
 
     static fromProxyHttpResponseByNonce(payload: any): NonFungibleTokenOfAccountOnNetwork {
         let result = NonFungibleTokenOfAccountOnNetwork.fromHttpResponse(payload);
-        let nonceAsHex = new Nonce(result.nonce).hex();
+        let nonceAsHex = numberToPaddedHex(result.nonce);
 
         result.identifier = `${payload.tokenIdentifier}-${nonceAsHex}`;
         result.collection = payload.tokenIdentifier || "";

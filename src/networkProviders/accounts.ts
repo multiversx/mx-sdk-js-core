@@ -1,12 +1,12 @@
 import BigNumber from "bignumber.js";
+import { Address } from "../address";
 import { IAddress } from "./interface";
-import { Address } from "./primitives";
 
 /**
  * A plain view of an account, as queried from the Network.
  */
 export class AccountOnNetwork {
-    address: IAddress = new Address("");
+    address: IAddress = Address.empty();
     nonce: number = 0;
     balance: BigNumber = new BigNumber(0);
     code: string = "";
@@ -65,7 +65,7 @@ export class GuardianData {
 
 class Guardian {
     activationEpoch: number = 0;
-    address: IAddress = new Address("");
+    address: IAddress = Address.empty();
     serviceUID: string = "";
 
     static fromHttpResponse(responsePart: any): Guardian {

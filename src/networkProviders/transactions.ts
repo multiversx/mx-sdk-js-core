@@ -84,6 +84,10 @@ export class TransactionOnNetwork {
             result.isCompleted = result.status.isSuccessful() || result.status.isFailed();
         }
 
+        result.innerTransactions = (response.innerTransactions || []).map((item: any) =>
+            TransactionOnNetwork.fromProxyHttpResponse(item.hash, item),
+        );
+
         return result;
     }
 
@@ -91,6 +95,11 @@ export class TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.contractResults = ContractResults.fromApiHttpResponse(response.results || []);
         result.isCompleted = !result.status.isPending();
+
+        result.innerTransactions = (response.innerTransactions || []).map((item: any) =>
+            TransactionOnNetwork.fromApiHttpResponse(item.hash, item),
+        );
+
         return result;
     }
 
@@ -118,9 +127,6 @@ export class TransactionOnNetwork {
 
         result.receipt = TransactionReceipt.fromHttpResponse(response.receipt || {});
         result.logs = TransactionLogs.fromHttpResponse(response.logs || {});
-        result.innerTransactions = (response.innerTransactions || []).map((item: any) =>
-            TransactionOnNetwork.fromHttpResponse(item.hash, item),
-        );
 
         return result;
     }

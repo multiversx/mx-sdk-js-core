@@ -36,7 +36,7 @@ npm install esmify --no-save
 
 ### axios
 
-This package can make HTTP requests using `axios`, but it is not bundled by default. If you plan to use the API network provider or Proxy network provider, make sure to install `axios`:
+This package can make HTTP requests using `axios`, which is not bundled by default. If you plan to use the API network provider or Proxy network provider, make sure to install `axios`:
 
 ```bash
 npm install axios
@@ -44,7 +44,7 @@ npm install axios
 
 ### @multiversx/sdk-bls-wasm
 
-This package requires `@multiversx/sdk-bls-wasm` for BLS (Boneh-Lynn-Shacham) cryptographic functions, but it is not bundled by default. If you plan to use BLS functionality, make sure to install this optional dependency:
+This package requires `@multiversx/sdk-bls-wasm` for BLS (Boneh-Lynn-Shacham) cryptographic functions, which is not bundled by default. If you plan to use BLS functionality, make sure to install this optional dependency:
 
 ```bash
 npm install @multiversx/sdk-bls-wasm

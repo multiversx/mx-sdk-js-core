@@ -22,10 +22,12 @@ export class ProxyNetworkProvider implements INetworkProvider {
     private url: string;
     private config: NetworkProviderConfig;
     private userAgentPrefix = `${BaseUserAgent}/proxy`;
+    private axios: any;
 
     constructor(url: string, config?: NetworkProviderConfig) {
         this.url = url;
         this.config = { ...defaultAxiosConfig, ...config };
+        this.axios = getAxios();
         extendUserAgent(this.userAgentPrefix, this.config);
     }
 
@@ -224,11 +226,10 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     private async doGet(resourceUrl: string): Promise<any> {
-        const axios = await getAxios();
         const url = `${this.url}/${resourceUrl}`;
 
         try {
-            const response = await axios.default.get(url, this.config);
+            const response = await this.axios.default.get(url, this.config);
             const payload = response.data.data;
             return payload;
         } catch (error) {
@@ -237,11 +238,10 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     private async doPost(resourceUrl: string, payload: any): Promise<any> {
-        const axios = await getAxios();
         const url = `${this.url}/${resourceUrl}`;
 
         try {
-            const response = await axios.default.post(url, payload, {
+            const response = await this.axios.default.post(url, payload, {
                 ...this.config,
                 headers: {
                     "Content-Type": "application/json",

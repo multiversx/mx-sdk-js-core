@@ -57,11 +57,9 @@ export function isEmpty(value: { isEmpty?: () => boolean; length?: number }): bo
     return value.length === 0;
 }
 
-export async function getAxios() {
-    let axios;
+export function getAxios() {
     try {
-        axios = require("axios");
-        return axios;
+        return require("axios");
     } catch (error) {
         throw new Error("axios is required but not installed. Please install axios to make network requests.");
     }

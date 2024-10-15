@@ -1,10 +1,10 @@
-import axios from "axios";
 import * as fs from "fs";
 import * as path from "path";
 import { Account } from "../account";
 import { Address } from "../address";
 import { IAddress } from "../interface";
 import { IAccountOnNetwork } from "../interfaceOfNetwork";
+import { getAxios } from "../utils";
 import { UserSecretKey, UserSigner } from "./../wallet";
 import { readTestFile } from "./files";
 import { isOnBrowserTests } from "./utils";
@@ -82,7 +82,8 @@ async function readTestWalletFileContents(name: string): Promise<string> {
 }
 
 async function downloadTextFile(url: string) {
-    let response = await axios.get(url, { responseType: "text", transformResponse: [] });
+    const axios = await getAxios();
+    let response = await axios.default.get(url, { responseType: "text", transformResponse: [] });
     let text = response.data.toString();
     return text;
 }

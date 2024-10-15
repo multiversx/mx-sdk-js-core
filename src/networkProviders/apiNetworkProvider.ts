@@ -1,5 +1,5 @@
-import axios from "axios";
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
+import { getAxios } from "../utils";
 import { numberToPaddedHex } from "../utils.codec";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig, defaultPagination } from "./config";
@@ -26,12 +26,14 @@ export class ApiNetworkProvider implements INetworkProvider {
     private config: NetworkProviderConfig;
     private backingProxyNetworkProvider;
     private userAgentPrefix = `${BaseUserAgent}/api`;
+    private axios: any;
 
     constructor(url: string, config?: NetworkProviderConfig) {
         this.url = url;
         const proxyConfig = this.getProxyConfig(config);
         this.config = { ...defaultAxiosConfig, ...config };
         this.backingProxyNetworkProvider = new ProxyNetworkProvider(url, proxyConfig);
+        this.axios = getAxios();
         extendUserAgent(this.userAgentPrefix, this.config);
     }
 
@@ -205,7 +207,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         const url = `${this.url}/${resourceUrl}`;
 
         try {
-            const response = await axios.get(url, this.config);
+            const response = await this.axios.default.get(url, this.config);
             return response.data;
         } catch (error) {
             this.handleApiError(error, resourceUrl);
@@ -216,7 +218,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         const url = `${this.url}/${resourceUrl}`;
 
         try {
-            const response = await axios.post(url, payload, {
+            const response = await this.axios.default.post(url, payload, {
                 ...this.config,
                 headers: {
                     "Content-Type": "application/json",

@@ -2,20 +2,29 @@ import { ErrInvariantFailed } from "../errors";
 import { guardLength } from "./assertions";
 import { parseValidatorKey } from "./pem";
 
-const bls = require("@multiversx/sdk-bls-wasm");
-
 export const VALIDATOR_SECRETKEY_LENGTH = 32;
 export const VALIDATOR_PUBKEY_LENGTH = 96;
 
 export class BLS {
     private static isInitialized: boolean = false;
+    public static bls: any;
+
+    private static loadBLSModule() {
+        if (!BLS.bls) {
+            try {
+                BLS.bls = require("@multiversx/sdk-bls-wasm");
+            } catch (error) {
+                throw new Error("BLS module is required but not installed. Please install '@multiversx/sdk-bls-wasm'.");
+            }
+        }
+    }
 
     static async initIfNecessary() {
         if (BLS.isInitialized) {
             return;
         }
-
-        await bls.init(bls.BLS12_381);
+        BLS.loadBLSModule();
+        await BLS.bls.init(BLS.bls.BLS12_381);
 
         BLS.isInitialized = true;
     }
@@ -37,7 +46,7 @@ export class ValidatorSecretKey {
         BLS.guardInitialized();
         guardLength(buffer, VALIDATOR_SECRETKEY_LENGTH);
 
-        this.secretKey = new bls.SecretKey();
+        this.secretKey = new BLS.bls.SecretKey();
         this.secretKey.setLittleEndian(Uint8Array.from(buffer));
         this.publicKey = this.secretKey.getPublicKey();
     }

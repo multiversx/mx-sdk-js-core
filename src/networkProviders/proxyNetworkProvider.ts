@@ -1,5 +1,5 @@
-import axios from "axios";
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
+import { getAxios } from "../utils";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig } from "./config";
 import { BaseUserAgent, EsdtContractAddress } from "./constants";
@@ -22,10 +22,12 @@ export class ProxyNetworkProvider implements INetworkProvider {
     private url: string;
     private config: NetworkProviderConfig;
     private userAgentPrefix = `${BaseUserAgent}/proxy`;
+    private axios: any;
 
     constructor(url: string, config?: NetworkProviderConfig) {
         this.url = url;
         this.config = { ...defaultAxiosConfig, ...config };
+        this.axios = getAxios();
         extendUserAgent(this.userAgentPrefix, this.config);
     }
 
@@ -227,7 +229,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         const url = `${this.url}/${resourceUrl}`;
 
         try {
-            const response = await axios.get(url, this.config);
+            const response = await this.axios.default.get(url, this.config);
             const payload = response.data.data;
             return payload;
         } catch (error) {
@@ -239,7 +241,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         const url = `${this.url}/${resourceUrl}`;
 
         try {
-            const response = await axios.post(url, payload, {
+            const response = await this.axios.default.post(url, payload, {
                 ...this.config,
                 headers: {
                     "Content-Type": "application/json",

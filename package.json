@@ -37,7 +37,6 @@
   },
   "dependencies": {
     "@multiversx/sdk-transaction-decoder": "1.0.2",
-    "@multiversx/sdk-bls-wasm": "0.3.5",
     "json-bigint": "1.0.0",
     "bech32": "1.1.4",
     "bip39": "3.1.0",
@@ -75,7 +74,10 @@
   },
   "peerDependencies": {
     "bignumber.js": "^9.0.1",
-    "protobufjs": "^7.2.6",
-    "axios": "^1.7.4"
+    "protobufjs": "^7.2.6"
+  },
+  "optionalDependencies": {
+    "axios": "^1.7.4",
+    "@multiversx/sdk-bls-wasm": "0.3.5"
   }
 }

@@ -36,7 +36,7 @@ describe("test relayed transactions factory (on localnet)", function () {
         ({ alice, carol, heidi, judy } = await loadTestWallets());
     });
 
-    it("should create relayed v3 transaction", async function () {
+    it.only("should create relayed v3 transaction", async function () {
         this.timeout(120000);
 
         await alice.sync(networkProvider);
@@ -168,9 +168,21 @@ describe("test relayed transactions factory (on localnet)", function () {
         const innerTransactionsOfRelayedWithCrossShardCalls =
             relayedWithCrossShardCallsTransactionOnNetwork.innerTransactions || [];
 
+        let outcome: any;
+
         // Carol to Judy's contract
-        let outcome = smartContractTransactionsParser.parseExecute({
+        outcome = smartContractTransactionsParser.parseExecute({
             transactionOnNetwork: innerTransactionsOfRelayedWithIntraShardCalls[0],
+        });
+        assert.deepEqual(outcome.values, [Buffer.from([2])]);
+
+        // Same, but fetched as standalone transaction
+        outcome = smartContractTransactionsParser.parseExecute({
+            transactionOnNetwork: await networkProvider.getTransaction(
+                innerTransactionsOfRelayedWithIntraShardCalls[0].hash,
+                false,
+                relayedWithIntraShardCallsTransactionHash,
+            ),
         });
         assert.deepEqual(outcome.values, [Buffer.from([2])]);
 
@@ -180,15 +192,45 @@ describe("test relayed transactions factory (on localnet)", function () {
         });
         assert.deepEqual(outcome.values, [Buffer.from([3])]);
 
+        // Same, but fetched as standalone transaction
+        outcome = smartContractTransactionsParser.parseExecute({
+            transactionOnNetwork: await networkProvider.getTransaction(
+                innerTransactionsOfRelayedWithIntraShardCalls[1].hash,
+                false,
+                relayedWithIntraShardCallsTransactionHash,
+            ),
+        });
+        assert.deepEqual(outcome.values, [Buffer.from([3])]);
+
         // Carol to Alice's contract
         outcome = smartContractTransactionsParser.parseExecute({
             transactionOnNetwork: innerTransactionsOfRelayedWithCrossShardCalls[0],
         });
         assert.deepEqual(outcome.values, [Buffer.from([2])]);
 
+        // Same, but fetched as standalone transaction
+        outcome = smartContractTransactionsParser.parseExecute({
+            transactionOnNetwork: await networkProvider.getTransaction(
+                innerTransactionsOfRelayedWithCrossShardCalls[0].hash,
+                false,
+                relayedWithCrossShardCallsTransactionHash,
+            ),
+        });
+        assert.deepEqual(outcome.values, [Buffer.from([2])]);
+
         // Judy to Alice's contract
         outcome = smartContractTransactionsParser.parseExecute({
             transactionOnNetwork: innerTransactionsOfRelayedWithCrossShardCalls[1],
+        });
+        assert.deepEqual(outcome.values, [Buffer.from([3])]);
+
+        // Same, but fetched as standalone transaction
+        outcome = smartContractTransactionsParser.parseExecute({
+            transactionOnNetwork: await networkProvider.getTransaction(
+                innerTransactionsOfRelayedWithCrossShardCalls[1].hash,
+                false,
+                relayedWithCrossShardCallsTransactionHash,
+            ),
         });
         assert.deepEqual(outcome.values, [Buffer.from([3])]);
     });

@@ -126,6 +126,30 @@ describe("test smart contract transactions outcome parser on mainnet", () => {
         }
     });
 
+    it("should parse (multi_transfer_too_much_gas)", async function () {
+        this.timeout(3600000);
+
+        const records = await loadRecords("multi_transfer_too_much_gas");
+
+        for (let i = 0; i < records.length; i++) {
+            const { hash } = records[i];
+            console.log(i, hash);
+
+            const transactionOnNetwork = await networkProvider.getTransaction(hash);
+            const transactionOutcome = converter.transactionOnNetworkToOutcome(transactionOnNetwork);
+            const parsedOutcomeGivenTransactionOutcome = parser.parseExecute({ transactionOutcome });
+            const parsedOutcomeGivenTransactionOnNetwork = parser.parseExecute({ transactionOnNetwork });
+
+            assert.deepEqual(parsedOutcomeGivenTransactionOutcome, parsedOutcomeGivenTransactionOnNetwork);
+            assert.isTrue(parsedOutcomeGivenTransactionOnNetwork.returnCode.length > 0);
+            assert.isTrue(parsedOutcomeGivenTransactionOnNetwork.returnMessage.length > 0);
+            assert.lengthOf(parsedOutcomeGivenTransactionOnNetwork.values, 0);
+
+            assert.equal(parsedOutcomeGivenTransactionOnNetwork.returnCode, "ok");
+            assert.equal(parsedOutcomeGivenTransactionOnNetwork.returnMessage, "ok");
+        }
+    });
+
     async function loadRecords(kind: string): Promise<any[]> {
         const path = "src/testdata/transactions.mainnet.json";
         const content: string = await promises.readFile(path, { encoding: "utf8" });

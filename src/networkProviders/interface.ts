@@ -145,6 +145,6 @@ export interface IAddress {
 }
 
 /**
- * @deprecated This will be remove with the next release (replaced by the `ITransaction` interface from "src/interface.ts").
+ * @deprecated This will be removed with the next release (replaced by the `ITransaction` interface from "src/interface.ts").
  */
 export type ITransactionNext = ITransactionAsInSpecs;

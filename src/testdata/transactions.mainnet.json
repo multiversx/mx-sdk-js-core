@@ -11506,5 +11506,85 @@
     {
         "hash": "a7c20ed14474fad25b3a2c089fae2a45a5c5d11b1ea7574de32542571b46440a",
         "kind": "relayed_error"
+    },
+    {
+        "hash": "6e0414891686baf7a21c27c24b09e16fe9c3bce040b1bb504a40f4ddf506f402",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "3206004a1366581669210845baa1eca90336534e391f81bd01dfe998da4cec40",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "c8c164f1597410abc8eae16b660e8d446423b2566d5a8b7617430e0bced0257d",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "bb9fb4ca0494ab060aa9ccaf4f24438d0ba2d09127178b97725df3dfa470c264",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "f7df0d7180c70b74706ec54a77c56bef02f86dffe5ac2367816b5537559a1aff",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "251c7805dd1004ce6f33a2932e237cc2cc41c945683100cd1c23f5de9bccd058",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "104187750797f102e3cd223f5a7e3f05bf31ce22606eef9c75318178eb8c6713",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "c4511ee6580b3460b0a80dad8514c0998fb006c7e5896831f307211360654c31",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "4c4327edcc77e4d8f3de27ecb37cdd898620a6aa46077d7c75b3b637c2d07a60",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "f3873ef6f68eab202b775a3b1bec603ceea138031819f290249ad4fbfbb24871",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "0209629e347c84714eeb50cb6561b5053e55cc504062eaf70cbfcac5e14f27b5",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "9f381f611328b20cce90d18eff81a7532451b858711892ef0e3c29f80d6dceff",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "22edc571dd43166a30c0af4182d69c2a628b2543c09724042b6680c0042e0a9e",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "8b3b99a33b1b47377fe2c699244c8c137716a1ca8e8cca7f1c48b32a77f0751e",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "53dfadaea88e58da21f698f10a1949cc51c4a2cc88a061474ff1f43c2190c752",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "080d3a888c140a1664da1f0df59e716da84e377d91e50af45cfd65695c28fcca",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "72736705d7cc350ba9ad9c6bd811e744a7c09ce948e2a3982475bc4adcc609a5",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "dc534504eb937a0aaac4189ad774dcb1cad32f72b35f31f77370997dc2e1c17c",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "122b1bfe8cd22e853708c130be8b8226dfd53380a4e3bd0a56faa8eb66bbe0f6",
+        "kind": "multi_transfer_too_much_gas"
+    },
+    {
+        "hash": "a794915071d0924922546fabc67202a06e9d56fb64cda21fa8a235826ae2e3cd",
+        "kind": "multi_transfer_too_much_gas"
     }
 ]

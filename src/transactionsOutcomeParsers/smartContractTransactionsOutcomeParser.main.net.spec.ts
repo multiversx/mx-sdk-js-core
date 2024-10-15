@@ -141,12 +141,9 @@ describe("test smart contract transactions outcome parser on mainnet", () => {
             const parsedOutcomeGivenTransactionOnNetwork = parser.parseExecute({ transactionOnNetwork });
 
             assert.deepEqual(parsedOutcomeGivenTransactionOutcome, parsedOutcomeGivenTransactionOnNetwork);
-            assert.isTrue(parsedOutcomeGivenTransactionOnNetwork.returnCode.length > 0);
-            assert.isTrue(parsedOutcomeGivenTransactionOnNetwork.returnMessage.length > 0);
-            assert.lengthOf(parsedOutcomeGivenTransactionOnNetwork.values, 0);
-
             assert.equal(parsedOutcomeGivenTransactionOnNetwork.returnCode, "ok");
             assert.equal(parsedOutcomeGivenTransactionOnNetwork.returnMessage, "ok");
+            assert.lengthOf(parsedOutcomeGivenTransactionOnNetwork.values, 0);
         }
     });
 

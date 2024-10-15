@@ -203,4 +203,12 @@ describe("test abi registry", () => {
         assert.deepEqual(enumType.variants[1].name, "interrupted");
         assert.deepEqual(enumType.variants[1].discriminant, 1);
     });
+
+    it("should load abi with title for endpoint", async () => {
+        const registry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
+
+        const endpoint = registry.getEndpoint("createLotteryPool");
+
+        assert.equal(endpoint.title, "Create lottery pool");
+    });
 });

@@ -79,6 +79,14 @@ export class TransactionsConverter {
         return Buffer.from(value || "", "hex");
     }
 
+    /**
+     * @deprecated Where {@link TransactionOutcome} was needed (throughout the SDK), pass the {@link ITransactionOnNetwork} object instead.
+     *
+     * Summarizes the outcome of a transaction on the network, and maps it to the "standard" resources (according to the sdk-specs).
+     *
+     * In the future, this converter function will become obsolete,
+     * as the impedance mismatch between the network components and the "core" components will be reduced.
+     */
     public transactionOnNetworkToOutcome(transactionOnNetwork: ITransactionOnNetwork): TransactionOutcome {
         // In the future, this will not be needed because the transaction, as returned from the API,
         // will hold the data corresponding to the direct smart contract call outcome (in case of smart contract calls).

@@ -10,6 +10,7 @@ import { TransactionWatcher } from "../transactionWatcher";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
+import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 
 describe("test relayed transactions factory (on localnet)", function () {
     const networkProvider = createLocalnetProvider();
@@ -21,6 +22,7 @@ describe("test relayed transactions factory (on localnet)", function () {
 
     const config = new TransactionsFactoryConfig({ chainID: "localnet" });
     const relayedTransactionsFactory = new RelayedTransactionsFactory({ config: config });
+    const transferTransactionsFactory = new TransferTransactionsFactory({ config: config });
     const smartContractTransactionsFactory = new SmartContractTransactionsFactory({ config: config });
     const smartContractTransactionsParser = new SmartContractTransactionsOutcomeParser();
     const transactionComputer = new TransactionComputer();
@@ -36,7 +38,68 @@ describe("test relayed transactions factory (on localnet)", function () {
         ({ alice, carol, heidi, judy } = await loadTestWallets());
     });
 
-    it.only("should create relayed v3 transaction", async function () {
+    it("should create relayed v3 transaction (simple transfers)", async function () {
+        this.timeout(120000);
+
+        await alice.sync(networkProvider);
+        await carol.sync(networkProvider);
+        await heidi.sync(networkProvider);
+        await judy.sync(networkProvider);
+
+        const parentTransaction = relayedTransactionsFactory.createRelayedV3Transaction({
+            relayerAddress: heidi.address,
+            innerTransactions: [
+                // Intra-shard, Carol to Judy
+                await signTransaction({
+                    transaction: transferTransactionsFactory.createTransactionForTransfer({
+                        sender: carol.address,
+                        receiver: judy.address,
+                        nativeAmount: 1000000000000000000n,
+                    }),
+                    wallet: carol,
+                    relayer: heidi,
+                }),
+                // Cross-shard, Judy to Alice
+                await signTransaction({
+                    transaction: transferTransactionsFactory.createTransactionForTransfer({
+                        sender: judy.address,
+                        receiver: alice.address,
+                        nativeAmount: 1000000000000000000n,
+                    }),
+                    wallet: judy,
+                    relayer: heidi,
+                }),
+            ],
+        });
+
+        await signTransaction({ transaction: parentTransaction, wallet: heidi });
+
+        const parentTransactionHash = await networkProvider.sendTransaction(parentTransaction);
+        const parentTransactionOnNetwork = await transactionWatcher.awaitCompleted(parentTransactionHash);
+
+        console.log("parentTransactionHash", parentTransactionHash);
+
+        assert.equal(parentTransactionOnNetwork.innerTransactions!.length, 2);
+        assert.equal(parentTransactionOnNetwork.innerTransactions![0].contractResults.items.length, 1);
+        assert.equal(parentTransactionOnNetwork.innerTransactions![1].contractResults.items.length, 1);
+
+        const innerTransactionOnNetwork0 = await networkProvider.getTransaction(
+            parentTransactionOnNetwork.innerTransactions![0].hash,
+            false,
+            parentTransactionHash,
+        );
+
+        const innerTransactionOnNetwork1 = await networkProvider.getTransaction(
+            parentTransactionOnNetwork.innerTransactions![1].hash,
+            false,
+            parentTransactionHash,
+        );
+
+        assert.deepEqual(innerTransactionOnNetwork0, parentTransactionOnNetwork.innerTransactions![0]);
+        assert.deepEqual(innerTransactionOnNetwork1, parentTransactionOnNetwork.innerTransactions![1]);
+    });
+
+    it("should create relayed v3 transaction (contract calls)", async function () {
         this.timeout(120000);
 
         await alice.sync(networkProvider);

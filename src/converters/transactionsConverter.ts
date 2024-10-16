@@ -98,7 +98,6 @@ export class TransactionsConverter {
             returnMessage: callOutcomeBundle.returnMessage,
             returnDataParts: callOutcomeBundle.values,
         });
-
         const contractResults = transactionOnNetwork.contractResults.items.map((result) =>
             this.smartContractResultOnNetworkToSmartContractResult(result),
         );

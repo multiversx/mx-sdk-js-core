@@ -26,6 +26,11 @@ export interface ITransactionOnNetwork {
     receipt: ITransactionReceipt;
     contractResults: IContractResults;
     logs: ITransactionLogs;
+
+    // TODO: In a future major release, make these required (empty is allowed).
+    nonce?: number;
+    relayer?: string;
+    innerTransactions?: ITransactionOnNetwork[];
 }
 
 export interface ITransactionStatus {

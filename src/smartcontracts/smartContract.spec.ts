@@ -1,6 +1,6 @@
-import { TransactionStatus } from "../networkProviders";
 import { assert } from "chai";
 import { Address } from "../address";
+import { TransactionStatus } from "../networkProviders";
 import {
     loadTestWallets,
     MarkCompleted,

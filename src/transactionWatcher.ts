@@ -9,6 +9,7 @@ import {
 import { ITransactionFetcher } from "./interface";
 import { ITransactionEvent, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 import { Logger } from "./logger";
+import { TransactionOnNetwork } from "./networkProviders";
 
 export type PredicateIsAwaitedStatus = (status: ITransactionStatus) => boolean;
 
@@ -77,7 +78,7 @@ export class TransactionWatcher {
      * Waits until the transaction is completely processed.
      * @param txHash The hex-encoded transaction hash
      */
-    public async awaitCompleted(transactionOrTxHash: ITransaction | string): Promise<ITransactionOnNetwork> {
+    public async awaitCompleted(transactionOrTxHash: ITransaction | string): Promise<TransactionOnNetwork> {
         const isCompleted = (transactionOnNetwork: ITransactionOnNetwork) => {
             if (transactionOnNetwork.isCompleted === undefined) {
                 throw new ErrIsCompletedFieldIsMissingOnTransaction();
@@ -91,7 +92,7 @@ export class TransactionWatcher {
         };
         const errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 
-        return this.awaitConditionally<ITransactionOnNetwork>(isCompleted, doFetch, errorProvider);
+        return this.awaitConditionally<TransactionOnNetwork>(isCompleted, doFetch, errorProvider);
     }
 
     public async awaitAllEvents(
@@ -236,7 +237,7 @@ class TransactionFetcherWithTracing implements ITransactionFetcher {
         this.fetcher = fetcher;
     }
 
-    async getTransaction(txHash: string): Promise<ITransactionOnNetwork> {
+    async getTransaction(txHash: string): Promise<TransactionOnNetwork> {
         Logger.debug(`transactionWatcher, getTransaction(${txHash})`);
         return await this.fetcher.getTransaction(txHash);
     }

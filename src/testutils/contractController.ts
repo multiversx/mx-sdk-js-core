@@ -1,5 +1,6 @@
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { Logger } from "../logger";
+import { TransactionOnNetwork } from "../networkProviders";
 import { Interaction } from "../smartcontracts/interaction";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "../smartcontracts/interface";
 import { ResultsParser } from "../smartcontracts/resultsParser";
@@ -24,7 +25,7 @@ export class ContractController {
 
     async deploy(
         transaction: Transaction,
-    ): Promise<{ transactionOnNetwork: ITransactionOnNetwork; bundle: UntypedOutcomeBundle }> {
+    ): Promise<{ transactionOnNetwork: TransactionOnNetwork; bundle: UntypedOutcomeBundle }> {
         const txHash = await this.provider.sendTransaction(transaction);
         Logger.info(`ContractController.deploy [begin]: transaction = ${txHash}`);
 

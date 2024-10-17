@@ -1,11 +1,11 @@
 import BigNumber from "bignumber.js";
-import { ITransactionOnNetwork } from "./interfaceOfNetwork";
+import { TransactionOnNetwork } from "./networkProviders";
 
 export interface ITransactionFetcher {
     /**
      * Fetches the state of a {@link Transaction}.
      */
-    getTransaction(txHash: string): Promise<ITransactionOnNetwork>;
+    getTransaction(txHash: string): Promise<TransactionOnNetwork>;
 }
 
 export interface IPlainTransactionObject {
@@ -34,6 +34,7 @@ export interface ISignature {
 
 export interface IAddress {
     bech32(): string;
+    pubkey(): Buffer;
 }
 
 export interface ITransactionValue {

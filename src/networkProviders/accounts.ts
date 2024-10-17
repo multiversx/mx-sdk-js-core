@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
-import { IAddress } from "./interface";
+import { IAddress } from "../interface";
 
 /**
  * A plain view of an account, as queried from the Network.

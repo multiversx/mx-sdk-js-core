@@ -338,6 +338,15 @@ export class ErrIsCompletedFieldIsMissingOnTransaction extends Err {
 }
 
 /**
+ * Signals that the network provider provided is not valid
+ */
+export class ErrInvalidNetworkProviderKind extends Err {
+    public constructor() {
+        super("Invalid network provider kind. Choose between `api` and `proxy`.");
+    }
+}
+
+/**
  * Signals that the provided token identifier is not valid
  */
 export class ErrInvalidTokenIdentifier extends Err {

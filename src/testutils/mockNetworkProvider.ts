@@ -1,4 +1,3 @@
-import { ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "../networkProviders";
 import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
 import * as errors from "../errors";
@@ -11,6 +10,7 @@ import {
     ITransactionOnNetwork,
     ITransactionStatus,
 } from "../interfaceOfNetwork";
+import { ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "../networkProviders";
 import { Query } from "../smartcontracts/query";
 import { Transaction, TransactionHash } from "../transaction";
 import { createAccountBalance } from "./utils";
@@ -20,14 +20,14 @@ export class MockNetworkProvider {
     static AddressOfBob = new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
     static AddressOfCarol = new Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
 
-    private readonly transactions: Map<string, ITransactionOnNetwork>;
+    private readonly transactions: Map<string, TransactionOnNetwork>;
     private nextTransactionTimelinePoints: any[] = [];
     private readonly accounts: Map<string, IAccountOnNetwork>;
     private readonly queryContractResponders: QueryContractResponder[] = [];
     private readonly getTransactionResponders: GetTransactionResponder[] = [];
 
     constructor() {
-        this.transactions = new Map<string, ITransactionOnNetwork>();
+        this.transactions = new Map<string, TransactionOnNetwork>();
         this.accounts = new Map<string, IAccountOnNetwork>();
 
         this.accounts.set(MockNetworkProvider.AddressOfAlice.bech32(), {
@@ -55,7 +55,7 @@ export class MockNetworkProvider {
         }
     }
 
-    mockPutTransaction(hash: TransactionHash, item: ITransactionOnNetwork) {
+    mockPutTransaction(hash: TransactionHash, item: TransactionOnNetwork) {
         item.isCompleted = false;
         this.transactions.set(hash.toString(), item);
     }
@@ -134,7 +134,7 @@ export class MockNetworkProvider {
         return {};
     }
 
-    async getTransaction(txHash: string): Promise<ITransactionOnNetwork> {
+    async getTransaction(txHash: string): Promise<TransactionOnNetwork> {
         // At first, try to use a mock responder
         for (const responder of this.getTransactionResponders) {
             if (responder.matches(txHash)) {
@@ -193,9 +193,9 @@ class QueryContractResponder {
 
 class GetTransactionResponder {
     readonly matches: (hash: string) => boolean;
-    readonly response: ITransactionOnNetwork;
+    readonly response: TransactionOnNetwork;
 
-    constructor(matches: (hash: string) => boolean, response: ITransactionOnNetwork) {
+    constructor(matches: (hash: string) => boolean, response: TransactionOnNetwork) {
         this.matches = matches;
         this.response = response;
     }

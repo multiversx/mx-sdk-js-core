@@ -1,4 +1,4 @@
-import { ITransaction as ITransactionAsInSpecs } from "../interface";
+import { IAddress, ITransaction as ITransactionAsInSpecs } from "../interface";
 import { AccountOnNetwork } from "./accounts";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { NetworkConfig } from "./networkConfig";
@@ -138,10 +138,6 @@ export interface IPagination {
 
 export interface ITransaction {
     toSendable(): any;
-}
-
-export interface IAddress {
-    bech32(): string;
 }
 
 /**

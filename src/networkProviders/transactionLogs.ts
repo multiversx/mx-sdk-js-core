@@ -1,6 +1,6 @@
 import { Address } from "../address";
+import { IAddress } from "../interface";
 import { ErrUnexpectedCondition } from "./../errors";
-import { IAddress } from "./interface";
 import { TransactionEvent } from "./transactionEvents";
 
 export class TransactionLogs {

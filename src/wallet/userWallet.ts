@@ -1,4 +1,7 @@
+import { readFileSync } from "fs";
+import path from "path";
 import { Err } from "../errors";
+import { Logger } from "../logger";
 import { CipherAlgorithm, Decryptor, EncryptedData, Encryptor, KeyDerivationFunction, Randomness } from "./crypto";
 import { ScryptKeyDerivationParams } from "./crypto/derivationParams";
 import { Mnemonic } from "./mnemonic";
@@ -94,6 +97,31 @@ export class UserWallet {
         }
 
         throw new Err(`Unknown kind: ${kind}`);
+    }
+
+    static loadSecretKey(filePath: string, password: string, addressIndex?: number): UserSecretKey {
+        // Load and parse the keystore file
+        const keyFileJson = readFileSync(path.resolve(filePath), "utf8");
+        const keyFileObject = JSON.parse(keyFileJson);
+        const kind = keyFileObject.kind || UserWalletKind.SecretKey.valueOf();
+
+        Logger.debug(`UserWallet.loadSecretKey(), kind = ${kind}`);
+
+        let secretKey: UserSecretKey;
+
+        if (kind === UserWalletKind.SecretKey.valueOf()) {
+            if (addressIndex !== undefined) {
+                throw new Error("address_index must not be provided when kind == 'secretKey'");
+            }
+            secretKey = UserWallet.decryptSecretKey(keyFileObject, password);
+        } else if (kind === UserWalletKind.Mnemonic.valueOf()) {
+            const mnemonic = UserWallet.decryptMnemonic(keyFileObject, password);
+            secretKey = mnemonic.deriveKey(addressIndex || 0);
+        } else {
+            throw new Error(`Unknown kind: ${kind}`);
+        }
+
+        return secretKey;
     }
 
     /**

@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
-import { IAddress } from "./interface";
+import { IAddress } from "../interface";
 
 export class PairOnNetwork {
     address: IAddress = Address.empty();

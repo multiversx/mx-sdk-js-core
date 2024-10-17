@@ -1,5 +1,5 @@
 import { Address } from "../address";
-import { IAddress } from "./interface";
+import { IAddress } from "../interface";
 
 export class TransactionEvent {
     address: IAddress = Address.empty();

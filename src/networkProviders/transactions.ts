@@ -1,6 +1,8 @@
 import { Address } from "../address";
+import { IAddress } from "../interface";
+import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { ContractResults } from "./contractResults";
-import { IAddress, ITransaction, ITransactionNext } from "./interface";
+import { ITransaction, ITransactionNext } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
 import { TransactionReceipt } from "./transactionReceipt";
 import { TransactionStatus } from "./transactionStatus";
@@ -36,7 +38,7 @@ export function prepareTransactionForBroadcasting(transaction: ITransaction | IT
     };
 }
 
-export class TransactionOnNetwork {
+export class TransactionOnNetwork implements ITransactionOnNetwork {
     isCompleted?: boolean;
     hash: string = "";
     type: string = "";

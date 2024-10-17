@@ -21,7 +21,7 @@ interface IAddress {
 /**
  * An Address, as an immutable object.
  */
-export class Address {
+export class Address implements IAddress {
     private readonly publicKey: Buffer;
     private readonly hrp: string;
 

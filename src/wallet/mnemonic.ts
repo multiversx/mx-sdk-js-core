@@ -7,6 +7,7 @@ const BIP44_DERIVATION_PREFIX = "m/44'/508'/0'/0'";
 
 let bip39: any;
 
+// Load bip39 when needed
 function loadBip39() {
     if (!bip39) {
         try {
@@ -25,13 +26,13 @@ export class Mnemonic {
     }
 
     static generate(): Mnemonic {
-        loadBip39(); // Load bip39 when needed
+        loadBip39();
         const text = bip39.generateMnemonic(MNEMONIC_STRENGTH);
         return new Mnemonic(text);
     }
 
     static fromString(text: string) {
-        loadBip39(); // Load bip39 when needed
+        loadBip39();
         text = text.trim();
 
         Mnemonic.assertTextIsValid(text);
@@ -39,7 +40,7 @@ export class Mnemonic {
     }
 
     static fromEntropy(entropy: Uint8Array): Mnemonic {
-        loadBip39(); // Load bip39 when needed
+        loadBip39();
         try {
             const text = bip39.entropyToMnemonic(Buffer.from(entropy));
             return new Mnemonic(text);
@@ -49,7 +50,7 @@ export class Mnemonic {
     }
 
     public static assertTextIsValid(text: string) {
-        loadBip39(); // Load bip39 when needed
+        loadBip39();
         let isValid = bip39.validateMnemonic(text);
 
         if (!isValid) {
@@ -58,7 +59,7 @@ export class Mnemonic {
     }
 
     deriveKey(addressIndex: number = 0, password: string = ""): UserSecretKey {
-        loadBip39(); // Load bip39 when needed
+        loadBip39();
         let seed = bip39.mnemonicToSeedSync(this.text, password);
         let derivationPath = `${BIP44_DERIVATION_PREFIX}/${addressIndex}'`;
         let derivationResult = derivePath(derivationPath, seed.toString("hex"));
@@ -71,7 +72,7 @@ export class Mnemonic {
     }
 
     getEntropy(): Uint8Array {
-        loadBip39(); // Load bip39 when needed
+        loadBip39();
         const entropy = bip39.mnemonicToEntropy(this.text);
         return Buffer.from(entropy, "hex");
     }

@@ -46,8 +46,6 @@
              * @property {number|null} [Options] Transaction Options
              * @property {Uint8Array|null} [GuardianAddr] Transaction GuardianAddr
              * @property {Uint8Array|null} [GuardianSignature] Transaction GuardianSignature
-             * @property {Uint8Array|null} [Relayer] Transaction Relayer
-             * @property {Array.<proto.ITransaction>|null} [InnerTransactions] Transaction InnerTransactions
              */
     
             /**
@@ -59,7 +57,6 @@
              * @param {proto.ITransaction=} [properties] Properties to set
              */
             function Transaction(properties) {
-                this.InnerTransactions = [];
                 if (properties)
                     for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
@@ -187,22 +184,6 @@
             Transaction.prototype.GuardianSignature = $util.newBuffer([]);
     
             /**
-             * Transaction Relayer.
-             * @member {Uint8Array} Relayer
-             * @memberof proto.Transaction
-             * @instance
-             */
-            Transaction.prototype.Relayer = $util.newBuffer([]);
-    
-            /**
-             * Transaction InnerTransactions.
-             * @member {Array.<proto.ITransaction>} InnerTransactions
-             * @memberof proto.Transaction
-             * @instance
-             */
-            Transaction.prototype.InnerTransactions = $util.emptyArray;
-    
-            /**
              * Creates a new Transaction instance using the specified properties.
              * @function create
              * @memberof proto.Transaction
@@ -256,11 +237,6 @@
                     writer.uint32(/* id 14, wireType 2 =*/114).bytes(message.GuardianAddr);
                 if (message.GuardianSignature != null && Object.hasOwnProperty.call(message, "GuardianSignature"))
                     writer.uint32(/* id 15, wireType 2 =*/122).bytes(message.GuardianSignature);
-                if (message.Relayer != null && Object.hasOwnProperty.call(message, "Relayer"))
-                    writer.uint32(/* id 16, wireType 2 =*/130).bytes(message.Relayer);
-                if (message.InnerTransactions != null && message.InnerTransactions.length)
-                    for (var i = 0; i < message.InnerTransactions.length; ++i)
-                        $root.proto.Transaction.encode(message.InnerTransactions[i], writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
                 return writer;
             };
     
@@ -355,16 +331,6 @@
                             message.GuardianSignature = reader.bytes();
                             break;
                         }
-                    case 16: {
-                            message.Relayer = reader.bytes();
-                            break;
-                        }
-                    case 17: {
-                            if (!(message.InnerTransactions && message.InnerTransactions.length))
-                                message.InnerTransactions = [];
-                            message.InnerTransactions.push($root.proto.Transaction.decode(reader, reader.uint32()));
-                            break;
-                        }
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -445,18 +411,6 @@
                 if (message.GuardianSignature != null && message.hasOwnProperty("GuardianSignature"))
                     if (!(message.GuardianSignature && typeof message.GuardianSignature.length === "number" || $util.isString(message.GuardianSignature)))
                         return "GuardianSignature: buffer expected";
-                if (message.Relayer != null && message.hasOwnProperty("Relayer"))
-                    if (!(message.Relayer && typeof message.Relayer.length === "number" || $util.isString(message.Relayer)))
-                        return "Relayer: buffer expected";
-                if (message.InnerTransactions != null && message.hasOwnProperty("InnerTransactions")) {
-                    if (!Array.isArray(message.InnerTransactions))
-                        return "InnerTransactions: array expected";
-                    for (var i = 0; i < message.InnerTransactions.length; ++i) {
-                        var error = $root.proto.Transaction.verify(message.InnerTransactions[i]);
-                        if (error)
-                            return "InnerTransactions." + error;
-                    }
-                }
                 return null;
             };
     
@@ -553,21 +507,6 @@
                         $util.base64.decode(object.GuardianSignature, message.GuardianSignature = $util.newBuffer($util.base64.length(object.GuardianSignature)), 0);
                     else if (object.GuardianSignature.length >= 0)
                         message.GuardianSignature = object.GuardianSignature;
-                if (object.Relayer != null)
-                    if (typeof object.Relayer === "string")
-                        $util.base64.decode(object.Relayer, message.Relayer = $util.newBuffer($util.base64.length(object.Relayer)), 0);
-                    else if (object.Relayer.length >= 0)
-                        message.Relayer = object.Relayer;
-                if (object.InnerTransactions) {
-                    if (!Array.isArray(object.InnerTransactions))
-                        throw TypeError(".proto.Transaction.InnerTransactions: array expected");
-                    message.InnerTransactions = [];
-                    for (var i = 0; i < object.InnerTransactions.length; ++i) {
-                        if (typeof object.InnerTransactions[i] !== "object")
-                            throw TypeError(".proto.Transaction.InnerTransactions: object expected");
-                        message.InnerTransactions[i] = $root.proto.Transaction.fromObject(object.InnerTransactions[i]);
-                    }
-                }
                 return message;
             };
     
@@ -584,8 +523,6 @@
                 if (!options)
                     options = {};
                 var object = {};
-                if (options.arrays || options.defaults)
-                    object.InnerTransactions = [];
                 if (options.defaults) {
                     if ($util.Long) {
                         var long = new $util.Long(0, 0, true);
@@ -674,13 +611,6 @@
                         if (options.bytes !== Array)
                             object.GuardianSignature = $util.newBuffer(object.GuardianSignature);
                     }
-                    if (options.bytes === String)
-                        object.Relayer = "";
-                    else {
-                        object.Relayer = [];
-                        if (options.bytes !== Array)
-                            object.Relayer = $util.newBuffer(object.Relayer);
-                    }
                 }
                 if (message.Nonce != null && message.hasOwnProperty("Nonce"))
                     if (typeof message.Nonce === "number")
@@ -721,13 +651,6 @@
                     object.GuardianAddr = options.bytes === String ? $util.base64.encode(message.GuardianAddr, 0, message.GuardianAddr.length) : options.bytes === Array ? Array.prototype.slice.call(message.GuardianAddr) : message.GuardianAddr;
                 if (message.GuardianSignature != null && message.hasOwnProperty("GuardianSignature"))
                     object.GuardianSignature = options.bytes === String ? $util.base64.encode(message.GuardianSignature, 0, message.GuardianSignature.length) : options.bytes === Array ? Array.prototype.slice.call(message.GuardianSignature) : message.GuardianSignature;
-                if (message.Relayer != null && message.hasOwnProperty("Relayer"))
-                    object.Relayer = options.bytes === String ? $util.base64.encode(message.Relayer, 0, message.Relayer.length) : options.bytes === Array ? Array.prototype.slice.call(message.Relayer) : message.Relayer;
-                if (message.InnerTransactions && message.InnerTransactions.length) {
-                    object.InnerTransactions = [];
-                    for (var j = 0; j < message.InnerTransactions.length; ++j)
-                        object.InnerTransactions[j] = $root.proto.Transaction.toObject(message.InnerTransactions[j], options);
-                }
                 return object;
             };
     

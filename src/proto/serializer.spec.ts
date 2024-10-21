@@ -7,7 +7,6 @@ import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";
 import { ProtoSerializer } from "./serializer";
-import { TransactionComputer } from "../transactionComputer";
 
 describe("serialize transactions", () => {
     let wallets: Record<string, TestWallet>;
@@ -144,44 +143,6 @@ describe("serialize transactions", () => {
         assert.equal(
             buffer.toString("hex"),
             "08cc011209000de0b6b3a76400001a200139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e12205616c6963652a20b2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba32056361726f6c388094ebdc0340d086035201545802624051e6cd78fb3ab4b53ff7ad6864df27cb4a56d70603332869d47a5cf6ea977c30e696103e41e8dddf2582996ad335229fdf4acb726564dbc1a0bc9e705b511f06",
-        );
-    });
-
-    it("serialize with inner transactions", async () => {
-        const innerTransaction = new Transaction({
-            nonce: 204,
-            value: "1000000000000000000",
-            sender: Address.fromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
-            receiver: Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
-            senderUsername: "carol",
-            receiverUsername: "alice",
-            gasLimit: 50000,
-            chainID: "T",
-        });
-
-        const signer = wallets.carol.signer;
-        const txComputer = new TransactionComputer();
-        innerTransaction.signature = await signer.sign(txComputer.computeBytesForSigning(innerTransaction));
-
-        const relayedTransaction = new Transaction({
-            nonce: 204,
-            value: "1000000000000000000",
-            sender: Address.fromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
-            receiver: Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
-            senderUsername: "carol",
-            receiverUsername: "alice",
-            gasLimit: 50000,
-            chainID: "T",
-            relayer: wallets["carol"].address.toBech32(),
-            innerTransactions: [innerTransaction],
-        });
-
-        relayedTransaction.signature = await signer.sign(txComputer.computeBytesForSigning(relayedTransaction));
-
-        const serializedTransaction = serializer.serializeTransaction(relayedTransaction);
-        assert.equal(
-            serializedTransaction.toString("hex"),
-            "08cc011209000de0b6b3a76400001a200139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e12205616c6963652a20b2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba32056361726f6c388094ebdc0340d0860352015458026240901a6a974d6ab36546e7881c6e0364ec4c61a891aa70e5eb60f818d6c92a39cfa0beac6fab73f503853cfe8fe6149b4be207ddb93788f8450d75a07fa8759d06820120b2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba8a01b10108cc011209000de0b6b3a76400001a200139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e12205616c6963652a20b2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba32056361726f6c388094ebdc0340d086035201545802624051e6cd78fb3ab4b53ff7ad6864df27cb4a56d70603332869d47a5cf6ea977c30e696103e41e8dddf2582996ad335229fdf4acb726564dbc1a0bc9e705b511f06",
         );
     });
 });

@@ -1,10 +1,21 @@
-import { entropyToMnemonic, generateMnemonic, mnemonicToEntropy, mnemonicToSeedSync, validateMnemonic } from "bip39";
 import { derivePath } from "ed25519-hd-key";
 import { ErrBadMnemonicEntropy, ErrWrongMnemonic } from "../errors";
 import { UserSecretKey } from "./userKeys";
 
 const MNEMONIC_STRENGTH = 256;
 const BIP44_DERIVATION_PREFIX = "m/44'/508'/0'/0'";
+
+let bip39: any;
+
+function loadBip39() {
+    if (!bip39) {
+        try {
+            bip39 = require("bip39");
+        } catch (error) {
+            throw new Error("bip39 is required but not installed. Please install 'bip39' to use mnemonic features.");
+        }
+    }
+}
 
 export class Mnemonic {
     private readonly text: string;
@@ -14,11 +25,13 @@ export class Mnemonic {
     }
 
     static generate(): Mnemonic {
-        const text = generateMnemonic(MNEMONIC_STRENGTH);
+        loadBip39(); // Load bip39 when needed
+        const text = bip39.generateMnemonic(MNEMONIC_STRENGTH);
         return new Mnemonic(text);
     }
 
     static fromString(text: string) {
+        loadBip39(); // Load bip39 when needed
         text = text.trim();
 
         Mnemonic.assertTextIsValid(text);
@@ -26,8 +39,9 @@ export class Mnemonic {
     }
 
     static fromEntropy(entropy: Uint8Array): Mnemonic {
+        loadBip39(); // Load bip39 when needed
         try {
-            const text = entropyToMnemonic(Buffer.from(entropy));
+            const text = bip39.entropyToMnemonic(Buffer.from(entropy));
             return new Mnemonic(text);
         } catch (err: any) {
             throw new ErrBadMnemonicEntropy(err);
@@ -35,7 +49,8 @@ export class Mnemonic {
     }
 
     public static assertTextIsValid(text: string) {
-        let isValid = validateMnemonic(text);
+        loadBip39(); // Load bip39 when needed
+        let isValid = bip39.validateMnemonic(text);
 
         if (!isValid) {
             throw new ErrWrongMnemonic();
@@ -43,7 +58,8 @@ export class Mnemonic {
     }
 
     deriveKey(addressIndex: number = 0, password: string = ""): UserSecretKey {
-        let seed = mnemonicToSeedSync(this.text, password);
+        loadBip39(); // Load bip39 when needed
+        let seed = bip39.mnemonicToSeedSync(this.text, password);
         let derivationPath = `${BIP44_DERIVATION_PREFIX}/${addressIndex}'`;
         let derivationResult = derivePath(derivationPath, seed.toString("hex"));
         let key = derivationResult.key;
@@ -55,7 +71,8 @@ export class Mnemonic {
     }
 
     getEntropy(): Uint8Array {
-        const entropy = mnemonicToEntropy(this.text);
+        loadBip39(); // Load bip39 when needed
+        const entropy = bip39.mnemonicToEntropy(this.text);
         return Buffer.from(entropy, "hex");
     }
 

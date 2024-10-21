@@ -122,10 +122,6 @@ export class TransactionComputer {
         obj.version = transaction.version;
         obj.options = transaction.options ? transaction.options : undefined;
         obj.guardian = transaction.guardian ? transaction.guardian : undefined;
-        obj.relayer = transaction.relayer ? transaction.relayer : undefined;
-        obj.innerTransactions = transaction.innerTransactions.length
-            ? transaction.innerTransactions.map((tx) => this.toPlainObject(tx, true))
-            : undefined;
 
         return obj;
     }

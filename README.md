@@ -50,6 +50,14 @@ This package requires `@multiversx/sdk-bls-wasm` for BLS (Boneh-Lynn-Shacham) cr
 npm install @multiversx/sdk-bls-wasm
 ```
 
+### bip39
+
+This package provides mnemonic and seed generation functionality using `bip39`, but it is not bundled by default. If you plan to use mnemonic-related features, make sure to install this optional dependency:
+
+```bash
+npm install bip39
+```
+
 ### Building the library
 
 In order to compile the library, run the following:

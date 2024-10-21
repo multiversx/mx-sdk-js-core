@@ -1,6 +1,6 @@
 {
   "name": "@multiversx/sdk-core",
-  "version": "13.10.0",
+  "version": "13.12.0",
   "description": "MultiversX SDK for JavaScript and TypeScript",
   "author": "MultiversX",
   "homepage": "https://multiversx.com",
@@ -40,7 +40,6 @@
     "@multiversx/sdk-transaction-decoder": "1.0.2",
     "json-bigint": "1.0.0",
     "bech32": "1.1.4",
-    "bip39": "3.1.0",
     "blake2b": "2.1.3",
     "buffer": "6.0.3",
     "ed25519-hd-key": "1.1.2",
@@ -79,6 +78,7 @@
   },
   "optionalDependencies": {
     "axios": "^1.7.4",
-    "@multiversx/sdk-bls-wasm": "0.3.5"
+    "@multiversx/sdk-bls-wasm": "0.3.5",
+    "bip39": "3.1.0"
   }
 }

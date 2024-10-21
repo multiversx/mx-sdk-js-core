@@ -103,16 +103,6 @@ export class Transaction {
     public guardianSignature: Uint8Array;
 
     /**
-     * The relayer in case it is a relayedV3 Transaction.
-     */
-    public relayer: string;
-
-    /**
-     * The inner transactions in case it is a relayedV3 Transaction.
-     */
-    public innerTransactions: ITransaction[];
-
-    /**
      * Creates a new Transaction object.
      */
     public constructor(options: {
@@ -131,8 +121,6 @@ export class Transaction {
         guardian?: IAddress | string;
         signature?: Uint8Array;
         guardianSignature?: Uint8Array;
-        relayer?: string;
-        innerTransactions?: ITransaction[];
     }) {
         this.nonce = BigInt(options.nonce?.valueOf() || 0n);
         // We still rely on "bigNumber" for value, because client code might be passing a BigNumber object as a legacy "ITransactionValue",
@@ -152,9 +140,6 @@ export class Transaction {
 
         this.signature = options.signature || Buffer.from([]);
         this.guardianSignature = options.guardianSignature || Buffer.from([]);
-
-        this.relayer = options.relayer || "";
-        this.innerTransactions = options.innerTransactions || [];
     }
 
     private addressAsBech32(address: IAddress | string): string {

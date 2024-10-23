@@ -1,4 +1,4 @@
-import { ProviderWrapper } from "../facades/providerWrapper";
+import { ProviderWrapper } from "../entrypoints/providerWrapper";
 import { TransactionOnNetwork } from "../networkProviders";
 import { INetworkProvider } from "../networkProviders/interface";
 import { IESDTIssueOutcome } from "../tokenOperations";
@@ -24,7 +24,7 @@ export class TokenManagementController {
         this.parser = new TokenManagementTransactionsOutcomeParser();
     }
 
-    createTransactionForIssuingFungible(
+    async createTransactionForIssuingFungible(
         sender: IAccount,
         nonce: bigint,
         tokenName: string,
@@ -37,7 +37,7 @@ export class TokenManagementController {
         canChangeOwner: boolean,
         canUpgrade: boolean,
         canAddSpecialRoles: boolean,
-    ): Transaction {
+    ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingFungible({
             sender: sender.address,
             tokenName,
@@ -53,7 +53,7 @@ export class TokenManagementController {
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
@@ -67,7 +67,7 @@ export class TokenManagementController {
         return this.parseIssueFungible(transaction);
     }
 
-    createTransactionForIssuingSemiFungible(
+    async createTransactionForIssuingSemiFungible(
         sender: IAccount,
         nonce: bigint,
         tokenName: string,
@@ -79,7 +79,7 @@ export class TokenManagementController {
         canChangeOwner: boolean,
         canUpgrade: boolean,
         canAddSpecialRoles: boolean,
-    ): Transaction {
+    ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingSemiFungible({
             sender: sender.address,
             tokenName,
@@ -94,7 +94,7 @@ export class TokenManagementController {
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
@@ -108,7 +108,7 @@ export class TokenManagementController {
         return this.parseIssueSemiFungible(transaction);
     }
 
-    createTransactionForIssuingNonFungible(
+    async createTransactionForIssuingNonFungible(
         sender: IAccount,
         nonce: bigint,
         tokenName: string,
@@ -120,7 +120,7 @@ export class TokenManagementController {
         canChangeOwner: boolean,
         canUpgrade: boolean,
         canAddSpecialRoles: boolean,
-    ): Transaction {
+    ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingNonFungible({
             sender: sender.address,
             tokenName,
@@ -135,7 +135,7 @@ export class TokenManagementController {
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }

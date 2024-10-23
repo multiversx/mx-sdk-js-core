@@ -1,10 +1,13 @@
 import { Address } from "./address";
+import { LibraryConfig } from "./config";
+import { IAccount } from "./controllers/interfaces";
 import { IAccountBalance, IAddress, INonce } from "./interface";
+import { UserSigner, UserWallet } from "./wallet";
 
 /**
  * An abstraction representing an account (user or Smart Contract) on the Network.
  */
-export class Account {
+export class Account implements IAccount {
     /**
      * The address of the account.
      */
@@ -16,17 +19,29 @@ export class Account {
     nonce: INonce = 0;
 
     /**
+     * @deprecated This will be remove with the next release as not needed anymore.
+     */
+    /**
      * The balance of the account.
      */
     balance: IAccountBalance = "0";
 
     /**
+     * The signer of the account.
+     */
+    signer?: UserSigner;
+
+    /**
      * Creates an account object from an address
      */
-    constructor(address: IAddress) {
+    constructor(address: IAddress, signer?: UserSigner) {
         this.address = address;
+        this.signer = signer;
     }
 
+    /**
+     * @deprecated This will be remove with the next release as not needed anymore.
+     */
     /**
      * Updates account properties (such as nonce, balance).
      */
@@ -60,5 +75,38 @@ export class Account {
             nonce: this.nonce.valueOf(),
             balance: this.balance.toString(),
         };
+    }
+
+    sign(data: Uint8Array): Promise<Uint8Array> {
+        if (!this.signer) {
+            throw new Error("Signer not initialiezed, please provide the signer when account is instantiated");
+        }
+        return this.signer.sign(data);
+    }
+
+    static fromPem(path: string, hrp: string = LibraryConfig.DefaultAddressHrp): Account {
+        const userSigner = UserSigner.fromPem(path);
+        return new Account(userSigner.getAddress(hrp), userSigner);
+    }
+
+    static fromWallet(
+        keyFileObject: any,
+        password: string,
+        addressIndex?: number,
+        hrp: string = LibraryConfig.DefaultAddressHrp,
+    ): Account {
+        const userSigner = UserSigner.fromWallet(keyFileObject, password, addressIndex);
+        return new Account(userSigner.getAddress(hrp), userSigner);
+    }
+
+    static fromKeystore(
+        filePath: string,
+        password: string,
+        addressIndex?: number,
+        hrp: string = LibraryConfig.DefaultAddressHrp,
+    ): Account {
+        const secretKey = UserWallet.loadSecretKey(filePath, password, addressIndex);
+        const userSigner = new UserSigner(secretKey);
+        return new Account(userSigner.getAddress(hrp), userSigner);
     }
 }

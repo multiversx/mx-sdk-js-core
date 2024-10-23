@@ -84,7 +84,7 @@ export class SmartContractTransactionsFactory {
     createTransactionForExecute(options: {
         sender: IAddress;
         contract: IAddress;
-        function: string;
+        func: string;
         gasLimit: bigint;
         arguments?: any[];
         nativeTransferAmount?: bigint;
@@ -118,9 +118,10 @@ export class SmartContractTransactionsFactory {
             receiver = options.sender;
         }
 
-        dataParts.push(dataParts.length ? utf8ToHex(options.function) : options.function);
+        dataParts.push(dataParts.length ? utf8ToHex(options.func) : options.func);
 
-        const endpoint = this.abi?.getEndpoint(options.function);
+        const endpoint = this.abi?.getEndpoint(options.func);
+
         const preparedArgs = this.argsToDataParts(args, endpoint);
         dataParts.push(...preparedArgs);
 

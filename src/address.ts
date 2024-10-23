@@ -3,6 +3,7 @@ import BigNumber from "bignumber.js";
 import { LibraryConfig } from "./config";
 import { CURRENT_NUMBER_OF_SHARDS_WITHOUT_META, METACHAIN_ID, WasmVirtualMachine } from "./constants";
 import * as errors from "./errors";
+import { IAddress } from "./interface";
 import { bigIntToBuffer } from "./tokenOperations/codec";
 const createKeccakHash = require("keccak");
 
@@ -12,11 +13,6 @@ const createKeccakHash = require("keccak");
 const PUBKEY_LENGTH = 32;
 
 const SMART_CONTRACT_HEX_PUBKEY_PREFIX = "0".repeat(16);
-
-interface IAddress {
-    getPublicKey(): Buffer;
-    getHrp(): string;
-}
 
 /**
  * An Address, as an immutable object.
@@ -298,7 +294,7 @@ export class AddressComputer {
 
     computeContractAddress(deployer: IAddress, deploymentNonce: bigint): Address {
         const initialPadding = Buffer.alloc(8, 0);
-        const ownerPubkey = deployer.getPublicKey();
+        const ownerPubkey = deployer.pubkey();
         const shardSelector = ownerPubkey.slice(30);
         const ownerNonceBytes = Buffer.alloc(8);
 
@@ -315,7 +311,7 @@ export class AddressComputer {
     }
 
     getShardOfAddress(address: IAddress): number {
-        return this.getShardOfPubkey(address.getPublicKey(), this.numberOfShardsWithoutMeta);
+        return this.getShardOfPubkey(address.pubkey(), this.numberOfShardsWithoutMeta);
     }
 
     private getShardOfPubkey(pubkey: Uint8Array, numberOfShards: number): number {

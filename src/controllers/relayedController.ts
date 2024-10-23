@@ -17,24 +17,28 @@ export class RelayedController {
         this.txComputer = new TransactionComputer();
     }
 
-    createRelayedV1Transaction(sender: IAccount, nonce: bigint, innerTransaction: ITransaction): Transaction {
+    async createRelayedV1Transaction(
+        sender: IAccount,
+        nonce: bigint,
+        innerTransaction: ITransaction,
+    ): Promise<Transaction> {
         const transaction = this.factory.createRelayedV1Transaction({
             innerTransaction,
             relayerAddress: sender.address,
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    createRelayedV2Transaction(
+    async createRelayedV2Transaction(
         sender: IAccount,
         nonce: bigint,
         innerTransaction: ITransaction,
         innerTransactionGasLimit: bigint,
-    ): Transaction {
+    ): Promise<Transaction> {
         const transaction = this.factory.createRelayedV2Transaction({
             innerTransaction,
             innerTransactionGasLimit: BigInt(innerTransactionGasLimit),
@@ -42,19 +46,23 @@ export class RelayedController {
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    createRelayedV3Transaction(sender: IAccount, nonce: bigint, innerTransactions: ITransaction[]): Transaction {
+    async createRelayedV3Transaction(
+        sender: IAccount,
+        nonce: bigint,
+        innerTransactions: ITransaction[],
+    ): Promise<Transaction> {
         const transaction = this.factory.createRelayedV3Transaction({
             relayerAddress: sender.address,
             innerTransactions,
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }

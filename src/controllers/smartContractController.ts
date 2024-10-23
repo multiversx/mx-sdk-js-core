@@ -1,10 +1,10 @@
 import { QueryRunnerAdapter } from "../adapters";
-import { TransactionsConverter } from "../converters";
-import { ProviderWrapper } from "../facades/providerWrapper";
+import { ProviderWrapper } from "../entrypoints/providerWrapper";
 import { IAddress } from "../interface";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { INetworkProvider } from "../networkProviders/interface";
-import { IAbi, SmartContractQueriesController } from "../smartContractQueriesController";
+import { SmartContractQueriesController } from "../smartContractQueriesController";
+import { AbiRegistry } from "../smartcontracts";
 import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
@@ -14,29 +14,28 @@ import { TransactionWatcher } from "../transactionWatcher";
 import { IAccount } from "./interfaces";
 
 export class SmartContractController {
-    private abi?: IAbi;
     private factory: SmartContractTransactionsFactory;
     private parser: SmartContractTransactionsOutcomeParser;
     private queryController: SmartContractQueriesController;
     private transactionWatcher: TransactionWatcher;
     private txComputer: TransactionComputer;
 
-    constructor(chainId: string, networkProvider: INetworkProvider, abi?: IAbi) {
-        this.abi = abi;
+    constructor(chainId: string, networkProvider: INetworkProvider, abi?: AbiRegistry) {
         this.factory = new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: chainId }),
+            abi,
         });
-        this.parser = new SmartContractTransactionsOutcomeParser();
+        this.parser = new SmartContractTransactionsOutcomeParser({ abi });
 
         this.queryController = new SmartContractQueriesController({
             queryRunner: new QueryRunnerAdapter({ networkProvider }),
-            abi: this.abi,
+            abi,
         });
         this.transactionWatcher = new TransactionWatcher(new ProviderWrapper(networkProvider));
         this.txComputer = new TransactionComputer();
     }
 
-    createTransactionForDeploy(
+    async createTransactionForDeploy(
         sender: IAccount,
         nonce: bigint,
         bytecode: Uint8Array,
@@ -47,7 +46,7 @@ export class SmartContractController {
         isReadable: boolean = true,
         isPayable: boolean = false,
         isPayableBySc: boolean = true,
-    ): Transaction {
+    ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForDeploy({
             sender: sender.address,
             bytecode,
@@ -61,15 +60,13 @@ export class SmartContractController {
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
     parseDeploy(transactionOnNetwork: ITransactionOnNetwork): SmartContractDeployOutcome {
-        const txConverter = new TransactionsConverter();
-        const txOutcome = txConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
-        return this.parser.parseDeploy({ transactionOutcome: txOutcome });
+        return this.parser.parseDeploy({ transactionOnNetwork });
     }
 
     async awaitCompletedDeploy(txHash: string): Promise<SmartContractDeployOutcome> {
@@ -77,7 +74,7 @@ export class SmartContractController {
         return this.parseDeploy(transaction);
     }
 
-    createTransactionForUpgrade(
+    async createTransactionForUpgrade(
         sender: IAccount,
         nonce: bigint,
         contract: IAddress,
@@ -89,7 +86,7 @@ export class SmartContractController {
         isReadable: boolean = true,
         isPayable: boolean = false,
         isPayableBySc: boolean = true,
-    ): Transaction {
+    ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUpgrade({
             sender: sender.address,
             contract,
@@ -104,12 +101,12 @@ export class SmartContractController {
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    createTransactionForExecute(
+    async createTransactionForExecute(
         sender: IAccount,
         nonce: bigint,
         contract: IAddress,
@@ -118,19 +115,19 @@ export class SmartContractController {
         args: any[] = [],
         nativeTransferAmount: bigint = BigInt(0),
         tokenTransfers: TokenTransfer[] = [],
-    ): Transaction {
+    ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForExecute({
             sender: sender.address,
             contract,
             gasLimit,
-            function: func,
+            func,
             arguments: args,
             nativeTransferAmount,
             tokenTransfers,
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }

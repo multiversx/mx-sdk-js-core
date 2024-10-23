@@ -9,7 +9,7 @@ import { TransfersController } from "../controllers/transfersController";
 import { ErrInvalidNetworkProviderKind } from "../errors";
 import { Message, MessageComputer } from "../message";
 import { ApiNetworkProvider, ProxyNetworkProvider, TransactionOnNetwork } from "../networkProviders";
-import { IAbi } from "../smartContractQueriesController";
+import { AbiRegistry } from "../smartcontracts";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionWatcher } from "../transactionWatcher";
@@ -33,9 +33,9 @@ class NetworkEntrypoint {
         this.chainId = chainId;
     }
 
-    signTransaction(transaction: Transaction, account: IAccount): void {
+    async signTransaction(transaction: Transaction, account: IAccount): Promise<void> {
         const txComputer = new TransactionComputer();
-        transaction.signature = account.sign(txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await account.sign(txComputer.computeBytesForSigning(transaction));
     }
 
     verifyTransactionSignature(transaction: Transaction): boolean {
@@ -44,9 +44,9 @@ class NetworkEntrypoint {
         return verifier.verify(txComputer.computeBytesForVerifying(transaction), transaction.signature);
     }
 
-    signMessage(message: Message, account: IAccount): void {
+    async signMessage(message: Message, account: IAccount): Promise<void> {
         const messageComputer = new MessageComputer();
-        message.signature = account.sign(messageComputer.computeBytesForSigning(message));
+        message.signature = await account.sign(messageComputer.computeBytesForSigning(message));
     }
 
     verifyMessageSignature(message: Message): boolean {
@@ -97,7 +97,7 @@ class NetworkEntrypoint {
         return new RelayedController(this.chainId);
     }
 
-    createSmartContractController(abi?: IAbi): SmartContractController {
+    createSmartContractController(abi?: AbiRegistry): SmartContractController {
         return new SmartContractController(this.chainId, this.networkProvider, abi);
     }
 

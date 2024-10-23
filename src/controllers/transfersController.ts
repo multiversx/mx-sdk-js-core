@@ -14,13 +14,13 @@ export class TransfersController {
         this.txComputer = new TransactionComputer();
     }
 
-    createTransactionForNativeTokenTransfer(
+    async createTransactionForNativeTokenTransfer(
         sender: IAccount,
         nonce: bigint,
         receiver: IAddress,
         nativeTransferAmount: bigint = BigInt(0),
         data?: Uint8Array,
-    ): Transaction {
+    ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForNativeTokenTransfer({
             sender: sender.address,
             receiver,
@@ -29,17 +29,17 @@ export class TransfersController {
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    createTransactionForEsdtTokenTransfer(
+    async createTransactionForEsdtTokenTransfer(
         sender: IAccount,
         nonce: bigint,
         receiver: IAddress,
         tokenTransfers: TokenTransfer[],
-    ): Transaction {
+    ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForESDTTokenTransfer({
             sender: sender.address,
             receiver,
@@ -47,19 +47,19 @@ export class TransfersController {
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    createTransactionForTransfer(
+    async createTransactionForTransfer(
         sender: IAccount,
         nonce: bigint,
         receiver: IAddress,
         nativeTransferAmount?: bigint,
         tokenTransfers?: TokenTransfer[],
         data?: Uint8Array,
-    ): Transaction {
+    ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForTransfer({
             sender: sender.address,
             receiver,
@@ -69,7 +69,7 @@ export class TransfersController {
         });
 
         transaction.nonce = nonce;
-        transaction.signature = sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }

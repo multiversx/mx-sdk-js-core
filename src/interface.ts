@@ -32,6 +32,7 @@ export interface ISignature {
     hex(): string;
 }
 
+// TODO: Reconsider this, either remove or update functions name
 export interface IAddress {
     bech32(): string;
     pubkey(): Buffer;

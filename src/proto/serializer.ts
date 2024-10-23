@@ -60,12 +60,6 @@ export class ProtoSerializer {
             protoTransaction.GuardianSignature = transaction.guardianSignature;
         }
 
-        if (transaction.relayer) {
-            protoTransaction.Relayer = new Address(transaction.relayer).getPublicKey();
-        }
-
-        protoTransaction.InnerTransactions = transaction.innerTransactions.map((tx) => this.convertToProtoMessage(tx));
-
         return protoTransaction;
     }
 

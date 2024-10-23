@@ -120,7 +120,7 @@ export class SmartContractController {
             sender: sender.address,
             contract,
             gasLimit,
-            func,
+            function: func,
             arguments: args,
             nativeTransferAmount,
             tokenTransfers,

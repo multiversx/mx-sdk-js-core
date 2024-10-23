@@ -86,7 +86,7 @@ describe("test smart contract transactions factory", function () {
         const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
         });
@@ -94,7 +94,7 @@ describe("test smart contract transactions factory", function () {
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
         });
@@ -118,7 +118,7 @@ describe("test smart contract transactions factory", function () {
         const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: [new U32Value(7)],
             nativeTransferAmount: egldAmount,
@@ -127,7 +127,7 @@ describe("test smart contract transactions factory", function () {
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: [7],
             nativeTransferAmount: egldAmount,
@@ -154,7 +154,7 @@ describe("test smart contract transactions factory", function () {
         const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
             tokenTransfers: [transfer],
@@ -163,7 +163,7 @@ describe("test smart contract transactions factory", function () {
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
             tokenTransfers: [transfer],
@@ -193,7 +193,7 @@ describe("test smart contract transactions factory", function () {
         const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
             tokenTransfers: [fooTransfer, barTransfer],
@@ -202,7 +202,7 @@ describe("test smart contract transactions factory", function () {
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
             tokenTransfers: [fooTransfer, barTransfer],
@@ -237,7 +237,7 @@ describe("test smart contract transactions factory", function () {
         const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
             tokenTransfers: [transfer],
@@ -246,7 +246,7 @@ describe("test smart contract transactions factory", function () {
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
             tokenTransfers: [transfer],
@@ -284,7 +284,7 @@ describe("test smart contract transactions factory", function () {
         const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
             tokenTransfers: [firstTransfer, secondTransfer],
@@ -293,7 +293,7 @@ describe("test smart contract transactions factory", function () {
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
             tokenTransfers: [firstTransfer, secondTransfer],
@@ -331,7 +331,7 @@ describe("test smart contract transactions factory", function () {
         const transaction = factory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
             nativeTransferAmount: 1000000000000000000n,
@@ -341,7 +341,7 @@ describe("test smart contract transactions factory", function () {
         const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
             sender: sender,
             contract: contract,
-            func: func,
+            function: func,
             gasLimit: gasLimit,
             arguments: args,
             nativeTransferAmount: 1000000000000000000n,

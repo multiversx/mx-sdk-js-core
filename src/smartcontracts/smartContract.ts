@@ -254,7 +254,7 @@ export class SmartContract implements ISmartContract {
         const transaction = factory.createTransactionForExecute({
             sender: caller,
             contract: receiver ? receiver : this.getAddress(),
-            func: func.toString(),
+            function: func.toString(),
             gasLimit: BigInt(gasLimit.valueOf()),
             arguments: args,
         });

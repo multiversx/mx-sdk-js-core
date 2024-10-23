@@ -50,20 +50,4 @@ export class RelayedController {
 
         return transaction;
     }
-
-    async createRelayedV3Transaction(
-        sender: IAccount,
-        nonce: bigint,
-        innerTransactions: ITransaction[],
-    ): Promise<Transaction> {
-        const transaction = this.factory.createRelayedV3Transaction({
-            relayerAddress: sender.address,
-            innerTransactions,
-        });
-
-        transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
-
-        return transaction;
-    }
 }

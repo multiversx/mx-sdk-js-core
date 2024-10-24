@@ -23,14 +23,12 @@ describe("TestEntrypoint", () => {
         const sender = Account.fromPem(alicePem.pemFileText);
         sender.nonce = 77777;
 
-        const transaction = await controller.createTransactionForTransfer(
-            sender,
-            BigInt(sender.getNonceThenIncrement().valueOf()),
-            sender.address,
-            BigInt(0),
-            [],
-            Buffer.from("hello"),
-        );
+        const transaction = await controller.createTransactionForTransfer(sender, {
+            nonce: BigInt(sender.getNonceThenIncrement().valueOf()),
+            receiver: sender.address,
+            nativeTransferAmount: BigInt(0),
+            data: Buffer.from("hello"),
+        });
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
             "69bc7d1777edd0a901e6cf94830475716205c5efdf2fd44d4be31badead59fc8418b34f0aa3b2c80ba14aed5edd30031757d826af58a1abb690a0bee89ba9309",
@@ -47,13 +45,12 @@ describe("TestEntrypoint", () => {
         const controller = entrypoint.createSmartContractController(abi);
         const bytecode = readFileSync("src/testdata/adder.wasm");
 
-        const transaction = await controller.createTransactionForDeploy(
-            sender,
-            BigInt(sender.getNonceThenIncrement().valueOf()),
+        const transaction = await controller.createTransactionForDeploy(sender, {
+            nonce: BigInt(sender.getNonceThenIncrement().valueOf()),
             bytecode,
-            BigInt(10_000_000),
-            [0],
-        );
+            gasLimit: BigInt(10_000_000),
+            arguments: [0],
+        });
 
         const txHash = await entrypoint.sendTransaction(transaction);
         const outcome = await controller.awaitCompletedDeploy(txHash);
@@ -62,14 +59,13 @@ describe("TestEntrypoint", () => {
 
         const contractAddress = Address.fromBech32(outcome.contracts[0].address);
 
-        const executeTransaction = await controller.createTransactionForExecute(
-            sender,
-            BigInt(sender.getNonceThenIncrement().valueOf()),
-            contractAddress,
-            BigInt(10_000_000),
-            "add",
-            [7],
-        );
+        const executeTransaction = await controller.createTransactionForExecute(sender, {
+            nonce: BigInt(sender.getNonceThenIncrement().valueOf()),
+            contract: contractAddress,
+            gasLimit: BigInt(10_000_000),
+            function: "add",
+            arguments: [7],
+        });
 
         const txHashExecute = await entrypoint.sendTransaction(executeTransaction);
         await entrypoint.awaitCompletedTransaction(txHashExecute);
@@ -79,7 +75,7 @@ describe("TestEntrypoint", () => {
         assert.equal(queryResult[0], 7);
     });
 
-    it.only("create relayed transaction", async function () {
+    it("create relayed transaction", async function () {
         const transferController = entrypoint.createTransfersController();
         const sender = Account.fromPem(alicePem.pemFileText);
         sender.nonce = 77777;
@@ -87,14 +83,11 @@ describe("TestEntrypoint", () => {
         const relayer = Account.fromPem(bobPem.pemFileText);
         relayer.nonce = 7;
 
-        const transaction = await transferController.createTransactionForTransfer(
-            sender,
-            BigInt(sender.getNonceThenIncrement().valueOf()),
-            sender.address,
-            BigInt(0),
-            [],
-            Buffer.from("hello"),
-        );
+        const transaction = await transferController.createTransactionForTransfer(sender, {
+            nonce: BigInt(sender.getNonceThenIncrement().valueOf()),
+            receiver: sender.address,
+            data: Buffer.from("hello"),
+        });
         const innerTransactionGasLimit = transaction.gasLimit;
         transaction.gasLimit = BigInt(0);
         transaction.signature = await sender.sign(txComputer.computeBytesForSigning(transaction));

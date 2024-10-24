@@ -99,9 +99,9 @@ type TransactionInput = {
     contract: IAddress;
     gasLimit: bigint;
     function: string;
-    arguments: any[];
-    nativeTransferAmount: bigint;
-    tokenTransfers: TokenTransfer[];
+    arguments?: any[];
+    nativeTransferAmount?: bigint;
+    tokenTransfers?: TokenTransfer[];
 };
 
 type ContractUpgradeInput = ContractDepoyInput & { contract: IAddress };

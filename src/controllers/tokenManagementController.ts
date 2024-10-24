@@ -24,42 +24,13 @@ export class TokenManagementController {
         this.parser = new TokenManagementTransactionsOutcomeParser();
     }
 
-    async createTransactionForIssuingFungible(
-        sender: IAccount,
-        nonce: bigint,
-        tokenName: string,
-        tokenTicker: string,
-        initialSupply: bigint,
-        numDecimals: bigint,
-        canFreeze: boolean,
-        canWipe: boolean,
-        canPause: boolean,
-        canChangeOwner: boolean,
-        canUpgrade: boolean,
-        canAddSpecialRoles: boolean,
-    ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForIssuingFungible({
-            sender: sender.address,
-            tokenName,
-            tokenTicker,
-            initialSupply,
-            numDecimals,
-            canFreeze,
-            canWipe,
-            canPause,
-            canChangeOwner,
-            canUpgrade,
-            canAddSpecialRoles,
-        });
+    async createTransactionForIssuingFungible(sender: IAccount, options: IssueFungibleInput): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForIssuingFungible({ ...options, sender: sender.address });
 
-        transaction.nonce = nonce;
+        transaction.nonce = options.nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
-    }
-
-    parseIssueFungible(transactionOnNetwork: TransactionOnNetwork): IESDTIssueOutcome[] {
-        return this.parser.parseIssueFungible(transactionOnNetwork);
     }
 
     async awaitCompletedIssueFungible(txHash: string): Promise<IESDTIssueOutcome[]> {
@@ -67,40 +38,22 @@ export class TokenManagementController {
         return this.parseIssueFungible(transaction);
     }
 
+    parseIssueFungible(transactionOnNetwork: TransactionOnNetwork): IESDTIssueOutcome[] {
+        return this.parser.parseIssueFungible(transactionOnNetwork);
+    }
     async createTransactionForIssuingSemiFungible(
         sender: IAccount,
-        nonce: bigint,
-        tokenName: string,
-        tokenTicker: string,
-        canFreeze: boolean,
-        canWipe: boolean,
-        canPause: boolean,
-        canTransferNftCreateRole: boolean,
-        canChangeOwner: boolean,
-        canUpgrade: boolean,
-        canAddSpecialRoles: boolean,
+        options: IssueSemiFungibleInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingSemiFungible({
+            ...options,
             sender: sender.address,
-            tokenName,
-            tokenTicker,
-            canFreeze,
-            canWipe,
-            canPause,
-            canTransferNFTCreateRole: canTransferNftCreateRole,
-            canChangeOwner,
-            canUpgrade,
-            canAddSpecialRoles,
         });
 
-        transaction.nonce = nonce;
+        transaction.nonce = options.nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
-    }
-
-    parseIssueSemiFungible(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
-        return this.parser.parseIssueSemiFungible(transactionOnNetwork);
     }
 
     async awaitCompletedIssueSemiFungible(txHash: string): Promise<{ tokenIdentifier: string }[]> {
@@ -108,33 +61,17 @@ export class TokenManagementController {
         return this.parseIssueSemiFungible(transaction);
     }
 
+    parseIssueSemiFungible(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+        return this.parser.parseIssueSemiFungible(transactionOnNetwork);
+    }
+
     async createTransactionForIssuingNonFungible(
         sender: IAccount,
-        nonce: bigint,
-        tokenName: string,
-        tokenTicker: string,
-        canFreeze: boolean,
-        canWipe: boolean,
-        canPause: boolean,
-        canTransferNFTCreateRole: boolean,
-        canChangeOwner: boolean,
-        canUpgrade: boolean,
-        canAddSpecialRoles: boolean,
+        options: IssueNonFungibleInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForIssuingNonFungible({
-            sender: sender.address,
-            tokenName,
-            tokenTicker,
-            canFreeze,
-            canWipe,
-            canPause,
-            canTransferNFTCreateRole,
-            canChangeOwner,
-            canUpgrade,
-            canAddSpecialRoles,
-        });
+        const transaction = this.factory.createTransactionForIssuingNonFungible({ ...options, sender: sender.address });
 
-        transaction.nonce = nonce;
+        transaction.nonce = options.nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -145,3 +82,27 @@ export class TokenManagementController {
         return this.parser.parseIssueNonFungible(transaction);
     }
 }
+
+type IssueFungibleInput = IssueInput & {
+    initialSupply: bigint;
+    numDecimals: bigint;
+};
+
+type IssueSemiFungibleInput = IssueNonFungibleInput;
+
+type IssueNonFungibleInput = IssueInput & {
+    canTransferNFTCreateRole: boolean;
+};
+
+type IssueInput = {
+    nonce: bigint;
+    tokenName: string;
+    tokenTicker: string;
+    canFreeze: boolean;
+    canWipe: boolean;
+    canPause: boolean;
+    canTransferNFTCreateRole: boolean;
+    canChangeOwner: boolean;
+    canUpgrade: boolean;
+    canAddSpecialRoles: boolean;
+};

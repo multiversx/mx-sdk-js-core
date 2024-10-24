@@ -35,38 +35,13 @@ export class SmartContractController {
         this.txComputer = new TransactionComputer();
     }
 
-    async createTransactionForDeploy(
-        sender: IAccount,
-        nonce: bigint,
-        bytecode: Uint8Array,
-        gasLimit: bigint,
-        args: any[] = [],
-        nativeTransferAmount: bigint = BigInt(0),
-        isUpgradeable: boolean = true,
-        isReadable: boolean = true,
-        isPayable: boolean = false,
-        isPayableBySc: boolean = true,
-    ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForDeploy({
-            sender: sender.address,
-            bytecode,
-            gasLimit: gasLimit,
-            arguments: args,
-            nativeTransferAmount,
-            isUpgradeable,
-            isReadable,
-            isPayable,
-            isPayableBySmartContract: isPayableBySc,
-        });
+    async createTransactionForDeploy(sender: IAccount, options: ContractDepoyInput): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForDeploy({ ...options, sender: sender.address });
 
-        transaction.nonce = nonce;
+        transaction.nonce = options.nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
-    }
-
-    parseDeploy(transactionOnNetwork: ITransactionOnNetwork): SmartContractDeployOutcome {
-        return this.parser.parseDeploy({ transactionOnNetwork });
     }
 
     async awaitCompletedDeploy(txHash: string): Promise<SmartContractDeployOutcome> {
@@ -74,59 +49,19 @@ export class SmartContractController {
         return this.parseDeploy(transaction);
     }
 
-    async createTransactionForUpgrade(
-        sender: IAccount,
-        nonce: bigint,
-        contract: IAddress,
-        bytecode: Uint8Array,
-        gasLimit: bigint,
-        args: any[] = [],
-        nativeTransferAmount: bigint = BigInt(0),
-        isUpgradeable: boolean = true,
-        isReadable: boolean = true,
-        isPayable: boolean = false,
-        isPayableBySc: boolean = true,
-    ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUpgrade({
-            sender: sender.address,
-            contract,
-            bytecode,
-            gasLimit,
-            arguments: args,
-            nativeTransferAmount,
-            isUpgradeable,
-            isReadable,
-            isPayable,
-            isPayableBySmartContract: isPayableBySc,
-        });
+    async createTransactionForUpgrade(sender: IAccount, options: ContractUpgradeInput): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUpgrade({ ...options, sender: sender.address });
 
-        transaction.nonce = nonce;
+        transaction.nonce = options.nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createTransactionForExecute(
-        sender: IAccount,
-        nonce: bigint,
-        contract: IAddress,
-        gasLimit: bigint,
-        func: string,
-        args: any[] = [],
-        nativeTransferAmount: bigint = BigInt(0),
-        tokenTransfers: TokenTransfer[] = [],
-    ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForExecute({
-            sender: sender.address,
-            contract,
-            gasLimit,
-            function: func,
-            arguments: args,
-            nativeTransferAmount,
-            tokenTransfers,
-        });
+    async createTransactionForExecute(sender: IAccount, options: TransactionInput): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForExecute({ ...options, sender: sender.address });
 
-        transaction.nonce = nonce;
+        transaction.nonce = options.nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -141,7 +76,35 @@ export class SmartContractController {
             value: BigInt(value ?? 0),
         });
     }
+
+    parseDeploy(transactionOnNetwork: ITransactionOnNetwork): SmartContractDeployOutcome {
+        return this.parser.parseDeploy({ transactionOnNetwork });
+    }
 }
+
+type ContractDepoyInput = {
+    nonce: bigint;
+    bytecode: Uint8Array;
+    gasLimit: bigint;
+    arguments: any[];
+    nativeTransferAmount?: bigint;
+    isUpgradeable?: boolean;
+    isReadable?: boolean;
+    isPayable?: boolean;
+    isPayableBySmartContract?: boolean;
+};
+
+type TransactionInput = {
+    nonce: bigint;
+    contract: IAddress;
+    gasLimit: bigint;
+    function: string;
+    arguments: any[];
+    nativeTransferAmount: bigint;
+    tokenTransfers: TokenTransfer[];
+};
+
+type ContractUpgradeInput = ContractDepoyInput & { contract: IAddress };
 
 interface SmartContractDeployOutcome {
     returnCode: string;

@@ -3,15 +3,21 @@ import { readFileSync } from "fs";
 import { Account } from "../account";
 import { Address } from "../address";
 import { loadAbiRegistry, loadTestWallet, TestWallet } from "../testutils";
+import { TransactionComputer } from "../transactionComputer";
 import { DevnetEntrypoint } from "./entrypoints";
 
 describe("TestEntrypoint", () => {
     const entrypoint = new DevnetEntrypoint();
     let alicePem: TestWallet;
+    let bobPem: TestWallet;
+    let txComputer: TransactionComputer;
 
     before(async function () {
         alicePem = await loadTestWallet("alice");
+        bobPem = await loadTestWallet("bob");
+        txComputer = new TransactionComputer();
     });
+
     it("native transfer", async () => {
         const controller = entrypoint.createTransfersController();
         const sender = Account.fromPem(alicePem.pemFileText);
@@ -71,5 +77,36 @@ describe("TestEntrypoint", () => {
         const queryResult = await controller.queryContract(contractAddress, "getSum", []);
         assert.equal(queryResult.length, 1);
         assert.equal(queryResult[0], 7);
+    });
+
+    it.only("create relayed transaction", async function () {
+        const transferController = entrypoint.createTransfersController();
+        const sender = Account.fromPem(alicePem.pemFileText);
+        sender.nonce = 77777;
+
+        const relayer = Account.fromPem(bobPem.pemFileText);
+        relayer.nonce = 7;
+
+        const transaction = await transferController.createTransactionForTransfer(
+            sender,
+            BigInt(sender.getNonceThenIncrement().valueOf()),
+            sender.address,
+            BigInt(0),
+            [],
+            Buffer.from("hello"),
+        );
+        const innerTransactionGasLimit = transaction.gasLimit;
+        transaction.gasLimit = BigInt(0);
+        transaction.signature = await sender.sign(txComputer.computeBytesForSigning(transaction));
+
+        const relayedController = entrypoint.createRelayedController();
+        const relayedTransaction = relayedController.createRelayedV2Transaction(
+            relayer,
+            BigInt(relayer.getNonceThenIncrement().valueOf()),
+            transaction,
+            innerTransactionGasLimit,
+        );
+
+        assert.equal((await relayedTransaction).chainID, "D");
     });
 });

@@ -41,11 +41,12 @@ export class RelayedController {
     ): Promise<Transaction> {
         const transaction = this.factory.createRelayedV2Transaction({
             innerTransaction,
-            innerTransactionGasLimit: BigInt(innerTransactionGasLimit),
+            innerTransactionGasLimit,
             relayerAddress: sender.address,
         });
 
         transaction.nonce = nonce;
+        transaction.gasLimit = BigInt(0);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;

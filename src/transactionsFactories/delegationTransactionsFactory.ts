@@ -376,16 +376,20 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForWithdrawing(_address: IAddress, _delegationContract: IAddress): Transaction {
+    createTransactionForWithdrawing(_options: { sender: IAddress; delegationContract: IAddress }): Transaction {
         throw new Error("Method not implemented.");
     }
-    createTransactionForUndelegating(_address: IAddress, _delegationContract: IAddress, _amount: bigint): Transaction {
+    createTransactionForUndelegating(_options: {
+        sender: IAddress;
+        delegationContract: IAddress;
+        amount: bigint;
+    }): Transaction {
         throw new Error("Method not implemented.");
     }
-    createTransactionForRedelegatingRewards(_address: IAddress, _delegationContract: IAddress): Transaction {
+    createTransactionForRedelegatingRewards(_options: { sender: IAddress; delegationContract: IAddress }): Transaction {
         throw new Error("Method not implemented.");
     }
-    createTransactionForClaimingRewards(_address: IAddress, _delegationContract: IAddress): Transaction {
+    createTransactionForClaimingRewards(_options: { sender: IAddress; delegationContract: IAddress }): Transaction {
         throw new Error("Method not implemented.");
     }
     createTransactionForDelegating(_options: {

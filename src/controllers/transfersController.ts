@@ -16,19 +16,14 @@ export class TransfersController {
 
     async createTransactionForNativeTokenTransfer(
         sender: IAccount,
-        nonce: bigint,
-        receiver: IAddress,
-        nativeTransferAmount: bigint = BigInt(0),
-        data?: Uint8Array,
+        options: NativeTokenTransferInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForNativeTokenTransfer({
+            ...options,
             sender: sender.address,
-            receiver,
-            nativeAmount: nativeTransferAmount,
-            data,
         });
 
-        transaction.nonce = nonce;
+        transaction.nonce = options.nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -36,17 +31,11 @@ export class TransfersController {
 
     async createTransactionForEsdtTokenTransfer(
         sender: IAccount,
-        nonce: bigint,
-        receiver: IAddress,
-        tokenTransfers: TokenTransfer[],
+        options: ESDTTokenTransferInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForESDTTokenTransfer({
-            sender: sender.address,
-            receiver,
-            tokenTransfers,
-        });
+        const transaction = this.factory.createTransactionForESDTTokenTransfer({ ...options, sender: sender.address });
 
-        transaction.nonce = nonce;
+        transaction.nonce = options.nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -54,23 +43,34 @@ export class TransfersController {
 
     async createTransactionForTransfer(
         sender: IAccount,
-        nonce: bigint,
-        receiver: IAddress,
-        nativeTransferAmount?: bigint,
-        tokenTransfers?: TokenTransfer[],
-        data?: Uint8Array,
+        options: CreateTransferTransactionInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForTransfer({
-            sender: sender.address,
-            receiver,
-            nativeAmount: nativeTransferAmount,
-            tokenTransfers,
-            data,
-        });
+        const transaction = this.factory.createTransactionForTransfer({ ...options, sender: sender.address });
 
-        transaction.nonce = nonce;
+        transaction.nonce = options.nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 }
+
+type NativeTokenTransferInput = {
+    nonce: bigint;
+    receiver: IAddress;
+    nativeAmount?: bigint;
+    data?: Uint8Array;
+};
+
+type ESDTTokenTransferInput = {
+    nonce: bigint;
+    receiver: IAddress;
+    tokenTransfers: TokenTransfer[];
+};
+
+type CreateTransferTransactionInput = {
+    nonce: bigint;
+    receiver: IAddress;
+    nativeTransferAmount?: bigint;
+    tokenTransfers?: TokenTransfer[];
+    data?: Uint8Array;
+};

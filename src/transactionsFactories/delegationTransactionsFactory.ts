@@ -20,7 +20,7 @@ interface IConfig {
     additionalGasLimitForDelegationOperations: bigint;
 }
 
-interface IValidatorPublicKey {
+export interface IValidatorPublicKey {
     hex(): string;
 }
 
@@ -374,6 +374,30 @@ export class DelegationTransactionsFactory {
             gasLimit: gasLimit,
             addDataMovementGas: true,
         }).build();
+    }
+
+    createTransactionForWithdrawing(_options: { sender: IAddress; delegationContract: IAddress }): Transaction {
+        throw new Error("Method not implemented.");
+    }
+    createTransactionForUndelegating(_options: {
+        sender: IAddress;
+        delegationContract: IAddress;
+        amount: bigint;
+    }): Transaction {
+        throw new Error("Method not implemented.");
+    }
+    createTransactionForRedelegatingRewards(_options: { sender: IAddress; delegationContract: IAddress }): Transaction {
+        throw new Error("Method not implemented.");
+    }
+    createTransactionForClaimingRewards(_options: { sender: IAddress; delegationContract: IAddress }): Transaction {
+        throw new Error("Method not implemented.");
+    }
+    createTransactionForDelegating(_options: {
+        sender: IAddress;
+        delegationContract: IAddress;
+        amount: bigint;
+    }): Transaction {
+        throw new Error("Method not implemented.");
     }
 
     private computeExecutionGasLimitForNodesManagement(numNodes: number): bigint {

@@ -121,6 +121,7 @@ export class SmartContractTransactionsFactory {
         dataParts.push(dataParts.length ? utf8ToHex(options.function) : options.function);
 
         const endpoint = this.abi?.getEndpoint(options.function);
+
         const preparedArgs = this.argsToDataParts(args, endpoint);
         dataParts.push(...preparedArgs);
 

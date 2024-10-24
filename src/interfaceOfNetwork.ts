@@ -14,14 +14,19 @@ export interface INetworkConfig {
 
 export interface ITransactionOnNetwork {
     isCompleted?: boolean;
-
     hash: string;
     type: string;
+    nonce: number;
+    round: number;
+    epoch: number;
     value: string;
     receiver: IAddress;
     sender: IAddress;
+    gasLimit: number;
+    gasPrice: number;
     function?: string;
     data: Buffer;
+    signature: string;
     status: ITransactionStatus;
     receipt: ITransactionReceipt;
     contractResults: IContractResults;

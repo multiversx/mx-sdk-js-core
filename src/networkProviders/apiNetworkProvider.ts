@@ -1,4 +1,5 @@
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
+import { IAddress } from "../interface";
 import { getAxios } from "../utils";
 import { numberToPaddedHex } from "../utils.codec";
 import { AccountOnNetwork, GuardianData } from "./accounts";
@@ -6,7 +7,7 @@ import { defaultAxiosConfig, defaultPagination } from "./config";
 import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { ContractQueryResponse } from "./contractQueryResponse";
-import { IAddress, IContractQuery, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "./interface";
+import { IContractQuery, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkProviderConfig } from "./networkProviderConfig";

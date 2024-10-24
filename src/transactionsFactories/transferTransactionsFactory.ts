@@ -91,7 +91,7 @@ export class TransferTransactionsFactory {
     createTransactionForNativeTokenTransfer(options: {
         sender: IAddress;
         receiver: IAddress;
-        nativeAmount: bigint;
+        nativeAmount?: bigint;
         data?: Uint8Array;
     }): Transaction {
         this.ensureConfigIsDefined();
@@ -104,7 +104,7 @@ export class TransferTransactionsFactory {
             chainID: this.config!.chainID,
             gasLimit: this.computeGasForMoveBalance(this.config!, data),
             data: data,
-            value: options.nativeAmount,
+            value: options.nativeAmount ?? BigInt(0),
         });
     }
 

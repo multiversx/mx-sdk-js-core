@@ -3,7 +3,7 @@ import { IAddress } from "../interface";
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "./transactionBuilder";
 
-interface IConfig {
+export interface IConfig {
     chainID: string;
     minGasLimit: bigint;
     gasLimitPerByte: bigint;

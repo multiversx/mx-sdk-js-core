@@ -1,3 +1,4 @@
+export * from "./crypto";
 export * from "./mnemonic";
 export * from "./pem";
 export * from "./userKeys";

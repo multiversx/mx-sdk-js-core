@@ -1,6 +1,6 @@
+import { Address } from "../address";
 import { IAddress } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
-import { Address } from "./primitives";
 
 export class ContractResults {
     readonly items: ContractResultItem[];
@@ -14,12 +14,12 @@ export class ContractResults {
     }
 
     static fromProxyHttpResponse(results: any[]): ContractResults {
-        let items = results.map(item => ContractResultItem.fromProxyHttpResponse(item));
+        let items = results.map((item) => ContractResultItem.fromProxyHttpResponse(item));
         return new ContractResults(items);
     }
 
     static fromApiHttpResponse(results: any[]): ContractResults {
-        let items = results.map(item => ContractResultItem.fromApiHttpResponse(item));
+        let items = results.map((item) => ContractResultItem.fromApiHttpResponse(item));
         return new ContractResults(items);
     }
 }
@@ -28,8 +28,8 @@ export class ContractResultItem {
     hash: string = "";
     nonce: number = 0;
     value: string = "";
-    receiver: IAddress = new Address("");
-    sender: IAddress = new Address("");
+    receiver: IAddress = Address.empty();
+    sender: IAddress = Address.empty();
     data: string = "";
     previousHash: string = "";
     originalHash: string = "";

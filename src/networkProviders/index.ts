@@ -5,14 +5,14 @@ export { AccountOnNetwork } from "./accounts";
 export { ContractQueryResponse } from "./contractQueryResponse";
 export { ContractResultItem, ContractResults } from "./contractResults";
 export {
-    TransactionEvent as TransactionEventOnNetwork,
     TransactionEventData,
+    TransactionEvent as TransactionEventOnNetwork,
     TransactionEventTopic,
 } from "./transactionEvents";
 export { TransactionLogs as TransactionLogsOnNetwork } from "./transactionLogs";
 export { TransactionReceipt } from "./transactionReceipt";
-export { TransactionStatus } from "./transactionStatus";
 export { TransactionOnNetwork } from "./transactions";
+export { TransactionStatus } from "./transactionStatus";
 
 export { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 export { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";

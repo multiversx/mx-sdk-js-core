@@ -1,4 +1,4 @@
-import { UserVerifier } from "@multiversx/sdk-wallet";
+import { UserVerifier } from "./wallet";
 import { assert } from "chai";
 import { DEFAULT_MESSAGE_VERSION, SDK_JS_SIGNER, UNKNOWN_SIGNER } from "./constants";
 import { Message, MessageComputer } from "./message";

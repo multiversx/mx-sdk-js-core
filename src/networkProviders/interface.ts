@@ -1,3 +1,4 @@
+import { ITransaction as ITransactionAsInSpecs } from "../interface";
 import { AccountOnNetwork } from "./accounts";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { NetworkConfig } from "./networkConfig";
@@ -46,7 +47,10 @@ export interface INetworkProvider {
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
-    getNonFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
+    getNonFungibleTokensOfAccount(
+        address: IAddress,
+        pagination?: IPagination,
+    ): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about a specific fungible token held by an account.
@@ -56,7 +60,11 @@ export interface INetworkProvider {
     /**
      * Fetches data about a specific non-fungible token (instance) held by an account.
      */
-    getNonFungibleTokenOfAccount(address: IAddress, collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork>;
+    getNonFungibleTokenOfAccount(
+        address: IAddress,
+        collection: string,
+        nonce: number,
+    ): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches the state of a transaction.
@@ -80,7 +88,7 @@ export interface INetworkProvider {
 
     /**
      * Simulates the processing of an already-signed transaction.
-     * 
+     *
      */
     simulateTransaction(tx: ITransaction): Promise<any>;
 
@@ -118,8 +126,8 @@ export interface INetworkProvider {
 export interface IContractQuery {
     address: IAddress;
     caller?: IAddress;
-    func: { toString(): string; };
-    value?: { toString(): string; };
+    func: { toString(): string };
+    value?: { toString(): string };
     getEncodedArguments(): string[];
 }
 
@@ -132,22 +140,11 @@ export interface ITransaction {
     toSendable(): any;
 }
 
-export interface IAddress { bech32(): string; }
+export interface IAddress {
+    bech32(): string;
+}
 
-export interface ITransactionNext {
-    sender: string;
-    receiver: string;
-    gasLimit: bigint;
-    chainID: string;
-    nonce: bigint;
-    value: bigint;
-    senderUsername: string;
-    receiverUsername: string;
-    gasPrice: bigint;
-    data: Uint8Array;
-    version: number;
-    options: number;
-    guardian: string;
-    signature: Uint8Array;
-    guardianSignature: Uint8Array;
-  }
+/**
+ * @deprecated This will be removed with the next release (replaced by the `ITransaction` interface from "src/interface.ts").
+ */
+export type ITransactionNext = ITransactionAsInSpecs;

@@ -1,8 +1,8 @@
+import { Address } from "../address";
 import { IAddress } from "./interface";
-import { Address } from "./primitives";
 
 export class TransactionEvent {
-    address: IAddress = new Address("");
+    address: IAddress = Address.empty();
     identifier: string = "";
     topics: TransactionEventTopic[] = [];
 
@@ -18,16 +18,16 @@ export class TransactionEvent {
     }
 
     static fromHttpResponse(responsePart: {
-        address: string,
-        identifier: string,
-        topics: string[],
-        data: string,
-        additionalData?: string[]
+        address: string;
+        identifier: string;
+        topics: string[];
+        data: string;
+        additionalData?: string[];
     }): TransactionEvent {
         let result = new TransactionEvent();
         result.address = new Address(responsePart.address);
         result.identifier = responsePart.identifier || "";
-        result.topics = (responsePart.topics || []).map(topic => new TransactionEventTopic(topic));
+        result.topics = (responsePart.topics || []).map((topic) => new TransactionEventTopic(topic));
 
         result.dataPayload = TransactionEventData.fromBase64(responsePart.data);
         result.additionalData = (responsePart.additionalData || []).map(TransactionEventData.fromBase64);
@@ -37,7 +37,7 @@ export class TransactionEvent {
     }
 
     findFirstOrNoneTopic(predicate: (topic: TransactionEventTopic) => boolean): TransactionEventTopic | undefined {
-        return this.topics.filter(topic => predicate(topic))[0];
+        return this.topics.filter((topic) => predicate(topic))[0];
     }
 
     getLastTopic(): TransactionEventTopic {

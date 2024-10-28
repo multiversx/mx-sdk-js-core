@@ -1,14 +1,14 @@
-import { PathLike } from "fs";
+import BigNumber from "bignumber.js";
 import * as fs from "fs";
-import { SmartContract } from "../smartcontracts/smartContract";
+import { PathLike } from "fs";
+import { IChainID, IGasLimit } from "../interface";
 import { Code } from "../smartcontracts/code";
+import { SmartContract } from "../smartcontracts/smartContract";
 import { AbiRegistry, TypedValue } from "../smartcontracts/typesystem";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
-import { IChainID, IGasLimit } from "../interface";
+import { getAxios } from "../utils";
 import { TestWallet } from "./wallets";
-import axios, { AxiosResponse } from "axios";
-import BigNumber from "bignumber.js";
 
 export async function prepareDeployment(obj: {
     deployer: TestWallet;
@@ -41,7 +41,8 @@ export async function prepareDeployment(obj: {
 
 export async function loadContractCode(path: PathLike): Promise<Code> {
     if (isOnBrowserTests()) {
-        let response: AxiosResponse<ArrayBuffer> = await axios.get(path.toString(), {
+        const axios = await getAxios();
+        let response: any = await axios.default.get(path.toString(), {
             responseType: "arraybuffer",
             transformResponse: [],
             headers: {
@@ -60,7 +61,8 @@ export async function loadContractCode(path: PathLike): Promise<Code> {
 
 export async function loadAbiRegistry(path: PathLike): Promise<AbiRegistry> {
     if (isOnBrowserTests()) {
-        let response: AxiosResponse = await axios.get(path.toString());
+        const axios = await getAxios();
+        let response: any = await axios.default.get(path.toString());
         return AbiRegistry.create(response.data);
     }
 

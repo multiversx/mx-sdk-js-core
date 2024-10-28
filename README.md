@@ -32,6 +32,32 @@ npm install --global browserify
 npm install esmify --no-save
 ```
 
+## Optional Dependencies
+
+### axios
+
+This package can make HTTP requests using `axios`, which is not bundled by default. If you plan to use the API network provider or Proxy network provider, make sure to install `axios`:
+
+```bash
+npm install axios
+```
+
+### @multiversx/sdk-bls-wasm
+
+This package requires `@multiversx/sdk-bls-wasm` for BLS (Boneh-Lynn-Shacham) cryptographic functions, which is not bundled by default. If you plan to use BLS functionality, make sure to install this optional dependency:
+
+```bash
+npm install @multiversx/sdk-bls-wasm
+```
+
+### bip39
+
+This package provides mnemonic and seed generation functionality using `bip39`, but it is not bundled by default. If you plan to use mnemonic-related features, make sure to install this optional dependency:
+
+```bash
+npm install bip39
+```
+
 ### Building the library
 
 In order to compile the library, run the following:

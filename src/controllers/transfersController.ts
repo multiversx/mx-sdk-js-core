@@ -9,8 +9,8 @@ export class TransfersController {
     private factory: TransferTransactionsFactory;
     private txComputer: TransactionComputer;
 
-    constructor(chainId: string) {
-        this.factory = new TransferTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: chainId }) });
+    constructor(options: { chainID: string }) {
+        this.factory = new TransferTransactionsFactory({ config: new TransactionsFactoryConfig(options) });
         this.txComputer = new TransactionComputer();
     }
 

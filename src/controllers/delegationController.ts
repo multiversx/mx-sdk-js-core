@@ -19,10 +19,10 @@ export class DelegationController {
     private parser: DelegationTransactionsOutcomeParser;
     private txComputer: TransactionComputer;
 
-    constructor(chainId: string, networkProvider: INetworkProvider) {
-        this.transactionAwaiter = new TransactionWatcher(new ProviderWrapper(networkProvider));
+    constructor(options: { chainID: string; networkProvider: INetworkProvider }) {
+        this.transactionAwaiter = new TransactionWatcher(new ProviderWrapper(options.networkProvider));
         this.factory = new DelegationTransactionsFactory({
-            config: new TransactionsFactoryConfig({ chainID: chainId }),
+            config: new TransactionsFactoryConfig({ chainID: options.chainID }),
         });
         this.parser = new DelegationTransactionsOutcomeParser();
         this.txComputer = new TransactionComputer();

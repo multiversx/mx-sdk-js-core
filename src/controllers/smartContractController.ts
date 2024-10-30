@@ -20,18 +20,18 @@ export class SmartContractController {
     private transactionWatcher: TransactionWatcher;
     private txComputer: TransactionComputer;
 
-    constructor(chainId: string, networkProvider: INetworkProvider, abi?: AbiRegistry) {
+    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: AbiRegistry }) {
         this.factory = new SmartContractTransactionsFactory({
-            config: new TransactionsFactoryConfig({ chainID: chainId }),
-            abi,
+            config: new TransactionsFactoryConfig({ chainID: options.chainID }),
+            abi: options.abi,
         });
-        this.parser = new SmartContractTransactionsOutcomeParser({ abi });
+        this.parser = new SmartContractTransactionsOutcomeParser(options);
 
         this.queryController = new SmartContractQueriesController({
-            queryRunner: new QueryRunnerAdapter({ networkProvider }),
-            abi,
+            queryRunner: new QueryRunnerAdapter(options),
+            abi: options.abi,
         });
-        this.transactionWatcher = new TransactionWatcher(new ProviderWrapper(networkProvider));
+        this.transactionWatcher = new TransactionWatcher(new ProviderWrapper(options.networkProvider));
         this.txComputer = new TransactionComputer();
     }
 

@@ -15,11 +15,11 @@ export class TokenManagementController {
     private txComputer: TransactionComputer;
     private parser: TokenManagementTransactionsOutcomeParser;
 
-    constructor(chainId: string, networkProvider: INetworkProvider) {
+    constructor(options: { chainID: string; networkProvider: INetworkProvider }) {
         this.factory = new TokenManagementTransactionsFactory({
-            config: new TransactionsFactoryConfig({ chainID: chainId }),
+            config: new TransactionsFactoryConfig({ chainID: options.chainID }),
         });
-        this.transactionAwaiter = new TransactionWatcher(new ProviderWrapper(networkProvider));
+        this.transactionAwaiter = new TransactionWatcher(new ProviderWrapper(options.networkProvider));
         this.txComputer = new TransactionComputer();
         this.parser = new TokenManagementTransactionsOutcomeParser();
     }

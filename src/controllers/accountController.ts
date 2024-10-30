@@ -8,8 +8,10 @@ export class AccountController {
     private factory: AccountTransactionsFactory;
     private txComputer: TransactionComputer;
 
-    constructor(chainId: string) {
-        this.factory = new AccountTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: chainId }) });
+    constructor(options: { chainID: string }) {
+        this.factory = new AccountTransactionsFactory({
+            config: new TransactionsFactoryConfig(options),
+        });
         this.txComputer = new TransactionComputer();
     }
 

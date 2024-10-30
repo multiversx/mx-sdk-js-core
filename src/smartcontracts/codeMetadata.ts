@@ -1,3 +1,5 @@
+export const CodeMetadataLength = 2;
+
 /**
  * The metadata of a Smart Contract, as an abstraction.
  */
@@ -6,7 +8,6 @@ export class CodeMetadata {
     public readable: boolean;
     public payable: boolean;
     public payableBySc: boolean;
-    private static readonly codeMetadataLength = 2;
 
     static ByteZero = {
         Upgradeable: 1,
@@ -48,8 +49,8 @@ export class CodeMetadata {
      * Creates a metadata object from a buffer.
      */
     static fromBuffer(buffer: Buffer): CodeMetadata {
-        if (buffer.length < this.codeMetadataLength) {
-            throw new Error("Buffer is too short.");
+        if (buffer.length != CodeMetadataLength) {
+            throw new Error(`code metadata buffer has length ${buffer.length}, expected ${CodeMetadataLength}`);
         }
 
         const byteZero = buffer[0];

@@ -29,7 +29,7 @@ export class Account implements IAccount {
     /**
      * The signer of the account.
      */
-    signer?: UserSigner;
+    private signer?: UserSigner;
 
     /**
      * Creates an account object from an address
@@ -84,22 +84,22 @@ export class Account implements IAccount {
         return this.signer.sign(data);
     }
 
-    static fromPem(path: string, hrp: string = LibraryConfig.DefaultAddressHrp): Account {
-        const userSigner = UserSigner.fromPem(path);
+    static newFromPem(path: string, index: number = 0, hrp: string = LibraryConfig.DefaultAddressHrp): Account {
+        const userSigner = UserSigner.fromPem(path, index);
         return new Account(userSigner.getAddress(hrp), userSigner);
     }
 
-    static fromWallet(
-        keyFileObject: any,
+    static newFromMnemonic(
+        keystoreObject: any,
         password: string,
         addressIndex?: number,
         hrp: string = LibraryConfig.DefaultAddressHrp,
     ): Account {
-        const userSigner = UserSigner.fromWallet(keyFileObject, password, addressIndex);
+        const userSigner = UserSigner.fromWallet(keystoreObject, password, addressIndex);
         return new Account(userSigner.getAddress(hrp), userSigner);
     }
 
-    static fromKeystore(
+    static newFromKeystore(
         filePath: string,
         password: string,
         addressIndex?: number,

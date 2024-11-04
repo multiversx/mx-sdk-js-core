@@ -1,5 +1,6 @@
 import { assert } from "chai";
 import { Address } from "../address";
+import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
 import { ErrBadUsage } from "../errors";
 import { Token, TokenTransfer } from "../tokens";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
@@ -203,6 +204,26 @@ describe("test transfer transactions factory", function () {
         assert.deepEqual(
             transaction.data.toString(),
             "MultiESDTNFTTransfer@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@03@4e46542d313233343536@0a@01@544553542d393837363534@01@01@45474c442d303030303030@@0de0b6b3a7640000",
+        );
+    });
+
+    it("should create multi transfer for egld", async () => {
+        const firstNft = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
+        const firstTransfer = new TokenTransfer({ token: firstNft, amount: 1000000000000000000n });
+
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
+            sender: alice,
+            receiver: bob,
+            tokenTransfers: [firstTransfer],
+        });
+
+        assert.equal(transaction.sender, alice.toBech32());
+        assert.equal(transaction.receiver, alice.toBech32());
+        assert.equal(transaction.value.valueOf(), 0n);
+        assert.equal(transaction.gasLimit.valueOf(), 1_243_500n);
+        assert.deepEqual(
+            transaction.data.toString(),
+            "MultiESDTNFTTransfer@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@01@45474c442d303030303030@@0de0b6b3a7640000",
         );
     });
 });

@@ -117,21 +117,6 @@ describe("test transfer transactions factory", function () {
         );
     });
 
-    it("should fail if prefix longer than expected", async () => {
-        const nft = new Token({ identifier: "prefix-NFT-123456", nonce: 10n });
-        const transfer = new TokenTransfer({ token: nft, amount: 1n });
-
-        assert.throw(
-            () =>
-                transferFactory.createTransactionForESDTTokenTransfer({
-                    sender: alice,
-                    receiver: bob,
-                    tokenTransfers: [transfer],
-                }),
-            "The identifier is not valid. The prefix does not have the right length",
-        );
-    });
-
     it("should create 'Transaction' for multiple nft transfers", async () => {
         const firstNft = new Token({ identifier: "NFT-123456", nonce: 10n });
         const firstTransfer = new TokenTransfer({ token: firstNft, amount: 1n });

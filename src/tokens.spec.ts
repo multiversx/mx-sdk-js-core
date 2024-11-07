@@ -27,9 +27,25 @@ describe("test tokens and token computer", async () => {
         let identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(extendedIdentifier);
         assert.equal(identifier, "TEST-123456");
 
+        const extendedIdentifierWithPrefix = "t0-TEST-123456-0a";
+        identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(extendedIdentifierWithPrefix);
+        assert.equal(identifier, "t0-TEST-123456");
+
+        const extendedIdentifierWithPrefixWithoutNonce = "t0-TEST-123456";
+        identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(extendedIdentifierWithPrefixWithoutNonce);
+        assert.equal(identifier, "t0-TEST-123456");
+
         const fungibleTokenIdentifier = "FNG-123456";
         identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(fungibleTokenIdentifier);
         assert.equal(identifier, "FNG-123456");
+    });
+
+    it("should fail if prefix longer than expected", async () => {
+        const nftIdentifier = "prefix-TEST-123456";
+        assert.throw(
+            () => tokenComputer.extractIdentifierFromExtendedIdentifier(nftIdentifier),
+            "The identifier is not valid. The prefix does not have the right length",
+        );
     });
 });
 

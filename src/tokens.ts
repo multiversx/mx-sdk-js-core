@@ -254,15 +254,15 @@ export class TokenComputer {
         this.checkIfExtendedIdentifierWasProvided(parts);
         this.ensureTokenTickerValidity(ticker);
         this.checkLengthOfRandomSequence(randomnes);
-        if (parts.length === 3) {
+        if (prefix) {
             this.checkLengthOfPrefix(prefix);
             return prefix + "-" + ticker + "-" + randomnes;
         }
-        return parts[0] + "-" + parts[1];
+        return ticker + "-" + randomnes;
     }
 
     splitIdentifierIntoComponent(parts: string[]): { prefix: any; ticker: any; randomnes: any } {
-        if (parts.length === 3) {
+        if (parts.length >= 3 && parts[2].length === 6) {
             return { prefix: parts[0], ticker: parts[1], randomnes: parts[2] };
         }
 
@@ -273,7 +273,7 @@ export class TokenComputer {
         //  this is for the identifiers of fungible tokens
         const MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 2;
         //  this is for the identifiers of nft, sft and meta-esdt
-        const MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 5;
+        const MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 4;
 
         if (
             tokenParts.length < MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED ||
@@ -295,7 +295,7 @@ export class TokenComputer {
 
     private checkLengthOfPrefix(prefix: string): void {
         const TOKEN_PREFIX_LENGTH = 4;
-        if (prefix && prefix.length > TOKEN_PREFIX_LENGTH) {
+        if (prefix.length > TOKEN_PREFIX_LENGTH) {
             throw new ErrInvalidTokenIdentifier(
                 "The identifier is not valid. The prefix does not have the right length",
             );

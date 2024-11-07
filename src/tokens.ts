@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
-import { ErrInvalidArgument, ErrInvalidTokenIdentifier } from "./errors";
 import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "./constants";
+import { ErrInvalidArgument, ErrInvalidTokenIdentifier } from "./errors";
 
 // Legacy constants:
 const EGLDTokenIdentifier = "EGLD";
@@ -249,19 +249,31 @@ export class TokenComputer {
 
     extractIdentifierFromExtendedIdentifier(identifier: string): string {
         const parts = identifier.split("-");
+        const { prefix, ticker, randomnes } = this.splitIdentifierIntoComponent(parts);
 
         this.checkIfExtendedIdentifierWasProvided(parts);
-        this.ensureTokenTickerValidity(parts[0]);
-        this.checkLengthOfRandomSequence(parts[1]);
-
+        this.ensureTokenTickerValidity(ticker);
+        this.checkLengthOfRandomSequence(randomnes);
+        if (parts.length === 3) {
+            this.checkLengthOfPrefix(prefix);
+            return prefix + "-" + ticker + "-" + randomnes;
+        }
         return parts[0] + "-" + parts[1];
+    }
+
+    splitIdentifierIntoComponent(parts: string[]): { prefix: any; ticker: any; randomnes: any } {
+        if (parts.length === 3) {
+            return { prefix: parts[0], ticker: parts[1], randomnes: parts[2] };
+        }
+
+        return { prefix: null, ticker: parts[0], randomnes: parts[1] };
     }
 
     private checkIfExtendedIdentifierWasProvided(tokenParts: string[]): void {
         //  this is for the identifiers of fungible tokens
         const MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 2;
         //  this is for the identifiers of nft, sft and meta-esdt
-        const MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 3;
+        const MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 5;
 
         if (
             tokenParts.length < MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED ||
@@ -277,6 +289,15 @@ export class TokenComputer {
         if (randomSequence.length !== TOKEN_RANDOM_SEQUENCE_LENGTH) {
             throw new ErrInvalidTokenIdentifier(
                 "The identifier is not valid. The random sequence does not have the right length",
+            );
+        }
+    }
+
+    private checkLengthOfPrefix(prefix: string): void {
+        const TOKEN_PREFIX_LENGTH = 4;
+        if (prefix && prefix.length > TOKEN_PREFIX_LENGTH) {
+            throw new ErrInvalidTokenIdentifier(
+                "The identifier is not valid. The prefix does not have the right length",
             );
         }
     }

@@ -226,6 +226,7 @@ export class TokenTransfer {
 }
 
 export class TokenComputer {
+    TOKEN_RANDOM_SEQUENCE_LENGTH = 6;
     constructor() {}
 
     isFungible(token: Token): boolean {
@@ -249,24 +250,25 @@ export class TokenComputer {
 
     extractIdentifierFromExtendedIdentifier(identifier: string): string {
         const parts = identifier.split("-");
-        const { prefix, ticker, randomnes } = this.splitIdentifierIntoComponent(parts);
+        const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(parts);
 
         this.checkIfExtendedIdentifierWasProvided(parts);
         this.ensureTokenTickerValidity(ticker);
-        this.checkLengthOfRandomSequence(randomnes);
+        this.checkLengthOfRandomSequence(randomSequence);
         if (prefix) {
             this.checkLengthOfPrefix(prefix);
-            return prefix + "-" + ticker + "-" + randomnes;
+            return prefix + "-" + ticker + "-" + randomSequence;
         }
-        return ticker + "-" + randomnes;
+        return ticker + "-" + randomSequence;
     }
 
-    splitIdentifierIntoComponent(parts: string[]): { prefix: any; ticker: any; randomnes: any } {
-        if (parts.length >= 3 && parts[2].length === 6) {
-            return { prefix: parts[0], ticker: parts[1], randomnes: parts[2] };
+    private splitIdentifierIntoComponents(identifier: string): { prefix: any; ticker: any; randomSequence: any } {
+        const parts = identifier.split("-");
+        if (parts.length >= 3 && parts[2].length === this.TOKEN_RANDOM_SEQUENCE_LENGTH) {
+            return { prefix: parts[0], ticker: parts[1], randomSequence: parts[2] };
         }
 
-        return { prefix: null, ticker: parts[0], randomnes: parts[1] };
+        return { prefix: null, ticker: parts[0], randomSequence: parts[1] };
     }
 
     private checkIfExtendedIdentifierWasProvided(tokenParts: string[]): void {
@@ -284,9 +286,7 @@ export class TokenComputer {
     }
 
     private checkLengthOfRandomSequence(randomSequence: string): void {
-        const TOKEN_RANDOM_SEQUENCE_LENGTH = 6;
-
-        if (randomSequence.length !== TOKEN_RANDOM_SEQUENCE_LENGTH) {
+        if (randomSequence.length !== this.TOKEN_RANDOM_SEQUENCE_LENGTH) {
             throw new ErrInvalidTokenIdentifier(
                 "The identifier is not valid. The random sequence does not have the right length",
             );
@@ -294,8 +294,9 @@ export class TokenComputer {
     }
 
     private checkLengthOfPrefix(prefix: string): void {
-        const TOKEN_PREFIX_LENGTH = 4;
-        if (prefix.length > TOKEN_PREFIX_LENGTH) {
+        const MAX_TOKEN_PREFIX_LENGTH = 4;
+        const MIN_TOKEN_PREFIX_LENGTH = 1;
+        if (prefix.length < MIN_TOKEN_PREFIX_LENGTH || prefix.length > MAX_TOKEN_PREFIX_LENGTH) {
             throw new ErrInvalidTokenIdentifier(
                 "The identifier is not valid. The prefix does not have the right length",
             );

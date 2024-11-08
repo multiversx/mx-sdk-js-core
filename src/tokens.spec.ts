@@ -17,8 +17,16 @@ describe("test tokens and token computer", async () => {
         let nonce = tokenComputer.extractNonceFromExtendedIdentifier(extendedIdentifier);
         assert.equal(nonce, 10);
 
+        const extendedIdentifierWithPrefix = "test-TEST-123456-0a";
+        nonce = tokenComputer.extractNonceFromExtendedIdentifier(extendedIdentifierWithPrefix);
+        assert.equal(nonce, 10);
+
         const fungibleTokenIdentifier = "FNG-123456";
         nonce = tokenComputer.extractNonceFromExtendedIdentifier(fungibleTokenIdentifier);
+        assert.equal(nonce, 0);
+
+        const fungibleTokenIdentifierWithPrefix = "fun-FNG-123456";
+        nonce = tokenComputer.extractNonceFromExtendedIdentifier(fungibleTokenIdentifierWithPrefix);
         assert.equal(nonce, 0);
     });
 

@@ -236,25 +236,24 @@ export class TokenComputer {
     extractNonceFromExtendedIdentifier(identifier: string): number {
         const parts = identifier.split("-");
 
-        this.checkIfExtendedIdentifierWasProvided(parts);
-        this.checkLengthOfRandomSequence(parts[1]);
+        const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(identifier);
+        this.validateExtendedIdentifier(prefix, randomSequence, ticker, parts);
 
-        // in case the identifier of a fungible token is provided
-        if (parts.length == 2) {
+        // If identifier is for a fungible token (2 parts), return 0
+        if (parts.length === 2 || (prefix && parts.length === 3)) {
             return 0;
         }
 
-        const hexNonce = Buffer.from(parts[2], "hex");
-        return decodeUnsignedNumber(hexNonce);
+        // Otherwise, decode the last part as an unsigned number
+        const hecNonce = parts[parts.length - 1];
+        return decodeUnsignedNumber(Buffer.from(hecNonce, "hex"));
     }
 
     extractIdentifierFromExtendedIdentifier(identifier: string): string {
         const parts = identifier.split("-");
-        const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(parts);
+        const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(identifier);
 
-        this.checkIfExtendedIdentifierWasProvided(parts);
-        this.ensureTokenTickerValidity(ticker);
-        this.checkLengthOfRandomSequence(randomSequence);
+        this.validateExtendedIdentifier(prefix, randomSequence, ticker, parts);
         if (prefix) {
             this.checkLengthOfPrefix(prefix);
             return prefix + "-" + ticker + "-" + randomSequence;
@@ -262,20 +261,25 @@ export class TokenComputer {
         return ticker + "-" + randomSequence;
     }
 
+    private validateExtendedIdentifier(prefix: string, randomSequence: string, ticker: string, parts: string[]): void {
+        this.checkIfExtendedIdentifierWasProvided(prefix, parts);
+        this.ensureTokenTickerValidity(ticker);
+        this.checkLengthOfRandomSequence(randomSequence);
+    }
+
     private splitIdentifierIntoComponents(identifier: string): { prefix: any; ticker: any; randomSequence: any } {
         const parts = identifier.split("-");
-        if (parts.length >= 3 && parts[2].length === this.TOKEN_RANDOM_SEQUENCE_LENGTH) {
+        if (this.isLowercaseAlphanumeric(parts[0]))
             return { prefix: parts[0], ticker: parts[1], randomSequence: parts[2] };
-        }
 
         return { prefix: null, ticker: parts[0], randomSequence: parts[1] };
     }
 
-    private checkIfExtendedIdentifierWasProvided(tokenParts: string[]): void {
+    private checkIfExtendedIdentifierWasProvided(prefix: string, tokenParts: string[]): void {
         //  this is for the identifiers of fungible tokens
         const MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 2;
         //  this is for the identifiers of nft, sft and meta-esdt
-        const MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 4;
+        const MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = prefix ? 4 : 3;
 
         if (
             tokenParts.length < MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED ||
@@ -283,6 +287,10 @@ export class TokenComputer {
         ) {
             throw new ErrInvalidTokenIdentifier("Invalid extended token identifier provided");
         }
+    }
+
+    private isLowercaseAlphanumeric(str: string): boolean {
+        return /^[a-z0-9]+$/.test(str);
     }
 
     private checkLengthOfRandomSequence(randomSequence: string): void {

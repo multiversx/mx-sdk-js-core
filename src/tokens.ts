@@ -245,8 +245,8 @@ export class TokenComputer {
         }
 
         // Otherwise, decode the last part as an unsigned number
-        const hecNonce = parts[parts.length - 1];
-        return decodeUnsignedNumber(Buffer.from(hecNonce, "hex"));
+        const hexNonce = parts[parts.length - 1];
+        return decodeUnsignedNumber(Buffer.from(hexNonce, "hex"));
     }
 
     extractIdentifierFromExtendedIdentifier(identifier: string): string {

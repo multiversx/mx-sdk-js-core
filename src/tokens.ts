@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
-import { ErrInvalidArgument, ErrInvalidTokenIdentifier } from "./errors";
 import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "./constants";
+import { ErrInvalidArgument, ErrInvalidTokenIdentifier } from "./errors";
 
 // Legacy constants:
 const EGLDTokenIdentifier = "EGLD";
@@ -226,6 +226,7 @@ export class TokenTransfer {
 }
 
 export class TokenComputer {
+    TOKEN_RANDOM_SEQUENCE_LENGTH = 6;
     constructor() {}
 
     isFungible(token: Token): boolean {
@@ -235,33 +236,55 @@ export class TokenComputer {
     extractNonceFromExtendedIdentifier(identifier: string): number {
         const parts = identifier.split("-");
 
-        this.checkIfExtendedIdentifierWasProvided(parts);
-        this.checkLengthOfRandomSequence(parts[1]);
+        const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(parts);
+        this.validateExtendedIdentifier(prefix, ticker, randomSequence, parts);
 
-        // in case the identifier of a fungible token is provided
-        if (parts.length == 2) {
+        // If identifier is for a fungible token (2 parts or 3 with prefix), return 0
+        if (parts.length === 2 || (prefix && parts.length === 3)) {
             return 0;
         }
 
-        const hexNonce = Buffer.from(parts[2], "hex");
-        return decodeUnsignedNumber(hexNonce);
+        // Otherwise, decode the last part as an unsigned number
+        const hexNonce = parts[parts.length - 1];
+        return decodeUnsignedNumber(Buffer.from(hexNonce, "hex"));
     }
 
     extractIdentifierFromExtendedIdentifier(identifier: string): string {
         const parts = identifier.split("-");
+        const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(parts);
 
-        this.checkIfExtendedIdentifierWasProvided(parts);
-        this.ensureTokenTickerValidity(parts[0]);
-        this.checkLengthOfRandomSequence(parts[1]);
-
-        return parts[0] + "-" + parts[1];
+        this.validateExtendedIdentifier(prefix, ticker, randomSequence, parts);
+        if (prefix) {
+            this.checkLengthOfPrefix(prefix);
+            return prefix + "-" + ticker + "-" + randomSequence;
+        }
+        return ticker + "-" + randomSequence;
     }
 
-    private checkIfExtendedIdentifierWasProvided(tokenParts: string[]): void {
+    private validateExtendedIdentifier(
+        prefix: string | null,
+        ticker: string,
+        randomSequence: string,
+        parts: string[],
+    ): void {
+        this.checkIfExtendedIdentifierWasProvided(prefix, parts);
+        this.ensureTokenTickerValidity(ticker);
+        this.checkLengthOfRandomSequence(randomSequence);
+    }
+
+    private splitIdentifierIntoComponents(parts: string[]): { prefix: any; ticker: any; randomSequence: any } {
+        if (this.isLowercaseAlphanumeric(parts[0])) {
+            return { prefix: parts[0], ticker: parts[1], randomSequence: parts[2] };
+        }
+
+        return { prefix: null, ticker: parts[0], randomSequence: parts[1] };
+    }
+
+    private checkIfExtendedIdentifierWasProvided(prefix: string | null, tokenParts: string[]): void {
         //  this is for the identifiers of fungible tokens
         const MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 2;
         //  this is for the identifiers of nft, sft and meta-esdt
-        const MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 3;
+        const MAX_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = prefix ? 4 : 3;
 
         if (
             tokenParts.length < MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED ||
@@ -271,12 +294,24 @@ export class TokenComputer {
         }
     }
 
-    private checkLengthOfRandomSequence(randomSequence: string): void {
-        const TOKEN_RANDOM_SEQUENCE_LENGTH = 6;
+    private isLowercaseAlphanumeric(str: string): boolean {
+        return /^[a-z0-9]+$/.test(str);
+    }
 
-        if (randomSequence.length !== TOKEN_RANDOM_SEQUENCE_LENGTH) {
+    private checkLengthOfRandomSequence(randomSequence: string): void {
+        if (randomSequence.length !== this.TOKEN_RANDOM_SEQUENCE_LENGTH) {
             throw new ErrInvalidTokenIdentifier(
                 "The identifier is not valid. The random sequence does not have the right length",
+            );
+        }
+    }
+
+    private checkLengthOfPrefix(prefix: string): void {
+        const MAX_TOKEN_PREFIX_LENGTH = 4;
+        const MIN_TOKEN_PREFIX_LENGTH = 1;
+        if (prefix.length < MIN_TOKEN_PREFIX_LENGTH || prefix.length > MAX_TOKEN_PREFIX_LENGTH) {
+            throw new ErrInvalidTokenIdentifier(
+                "The identifier is not valid. The prefix does not have the right length",
             );
         }
     }

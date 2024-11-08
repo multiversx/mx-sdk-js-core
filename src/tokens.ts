@@ -236,7 +236,7 @@ export class TokenComputer {
     extractNonceFromExtendedIdentifier(identifier: string): number {
         const parts = identifier.split("-");
 
-        const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(identifier);
+        const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(parts);
         this.validateExtendedIdentifier(prefix, randomSequence, ticker, parts);
 
         // If identifier is for a fungible token (2 parts or 3 with prefix), return 0
@@ -251,7 +251,7 @@ export class TokenComputer {
 
     extractIdentifierFromExtendedIdentifier(identifier: string): string {
         const parts = identifier.split("-");
-        const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(identifier);
+        const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(parts);
 
         this.validateExtendedIdentifier(prefix, randomSequence, ticker, parts);
         if (prefix) {
@@ -267,10 +267,10 @@ export class TokenComputer {
         this.checkLengthOfRandomSequence(randomSequence);
     }
 
-    private splitIdentifierIntoComponents(identifier: string): { prefix: any; ticker: any; randomSequence: any } {
-        const parts = identifier.split("-");
-        if (this.isLowercaseAlphanumeric(parts[0]))
+    private splitIdentifierIntoComponents(parts: string[]): { prefix: any; ticker: any; randomSequence: any } {
+        if (this.isLowercaseAlphanumeric(parts[0])) {
             return { prefix: parts[0], ticker: parts[1], randomSequence: parts[2] };
+        }
 
         return { prefix: null, ticker: parts[0], randomSequence: parts[1] };
     }

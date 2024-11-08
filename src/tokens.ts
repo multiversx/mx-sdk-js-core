@@ -237,7 +237,7 @@ export class TokenComputer {
         const parts = identifier.split("-");
 
         const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(parts);
-        this.validateExtendedIdentifier(prefix, randomSequence, ticker, parts);
+        this.validateExtendedIdentifier(prefix, ticker, randomSequence, parts);
 
         // If identifier is for a fungible token (2 parts or 3 with prefix), return 0
         if (parts.length === 2 || (prefix && parts.length === 3)) {
@@ -253,7 +253,7 @@ export class TokenComputer {
         const parts = identifier.split("-");
         const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(parts);
 
-        this.validateExtendedIdentifier(prefix, randomSequence, ticker, parts);
+        this.validateExtendedIdentifier(prefix, ticker, randomSequence, parts);
         if (prefix) {
             this.checkLengthOfPrefix(prefix);
             return prefix + "-" + ticker + "-" + randomSequence;

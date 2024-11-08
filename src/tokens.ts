@@ -261,7 +261,12 @@ export class TokenComputer {
         return ticker + "-" + randomSequence;
     }
 
-    private validateExtendedIdentifier(prefix: string, randomSequence: string, ticker: string, parts: string[]): void {
+    private validateExtendedIdentifier(
+        prefix: string | null,
+        ticker: string,
+        randomSequence: string,
+        parts: string[],
+    ): void {
         this.checkIfExtendedIdentifierWasProvided(prefix, parts);
         this.ensureTokenTickerValidity(ticker);
         this.checkLengthOfRandomSequence(randomSequence);
@@ -275,7 +280,7 @@ export class TokenComputer {
         return { prefix: null, ticker: parts[0], randomSequence: parts[1] };
     }
 
-    private checkIfExtendedIdentifierWasProvided(prefix: string, tokenParts: string[]): void {
+    private checkIfExtendedIdentifierWasProvided(prefix: string | null, tokenParts: string[]): void {
         //  this is for the identifiers of fungible tokens
         const MIN_EXTENDED_IDENTIFIER_LENGTH_IF_SPLITTED = 2;
         //  this is for the identifiers of nft, sft and meta-esdt

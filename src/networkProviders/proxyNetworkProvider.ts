@@ -28,7 +28,6 @@ export class ProxyNetworkProvider implements INetworkProvider {
         this.url = url;
         this.config = { ...defaultAxiosConfig, ...config };
         this.axios = getAxios();
-        extendUserAgent(this.userAgentPrefix, this.config);
     }
 
     async getNetworkConfig(): Promise<NetworkConfig> {

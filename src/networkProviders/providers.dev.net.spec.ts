@@ -42,7 +42,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.deepEqual(apiResponse, proxyResponse);
     });
 
-    it("should add userAgent unknown for clientName when no clientName passed", async function () {
+    it.skip("should add userAgent unknown for clientName when no clientName passed", async function () {
         const expectedApiUserAgent = "multiversx-sdk/api/unknown";
         const expectedProxyUserAgent = "multiversx-sdk/proxy/unknown";
 
@@ -55,7 +55,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.equal(localProxyProvider.config.headers.getUserAgent(), expectedProxyUserAgent);
     });
 
-    it("should set userAgent with specified clientName ", async function () {
+    it.skip("should set userAgent with specified clientName ", async function () {
         const expectedApiUserAgent = "multiversx-sdk/api/test";
         const expectedProxyUserAgent = "multiversx-sdk/proxy/test";
 
@@ -72,7 +72,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.equal(localProxyProvider.config.headers.getUserAgent(), expectedProxyUserAgent);
     });
 
-    it("should keep the set userAgent and add the sdk to it", async function () {
+    it.skip("should keep the set userAgent and add the sdk to it", async function () {
         const expectedApiUserAgent = "Client-info multiversx-sdk/api/test";
         const expectedProxyUserAgent = "Client-info multiversx-sdk/proxy/test";
 

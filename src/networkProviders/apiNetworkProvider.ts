@@ -34,7 +34,6 @@ export class ApiNetworkProvider implements INetworkProvider {
         this.config = { ...defaultAxiosConfig, ...config };
         this.backingProxyNetworkProvider = new ProxyNetworkProvider(url, proxyConfig);
         this.axios = getAxios();
-        extendUserAgent(this.userAgentPrefix, this.config);
     }
 
     private getProxyConfig(config: NetworkProviderConfig | undefined) {

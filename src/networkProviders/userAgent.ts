@@ -2,7 +2,13 @@ import { AxiosHeaders } from "axios";
 import { UnknownClientName } from "./constants";
 import { NetworkProviderConfig } from "./networkProviderConfig";
 
-export function extendUserAgent(userAgentPrefix: string, config: NetworkProviderConfig) {
+export function extendUserAgentIfBackend(userAgentPrefix: string, config: NetworkProviderConfig) {
+    if (isBackend()) {
+        extendUserAgent(userAgentPrefix, config);
+    }
+}
+
+function extendUserAgent(userAgentPrefix: string, config: NetworkProviderConfig) {
     if (!config.headers) {
         config.headers = new AxiosHeaders({});
     }
@@ -22,6 +28,6 @@ export function extendUserAgent(userAgentPrefix: string, config: NetworkProvider
     headers.setUserAgent(newUserAgent, true);
 }
 
-export function isBackend(): boolean {
+function isBackend(): boolean {
     return typeof window === "undefined";
 }

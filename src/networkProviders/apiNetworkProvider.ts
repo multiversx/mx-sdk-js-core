@@ -18,7 +18,7 @@ import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwor
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
-import { extendUserAgent, isBackend } from "./userAgent";
+import { extendUserAgentIfBackend } from "./userAgent";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
 export class ApiNetworkProvider implements INetworkProvider {
@@ -34,9 +34,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         this.config = { ...defaultAxiosConfig, ...config };
         this.backingProxyNetworkProvider = new ProxyNetworkProvider(url, proxyConfig);
         this.axios = getAxios();
-        if (isBackend()) {
-            extendUserAgent(this.userAgentPrefix, this.config);
-        }
+        extendUserAgentIfBackend(this.userAgentPrefix, this.config);
     }
 
     private getProxyConfig(config: NetworkProviderConfig | undefined) {

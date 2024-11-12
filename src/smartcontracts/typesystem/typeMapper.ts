@@ -6,6 +6,7 @@ import { BytesType } from "./bytes";
 import { CodeMetadataType } from "./codeMetadata";
 import { CompositeType } from "./composite";
 import { EnumType, EnumVariantDefinition } from "./enum";
+import { ExplicitEnumType, ExplicitEnumVariantDefinition } from "./explicit-enum";
 import { FieldDefinition } from "./fields";
 import { ListType, OptionType } from "./generic";
 import { ArrayVecType } from "./genericArray";
@@ -160,6 +161,11 @@ export class TypeMapper {
             return this.mapEnumType(<EnumType>type);
         }
 
+        if (type.hasExactClass(ExplicitEnumType.ClassName)) {
+            // This will call mapType() recursively, for all the explicit enum variant fields.
+            return this.mapExplicitEnumType(<ExplicitEnumType>type);
+        }
+
         if (type.hasExactClass(StructType.ClassName)) {
             // This will call mapType() recursively, for all the struct's fields.
             return this.mapStructType(<StructType>type);
@@ -201,6 +207,12 @@ export class TypeMapper {
                 ),
         );
         let mappedEnum = new EnumType(type.getName(), variants);
+        return mappedEnum;
+    }
+
+    private mapExplicitEnumType(type: ExplicitEnumType): ExplicitEnumType {
+        let variants = type.variants.map((variant) => new ExplicitEnumVariantDefinition(variant.name));
+        let mappedEnum = new ExplicitEnumType(type.getName(), variants);
         return mappedEnum;
     }
 

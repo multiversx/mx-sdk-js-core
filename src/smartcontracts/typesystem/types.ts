@@ -10,18 +10,20 @@ export class Type {
 
     private readonly name: string;
     private readonly typeParameters: Type[];
-    protected readonly cardinality: TypeCardinality;
+    private readonly cardinality: TypeCardinality;
+    protected readonly metadata: any;
 
     public constructor(
         name: string,
         typeParameters: Type[] = [],
         cardinality: TypeCardinality = TypeCardinality.fixed(1),
+        metadata?: any,
     ) {
         guardValueIsSet("name", name);
-
         this.name = name;
         this.typeParameters = typeParameters;
         this.cardinality = cardinality;
+        this.metadata = metadata;
     }
 
     getName(): string {
@@ -42,13 +44,26 @@ export class Type {
      * Gets the fully qualified name of the type, to allow for better (efficient and non-ambiguous) type comparison within the custom typesystem.
      */
     getFullyQualifiedName(): string {
-        let joinedTypeParameters = this.getTypeParameters()
-            .map((type) => type.getFullyQualifiedName())
-            .join(", ");
-
-        return this.isGenericType()
-            ? `multiversx:types:${this.getName()}<${joinedTypeParameters}>`
+        return this.isGenericType() || this.hasMetadata()
+            ? this.getFullNameForGeneric()
             : `multiversx:types:${this.getName()}`;
+    }
+
+    private getFullNameForGeneric(): string {
+        const hasTypeParameters = this.getTypeParameters().length > 0;
+        const joinedTypeParameters = hasTypeParameters
+            ? `${this.getTypeParameters()
+                  .map((type) => type.getFullyQualifiedName())
+                  .join(", ")}`
+            : "";
+        let baseName = `multiversx:types:${this.getName()}`;
+        if (hasTypeParameters) {
+            baseName = `${baseName}<${joinedTypeParameters}>`;
+        }
+        if (this.metadata !== undefined) {
+            baseName = `${baseName}*${this.metadata}*`;
+        }
+        return baseName;
     }
 
     hasExactClass(className: string): boolean {
@@ -64,8 +79,16 @@ export class Type {
         return this.typeParameters;
     }
 
+    getMetadata(): any {
+        return this.metadata;
+    }
+
     isGenericType(): boolean {
         return this.typeParameters.length > 0;
+    }
+
+    hasMetadata(): boolean {
+        return !!this.metadata;
     }
 
     getFirstTypeParameter(): Type {

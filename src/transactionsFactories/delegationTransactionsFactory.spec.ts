@@ -1,4 +1,4 @@
-import { ValidatorPublicKey } from "@multiversx/sdk-wallet";
+import { ValidatorPublicKey } from "./../wallet";
 import { assert } from "chai";
 import { Address } from "../address";
 import { DELEGATION_MANAGER_SC_ADDRESS } from "../constants";

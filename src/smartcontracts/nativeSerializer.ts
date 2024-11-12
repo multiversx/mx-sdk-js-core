@@ -22,6 +22,8 @@ import {
     EndpointParameterDefinition,
     EnumType,
     EnumValue,
+    ExplicitEnumType,
+    ExplicitEnumValue,
     Field,
     I16Type,
     I16Value,
@@ -34,6 +36,8 @@ import {
     isTyped,
     List,
     ListType,
+    ManagedDecimalType,
+    ManagedDecimalValue,
     NumericalType,
     OptionalType,
     OptionalValue,
@@ -99,7 +103,6 @@ export namespace NativeSerializer {
         // With respect to the notes of "repackNonCountedVariadicParameters", "getArgumentsCardinality" will not be needed anymore.
         // Currently, it is used only for a arguments count check, which will become redundant.
         const { min, max } = getArgumentsCardinality(endpoint.input);
-
         if (!(min <= args.length && args.length <= max)) {
             throw new ErrInvalidArgument(
                 `Wrong number of arguments for endpoint ${endpoint.name}: expected between ${min} and ${max} arguments, have ${args.length}`,
@@ -201,6 +204,12 @@ export namespace NativeSerializer {
         }
         if (type instanceof EnumType) {
             return toEnumValue(value, type, errorContext);
+        }
+        if (type instanceof ExplicitEnumType) {
+            return toExplicitEnumValue(value, type, errorContext);
+        }
+        if (type instanceof ManagedDecimalType) {
+            return toManagedDecimal(value, type, errorContext);
         }
         errorContext.throwError(`convertToTypedValue: unhandled type ${type}`);
     }
@@ -331,6 +340,26 @@ export namespace NativeSerializer {
             return new EnumValue(type, variant, fieldValues);
         }
         errorContext.throwError(`(function: toEnumValue) unsupported native type ${typeof native}`);
+    }
+
+    function toExplicitEnumValue(native: any, type: ExplicitEnumType, errorContext: ArgumentErrorContext): TypedValue {
+        if (typeof native === "string") {
+            return ExplicitEnumValue.fromName(type, native);
+        }
+        if (typeof native === "object") {
+            errorContext.guardHasField(native, "name");
+            const variant = type.getVariantByName(native.name);
+
+            return new ExplicitEnumValue(type, variant);
+        }
+        errorContext.throwError(`(function: toExplicitEnumValue) unsupported native type ${typeof native}`);
+    }
+
+    function toManagedDecimal(native: any, type: ManagedDecimalType, errorContext: ArgumentErrorContext): TypedValue {
+        if (typeof native === "object") {
+            return new ManagedDecimalValue(native[0], native[1], type.isVariable());
+        }
+        errorContext.throwError(`(function: toManagedDecimal) unsupported native type ${typeof native}`);
     }
 
     // TODO: move logic to typesystem/bytes.ts

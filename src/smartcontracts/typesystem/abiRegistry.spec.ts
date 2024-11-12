@@ -30,6 +30,12 @@ describe("test abi registry", () => {
         let getStatus = registry.getEndpoint("status");
         let getLotteryInfo = registry.getEndpoint("getLotteryInfo");
 
+        // basic-features
+        registry = await loadAbiRegistry("src/testdata/basic-features.abi.json");
+        let returnManagedDecimal = registry.getEndpoint("returns_egld_decimal");
+        let returnsManagedDecimalSigned = registry.getEndpoint("managed_decimal_ln");
+        let returnsManagedDecimalVariable = registry.getEndpoint("managed_decimal_addition_var");
+
         assert.isFalse(start.modifiers.isReadonly());
         assert.isTrue(getStatus.modifiers.isReadonly());
         assert.isTrue(getLotteryInfo.modifiers.isReadonly());
@@ -54,6 +60,11 @@ describe("test abi registry", () => {
         assert.instanceOf(getLotteryInfo.input[0].type, BytesType);
         assert.instanceOf(getLotteryInfo.output[0].type, StructType);
         assert.equal(getLotteryInfo.output[0].type.getName(), "LotteryInfo");
+        assert.equal(returnManagedDecimal.output[0].type.getName(), "ManagedDecimal");
+        assert.equal(returnsManagedDecimalSigned.output[0].type.getName(), "ManagedDecimalSigned");
+        assert.equal(returnsManagedDecimalSigned.output[0].type.getMetadata(), "9");
+        assert.equal(returnsManagedDecimalVariable.output[0].type.getName(), "ManagedDecimal");
+        assert.equal(returnsManagedDecimalVariable.output[0].type.getMetadata(), "usize");
 
         let fieldDefinitions = (<StructType>getLotteryInfo.output[0].type).getFieldsDefinitions();
         assert.instanceOf(fieldDefinitions[0].type, TokenIdentifierType);
@@ -182,14 +193,20 @@ describe("test abi registry", () => {
     });
 
     it("should load ABI explicit-enum", async () => {
-        const registry = await loadAbiRegistry("src/testdata/explicit-enum.abi.json");
+        const registry = await loadAbiRegistry("src/testdata/basic-features.abi.json");
 
-        const enumType = registry.getEnum("OperationCompletionStatus");
+        const enumType = registry.getExplicitEnum("OperationCompletionStatus");
 
         assert.deepEqual(enumType.variants[0].name, "completed");
-        assert.deepEqual(enumType.variants[0].discriminant, 0);
 
         assert.deepEqual(enumType.variants[1].name, "interrupted");
-        assert.deepEqual(enumType.variants[1].discriminant, 1);
+    });
+
+    it("should load abi with title for endpoint", async () => {
+        const registry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
+
+        const endpoint = registry.getEndpoint("createLotteryPool");
+
+        assert.equal(endpoint.title, "Create lottery pool");
     });
 });

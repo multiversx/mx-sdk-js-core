@@ -1,0 +1,6200 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.80.0",
+            "commitHash": "051478957371ee0084a7c0913941d2a8c4757bb9",
+            "commitDate": "2024-07-21",
+            "channel": "Stable",
+            "short": "rustc 1.80.0 (051478957 2024-07-21)"
+        },
+        "contractCrate": {
+            "name": "basic-features",
+            "version": "0.0.0",
+            "gitVersion": "v0.53.0-3-g49a82cb19"
+        },
+        "framework": {
+            "name": "multiversx-sc",
+            "version": "0.53.0"
+        }
+    },
+    "name": "BasicFeatures",
+    "constructor": {
+        "inputs": [],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "panicWithMessage",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "docs": [
+                "Operation that has caused issues in the past"
+            ],
+            "name": "count_ones",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "arg",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "endpoint_with_mutable_arg",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "arg1",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "arg2",
+                    "type": "u64"
+                },
+                {
+                    "name": "arg3",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "sqrt_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "sqrt_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "log2_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "log2_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "pow_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "pow_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "pow_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "pow_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "big_uint_to_u64",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bu",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "optional<u64>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "biguint_overwrite_u64",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bu",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "small",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "big_uint_zero",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "big_uint_from_u64_1",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "small",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "big_uint_from_u64_2",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "small",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "biguint_from_u128",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "big_uint_from_managed_buffer",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mb",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "big_uint_from_managed_buffer_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mb",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "big_int_zero",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "big_int_from_i64_1",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "small",
+                    "type": "i64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "big_int_from_i64_2",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "small",
+                    "type": "i64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "big_uint_eq_u64",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bi",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "small",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "big_int_to_i64",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bi",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "optional<i64>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "bigint_overwrite_i64",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bi",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "small",
+                    "type": "i64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "add_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "add_big_int_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "add_big_uint_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "add_big_int_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "add_big_uint_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "add_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "add_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "add_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "sub_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "sub_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "sub_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "sub_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "mul_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "mul_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "mul_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "mul_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "div_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "div_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "div_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "div_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "rem_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "rem_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "rem_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "rem_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "add_assign_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "add_assign_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "add_assign_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "add_assign_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "sub_assign_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "sub_assign_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "sub_assign_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "sub_assign_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "mul_assign_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "mul_assign_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "mul_assign_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "mul_assign_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "div_assign_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "div_assign_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "div_assign_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "div_assign_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "rem_assign_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "rem_assign_big_int_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "b",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "rem_assign_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "rem_assign_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_and_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_and_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_or_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_or_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_xor_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_xor_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_and_assign_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_and_assign_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_or_assign_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_or_assign_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_xor_assign_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "bit_xor_assign_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "shr_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "shr_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "shl_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "shl_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "shr_assign_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "shr_assign_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "shl_assign_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "shl_assign_big_uint_ref",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_block_timestamp",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_block_nonce",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_block_round",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_block_epoch",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_block_random_seed",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "array48<u8>"
+                }
+            ]
+        },
+        {
+            "name": "get_prev_block_timestamp",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_prev_block_nonce",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_prev_block_round",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_prev_block_epoch",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_prev_block_random_seed",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "array48<u8>"
+                }
+            ]
+        },
+        {
+            "name": "get_caller",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "get_owner_address",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "get_shard_of_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "is_smart_contract",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "get_state_root_hash",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "array32<u8>"
+                }
+            ]
+        },
+        {
+            "name": "get_tx_hash",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "array32<u8>"
+                }
+            ]
+        },
+        {
+            "name": "get_gas_left",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "get_cumulated_validator_rewards",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "get_code_metadata",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "CodeMetadata"
+                }
+            ]
+        },
+        {
+            "name": "is_builtin_function",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "function_name",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "codec_err_finish",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "CodecErrorTestType"
+                }
+            ]
+        },
+        {
+            "name": "codec_err_storage_key",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i32"
+                }
+            ]
+        },
+        {
+            "name": "codec_err_storage_get",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "CodecErrorTestType"
+                }
+            ]
+        },
+        {
+            "name": "codec_err_storage_set",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "codec_err_event_topic",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "codec_err_event_data",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "docs": [
+                "Never actually calls any deploy/upgrade, so it is appropriate in this contract.",
+                "It just covers contract init serialization errors."
+            ],
+            "name": "codec_err_contract_init",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "docs": [
+                "Never actually calls any async/sync call, so it is appropriate in this contract.",
+                "It just covers contract call serialization errors."
+            ],
+            "name": "codec_err_contract_call",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "compute_sha256",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "input",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "array32<u8>"
+                }
+            ]
+        },
+        {
+            "name": "compute_keccak256",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "input",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "array32<u8>"
+                }
+            ]
+        },
+        {
+            "name": "compute_ripemd160",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "input",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "array20<u8>"
+                }
+            ]
+        },
+        {
+            "name": "verify_bls_signature",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "key",
+                    "type": "bytes"
+                },
+                {
+                    "name": "message",
+                    "type": "bytes"
+                },
+                {
+                    "name": "signature",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "verify_ed25519_signature",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "key",
+                    "type": "bytes"
+                },
+                {
+                    "name": "message",
+                    "type": "bytes"
+                },
+                {
+                    "name": "signature",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "verify_secp256k1_signature",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "key",
+                    "type": "bytes"
+                },
+                {
+                    "name": "message",
+                    "type": "bytes"
+                },
+                {
+                    "name": "signature",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "compute_secp256k1_der_signature",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "r",
+                    "type": "bytes"
+                },
+                {
+                    "name": "s",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "echo_u64",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "echo_i64",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "i64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "i64"
+                }
+            ]
+        },
+        {
+            "name": "echo_i32",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "i32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "i32"
+                }
+            ]
+        },
+        {
+            "name": "echo_u32",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "echo_isize",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "i32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "i32"
+                }
+            ]
+        },
+        {
+            "name": "echo_usize",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "echo_i8",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "i8"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "i8"
+                }
+            ]
+        },
+        {
+            "name": "echo_u8",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "u8"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u8"
+                }
+            ]
+        },
+        {
+            "name": "echo_bool",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "bool"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "echo_opt_bool",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "Option<bool>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Option<bool>"
+                }
+            ]
+        },
+        {
+            "name": "echo_multi_value_u32",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "m",
+                    "type": "variadic<u32>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                },
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "echo_multi_value_tuples",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "m",
+                    "type": "variadic<multi<i32,bytes>>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<multi<i32,bytes>>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "echo_ser_example_2",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "se",
+                    "type": "ExampleEnumWithFields"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ExampleEnumWithFields"
+                }
+            ]
+        },
+        {
+            "name": "echo_simple_enum",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "se",
+                    "type": "ExampleEnumSimple"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ExampleEnumSimple"
+                }
+            ]
+        },
+        {
+            "name": "finish_simple_enum_variant_1",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "ExampleEnumSimple"
+                }
+            ]
+        },
+        {
+            "name": "echo_arrayvec",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "av",
+                    "type": "List<i32>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<i32>"
+                }
+            ]
+        },
+        {
+            "name": "echo_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bi",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "echo_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bi",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "echo_managed_buffer",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mb",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "echo_managed_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "ma",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "docs": [
+                "This tests that nested serialization of big ints within unmanaged types works."
+            ],
+            "name": "echo_big_int_managed_vec",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "List<BigInt>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<BigInt>"
+                }
+            ]
+        },
+        {
+            "docs": [
+                "This tests that nested serialization of big ints within unmanaged types works."
+            ],
+            "name": "echo_big_int_tuple",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "tuple<BigInt,bytes>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "tuple<BigInt,bytes>"
+                }
+            ]
+        },
+        {
+            "docs": [
+                "This tests that nested serialization of big ints within unmanaged types works."
+            ],
+            "name": "echo_big_int_option",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "Option<BigInt>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Option<BigInt>"
+                }
+            ]
+        },
+        {
+            "name": "echo_tuple_into_multiresult",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "addr",
+                    "type": "Address"
+                },
+                {
+                    "name": "vec",
+                    "type": "List<bytes>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                },
+                {
+                    "type": "List<bytes>"
+                }
+            ]
+        },
+        {
+            "name": "echo_managed_vec_of_managed_vec",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mv",
+                    "type": "List<List<u32>>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<List<u32>>"
+                }
+            ]
+        },
+        {
+            "name": "echo_managed_vec_of_token_identifier",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mv",
+                    "type": "List<TokenIdentifier>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<TokenIdentifier>"
+                }
+            ]
+        },
+        {
+            "name": "echo_varags_managed_eager",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "m",
+                    "type": "variadic<u32>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                },
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "echo_varags_managed_sum",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "m",
+                    "type": "variadic<multi<u32,u32>>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<multi<u32,u32,u32>>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "compute_get_values",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "tuple<BigUint,BigUint,BigUint,BigUint,BigUint,u32>"
+                }
+            ]
+        },
+        {
+            "name": "compute_create_ec",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "tuple<BigUint,BigUint,BigUint,BigUint,BigUint,u32>"
+                }
+            ]
+        },
+        {
+            "name": "compute_get_ec_length",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "compute_get_priv_key_byte_length",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "compute_ec_add",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                },
+                {
+                    "name": "x_first_point",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "y_first_point",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "x_second_point",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "y_second_point",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                },
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "compute_ec_double",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                },
+                {
+                    "name": "x_point",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "y_point",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                },
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "compute_is_on_curve_ec",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                },
+                {
+                    "name": "x_point",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "y_point",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "compute_scalar_mult",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                },
+                {
+                    "name": "x_point",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "y_point",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "data",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                },
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "compute_scalar_base_mult",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                },
+                {
+                    "name": "data",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                },
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "compute_marshal_ec",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                },
+                {
+                    "name": "x_pair",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "y_pair",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "compute_marshal_compressed_ec",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                },
+                {
+                    "name": "x_pair",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "y_pair",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "compute_unmarshal_ec",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                },
+                {
+                    "name": "data",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                },
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "compute_unmarshal_compressed_ec",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                },
+                {
+                    "name": "data",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                },
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "compute_generate_key_ec",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "curve_bitsize",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                },
+                {
+                    "type": "BigUint"
+                },
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "logEventA",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "data",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "docs": [
+                "Logs `event_a` a repeated number of times."
+            ],
+            "name": "logEventARepeat",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "num_logs",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "logEventB",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "arg1",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "arg2",
+                    "type": "Address"
+                },
+                {
+                    "name": "data",
+                    "type": "variadic<bytes>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "only_owner_endpoint",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "only_user_account_endpoint",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "require_equals",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "a",
+                    "type": "u32"
+                },
+                {
+                    "name": "b",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "sc_panic",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "maddress_from_array",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "array",
+                    "type": "array32<u8>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "maddress_from_managed_buffer",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "managed_buffer",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "mbuffer_new",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "mbuffer_concat",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mb1",
+                    "type": "bytes"
+                },
+                {
+                    "name": "mb2",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "mbuffer_copy_slice",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mb",
+                    "type": "bytes"
+                },
+                {
+                    "name": "starting_position",
+                    "type": "u32"
+                },
+                {
+                    "name": "slice_len",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "optional<bytes>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "mbuffer_set_random",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "nr_bytes",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "mbuffer_eq",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mb1",
+                    "type": "bytes"
+                },
+                {
+                    "name": "mb2",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "managed_address_zero",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "managed_address_eq",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mb1",
+                    "type": "Address"
+                },
+                {
+                    "name": "mb2",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "managed_vec_new",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "List<BigUint>"
+                }
+            ]
+        },
+        {
+            "name": "managed_vec_biguint_push",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mv",
+                    "type": "List<BigUint>"
+                },
+                {
+                    "name": "item",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<BigUint>"
+                }
+            ]
+        },
+        {
+            "name": "managed_vec_biguint_eq",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mv1",
+                    "type": "List<BigUint>"
+                },
+                {
+                    "name": "mv2",
+                    "type": "List<BigUint>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "managed_vec_address_push",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mv",
+                    "type": "List<Address>"
+                },
+                {
+                    "name": "item",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<Address>"
+                }
+            ]
+        },
+        {
+            "name": "managed_vec_set",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mv",
+                    "type": "List<BigUint>"
+                },
+                {
+                    "name": "index",
+                    "type": "u32"
+                },
+                {
+                    "name": "item",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<BigUint>"
+                }
+            ]
+        },
+        {
+            "name": "managed_vec_remove",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mv",
+                    "type": "List<BigUint>"
+                },
+                {
+                    "name": "index",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<BigUint>"
+                }
+            ]
+        },
+        {
+            "name": "managed_vec_find",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mv",
+                    "type": "List<BigUint>"
+                },
+                {
+                    "name": "item",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Option<u32>"
+                }
+            ]
+        },
+        {
+            "name": "managed_vec_contains",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mv",
+                    "type": "List<BigUint>"
+                },
+                {
+                    "name": "item",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "managed_ref_explicit",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "mv",
+                    "type": "List<BigUint>"
+                },
+                {
+                    "name": "index",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "storage_read_raw",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "storage_key",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "storage_write_raw",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "storage_key",
+                    "type": "bytes"
+                },
+                {
+                    "name": "value",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "storage_read_from_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "storage_key",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "load_bytes",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "load_big_uint",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "load_big_int",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "load_u64",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "load_usize",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "load_i64",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i64"
+                }
+            ]
+        },
+        {
+            "name": "load_bool",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "load_addr",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "load_opt_addr",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "optional<Address>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "is_empty_opt_addr",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "get_nr_to_clear",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "clear_storage_value",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "load_ser_2",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "ExampleEnumWithFields"
+                }
+            ]
+        },
+        {
+            "name": "load_map1",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "addr",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "load_map2",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "addr1",
+                    "type": "Address"
+                },
+                {
+                    "name": "addr2",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "load_map3",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "load_from_address_raw",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "key",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "store_bytes",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bi",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bi",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_big_int",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bi",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_usize",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_i32",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "i32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_u64",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_i64",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "i64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_bool",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "bool"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_addr",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "arg",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_opt_addr",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "opt_addr",
+                    "type": "optional<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_ser_2",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "arg",
+                    "type": "ExampleEnumWithFields"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_map1",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "addr",
+                    "type": "Address"
+                },
+                {
+                    "name": "bi",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_map2",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "addr1",
+                    "type": "Address"
+                },
+                {
+                    "name": "addr2",
+                    "type": "Address"
+                },
+                {
+                    "name": "bi",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_map3",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "u32"
+                },
+                {
+                    "name": "b",
+                    "type": "bool"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_reserved_i64",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "i64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_reserved_big_uint",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "store_reserved_vec_u8",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "address_to_id_mapper_get_id",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "address_to_id_mapper_get_id_non_zero",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "address_to_id_mapper_get_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Option<Address>"
+                }
+            ]
+        },
+        {
+            "name": "address_to_id_mapper_contains",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "address_to_id_mapper_set",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "address_to_id_mapper_get_id_or_insert",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "address_to_id_mapper_remove_by_id",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address_id",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Option<Address>"
+                }
+            ]
+        },
+        {
+            "name": "address_to_id_mapper_remove_by_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getListMapper",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "listMapperPushBack",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "listMapperPushFront",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "listMapperPopFront",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "optional<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "listMapperPopBack",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "optional<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "listMapperFront",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "optional<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "listMapperBack",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "optional<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "listMapperPushAfter",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "node_id",
+                    "type": "u32"
+                },
+                {
+                    "name": "element",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "optional<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "listMapperPushBefore",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "node_id",
+                    "type": "u32"
+                },
+                {
+                    "name": "element",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "optional<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "listMapperRemoveNode",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "node_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "listMapperRemoveNodeById",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "node_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "optional<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "listMapperSetValue",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "node_id",
+                    "type": "u32"
+                },
+                {
+                    "name": "new_value",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "listMapperSetValueById",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "node_id",
+                    "type": "u32"
+                },
+                {
+                    "name": "new_value",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "listMapperIterateByHand",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "node_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "listMapperIterateByIter",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "node_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "queue_mapper",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "queue_mapper_push_back",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "queue_mapper_pop_front",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Option<u32>"
+                }
+            ]
+        },
+        {
+            "name": "queue_mapper_front",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "map_mapper",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<multi<u32,u32>>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "map_mapper_keys",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "map_mapper_values",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "map_mapper_insert",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                },
+                {
+                    "name": "value",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Option<u32>"
+                }
+            ]
+        },
+        {
+            "name": "map_mapper_contains_key",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "map_mapper_get",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Option<u32>"
+                }
+            ]
+        },
+        {
+            "name": "map_mapper_remove",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Option<u32>"
+                }
+            ]
+        },
+        {
+            "name": "map_mapper_entry_or_default_update_increment",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                },
+                {
+                    "name": "increment",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "map_mapper_entry_or_insert_default",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                },
+                {
+                    "name": "default",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "map_mapper_entry_and_modify",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                },
+                {
+                    "name": "increment",
+                    "type": "u32"
+                },
+                {
+                    "name": "otherwise",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "map_mapper_entry_or_insert_with_key",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                },
+                {
+                    "name": "key_increment",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "map_storage_mapper_view",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "map_storage_mapper_insert_default",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "map_storage_mapper_contains_key",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "map_storage_mapper_get",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "map_storage_mapper_insert_value",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                },
+                {
+                    "name": "key",
+                    "type": "u32"
+                },
+                {
+                    "name": "value",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Option<u32>"
+                }
+            ]
+        },
+        {
+            "name": "map_storage_mapper_get_value",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                },
+                {
+                    "name": "key",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Option<u32>"
+                }
+            ]
+        },
+        {
+            "name": "map_storage_mapper_remove",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "map_storage_mapper_clear",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "map_storage_mapper_entry_or_default_update_increment",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                },
+                {
+                    "name": "key",
+                    "type": "u32"
+                },
+                {
+                    "name": "increment",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "map_storage_mapper_entry_and_modify_increment_or_default",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                },
+                {
+                    "name": "key",
+                    "type": "u32"
+                },
+                {
+                    "name": "value",
+                    "type": "u32"
+                },
+                {
+                    "name": "other",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "map_storage_mapper_entry_or_default_update",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                },
+                {
+                    "name": "key",
+                    "type": "u32"
+                },
+                {
+                    "name": "value",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Option<u32>"
+                }
+            ]
+        },
+        {
+            "name": "set_mapper",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "set_mapper_insert",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "set_mapper_contains",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "set_mapper_remove",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "set_mapper_front",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "set_mapper_back",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "set_mapper_next",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "set_mapper_previous",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "set_mapper_iter_from_and_count",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "map_my_single_value_mapper",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "my_single_value_mapper_increment_1",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "docs": [
+                "Same as my_single_value_mapper_increment_1, but expressed more compactly."
+            ],
+            "name": "my_single_value_mapper_increment_2",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "my_single_value_mapper_subtract_with_require",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "my_single_value_mapper_set_if_empty",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "value",
+                    "type": "BigInt"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "clear_single_value_mapper",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "get_from_address_single_value_mapper",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "is_empty_single_value_mapper",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "is_empty_at_address_single_value_mapper",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "raw_byte_length_single_value_mapper",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "set_single_value_mapper_with_key",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "key",
+                    "type": "u32"
+                },
+                {
+                    "name": "value",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "vec_mapper",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "vec_mapper_push",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "vec_mapper_get",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "index",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "vec_mapper_get_at_address",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "index",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "vec_mapper_len",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "vec_mapper_len_at_address",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "token_attributes_set",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "attributes",
+                    "type": "TokenAttributesStruct"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "token_attributes_update",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "attributes",
+                    "type": "TokenAttributesStruct"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "token_attributes_get_attributes",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "TokenAttributesStruct"
+                }
+            ]
+        },
+        {
+            "name": "token_attributes_get_nonce",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "attributes",
+                    "type": "TokenAttributesStruct"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "token_attributes_clear",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "token_attributes_has_attributes",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "add_to_whitelist",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "remove_from_whitelist",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "check_contains",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "check_contains_at_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "item",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "require_contains",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "require_contains_at_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "item",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "issue_fungible_default_callback",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "token_ticker",
+                    "type": "bytes"
+                },
+                {
+                    "name": "initial_supply",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "issue_fungible_custom_callback",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "token_ticker",
+                    "type": "bytes"
+                },
+                {
+                    "name": "initial_supply",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "issue_and_set_all_roles_fungible",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "token_ticker",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "set_local_roles_fungible",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "mint_fungible",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "mint_and_send_fungible",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "burn_fungible",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "get_balance_fungible",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "require_same_token_fungible",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "require_all_same_token_fungible",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "getFungibleTokenId",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "issue_and_set_all_roles_meta",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "token_ticker",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "mapper_nft_set_token_id",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "mapper_nft_create",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "attributes",
+                    "type": "RgbColor"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "mapper_nft_create_and_send",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "attributes",
+                    "type": "RgbColor"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "mapper_nft_add_quantity",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "mapper_nft_add_quantity_and_send",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "to",
+                    "type": "Address"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "EsdtTokenPayment"
+                }
+            ]
+        },
+        {
+            "name": "mapper_nft_burn",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "mapper_nft_get_balance",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "mapper_get_token_attributes",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "RgbColor"
+                }
+            ]
+        },
+        {
+            "name": "getNonFungibleTokenId",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "init_unique_id_mapper",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "len",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unique_id_mapper_get",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "index",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "unique_id_mapper_swap_remove",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "index",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "unique_id_mapper_set",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "index",
+                    "type": "u32"
+                },
+                {
+                    "name": "id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "unique_id_mapper",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "unordered_set_mapper",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<u32>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "unordered_set_mapper_insert",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "unordered_set_mapper_contains",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "unordered_set_mapper_remove",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "managed_struct_eq",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "s1",
+                    "type": "ExampleStructManaged"
+                },
+                {
+                    "name": "s2",
+                    "type": "ExampleStructManaged"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "no_overflow_usize",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "no_overflow_u8",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u8"
+                }
+            ]
+        },
+        {
+            "name": "no_overflow_u16",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "no_overflow_u32",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "no_overflow_u64",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "overflow_usize",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "overflow_u8",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u8"
+                }
+            ]
+        },
+        {
+            "name": "overflow_u16",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u16"
+                }
+            ]
+        },
+        {
+            "name": "overflow_u32",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "overflow_u64",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "no_overflow_isize",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i32"
+                }
+            ]
+        },
+        {
+            "name": "no_overflow_i8",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i8"
+                }
+            ]
+        },
+        {
+            "name": "no_overflow_i16",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i16"
+                }
+            ]
+        },
+        {
+            "name": "no_overflow_i32",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i32"
+                }
+            ]
+        },
+        {
+            "name": "no_overflow_i64",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i64"
+                }
+            ]
+        },
+        {
+            "name": "overflow_isize",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i32"
+                }
+            ]
+        },
+        {
+            "name": "overflow_i8",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i8"
+                }
+            ]
+        },
+        {
+            "name": "overflow_i16",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i16"
+                }
+            ]
+        },
+        {
+            "name": "overflow_i32",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i32"
+                }
+            ]
+        },
+        {
+            "name": "overflow_i64",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "i64"
+                }
+            ]
+        },
+        {
+            "name": "token_identifier_egld",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "EgldOrEsdtTokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "token_identifier_is_valid_1",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "EgldOrEsdtTokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "token_identifier_is_valid_2",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "bytes",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "returns_egld_decimal",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<18>"
+                }
+            ]
+        },
+        {
+            "name": "set_contract_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "is_empty_at_address",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "contains_at_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "len_at_address",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "next_at_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "previous_at_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "front_at_address",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "back_at_address",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "keys_at_address",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "List<u32>"
+                }
+            ]
+        },
+        {
+            "name": "values_at_address",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "List<u32>"
+                }
+            ]
+        },
+        {
+            "name": "contains_unordered_at_address",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "item",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "get_by_index",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "index",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "fill_set_mapper",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "value",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "fill_map_mapper",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "value",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "fill_unordered_set_mapper",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "value",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "get_value_from_address_with_keys",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "extra_key",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_addition",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "first",
+                    "type": "ManagedDecimal<2>"
+                },
+                {
+                    "name": "second",
+                    "type": "ManagedDecimal<2>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<2>"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_subtraction",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "first",
+                    "type": "ManagedDecimal<2>"
+                },
+                {
+                    "name": "second",
+                    "type": "ManagedDecimal<2>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<2>"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_eq",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "first",
+                    "type": "ManagedDecimal<2>"
+                },
+                {
+                    "name": "second",
+                    "type": "ManagedDecimal<2>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_trunc",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_into_raw_units",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_ln",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "ManagedDecimal<9>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimalSigned<9>"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_log2",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "ManagedDecimal<9>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimalSigned<9>"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_addition_var",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "first",
+                    "type": "ManagedDecimal<usize>"
+                },
+                {
+                    "name": "second",
+                    "type": "ManagedDecimal<usize>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<usize>"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_subtraction_var",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "first",
+                    "type": "ManagedDecimal<usize>"
+                },
+                {
+                    "name": "second",
+                    "type": "ManagedDecimal<usize>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimal<usize>"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_eq_var",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "first",
+                    "type": "ManagedDecimal<usize>"
+                },
+                {
+                    "name": "second",
+                    "type": "ManagedDecimal<usize>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_ln_var",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "ManagedDecimal<usize>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimalSigned<9>"
+                }
+            ]
+        },
+        {
+            "name": "managed_decimal_log2_var",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "x",
+                    "type": "ManagedDecimal<usize>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ManagedDecimalSigned<9>"
+                }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "identifier": "event_err_topic",
+            "inputs": [
+                {
+                    "name": "err_topic",
+                    "type": "CodecErrorTestType",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "event_err_data",
+            "inputs": [
+                {
+                    "name": "data",
+                    "type": "CodecErrorTestType"
+                }
+            ]
+        },
+        {
+            "identifier": "event_a",
+            "inputs": [
+                {
+                    "name": "data",
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "identifier": "event_b",
+            "inputs": [
+                {
+                    "name": "arg1",
+                    "type": "BigUint",
+                    "indexed": true
+                },
+                {
+                    "name": "arg2",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "data",
+                    "type": "List<bytes>"
+                }
+            ]
+        }
+    ],
+    "esdtAttributes": [],
+    "hasCallback": true,
+    "types": {
+        "CodecErrorTestType": {
+            "type": "struct",
+            "docs": [
+                "Helper type to explore encode/decode errors."
+            ]
+        },
+        "OperationCompletionStatus": {
+            "type": "explicit-enum",
+            "variants": [
+                {
+                    "docs": [
+                        "indicates that operation was completed"
+                    ],
+                    "name": "completed"
+                },
+                {
+                    "docs": [
+                        "indicates that operation was interrupted prematurely, due to low gas"
+                    ],
+                    "name": "interrupted"
+                }
+            ]
+        },
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "ExampleEnumSimple": {
+            "type": "enum",
+            "docs": [
+                "Copied from multiversx-sc serialization tests."
+            ],
+            "variants": [
+                {
+                    "docs": [
+                        "Variant 0 doc comment.",
+                        "This will show up in the ABI."
+                    ],
+                    "name": "Variant0",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Variant1",
+                    "discriminant": 1
+                },
+                {
+                    "docs": [
+                        "One line is enough. The one above doesn't have any."
+                    ],
+                    "name": "Variant2",
+                    "discriminant": 2
+                }
+            ]
+        },
+        "ExampleEnumWithFields": {
+            "type": "enum",
+            "docs": [
+                "Copied from multiversx-sc serialization tests."
+            ],
+            "variants": [
+                {
+                    "name": "Unit",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Newtype",
+                    "discriminant": 1,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "u32"
+                        }
+                    ]
+                },
+                {
+                    "name": "Tuple",
+                    "discriminant": 2,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "u32"
+                        },
+                        {
+                            "name": "1",
+                            "type": "u32"
+                        }
+                    ]
+                },
+                {
+                    "name": "Struct",
+                    "discriminant": 3,
+                    "fields": [
+                        {
+                            "name": "a",
+                            "type": "u32"
+                        }
+                    ]
+                }
+            ]
+        },
+        "ExampleStructManaged": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "big_uint",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "int",
+                    "type": "u32"
+                },
+                {
+                    "name": "bytes",
+                    "type": "bytes"
+                }
+            ]
+        },
+        "RgbColor": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "r",
+                    "type": "u8"
+                },
+                {
+                    "name": "g",
+                    "type": "u8"
+                },
+                {
+                    "name": "b",
+                    "type": "u8"
+                }
+            ]
+        },
+        "TokenAttributesStruct": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "field_biguint",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "field_u64",
+                    "type": "u64"
+                },
+                {
+                    "name": "field_vec_u32",
+                    "type": "List<u32>"
+                }
+            ]
+        }
+    }
+}

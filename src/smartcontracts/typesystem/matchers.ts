@@ -2,18 +2,21 @@ import * as errors from "../../errors";
 import { AddressType, AddressValue } from "./address";
 import { BooleanType, BooleanValue } from "./boolean";
 import { BytesType, BytesValue } from "./bytes";
+import { CodeMetadataType, CodeMetadataValue } from "./codeMetadata";
 import { EnumType, EnumValue } from "./enum";
-import { OptionType, OptionValue, List, ListType } from "./generic";
+import { ExplicitEnumType, ExplicitEnumValue } from "./explicit-enum";
+import { List, ListType, OptionType, OptionValue } from "./generic";
+import { ArrayVec, ArrayVecType } from "./genericArray";
 import { H256Type, H256Value } from "./h256";
-import { NumericalType, NumericalValue } from "./numerical";
+import { ManagedDecimalType, ManagedDecimalValue } from "./managedDecimal";
+import { ManagedDecimalSignedType, ManagedDecimalSignedValue } from "./managedDecimalSigned";
 import { NothingType, NothingValue } from "./nothing";
+import { NumericalType, NumericalValue } from "./numerical";
+import { StringType, StringValue } from "./string";
 import { Struct, StructType } from "./struct";
 import { TokenIdentifierType, TokenIdentifierValue } from "./tokenIdentifier";
 import { Tuple, TupleType } from "./tuple";
-import { Type, PrimitiveType, PrimitiveValue } from "./types";
-import { ArrayVec, ArrayVecType } from "./genericArray";
-import { TypedValue } from "./types";
-import { StringType, StringValue } from "./string";
+import { PrimitiveType, PrimitiveValue, Type, TypedValue } from "./types";
 
 // TODO: Extend functionality or rename wrt. restricted / reduced functionality (not all types are handled: composite, variadic).
 export function onTypeSelect<TResult>(
@@ -26,6 +29,9 @@ export function onTypeSelect<TResult>(
         onStruct: () => TResult;
         onTuple: () => TResult;
         onEnum: () => TResult;
+        onExplicitEnum: () => TResult;
+        onManagedDecimal: () => TResult;
+        onManagedDecimalSigned: () => TResult;
         onOther?: () => TResult;
     },
 ): TResult {
@@ -50,6 +56,17 @@ export function onTypeSelect<TResult>(
     if (type.hasExactClass(EnumType.ClassName)) {
         return selectors.onEnum();
     }
+    if (type.hasExactClass(ExplicitEnumType.ClassName)) {
+        return selectors.onExplicitEnum();
+    }
+
+    if (type.hasExactClass(ManagedDecimalType.ClassName)) {
+        return selectors.onManagedDecimal();
+    }
+
+    if (type.hasExactClass(ManagedDecimalSignedType.ClassName)) {
+        return selectors.onManagedDecimalSigned();
+    }
 
     if (selectors.onOther) {
         return selectors.onOther();
@@ -68,6 +85,9 @@ export function onTypedValueSelect<TResult>(
         onStruct: () => TResult;
         onTuple: () => TResult;
         onEnum: () => TResult;
+        onExplicitEnum: () => TResult;
+        onManagedDecimal: () => TResult;
+        onManagedDecimalSigned: () => TResult;
         onOther?: () => TResult;
     },
 ): TResult {
@@ -92,6 +112,15 @@ export function onTypedValueSelect<TResult>(
     if (value.hasExactClass(EnumValue.ClassName)) {
         return selectors.onEnum();
     }
+    if (value.hasExactClass(ExplicitEnumValue.ClassName)) {
+        return selectors.onExplicitEnum();
+    }
+    if (value.hasExactClass(ManagedDecimalValue.ClassName)) {
+        return selectors.onManagedDecimal();
+    }
+    if (value.hasExactClass(ManagedDecimalSignedValue.ClassName)) {
+        return selectors.onManagedDecimalSigned();
+    }
 
     if (selectors.onOther) {
         return selectors.onOther();
@@ -110,6 +139,7 @@ export function onPrimitiveValueSelect<TResult>(
         onString: () => TResult;
         onH256: () => TResult;
         onTypeIdentifier: () => TResult;
+        onCodeMetadata: () => TResult;
         onNothing: () => TResult;
         onOther?: () => TResult;
     },
@@ -135,9 +165,13 @@ export function onPrimitiveValueSelect<TResult>(
     if (value.hasExactClass(TokenIdentifierValue.ClassName)) {
         return selectors.onTypeIdentifier();
     }
+    if (value.hasExactClass(CodeMetadataValue.ClassName)) {
+        return selectors.onCodeMetadata();
+    }
     if (value.hasExactClass(NothingValue.ClassName)) {
         return selectors.onNothing();
     }
+
     if (selectors.onOther) {
         return selectors.onOther();
     }
@@ -155,6 +189,7 @@ export function onPrimitiveTypeSelect<TResult>(
         onString: () => TResult;
         onH256: () => TResult;
         onTokenIndetifier: () => TResult;
+        onCodeMetadata: () => TResult;
         onNothing: () => TResult;
         onOther?: () => TResult;
     },
@@ -179,6 +214,9 @@ export function onPrimitiveTypeSelect<TResult>(
     }
     if (type.hasExactClass(TokenIdentifierType.ClassName)) {
         return selectors.onTokenIndetifier();
+    }
+    if (type.hasExactClass(CodeMetadataType.ClassName)) {
+        return selectors.onCodeMetadata();
     }
     if (type.hasExactClass(NothingType.ClassName)) {
         return selectors.onNothing();

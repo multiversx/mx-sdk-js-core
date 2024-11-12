@@ -1,4 +1,4 @@
-import { UserPublicKey, UserVerifier } from "@multiversx/sdk-wallet";
+import { UserPublicKey, UserVerifier } from "./wallet";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "./address";

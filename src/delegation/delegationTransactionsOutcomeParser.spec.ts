@@ -1,8 +1,13 @@
 import { assert } from "chai";
 import { Address } from "../address";
 import { b64TopicsToBytes } from "../testutils";
+import {
+    SmartContractResult,
+    TransactionEvent,
+    TransactionLogs,
+    TransactionOutcome,
+} from "../transactionsOutcomeParsers/resources";
 import { DelegationTransactionsOutcomeParser } from "./delegationTransactionsOutcomeParser";
-import { SmartContractResult, TransactionEvent, TransactionLogs, TransactionOutcome } from "./resources";
 
 describe("test delegation transactions outcome parser", () => {
     const parser = new DelegationTransactionsOutcomeParser();

@@ -4,7 +4,7 @@ import { Err } from "../errors";
 import { IAddress } from "../interface";
 import { ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../smartcontracts";
 import { Transaction } from "../transaction";
-import { TransactionBuilder } from "./transactionBuilder";
+import { TransactionBuilder } from "../transactionsFactories/transactionBuilder";
 
 interface IConfig {
     chainID: string;

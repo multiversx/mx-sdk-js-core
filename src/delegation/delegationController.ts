@@ -1,3 +1,4 @@
+import { IAccount } from "../controllers/interfaces";
 import { ProviderWrapper } from "../entrypoints/providerWrapper";
 import { IAddress } from "../interface";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
@@ -11,7 +12,6 @@ import {
 } from "../transactionsFactories";
 import { DelegationTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
-import { IAccount } from "./interfaces";
 
 export class DelegationController {
     private transactionAwaiter: TransactionWatcher;

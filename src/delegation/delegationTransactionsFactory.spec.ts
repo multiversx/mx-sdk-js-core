@@ -1,9 +1,9 @@
-import { ValidatorPublicKey } from "./../wallet";
 import { assert } from "chai";
 import { Address } from "../address";
-import { DELEGATION_MANAGER_SC_ADDRESS } from "../constants";
+import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../constants";
+import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
+import { ValidatorPublicKey } from "../wallet";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
-import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test delegation transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });
@@ -23,7 +23,10 @@ describe("test delegation transactions factory", function () {
         });
 
         assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, DELEGATION_MANAGER_SC_ADDRESS);
+        assert.equal(
+            transaction.receiver,
+            Address.fromHex(DELEGATION_MANAGER_SC_ADDRESS_HEX, this.config.addressHrp).bech32(),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("createNewDelegationContract@010f0cf064dd59200000@0a"));
         assert.equal(transaction.gasLimit, 60126500n);

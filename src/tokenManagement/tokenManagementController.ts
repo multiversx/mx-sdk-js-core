@@ -1,5 +1,5 @@
+import { IAccount } from "../controllers/interfaces";
 import { ProviderWrapper } from "../entrypoints/providerWrapper";
-import { IAddress } from "../interface";
 import { TransactionOnNetwork } from "../networkProviders";
 import { INetworkProvider } from "../networkProviders/interface";
 import { IESDTIssueOutcome } from "../tokenOperations";
@@ -8,7 +8,22 @@ import { TransactionComputer } from "../transactionComputer";
 import { TokenManagementTransactionsFactory, TransactionsFactoryConfig } from "../transactionsFactories";
 import { TokenManagementTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
-import { IAccount } from "./interfaces";
+import {
+    FungibleSpecialRoleInput,
+    IssueFungibleInput,
+    IssueNonFungibleInput,
+    IssueSemiFungibleInput,
+    LocalBurnInput,
+    LocalMintInput,
+    ManagementInput,
+    MintInput,
+    RegisterMetaESDTInput,
+    RegisterRolesInput,
+    SemiFungibleSpecialRoleInput,
+    SpecialRoleInput,
+    UpdateAttributesInput,
+    UpdateQuantityInput,
+} from "./resources";
 
 export class TokenManagementController {
     private factory: TokenManagementTransactionsFactory;
@@ -85,7 +100,7 @@ export class TokenManagementController {
 
     async createTransactionForRegisteringMetaEsdt(
         sender: IAccount,
-        options: IssueNonFungibleInput,
+        options: RegisterMetaESDTInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringMetaESDT({
             ...options,
@@ -105,7 +120,7 @@ export class TokenManagementController {
 
     async createTransactionForRegisteringAndSettingRoles(
         sender: IAccount,
-        options: IssueNonFungibleInput,
+        options: RegisterRolesInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringAndSettingRoles({
             ...options,
@@ -439,64 +454,3 @@ export class TokenManagementController {
         return this.parser.parseBurnQuantity(transaction);
     }
 }
-
-type IssueFungibleInput = IssueInput & { initialSupply: bigint; numDecimals: bigint };
-
-type IssueSemiFungibleInput = IssueNonFungibleInput;
-
-type IssueNonFungibleInput = IssueInput & { canTransferNFTCreateRole: boolean };
-
-type IssueInput = {
-    nonce: bigint;
-    tokenName: string;
-    tokenTicker: string;
-    canFreeze: boolean;
-    canWipe: boolean;
-    canPause: boolean;
-    canTransferNFTCreateRole: boolean;
-    canChangeOwner: boolean;
-    canUpgrade: boolean;
-    canAddSpecialRoles: boolean;
-};
-
-type FungibleSpecialRoleInput = SpecialRoleInput & {
-    addRoleLocalMint: boolean;
-    addRoleLocalBurn: boolean;
-    addRoleESDTTransferRole: boolean;
-};
-type SemiFungibleSpecialRoleInput = SpecialRoleInput & { addRoleNFTAddQuantity: boolean };
-
-type SpecialRoleInput = {
-    nonce: bigint;
-    user: IAddress;
-    tokenIdentifier: string;
-    addRoleNFTCreate: boolean;
-    addRoleNFTBurn: boolean;
-    addRoleNFTUpdateAttributes: boolean;
-    addRoleNFTAddURI: boolean;
-    addRoleESDTTransferRole: boolean;
-    addRoleESDTModifyCreator?: boolean;
-    addRoleNFTRecreate?: boolean;
-    addRoleESDTSetNewURI?: boolean;
-    addRoleESDTModifyRoyalties?: boolean;
-};
-
-type MintInput = {
-    nonce: bigint;
-    tokenIdentifier: string;
-    initialQuantity: bigint;
-    name: string;
-    royalties: number;
-    hash: string;
-    attributes: Uint8Array;
-    uris: string[];
-};
-type ManagementInput = { nonce: bigint; user: IAddress; tokenIdentifier: string };
-type LocalBurnInput = { nonce: bigint; tokenIdentifier: string; supplyToBurn: bigint };
-type LocalMintInput = { nonce: bigint; tokenIdentifier: string; supplyToMint: bigint };
-
-type UpdateAttributesInput = UpdateInput & { attributes: Uint8Array };
-
-type UpdateQuantityInput = UpdateInput & { quantity: bigint };
-
-type UpdateInput = { nonce: bigint; tokenIdentifier: string; tokenNonce: bigint };

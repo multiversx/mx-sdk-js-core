@@ -3,7 +3,7 @@ import { TransactionsConverter } from "../converters/transactionsConverter";
 import { ErrParseTransactionOutcome } from "../errors";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { bufferToBigInt } from "../smartcontracts/codec/utils";
-import { TransactionEvent, TransactionOutcome, findEventsByIdentifier } from "./resources";
+import { TransactionEvent, TransactionOutcome, findEventsByIdentifier } from "../transactionsOutcomeParsers/resources";
 
 export class TokenManagementTransactionsOutcomeParser {
     constructor() {}

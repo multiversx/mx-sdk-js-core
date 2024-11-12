@@ -2,8 +2,8 @@ import { assert } from "chai";
 import { Address } from "../address";
 import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
 import { loadTestWallets, TestWallet } from "../testutils";
+import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { TokenManagementTransactionsFactory } from "./tokenManagementTransactionsFactory";
-import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test token management transactions factory", () => {
     let frank: TestWallet, grace: TestWallet;

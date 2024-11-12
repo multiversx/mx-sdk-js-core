@@ -1,54 +1,55 @@
-import * as errors from "../../errors";
+import BigNumber from "bignumber.js";
 import { assert } from "chai";
-import { BinaryCodec, BinaryCodecConstraints } from "./binary";
+import { Address } from "../../address";
+import * as errors from "../../errors";
 import {
     AddressType,
     AddressValue,
+    ArrayVec,
+    ArrayVecType,
     BigIntType,
+    BigIntValue,
     BigUIntType,
     BigUIntValue,
     BooleanType,
     BooleanValue,
+    EnumType,
+    EnumValue,
+    EnumVariantDefinition,
+    Field,
     I16Type,
+    I16Value,
     I32Type,
+    I32Value,
     I64Type,
+    I64Value,
     I8Type,
+    I8Value,
+    List,
+    ListType,
     NumericalType,
     NumericalValue,
+    StringType,
+    StringValue,
     Struct,
-    Field,
     StructType,
+    TokenIdentifierType,
+    TokenIdentifierValue,
     TypedValue,
     U16Type,
+    U16Value,
     U32Type,
     U32Value,
     U64Type,
     U64Value,
     U8Type,
     U8Value,
-    List,
-    ListType,
-    EnumType,
-    EnumVariantDefinition,
-    EnumValue,
-    ArrayVec,
-    ArrayVecType,
-    U16Value,
-    TokenIdentifierType,
-    TokenIdentifierValue,
-    StringValue,
-    StringType,
-    BigIntValue,
-    I64Value,
-    I32Value,
-    I16Value,
-    I8Value,
 } from "../typesystem";
-import { isMsbOne } from "./utils";
-import { Address } from "../../address";
 import { BytesType, BytesValue } from "../typesystem/bytes";
-import BigNumber from "bignumber.js";
+import { ExplicitEnumType, ExplicitEnumValue, ExplicitEnumVariantDefinition } from "../typesystem/explicit-enum";
 import { FieldDefinition } from "../typesystem/fields";
+import { BinaryCodec, BinaryCodecConstraints } from "./binary";
+import { isMsbOne } from "./utils";
 
 describe("test binary codec (basic)", () => {
     let codec = new BinaryCodec();
@@ -174,6 +175,21 @@ describe("test binary codec (basic)", () => {
             8,
         ]);
         assert.deepEqual(codec.decodeTopLevel<StringValue>(Buffer.from(payload), new StringType()), stringValue);
+    });
+
+    it("should create explicit-enums, encode and decode", async () => {
+        let length = [0x00, 0x00, 0x00, 0x04];
+        let payload = [0x74, 0x65, 0x73, 0x74];
+        let enumType = new ExplicitEnumType("Colour", [new ExplicitEnumVariantDefinition("test")]);
+        let enumValue = ExplicitEnumValue.fromName(enumType, "test");
+
+        assert.deepEqual(codec.encodeNested(enumValue), Buffer.from([...length, ...payload]));
+        assert.deepEqual(codec.encodeTopLevel(enumValue), Buffer.from(payload));
+        assert.deepEqual(codec.decodeNested<ExplicitEnumValue>(Buffer.from([...length, ...payload]), enumType), [
+            enumValue,
+            8,
+        ]);
+        assert.deepEqual(codec.decodeTopLevel<ExplicitEnumValue>(Buffer.from(payload), enumType), enumValue);
     });
 });
 

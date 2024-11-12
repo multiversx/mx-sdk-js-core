@@ -193,15 +193,13 @@ describe("test abi registry", () => {
     });
 
     it("should load ABI explicit-enum", async () => {
-        const registry = await loadAbiRegistry("src/testdata/explicit-enum.abi.json");
+        const registry = await loadAbiRegistry("src/testdata/basic-features.abi.json");
 
-        const enumType = registry.getEnum("OperationCompletionStatus");
+        const enumType = registry.getExplicitEnum("OperationCompletionStatus");
 
         assert.deepEqual(enumType.variants[0].name, "completed");
-        assert.deepEqual(enumType.variants[0].discriminant, 0);
 
         assert.deepEqual(enumType.variants[1].name, "interrupted");
-        assert.deepEqual(enumType.variants[1].discriminant, 1);
     });
 
     it("should load abi with title for endpoint", async () => {

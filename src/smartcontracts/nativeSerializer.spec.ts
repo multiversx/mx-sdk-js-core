@@ -557,6 +557,19 @@ describe("test native serializer", () => {
                         },
                     ],
                 },
+                OperationCompletionStatus: {
+                    type: "explicit-enum",
+                    variants: [
+                        {
+                            docs: ["indicates that operation was completed"],
+                            name: "completed",
+                        },
+                        {
+                            docs: ["indicates that operation was interrupted prematurely, due to low gas"],
+                            name: "interrupted",
+                        },
+                    ],
+                },
             },
         });
 
@@ -588,6 +601,46 @@ describe("test native serializer", () => {
         });
         assert.deepEqual(typedValues[3].getType(), enumType);
         assert.deepEqual(typedValues[3].valueOf(), { name: "Else", fields: [new BigNumber(42), new BigNumber(43)] });
+    });
+
+    it("should perform type inference (explicit-enums)", async () => {
+        const abiRegistry = AbiRegistry.create({
+            endpoints: [
+                {
+                    name: "foo",
+                    inputs: [
+                        {
+                            type: "OperationCompletionStatus",
+                        },
+                    ],
+                    outputs: [],
+                },
+            ],
+            types: {
+                OperationCompletionStatus: {
+                    type: "explicit-enum",
+                    variants: [
+                        {
+                            docs: ["indicates that operation was completed"],
+                            name: "completed",
+                        },
+                        {
+                            docs: ["indicates that operation was interrupted prematurely, due to low gas"],
+                            name: "interrupted",
+                        },
+                    ],
+                },
+            },
+        });
+
+        const endpoint = abiRegistry.getEndpoint("foo");
+        const enumType = abiRegistry.getExplicitEnum("OperationCompletionStatus");
+        const enumString = "completed";
+
+        const typedValues = NativeSerializer.nativeToTypedValues([enumString], endpoint);
+
+        assert.deepEqual(typedValues[0].getType(), enumType);
+        assert.deepEqual(typedValues[0].valueOf(), { name: enumString });
     });
 
     it("should getArgumentsCardinality", async () => {

@@ -1,17 +1,24 @@
 import { IAccount } from "../controllers/interfaces";
 import { ProviderWrapper } from "../entrypoints/providerWrapper";
-import { IAddress } from "../interface";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { INetworkProvider } from "../networkProviders/interface";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import {
-    DelegationTransactionsFactory,
-    IValidatorPublicKey,
-    TransactionsFactoryConfig,
-} from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactories";
 import { DelegationTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
+import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
+import {
+    AddNodesInput,
+    ChangeServiceFee,
+    DelegateActionsInput,
+    ManageDelegationContractInput,
+    ManageNodesInput,
+    ModifyDelegationCapInput,
+    NewDelegationContractInput,
+    SetContractMetadataInput,
+    UnjailingNodesInput,
+} from "./resources";
 
 export class DelegationController {
     private transactionAwaiter: TransactionWatcher;
@@ -262,19 +269,3 @@ export class DelegationController {
         return transaction;
     }
 }
-
-type NewDelegationContractInput = { nonce: bigint; totalDelegationCap: bigint; serviceFee: bigint; amount: bigint };
-type AddNodesInput = ManageNodesInput & { signedMessages: Uint8Array[] };
-type UnjailingNodesInput = ManageNodesInput & { amount: bigint };
-type ManageNodesInput = { nonce: bigint; delegationContract: IAddress; publicKeys: IValidatorPublicKey[] };
-type ChangeServiceFee = { nonce: bigint; delegationContract: IAddress; serviceFee: bigint };
-type ModifyDelegationCapInput = { nonce: bigint; delegationContract: IAddress; delegationCap: bigint };
-type ManageDelegationContractInput = { nonce: bigint; delegationContract: IAddress };
-type DelegateActionsInput = { nonce: bigint; delegationContract: IAddress; amount: bigint };
-type SetContractMetadataInput = {
-    nonce: bigint;
-    delegationContract: IAddress;
-    name: string;
-    website: string;
-    identifier: string;
-};

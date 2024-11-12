@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { Address } from "../address";
+import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { AccountTransactionsFactory } from "./accountTransactionsFactory";
-import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test account transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });

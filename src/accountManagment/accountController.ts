@@ -1,8 +1,9 @@
-import { IAddress } from "../interface";
+import { IAccount } from "../controllers/interfaces";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { AccountTransactionsFactory, TransactionsFactoryConfig } from "../transactionsFactories";
-import { IAccount } from "./interfaces";
+import { TransactionsFactoryConfig } from "../transactionsFactories";
+import { AccountTransactionsFactory } from "./accountTransactionsFactory";
+import { GuardianInteractionInput, SaveKeyValueInput, SetGuardianInput } from "./resources";
 
 export class AccountController {
     private factory: AccountTransactionsFactory;
@@ -60,7 +61,3 @@ export class AccountController {
         return transaction;
     }
 }
-
-type SetGuardianInput = { nonce: bigint; guardianAddress: IAddress; serviceID: string };
-type SaveKeyValueInput = { nonce: bigint; keyValuePairs: Map<Uint8Array, Uint8Array> };
-type GuardianInteractionInput = { nonce: bigint };

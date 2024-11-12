@@ -7,12 +7,14 @@
 require("./globals");
 
 export * from "./account";
+export * from "./accountManagment";
 export * from "./adapters";
 export * from "./address";
 export * from "./asyncTimer";
 export * from "./config";
 export * from "./controllers";
 export * from "./converters";
+export * from "./delegation";
 export * from "./entrypoints";
 export * from "./errors";
 export * from "./gasEstimator";
@@ -36,4 +38,3 @@ export * from "./transactionsFactories";
 export * from "./transactionsOutcomeParsers";
 export * from "./transactionWatcher";
 export * from "./utils";
-export * from "./wallet";

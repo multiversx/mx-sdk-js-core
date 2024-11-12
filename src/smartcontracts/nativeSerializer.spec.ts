@@ -635,16 +635,12 @@ describe("test native serializer", () => {
 
         const endpoint = abiRegistry.getEndpoint("foo");
         const enumType = abiRegistry.getExplicitEnum("OperationCompletionStatus");
+        const enumString = "completed";
 
-        // Simple enum by name
-        const p1 = "completed";
-        // Enum with a single field
+        const typedValues = NativeSerializer.nativeToTypedValues([enumString], endpoint);
 
-        const typedValues = NativeSerializer.nativeToTypedValues([p1], endpoint);
-
-        console.log(typedValues[0].valueOf());
         assert.deepEqual(typedValues[0].getType(), enumType);
-        assert.deepEqual(typedValues[0].valueOf(), { name: "completed" });
+        assert.deepEqual(typedValues[0].valueOf(), { name: enumString });
     });
 
     it("should getArgumentsCardinality", async () => {

@@ -15,6 +15,7 @@ import { TokenTransfersDataBuilder } from "../tokenTransfersDataBuilder";
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "../transactionBuilder";
 import { TransactionPayload } from "../transactionPayload";
+import * as resources from "./resources";
 
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;
@@ -80,18 +81,16 @@ export class TransferTransactionsFactory {
         }
     }
 
-    createTransactionForNativeTokenTransfer(options: {
-        sender: IAddress;
-        receiver: IAddress;
-        nativeAmount?: bigint;
-        data?: Uint8Array;
-    }): Transaction {
+    createTransactionForNativeTokenTransfer(
+        sender: IAddress,
+        options: resources.NativeTokenTransferInput,
+    ): Transaction {
         this.ensureConfigIsDefined();
 
         const data = options.data || new Uint8Array();
 
         return new Transaction({
-            sender: options.sender.bech32(),
+            sender: sender.bech32(),
             receiver: options.receiver.bech32(),
             chainID: this.config!.chainID,
             gasLimit: this.computeGasForMoveBalance(this.config!, data),
@@ -100,11 +99,7 @@ export class TransferTransactionsFactory {
         });
     }
 
-    createTransactionForESDTTokenTransfer(options: {
-        sender: IAddress;
-        receiver: IAddress;
-        tokenTransfers: TokenTransfer[];
-    }): Transaction {
+    createTransactionForESDTTokenTransfer(sender: IAddress, options: resources.ESDTTokenTransferInput): Transaction {
         this.ensureConfigIsDefined();
 
         const numberOfTransfers = options.tokenTransfers.length;
@@ -114,7 +109,7 @@ export class TransferTransactionsFactory {
         }
 
         if (numberOfTransfers === 1) {
-            return this.createSingleESDTTransferTransaction(options);
+            return this.createSingleESDTTransferTransaction(sender, options);
         }
 
         const dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForMultiESDTNFTTransfer(
@@ -128,21 +123,15 @@ export class TransferTransactionsFactory {
 
         return new TransactionBuilder({
             config: this.config!,
-            sender: options.sender,
-            receiver: options.sender,
+            sender: sender,
+            receiver: sender,
             dataParts: dataParts,
             gasLimit: extraGasForTransfer,
             addDataMovementGas: true,
         }).build();
     }
 
-    createTransactionForTransfer(options: {
-        sender: IAddress;
-        receiver: IAddress;
-        nativeAmount?: bigint;
-        tokenTransfers?: TokenTransfer[];
-        data?: Uint8Array;
-    }): Transaction {
+    createTransactionForTransfer(sender: IAddress, options: resources.CreateTransferTransactionInput): Transaction {
         const nativeAmount = options.nativeAmount ?? 0n;
         let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
         const numberOfTokens = tokenTransfers.length;
@@ -152,8 +141,7 @@ export class TransferTransactionsFactory {
         }
 
         if ((nativeAmount && numberOfTokens === 0) || options.data) {
-            return this.createTransactionForNativeTokenTransfer({
-                sender: options.sender,
+            return this.createTransactionForNativeTokenTransfer(sender, {
                 receiver: options.receiver,
                 nativeAmount: nativeAmount,
                 data: options.data,
@@ -165,8 +153,7 @@ export class TransferTransactionsFactory {
             tokenTransfers.push(nativeTransfer);
         }
 
-        return this.createTransactionForESDTTokenTransfer({
-            sender: options.sender,
+        return this.createTransactionForESDTTokenTransfer(sender, {
             receiver: options.receiver,
             tokenTransfers: tokenTransfers,
         });
@@ -351,11 +338,13 @@ export class TransferTransactionsFactory {
         });
     }
 
-    private createSingleESDTTransferTransaction(options: {
-        sender: IAddress;
-        receiver: IAddress;
-        tokenTransfers: TokenTransfer[];
-    }): Transaction {
+    private createSingleESDTTransferTransaction(
+        sender: IAddress,
+        options: {
+            receiver: IAddress;
+            tokenTransfers: TokenTransfer[];
+        },
+    ): Transaction {
         this.ensureConfigIsDefined();
 
         let dataParts: string[] = [];
@@ -369,12 +358,12 @@ export class TransferTransactionsFactory {
         } else {
             dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForSingleESDTNFTTransfer(transfer, receiver);
             extraGasForTransfer = this.config!.gasLimitESDTNFTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER);
-            receiver = options.sender;
+            receiver = sender;
         }
 
         return new TransactionBuilder({
             config: this.config!,
-            sender: options.sender,
+            sender: sender,
             receiver: receiver,
             dataParts: dataParts,
             gasLimit: extraGasForTransfer,

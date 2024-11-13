@@ -3,7 +3,7 @@ import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransferTransactionsFactory } from "../transactionsFactories";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
-import { CreateTransferTransactionInput, ESDTTokenTransferInput, NativeTokenTransferInput } from "./resources";
+import * as resources from "./resources";
 
 export class TransfersController {
     private factory: TransferTransactionsFactory;
@@ -16,14 +16,12 @@ export class TransfersController {
 
     async createTransactionForNativeTokenTransfer(
         sender: IAccount,
-        options: NativeTokenTransferInput,
+        nonce: bigint,
+        options: resources.NativeTokenTransferInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForNativeTokenTransfer({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForNativeTokenTransfer(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -31,11 +29,12 @@ export class TransfersController {
 
     async createTransactionForEsdtTokenTransfer(
         sender: IAccount,
-        options: ESDTTokenTransferInput,
+        nonce: bigint,
+        options: resources.ESDTTokenTransferInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForESDTTokenTransfer({ ...options, sender: sender.address });
+        const transaction = this.factory.createTransactionForESDTTokenTransfer(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -43,11 +42,12 @@ export class TransfersController {
 
     async createTransactionForTransfer(
         sender: IAccount,
-        options: CreateTransferTransactionInput,
+        nonce: bigint,
+        options: resources.CreateTransferTransactionInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForTransfer({ ...options, sender: sender.address });
+        const transaction = this.factory.createTransactionForTransfer(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;

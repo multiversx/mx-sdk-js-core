@@ -3,6 +3,7 @@ import { guardValueIsSetWithMessage } from "../../utils";
 import { EndpointDefinition, EndpointParameterDefinition } from "./endpoint";
 import { EnumType } from "./enum";
 import { EventDefinition, EventTopicDefinition } from "./event";
+import { ExplicitEnumType } from "./explicit-enum";
 import { StructType } from "./struct";
 import { TypeMapper } from "./typeMapper";
 import { CustomType } from "./types";
@@ -63,8 +64,12 @@ export class AbiRegistry {
 
             if (typeDefinition.type == "struct") {
                 customTypes.push(StructType.fromJSON({ name: customTypeName, fields: typeDefinition.fields }));
-            } else if (typeDefinition.type == "enum" || typeDefinition.type == "explicit-enum") {
+            } else if (typeDefinition.type == "enum") {
                 customTypes.push(EnumType.fromJSON({ name: customTypeName, variants: typeDefinition.variants }));
+            } else if (typeDefinition.type == "explicit-enum") {
+                customTypes.push(
+                    ExplicitEnumType.fromJSON({ name: customTypeName, variants: typeDefinition.variants }),
+                );
             } else {
                 throw new errors.ErrTypingSystem(`Cannot handle custom type: ${customTypeName}`);
             }
@@ -105,6 +110,12 @@ export class AbiRegistry {
         const result = this.customTypes.find((e) => e.getName() == name && e.hasExactClass(EnumType.ClassName));
         guardValueIsSetWithMessage(`enum [${name}] not found`, result);
         return <EnumType>result!;
+    }
+
+    getExplicitEnum(name: string): ExplicitEnumType {
+        const result = this.customTypes.find((e) => e.getName() == name && e.hasExactClass(ExplicitEnumType.ClassName));
+        guardValueIsSetWithMessage(`enum [${name}] not found`, result);
+        return <ExplicitEnumType>result!;
     }
 
     getEnums(names: string[]): EnumType[] {

@@ -1,5 +1,4 @@
-import { ResultsParser } from "../abi";
-import { EventDefinition } from "../abi/typesystem/event";
+import { EventDefinition, ResultsParser } from "../abi";
 import { TransactionEvent } from "./resources";
 
 interface IAbi {

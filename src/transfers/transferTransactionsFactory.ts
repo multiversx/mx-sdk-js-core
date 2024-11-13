@@ -1,4 +1,5 @@
 import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "../abi";
+import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
 import { Err, ErrBadUsage } from "../errors";
 import {
     IAddress,
@@ -112,14 +113,10 @@ export class TransferTransactionsFactory {
             return this.createSingleESDTTransferTransaction(sender, options);
         }
 
-        const dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForMultiESDTNFTTransfer(
-            options.receiver,
+        const { dataParts, extraGasForTransfer } = this.buildMultiESDTNFTTransferData(
             options.tokenTransfers,
+            options.receiver,
         );
-
-        const extraGasForTransfer =
-            this.config!.gasLimitMultiESDTNFTTransfer * BigInt(numberOfTransfers) +
-            BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER);
 
         return new TransactionBuilder({
             config: this.config!,
@@ -347,10 +344,7 @@ export class TransferTransactionsFactory {
     ): Transaction {
         this.ensureConfigIsDefined();
 
-        let dataParts: string[] = [];
         const transfer = options.tokenTransfers[0];
-        let extraGasForTransfer = 0n;
-        let receiver = options.receiver;
 
         if (this.tokenComputer!.isFungible(transfer.token)) {
             dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForESDTTransfer(transfer);
@@ -369,6 +363,48 @@ export class TransferTransactionsFactory {
             gasLimit: extraGasForTransfer,
             addDataMovementGas: true,
         }).build();
+    }
+
+    private buildTransferData(transfer: TokenTransfer, options: { sender: IAddress; receiver: IAddress }) {
+        let dataParts: string[] = [];
+        let extraGasForTransfer: bigint;
+        let receiver = options.receiver;
+
+        if (this.tokenComputer!.isFungible(transfer.token)) {
+            if (transfer.token.identifier === EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER) {
+                ({ dataParts, extraGasForTransfer } = this.buildMultiESDTNFTTransferData([transfer], receiver));
+                receiver = options.sender;
+            } else {
+                ({ dataParts, extraGasForTransfer } = this.buildESDTTransferData(transfer));
+            }
+        } else {
+            ({ dataParts, extraGasForTransfer } = this.buildSingleESDTNFTTransferData(transfer, receiver));
+            receiver = options.sender; // Override receiver for non-fungible tokens
+        }
+        return { dataParts, extraGasForTransfer, receiver };
+    }
+
+    private buildMultiESDTNFTTransferData(transfer: TokenTransfer[], receiver: IAddress) {
+        return {
+            dataParts: this.tokenTransfersDataBuilder!.buildDataPartsForMultiESDTNFTTransfer(receiver, transfer),
+            extraGasForTransfer:
+                this.config!.gasLimitMultiESDTNFTTransfer * BigInt(transfer.length) +
+                BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER),
+        };
+    }
+
+    private buildESDTTransferData(transfer: TokenTransfer) {
+        return {
+            dataParts: this.tokenTransfersDataBuilder!.buildDataPartsForESDTTransfer(transfer),
+            extraGasForTransfer: this.config!.gasLimitESDTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_TRANSFER),
+        };
+    }
+
+    private buildSingleESDTNFTTransferData(transfer: TokenTransfer, receiver: IAddress) {
+        return {
+            dataParts: this.tokenTransfersDataBuilder!.buildDataPartsForSingleESDTNFTTransfer(transfer, receiver),
+            extraGasForTransfer: this.config!.gasLimitESDTNFTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER),
+        };
     }
 
     private computeGasForMoveBalance(config: IConfig, data: Uint8Array): bigint {

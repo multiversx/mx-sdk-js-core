@@ -9,13 +9,12 @@ import { ContractController } from "../testutils/contractController";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { Interaction } from "./interaction";
 import { ResultsParser } from "./resultsParser";
 import { ReturnCode } from "./returnCode";
 import { SmartContract } from "./smartContract";
-import { ManagedDecimalSignedValue, ManagedDecimalValue } from "./typesystem";
 
 describe("test smart contract interactor", function () {
     let provider = createLocalnetProvider();

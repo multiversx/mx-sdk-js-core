@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
+import * as contractsCodecUtils from "./abi/codec/utils";
 import { Address } from "./address";
 import { IAddress } from "./interface";
-import * as contractsCodecUtils from "./smartcontracts/codec/utils";
 
 export function numberToPaddedHex(value: bigint | number | BigNumber.Value) {
     let hexableNumber: { toString(radix?: number): string };

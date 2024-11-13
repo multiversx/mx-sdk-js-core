@@ -22,6 +22,8 @@ import {
     EndpointParameterDefinition,
     EnumType,
     EnumValue,
+    ExplicitEnumType,
+    ExplicitEnumValue,
     Field,
     I16Type,
     I16Value,
@@ -203,6 +205,9 @@ export namespace NativeSerializer {
         if (type instanceof EnumType) {
             return toEnumValue(value, type, errorContext);
         }
+        if (type instanceof ExplicitEnumType) {
+            return toExplicitEnumValue(value, type, errorContext);
+        }
         if (type instanceof ManagedDecimalType) {
             return toManagedDecimal(value, type, errorContext);
         }
@@ -335,6 +340,19 @@ export namespace NativeSerializer {
             return new EnumValue(type, variant, fieldValues);
         }
         errorContext.throwError(`(function: toEnumValue) unsupported native type ${typeof native}`);
+    }
+
+    function toExplicitEnumValue(native: any, type: ExplicitEnumType, errorContext: ArgumentErrorContext): TypedValue {
+        if (typeof native === "string") {
+            return ExplicitEnumValue.fromName(type, native);
+        }
+        if (typeof native === "object") {
+            errorContext.guardHasField(native, "name");
+            const variant = type.getVariantByName(native.name);
+
+            return new ExplicitEnumValue(type, variant);
+        }
+        errorContext.throwError(`(function: toExplicitEnumValue) unsupported native type ${typeof native}`);
     }
 
     function toManagedDecimal(native: any, type: ManagedDecimalType, errorContext: ArgumentErrorContext): TypedValue {

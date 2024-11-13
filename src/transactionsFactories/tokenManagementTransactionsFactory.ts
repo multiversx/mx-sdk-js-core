@@ -1,9 +1,9 @@
+import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../abi";
 import { Address } from "../address";
 import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
 import { ErrBadUsage } from "../errors";
 import { IAddress } from "../interface";
 import { Logger } from "../logger";
-import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../smartcontracts";
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "./transactionBuilder";
 

@@ -1,15 +1,8 @@
+import { ArgSerializer, EndpointDefinition, ResultsParser, ReturnCode, Type, UntypedOutcomeBundle } from "../abi";
 import { Address } from "../address";
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { Err } from "../errors";
 import { IContractResultItem, ITransactionEvent, ITransactionOnNetwork } from "../interfaceOfNetwork";
-import {
-    ArgSerializer,
-    EndpointDefinition,
-    ResultsParser,
-    ReturnCode,
-    Type,
-    UntypedOutcomeBundle,
-} from "../smartcontracts";
 import { SmartContractCallOutcome, TransactionOutcome, findEventsByIdentifier } from "./resources";
 
 enum Events {

@@ -1,8 +1,7 @@
+import { ArgSerializer, ContractFunction, EndpointDefinition, isTyped, NativeSerializer, ResultsParser } from "./abi";
 import { Err, ErrSmartContractQuery } from "./errors";
 import { IContractQueryResponse } from "./interfaceOfNetwork";
 import { SmartContractQuery, SmartContractQueryResponse } from "./smartContractQuery";
-import { ArgSerializer, ContractFunction, EndpointDefinition, NativeSerializer, ResultsParser } from "./smartcontracts";
-import { isTyped } from "./smartcontracts/typesystem";
 
 interface IAbi {
     getEndpoint(name: string | ContractFunction): EndpointDefinition;

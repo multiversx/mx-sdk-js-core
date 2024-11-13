@@ -1,11 +1,9 @@
+import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition, isTyped, NativeSerializer } from "../abi";
 import { Address } from "../address";
 import { CONTRACT_DEPLOY_ADDRESS_HEX, VM_TYPE_WASM_VM } from "../constants";
 import { Err } from "../errors";
 import { IAddress } from "../interface";
 import { Logger } from "../logger";
-import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../smartcontracts";
-import { NativeSerializer } from "../smartcontracts/nativeSerializer";
-import { isTyped } from "../smartcontracts/typesystem";
 import { TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { byteArrayToHex, utf8ToHex } from "../utils.codec";

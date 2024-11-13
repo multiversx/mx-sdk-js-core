@@ -6,6 +6,7 @@
 
 require("./globals");
 
+export * from "./abi";
 export * from "./account";
 export * from "./adapters";
 export * from "./address";
@@ -19,19 +20,18 @@ export * from "./interfaceOfNetwork";
 export * from "./logger";
 export * from "./message";
 export * from "./networkParams";
+export * from "./networkProviders";
 export * from "./relayedTransactionV1Builder";
 export * from "./relayedTransactionV2Builder";
 export * from "./signableMessage";
 export * from "./smartContractQueriesController";
-export * from "./smartcontracts";
 export * from "./tokenOperations";
 export * from "./tokens";
 export * from "./transaction";
 export * from "./transactionComputer";
 export * from "./transactionPayload";
-export * from "./transactionWatcher";
 export * from "./transactionsFactories";
 export * from "./transactionsOutcomeParsers";
+export * from "./transactionWatcher";
 export * from "./utils";
-export * from "./networkProviders";
 export * from "./wallet";

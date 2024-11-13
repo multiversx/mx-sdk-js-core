@@ -1,5 +1,4 @@
-import { ResultsParser } from "../smartcontracts";
-import { EventDefinition } from "../smartcontracts/typesystem/event";
+import { EventDefinition, ResultsParser } from "../abi";
 import { TransactionEvent } from "./resources";
 
 interface IAbi {

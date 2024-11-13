@@ -345,15 +345,10 @@ export class TransferTransactionsFactory {
         this.ensureConfigIsDefined();
 
         const transfer = options.tokenTransfers[0];
-
-        if (this.tokenComputer!.isFungible(transfer.token)) {
-            dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForESDTTransfer(transfer);
-            extraGasForTransfer = this.config!.gasLimitESDTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_TRANSFER);
-        } else {
-            dataParts = this.tokenTransfersDataBuilder!.buildDataPartsForSingleESDTNFTTransfer(transfer, receiver);
-            extraGasForTransfer = this.config!.gasLimitESDTNFTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER);
-            receiver = sender;
-        }
+        const { dataParts, extraGasForTransfer, receiver } = this.buildTransferData(transfer, {
+            sender,
+            receiver: options.receiver,
+        });
 
         return new TransactionBuilder({
             config: this.config!,

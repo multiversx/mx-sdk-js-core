@@ -1,14 +1,14 @@
 import { AbiRegistry } from "../abi";
+import { AccountController } from "../accountManagment";
 import { IAccount } from "../accounts/interfaces";
 import { Address } from "../address";
-import { AccountController } from "../controllers/accountController";
-import { DelegationController } from "../controllers/delegationController";
-import { TokenManagementController } from "../controllers/tokenManagementController";
+import { DelegationController } from "../delegation";
 import { ErrInvalidNetworkProviderKind } from "../errors";
 import { Message, MessageComputer } from "../message";
 import { ApiNetworkProvider, ProxyNetworkProvider, TransactionOnNetwork } from "../networkProviders";
 import { RelayedController } from "../relayed/relayedController";
 import { SmartContractController } from "../smartContracts/smartContractController";
+import { TokenManagementController } from "../tokenManagement";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionWatcher } from "../transactionWatcher";
@@ -86,27 +86,27 @@ class NetworkEntrypoint {
     }
 
     createDelegationController(): DelegationController {
-        return new DelegationController(this.chainId, this.networkProvider);
+        return new DelegationController({ chainID: this.chainId, networkProvider: this.networkProvider });
     }
 
     createAccountController(): AccountController {
-        return new AccountController(this.chainId);
+        return new AccountController({ chainID: this.chainId });
     }
 
     createRelayedController(): RelayedController {
-        return new RelayedController(this.chainId);
+        return new RelayedController({ chainID: this.chainId });
     }
 
     createSmartContractController(abi?: AbiRegistry): SmartContractController {
-        return new SmartContractController(this.chainId, this.networkProvider, abi);
+        return new SmartContractController({ chainID: this.chainId, networkProvider: this.networkProvider, abi });
     }
 
     createTokenManagementController(): TokenManagementController {
-        return new TokenManagementController(this.chainId, this.networkProvider);
+        return new TokenManagementController({ chainID: this.chainId, networkProvider: this.networkProvider });
     }
 
     createTransfersController(): TransfersController {
-        return new TransfersController(this.chainId);
+        return new TransfersController({ chainID: this.chainId });
     }
 }
 

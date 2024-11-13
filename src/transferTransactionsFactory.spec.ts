@@ -3,7 +3,7 @@ import { Address } from "./address";
 import { GasEstimator } from "./gasEstimator";
 import { TokenTransfer } from "./tokens";
 import { TransactionPayload } from "./transactionPayload";
-import { TransferTransactionsFactory } from "./transactionsFactories/transferTransactionsFactory";
+import { TransferTransactionsFactory } from "./transfers/transferTransactionsFactory";
 
 describe("test transaction factory", () => {
     const factory = new TransferTransactionsFactory(new GasEstimator());

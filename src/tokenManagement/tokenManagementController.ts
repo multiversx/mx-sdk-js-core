@@ -5,11 +5,11 @@ import { INetworkProvider } from "../networkProviders/interface";
 import { IESDTIssueOutcome } from "../tokenOperations";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TokenManagementTransactionsFactory } from "../transactionsFactories";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TokenManagementTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
 import * as resources from "./resources";
+import { TokenManagementTransactionsFactory } from "./tokenManagementTransactionsFactory";
 
 export class TokenManagementController {
     private factory: TokenManagementTransactionsFactory;

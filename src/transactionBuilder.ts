@@ -1,7 +1,7 @@
-import { ARGUMENTS_SEPARATOR } from "../constants";
-import { IAddress, ITransactionPayload } from "../interface";
-import { Transaction } from "../transaction";
-import { TransactionPayload } from "../transactionPayload";
+import { ARGUMENTS_SEPARATOR } from "./constants";
+import { IAddress, ITransactionPayload } from "./interface";
+import { Transaction } from "./transaction";
+import { TransactionPayload } from "./transactionPayload";
 
 interface Config {
     chainID: string;

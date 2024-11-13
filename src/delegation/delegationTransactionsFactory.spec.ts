@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { Address } from "../address";
 import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../constants";
-import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { ValidatorPublicKey } from "../wallet";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
 
@@ -15,8 +15,7 @@ describe("test delegation transactions factory", function () {
         const serviceFee = 10n;
         const value = 1250000000000000000000n;
 
-        const transaction = delegationFactory.createTransactionForNewDelegationContract({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForNewDelegationContract(sender, {
             totalDelegationCap: delagationCap,
             serviceFee: serviceFee,
             amount: value,
@@ -52,8 +51,7 @@ describe("test delegation transactions factory", function () {
                 ),
         };
 
-        const transaction = delegationFactory.createTransactionForAddingNodes({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForAddingNodes(sender, {
             delegationContract: delegationContract,
             publicKeys: [publicKey],
             signedMessages: [mockMessage.getSignature()],
@@ -81,8 +79,7 @@ describe("test delegation transactions factory", function () {
             },
         };
 
-        const transaction = delegationFactory.createTransactionForRemovingNodes({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForRemovingNodes(sender, {
             delegationContract: delegationContract,
             publicKeys: [publicKey],
         });
@@ -104,8 +101,7 @@ describe("test delegation transactions factory", function () {
             },
         };
 
-        const transaction = delegationFactory.createTransactionForStakingNodes({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForStakingNodes(sender, {
             delegationContract: delegationContract,
             publicKeys: [publicKey],
         });
@@ -127,8 +123,7 @@ describe("test delegation transactions factory", function () {
             },
         };
 
-        const transaction = delegationFactory.createTransactionForUnbondingNodes({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForUnbondingNodes(sender, {
             delegationContract: delegationContract,
             publicKeys: [publicKey],
         });
@@ -151,8 +146,7 @@ describe("test delegation transactions factory", function () {
             },
         };
 
-        const transaction = delegationFactory.createTransactionForUnstakingNodes({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForUnstakingNodes(sender, {
             delegationContract: delegationContract,
             publicKeys: [publicKey],
         });
@@ -175,8 +169,7 @@ describe("test delegation transactions factory", function () {
             },
         };
 
-        const transaction = delegationFactory.createTransactionForUnjailingNodes({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForUnjailingNodes(sender, {
             delegationContract: delegationContract,
             publicKeys: [publicKey],
             amount: 25000000000000000000n,
@@ -194,8 +187,7 @@ describe("test delegation transactions factory", function () {
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         const serviceFee = 10n;
 
-        const transaction = delegationFactory.createTransactionForChangingServiceFee({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForChangingServiceFee(sender, {
             delegationContract: delegationContract,
             serviceFee: serviceFee,
         });
@@ -212,8 +204,7 @@ describe("test delegation transactions factory", function () {
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         const delegationCap = 5000000000000000000000n;
 
-        const transaction = delegationFactory.createTransactionForModifyingDelegationCap({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForModifyingDelegationCap(sender, {
             delegationContract: delegationContract,
             delegationCap: delegationCap,
         });
@@ -229,8 +220,7 @@ describe("test delegation transactions factory", function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const transaction = delegationFactory.createTransactionForSettingAutomaticActivation({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForSettingAutomaticActivation(sender, {
             delegationContract: delegationContract,
         });
 
@@ -245,8 +235,7 @@ describe("test delegation transactions factory", function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const transaction = delegationFactory.createTransactionForUnsettingAutomaticActivation({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForUnsettingAutomaticActivation(sender, {
             delegationContract: delegationContract,
         });
 
@@ -261,8 +250,7 @@ describe("test delegation transactions factory", function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const transaction = delegationFactory.createTransactionForSettingCapCheckOnRedelegateRewards({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForSettingCapCheckOnRedelegateRewards(sender, {
             delegationContract: delegationContract,
         });
 
@@ -277,8 +265,7 @@ describe("test delegation transactions factory", function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const transaction = delegationFactory.createTransactionForUnsettingCapCheckOnRedelegateRewards({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForUnsettingCapCheckOnRedelegateRewards(sender, {
             delegationContract: delegationContract,
         });
 
@@ -293,8 +280,7 @@ describe("test delegation transactions factory", function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const transaction = delegationFactory.createTransactionForSettingMetadata({
-            sender: sender,
+        const transaction = delegationFactory.createTransactionForSettingMetadata(sender, {
             delegationContract: delegationContract,
             name: "name",
             website: "website",

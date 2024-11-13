@@ -141,11 +141,10 @@ export class SmartContract implements ISmartContract {
         const bytecode = Buffer.from(code.toString(), "hex");
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const transaction = factory.createTransactionForDeploy({
-            sender: deployer,
+        const transaction = factory.createTransactionForDeploy(deployer, {
             bytecode: bytecode,
             gasLimit: BigInt(gasLimit.valueOf()),
-            arguments: initArguments,
+            arguments: initArguments ?? [],
             isUpgradeable: metadataAsJson.upgradeable,
             isReadable: metadataAsJson.readable,
             isPayable: metadataAsJson.payable,
@@ -211,12 +210,11 @@ export class SmartContract implements ISmartContract {
         const bytecode = Uint8Array.from(Buffer.from(code.toString(), "hex"));
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const transaction = factory.createTransactionForUpgrade({
-            sender: caller,
+        const transaction = factory.createTransactionForUpgrade(caller, {
             contract: this.getAddress(),
             bytecode: bytecode,
             gasLimit: BigInt(gasLimit.valueOf()),
-            arguments: initArguments,
+            arguments: initArguments ?? [],
             isUpgradeable: metadataAsJson.upgradeable,
             isReadable: metadataAsJson.readable,
             isPayable: metadataAsJson.payable,
@@ -251,8 +249,7 @@ export class SmartContract implements ISmartContract {
         args = args || [];
         value = value || 0;
 
-        const transaction = factory.createTransactionForExecute({
-            sender: caller,
+        const transaction = factory.createTransactionForExecute(caller, {
             contract: receiver ? receiver : this.getAddress(),
             function: func.toString(),
             gasLimit: BigInt(gasLimit.valueOf()),

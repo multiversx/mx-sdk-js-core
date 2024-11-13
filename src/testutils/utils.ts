@@ -1,7 +1,8 @@
 import BigNumber from "bignumber.js";
 import * as fs from "fs";
 import { PathLike } from "fs";
-import { AbiRegistry, Code, SmartContract, TypedValue } from "../abi";
+import { AbiRegistry, Code, SmartContract } from "../abi";
+import { TypedValue } from "../abi/typesystem/types";
 import { IChainID, IGasLimit } from "../interface";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";

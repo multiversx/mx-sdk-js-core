@@ -3,9 +3,9 @@ import { Address } from "../address";
 import { Compatibility } from "../compatibility";
 import { TRANSACTION_VERSION_DEFAULT } from "../constants";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenTransfer, ITransactionValue } from "../interface";
+import { SmartContractTransactionsFactory } from "../smartContracts";
 import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
-import { SmartContractTransactionsFactory } from "../transactionsFactories";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { ContractFunction } from "./function";
 import { InteractionChecker } from "./interactionChecker";
@@ -98,8 +98,7 @@ export class Interaction {
             config: factoryConfig,
         });
 
-        const transaction = factory.createTransactionForExecute({
-            sender: this.sender,
+        const transaction = factory.createTransactionForExecute(this.sender, {
             contract: this.contract.getAddress(),
             function: this.function.valueOf(),
             gasLimit: BigInt(this.gasLimit.valueOf()),

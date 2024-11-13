@@ -96,8 +96,7 @@ describe("test transfer transactions factory", function () {
         const nft = new Token({ identifier: "t0-NFT-123456", nonce: 10n });
         const transfer = new TokenTransfer({ token: nft, amount: 1n });
 
-        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer(alice, {
             receiver: bob,
             tokenTransfers: [transfer],
         });
@@ -148,8 +147,7 @@ describe("test transfer transactions factory", function () {
         const secondNft = new Token({ identifier: "t0-TEST-987654", nonce: 1n });
         const secondTransfer = new TokenTransfer({ token: secondNft, amount: 1n });
 
-        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer(alice, {
             receiver: bob,
             tokenTransfers: [firstTransfer, secondTransfer],
         });
@@ -163,8 +161,7 @@ describe("test transfer transactions factory", function () {
             "MultiESDTNFTTransfer@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@02@74302d4e46542d313233343536@0a@01@74302d544553542d393837363534@01@01",
         );
 
-        const secondTransaction = transferFactory.createTransactionForTransfer({
-            sender: alice,
+        const secondTransaction = transferFactory.createTransactionForTransfer(alice, {
             receiver: bob,
             tokenTransfers: [firstTransfer, secondTransfer],
         });
@@ -253,8 +250,7 @@ describe("test transfer transactions factory", function () {
         const secondNft = new Token({ identifier: "t0-TEST-987654", nonce: 1n });
         const secondTransfer = new TokenTransfer({ token: secondNft, amount: 1n });
 
-        const transaction = transferFactory.createTransactionForTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForTransfer(alice, {
             receiver: bob,
             nativeAmount: 1000000000000000000n,
             tokenTransfers: [firstTransfer, secondTransfer],
@@ -274,8 +270,7 @@ describe("test transfer transactions factory", function () {
         const firstNft = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
         const firstTransfer = new TokenTransfer({ token: firstNft, amount: 1000000000000000000n });
 
-        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer(alice, {
             receiver: bob,
             tokenTransfers: [firstTransfer],
         });

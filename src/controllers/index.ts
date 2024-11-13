@@ -1,2 +1,2 @@
-export * from "./smartContractController";
+export * from "../smartContracts/smartContractController";
 export * from "./transfersController";

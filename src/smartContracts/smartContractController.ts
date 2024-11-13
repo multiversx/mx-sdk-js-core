@@ -6,12 +6,13 @@ import { IAddress } from "../interface";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { INetworkProvider } from "../networkProviders/interface";
 import { SmartContractQueriesController } from "../smartContractQueriesController";
-import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { SmartContractTransactionsFactory, TransactionsFactoryConfig } from "../transactionsFactories";
+import { SmartContractTransactionsFactory } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
+import { ContractDepoyInput, ContractUpgradeInput, SmartContractDeployOutcome, TransactionInput } from "./resources";
 
 export class SmartContractController {
     private factory: SmartContractTransactionsFactory;
@@ -79,51 +80,5 @@ export class SmartContractController {
 
     parseDeploy(transactionOnNetwork: ITransactionOnNetwork): SmartContractDeployOutcome {
         return this.parser.parseDeploy({ transactionOnNetwork });
-    }
-}
-
-type ContractDepoyInput = {
-    nonce: bigint;
-    bytecode: Uint8Array;
-    gasLimit: bigint;
-    arguments: any[];
-    nativeTransferAmount?: bigint;
-    isUpgradeable?: boolean;
-    isReadable?: boolean;
-    isPayable?: boolean;
-    isPayableBySmartContract?: boolean;
-};
-
-type TransactionInput = {
-    nonce: bigint;
-    contract: IAddress;
-    gasLimit: bigint;
-    function: string;
-    arguments?: any[];
-    nativeTransferAmount?: bigint;
-    tokenTransfers?: TokenTransfer[];
-};
-
-type ContractUpgradeInput = ContractDepoyInput & { contract: IAddress };
-
-interface SmartContractDeployOutcome {
-    returnCode: string;
-    returnMessage: string;
-    contracts: DeployedSmartContract[];
-}
-
-class DeployedSmartContract {
-    address: string;
-    ownerAddress: string;
-    codeHash: Uint8Array;
-
-    constructor(address: string, ownerAddress: string, codeHash: Uint8Array) {
-        this.address = address;
-        this.ownerAddress = ownerAddress;
-        this.codeHash = codeHash;
-    }
-
-    toString(): string {
-        return `DeployedSmartContract(address=${this.address}, ownerAddress=${this.ownerAddress}, codeHash=${Buffer.from(this.codeHash).toString("hex")})`;
     }
 }

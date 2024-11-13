@@ -1,20 +1,20 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
+import { promises } from "fs";
+import { QueryRunnerAdapter } from "../adapters/queryRunnerAdapter";
+import { SmartContractQueriesController } from "../smartContractQueriesController";
+import { SmartContractTransactionsFactory } from "../smartContracts/smartContractTransactionsFactory";
 import { loadAbiRegistry, loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
 import { ContractController } from "../testutils/contractController";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
+import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
+import { TransactionWatcher } from "../transactionWatcher";
 import { Interaction } from "./interaction";
+import { ResultsParser } from "./resultsParser";
 import { ReturnCode } from "./returnCode";
 import { SmartContract } from "./smartContract";
-import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
-import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
-import { promises } from "fs";
-import { ResultsParser } from "./resultsParser";
-import { TransactionWatcher } from "../transactionWatcher";
-import { SmartContractQueriesController } from "../smartContractQueriesController";
-import { QueryRunnerAdapter } from "../adapters/queryRunnerAdapter";
 import { ManagedDecimalSignedValue, ManagedDecimalValue } from "./typesystem";
 
 describe("test smart contract interactor", function () {

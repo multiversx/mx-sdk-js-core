@@ -1,12 +1,12 @@
-import { ContractQueryResponse } from "./networkProviders";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
+import { AbiRegistry, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "./abi";
 import { QueryRunnerAdapter } from "./adapters/queryRunnerAdapter";
+import { ContractQueryResponse } from "./networkProviders";
 import { SmartContractQueriesController } from "./smartContractQueriesController";
 import { SmartContractQueryResponse } from "./smartContractQuery";
-import { AbiRegistry, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "./smartcontracts";
-import { bigIntToBuffer } from "./smartcontracts/codec/utils";
 import { MockNetworkProvider, loadAbiRegistry } from "./testutils";
+import { bigIntToBuffer } from "./tokenOperations/codec";
 
 describe("test smart contract queries controller", () => {
     describe("createQuery", () => {

@@ -9,13 +9,13 @@ import { SmartContract } from "./smartContract";
 import {
     BigUIntType,
     BigUIntValue,
+    BytesValue,
     OptionalType,
     OptionalValue,
     OptionValue,
     TokenIdentifierValue,
     U32Value,
 } from "./typesystem";
-import { BytesValue } from "./typesystem/bytes";
 
 describe("integration tests: test checker within interactor", function () {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");

@@ -1,7 +1,7 @@
-import { ContractQueryResponse } from "../networkProviders";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
+import { ContractQueryResponse } from "../networkProviders";
 import {
     loadAbiRegistry,
     loadTestWallets,
@@ -16,8 +16,7 @@ import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { ReturnCode } from "./returnCode";
 import { SmartContract } from "./smartContract";
-import { BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
-import { BytesValue } from "./typesystem/bytes";
+import { BigUIntValue, BytesValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
 
 describe("test smart contract interactor", function () {
     let dummyAddress = new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");

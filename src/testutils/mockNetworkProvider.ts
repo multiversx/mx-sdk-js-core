@@ -1,4 +1,4 @@
-import { ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "../networkProviders";
+import { Query } from "../abi/query";
 import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
 import * as errors from "../errors";
@@ -11,7 +11,7 @@ import {
     ITransactionOnNetwork,
     ITransactionStatus,
 } from "../interfaceOfNetwork";
-import { Query } from "../smartcontracts/query";
+import { ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "../networkProviders";
 import { Transaction, TransactionHash } from "../transaction";
 import { createAccountBalance } from "./utils";
 

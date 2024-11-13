@@ -1,10 +1,8 @@
 import BigNumber from "bignumber.js";
 import * as fs from "fs";
 import { PathLike } from "fs";
+import { AbiRegistry, Code, SmartContract, TypedValue } from "../abi";
 import { IChainID, IGasLimit } from "../interface";
-import { Code } from "../smartcontracts/code";
-import { SmartContract } from "../smartcontracts/smartContract";
-import { AbiRegistry, TypedValue } from "../smartcontracts/typesystem";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
 import { getAxios } from "../utils";

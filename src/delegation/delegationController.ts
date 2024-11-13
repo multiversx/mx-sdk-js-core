@@ -4,21 +4,11 @@ import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { INetworkProvider } from "../networkProviders/interface";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { DelegationTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
-import {
-    AddNodesInput,
-    ChangeServiceFee,
-    DelegateActionsInput,
-    ManageDelegationContractInput,
-    ManageNodesInput,
-    ModifyDelegationCapInput,
-    NewDelegationContractInput,
-    SetContractMetadataInput,
-    UnjailingNodesInput,
-} from "./resources";
+import * as inputs from "./resources";
 
 export class DelegationController {
     private transactionAwaiter: TransactionWatcher;
@@ -37,14 +27,12 @@ export class DelegationController {
 
     async createTransactionForNewDelegationContract(
         sender: IAccount,
-        options: NewDelegationContractInput,
+        nonce: bigint,
+        options: inputs.NewDelegationContractInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForNewDelegationContract({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForNewDelegationContract(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -59,64 +47,92 @@ export class DelegationController {
         return this.parser.parseCreateNewDelegationContract(transactionOnNetwork);
     }
 
-    async createTransactionForAddingNodes(sender: IAccount, options: AddNodesInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForAddingNodes({ ...options, sender: sender.address });
+    async createTransactionForAddingNodes(
+        sender: IAccount,
+        nonce: bigint,
+        options: inputs.AddNodesInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForAddingNodes(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createTransactionForRemovingNodes(sender: IAccount, options: ManageNodesInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForRemovingNodes({ ...options, sender: sender.address });
+    async createTransactionForRemovingNodes(
+        sender: IAccount,
+        nonce: bigint,
+        options: inputs.ManageNodesInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForRemovingNodes(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createTransactionForStakingNodes(sender: IAccount, options: ManageNodesInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForStakingNodes({ ...options, sender: sender.address });
+    async createTransactionForStakingNodes(
+        sender: IAccount,
+        nonce: bigint,
+        options: inputs.ManageNodesInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForStakingNodes(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createTransactionForUnbondingNodes(sender: IAccount, options: ManageNodesInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnbondingNodes({ ...options, sender: sender.address });
+    async createTransactionForUnbondingNodes(
+        sender: IAccount,
+        nonce: bigint,
+        options: inputs.ManageNodesInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnbondingNodes(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createTransactionForUnstakingNodes(sender: IAccount, options: ManageNodesInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnstakingNodes({ ...options, sender: sender.address });
+    async createTransactionForUnstakingNodes(
+        sender: IAccount,
+        nonce: bigint,
+        options: inputs.ManageNodesInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnstakingNodes(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createTransactionForUnjailingNodes(sender: IAccount, options: UnjailingNodesInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnjailingNodes({ ...options, sender: sender.address });
+    async createTransactionForUnjailingNodes(
+        sender: IAccount,
+        nonce: bigint,
+        options: inputs.UnjailingNodesInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnjailingNodes(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createTransactionForChangingServiceFee(sender: IAccount, options: ChangeServiceFee): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForChangingServiceFee({ ...options, sender: sender.address });
+    async createTransactionForChangingServiceFee(
+        sender: IAccount,
+        nonce: bigint,
+        options: inputs.ChangeServiceFee,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForChangingServiceFee(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -124,14 +140,12 @@ export class DelegationController {
 
     async createTransactionForModifyingDelegationCap(
         sender: IAccount,
-        options: ModifyDelegationCapInput,
+        nonce: bigint,
+        options: inputs.ModifyDelegationCapInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForModifyingDelegationCap({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForModifyingDelegationCap(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -139,14 +153,12 @@ export class DelegationController {
 
     async createTransactionForSettingAutomaticActivation(
         sender: IAccount,
-        options: ManageDelegationContractInput,
+        nonce: bigint,
+        options: inputs.ManageDelegationContractInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingAutomaticActivation({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForSettingAutomaticActivation(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -154,14 +166,12 @@ export class DelegationController {
 
     async createTransactionForUnsettingAutomaticActivation(
         sender: IAccount,
-        options: ManageDelegationContractInput,
+        nonce: bigint,
+        options: inputs.ManageDelegationContractInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnsettingAutomaticActivation({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForUnsettingAutomaticActivation(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -169,14 +179,15 @@ export class DelegationController {
 
     async createTransactionForSettingCapCheckOnRedelegateRewards(
         sender: IAccount,
-        options: ManageDelegationContractInput,
+        nonce: bigint,
+        options: inputs.ManageDelegationContractInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingCapCheckOnRedelegateRewards({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForSettingCapCheckOnRedelegateRewards(
+            sender.address,
+            options,
+        );
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -184,14 +195,15 @@ export class DelegationController {
 
     async createTransactionForUnsettingCapCheckOnRedelegateRewards(
         sender: IAccount,
-        options: ManageDelegationContractInput,
+        nonce: bigint,
+        options: inputs.ManageDelegationContractInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnsettingCapCheckOnRedelegateRewards({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForUnsettingCapCheckOnRedelegateRewards(
+            sender.address,
+            options,
+        );
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -199,23 +211,25 @@ export class DelegationController {
 
     async createTransactionForSettingMetadata(
         sender: IAccount,
-        options: SetContractMetadataInput,
+        nonce: bigint,
+        options: inputs.SetContractMetadataInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingMetadata({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForSettingMetadata(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createTransactionForDelegating(sender: IAccount, options: DelegateActionsInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForDelegating({ ...options, sender: sender.address });
+    async createTransactionForDelegating(
+        sender: IAccount,
+        nonce: bigint,
+        options: inputs.DelegateActionsInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForDelegating(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -223,11 +237,12 @@ export class DelegationController {
 
     async createTransactionForClaimingRewards(
         sender: IAccount,
-        options: ManageDelegationContractInput,
+        nonce: bigint,
+        options: inputs.ManageDelegationContractInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForClaimingRewards({ ...options, sender: sender.address });
+        const transaction = this.factory.createTransactionForClaimingRewards(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -235,23 +250,25 @@ export class DelegationController {
 
     async createTransactionForRedelegatingRewards(
         sender: IAccount,
-        options: ManageDelegationContractInput,
+        nonce: bigint,
+        options: inputs.ManageDelegationContractInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForRedelegatingRewards({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForRedelegatingRewards(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createTransactionForUndelegating(sender: IAccount, options: DelegateActionsInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUndelegating({ ...options, sender: sender.address });
+    async createTransactionForUndelegating(
+        sender: IAccount,
+        nonce: bigint,
+        options: inputs.DelegateActionsInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUndelegating(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -259,11 +276,12 @@ export class DelegationController {
 
     async createTransactionForWithdrawing(
         sender: IAccount,
-        options: ManageDelegationContractInput,
+        nonce: bigint,
+        options: inputs.ManageDelegationContractInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForWithdrawing({ ...options, sender: sender.address });
+        const transaction = this.factory.createTransactionForWithdrawing(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;

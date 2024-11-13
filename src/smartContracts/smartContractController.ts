@@ -12,7 +12,7 @@ import { SmartContractTransactionsFactory } from "../transactionsFactories";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
-import { ContractDepoyInput, ContractUpgradeInput, SmartContractDeployOutcome, TransactionInput } from "./resources";
+import * as resources from "./resources";
 
 export class SmartContractController {
     private factory: SmartContractTransactionsFactory;
@@ -36,33 +36,45 @@ export class SmartContractController {
         this.txComputer = new TransactionComputer();
     }
 
-    async createTransactionForDeploy(sender: IAccount, options: ContractDepoyInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForDeploy({ ...options, sender: sender.address });
+    async createTransactionForDeploy(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.ContractDepoyInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForDeploy(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async awaitCompletedDeploy(txHash: string): Promise<SmartContractDeployOutcome> {
+    async awaitCompletedDeploy(txHash: string): Promise<resources.SmartContractDeployOutcome> {
         const transaction = await this.transactionWatcher.awaitCompleted(txHash);
         return this.parseDeploy(transaction);
     }
 
-    async createTransactionForUpgrade(sender: IAccount, options: ContractUpgradeInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUpgrade({ ...options, sender: sender.address });
+    async createTransactionForUpgrade(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.ContractUpgradeInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUpgrade(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createTransactionForExecute(sender: IAccount, options: TransactionInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForExecute({ ...options, sender: sender.address });
+    async createTransactionForExecute(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.TransactionInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForExecute(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -78,7 +90,7 @@ export class SmartContractController {
         });
     }
 
-    parseDeploy(transactionOnNetwork: ITransactionOnNetwork): SmartContractDeployOutcome {
+    parseDeploy(transactionOnNetwork: ITransactionOnNetwork): resources.SmartContractDeployOutcome {
         return this.parser.parseDeploy({ transactionOnNetwork });
     }
 }

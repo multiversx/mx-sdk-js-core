@@ -2,7 +2,6 @@ import { IAddress } from "../interface";
 import { TokenTransfer } from "../tokens";
 
 export type ContractDepoyInput = {
-    nonce: bigint;
     bytecode: Uint8Array;
     gasLimit: bigint;
     arguments: any[];
@@ -14,7 +13,6 @@ export type ContractDepoyInput = {
 };
 
 export type TransactionInput = {
-    nonce: bigint;
     contract: IAddress;
     gasLimit: bigint;
     function: string;

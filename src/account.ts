@@ -1,6 +1,6 @@
+import { IAccount } from "./accounts/interfaces";
 import { Address } from "./address";
 import { LibraryConfig } from "./config";
-import { IAccount } from "./controllers/interfaces";
 import { IAccountBalance, IAddress, INonce } from "./interface";
 import { UserSigner, UserWallet } from "./wallet";
 

@@ -1,4 +1,4 @@
-import { IAccount } from "../controllers/interfaces";
+import { IAccount } from "../accounts/interfaces";
 import { ProviderWrapper } from "../entrypoints/providerWrapper";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { INetworkProvider } from "../networkProviders/interface";

@@ -1,8 +1,9 @@
-import { ITransaction } from "../interface";
+import { IAccount } from "../accounts/interfaces";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { RelayedTransactionsFactory, TransactionsFactoryConfig } from "../transactionsFactories";
-import { IAccount } from "./interfaces";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
+import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
+import { CreateV1RelayTransactionInput, CreateV2RelayTransactionInput } from "./resources";
 
 export class RelayedController {
     private factory: RelayedTransactionsFactory;
@@ -38,10 +39,3 @@ export class RelayedController {
         return transaction;
     }
 }
-
-type CreateV1RelayTransactionInput = { nonce: bigint; innerTransaction: ITransaction };
-type CreateV2RelayTransactionInput = {
-    nonce: bigint;
-    innerTransaction: ITransaction;
-    innerTransactionGasLimit: bigint;
-};

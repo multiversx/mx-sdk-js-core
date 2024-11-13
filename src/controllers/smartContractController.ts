@@ -1,3 +1,4 @@
+import { IAccount } from "../accounts/interfaces";
 import { QueryRunnerAdapter } from "../adapters";
 import { ProviderWrapper } from "../entrypoints/providerWrapper";
 import { IAddress } from "../interface";
@@ -11,7 +12,6 @@ import { TransactionComputer } from "../transactionComputer";
 import { SmartContractTransactionsFactory, TransactionsFactoryConfig } from "../transactionsFactories";
 import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
-import { IAccount } from "./interfaces";
 
 export class SmartContractController {
     private factory: SmartContractTransactionsFactory;

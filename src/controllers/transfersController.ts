@@ -1,9 +1,9 @@
+import { IAccount } from "../accounts/interfaces";
 import { IAddress } from "../interface";
 import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionsFactoryConfig, TransferTransactionsFactory } from "../transactionsFactories";
-import { IAccount } from "./interfaces";
 
 export class TransfersController {
     private factory: TransferTransactionsFactory;

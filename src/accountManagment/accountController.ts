@@ -1,7 +1,7 @@
-import { IAccount } from "../controllers/interfaces";
+import { IAccount } from "../accounts/interfaces";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { AccountTransactionsFactory } from "./accountTransactionsFactory";
 import { GuardianInteractionInput, SaveKeyValueInput, SetGuardianInput } from "./resources";
 

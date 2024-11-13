@@ -2,8 +2,8 @@ import { assert } from "chai";
 import { TestWallet, loadTestWallets } from "../testutils";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
-import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test relayed transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "T" });

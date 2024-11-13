@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { Address } from "../address";
 import { ErrBadUsage } from "../errors";
 import { Token, TokenTransfer } from "../tokens";
-import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 
 describe("test transfer transactions factory", function () {

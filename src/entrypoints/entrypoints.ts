@@ -4,7 +4,6 @@ import { Address } from "../address";
 import { AccountController } from "../controllers/accountController";
 import { DelegationController } from "../controllers/delegationController";
 import { TokenManagementController } from "../controllers/tokenManagementController";
-import { TransfersController } from "../controllers/transfersController";
 import { ErrInvalidNetworkProviderKind } from "../errors";
 import { Message, MessageComputer } from "../message";
 import { ApiNetworkProvider, ProxyNetworkProvider, TransactionOnNetwork } from "../networkProviders";
@@ -13,6 +12,7 @@ import { SmartContractController } from "../smartContracts/smartContractControll
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionWatcher } from "../transactionWatcher";
+import { TransfersController } from "../transfers/transfersController";
 import { UserVerifier } from "../wallet";
 import { DevnetEntrypointConfig, MainnetEntrypointConfig, TestnetEntrypointConfig } from "./config";
 import { ProviderWrapper } from "./providerWrapper";

@@ -1,7 +1,6 @@
-import { ArgSerializer } from "../abi/argSerializer";
-import { AddressValue, BigUIntValue, TokenIdentifierValue, TypedValue, U32Value } from "../abi/typesystem";
-import { IAddress } from "../interface";
-import { TokenComputer, TokenTransfer } from "../tokens";
+import { AddressValue, ArgSerializer, BigUIntValue, TokenIdentifierValue, TypedValue, U32Value } from "./abi";
+import { IAddress } from "./interface";
+import { TokenComputer, TokenTransfer } from "./tokens";
 
 export class TokenTransfersDataBuilder {
     private tokenComputer: TokenComputer;

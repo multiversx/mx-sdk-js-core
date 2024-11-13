@@ -5,7 +5,7 @@ import { ErrBadUsage } from "../errors";
 import { IAddress } from "../interface";
 import { Logger } from "../logger";
 import { Transaction } from "../transaction";
-import { TransactionBuilder } from "../transactionsFactories/transactionBuilder";
+import { TransactionBuilder } from "../transactionBuilder";
 
 interface IConfig {
     chainID: string;

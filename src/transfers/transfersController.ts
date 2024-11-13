@@ -1,9 +1,9 @@
 import { IAccount } from "../accounts/interfaces";
-import { IAddress } from "../interface";
-import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig, TransferTransactionsFactory } from "../transactionsFactories";
+import { TransferTransactionsFactory } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
+import { CreateTransferTransactionInput, ESDTTokenTransferInput, NativeTokenTransferInput } from "./resources";
 
 export class TransfersController {
     private factory: TransferTransactionsFactory;
@@ -53,24 +53,3 @@ export class TransfersController {
         return transaction;
     }
 }
-
-type NativeTokenTransferInput = {
-    nonce: bigint;
-    receiver: IAddress;
-    nativeAmount?: bigint;
-    data?: Uint8Array;
-};
-
-type ESDTTokenTransferInput = {
-    nonce: bigint;
-    receiver: IAddress;
-    tokenTransfers: TokenTransfer[];
-};
-
-type CreateTransferTransactionInput = {
-    nonce: bigint;
-    receiver: IAddress;
-    nativeTransferAmount?: bigint;
-    tokenTransfers?: TokenTransfer[];
-    data?: Uint8Array;
-};

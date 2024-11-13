@@ -11,10 +11,10 @@ import {
     ITransactionValue,
 } from "../interface";
 import { TokenComputer, TokenTransfer } from "../tokens";
+import { TokenTransfersDataBuilder } from "../tokenTransfersDataBuilder";
 import { Transaction } from "../transaction";
+import { TransactionBuilder } from "../transactionBuilder";
 import { TransactionPayload } from "../transactionPayload";
-import { TokenTransfersDataBuilder } from "./tokenTransfersDataBuilder";
-import { TransactionBuilder } from "./transactionBuilder";
 
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
 const ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER = 800000;

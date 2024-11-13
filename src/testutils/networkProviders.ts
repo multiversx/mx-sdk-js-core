@@ -1,13 +1,7 @@
+import { Query } from "../abi/query";
 import { IAddress } from "../interface";
-import {
-    IAccountOnNetwork,
-    IContractQueryResponse,
-    INetworkConfig,
-    ITransactionOnNetwork,
-    ITransactionStatus,
-} from "../interfaceOfNetwork";
-import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
-import { Query } from "../smartcontracts/query";
+import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionStatus } from "../interfaceOfNetwork";
+import { ApiNetworkProvider, ProxyNetworkProvider, TransactionOnNetwork } from "../networkProviders";
 import { Transaction } from "../transaction";
 
 export function createLocalnetProvider(): INetworkProvider {
@@ -38,7 +32,7 @@ export function createMainnetProvider(): INetworkProvider {
 export interface INetworkProvider {
     getNetworkConfig(): Promise<INetworkConfig>;
     getAccount(address: IAddress): Promise<IAccountOnNetwork>;
-    getTransaction(txHash: string, withProcessStatus?: boolean): Promise<ITransactionOnNetwork>;
+    getTransaction(txHash: string, withProcessStatus?: boolean): Promise<TransactionOnNetwork>;
     getTransactionStatus(txHash: string): Promise<ITransactionStatus>;
     sendTransaction(tx: Transaction): Promise<string>;
     simulateTransaction(tx: Transaction): Promise<any>;

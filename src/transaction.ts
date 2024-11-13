@@ -20,13 +20,13 @@ import {
 import { INetworkConfig } from "./interfaceOfNetwork";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { interpretSignatureAsBuffer } from "./signature";
-import { TransactionPayload } from "./transactionPayload";
 import { TransactionComputer } from "./transactionComputer";
+import { TransactionPayload } from "./transactionPayload";
 
 /**
  * An abstraction for creating and signing transactions.
  */
-export class Transaction {
+export class Transaction implements ITransaction {
     /**
      * The nonce of the transaction (the account sequence number of the sender).
      */

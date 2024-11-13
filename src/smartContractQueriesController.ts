@@ -3,7 +3,7 @@ import { Err, ErrSmartContractQuery } from "./errors";
 import { IContractQueryResponse } from "./interfaceOfNetwork";
 import { SmartContractQuery, SmartContractQueryResponse } from "./smartContractQuery";
 
-interface IAbi {
+export interface IAbi {
     getEndpoint(name: string | ContractFunction): EndpointDefinition;
 }
 

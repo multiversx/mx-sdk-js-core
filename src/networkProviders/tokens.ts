@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "../address";
+import { IAddress } from "../interface";
 import { numberToPaddedHex } from "../utils.codec";
-import { IAddress } from "./interface";
 
 export class FungibleTokenOfAccountOnNetwork {
     identifier: string = "";

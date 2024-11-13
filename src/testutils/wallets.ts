@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Account } from "../account";
+import { Account } from "../accounts/account";
 import { Address } from "../address";
 import { IAddress } from "../interface";
 import { IAccountOnNetwork } from "../interfaceOfNetwork";
@@ -104,7 +104,7 @@ export class TestWallet {
         this.signer = new UserSigner(UserSecretKey.fromString(secretKeyHex));
         this.keyFileObject = keyFileObject;
         this.pemFileText = pemFileText;
-        this.account = new Account(this.address);
+        this.account = new Account(this.address, this.signer);
     }
 
     getAddress(): Address {

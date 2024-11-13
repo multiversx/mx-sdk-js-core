@@ -3,7 +3,7 @@ import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { AccountTransactionsFactory } from "./accountTransactionsFactory";
-import { GuardianInteractionInput, SaveKeyValueInput, SetGuardianInput } from "./resources";
+import { SaveKeyValueInput, SetGuardianInput } from "./resources";
 
 export class AccountController {
     private factory: AccountTransactionsFactory;
@@ -16,46 +16,45 @@ export class AccountController {
         this.txComputer = new TransactionComputer();
     }
 
-    async createTransactionForSavingKeyValue(sender: IAccount, options: SaveKeyValueInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSavingKeyValue({
-            sender: sender.address,
-            keyValuePairs: options.keyValuePairs,
-        });
-
-        transaction.nonce = options.nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
-
-        return transaction;
-    }
-
-    async createTransactionForSettingGuardian(sender: IAccount, options: SetGuardianInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingGuardian({ ...options, sender: sender.address });
-
-        transaction.nonce = options.nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
-
-        return transaction;
-    }
-
-    async createTransactionForGuardingAccount(
+    async createTransactionForSavingKeyValue(
         sender: IAccount,
-        options: GuardianInteractionInput,
+        nonce: bigint,
+        options: SaveKeyValueInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForGuardingAccount({ sender: sender.address });
+        const transaction = this.factory.createTransactionForSavingKeyValue(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createTransactionForUnguardingAccount(
+    async createTransactionForSettingGuardian(
         sender: IAccount,
-        options: GuardianInteractionInput,
+        nonce: bigint,
+        options: SetGuardianInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnguardingAccount({ sender: sender.address });
+        const transaction = this.factory.createTransactionForSettingGuardian(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async createTransactionForGuardingAccount(sender: IAccount, nonce: bigint): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForGuardingAccount(sender.address);
+
+        transaction.nonce = nonce;
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async createTransactionForUnguardingAccount(sender: IAccount, nonce: bigint): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnguardingAccount(sender.address);
+
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;

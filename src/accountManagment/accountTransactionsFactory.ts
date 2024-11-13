@@ -2,6 +2,7 @@ import { Address } from "../address";
 import { IAddress } from "../interface";
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "../transactionBuilder";
+import { SaveKeyValueInput, SetGuardianInput } from "./resources";
 
 export interface IConfig {
     chainID: string;
@@ -22,10 +23,7 @@ export class AccountTransactionsFactory {
         this.config = options.config;
     }
 
-    createTransactionForSavingKeyValue(options: {
-        sender: IAddress;
-        keyValuePairs: Map<Uint8Array, Uint8Array>;
-    }): Transaction {
+    createTransactionForSavingKeyValue(sender: IAddress, options: SaveKeyValueInput): Transaction {
         const functionName = "SaveKeyValue";
         const keyValueParts = this.computeDataPartsForSavingKeyValue(options.keyValuePairs);
         const dataParts = [functionName, ...keyValueParts];
@@ -33,8 +31,8 @@ export class AccountTransactionsFactory {
 
         return new TransactionBuilder({
             config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
+            sender: sender,
+            receiver: sender,
             dataParts: dataParts,
             gasLimit: extraGas,
             addDataMovementGas: true,
@@ -63,11 +61,7 @@ export class AccountTransactionsFactory {
         return dataParts;
     }
 
-    createTransactionForSettingGuardian(options: {
-        sender: IAddress;
-        guardianAddress: IAddress;
-        serviceID: string;
-    }): Transaction {
+    createTransactionForSettingGuardian(sender: IAddress, options: SetGuardianInput): Transaction {
         const dataParts = [
             "SetGuardian",
             Address.fromBech32(options.guardianAddress.bech32()).toHex(),
@@ -76,34 +70,34 @@ export class AccountTransactionsFactory {
 
         return new TransactionBuilder({
             config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
+            sender: sender,
+            receiver: sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitSetGuardian,
             addDataMovementGas: true,
         }).build();
     }
 
-    createTransactionForGuardingAccount(options: { sender: IAddress }): Transaction {
+    createTransactionForGuardingAccount(sender: IAddress): Transaction {
         const dataParts = ["GuardAccount"];
 
         return new TransactionBuilder({
             config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
+            sender: sender,
+            receiver: sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitGuardAccount,
             addDataMovementGas: true,
         }).build();
     }
 
-    createTransactionForUnguardingAccount(options: { sender: IAddress }): Transaction {
+    createTransactionForUnguardingAccount(sender: IAddress): Transaction {
         const dataParts = ["UnGuardAccount"];
 
         return new TransactionBuilder({
             config: this.config,
-            sender: options.sender,
-            receiver: options.sender,
+            sender: sender,
+            receiver: sender,
             dataParts: dataParts,
             gasLimit: this.config.gasLimitUnguardAccount,
             addDataMovementGas: true,

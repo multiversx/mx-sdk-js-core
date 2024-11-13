@@ -1,9 +1,9 @@
 import BigNumber from "bignumber.js";
+import { bigIntToBuffer } from "../abi/codec/utils";
 import { Address } from "../address";
 import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED } from "../constants";
 import * as errors from "../errors";
 import { ITransaction, ITransactionValue } from "../interface";
-import { bigIntToBuffer } from "../smartcontracts/codec/utils";
 import { Transaction } from "../transaction";
 
 /**

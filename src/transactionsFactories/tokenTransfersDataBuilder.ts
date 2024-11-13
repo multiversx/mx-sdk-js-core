@@ -1,6 +1,5 @@
+import { AddressValue, ArgSerializer, BigUIntValue, TokenIdentifierValue, TypedValue, U32Value } from "../abi";
 import { IAddress } from "../interface";
-import { ArgSerializer } from "../smartcontracts/argSerializer";
-import { AddressValue, BigUIntValue, TokenIdentifierValue, TypedValue, U32Value } from "../smartcontracts/typesystem";
 import { TokenComputer, TokenTransfer } from "../tokens";
 
 export class TokenTransfersDataBuilder {

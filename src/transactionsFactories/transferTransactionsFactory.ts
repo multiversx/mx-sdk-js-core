@@ -1,3 +1,4 @@
+import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "../abi";
 import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
 import { Err, ErrBadUsage } from "../errors";
 import {
@@ -10,15 +11,6 @@ import {
     ITransactionPayload,
     ITransactionValue,
 } from "../interface";
-import {
-    AddressValue,
-    ArgSerializer,
-    BigUIntValue,
-    BytesValue,
-    TypedValue,
-    U16Value,
-    U64Value,
-} from "../smartcontracts";
 import { TokenComputer, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionPayload } from "../transactionPayload";

@@ -7,15 +7,22 @@ import { prepareDeployment } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { loadTestWallets, TestWallet } from "../testutils/wallets";
 import { TransactionComputer } from "../transactionComputer";
+import { TransactionsFactoryConfig } from "../transactionsFactories";
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
-import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { decodeUnsignedNumber } from "./codec";
 import { ContractFunction } from "./function";
 import { ResultsParser } from "./resultsParser";
 import { SmartContract } from "./smartContract";
-import { AddressValue, BigUIntValue, OptionalValue, OptionValue, TokenIdentifierValue, U32Value } from "./typesystem";
-import { BytesValue } from "./typesystem/bytes";
+import {
+    AddressValue,
+    BigUIntValue,
+    BytesValue,
+    OptionalValue,
+    OptionValue,
+    TokenIdentifierValue,
+    U32Value,
+} from "./typesystem";
 
 describe("test on local testnet", function () {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;

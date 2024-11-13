@@ -12,6 +12,7 @@ export * from "./codeMetadata";
 export * from "./composite";
 export * from "./endpoint";
 export * from "./enum";
+export * from "./event";
 export * from "./explicit-enum";
 export * from "./factory";
 export * from "./fields";

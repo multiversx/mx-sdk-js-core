@@ -1,7 +1,7 @@
+import { AddressValue, ArgSerializer, BytesValue, U64Value } from "./abi";
 import { ErrGasLimitShouldBe0ForInnerTransaction, ErrInvalidRelayedV2BuilderArguments } from "./errors";
 import { IAddress, IGasLimit, INonce } from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
-import { AddressValue, ArgSerializer, BytesValue, U64Value } from "./smartcontracts";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 

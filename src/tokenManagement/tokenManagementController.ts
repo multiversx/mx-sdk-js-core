@@ -5,25 +5,11 @@ import { INetworkProvider } from "../networkProviders/interface";
 import { IESDTIssueOutcome } from "../tokenOperations";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TokenManagementTransactionsFactory, TransactionsFactoryConfig } from "../transactionsFactories";
+import { TokenManagementTransactionsFactory } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TokenManagementTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
-import {
-    FungibleSpecialRoleInput,
-    IssueFungibleInput,
-    IssueNonFungibleInput,
-    IssueSemiFungibleInput,
-    LocalBurnInput,
-    LocalMintInput,
-    ManagementInput,
-    MintInput,
-    RegisterMetaESDTInput,
-    RegisterRolesInput,
-    SemiFungibleSpecialRoleInput,
-    SpecialRoleInput,
-    UpdateAttributesInput,
-    UpdateQuantityInput,
-} from "./resources";
+import * as resources from "./resources";
 
 export class TokenManagementController {
     private factory: TokenManagementTransactionsFactory;
@@ -40,10 +26,14 @@ export class TokenManagementController {
         this.parser = new TokenManagementTransactionsOutcomeParser();
     }
 
-    async createTransactionForIssuingFungible(sender: IAccount, options: IssueFungibleInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForIssuingFungible({ ...options, sender: sender.address });
+    async createTransactionForIssuingFungible(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.IssueFungibleInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForIssuingFungible(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -59,14 +49,12 @@ export class TokenManagementController {
     }
     async createTransactionForIssuingSemiFungible(
         sender: IAccount,
-        options: IssueSemiFungibleInput,
+        nonce: bigint,
+        options: resources.IssueSemiFungibleInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForIssuingSemiFungible({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForIssuingSemiFungible(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -83,11 +71,12 @@ export class TokenManagementController {
 
     async createTransactionForIssuingNonFungible(
         sender: IAccount,
-        options: IssueNonFungibleInput,
+        nonce: bigint,
+        options: resources.IssueNonFungibleInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForIssuingNonFungible({ ...options, sender: sender.address });
+        const transaction = this.factory.createTransactionForIssuingNonFungible(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -100,14 +89,12 @@ export class TokenManagementController {
 
     async createTransactionForRegisteringMetaEsdt(
         sender: IAccount,
-        options: RegisterMetaESDTInput,
+        nonce: bigint,
+        options: resources.RegisterMetaESDTInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForRegisteringMetaESDT({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForRegisteringMetaESDT(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -120,14 +107,12 @@ export class TokenManagementController {
 
     async createTransactionForRegisteringAndSettingRoles(
         sender: IAccount,
-        options: RegisterRolesInput,
+        nonce: bigint,
+        options: resources.RegisterRolesInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForRegisteringAndSettingRoles({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForRegisteringAndSettingRoles(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -140,14 +125,12 @@ export class TokenManagementController {
 
     async createTransactionForSetBurnRoleGlobally(
         sender: IAccount,
-        options: { nonce: bigint; tokenIdentifier: string },
+        nonce: bigint,
+        options: resources.TokenIdentifierInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingBurnRoleGlobally({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForSettingBurnRoleGlobally(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -160,14 +143,12 @@ export class TokenManagementController {
 
     async createTransactionForUnsettingBurnRoleGlobally(
         sender: IAccount,
-        options: { nonce: bigint; tokenIdentifier: string },
+        nonce: bigint,
+        options: resources.TokenIdentifierInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnsettingBurnRoleGlobally({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForUnsettingBurnRoleGlobally(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -180,14 +161,12 @@ export class TokenManagementController {
 
     async createTransactionForSettingSpecialRoleOnFungibleToken(
         sender: IAccount,
-        options: FungibleSpecialRoleInput,
+        nonce: bigint,
+        options: resources.FungibleSpecialRoleInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingSpecialRoleOnFungibleToken({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForSettingSpecialRoleOnFungibleToken(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -206,14 +185,15 @@ export class TokenManagementController {
 
     async createTransactionForSettingSpecialRoleOnSemiFungibleToken(
         sender: IAccount,
-        options: SemiFungibleSpecialRoleInput,
+        nonce: bigint,
+        options: resources.SemiFungibleSpecialRoleInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken(
+            sender.address,
+            options,
+        );
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -232,14 +212,15 @@ export class TokenManagementController {
 
     async createTransactionForSettingSpecialRoleOnNonFungibleToken(
         sender: IAccount,
-        options: SpecialRoleInput,
+        nonce: bigint,
+        options: resources.SpecialRoleInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingSpecialRoleOnNonFungibleToken({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForSettingSpecialRoleOnNonFungibleToken(
+            sender.address,
+            options,
+        );
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -256,13 +237,14 @@ export class TokenManagementController {
         return this.parser.parseSetSpecialRole(transaction);
     }
 
-    async createTransactionForCreatingNft(sender: IAccount, options: MintInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForCreatingNFT({
-            ...options,
-            sender: sender.address,
-        });
+    async createTransactionForCreatingNft(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.MintInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForCreatingNFT(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -279,13 +261,14 @@ export class TokenManagementController {
         return this.parser.parseNftCreate(transaction);
     }
 
-    async createTransactionForPausing(sender: IAccount, options: ManagementInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForPausing({
-            ...options,
-            sender: sender.address,
-        });
+    async createTransactionForPausing(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.ManagementInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForPausing(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -296,13 +279,14 @@ export class TokenManagementController {
         return this.parser.parsePause(transaction);
     }
 
-    async createTransactionForUnpausing(sender: IAccount, options: ManagementInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnpausing({
-            ...options,
-            sender: sender.address,
-        });
+    async createTransactionForUnpausing(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.ManagementInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnpausing(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -313,13 +297,14 @@ export class TokenManagementController {
         return this.parser.parseUnpause(transaction);
     }
 
-    async createTransactionForFreezing(sender: IAccount, options: ManagementInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForFreezing({
-            ...options,
-            sender: sender.address,
-        });
+    async createTransactionForFreezing(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.ManagementInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForFreezing(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -330,13 +315,14 @@ export class TokenManagementController {
         return this.parser.parseFreeze(transaction);
     }
 
-    async createTransactionForUnFreezing(sender: IAccount, options: ManagementInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnfreezing({
-            ...options,
-            sender: sender.address,
-        });
+    async createTransactionForUnFreezing(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.ManagementInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnfreezing(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -347,13 +333,14 @@ export class TokenManagementController {
         return this.parser.parseUnfreeze(transaction);
     }
 
-    async createTransactionForWiping(sender: IAccount, options: ManagementInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForWiping({
-            ...options,
-            sender: sender.address,
-        });
+    async createTransactionForWiping(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.ManagementInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForWiping(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -364,13 +351,14 @@ export class TokenManagementController {
         return this.parser.parseWipe(transaction);
     }
 
-    async createTransactionForLocaMinting(sender: IAccount, options: LocalMintInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForLocalMint({
-            ...options,
-            sender: sender.address,
-        });
+    async createTransactionForLocaMinting(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.LocalMintInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForLocalMint(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -381,13 +369,14 @@ export class TokenManagementController {
         return this.parser.parseLocalMint(transaction);
     }
 
-    async createTransactionForLocalBurning(sender: IAccount, options: LocalBurnInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForLocalBurning({
-            ...options,
-            sender: sender.address,
-        });
+    async createTransactionForLocalBurning(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.LocalBurnInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForLocalBurning(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -400,14 +389,12 @@ export class TokenManagementController {
 
     async createTransactionForUpdatingAttributes(
         sender: IAccount,
-        options: UpdateAttributesInput,
+        nonce: bigint,
+        options: resources.UpdateAttributesInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUpdatingAttributes({
-            ...options,
-            sender: sender.address,
-        });
+        const transaction = this.factory.createTransactionForUpdatingAttributes(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -418,14 +405,14 @@ export class TokenManagementController {
         return this.parser.parseUpdateAttributes(transaction);
     }
 
-    async createTransactionForAddingQuantity(sender: IAccount, options: UpdateQuantityInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForAddingQuantity({
-            ...options,
-            sender: sender.address,
-            quantityToAdd: options.quantity,
-        });
+    async createTransactionForAddingQuantity(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.UpdateQuantityInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForAddingQuantity(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -436,14 +423,14 @@ export class TokenManagementController {
         return this.parser.parseAddQuantity(transaction);
     }
 
-    async createTransactionForBurningQuantity(sender: IAccount, options: UpdateQuantityInput): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForBurningQuantity({
-            ...options,
-            sender: sender.address,
-            quantityToBurn: options.quantity,
-        });
+    async createTransactionForBurningQuantity(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.UpdateQuantityInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForBurningQuantity(sender.address, options);
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;

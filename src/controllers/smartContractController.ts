@@ -1,3 +1,4 @@
+import { AbiRegistry } from "../abi";
 import { IAccount } from "../accounts/interfaces";
 import { QueryRunnerAdapter } from "../adapters";
 import { ProviderWrapper } from "../entrypoints/providerWrapper";
@@ -5,7 +6,6 @@ import { IAddress } from "../interface";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { INetworkProvider } from "../networkProviders/interface";
 import { SmartContractQueriesController } from "../smartContractQueriesController";
-import { AbiRegistry } from "../smartcontracts";
 import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";

@@ -5,7 +5,7 @@ import { ErrContractHasNoAddress } from "../errors";
 import { IAddress, INonce } from "../interface";
 import { Transaction } from "../transaction";
 import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
-import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { guardValueIsSet } from "../utils";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";

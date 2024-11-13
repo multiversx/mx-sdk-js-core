@@ -1,3 +1,4 @@
+import { AbiRegistry } from "../abi";
 import { IAccount } from "../accounts/interfaces";
 import { Address } from "../address";
 import { AccountController } from "../controllers/accountController";
@@ -9,7 +10,6 @@ import { ErrInvalidNetworkProviderKind } from "../errors";
 import { Message, MessageComputer } from "../message";
 import { ApiNetworkProvider, ProxyNetworkProvider, TransactionOnNetwork } from "../networkProviders";
 import { RelayedController } from "../relayed/relayedController";
-import { AbiRegistry } from "../smartcontracts";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionWatcher } from "../transactionWatcher";

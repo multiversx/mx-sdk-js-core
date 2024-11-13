@@ -1,9 +1,7 @@
+import { Interaction, ResultsParser, TypedOutcomeBundle, UntypedOutcomeBundle } from "../abi";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { Logger } from "../logger";
 import { TransactionOnNetwork } from "../networkProviders";
-import { Interaction } from "../smartcontracts/interaction";
-import { TypedOutcomeBundle, UntypedOutcomeBundle } from "../smartcontracts/interface";
-import { ResultsParser } from "../smartcontracts/resultsParser";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
 import { INetworkProvider } from "./networkProviders";

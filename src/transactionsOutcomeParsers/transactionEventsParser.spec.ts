@@ -1,3 +1,8 @@
+import BigNumber from "bignumber.js";
+import { assert } from "chai";
+import { AbiRegistry } from "../abi";
+import { Address } from "../address";
+import { TransactionsConverter } from "../converters/transactionsConverter";
 import {
     ContractResultItem,
     ContractResults,
@@ -7,11 +12,6 @@ import {
     TransactionLogsOnNetwork,
     TransactionOnNetwork,
 } from "../networkProviders";
-import BigNumber from "bignumber.js";
-import { assert } from "chai";
-import { Address } from "../address";
-import { TransactionsConverter } from "../converters/transactionsConverter";
-import { AbiRegistry } from "../smartcontracts";
 import { loadAbiRegistry } from "../testutils";
 import { TransactionEvent, findEventsByFirstTopic } from "./resources";
 import { TransactionEventsParser } from "./transactionEventsParser";

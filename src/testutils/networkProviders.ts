@@ -1,7 +1,7 @@
+import { Query } from "../abi/query";
 import { IAddress } from "../interface";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionStatus } from "../interfaceOfNetwork";
 import { ApiNetworkProvider, ProxyNetworkProvider, TransactionOnNetwork } from "../networkProviders";
-import { Query } from "../smartcontracts/query";
 import { Transaction } from "../transaction";
 
 export function createLocalnetProvider(): INetworkProvider {

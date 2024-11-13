@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Account } from "../account";
+import { Account } from "../accounts/account";
 import { Address } from "../address";
 import { IAddress } from "../interface";
 import { IAccountOnNetwork } from "../interfaceOfNetwork";

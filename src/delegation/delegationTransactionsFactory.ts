@@ -1,8 +1,8 @@
+import { ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../abi";
 import { Address } from "../address";
 import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../constants";
 import { Err } from "../errors";
 import { IAddress } from "../interface";
-import { ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../smartcontracts";
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "../transactionsFactories/transactionBuilder";
 

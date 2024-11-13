@@ -1,6 +1,6 @@
+import { ResultsParser } from "../abi";
 import { IPlainTransactionObject, ITransaction } from "../interface";
 import { IContractResultItem, ITransactionEvent, ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { ResultsParser } from "../smartcontracts";
 import { Transaction } from "../transaction";
 import {
     SmartContractCallOutcome,

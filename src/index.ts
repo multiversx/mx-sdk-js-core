@@ -6,8 +6,9 @@
 
 require("./globals");
 
-export * from "./account";
+export * from "./abi";
 export * from "./accountManagment";
+export * from "./accounts";
 export * from "./adapters";
 export * from "./address";
 export * from "./asyncTimer";
@@ -28,7 +29,6 @@ export * from "./relayedTransactionV1Builder";
 export * from "./relayedTransactionV2Builder";
 export * from "./signableMessage";
 export * from "./smartContractQueriesController";
-export * from "./smartcontracts";
 export * from "./tokenManagement";
 export * from "./tokenOperations";
 export * from "./tokens";

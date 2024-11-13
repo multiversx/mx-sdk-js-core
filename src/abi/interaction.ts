@@ -1,11 +1,12 @@
-import { Account } from "../account";
+import { Account } from "../accounts/account";
 import { Address } from "../address";
 import { Compatibility } from "../compatibility";
 import { TRANSACTION_VERSION_DEFAULT } from "../constants";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenTransfer, ITransactionValue } from "../interface";
 import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
-import { SmartContractTransactionsFactory, TransactionsFactoryConfig } from "../transactionsFactories";
+import { SmartContractTransactionsFactory } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { ContractFunction } from "./function";
 import { InteractionChecker } from "./interactionChecker";
 import { CallArguments } from "./interface";

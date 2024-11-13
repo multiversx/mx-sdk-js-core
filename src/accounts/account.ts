@@ -1,8 +1,8 @@
-import { IAccount } from "./accounts/interfaces";
-import { Address } from "./address";
-import { LibraryConfig } from "./config";
-import { IAccountBalance, IAddress, INonce } from "./interface";
-import { UserSigner, UserWallet } from "./wallet";
+import { Address } from "../address";
+import { LibraryConfig } from "../config";
+import { IAccountBalance, IAddress, INonce } from "../interface";
+import { UserSigner, UserWallet } from "../wallet";
+import { IAccount } from "./interfaces";
 
 /**
  * An abstraction representing an account (user or Smart Contract) on the Network.

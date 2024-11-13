@@ -1,13 +1,11 @@
 import { assert } from "chai";
+import { AbiRegistry, Code, U32Value } from "../abi";
 import { Address } from "../address";
 import { Err } from "../errors";
-import { U32Value } from "../smartcontracts";
-import { Code } from "../smartcontracts/code";
-import { AbiRegistry } from "../smartcontracts/typesystem/abiRegistry";
 import { loadAbiRegistry, loadContractCode } from "../testutils/utils";
 import { Token, TokenTransfer } from "../tokens";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
-import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test smart contract transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });

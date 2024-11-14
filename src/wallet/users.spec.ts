@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import path from "path";
 import { ErrBadMnemonicEntropy, ErrInvariantFailed } from "../errors";
 import { TestMessage } from "./../testutils/message";
 import { TestTransaction } from "./../testutils/transaction";
@@ -241,9 +242,20 @@ describe("test user wallets", async () => {
         assert.deepEqual(dummyWallet.toJSON(), expectedDummyWallet);
     });
 
-    it("should loadSecretKey, but without 'kind' field", async function () {
+    it("should create user wallet from secret key, but without 'kind' field", async function () {
         const keyFileObject = await loadTestKeystore("withoutKind.json");
         const secretKey = UserWallet.decrypt(keyFileObject, password);
+
+        assert.equal(
+            secretKey.generatePublicKey().toAddress().bech32(),
+            "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
+        );
+    });
+
+    it("should loadSecretKey, but without 'kind' field", async function () {
+        const testdataPath = path.resolve(__dirname, "..", "testdata/testwallets");
+        const keystorePath = path.resolve(testdataPath, "withoutKind.json");
+        const secretKey = UserWallet.loadSecretKey(keystorePath, password);
 
         assert.equal(
             secretKey.generatePublicKey().toAddress().bech32(),

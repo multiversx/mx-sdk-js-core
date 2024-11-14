@@ -1,5 +1,4 @@
 export * from "../accountManagement/accountTransactionsFactory";
-export * from "./delegationTransactionsFactory";
 export * from "./relayedTransactionsFactory";
 export * from "./smartContractTransactionsFactory";
 export * from "./tokenManagementTransactionsFactory";

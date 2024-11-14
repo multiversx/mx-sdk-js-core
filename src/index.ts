@@ -14,6 +14,7 @@ export * from "./address";
 export * from "./asyncTimer";
 export * from "./config";
 export * from "./converters";
+export * from "./delegation";
 export * from "./errors";
 export * from "./gasEstimator";
 export * from "./interface";

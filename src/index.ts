@@ -23,6 +23,7 @@ export * from "./logger";
 export * from "./message";
 export * from "./networkParams";
 export * from "./networkProviders";
+export * from "./relayed";
 export * from "./relayedTransactionV1Builder";
 export * from "./relayedTransactionV2Builder";
 export * from "./signableMessage";

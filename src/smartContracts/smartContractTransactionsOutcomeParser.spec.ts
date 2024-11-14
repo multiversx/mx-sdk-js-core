@@ -1,17 +1,22 @@
-import {
-    ContractResultItem,
-    ContractResults,
-    TransactionEventTopic,
-    TransactionOnNetwork,
-    TransactionEventOnNetwork,
-    TransactionLogsOnNetwork,
-} from "../networkProviders";
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
 import { TransactionsConverter } from "../converters/transactionsConverter";
+import {
+    ContractResultItem,
+    ContractResults,
+    TransactionEventOnNetwork,
+    TransactionEventTopic,
+    TransactionLogsOnNetwork,
+    TransactionOnNetwork,
+} from "../networkProviders";
 import { loadAbiRegistry } from "../testutils";
-import { SmartContractCallOutcome, TransactionEvent, TransactionLogs, TransactionOutcome } from "./resources";
+import {
+    SmartContractCallOutcome,
+    TransactionEvent,
+    TransactionLogs,
+    TransactionOutcome,
+} from "../transactionsOutcomeParsers/resources";
 import { SmartContractTransactionsOutcomeParser } from "./smartContractTransactionsOutcomeParser";
 
 describe("test smart contract transactions outcome parser", () => {

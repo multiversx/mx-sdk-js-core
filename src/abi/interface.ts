@@ -1,4 +1,5 @@
-import { IAddress, IChainID, IGasLimit, IGasPrice, ITransactionValue } from "../interface";
+import { Address } from "../address";
+import { IChainID, IGasLimit, IGasPrice, ITransactionValue } from "../interface";
 import { Transaction } from "../transaction";
 import { ReturnCode } from "./returnCode";
 import { TypedValue } from "./typesystem";
@@ -10,7 +11,7 @@ export interface ISmartContract {
     /**
      * Gets the address of the Smart Contract.
      */
-    getAddress(): IAddress;
+    getAddress(): Address;
 
     /**
      * Creates a {@link Transaction} for deploying the Smart Contract to the Network.
@@ -36,7 +37,7 @@ export interface DeployArguments {
     gasLimit: IGasLimit;
     gasPrice?: IGasPrice;
     chainID: IChainID;
-    deployer: IAddress;
+    deployer: Address;
 }
 
 export interface UpgradeArguments {
@@ -47,7 +48,7 @@ export interface UpgradeArguments {
     gasLimit: IGasLimit;
     gasPrice?: IGasPrice;
     chainID: IChainID;
-    caller: IAddress;
+    caller: Address;
 }
 
 export interface CallArguments {
@@ -55,17 +56,17 @@ export interface CallArguments {
     args?: any[];
     value?: ITransactionValue;
     gasLimit: IGasLimit;
-    receiver?: IAddress;
+    receiver?: Address;
     gasPrice?: IGasPrice;
     chainID: IChainID;
-    caller: IAddress;
+    caller: Address;
 }
 
 export interface QueryArguments {
     func: IContractFunction;
     args?: TypedValue[];
     value?: ITransactionValue;
-    caller?: IAddress;
+    caller?: Address;
 }
 
 export interface TypedOutcomeBundle {

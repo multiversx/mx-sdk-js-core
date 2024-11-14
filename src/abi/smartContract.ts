@@ -2,11 +2,11 @@ import { Address, AddressComputer } from "../address";
 import { Compatibility } from "../compatibility";
 import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
 import { ErrContractHasNoAddress } from "../errors";
-import { IAddress, INonce } from "../interface";
+import { INonce } from "../interface";
 import { Transaction } from "../transaction";
-import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
 import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { guardValueIsSet } from "../utils";
+import { SmartContractTransactionsFactory } from "./../smartContracts/smartContractTransactionsFactory";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
@@ -33,7 +33,7 @@ interface IAbi {
  * An abstraction for deploying and interacting with Smart Contracts.
  */
 export class SmartContract implements ISmartContract {
-    private address: IAddress = Address.empty();
+    private address: Address = Address.empty();
     private abi?: IAbi;
 
     /**
@@ -54,7 +54,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Create a SmartContract object by providing its address on the Network.
      */
-    constructor(options: { address?: IAddress; abi?: IAbi } = {}) {
+    constructor(options: { address?: Address; abi?: IAbi } = {}) {
         this.address = options.address || Address.empty();
         this.abi = options.abi;
 
@@ -93,14 +93,14 @@ export class SmartContract implements ISmartContract {
     /**
      * Sets the address, as on Network.
      */
-    setAddress(address: IAddress) {
+    setAddress(address: Address) {
         this.address = address;
     }
 
     /**
      * Gets the address, as on Network.
      */
-    getAddress(): IAddress {
+    getAddress(): Address {
         return this.address;
     }
 
@@ -141,11 +141,10 @@ export class SmartContract implements ISmartContract {
         const bytecode = Buffer.from(code.toString(), "hex");
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const transaction = factory.createTransactionForDeploy({
-            sender: deployer,
+        const transaction = factory.createTransactionForDeploy(deployer, {
             bytecode: bytecode,
             gasLimit: BigInt(gasLimit.valueOf()),
-            arguments: initArguments,
+            arguments: initArguments ?? [],
             isUpgradeable: metadataAsJson.upgradeable,
             isReadable: metadataAsJson.readable,
             isPayable: metadataAsJson.payable,
@@ -211,12 +210,11 @@ export class SmartContract implements ISmartContract {
         const bytecode = Uint8Array.from(Buffer.from(code.toString(), "hex"));
         const metadataAsJson = this.getMetadataPropertiesAsObject(codeMetadata);
 
-        const transaction = factory.createTransactionForUpgrade({
-            sender: caller,
+        const transaction = factory.createTransactionForUpgrade(caller, {
             contract: this.getAddress(),
             bytecode: bytecode,
             gasLimit: BigInt(gasLimit.valueOf()),
-            arguments: initArguments,
+            arguments: initArguments ?? [],
             isUpgradeable: metadataAsJson.upgradeable,
             isReadable: metadataAsJson.readable,
             isPayable: metadataAsJson.payable,
@@ -251,8 +249,7 @@ export class SmartContract implements ISmartContract {
         args = args || [];
         value = value || 0;
 
-        const transaction = factory.createTransactionForExecute({
-            sender: caller,
+        const transaction = factory.createTransactionForExecute(caller, {
             contract: receiver ? receiver : this.getAddress(),
             function: func.toString(),
             gasLimit: BigInt(gasLimit.valueOf()),
@@ -291,7 +288,7 @@ export class SmartContract implements ISmartContract {
      * @param owner The owner of the Smart Contract
      * @param nonce The owner nonce used for the deployment transaction
      */
-    static computeAddress(owner: IAddress, nonce: INonce): IAddress {
+    static computeAddress(owner: Address, nonce: INonce): Address {
         const deployer = Address.fromBech32(owner.bech32());
         const addressComputer = new AddressComputer();
         return addressComputer.computeContractAddress(deployer, BigInt(nonce.valueOf()));

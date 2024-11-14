@@ -3,7 +3,7 @@ import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionsFactoryConfig } from "../transactionsFactories";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
-import { CreateV1RelayedTransactionInput, CreateV2RelayedTransactionInput } from "./resources";
+import { RelayedV1TransactionInput, RelayedV2TransactionInput } from "./resources";
 
 export class RelayedController {
     private factory: RelayedTransactionsFactory;
@@ -20,19 +20,27 @@ export class RelayedController {
         this.txComputer = new TransactionComputer();
     }
 
-    async createRelayedV1Transaction(sender: IAccount, options: CreateV1RelayedTransactionInput): Promise<Transaction> {
+    async createRelayedV1Transaction(
+        sender: IAccount,
+        nonce: bigint,
+        options: RelayedV1TransactionInput,
+    ): Promise<Transaction> {
         const transaction = this.factory.createRelayedV1Transaction({ ...options, relayerAddress: sender.address });
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
     }
 
-    async createRelayedV2Transaction(sender: IAccount, options: CreateV2RelayedTransactionInput): Promise<Transaction> {
+    async createRelayedV2Transaction(
+        sender: IAccount,
+        nonce: bigint,
+        options: RelayedV2TransactionInput,
+    ): Promise<Transaction> {
         const transaction = this.factory.createRelayedV2Transaction({ ...options, relayerAddress: sender.address });
 
-        transaction.nonce = options.nonce;
+        transaction.nonce = nonce;
         transaction.gasLimit = BigInt(0);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 

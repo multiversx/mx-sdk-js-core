@@ -1,4 +1,4 @@
-import { Account } from "../account";
+import { Account } from "../accounts";
 import { Address } from "../address";
 import { Compatibility } from "../compatibility";
 import { TRANSACTION_VERSION_DEFAULT } from "../constants";

@@ -141,7 +141,7 @@ describe("test user wallets", () => {
         assert.equal(UserSecretKey.fromPem(carol.pemFileText).hex(), carol.secretKeyHex);
     });
 
-    it.only("should create and load keystore files (with secret keys)", function () {
+    it("should create and load keystore files (with secret keys)", function () {
         this.timeout(10000);
 
         let aliceSecretKey = UserSecretKey.fromString(alice.secretKeyHex);

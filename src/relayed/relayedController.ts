@@ -3,7 +3,7 @@ import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionsFactoryConfig } from "../transactionsFactories";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
-import { CreateV1RelayTransactionInput, CreateV2RelayTransactionInput } from "./resources";
+import { CreateV1RelayedTransactionInput, CreateV2RelayedTransactionInput } from "./resources";
 
 export class RelayedController {
     private factory: RelayedTransactionsFactory;
@@ -20,7 +20,7 @@ export class RelayedController {
         this.txComputer = new TransactionComputer();
     }
 
-    async createRelayedV1Transaction(sender: IAccount, options: CreateV1RelayTransactionInput): Promise<Transaction> {
+    async createRelayedV1Transaction(sender: IAccount, options: CreateV1RelayedTransactionInput): Promise<Transaction> {
         const transaction = this.factory.createRelayedV1Transaction({ ...options, relayerAddress: sender.address });
 
         transaction.nonce = options.nonce;
@@ -29,7 +29,7 @@ export class RelayedController {
         return transaction;
     }
 
-    async createRelayedV2Transaction(sender: IAccount, options: CreateV2RelayTransactionInput): Promise<Transaction> {
+    async createRelayedV2Transaction(sender: IAccount, options: CreateV2RelayedTransactionInput): Promise<Transaction> {
         const transaction = this.factory.createRelayedV2Transaction({ ...options, relayerAddress: sender.address });
 
         transaction.nonce = options.nonce;

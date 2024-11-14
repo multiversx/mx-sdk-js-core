@@ -77,28 +77,28 @@ describe("test user wallets", () => {
         const mnemonic = Mnemonic.fromString(DummyMnemonicOf12Words);
 
         assert.equal(
-            mnemonic.deriveKey(0).generatePublicKey().toAddress().bech32(),
+            mnemonic.deriveKey(0).generatePublicKey().toAddress().toBech32(),
             "erd1l8g9dk3gz035gkjhwegsjkqzdu3augrwhcfxrnucnyyrpc2220pqg4g7na",
         );
         assert.equal(
-            mnemonic.deriveKey(1).generatePublicKey().toAddress().bech32(),
+            mnemonic.deriveKey(1).generatePublicKey().toAddress().toBech32(),
             "erd1fmhwg84rldg0xzngf53m0y607wvefvamh07n2mkypedx27lcqnts4zs09p",
         );
         assert.equal(
-            mnemonic.deriveKey(2).generatePublicKey().toAddress().bech32(),
+            mnemonic.deriveKey(2).generatePublicKey().toAddress().toBech32(),
             "erd1tyuyemt4xz2yjvc7rxxp8kyfmk2n3h8gv3aavzd9ru4v2vhrkcksptewtj",
         );
 
         assert.equal(
-            mnemonic.deriveKey(0).generatePublicKey().toAddress("test").bech32(),
+            mnemonic.deriveKey(0).generatePublicKey().toAddress("test").toBech32(),
             "test1l8g9dk3gz035gkjhwegsjkqzdu3augrwhcfxrnucnyyrpc2220pqc6tnnf",
         );
         assert.equal(
-            mnemonic.deriveKey(1).generatePublicKey().toAddress("xerd").bech32(),
+            mnemonic.deriveKey(1).generatePublicKey().toAddress("xerd").toBech32(),
             "xerd1fmhwg84rldg0xzngf53m0y607wvefvamh07n2mkypedx27lcqntsj4adj4",
         );
         assert.equal(
-            mnemonic.deriveKey(2).generatePublicKey().toAddress("yerd").bech32(),
+            mnemonic.deriveKey(2).generatePublicKey().toAddress("yerd").toBech32(),
             "yerd1tyuyemt4xz2yjvc7rxxp8kyfmk2n3h8gv3aavzd9ru4v2vhrkcksn8p0n5",
         );
     });
@@ -154,12 +154,12 @@ describe("test user wallets", () => {
         let carolKeyFile = UserWallet.fromSecretKey({ secretKey: carolSecretKey, password: password });
         console.timeEnd("encrypt");
 
-        assert.equal(aliceKeyFile.toJSON().bech32, alice.address.bech32());
-        assert.equal(bobKeyFile.toJSON().bech32, bob.address.bech32());
-        assert.equal(carolKeyFile.toJSON().bech32, carol.address.bech32());
+        assert.equal(aliceKeyFile.toJSON().bech32, alice.address.toBech32());
+        assert.equal(bobKeyFile.toJSON().bech32, bob.address.toBech32());
+        assert.equal(carolKeyFile.toJSON().bech32, carol.address.toBech32());
 
         console.time("decrypt");
-        // assert.deepEqual(UserWallet.decryptSecretKey(aliceKeyFile.toJSON(), password), aliceSecretKey);
+        assert.deepEqual(UserWallet.decryptSecretKey(aliceKeyFile.toJSON(), password), aliceSecretKey);
         assert.deepEqual(UserWallet.decryptSecretKey(bobKeyFile.toJSON(), password), bobSecretKey);
         assert.deepEqual(UserWallet.decryptSecretKey(carolKeyFile.toJSON(), password), carolSecretKey);
         console.timeEnd("decrypt");
@@ -196,7 +196,6 @@ describe("test user wallets", () => {
             }),
         });
 
-        console.log(alice.keyFileObject, aliceKeyFile.toJSON());
         assert.deepEqual(aliceKeyFile.toJSON(), alice.keyFileObject);
         assert.deepEqual(bobKeyFile.toJSON(), bob.keyFileObject);
         assert.deepEqual(carolKeyFile.toJSON(), carol.keyFileObject);
@@ -207,7 +206,7 @@ describe("test user wallets", () => {
         const secretKey = UserWallet.decryptSecretKey(keyFileObject, password);
 
         assert.equal(
-            secretKey.generatePublicKey().toAddress().bech32(),
+            secretKey.generatePublicKey().toAddress().toBech32(),
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
         );
     });
@@ -220,15 +219,15 @@ describe("test user wallets", () => {
 
         assert.equal(json.version, 4);
         assert.equal(json.kind, "mnemonic");
-        assert.isUndefined(json.bech32);
+        assert.isUndefined(json.toBech32);
 
         const mnemonic = UserWallet.decryptMnemonic(json, password);
         const mnemonicText = mnemonic.toString();
 
         assert.equal(mnemonicText, dummyMnemonic);
-        assert.equal(mnemonic.deriveKey(0).generatePublicKey().toAddress().bech32(), alice.address.bech32());
-        assert.equal(mnemonic.deriveKey(1).generatePublicKey().toAddress().bech32(), bob.address.bech32());
-        assert.equal(mnemonic.deriveKey(2).generatePublicKey().toAddress().bech32(), carol.address.bech32());
+        assert.equal(mnemonic.deriveKey(0).generatePublicKey().toAddress().toBech32(), alice.address.toBech32());
+        assert.equal(mnemonic.deriveKey(1).generatePublicKey().toAddress().toBech32(), bob.address.toBech32());
+        assert.equal(mnemonic.deriveKey(2).generatePublicKey().toAddress().toBech32(), carol.address.toBech32());
 
         // With provided randomness, in order to reproduce our test wallets
         const expectedDummyWallet = await loadTestKeystore("withDummyMnemonic.json");
@@ -250,7 +249,7 @@ describe("test user wallets", () => {
         const secretKey = UserWallet.decrypt(keyFileObject, password);
 
         assert.equal(
-            secretKey.generatePublicKey().toAddress().bech32(),
+            secretKey.generatePublicKey().toAddress().toBech32(),
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
         );
     });
@@ -261,7 +260,7 @@ describe("test user wallets", () => {
         const secretKey = UserWallet.loadSecretKey(keystorePath, password);
 
         assert.equal(
-            secretKey.generatePublicKey().toAddress().bech32(),
+            secretKey.generatePublicKey().toAddress().toBech32(),
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
         );
     });
@@ -279,15 +278,15 @@ describe("test user wallets", () => {
         const keyFileObject = await loadTestKeystore("withDummyMnemonic.json");
 
         assert.equal(
-            UserWallet.decrypt(keyFileObject, password, 0).generatePublicKey().toAddress().bech32(),
+            UserWallet.decrypt(keyFileObject, password, 0).generatePublicKey().toAddress().toBech32(),
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
         );
         assert.equal(
-            UserWallet.decrypt(keyFileObject, password, 1).generatePublicKey().toAddress().bech32(),
+            UserWallet.decrypt(keyFileObject, password, 1).generatePublicKey().toAddress().toBech32(),
             "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
         );
         assert.equal(
-            UserWallet.decrypt(keyFileObject, password, 2).generatePublicKey().toAddress().bech32(),
+            UserWallet.decrypt(keyFileObject, password, 2).generatePublicKey().toAddress().toBech32(),
             "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8",
         );
     });
@@ -483,40 +482,40 @@ describe("test user wallets", () => {
         const keyFileObjectWithSecretKey = await loadTestKeystore("withDummySecretKey.json");
 
         assert.equal(
-            UserSigner.fromWallet(keyFileObjectWithoutKind, password).getAddress().bech32(),
+            UserSigner.fromWallet(keyFileObjectWithoutKind, password).getAddress().toBech32(),
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
         );
         assert.equal(
-            UserSigner.fromWallet(keyFileObjectWithMnemonic, password).getAddress().bech32(),
+            UserSigner.fromWallet(keyFileObjectWithMnemonic, password).getAddress().toBech32(),
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
         );
         assert.equal(
-            UserSigner.fromWallet(keyFileObjectWithSecretKey, password).getAddress().bech32(),
+            UserSigner.fromWallet(keyFileObjectWithSecretKey, password).getAddress().toBech32(),
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
         );
         assert.equal(
-            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 0).getAddress().bech32(),
+            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 0).getAddress().toBech32(),
             "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
         );
         assert.equal(
-            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 1).getAddress().bech32(),
+            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 1).getAddress().toBech32(),
             "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
         );
         assert.equal(
-            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 2).getAddress().bech32(),
+            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 2).getAddress().toBech32(),
             "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8",
         );
 
         assert.equal(
-            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 0).getAddress("test").bech32(),
+            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 0).getAddress("test").toBech32(),
             "test1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ss5hqhtr",
         );
         assert.equal(
-            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 1).getAddress("xerd").bech32(),
+            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 1).getAddress("xerd").toBech32(),
             "xerd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruq9thc9j",
         );
         assert.equal(
-            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 2).getAddress("yerd").bech32(),
+            UserSigner.fromWallet(keyFileObjectWithMnemonic, password, 2).getAddress("yerd").toBech32(),
             "yerd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaqgh23pp",
         );
     });

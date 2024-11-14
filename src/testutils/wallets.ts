@@ -65,6 +65,7 @@ export async function loadPassword(): Promise<string> {
 
 export async function loadTestWallet(name: string): Promise<TestWallet> {
     const jsonContents = JSON.parse(await readTestWalletFileContents(name + ".json"));
+    jsonContents.kind = jsonContents.kind ?? "secretKey";
     const pemContents = await readTestWalletFileContents(name + ".pem");
     const secretKey = UserSecretKey.fromPem(pemContents);
     const publicKey = secretKey.generatePublicKey().valueOf();

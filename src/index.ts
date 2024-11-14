@@ -7,7 +7,8 @@
 require("./globals");
 
 export * from "./abi";
-export * from "./account";
+export * from "./accountManagement";
+export * from "./accounts";
 export * from "./adapters";
 export * from "./address";
 export * from "./asyncTimer";

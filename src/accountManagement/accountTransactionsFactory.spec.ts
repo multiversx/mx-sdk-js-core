@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { Address } from "../address";
-import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
+import { TransactionsFactoryConfig } from "../transactionsFactories";
 import { AccountTransactionsFactory } from "./accountTransactionsFactory";
 
 describe("test account transactions factory", function () {
@@ -11,8 +11,7 @@ describe("test account transactions factory", function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const keyValuePairs = new Map([[Buffer.from("key0"), Buffer.from("value0")]]);
 
-        const transaction = factory.createTransactionForSavingKeyValue({
-            sender: sender,
+        const transaction = factory.createTransactionForSavingKeyValue(sender, {
             keyValuePairs: keyValuePairs,
         });
 
@@ -29,8 +28,7 @@ describe("test account transactions factory", function () {
         const guardian = Address.fromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const serviceID = "MultiversXTCSService";
 
-        const transaction = factory.createTransactionForSettingGuardian({
-            sender: sender,
+        const transaction = factory.createTransactionForSettingGuardian(sender, {
             guardianAddress: guardian,
             serviceID: serviceID,
         });
@@ -49,9 +47,7 @@ describe("test account transactions factory", function () {
     it("should create 'Transaction' for guarding account", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
-        const transaction = factory.createTransactionForGuardingAccount({
-            sender: sender,
-        });
+        const transaction = factory.createTransactionForGuardingAccount(sender);
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -64,9 +60,7 @@ describe("test account transactions factory", function () {
     it("should create 'Transaction' for unguarding account", async function () {
         const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
-        const transaction = factory.createTransactionForUnguardingAccount({
-            sender: sender,
-        });
+        const transaction = factory.createTransactionForUnguardingAccount(sender);
 
         assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");

@@ -4,7 +4,7 @@ import { Transaction } from "../transaction";
 import { TransactionBuilder } from "../transactionsFactories/transactionBuilder";
 import { SaveKeyValueInput, SetGuardianInput } from "./resources";
 
-export interface IConfig {
+interface IConfig {
     chainID: string;
     minGasLimit: bigint;
     gasLimitPerByte: bigint;

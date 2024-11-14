@@ -5,7 +5,7 @@ import { Err } from "../errors";
 import { IAddress } from "../interface";
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "../transactionsFactories/transactionBuilder";
-import * as inputs from "./resources";
+import * as resources from "./resources";
 
 interface IConfig {
     chainID: string;
@@ -19,10 +19,6 @@ interface IConfig {
     gasLimitDelegationOperations: bigint;
     additionalGasLimitPerValidatorNode: bigint;
     additionalGasLimitForDelegationOperations: bigint;
-}
-
-export interface IValidatorPublicKey {
-    hex(): string;
 }
 
 /**
@@ -41,7 +37,7 @@ export class DelegationTransactionsFactory {
 
     createTransactionForNewDelegationContract(
         sender: IAddress,
-        options: inputs.NewDelegationContractInput,
+        options: resources.NewDelegationContractInput,
     ): Transaction {
         const dataParts = [
             "createNewDelegationContract",
@@ -65,7 +61,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForAddingNodes(sender: IAddress, options: inputs.AddNodesInput): Transaction {
+    createTransactionForAddingNodes(sender: IAddress, options: resources.AddNodesInput): Transaction {
         if (options.publicKeys.length !== options.signedMessages.length) {
             throw new Err("The number of public keys should match the number of signed messages");
         }
@@ -92,7 +88,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForRemovingNodes(sender: IAddress, options: inputs.ManageNodesInput): Transaction {
+    createTransactionForRemovingNodes(sender: IAddress, options: resources.ManageNodesInput): Transaction {
         const dataParts = ["removeNodes"];
 
         for (const key of options.publicKeys) {
@@ -110,8 +106,9 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForStakingNodes(sender: IAddress, options: inputs.ManageNodesInput): Transaction {
+    createTransactionForStakingNodes(sender: IAddress, options: resources.ManageNodesInput): Transaction {
         let dataParts = ["stakeNodes"];
+        console.log(options.publicKeys);
 
         for (const key of options.publicKeys) {
             dataParts = dataParts.concat(key.hex());
@@ -133,7 +130,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnbondingNodes(sender: IAddress, options: inputs.ManageNodesInput): Transaction {
+    createTransactionForUnbondingNodes(sender: IAddress, options: resources.ManageNodesInput): Transaction {
         let dataParts = ["unBondNodes"];
 
         for (const key of options.publicKeys) {
@@ -156,7 +153,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnstakingNodes(sender: IAddress, options: inputs.ManageNodesInput): Transaction {
+    createTransactionForUnstakingNodes(sender: IAddress, options: resources.ManageNodesInput): Transaction {
         let dataParts = ["unStakeNodes"];
 
         for (const key of options.publicKeys) {
@@ -179,7 +176,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnjailingNodes(sender: IAddress, options: inputs.UnjailingNodesInput): Transaction {
+    createTransactionForUnjailingNodes(sender: IAddress, options: resources.UnjailingNodesInput): Transaction {
         const dataParts = ["unJailNodes"];
 
         for (const key of options.publicKeys) {
@@ -198,7 +195,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForChangingServiceFee(sender: IAddress, options: inputs.ChangeServiceFee): Transaction {
+    createTransactionForChangingServiceFee(sender: IAddress, options: resources.ChangeServiceFee): Transaction {
         const dataParts = [
             "changeServiceFee",
             this.argSerializer.valuesToStrings([new BigUIntValue(options.serviceFee)])[0],
@@ -218,7 +215,7 @@ export class DelegationTransactionsFactory {
 
     createTransactionForModifyingDelegationCap(
         sender: IAddress,
-        options: inputs.ModifyDelegationCapInput,
+        options: resources.ModifyDelegationCapInput,
     ): Transaction {
         const dataParts = [
             "modifyTotalDelegationCap",
@@ -239,7 +236,7 @@ export class DelegationTransactionsFactory {
 
     createTransactionForSettingAutomaticActivation(
         sender: IAddress,
-        options: inputs.ManageDelegationContractInput,
+        options: resources.ManageDelegationContractInput,
     ): Transaction {
         const dataParts = ["setAutomaticActivation", this.argSerializer.valuesToStrings([new StringValue("true")])[0]];
         const gasLimit =
@@ -257,7 +254,7 @@ export class DelegationTransactionsFactory {
 
     createTransactionForUnsettingAutomaticActivation(
         sender: IAddress,
-        options: inputs.ManageDelegationContractInput,
+        options: resources.ManageDelegationContractInput,
     ): Transaction {
         const dataParts = ["setAutomaticActivation", this.argSerializer.valuesToStrings([new StringValue("false")])[0]];
         const gasLimit =
@@ -275,7 +272,7 @@ export class DelegationTransactionsFactory {
 
     createTransactionForSettingCapCheckOnRedelegateRewards(
         sender: IAddress,
-        options: inputs.ManageDelegationContractInput,
+        options: resources.ManageDelegationContractInput,
     ): Transaction {
         const dataParts = [
             "setCheckCapOnReDelegateRewards",
@@ -296,7 +293,7 @@ export class DelegationTransactionsFactory {
 
     createTransactionForUnsettingCapCheckOnRedelegateRewards(
         sender: IAddress,
-        options: inputs.ManageDelegationContractInput,
+        options: resources.ManageDelegationContractInput,
     ): Transaction {
         const dataParts = [
             "setCheckCapOnReDelegateRewards",
@@ -315,7 +312,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForSettingMetadata(sender: IAddress, options: inputs.SetContractMetadataInput): Transaction {
+    createTransactionForSettingMetadata(sender: IAddress, options: resources.SetContractMetadataInput): Transaction {
         const dataParts = [
             "setMetaData",
             ...this.argSerializer.valuesToStrings([
@@ -338,25 +335,29 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForWithdrawing(_sender: IAddress, _options: inputs.ManageDelegationContractInput): Transaction {
+    createTransactionForWithdrawing(_sender: IAddress, _options: resources.ManageDelegationContractInput): Transaction {
         throw new Error("Method not implemented.");
     }
-    createTransactionForUndelegating(_sender: IAddress, _options: inputs.DelegateActionsInput): Transaction {
+
+    createTransactionForUndelegating(_sender: IAddress, _options: resources.DelegateActionsInput): Transaction {
         throw new Error("Method not implemented.");
     }
+
     createTransactionForRedelegatingRewards(
         _sender: IAddress,
-        _options: inputs.ManageDelegationContractInput,
+        _options: resources.ManageDelegationContractInput,
     ): Transaction {
         throw new Error("Method not implemented.");
     }
+
     createTransactionForClaimingRewards(
         _sender: IAddress,
-        _options: inputs.ManageDelegationContractInput,
+        _options: resources.ManageDelegationContractInput,
     ): Transaction {
         throw new Error("Method not implemented.");
     }
-    createTransactionForDelegating(_sender: IAddress, _options: inputs.DelegateActionsInput): Transaction {
+
+    createTransactionForDelegating(_sender: IAddress, _options: resources.DelegateActionsInput): Transaction {
         throw new Error("Method not implemented.");
     }
 

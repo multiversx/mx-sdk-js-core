@@ -73,11 +73,11 @@ describe("test delegation transactions factory", function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
 
-        const publicKey = {
-            hex(): string {
-                return Buffer.from("abba").toString("hex");
-            },
-        };
+        const publicKey = new ValidatorPublicKey(
+            Buffer.from(
+                "be2e593ff10899a2ee8e1d5c8094e36c9f48e04b87e129991ff09475808743e07bb41bf6e7bc1463fa554c4b46594b98",
+            ),
+        );
 
         const transaction = delegationFactory.createTransactionForRemovingNodes(sender, {
             delegationContract: delegationContract,
@@ -87,19 +87,23 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
-        assert.deepEqual(transaction.data, Buffer.from("removeNodes@61626261"));
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from(
+                "removeNodes@626532653539336666313038393961326565386531643563383039346533366339663438653034623837653132393939316666303934373538303837343365303762623431626636653762633134363366613535346334623436353934623938",
+            ),
+        );
         assert.equal(transaction.value, 0n);
     });
 
     it("should create 'Transaction' for staking nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-
-        const publicKey = {
-            hex(): string {
-                return Buffer.from("abba").toString("hex");
-            },
-        };
+        const publicKey = new ValidatorPublicKey(
+            Buffer.from(
+                "be2e593ff10899a2ee8e1d5c8094e36c9f48e04b87e129991ff09475808743e07bb41bf6e7bc1463fa554c4b46594b98",
+            ),
+        );
 
         const transaction = delegationFactory.createTransactionForStakingNodes(sender, {
             delegationContract: delegationContract,
@@ -109,19 +113,23 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
-        assert.deepEqual(transaction.data, Buffer.from("stakeNodes@61626261"));
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from(
+                "stakeNodes@626532653539336666313038393961326565386531643563383039346533366339663438653034623837653132393939316666303934373538303837343365303762623431626636653762633134363366613535346334623436353934623938",
+            ),
+        );
         assert.equal(transaction.value, 0n);
     });
 
     it("should create 'Transaction' for unbonding nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-
-        const publicKey = {
-            hex(): string {
-                return Buffer.from("abba").toString("hex");
-            },
-        };
+        const publicKey = new ValidatorPublicKey(
+            Buffer.from(
+                "be2e593ff10899a2ee8e1d5c8094e36c9f48e04b87e129991ff09475808743e07bb41bf6e7bc1463fa554c4b46594b98",
+            ),
+        );
 
         const transaction = delegationFactory.createTransactionForUnbondingNodes(sender, {
             delegationContract: delegationContract,
@@ -131,20 +139,24 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
-        assert.deepEqual(transaction.data, Buffer.from("unBondNodes@61626261"));
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from(
+                "unBondNodes@626532653539336666313038393961326565386531643563383039346533366339663438653034623837653132393939316666303934373538303837343365303762623431626636653762633134363366613535346334623436353934623938",
+            ),
+        );
         assert.equal(transaction.value, 0n);
-        assert.equal(transaction.gasLimit, 12080000n);
+        assert.equal(transaction.gasLimit, 12356000n);
     });
 
     it("should create 'Transaction' for unstaking nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-
-        const publicKey = {
-            hex(): string {
-                return Buffer.from("abba").toString("hex");
-            },
-        };
+        const publicKey = new ValidatorPublicKey(
+            Buffer.from(
+                "be2e593ff10899a2ee8e1d5c8094e36c9f48e04b87e129991ff09475808743e07bb41bf6e7bc1463fa554c4b46594b98",
+            ),
+        );
 
         const transaction = delegationFactory.createTransactionForUnstakingNodes(sender, {
             delegationContract: delegationContract,
@@ -154,31 +166,39 @@ describe("test delegation transactions factory", function () {
         assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
-        assert.deepEqual(transaction.data, Buffer.from("unStakeNodes@61626261"));
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from(
+                "unStakeNodes@626532653539336666313038393961326565386531643563383039346533366339663438653034623837653132393939316666303934373538303837343365303762623431626636653762633134363366613535346334623436353934623938",
+            ),
+        );
         assert.equal(transaction.value, 0n);
-        assert.equal(transaction.gasLimit, 12081500n);
+        assert.equal(transaction.gasLimit, 12357500n);
     });
 
     it("should create 'Transaction' for unjailing nodes", async function () {
         const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
-
-        const publicKey = {
-            hex(): string {
-                return Buffer.from("abba").toString("hex");
-            },
-        };
+        const publicKey = new ValidatorPublicKey(
+            Buffer.from(
+                "be2e593ff10899a2ee8e1d5c8094e36c9f48e04b87e129991ff09475808743e07bb41bf6e7bc1463fa554c4b46594b98",
+            ),
+        );
 
         const transaction = delegationFactory.createTransactionForUnjailingNodes(sender, {
             delegationContract: delegationContract,
             publicKeys: [publicKey],
             amount: 25000000000000000000n,
         });
-
         assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
         assert.isDefined(transaction.data);
-        assert.deepEqual(transaction.data, Buffer.from("unJailNodes@61626261"));
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from(
+                "unJailNodes@626532653539336666313038393961326565386531643563383039346533366339663438653034623837653132393939316666303934373538303837343365303762623431626636653762633134363366613535346334623436353934623938",
+            ),
+        );
         assert.equal(transaction.value, 25000000000000000000n);
     });
 

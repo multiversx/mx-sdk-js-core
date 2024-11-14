@@ -25,7 +25,7 @@ export class RelayedController {
         nonce: bigint,
         options: RelayedV1TransactionInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createRelayedV1Transaction({ ...options, relayerAddress: sender.address });
+        const transaction = this.factory.createRelayedV1Transaction(sender.address, options);
 
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
@@ -38,7 +38,7 @@ export class RelayedController {
         nonce: bigint,
         options: RelayedV2TransactionInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createRelayedV2Transaction({ ...options, relayerAddress: sender.address });
+        const transaction = this.factory.createRelayedV2Transaction(sender.address, options);
 
         transaction.nonce = nonce;
         transaction.gasLimit = BigInt(0);

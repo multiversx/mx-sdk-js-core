@@ -7,7 +7,7 @@ import { TransactionsFactoryConfig } from "../transactionsFactories";
 import { TransactionWatcher } from "../transactionWatcher";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
 import { DelegationTransactionsOutcomeParser } from "./delegationTransactionsOutcomeParser";
-import * as inputs from "./resources";
+import * as resources from "./resources";
 
 export class DelegationController {
     private transactionAwaiter: TransactionWatcher;
@@ -27,7 +27,7 @@ export class DelegationController {
     async createTransactionForNewDelegationContract(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.NewDelegationContractInput,
+        options: resources.NewDelegationContractInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForNewDelegationContract(sender.address, options);
 
@@ -49,7 +49,7 @@ export class DelegationController {
     async createTransactionForAddingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.AddNodesInput,
+        options: resources.AddNodesInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForAddingNodes(sender.address, options);
 
@@ -62,7 +62,7 @@ export class DelegationController {
     async createTransactionForRemovingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ManageNodesInput,
+        options: resources.ManageNodesInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRemovingNodes(sender.address, options);
 
@@ -75,7 +75,7 @@ export class DelegationController {
     async createTransactionForStakingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ManageNodesInput,
+        options: resources.ManageNodesInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForStakingNodes(sender.address, options);
 
@@ -88,7 +88,7 @@ export class DelegationController {
     async createTransactionForUnbondingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ManageNodesInput,
+        options: resources.ManageNodesInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnbondingNodes(sender.address, options);
 
@@ -101,7 +101,7 @@ export class DelegationController {
     async createTransactionForUnstakingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ManageNodesInput,
+        options: resources.ManageNodesInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnstakingNodes(sender.address, options);
 
@@ -114,7 +114,7 @@ export class DelegationController {
     async createTransactionForUnjailingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.UnjailingNodesInput,
+        options: resources.UnjailingNodesInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnjailingNodes(sender.address, options);
 
@@ -127,7 +127,7 @@ export class DelegationController {
     async createTransactionForChangingServiceFee(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ChangeServiceFee,
+        options: resources.ChangeServiceFee,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForChangingServiceFee(sender.address, options);
 
@@ -140,7 +140,7 @@ export class DelegationController {
     async createTransactionForModifyingDelegationCap(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ModifyDelegationCapInput,
+        options: resources.ModifyDelegationCapInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingDelegationCap(sender.address, options);
 
@@ -153,7 +153,7 @@ export class DelegationController {
     async createTransactionForSettingAutomaticActivation(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ManageDelegationContractInput,
+        options: resources.ManageDelegationContractInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingAutomaticActivation(sender.address, options);
 
@@ -166,7 +166,7 @@ export class DelegationController {
     async createTransactionForUnsettingAutomaticActivation(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ManageDelegationContractInput,
+        options: resources.ManageDelegationContractInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingAutomaticActivation(sender.address, options);
 
@@ -179,7 +179,7 @@ export class DelegationController {
     async createTransactionForSettingCapCheckOnRedelegateRewards(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ManageDelegationContractInput,
+        options: resources.ManageDelegationContractInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingCapCheckOnRedelegateRewards(
             sender.address,
@@ -195,7 +195,7 @@ export class DelegationController {
     async createTransactionForUnsettingCapCheckOnRedelegateRewards(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ManageDelegationContractInput,
+        options: resources.ManageDelegationContractInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingCapCheckOnRedelegateRewards(
             sender.address,
@@ -211,7 +211,7 @@ export class DelegationController {
     async createTransactionForSettingMetadata(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.SetContractMetadataInput,
+        options: resources.SetContractMetadataInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingMetadata(sender.address, options);
 
@@ -224,7 +224,7 @@ export class DelegationController {
     async createTransactionForDelegating(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.DelegateActionsInput,
+        options: resources.DelegateActionsInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForDelegating(sender.address, options);
 
@@ -237,7 +237,7 @@ export class DelegationController {
     async createTransactionForClaimingRewards(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ManageDelegationContractInput,
+        options: resources.ManageDelegationContractInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForClaimingRewards(sender.address, options);
 
@@ -250,7 +250,7 @@ export class DelegationController {
     async createTransactionForRedelegatingRewards(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ManageDelegationContractInput,
+        options: resources.ManageDelegationContractInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRedelegatingRewards(sender.address, options);
 
@@ -263,7 +263,7 @@ export class DelegationController {
     async createTransactionForUndelegating(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.DelegateActionsInput,
+        options: resources.DelegateActionsInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUndelegating(sender.address, options);
 
@@ -276,7 +276,7 @@ export class DelegationController {
     async createTransactionForWithdrawing(
         sender: IAccount,
         nonce: bigint,
-        options: inputs.ManageDelegationContractInput,
+        options: resources.ManageDelegationContractInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForWithdrawing(sender.address, options);
 

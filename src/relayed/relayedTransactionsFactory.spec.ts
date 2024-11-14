@@ -25,7 +25,7 @@ describe("test relayed transactions factory", function () {
         });
 
         assert.throws(() => {
-            factory.createRelayedV1Transaction({ innerTransaction: innerTransaction, relayerAddress: bob.address }),
+            factory.createRelayedV1Transaction(bob.address, { innerTransaction: innerTransaction }),
                 "The inner transaction is not signed";
         });
 
@@ -33,7 +33,7 @@ describe("test relayed transactions factory", function () {
         innerTransaction.signature = Buffer.from("invalidsignature");
 
         assert.throws(() => {
-            factory.createRelayedV1Transaction({ innerTransaction: innerTransaction, relayerAddress: bob.address }),
+            factory.createRelayedV1Transaction(bob.address, { innerTransaction: innerTransaction }),
                 "The gas limit is not set for the inner transaction";
         });
     });
@@ -51,9 +51,8 @@ describe("test relayed transactions factory", function () {
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
         innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
 
-        const relayedTransaction = factory.createRelayedV1Transaction({
+        const relayedTransaction = factory.createRelayedV1Transaction(alice.getAddress(), {
             innerTransaction: innerTransaction,
-            relayerAddress: alice.address,
         });
         relayedTransaction.nonce = 2627n;
 
@@ -85,9 +84,8 @@ describe("test relayed transactions factory", function () {
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
         innerTransaction.signature = await carol.signer.sign(serializedInnerTransaction);
 
-        const relayedTransaction = factory.createRelayedV1Transaction({
+        const relayedTransaction = factory.createRelayedV1Transaction(frank.getAddress(), {
             innerTransaction: innerTransaction,
-            relayerAddress: frank.address,
         });
         relayedTransaction.nonce = 715n;
 
@@ -119,9 +117,8 @@ describe("test relayed transactions factory", function () {
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
         innerTransaction.signature = await carol.signer.sign(serializedInnerTransaction);
 
-        const relayedTransaction = factory.createRelayedV1Transaction({
+        const relayedTransaction = factory.createRelayedV1Transaction(frank.getAddress(), {
             innerTransaction: innerTransaction,
-            relayerAddress: frank.address,
         });
         relayedTransaction.nonce = 715n;
 
@@ -155,9 +152,8 @@ describe("test relayed transactions factory", function () {
         innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
         innerTransaction.guardianSignature = await grace.signer.sign(serializedInnerTransaction);
 
-        const relayedTransaction = factory.createRelayedV1Transaction({
+        const relayedTransaction = factory.createRelayedV1Transaction(alice.getAddress(), {
             innerTransaction: innerTransaction,
-            relayerAddress: alice.address,
         });
         relayedTransaction.nonce = 2627n;
 
@@ -191,9 +187,8 @@ describe("test relayed transactions factory", function () {
         innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
         innerTransaction.guardianSignature = await grace.signer.sign(serializedInnerTransaction);
 
-        const relayedTransaction = factory.createRelayedV1Transaction({
+        const relayedTransaction = factory.createRelayedV1Transaction(alice.getAddress(), {
             innerTransaction: innerTransaction,
-            relayerAddress: alice.address,
         });
         relayedTransaction.nonce = 2627n;
         relayedTransaction.options = 2;
@@ -222,10 +217,9 @@ describe("test relayed transactions factory", function () {
         });
 
         assert.throws(() => {
-            factory.createRelayedV2Transaction({
+            factory.createRelayedV2Transaction(carol.getAddress(), {
                 innerTransaction: innerTransaction,
                 innerTransactionGasLimit: 50000n,
-                relayerAddress: carol.address,
             }),
                 "The gas limit should not be set for the inner transaction";
         });
@@ -233,10 +227,9 @@ describe("test relayed transactions factory", function () {
         innerTransaction.gasLimit = 0n;
 
         assert.throws(() => {
-            factory.createRelayedV2Transaction({
+            factory.createRelayedV2Transaction(carol.getAddress(), {
                 innerTransaction: innerTransaction,
                 innerTransactionGasLimit: 50000n,
-                relayerAddress: carol.address,
             }),
                 "The inner transaction is not signed";
         });
@@ -257,10 +250,9 @@ describe("test relayed transactions factory", function () {
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
         innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
 
-        const relayedTransaction = factory.createRelayedV2Transaction({
+        const relayedTransaction = factory.createRelayedV2Transaction(alice.getAddress(), {
             innerTransaction: innerTransaction,
             innerTransactionGasLimit: 60000000n,
-            relayerAddress: alice.address,
         });
         relayedTransaction.nonce = 37n;
 

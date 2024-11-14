@@ -1,8 +1,7 @@
 import { ITransaction } from "../interface";
 
-export type CreateV1RelayTransactionInput = { nonce: bigint; innerTransaction: ITransaction };
-export type CreateV2RelayTransactionInput = {
-    nonce: bigint;
+export type RelayedV1TransactionInput = { innerTransaction: ITransaction };
+export type RelayedV2TransactionInput = {
     innerTransaction: ITransaction;
     innerTransactionGasLimit: bigint;
 };

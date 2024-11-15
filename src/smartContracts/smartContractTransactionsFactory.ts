@@ -71,7 +71,7 @@ export class SmartContractTransactionsFactory {
         }).build();
     }
 
-    createTransactionForExecute(sender: Address, options: resources.TransactionInput): Transaction {
+    createTransactionForExecute(sender: Address, options: resources.ExecuteTransactionInput): Transaction {
         const args = options.arguments || [];
         let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
         let nativeTransferAmount = options.nativeTransferAmount ?? 0n;

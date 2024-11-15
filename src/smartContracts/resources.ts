@@ -12,7 +12,7 @@ export type ContractDepoyInput = {
     isPayableBySmartContract?: boolean;
 };
 
-export type TransactionInput = {
+export type ExecuteTransactionInput = {
     contract: Address;
     gasLimit: bigint;
     function: string;

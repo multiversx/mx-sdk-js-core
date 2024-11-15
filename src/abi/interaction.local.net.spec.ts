@@ -3,13 +3,13 @@ import { assert } from "chai";
 import { promises } from "fs";
 import { QueryRunnerAdapter } from "../adapters/queryRunnerAdapter";
 import { SmartContractQueriesController } from "../smartContractQueriesController";
+import { SmartContractTransactionsFactory } from "../smartContracts";
 import { loadAbiRegistry, loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
 import { ContractController } from "../testutils/contractController";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionsFactoryConfig } from "../transactionsFactories";
-import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
 import { TransactionWatcher } from "../transactionWatcher";
 import { Interaction } from "./interaction";
 import { ResultsParser } from "./resultsParser";
@@ -102,8 +102,7 @@ describe("test smart contract interactor", function () {
 
         const bytecode = await promises.readFile("src/testdata/answer.wasm");
 
-        const deployTransaction = factory.createTransactionForDeploy({
-            sender: alice.address,
+        const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 3000000n,
         });
@@ -144,8 +143,7 @@ describe("test smart contract interactor", function () {
         assert.deepEqual(parsed[0], new BigNumber(42));
 
         // Query
-        let transaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        let transaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "getUltimateAnswer",
             gasLimit: 3000000n,
@@ -160,8 +158,7 @@ describe("test smart contract interactor", function () {
         await provider.sendTransaction(transaction);
 
         // Execute, and wait for execution
-        transaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        transaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "getUltimateAnswer",
             gasLimit: 3000000n,
@@ -393,8 +390,7 @@ describe("test smart contract interactor", function () {
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
 
-        const deployTransaction = factory.createTransactionForDeploy({
-            sender: alice.address,
+        const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 3000000n,
         });
@@ -422,8 +418,7 @@ describe("test smart contract interactor", function () {
         const queryRunner = new QueryRunnerAdapter({ networkProvider: provider });
         const queryController = new SmartContractQueriesController({ abi: abiRegistry, queryRunner: queryRunner });
 
-        let incrementTransaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        let incrementTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "increment",
             gasLimit: 3000000n,
@@ -451,8 +446,7 @@ describe("test smart contract interactor", function () {
         let typedBundle = resultsParser.parseOutcome(transactionOnNetwork, abiRegistry.getEndpoint("increment"));
         assert.deepEqual(typedBundle.firstValue!.valueOf(), new BigNumber(2));
 
-        let decrementTransaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        let decrementTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "decrement",
             gasLimit: 3000000n,
@@ -590,8 +584,7 @@ describe("test smart contract interactor", function () {
         const bytecode = await promises.readFile("src/testdata/lottery-esdt.wasm");
 
         // Deploy the contract
-        const deployTransaction = factory.createTransactionForDeploy({
-            sender: alice.address,
+        const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 100000000n,
         });
@@ -617,8 +610,7 @@ describe("test smart contract interactor", function () {
         assert.isTrue(untypedBundle.returnCode.isSuccess());
 
         // start()
-        let startTransaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        let startTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "start",
             arguments: ["lucky", "EGLD", 1, null, null, 1, null, null],
@@ -638,8 +630,7 @@ describe("test smart contract interactor", function () {
         assert.lengthOf(typedBundle.values, 0);
 
         // status()
-        let lotteryStatusTransaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        let lotteryStatusTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "status",
             arguments: ["lucky"],
@@ -660,8 +651,7 @@ describe("test smart contract interactor", function () {
         assert.equal(typedBundle.firstValue!.valueOf().name, "Running");
 
         // getlotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
-        let lotteryInfoTransaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        let lotteryInfoTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "getLotteryInfo",
             arguments: ["lucky"],

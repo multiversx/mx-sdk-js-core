@@ -3,12 +3,12 @@ import { promises } from "fs";
 import { QueryRunnerAdapter } from "../adapters/queryRunnerAdapter";
 import { Logger } from "../logger";
 import { SmartContractQueriesController } from "../smartContractQueriesController";
+import { SmartContractTransactionsFactory } from "../smartContracts";
 import { prepareDeployment } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { loadTestWallets, TestWallet } from "../testutils/wallets";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionsFactoryConfig } from "../transactionsFactories";
-import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
 import { TransactionWatcher } from "../transactionWatcher";
 import { decodeUnsignedNumber } from "./codec";
 import { ContractFunction } from "./function";
@@ -129,8 +129,7 @@ describe("test on local testnet", function () {
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
 
-        const deployTransaction = factory.createTransactionForDeploy({
-            sender: alice.address,
+        const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 3000000n,
         });
@@ -144,8 +143,7 @@ describe("test on local testnet", function () {
         const contractAddress = SmartContract.computeAddress(alice.address, alice.account.nonce);
         alice.account.incrementNonce();
 
-        const smartContractCallTransaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        const smartContractCallTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "increment",
             gasLimit: 3000000n,
@@ -157,8 +155,7 @@ describe("test on local testnet", function () {
 
         alice.account.incrementNonce();
 
-        const simulateOne = factory.createTransactionForExecute({
-            sender: alice.address,
+        const simulateOne = factory.createTransactionForExecute(alice.address, {
             function: "increment",
             contract: contractAddress,
             gasLimit: 100000n,
@@ -171,8 +168,7 @@ describe("test on local testnet", function () {
 
         alice.account.incrementNonce();
 
-        const simulateTwo = factory.createTransactionForExecute({
-            sender: alice.address,
+        const simulateTwo = factory.createTransactionForExecute(alice.address, {
             function: "foobar",
             contract: contractAddress,
             gasLimit: 500000n,
@@ -283,8 +279,7 @@ describe("test on local testnet", function () {
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
 
-        const deployTransaction = factory.createTransactionForDeploy({
-            sender: alice.address,
+        const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 3000000n,
         });
@@ -298,8 +293,7 @@ describe("test on local testnet", function () {
         const contractAddress = SmartContract.computeAddress(alice.address, alice.account.nonce);
         alice.account.incrementNonce();
 
-        const firstScCallTransaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        const firstScCallTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "increment",
             gasLimit: 3000000n,
@@ -311,8 +305,7 @@ describe("test on local testnet", function () {
 
         alice.account.incrementNonce();
 
-        const secondScCallTransaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        const secondScCallTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "increment",
             gasLimit: 3000000n,
@@ -449,8 +442,7 @@ describe("test on local testnet", function () {
 
         const bytecode = await promises.readFile("src/testdata/erc20.wasm");
 
-        const deployTransaction = factory.createTransactionForDeploy({
-            sender: alice.address,
+        const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 50000000n,
             arguments: [new U32Value(10000)],
@@ -464,8 +456,7 @@ describe("test on local testnet", function () {
         const contractAddress = SmartContract.computeAddress(alice.address, alice.account.nonce);
         alice.account.incrementNonce();
 
-        const transactionMintBob = factory.createTransactionForExecute({
-            sender: alice.address,
+        const transactionMintBob = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "transferToken",
             gasLimit: 9000000n,
@@ -478,8 +469,7 @@ describe("test on local testnet", function () {
 
         alice.account.incrementNonce();
 
-        const transactionMintCarol = factory.createTransactionForExecute({
-            sender: alice.address,
+        const transactionMintCarol = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "transferToken",
             gasLimit: 9000000n,
@@ -629,8 +619,7 @@ describe("test on local testnet", function () {
 
         const bytecode = await promises.readFile("src/testdata/lottery-esdt.wasm");
 
-        const deployTransaction = factory.createTransactionForDeploy({
-            sender: alice.address,
+        const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 50000000n,
         });
@@ -644,8 +633,7 @@ describe("test on local testnet", function () {
         const contractAddress = SmartContract.computeAddress(alice.address, alice.account.nonce);
         alice.account.incrementNonce();
 
-        const startTransaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        const startTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "start",
             gasLimit: 10000000n,

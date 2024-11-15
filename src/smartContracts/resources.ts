@@ -4,7 +4,7 @@ import { TokenTransfer } from "../tokens";
 export type ContractDepoyInput = {
     bytecode: Uint8Array;
     gasLimit: bigint;
-    arguments: any[];
+    arguments?: any[];
     nativeTransferAmount?: bigint;
     isUpgradeable?: boolean;
     isReadable?: boolean;

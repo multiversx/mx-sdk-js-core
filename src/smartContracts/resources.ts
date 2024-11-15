@@ -1,7 +1,7 @@
 import { Address } from "../address";
 import { TokenTransfer } from "../tokens";
 
-export type ContractDepoyInput = {
+export type ContractDeployInput = {
     bytecode: Uint8Array;
     gasLimit: bigint;
     arguments?: any[];
@@ -12,7 +12,7 @@ export type ContractDepoyInput = {
     isPayableBySmartContract?: boolean;
 };
 
-export type ExecuteTransactionInput = {
+export type ContractExecuteInput = {
     contract: Address;
     gasLimit: bigint;
     function: string;
@@ -21,7 +21,7 @@ export type ExecuteTransactionInput = {
     tokenTransfers?: TokenTransfer[];
 };
 
-export type ContractUpgradeInput = ContractDepoyInput & { contract: Address };
+export type ContractUpgradeInput = ContractDeployInput & { contract: Address };
 
 export interface SmartContractDeployOutcome {
     returnCode: string;

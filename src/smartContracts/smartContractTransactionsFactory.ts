@@ -6,9 +6,9 @@ import { CONTRACT_DEPLOY_ADDRESS_HEX, VM_TYPE_WASM_VM } from "../constants";
 import { Err } from "../errors";
 import { Logger } from "../logger";
 import { TokenComputer, TokenTransfer } from "../tokens";
+import { TokenTransfersDataBuilder } from "../tokenTransfersDataBuilder";
 import { Transaction } from "../transaction";
-import { TokenTransfersDataBuilder } from "../transactionsFactories/tokenTransfersDataBuilder";
-import { TransactionBuilder } from "../transactionsFactories/transactionBuilder";
+import { TransactionBuilder } from "../transactionBuilder";
 import { byteArrayToHex, utf8ToHex } from "../utils.codec";
 import * as resources from "./resources";
 

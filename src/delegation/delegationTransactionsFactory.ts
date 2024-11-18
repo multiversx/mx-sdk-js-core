@@ -4,7 +4,7 @@ import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../constants";
 import { Err } from "../errors";
 import { IAddress } from "../interface";
 import { Transaction } from "../transaction";
-import { TransactionBuilder } from "../transactionsFactories/transactionBuilder";
+import { TransactionBuilder } from "../transactionBuilder";
 import * as resources from "./resources";
 
 interface IConfig {

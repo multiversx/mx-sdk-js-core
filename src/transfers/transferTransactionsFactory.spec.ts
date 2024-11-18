@@ -3,7 +3,7 @@ import { Address } from "../address";
 import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
 import { ErrBadUsage } from "../errors";
 import { Token, TokenTransfer } from "../tokens";
-import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 
 describe("test transfer transactions factory", function () {
@@ -20,8 +20,7 @@ describe("test transfer transactions factory", function () {
 
         assert.throw(
             () => {
-                transferFactory.createTransactionForESDTTokenTransfer({
-                    sender: alice,
+                transferFactory.createTransactionForESDTTokenTransfer(alice, {
                     receiver: bob,
                     tokenTransfers: transfers,
                 });
@@ -32,8 +31,7 @@ describe("test transfer transactions factory", function () {
     });
 
     it("should create 'Transaction' for native token transfer without data", async () => {
-        const transaction = transferFactory.createTransactionForNativeTokenTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForNativeTokenTransfer(alice, {
             receiver: bob,
             nativeAmount: 1000000000000000000n,
         });
@@ -46,8 +44,7 @@ describe("test transfer transactions factory", function () {
     });
 
     it("should create 'Transaction' for native token transfer with data", async () => {
-        const transaction = transferFactory.createTransactionForNativeTokenTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForNativeTokenTransfer(alice, {
             receiver: bob,
             nativeAmount: 1000000000000000000n,
             data: Buffer.from("test data"),
@@ -64,8 +61,7 @@ describe("test transfer transactions factory", function () {
         const fooToken = new Token({ identifier: "FOO-123456", nonce: 0n });
         const transfer = new TokenTransfer({ token: fooToken, amount: 1000000n });
 
-        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer(alice, {
             receiver: bob,
             tokenTransfers: [transfer],
         });
@@ -81,8 +77,7 @@ describe("test transfer transactions factory", function () {
         const nft = new Token({ identifier: "NFT-123456", nonce: 10n });
         const transfer = new TokenTransfer({ token: nft, amount: 1n });
 
-        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer(alice, {
             receiver: bob,
             tokenTransfers: [transfer],
         });
@@ -101,8 +96,7 @@ describe("test transfer transactions factory", function () {
         const nft = new Token({ identifier: "t0-NFT-123456", nonce: 10n });
         const transfer = new TokenTransfer({ token: nft, amount: 1n });
 
-        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer(alice, {
             receiver: bob,
             tokenTransfers: [transfer],
         });
@@ -124,8 +118,7 @@ describe("test transfer transactions factory", function () {
         const secondNft = new Token({ identifier: "TEST-987654", nonce: 1n });
         const secondTransfer = new TokenTransfer({ token: secondNft, amount: 1n });
 
-        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer(alice, {
             receiver: bob,
             tokenTransfers: [firstTransfer, secondTransfer],
         });
@@ -139,8 +132,7 @@ describe("test transfer transactions factory", function () {
             "MultiESDTNFTTransfer@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@02@4e46542d313233343536@0a@01@544553542d393837363534@01@01",
         );
 
-        const secondTransaction = transferFactory.createTransactionForTransfer({
-            sender: alice,
+        const secondTransaction = transferFactory.createTransactionForTransfer(alice, {
             receiver: bob,
             tokenTransfers: [firstTransfer, secondTransfer],
         });
@@ -155,8 +147,7 @@ describe("test transfer transactions factory", function () {
         const secondNft = new Token({ identifier: "t0-TEST-987654", nonce: 1n });
         const secondTransfer = new TokenTransfer({ token: secondNft, amount: 1n });
 
-        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer(alice, {
             receiver: bob,
             tokenTransfers: [firstTransfer, secondTransfer],
         });
@@ -170,8 +161,7 @@ describe("test transfer transactions factory", function () {
             "MultiESDTNFTTransfer@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@02@74302d4e46542d313233343536@0a@01@74302d544553542d393837363534@01@01",
         );
 
-        const secondTransaction = transferFactory.createTransactionForTransfer({
-            sender: alice,
+        const secondTransaction = transferFactory.createTransactionForTransfer(alice, {
             receiver: bob,
             tokenTransfers: [firstTransfer, secondTransfer],
         });
@@ -184,8 +174,7 @@ describe("test transfer transactions factory", function () {
             const nft = new Token({ identifier: "NFT-123456", nonce: 10n });
             const transfer = new TokenTransfer({ token: nft, amount: 1n });
 
-            transferFactory.createTransactionForTransfer({
-                sender: alice,
+            transferFactory.createTransactionForTransfer(alice, {
                 receiver: bob,
                 tokenTransfers: [transfer],
                 data: Buffer.from("test"),
@@ -194,8 +183,7 @@ describe("test transfer transactions factory", function () {
     });
 
     it("should create transaction for native transfers", async () => {
-        const transaction = transferFactory.createTransactionForTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForTransfer(alice, {
             receiver: bob,
             nativeAmount: 1000000000000000000n,
         });
@@ -207,8 +195,7 @@ describe("test transfer transactions factory", function () {
     });
 
     it("should create transaction for native transfers and set data field", async () => {
-        const transaction = transferFactory.createTransactionForTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForTransfer(alice, {
             receiver: bob,
             nativeAmount: 1000000000000000000n,
             data: Buffer.from("hello"),
@@ -222,8 +209,7 @@ describe("test transfer transactions factory", function () {
     });
 
     it("should create transaction for notarizing", async () => {
-        const transaction = transferFactory.createTransactionForTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForTransfer(alice, {
             receiver: bob,
             data: Buffer.from("hello"),
         });
@@ -241,8 +227,7 @@ describe("test transfer transactions factory", function () {
         const secondNft = new Token({ identifier: "TEST-987654", nonce: 1n });
         const secondTransfer = new TokenTransfer({ token: secondNft, amount: 1n });
 
-        const transaction = transferFactory.createTransactionForTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForTransfer(alice, {
             receiver: bob,
             nativeAmount: 1000000000000000000n,
             tokenTransfers: [firstTransfer, secondTransfer],
@@ -265,8 +250,7 @@ describe("test transfer transactions factory", function () {
         const secondNft = new Token({ identifier: "t0-TEST-987654", nonce: 1n });
         const secondTransfer = new TokenTransfer({ token: secondNft, amount: 1n });
 
-        const transaction = transferFactory.createTransactionForTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForTransfer(alice, {
             receiver: bob,
             nativeAmount: 1000000000000000000n,
             tokenTransfers: [firstTransfer, secondTransfer],
@@ -286,8 +270,7 @@ describe("test transfer transactions factory", function () {
         const firstNft = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
         const firstTransfer = new TokenTransfer({ token: firstNft, amount: 1000000000000000000n });
 
-        const transaction = transferFactory.createTransactionForESDTTokenTransfer({
-            sender: alice,
+        const transaction = transferFactory.createTransactionForESDTTokenTransfer(alice, {
             receiver: bob,
             tokenTransfers: [firstTransfer],
         });

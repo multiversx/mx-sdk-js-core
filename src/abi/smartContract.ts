@@ -4,7 +4,7 @@ import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
 import { ErrContractHasNoAddress } from "../errors";
 import { INonce } from "../interface";
 import { Transaction } from "../transaction";
-import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { guardValueIsSet } from "../utils";
 import { SmartContractTransactionsFactory } from "./../smartContracts/smartContractTransactionsFactory";
 import { CodeMetadata } from "./codeMetadata";

@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { TestWallet, loadTestWallets } from "../testutils";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 
 describe("test relayed transactions factory", function () {

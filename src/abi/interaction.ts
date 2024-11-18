@@ -6,7 +6,7 @@ import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenTransfer, ITran
 import { SmartContractTransactionsFactory } from "../smartContracts";
 import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
-import { TransactionsFactoryConfig } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { ContractFunction } from "./function";
 import { InteractionChecker } from "./interactionChecker";
 import { CallArguments } from "./interface";

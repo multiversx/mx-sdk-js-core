@@ -7,9 +7,9 @@ import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionComputer } from "./transactionComputer";
 import { TransactionPayload } from "./transactionPayload";
+import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 import { TransactionWatcher } from "./transactionWatcher";
-import { TransactionsFactoryConfig } from "./transactionsFactories/transactionsFactoryConfig";
-import { TransferTransactionsFactory } from "./transactionsFactories/transferTransactionsFactory";
+import { TransferTransactionsFactory } from "./transfers/transferTransactionsFactory";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;

@@ -9,7 +9,7 @@ import { ContractController } from "../testutils/contractController";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { Interaction } from "./interaction";
 import { ResultsParser } from "./resultsParser";

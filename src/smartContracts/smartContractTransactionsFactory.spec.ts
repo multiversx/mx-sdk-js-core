@@ -4,7 +4,7 @@ import { Address } from "../address";
 import { Err } from "../errors";
 import { loadAbiRegistry, loadContractCode } from "../testutils/utils";
 import { Token, TokenTransfer } from "../tokens";
-import { TransactionsFactoryConfig } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
 
 describe("test smart contract transactions factory", function () {

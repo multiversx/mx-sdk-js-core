@@ -8,7 +8,7 @@ import { prepareDeployment } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { loadTestWallets, TestWallet } from "../testutils/wallets";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { decodeUnsignedNumber } from "./codec";
 import { ContractFunction } from "./function";

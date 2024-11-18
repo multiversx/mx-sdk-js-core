@@ -1,4 +1,4 @@
-import { LibraryConfig } from "../config";
+import { LibraryConfig } from "./config";
 
 export class TransactionsFactoryConfig {
     chainID: string;

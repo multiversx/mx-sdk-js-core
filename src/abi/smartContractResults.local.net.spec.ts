@@ -4,7 +4,7 @@ import { SmartContractTransactionsFactory } from "../smartContracts";
 import { loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction } from "./function";
 import { ResultsParser } from "./resultsParser";

@@ -1,2 +1,2 @@
-export * from "./transactionsFactoryConfig";
+export * from "./transfersControllers";
 export * from "./transferTransactionsFactory";

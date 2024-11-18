@@ -1,7 +1,7 @@
 import { IAccount } from "../accounts/interfaces";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 import { RelayedV1TransactionInput, RelayedV2TransactionInput } from "./resources";
 

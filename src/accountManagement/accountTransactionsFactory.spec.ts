@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { Address } from "../address";
-import { TransactionsFactoryConfig } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { AccountTransactionsFactory } from "./accountTransactionsFactory";
 
 describe("test account transactions factory", function () {

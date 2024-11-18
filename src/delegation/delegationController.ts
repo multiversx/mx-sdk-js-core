@@ -3,7 +3,7 @@ import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { INetworkProvider } from "../networkProviders/interface";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
 import { DelegationTransactionsOutcomeParser } from "./delegationTransactionsOutcomeParser";

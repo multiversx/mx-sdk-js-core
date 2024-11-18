@@ -7,7 +7,7 @@ import { INetworkProvider } from "../networkProviders/interface";
 import { SmartContractQueriesController } from "../smartContractQueriesController";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
 import * as resources from "./resources";

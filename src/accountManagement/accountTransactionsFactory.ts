@@ -1,7 +1,7 @@
 import { Address } from "../address";
 import { IAddress } from "../interface";
 import { Transaction } from "../transaction";
-import { TransactionBuilder } from "../transactionsFactories/transactionBuilder";
+import { TransactionBuilder } from "../transactionBuilder";
 import { SaveKeyValueInput, SetGuardianInput } from "./resources";
 
 interface IConfig {

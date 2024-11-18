@@ -21,7 +21,7 @@ describe("fetch transactions from local testnet", function () {
         ({ alice } = await loadTestWallets());
         watcher = new TransactionWatcher({
             getTransaction: async (hash: string) => {
-                return await provider.getTransaction(hash, true);
+                return await provider.getTransaction(hash);
             },
         });
     });

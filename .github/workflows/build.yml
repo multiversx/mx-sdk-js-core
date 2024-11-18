@@ -5,7 +5,6 @@ name: Build and Test
 
 on:
   pull_request:
-    branches: [ main, development, feat/*, release/* ]
   workflow_dispatch:
 
 jobs:

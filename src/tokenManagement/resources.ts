@@ -50,6 +50,7 @@ export type MintInput = {
     uris: string[];
 };
 export type ManagementInput = { user: IAddress; tokenIdentifier: string };
+export type PausingInput = { tokenIdentifier: string };
 export type LocalBurnInput = { tokenIdentifier: string; supplyToBurn: bigint };
 export type LocalMintInput = { tokenIdentifier: string; supplyToMint: bigint };
 
@@ -59,6 +60,8 @@ export type UpdateQuantityInput = UpdateInput & { quantity: bigint };
 
 export type UpdateInput = { tokenIdentifier: string; tokenNonce: bigint };
 export type BurnRoleGloballyInput = { tokenIdentifier: string };
+export type UpdateTokenIDInput = { tokenIdentifier: string };
+export type ChangeTokenToDynamicInput = { tokenIdentifier: string };
 
 export type RegisterRolesInput = {
     tokenName: string;
@@ -81,12 +84,13 @@ export type RegisterMetaESDTInput = {
 };
 
 export type ModifyRoyaltiesInput = BaseInput & { newRoyalties: bigint };
+export type ModifyCreatorInput = BaseInput;
 
 export type BaseInput = { tokenIdentifier: string; tokenNonce: bigint };
 
 export type SetNewUriInput = BaseInput & { newUris: string[] };
 
-export type UpdateMetadataInput = {
+export type ManageMetadataInput = {
     tokenIdentifier: string;
     tokenNonce: bigint;
     newTokenName?: string;

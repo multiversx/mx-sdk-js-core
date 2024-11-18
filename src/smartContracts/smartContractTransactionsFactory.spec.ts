@@ -4,8 +4,8 @@ import { Address } from "../address";
 import { Err } from "../errors";
 import { loadAbiRegistry, loadContractCode } from "../testutils/utils";
 import { Token, TokenTransfer } from "../tokens";
+import { TransactionsFactoryConfig } from "../transactionsFactories";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
-import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 
 describe("test smart contract transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });
@@ -35,8 +35,7 @@ describe("test smart contract transactions factory", function () {
 
         assert.throws(
             () =>
-                factory.createTransactionForDeploy({
-                    sender: sender,
+                factory.createTransactionForDeploy(sender, {
                     bytecode: bytecode.valueOf(),
                     gasLimit: gasLimit,
                     arguments: args,
@@ -51,15 +50,13 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const args = [new U32Value(1)];
 
-        const transaction = factory.createTransactionForDeploy({
-            sender: sender,
+        const transaction = factory.createTransactionForDeploy(sender, {
             bytecode: bytecode.valueOf(),
             gasLimit: gasLimit,
             arguments: args,
         });
 
-        const transactionAbiAware = abiAwareFactory.createTransactionForDeploy({
-            sender: sender,
+        const transactionAbiAware = abiAwareFactory.createTransactionForDeploy(sender, {
             bytecode: bytecode.valueOf(),
             gasLimit: gasLimit,
             arguments: args,
@@ -81,16 +78,14 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const args = [new U32Value(7)];
 
-        const transaction = factory.createTransactionForExecute({
-            sender: sender,
+        const transaction = factory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
             arguments: args,
         });
 
-        const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
-            sender: sender,
+        const transactionAbiAware = abiAwareFactory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -113,8 +108,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const egldAmount = 1000000000000000000n;
 
-        const transaction = factory.createTransactionForExecute({
-            sender: sender,
+        const transaction = factory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -122,8 +116,7 @@ describe("test smart contract transactions factory", function () {
             nativeTransferAmount: egldAmount,
         });
 
-        const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
-            sender: sender,
+        const transactionAbiAware = abiAwareFactory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -149,8 +142,7 @@ describe("test smart contract transactions factory", function () {
         const token = new Token({ identifier: "FOO-6ce17b", nonce: 0n });
         const transfer = new TokenTransfer({ token, amount: 10n });
 
-        const transaction = factory.createTransactionForExecute({
-            sender: sender,
+        const transaction = factory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -158,8 +150,7 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [transfer],
         });
 
-        const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
-            sender: sender,
+        const transactionAbiAware = abiAwareFactory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -188,8 +179,7 @@ describe("test smart contract transactions factory", function () {
         const barToken = new Token({ identifier: "BAR-5bc08f", nonce: 0n });
         const barTransfer = new TokenTransfer({ token: barToken, amount: 3140n });
 
-        const transaction = factory.createTransactionForExecute({
-            sender: sender,
+        const transaction = factory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -197,8 +187,7 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [fooTransfer, barTransfer],
         });
 
-        const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
-            sender: sender,
+        const transactionAbiAware = abiAwareFactory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -232,8 +221,7 @@ describe("test smart contract transactions factory", function () {
         const token = new Token({ identifier: "NFT-123456", nonce: 1n });
         const transfer = new TokenTransfer({ token, amount: 1n });
 
-        const transaction = factory.createTransactionForExecute({
-            sender: sender,
+        const transaction = factory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -241,8 +229,7 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [transfer],
         });
 
-        const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
-            sender: sender,
+        const transactionAbiAware = abiAwareFactory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -279,8 +266,7 @@ describe("test smart contract transactions factory", function () {
         const secondToken = new Token({ identifier: "NFT-123456", nonce: 42n });
         const secondTransfer = new TokenTransfer({ token: secondToken, amount: 1n });
 
-        const transaction = factory.createTransactionForExecute({
-            sender: sender,
+        const transaction = factory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -288,8 +274,7 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [firstTransfer, secondTransfer],
         });
 
-        const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
-            sender: sender,
+        const transactionAbiAware = abiAwareFactory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -326,8 +311,7 @@ describe("test smart contract transactions factory", function () {
         const secondToken = new Token({ identifier: "NFT-123456", nonce: 42n });
         const secondTransfer = new TokenTransfer({ token: secondToken, amount: 1n });
 
-        const transaction = factory.createTransactionForExecute({
-            sender: sender,
+        const transaction = factory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -336,8 +320,7 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [firstTransfer, secondTransfer],
         });
 
-        const transactionAbiAware = abiAwareFactory.createTransactionForExecute({
-            sender: sender,
+        const transactionAbiAware = abiAwareFactory.createTransactionForExecute(sender, {
             contract: contract,
             function: func,
             gasLimit: gasLimit,
@@ -369,16 +352,14 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
         const args = [new U32Value(7)];
 
-        const transaction = factory.createTransactionForUpgrade({
-            sender: sender,
+        const transaction = factory.createTransactionForUpgrade(sender, {
             contract: contract,
             bytecode: bytecode.valueOf(),
             gasLimit: gasLimit,
             arguments: args,
         });
 
-        const transactionAbiAware = abiAwareFactory.createTransactionForUpgrade({
-            sender: sender,
+        const transactionAbiAware = abiAwareFactory.createTransactionForUpgrade(sender, {
             contract: contract,
             bytecode: bytecode.valueOf(),
             gasLimit: gasLimit,
@@ -442,8 +423,7 @@ describe("test smart contract transactions factory", function () {
         const gasLimit = 6000000n;
 
         // By default, use the upgrade constructor.
-        const tx1 = factory.createTransactionForUpgrade({
-            sender: sender,
+        const tx1 = factory.createTransactionForUpgrade(sender, {
             contract: receiver,
             bytecode: bytecode,
             gasLimit: gasLimit,
@@ -455,8 +435,7 @@ describe("test smart contract transactions factory", function () {
         // Fallback to the "upgrade" endpoint.
         (<any>abi).upgradeConstructorDefinition = undefined;
 
-        const tx2 = factory.createTransactionForUpgrade({
-            sender: sender,
+        const tx2 = factory.createTransactionForUpgrade(sender, {
             contract: receiver,
             bytecode: bytecode,
             gasLimit: gasLimit,
@@ -468,8 +447,7 @@ describe("test smart contract transactions factory", function () {
         // Fallback to the constructor.
         (<any>abi).endpoints.length = 0;
 
-        const tx3 = factory.createTransactionForUpgrade({
-            sender: sender,
+        const tx3 = factory.createTransactionForUpgrade(sender, {
             contract: receiver,
             bytecode: bytecode,
             gasLimit: gasLimit,
@@ -483,8 +461,7 @@ describe("test smart contract transactions factory", function () {
 
         assert.throws(
             () =>
-                factory.createTransactionForUpgrade({
-                    sender: sender,
+                factory.createTransactionForUpgrade(sender, {
                     contract: receiver,
                     bytecode: bytecode,
                     gasLimit: gasLimit,

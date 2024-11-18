@@ -1,14 +1,14 @@
 import { assert } from "chai";
+import { promises } from "fs";
+import { SmartContractTransactionsFactory } from "../smartContracts";
 import { loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
+import { TransactionComputer } from "../transactionComputer";
+import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction } from "./function";
 import { ResultsParser } from "./resultsParser";
 import { SmartContract } from "./smartContract";
-import { TransactionsFactoryConfig } from "../transactionsFactories/transactionsFactoryConfig";
-import { SmartContractTransactionsFactory } from "../transactionsFactories/smartContractTransactionsFactory";
-import { promises } from "fs";
-import { TransactionComputer } from "../transactionComputer";
 
 describe("fetch transactions from local testnet", function () {
     let alice: TestWallet;
@@ -91,8 +91,7 @@ describe("fetch transactions from local testnet", function () {
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
 
-        const deployTransaction = factory.createTransactionForDeploy({
-            sender: alice.address,
+        const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 3000000n,
         });
@@ -106,8 +105,7 @@ describe("fetch transactions from local testnet", function () {
         const contractAddress = SmartContract.computeAddress(alice.address, alice.account.nonce);
         alice.account.incrementNonce();
 
-        const smartContractCallTransaction = factory.createTransactionForExecute({
-            sender: alice.address,
+        const smartContractCallTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "increment",
             gasLimit: 3000000n,

@@ -3,7 +3,11 @@ import { Address } from "../address";
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { Err } from "../errors";
 import { IContractResultItem, ITransactionEvent, ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { SmartContractCallOutcome, TransactionOutcome, findEventsByIdentifier } from "./resources";
+import {
+    SmartContractCallOutcome,
+    TransactionOutcome,
+    findEventsByIdentifier,
+} from "../transactionsOutcomeParsers/resources";
 
 enum Events {
     SCDeploy = "SCDeploy",

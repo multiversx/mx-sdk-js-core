@@ -3,9 +3,10 @@ import { Address } from "../address";
 import { Compatibility } from "../compatibility";
 import { TRANSACTION_VERSION_DEFAULT } from "../constants";
 import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenTransfer, ITransactionValue } from "../interface";
+import { SmartContractTransactionsFactory } from "../smartContracts";
 import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
-import { SmartContractTransactionsFactory, TransactionsFactoryConfig } from "../transactionsFactories";
+import { TransactionsFactoryConfig } from "../transactionsFactories";
 import { ContractFunction } from "./function";
 import { InteractionChecker } from "./interactionChecker";
 import { CallArguments } from "./interface";
@@ -17,7 +18,7 @@ import { EndpointDefinition, TypedValue } from "./typesystem";
  */
 interface ISmartContractWithinInteraction {
     call({ func, args, value, gasLimit, receiver }: CallArguments): Transaction;
-    getAddress(): IAddress;
+    getAddress(): Address;
     getEndpoint(name: ContractFunction): EndpointDefinition;
 }
 
@@ -41,7 +42,7 @@ export class Interaction {
     private chainID: IChainID = "";
     private querent: IAddress = Address.empty();
     private explicitReceiver?: IAddress;
-    private sender: IAddress = Address.empty();
+    private sender: Address = Address.empty();
     private version: number = TRANSACTION_VERSION_DEFAULT;
 
     private tokenTransfers: TokenTransfer[];
@@ -97,8 +98,7 @@ export class Interaction {
             config: factoryConfig,
         });
 
-        const transaction = factory.createTransactionForExecute({
-            sender: this.sender,
+        const transaction = factory.createTransactionForExecute(this.sender, {
             contract: this.contract.getAddress(),
             function: this.function.valueOf(),
             gasLimit: BigInt(this.gasLimit.valueOf()),
@@ -173,7 +173,7 @@ export class Interaction {
         return this;
     }
 
-    withSender(sender: IAddress): Interaction {
+    withSender(sender: Address): Interaction {
         this.sender = sender;
         return this;
     }

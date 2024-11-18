@@ -118,7 +118,7 @@ describe("test smart contract interactor", function () {
 
         const transactionCompletionAwaiter = new TransactionWatcher({
             getTransaction: async (hash: string) => {
-                return await provider.getTransaction(hash, true);
+                return await provider.getTransaction(hash);
             },
         });
 
@@ -406,7 +406,7 @@ describe("test smart contract interactor", function () {
 
         const transactionCompletionAwaiter = new TransactionWatcher({
             getTransaction: async (hash: string) => {
-                return await provider.getTransaction(hash, true);
+                return await provider.getTransaction(hash);
             },
         });
 
@@ -600,7 +600,7 @@ describe("test smart contract interactor", function () {
 
         const transactionCompletionAwaiter = new TransactionWatcher({
             getTransaction: async (hash: string) => {
-                return await provider.getTransaction(hash, true);
+                return await provider.getTransaction(hash);
             },
         });
 

@@ -33,7 +33,7 @@ export function createMainnetProvider(): INetworkProvider {
 export interface INetworkProvider {
     getNetworkConfig(): Promise<INetworkConfig>;
     getAccount(address: IAddress): Promise<IAccountOnNetwork>;
-    getTransaction(txHash: string, withProcessStatus?: boolean): Promise<TransactionOnNetwork>;
+    getTransaction(txHash: string): Promise<TransactionOnNetwork>;
     getTransactionStatus(txHash: string): Promise<ITransactionStatus>;
     sendTransaction(tx: Transaction): Promise<string>;
     simulateTransaction(tx: Transaction): Promise<any>;

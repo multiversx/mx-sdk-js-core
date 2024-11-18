@@ -22,7 +22,7 @@ describe("test transaction", function () {
         return new TransactionWatcher(
             {
                 getTransaction: async (hash: string) => {
-                    return await provider.getTransaction(hash, true);
+                    return await provider.getTransaction(hash);
                 },
             },
             { timeoutMilliseconds: 100000 },

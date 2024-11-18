@@ -35,7 +35,7 @@ describe("test on local testnet", function () {
 
         watcher = new TransactionWatcher({
             getTransaction: async (hash: string) => {
-                return await provider.getTransaction(hash, true);
+                return await provider.getTransaction(hash);
             },
         });
     });

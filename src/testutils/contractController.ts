@@ -15,7 +15,7 @@ export class ContractController {
         this.provider = provider;
         this.transactionCompletionAwaiter = new TransactionWatcher({
             getTransaction: async (hash: string) => {
-                return await provider.getTransaction(hash, true);
+                return await provider.getTransaction(hash);
             },
         });
     }

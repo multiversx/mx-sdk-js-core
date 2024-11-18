@@ -370,7 +370,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForPausing(sender: IAddress, options: resources.ManagementInput): Transaction {
+    createTransactionForPausing(sender: IAddress, options: resources.PausingInput): Transaction {
         const dataParts = ["pause", ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)])];
 
         return new TransactionBuilder({
@@ -383,7 +383,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnpausing(sender: IAddress, options: resources.ManagementInput): Transaction {
+    createTransactionForUnpausing(sender: IAddress, options: resources.PausingInput): Transaction {
         const dataParts = [
             "unPause",
             ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
@@ -598,7 +598,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForModifyingCreator(sender: IAddress, options: resources.BaseInput): Transaction {
+    createTransactionForModifyingCreator(sender: IAddress, options: resources.ModifyCreatorInput): Transaction {
         const dataParts = [
             "ESDTModifyCreator",
             ...this.argSerializer.valuesToStrings([
@@ -617,7 +617,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUpdatingMetadata(sender: IAddress, options: resources.UpdateMetadataInput): Transaction {
+    createTransactionForUpdatingMetadata(sender: IAddress, options: resources.ManageMetadataInput): Transaction {
         const dataParts = [
             "ESDTMetaDataUpdate",
             ...this.argSerializer.valuesToStrings([
@@ -641,7 +641,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForMetadataRecreate(sender: IAddress, options: resources.UpdateMetadataInput): Transaction {
+    createTransactionForMetadataRecreate(sender: IAddress, options: resources.ManageMetadataInput): Transaction {
         const dataParts = [
             "ESDTMetaDataRecreate",
             ...this.argSerializer.valuesToStrings([
@@ -667,7 +667,7 @@ export class TokenManagementTransactionsFactory {
 
     createTransactionForChangingTokenToDynamic(
         sender: IAddress,
-        options: resources.BurnRoleGloballyInput,
+        options: resources.ChangeTokenToDynamicInput,
     ): Transaction {
         const dataParts = [
             "changeToDynamic",
@@ -684,7 +684,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUpdatingTokenId(sender: IAddress, options: resources.BurnRoleGloballyInput): Transaction {
+    createTransactionForUpdatingTokenId(sender: IAddress, options: resources.UpdateTokenIDInput): Transaction {
         const dataParts = [
             "updateTokenID",
             ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),

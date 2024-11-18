@@ -276,7 +276,7 @@ export class TokenManagementController {
     async createTransactionForPausing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManagementInput,
+        options: resources.PausingInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForPausing(sender.address, options);
 
@@ -298,7 +298,7 @@ export class TokenManagementController {
     async createTransactionForUnpausing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManagementInput,
+        options: resources.PausingInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnpausing(sender.address, options);
 

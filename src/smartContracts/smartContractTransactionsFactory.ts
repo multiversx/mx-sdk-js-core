@@ -46,7 +46,7 @@ export class SmartContractTransactionsFactory {
         this.contractDeployAddress = Address.fromHex(CONTRACT_DEPLOY_ADDRESS_HEX, this.config.addressHrp);
     }
 
-    createTransactionForDeploy(sender: Address, options: resources.ContractDepoyInput): Transaction {
+    createTransactionForDeploy(sender: Address, options: resources.ContractDeployInput): Transaction {
         const nativeTransferAmount = options.nativeTransferAmount ?? 0n;
         const isUpgradeable = options.isUpgradeable ?? true;
         const isReadable = options.isReadable ?? true;
@@ -71,7 +71,7 @@ export class SmartContractTransactionsFactory {
         }).build();
     }
 
-    createTransactionForExecute(sender: Address, options: resources.TransactionInput): Transaction {
+    createTransactionForExecute(sender: Address, options: resources.ContractExecuteInput): Transaction {
         const args = options.arguments || [];
         let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
         let nativeTransferAmount = options.nativeTransferAmount ?? 0n;

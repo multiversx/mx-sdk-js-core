@@ -38,7 +38,7 @@ export class SmartContractController {
     async createTransactionForDeploy(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ContractDepoyInput,
+        options: resources.ContractDeployInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForDeploy(sender.address, options);
 
@@ -69,7 +69,7 @@ export class SmartContractController {
     async createTransactionForExecute(
         sender: IAccount,
         nonce: bigint,
-        options: resources.TransactionInput,
+        options: resources.ContractExecuteInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForExecute(sender.address, options);
 

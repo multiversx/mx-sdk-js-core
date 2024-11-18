@@ -100,7 +100,7 @@ export class TransferTransactionsFactory {
         });
     }
 
-    createTransactionForESDTTokenTransfer(sender: IAddress, options: resources.ESDTTokenTransferInput): Transaction {
+    createTransactionForESDTTokenTransfer(sender: IAddress, options: resources.CustomTokenTransferInput): Transaction {
         this.ensureConfigIsDefined();
 
         const numberOfTransfers = options.tokenTransfers.length;

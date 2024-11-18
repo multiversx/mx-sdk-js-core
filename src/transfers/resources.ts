@@ -7,7 +7,7 @@ export type NativeTokenTransferInput = {
     data?: Uint8Array;
 };
 
-export type ESDTTokenTransferInput = {
+export type CustomTokenTransferInput = {
     receiver: Address;
     tokenTransfers: TokenTransfer[];
 };

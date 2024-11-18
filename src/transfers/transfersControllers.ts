@@ -30,7 +30,7 @@ export class TransfersController {
     async createTransactionForEsdtTokenTransfer(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ESDTTokenTransferInput,
+        options: resources.CustomTokenTransferInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForESDTTokenTransfer(sender.address, options);
 

@@ -1,7 +1,12 @@
 import { assert } from "chai";
 import { ErrParseTransactionOutcome } from "../errors";
 import { b64TopicsToBytes } from "../testutils";
-import { SmartContractResult, TransactionEvent, TransactionLogs, TransactionOutcome } from "./resources";
+import {
+    SmartContractResult,
+    TransactionEvent,
+    TransactionLogs,
+    TransactionOutcome,
+} from "../transactionsOutcomeParsers/resources";
 import { TokenManagementTransactionsOutcomeParser } from "./tokenManagementTransactionsOutcomeParser";
 
 describe("test token management transactions outcome parser", () => {

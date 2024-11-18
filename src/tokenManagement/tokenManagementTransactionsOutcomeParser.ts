@@ -3,7 +3,8 @@ import { Address } from "../address";
 import { TransactionsConverter } from "../converters/transactionsConverter";
 import { ErrParseTransactionOutcome } from "../errors";
 import { ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { TransactionEvent, TransactionOutcome, findEventsByIdentifier } from "./resources";
+import { TransactionEvent, TransactionOutcome, findEventsByIdentifier } from "../transactionsOutcomeParsers/resources";
+import { MintNftOutput, SpecialRoleOutput } from "./resources";
 
 export class TokenManagementTransactionsOutcomeParser {
     constructor() {}
@@ -79,11 +80,7 @@ export class TokenManagementTransactionsOutcomeParser {
         this.ensureNoError(transaction.logs.events);
     }
 
-    parseSetSpecialRole(transaction: TransactionOutcome | ITransactionOnNetwork): {
-        userAddress: string;
-        tokenIdentifier: string;
-        roles: string[];
-    }[] {
+    parseSetSpecialRole(transaction: TransactionOutcome | ITransactionOnNetwork): SpecialRoleOutput[] {
         transaction = this.ensureTransactionOutcome(transaction);
 
         this.ensureNoError(transaction.logs.events);
@@ -92,11 +89,7 @@ export class TokenManagementTransactionsOutcomeParser {
         return events.map((event) => this.getOutputForSetSpecialRoleEvent(event));
     }
 
-    private getOutputForSetSpecialRoleEvent(event: TransactionEvent): {
-        userAddress: string;
-        tokenIdentifier: string;
-        roles: string[];
-    } {
+    private getOutputForSetSpecialRoleEvent(event: TransactionEvent): SpecialRoleOutput {
         const userAddress = event.address;
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const encodedRoles = event.topics.slice(3);
@@ -105,11 +98,7 @@ export class TokenManagementTransactionsOutcomeParser {
         return { userAddress: userAddress, tokenIdentifier: tokenIdentifier, roles: roles };
     }
 
-    parseNftCreate(transaction: TransactionOutcome | ITransactionOnNetwork): {
-        tokenIdentifier: string;
-        nonce: bigint;
-        initialQuantity: bigint;
-    }[] {
+    parseNftCreate(transaction: TransactionOutcome | ITransactionOnNetwork): MintNftOutput[] {
         transaction = this.ensureTransactionOutcome(transaction);
 
         this.ensureNoError(transaction.logs.events);

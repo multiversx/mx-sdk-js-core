@@ -20,16 +20,16 @@ class NetworkEntrypoint {
     private networkProvider: ApiNetworkProvider | ProxyNetworkProvider;
     private chainId: string;
 
-    constructor(networkProviderUrl: string, networkProviderKind: string, chainId: string) {
-        if (networkProviderKind === "proxy") {
-            this.networkProvider = new ProxyNetworkProvider(networkProviderUrl);
-        } else if (networkProviderKind === "api") {
-            this.networkProvider = new ApiNetworkProvider(networkProviderUrl);
+    constructor(options: { networkProviderUrl: string; networkProviderKind: string; chainId: string }) {
+        if (options.networkProviderKind === "proxy") {
+            this.networkProvider = new ProxyNetworkProvider(options.networkProviderUrl);
+        } else if (options.networkProviderKind === "api") {
+            this.networkProvider = new ApiNetworkProvider(options.networkProviderUrl);
         } else {
             throw new ErrInvalidNetworkProviderKind();
         }
 
-        this.chainId = chainId;
+        this.chainId = options.chainId;
     }
 
     async signTransaction(transaction: Transaction, account: IAccount): Promise<void> {
@@ -111,32 +111,32 @@ class NetworkEntrypoint {
 export class TestnetEntrypoint extends NetworkEntrypoint {
     constructor(url?: string, kind?: string) {
         const entrypointConfig = new TestnetEntrypointConfig();
-        super(
-            url || entrypointConfig.networkProviderUrl,
-            kind || entrypointConfig.networkProviderKind,
-            entrypointConfig.chainId,
-        );
+        super({
+            networkProviderUrl: url || entrypointConfig.networkProviderUrl,
+            networkProviderKind: kind || entrypointConfig.networkProviderKind,
+            chainId: entrypointConfig.chainId,
+        });
     }
 }
 
 export class DevnetEntrypoint extends NetworkEntrypoint {
     constructor(url?: string, kind?: string) {
         const entrypointConfig = new DevnetEntrypointConfig();
-        super(
-            url || entrypointConfig.networkProviderUrl,
-            kind || entrypointConfig.networkProviderKind,
-            entrypointConfig.chainId,
-        );
+        super({
+            networkProviderUrl: url || entrypointConfig.networkProviderUrl,
+            networkProviderKind: kind || entrypointConfig.networkProviderKind,
+            chainId: entrypointConfig.chainId,
+        });
     }
 }
 
 export class MainnetEntrypoint extends NetworkEntrypoint {
     constructor(url?: string, kind?: string) {
         const entrypointConfig = new MainnetEntrypointConfig();
-        super(
-            url || entrypointConfig.networkProviderUrl,
-            kind || entrypointConfig.networkProviderKind,
-            entrypointConfig.chainId,
-        );
+        super({
+            networkProviderUrl: url || entrypointConfig.networkProviderUrl,
+            networkProviderKind: kind || entrypointConfig.networkProviderKind,
+            chainId: entrypointConfig.chainId,
+        });
     }
 }

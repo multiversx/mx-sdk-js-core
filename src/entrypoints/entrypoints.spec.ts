@@ -42,7 +42,7 @@ describe("TestEntrypoint", () => {
         this.timeout(30000);
         const abi = await loadAbiRegistry("src/testdata/adder.abi.json");
         const sender = Account.newFromPem(alicePem.pemFileText);
-        const accountAddress = new Address(sender.address.bech32());
+        const accountAddress = new Address(sender.address);
         sender.nonce = await entrypoint.recallAccountNonce(accountAddress);
 
         const controller = entrypoint.createSmartContractController(abi);
@@ -105,7 +105,7 @@ describe("TestEntrypoint", () => {
         transaction.signature = await sender.sign(txComputer.computeBytesForSigning(transaction));
 
         const relayedController = entrypoint.createRelayedController();
-        const relayedTransaction = relayedController.createRelayedV2Transaction(
+        const relayedTransaction = await relayedController.createRelayedV2Transaction(
             relayer,
             BigInt(relayer.getNonceThenIncrement().valueOf()),
             {
@@ -114,6 +114,8 @@ describe("TestEntrypoint", () => {
             },
         );
 
-        assert.equal((await relayedTransaction).chainID, "D");
+        assert.equal(relayedTransaction.chainID, "D");
+        assert.deepEqual(transaction.data, Buffer.from("hello"));
+        assert.equal(relayedTransaction.gasLimit, 0n);
     });
 });

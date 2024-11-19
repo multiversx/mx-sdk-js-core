@@ -1,40 +1,37 @@
 import { assert } from "chai";
-import {
-    SmartContractResult,
-    TransactionEvent,
-    TransactionLogs,
-    TransactionOutcome,
-    findEventsByFirstTopic,
-    findEventsByIdentifier,
-} from "./resources";
+import { ContractResultItem, ContractResults } from "../networkProviders/contractResults";
+import { TransactionEvent, TransactionEventTopic } from "../transactionEvents";
+import { TransactionLogs } from "../transactionLogs";
+import { TransactionOnNetwork } from "../transactions";
+import { findEventsByFirstTopic, findEventsByIdentifier } from "./resources";
 
 describe("test resources", () => {
     it("finds events by identifier, by first topic", async function () {
-        const outcome = new TransactionOutcome({
+        const outcome = new TransactionOnNetwork({
             logs: new TransactionLogs({
                 events: [
                     new TransactionEvent({
                         identifier: "foo",
-                        topics: [Buffer.from("a")],
+                        topics: [new TransactionEventTopic("a")],
                     }),
                 ],
             }),
-            smartContractResults: [
-                new SmartContractResult({
+            contractResults: new ContractResults([
+                new ContractResultItem({
                     logs: new TransactionLogs({
                         events: [
                             new TransactionEvent({
                                 identifier: "foo",
-                                topics: [Buffer.from("b")],
+                                topics: [new TransactionEventTopic("b")],
                             }),
                             new TransactionEvent({
                                 identifier: "bar",
-                                topics: [Buffer.from("c")],
+                                topics: [new TransactionEventTopic("c")],
                             }),
                         ],
                     }),
                 }),
-            ],
+            ]),
         });
 
         const foundByIdentifierFoo = findEventsByIdentifier(outcome, "foo");
@@ -44,25 +41,25 @@ describe("test resources", () => {
         assert.deepEqual(foundByIdentifierFoo, [
             new TransactionEvent({
                 identifier: "foo",
-                topics: [Buffer.from("a")],
+                topics: [new TransactionEventTopic("a")],
             }),
             new TransactionEvent({
                 identifier: "foo",
-                topics: [Buffer.from("b")],
+                topics: [new TransactionEventTopic("b")],
             }),
         ]);
 
         assert.deepEqual(foundByIdentifierBar, [
             new TransactionEvent({
                 identifier: "bar",
-                topics: [Buffer.from("c")],
+                topics: [new TransactionEventTopic("c")],
             }),
         ]);
 
         assert.deepEqual(foundByTopic, [
             new TransactionEvent({
                 identifier: "foo",
-                topics: [Buffer.from("b")],
+                topics: [new TransactionEventTopic("b")],
             }),
         ]);
     });

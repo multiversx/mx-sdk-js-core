@@ -10,9 +10,9 @@ import {
     TransactionEventOnNetwork,
     TransactionEventTopic,
     TransactionLogsOnNetwork,
-    TransactionOnNetwork,
 } from "../networkProviders";
 import { loadAbiRegistry } from "../testutils";
+import { TransactionOnNetwork } from "../transactions";
 import { ArgSerializer } from "./argSerializer";
 import { ResultsParser } from "./resultsParser";
 import { ReturnCode } from "./returnCode";

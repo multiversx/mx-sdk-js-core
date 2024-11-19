@@ -35,6 +35,7 @@ export * from "./tokens";
 export * from "./transaction";
 export * from "./transactionComputer";
 export * from "./transactionPayload";
+export * from "./transactions";
 export * from "./transactionsOutcomeParsers";
 export * from "./transactionWatcher";
 export * from "./transfers";

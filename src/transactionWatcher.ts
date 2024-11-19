@@ -9,7 +9,7 @@ import {
 import { ITransactionFetcher } from "./interface";
 import { ITransactionEvent, ITransactionOnNetwork, ITransactionStatus } from "./interfaceOfNetwork";
 import { Logger } from "./logger";
-import { TransactionOnNetwork } from "./networkProviders";
+import { TransactionOnNetwork } from "./transactions";
 
 export type PredicateIsAwaitedStatus = (status: ITransactionStatus) => boolean;
 

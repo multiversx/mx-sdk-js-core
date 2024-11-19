@@ -11,7 +11,6 @@ import {
     INonce,
     IPlainTransactionObject,
     ISignature,
-    ITransaction,
     ITransactionOptions,
     ITransactionPayload,
     ITransactionValue,
@@ -20,8 +19,8 @@ import {
 import { INetworkConfig } from "./interfaceOfNetwork";
 import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { interpretSignatureAsBuffer } from "./signature";
-import { TransactionPayload } from "./transactionPayload";
 import { TransactionComputer } from "./transactionComputer";
+import { TransactionPayload } from "./transactionPayload";
 
 /**
  * An abstraction for creating and signing transactions.

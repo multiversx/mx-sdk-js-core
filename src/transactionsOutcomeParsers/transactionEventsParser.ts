@@ -1,16 +1,12 @@
-import { EventDefinition, ResultsParser } from "../abi";
-import { TransactionEvent } from "./resources";
-
-interface IAbi {
-    getEvent(name: string): EventDefinition;
-}
+import { AbiRegistry, ResultsParser } from "../abi";
+import { TransactionEvent } from "../transactionEvents";
 
 export class TransactionEventsParser {
     private readonly legacyResultsParser: ResultsParser;
-    private readonly abi: IAbi;
+    private readonly abi: AbiRegistry;
     private readonly firstTopicIsIdentifier: boolean;
 
-    constructor(options: { abi: IAbi; firstTopicIsIdentifier?: boolean }) {
+    constructor(options: { abi: AbiRegistry; firstTopicIsIdentifier?: boolean }) {
         this.legacyResultsParser = new ResultsParser();
         this.abi = options.abi;
 
@@ -33,14 +29,14 @@ export class TransactionEventsParser {
     }
 
     parseEvent(options: { event: TransactionEvent }): any {
-        const topics = options.event.topics.map((topic) => Buffer.from(topic));
+        const topics = options.event.topics.map((topic) => topic.valueOf());
         const abiIdentifier = this.firstTopicIsIdentifier ? topics[0]?.toString() : options.event.identifier;
 
         if (this.firstTopicIsIdentifier) {
             topics.shift();
         }
 
-        const dataItems = options.event.dataItems.map((dataItem) => Buffer.from(dataItem));
+        const dataItems = options.event.additionalData.map((dataItem) => Buffer.from(dataItem));
         const eventDefinition = this.abi.getEvent(abiIdentifier);
 
         const parsedEvent = this.legacyResultsParser.doParseEvent({

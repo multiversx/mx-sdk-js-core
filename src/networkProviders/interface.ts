@@ -1,4 +1,5 @@
 import { ITransaction as ITransactionAsInSpecs } from "../interface";
+import { TransactionOnNetwork } from "../transactions";
 import { AccountOnNetwork } from "./accounts";
 import { ContractQueryResponse } from "./contractQueryResponse";
 import { NetworkConfig } from "./networkConfig";
@@ -7,7 +8,6 @@ import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
-import { TransactionOnNetwork } from "./transactions";
 import { TransactionStatus } from "./transactionStatus";
 
 /**

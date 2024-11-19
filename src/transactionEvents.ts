@@ -1,8 +1,7 @@
-import { Address } from "../address";
-import { IAddress } from "./interface";
+import { Address } from "./address";
 
 export class TransactionEvent {
-    address: IAddress = Address.empty();
+    address: Address = Address.empty();
     identifier: string = "";
     topics: TransactionEventTopic[] = [];
 

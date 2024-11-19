@@ -1,9 +1,9 @@
-import { Address } from "../address";
-import { ContractResults } from "./contractResults";
-import { IAddress, ITransaction, ITransactionNext } from "./interface";
+import { Address } from "./address";
+import { ContractResults } from "./networkProviders/contractResults";
+import { IAddress, ITransaction, ITransactionNext } from "./networkProviders/interface";
+import { TransactionReceipt } from "./networkProviders/transactionReceipt";
+import { TransactionStatus } from "./networkProviders/transactionStatus";
 import { TransactionLogs } from "./transactionLogs";
-import { TransactionReceipt } from "./transactionReceipt";
-import { TransactionStatus } from "./transactionStatus";
 
 export function prepareTransactionForBroadcasting(transaction: ITransaction | ITransactionNext): any {
     if ("toSendable" in transaction) {

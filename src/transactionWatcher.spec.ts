@@ -1,8 +1,9 @@
 import { assert } from "chai";
-import { TransactionOnNetwork, TransactionStatus } from "./networkProviders";
+import { TransactionStatus } from "./networkProviders";
 import { MarkCompleted, MockNetworkProvider, Wait } from "./testutils";
 import { TransactionHash } from "./transaction";
 import { TransactionWatcher } from "./transactionWatcher";
+import { TransactionOnNetwork } from "./transactions";
 
 describe("test transactionWatcher", () => {
     it("should await status == executed using hash", async () => {

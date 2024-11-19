@@ -11,8 +11,9 @@ import {
     ITransactionOnNetwork,
     ITransactionStatus,
 } from "../interfaceOfNetwork";
-import { ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "../networkProviders";
+import { ContractResultItem, ContractResults, TransactionStatus } from "../networkProviders";
 import { Transaction, TransactionHash } from "../transaction";
+import { TransactionOnNetwork } from "../transactions";
 import { createAccountBalance } from "./utils";
 
 export class MockNetworkProvider {

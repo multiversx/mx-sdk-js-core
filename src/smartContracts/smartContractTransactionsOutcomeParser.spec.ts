@@ -1,67 +1,24 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
-import { TransactionsConverter } from "../converters/transactionsConverter";
 import {
     ContractResultItem,
     ContractResults,
     TransactionEventOnNetwork,
     TransactionEventTopic,
     TransactionLogsOnNetwork,
-    TransactionOnNetwork,
 } from "../networkProviders";
 import { loadAbiRegistry } from "../testutils";
-import {
-    SmartContractCallOutcome,
-    TransactionEvent,
-    TransactionLogs,
-    TransactionOutcome,
-} from "../transactionsOutcomeParsers/resources";
+import { TransactionOnNetwork } from "../transactions";
 import { SmartContractTransactionsOutcomeParser } from "./smartContractTransactionsOutcomeParser";
 
 describe("test smart contract transactions outcome parser", () => {
-    it("parses deploy outcome (minimalistic)", async function () {
-        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj");
-        const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        const codeHash = Buffer.from("abba", "hex");
-
-        const parser = new SmartContractTransactionsOutcomeParser();
-
-        const parsed = parser.parseDeploy({
-            transactionOutcome: new TransactionOutcome({
-                directSmartContractCallOutcome: new SmartContractCallOutcome({
-                    returnCode: "ok",
-                    returnMessage: "ok",
-                }),
-                logs: new TransactionLogs({
-                    events: [
-                        new TransactionEvent({
-                            identifier: "SCDeploy",
-                            topics: [contract.getPublicKey(), deployer.getPublicKey(), codeHash],
-                        }),
-                    ],
-                }),
-            }),
-        });
-
-        assert.equal(parsed.returnCode, "ok");
-        assert.equal(parsed.returnMessage, "ok");
-        assert.deepEqual(parsed.contracts, [
-            {
-                address: contract.toBech32(),
-                ownerAddress: deployer.toBech32(),
-                codeHash: codeHash,
-            },
-        ]);
-    });
-
     it("parses deploy outcome", async function () {
         const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqqacl85rd0gl2q8wggl8pwcyzcr4fflc5d8ssve45cj");
         const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const codeHash = Buffer.from("abba", "hex");
 
         const parser = new SmartContractTransactionsOutcomeParser();
-        const transactionsConverter = new TransactionsConverter();
 
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
@@ -85,8 +42,7 @@ describe("test smart contract transactions outcome parser", () => {
             ]),
         });
 
-        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
-        const parsed = parser.parseDeploy({ transactionOutcome });
+        const parsed = parser.parseDeploy({ transactionOnNetwork });
 
         assert.equal(parsed.returnCode, "ok");
         assert.equal(parsed.returnMessage, "ok");
@@ -103,7 +59,6 @@ describe("test smart contract transactions outcome parser", () => {
         const deployer = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
         const parser = new SmartContractTransactionsOutcomeParser();
-        const transactionsConverter = new TransactionsConverter();
 
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
@@ -121,36 +76,15 @@ describe("test smart contract transactions outcome parser", () => {
             }),
         });
 
-        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
-        const parsed = parser.parseDeploy({ transactionOutcome });
+        const parsed = parser.parseDeploy({ transactionOnNetwork });
 
         assert.equal(parsed.returnCode, "user error");
         assert.equal(parsed.returnMessage, "wrong number of arguments");
         assert.deepEqual(parsed.contracts, []);
     });
 
-    it("parses execute outcome, without ABI (minimalistic)", function () {
-        const parser = new SmartContractTransactionsOutcomeParser();
-
-        const parsed = parser.parseExecute({
-            transactionOutcome: new TransactionOutcome({
-                directSmartContractCallOutcome: new SmartContractCallOutcome({
-                    function: "hello",
-                    returnCode: "ok",
-                    returnMessage: "ok",
-                    returnDataParts: [Buffer.from([42])],
-                }),
-            }),
-        });
-
-        assert.deepEqual(parsed.values, [Buffer.from([42])]);
-        assert.equal(parsed.returnCode, "ok");
-        assert.equal(parsed.returnMessage, "ok");
-    });
-
     it("parses execute outcome, without ABI", function () {
         const parser = new SmartContractTransactionsOutcomeParser();
-        const transactionsConverter = new TransactionsConverter();
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
             contractResults: new ContractResults([
@@ -161,44 +95,18 @@ describe("test smart contract transactions outcome parser", () => {
             ]),
         });
 
-        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
-
-        const parsed = parser.parseExecute({ transactionOutcome });
+        const parsed = parser.parseExecute({ transactionOnNetwork });
 
         assert.deepEqual(parsed.values, [Buffer.from([42])]);
         assert.equal(parsed.returnCode, "ok");
         assert.equal(parsed.returnMessage, "ok");
     });
 
-    it("parses execute outcome, with ABI (minimalistic)", async function () {
+    it.only("parses execute outcome, with ABI", async function () {
         const parser = new SmartContractTransactionsOutcomeParser({
             abi: await loadAbiRegistry("src/testdata/answer.abi.json"),
         });
 
-        const parsed = parser.parseExecute({
-            transactionOutcome: new TransactionOutcome({
-                directSmartContractCallOutcome: new SmartContractCallOutcome({
-                    // For the sake of the test, let's say that we've called this function as a transaction, not as a query.
-                    function: "getUltimateAnswer",
-                    returnCode: "ok",
-                    returnMessage: "ok",
-                    returnDataParts: [Buffer.from([42])],
-                }),
-            }),
-        });
-
-        // At this moment, U64Value.valueOf() returns a BigNumber. This might change in the future.
-        assert.deepEqual(parsed.values, [new BigNumber("42")]);
-        assert.equal(parsed.returnCode, "ok");
-        assert.equal(parsed.returnMessage, "ok");
-    });
-
-    it("parses execute outcome, with ABI", async function () {
-        const parser = new SmartContractTransactionsOutcomeParser({
-            abi: await loadAbiRegistry("src/testdata/answer.abi.json"),
-        });
-
-        const transactionsConverter = new TransactionsConverter();
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
             function: "getUltimateAnswer",
@@ -210,10 +118,10 @@ describe("test smart contract transactions outcome parser", () => {
             ]),
         });
 
-        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
-        const parsed = parser.parseExecute({ transactionOutcome });
+        const parsed = parser.parseExecute({ transactionOnNetwork });
 
         // At this moment, U64Value.valueOf() returns a BigNumber. This might change in the future.
+        console.log(1111, parsed.values);
         assert.deepEqual(parsed.values, [new BigNumber("42")]);
         assert.equal(parsed.returnCode, "ok");
         assert.equal(parsed.returnMessage, "ok");
@@ -224,7 +132,6 @@ describe("test smart contract transactions outcome parser", () => {
             abi: await loadAbiRegistry("src/testdata/answer.abi.json"),
         });
 
-        const transactionsConverter = new TransactionsConverter();
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
             contractResults: new ContractResults([
@@ -235,10 +142,8 @@ describe("test smart contract transactions outcome parser", () => {
             ]),
         });
 
-        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
-
         assert.throws(() => {
-            parser.parseExecute({ transactionOutcome });
-        }, 'Function name is not available in the transaction outcome, thus endpoint definition (ABI) cannot be picked (for parsing). Maybe provide the "function" parameter explicitly?');
+            parser.parseExecute({ transactionOnNetwork });
+        }, 'Function name is not available in the transaction, thus endpoint definition (ABI) cannot be picked (for parsing). Maybe provide the "function" parameter explicitly?');
     });
 });

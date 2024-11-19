@@ -1,9 +1,9 @@
 import { IAccount } from "../accounts/interfaces";
-import { TransactionOnNetwork } from "../networkProviders";
 import { INetworkProvider } from "../networkProviders/interface";
 import { IESDTIssueOutcome } from "../tokenOperations";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
+import { TransactionOnNetwork } from "../transactions";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TokenManagementTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";

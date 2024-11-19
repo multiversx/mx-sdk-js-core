@@ -1,13 +1,10 @@
-import { ArgSerializer, EndpointDefinition, ResultsParser, ReturnCode, Type, UntypedOutcomeBundle } from "../abi";
+import { ArgSerializer, EndpointDefinition, ResultsParser, Type, UntypedOutcomeBundle } from "../abi";
 import { Address } from "../address";
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { Err } from "../errors";
 import { IContractResultItem, ITransactionEvent, ITransactionOnNetwork } from "../interfaceOfNetwork";
-import {
-    SmartContractCallOutcome,
-    TransactionOutcome,
-    findEventsByIdentifier,
-} from "../transactionsOutcomeParsers/resources";
+import { TransactionOnNetwork } from "../transactions";
+import { SmartContractCallOutcome } from "../transactionsOutcomeParsers/resources";
 
 enum Events {
     SCDeploy = "SCDeploy",
@@ -43,9 +40,7 @@ export class SmartContractTransactionsOutcomeParser {
         this.legacyResultsParser = options?.legacyResultsParser || new ResultsParser();
     }
 
-    parseDeploy(
-        options: { transactionOutcome: TransactionOutcome } | { transactionOnNetwork: ITransactionOnNetwork },
-    ): {
+    parseDeploy(options: { transactionOnNetwork: TransactionOnNetwork }): {
         returnCode: string;
         returnMessage: string;
         contracts: {
@@ -54,37 +49,10 @@ export class SmartContractTransactionsOutcomeParser {
             codeHash: Uint8Array;
         }[];
     } {
-        if ("transactionOutcome" in options) {
-            return this.parseDeployGivenTransactionOutcome(options.transactionOutcome);
-        }
-
         return this.parseDeployGivenTransactionOnNetwork(options.transactionOnNetwork);
     }
 
-    /**
-     * Legacy approach.
-     */
-    protected parseDeployGivenTransactionOutcome(transactionOutcome: TransactionOutcome): {
-        returnCode: string;
-        returnMessage: string;
-        contracts: {
-            address: string;
-            ownerAddress: string;
-            codeHash: Uint8Array;
-        }[];
-    } {
-        const directCallOutcome = transactionOutcome.directSmartContractCallOutcome;
-        const events = findEventsByIdentifier(transactionOutcome, Events.SCDeploy);
-        const contracts = events.map((event) => this.parseScDeployEvent(event));
-
-        return {
-            returnCode: directCallOutcome.returnCode,
-            returnMessage: directCallOutcome.returnMessage,
-            contracts: contracts,
-        };
-    }
-
-    protected parseDeployGivenTransactionOnNetwork(transactionOnNetwork: ITransactionOnNetwork): {
+    protected parseDeployGivenTransactionOnNetwork(transactionOnNetwork: TransactionOnNetwork): {
         returnCode: string;
         returnMessage: string;
         contracts: {
@@ -132,66 +100,12 @@ export class SmartContractTransactionsOutcomeParser {
         };
     }
 
-    parseExecute(
-        options:
-            | { transactionOutcome: TransactionOutcome; function?: string }
-            | { transactionOnNetwork: ITransactionOnNetwork; function?: string },
-    ): {
+    parseExecute(options: { transactionOnNetwork: TransactionOnNetwork; function?: string }): {
         values: any[];
         returnCode: string;
         returnMessage: string;
     } {
-        if ("transactionOutcome" in options) {
-            return this.parseExecuteGivenTransactionOutcome(options.transactionOutcome, options.function);
-        }
-
         return this.parseExecuteGivenTransactionOnNetwork(options.transactionOnNetwork, options.function);
-    }
-
-    /**
-     * Legacy approach.
-     */
-    protected parseExecuteGivenTransactionOutcome(
-        transactionOutcome: TransactionOutcome,
-        functionName?: string,
-    ): {
-        values: any[];
-        returnCode: string;
-        returnMessage: string;
-    } {
-        const directCallOutcome = transactionOutcome.directSmartContractCallOutcome;
-
-        if (!this.abi) {
-            return {
-                values: directCallOutcome.returnDataParts,
-                returnCode: directCallOutcome.returnCode,
-                returnMessage: directCallOutcome.returnMessage,
-            };
-        }
-
-        functionName = functionName || directCallOutcome.function;
-
-        if (!functionName) {
-            throw new Err(
-                `Function name is not available in the transaction outcome, thus endpoint definition (ABI) cannot be picked (for parsing). Maybe provide the "function" parameter explicitly?`,
-            );
-        }
-
-        const endpoint = this.abi.getEndpoint(functionName);
-
-        const legacyUntypedBundle = {
-            returnCode: new ReturnCode(directCallOutcome.returnCode),
-            returnMessage: directCallOutcome.returnMessage,
-            values: directCallOutcome.returnDataParts.map((part) => Buffer.from(part)),
-        };
-
-        const legacyTypedBundle = this.legacyResultsParser.parseOutcomeFromUntypedBundle(legacyUntypedBundle, endpoint);
-
-        return {
-            values: legacyTypedBundle.values.map((value) => value.valueOf()),
-            returnCode: legacyTypedBundle.returnCode.toString(),
-            returnMessage: legacyTypedBundle.returnMessage,
-        };
     }
 
     protected parseExecuteGivenTransactionOnNetwork(
@@ -202,6 +116,7 @@ export class SmartContractTransactionsOutcomeParser {
         returnCode: string;
         returnMessage: string;
     } {
+        console.log({ transactionOnNetwork, functionName });
         const directCallOutcome = this.findDirectSmartContractCallOutcome(transactionOnNetwork);
 
         if (!this.abi) {

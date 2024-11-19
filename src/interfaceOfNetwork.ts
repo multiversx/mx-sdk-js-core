@@ -1,3 +1,4 @@
+import { Address } from "./address";
 import { IAccountBalance, IAddress } from "./interface";
 
 export interface IAccountOnNetwork {
@@ -67,7 +68,7 @@ export interface IContractReturnCode {
 }
 
 export interface ITransactionLogs {
-    address: IAddress;
+    address: Address;
     events: ITransactionEvent[];
 
     findSingleOrNoneEvent(
@@ -77,7 +78,7 @@ export interface ITransactionLogs {
 }
 
 export interface ITransactionEvent {
-    readonly address: IAddress;
+    readonly address: Address;
     readonly identifier: string;
     readonly topics: ITransactionEventTopic[];
     readonly data: string;

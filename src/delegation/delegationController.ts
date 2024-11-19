@@ -1,8 +1,8 @@
 import { IAccount } from "../accounts/interfaces";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { INetworkProvider } from "../networkProviders/interface";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
+import { TransactionOnNetwork } from "../transactions";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
@@ -42,7 +42,7 @@ export class DelegationController {
         return this.parseCreateNewDelegationContract(transaction);
     }
 
-    parseCreateNewDelegationContract(transactionOnNetwork: ITransactionOnNetwork): { contractAddress: string }[] {
+    parseCreateNewDelegationContract(transactionOnNetwork: TransactionOnNetwork): { contractAddress: string }[] {
         return this.parser.parseCreateNewDelegationContract(transactionOnNetwork);
     }
 

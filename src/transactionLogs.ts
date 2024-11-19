@@ -1,10 +1,9 @@
-import { Address } from "../address";
-import { ErrUnexpectedCondition } from "./../errors";
-import { IAddress } from "./interface";
+import { Address } from "./address";
+import { ErrUnexpectedCondition } from "./errors";
 import { TransactionEvent } from "./transactionEvents";
 
 export class TransactionLogs {
-    address: IAddress = Address.empty();
+    address: Address = Address.empty();
     events: TransactionEvent[] = [];
 
     constructor(init?: Partial<TransactionLogs>) {

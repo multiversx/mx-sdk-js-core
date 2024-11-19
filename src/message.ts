@@ -1,6 +1,5 @@
-import { IAddress } from "./interface";
-import { DEFAULT_MESSAGE_VERSION, MESSAGE_PREFIX, SDK_JS_SIGNER, UNKNOWN_SIGNER } from "./constants";
 import { Address } from "./address";
+import { DEFAULT_MESSAGE_VERSION, MESSAGE_PREFIX, SDK_JS_SIGNER, UNKNOWN_SIGNER } from "./constants";
 
 const createKeccakHash = require("keccak");
 
@@ -16,7 +15,7 @@ export class Message {
     /**
      * Address of the wallet that performed the signing operation.
      */
-    public address?: IAddress;
+    public address?: Address;
     /**
      * Number representing the message version.
      */
@@ -29,7 +28,7 @@ export class Message {
     constructor(options: {
         data: Uint8Array;
         signature?: Uint8Array;
-        address?: IAddress;
+        address?: Address;
         version?: number;
         signer?: string;
     }) {

@@ -41,7 +41,6 @@ export class RelayedController {
         const transaction = this.factory.createRelayedV2Transaction(sender.address, options);
 
         transaction.nonce = nonce;
-        transaction.gasLimit = BigInt(0);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;

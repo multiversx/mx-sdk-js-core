@@ -448,3 +448,12 @@ export class ErrContractQuery extends Err {
         super(originalError.message.replace("executeQuery:", ""));
     }
 }
+
+/**
+ * Signals that the network provider provided is not valid
+ */
+export class ErrInvalidNetworkProviderKind extends Err {
+    public constructor() {
+        super("Invalid network provider kind. Choose between `api` and `proxy`.");
+    }
+}

@@ -2,18 +2,11 @@ import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { AbiRegistry } from "../abi";
 import { Address } from "../address";
-import {
-    ContractResultItem,
-    ContractResults,
-    TransactionEventData,
-    TransactionEventOnNetwork,
-    TransactionEventTopic,
-    TransactionLogsOnNetwork,
-} from "../networkProviders";
-import { loadAbiRegistry } from "../testutils";
+import { b64TopicsToBytes, loadAbiRegistry } from "../testutils";
 import { TransactionEvent } from "../transactionEvents";
+import { TransactionLogs } from "../transactionLogs";
 import { TransactionOnNetwork } from "../transactions";
-import { findEventsByFirstTopic } from "./resources";
+import { findEventsByFirstTopic, SmartContractResult } from "./resources";
 import { TransactionEventsParser } from "./transactionEventsParser";
 
 describe("test transaction events parser", () => {
@@ -26,11 +19,11 @@ describe("test transaction events parser", () => {
             events: [
                 new TransactionEvent({
                     identifier: "transferOverMaxAmount",
-                    topics: [
-                        new TransactionEventTopic(Buffer.from("transferOverMaxAmount").toString("base64")),
-                        new TransactionEventTopic(Buffer.from([0x2a]).toString("base64")),
-                        new TransactionEventTopic(Buffer.from([0x2b]).toString("base64")),
-                    ],
+                    topics: b64TopicsToBytes([
+                        Buffer.from("transferOverMaxAmount").toString("base64"),
+                        Buffer.from([42]).toString("base64"),
+                        Buffer.from([43]).toString("base64"),
+                    ]),
                 }),
             ],
         });
@@ -50,25 +43,24 @@ describe("test transaction events parser", () => {
 
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
-            contractResults: new ContractResults([
-                new ContractResultItem({
-                    nonce: 8,
-                    data: "@6f6b",
-                    logs: new TransactionLogsOnNetwork({
+            smartContractResults: [
+                new SmartContractResult({
+                    data: Buffer.from("@6f6b"),
+                    logs: new TransactionLogs({
                         events: [
-                            new TransactionEventOnNetwork({
+                            new TransactionEvent({
                                 identifier: "deposit",
-                                topics: [
-                                    new TransactionEventTopic("ZGVwb3NpdA=="),
-                                    new TransactionEventTopic("cmzC1LRt1r10pMhNAnFb+FyudjGMq4G8CefCYdQUmmc="),
-                                    new TransactionEventTopic("AAAADFdFR0xELTAxZTQ5ZAAAAAAAAAAAAAAAAWQ="),
-                                ],
-                                additionalData: [new TransactionEventData(Buffer.from("AAAAAAAAA9sAAAA=", "base64"))],
+                                topics: b64TopicsToBytes([
+                                    "ZGVwb3NpdA==",
+                                    "cmzC1LRt1r10pMhNAnFb+FyudjGMq4G8CefCYdQUmmc=",
+                                    "AAAADFdFR0xELTAxZTQ5ZAAAAAAAAAAAAAAAAWQ=",
+                                ]),
+                                additionalData: [Buffer.from("AAAAAAAAA9sAAAA=", "base64")],
                             }),
                         ],
                     }),
                 }),
-            ]),
+            ],
         });
 
         const events = findEventsByFirstTopic(transactionOnNetwork, "deposit");
@@ -101,23 +93,16 @@ describe("test transaction events parser", () => {
 
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
-            contractResults: new ContractResults([
-                new ContractResultItem({
-                    nonce: 8,
-                    data: "@6f6b",
-                }),
-            ]),
-            logs: new TransactionLogsOnNetwork({
+            smartContractResults: [new SmartContractResult({ data: Buffer.from("@6f6b") })],
+            logs: new TransactionLogs({
                 events: [
-                    new TransactionEventOnNetwork({
+                    new TransactionEvent({
                         identifier: "performAction",
-                        topics: [new TransactionEventTopic("c3RhcnRQZXJmb3JtQWN0aW9u")],
+                        topics: b64TopicsToBytes(["c3RhcnRQZXJmb3JtQWN0aW9u"]),
                         additionalData: [
-                            new TransactionEventData(
-                                Buffer.from(
-                                    "00000001000000000500000000000000000500d006f73c4221216fa679bc559005584c4f1160e569e1000000000000000003616464000000010000000107000000010139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
-                                    "hex",
-                                ),
+                            Buffer.from(
+                                "00000001000000000500000000000000000500d006f73c4221216fa679bc559005584c4f1160e569e1000000000000000003616464000000010000000107000000010139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1",
+                                "hex",
                             ),
                         ],
                     }),
@@ -163,7 +148,7 @@ describe("test transaction events parser", () => {
                 events: [
                     new TransactionEvent({
                         identifier: "foobar",
-                        topics: [new TransactionEventTopic(Buffer.from("doFoobar").toString("base64"))],
+                        topics: b64TopicsToBytes([Buffer.from("doFoobar").toString("base64")]),
                     }),
                 ],
             });
@@ -200,16 +185,16 @@ describe("test transaction events parser", () => {
         const parsed = parser.parseEvent({
             event: new TransactionEvent({
                 identifier: "foobar",
-                topics: [
-                    new TransactionEventTopic(Buffer.from("doFoobar").toString("base64")),
-                    new TransactionEventTopic(Buffer.from([42]).toString("base64")),
-                    new TransactionEventTopic(Buffer.from("test").toString("base64")),
-                    new TransactionEventTopic(Buffer.from([43]).toString("base64")),
-                    new TransactionEventTopic(Buffer.from("test").toString("base64")),
-                    new TransactionEventTopic(Buffer.from("test").toString("base64")),
-                    new TransactionEventTopic(Buffer.from([44]).toString("base64")),
-                ],
-                additionalData: [new TransactionEventData(Buffer.from([42]))],
+                topics: b64TopicsToBytes([
+                    Buffer.from("doFoobar").toString("base64"),
+                    Buffer.from([42]).toString("base64"),
+                    Buffer.from("test").toString("base64"),
+                    Buffer.from([43]).toString("base64"),
+                    Buffer.from("test").toString("base64"),
+                    Buffer.from("test").toString("base64"),
+                    Buffer.from([44]).toString("base64"),
+                ]),
+                additionalData: [Buffer.from([42])],
             }),
         });
 

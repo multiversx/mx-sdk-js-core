@@ -2,9 +2,9 @@ import { ArgSerializer, EndpointDefinition, ResultsParser, Type, UntypedOutcomeB
 import { Address } from "../address";
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { Err } from "../errors";
-import { IContractResultItem, ITransactionEvent, ITransactionOnNetwork } from "../interfaceOfNetwork";
+import { TransactionEvent } from "../transactionEvents";
 import { TransactionOnNetwork } from "../transactions";
-import { SmartContractCallOutcome } from "../transactionsOutcomeParsers/resources";
+import { SmartContractCallOutcome, SmartContractResult } from "../transactionsOutcomeParsers/resources";
 
 enum Events {
     SCDeploy = "SCDeploy",
@@ -64,12 +64,12 @@ export class SmartContractTransactionsOutcomeParser {
         const directCallOutcome = this.findDirectSmartContractCallOutcome(transactionOnNetwork);
 
         const events = transactionOnNetwork.logs.events
-            .concat(transactionOnNetwork.contractResults.items.flatMap((result) => result.logs.events))
+            .concat(transactionOnNetwork.smartContractResults.flatMap((result) => result.logs.events))
             .filter((event) => event.identifier === Events.SCDeploy);
 
         const contracts = events.map((event) =>
             this.parseScDeployEvent({
-                topics: event.topics.map((topic) => Buffer.from(topic.hex(), "hex")),
+                topics: event.topics.map((topic) => Buffer.from(topic)),
             }),
         );
 
@@ -85,7 +85,7 @@ export class SmartContractTransactionsOutcomeParser {
         ownerAddress: string;
         codeHash: Uint8Array;
     } {
-        const topicForAddress = event.topics[0];
+        const topicForAddress = Buffer.from(event.topics[0]);
         const topicForOwnerAddress = event.topics[1];
         const topicForCodeHash = event.topics[2];
 
@@ -109,14 +109,13 @@ export class SmartContractTransactionsOutcomeParser {
     }
 
     protected parseExecuteGivenTransactionOnNetwork(
-        transactionOnNetwork: ITransactionOnNetwork,
+        transactionOnNetwork: TransactionOnNetwork,
         functionName?: string,
     ): {
         values: any[];
         returnCode: string;
         returnMessage: string;
     } {
-        console.log({ transactionOnNetwork, functionName });
         const directCallOutcome = this.findDirectSmartContractCallOutcome(transactionOnNetwork);
 
         if (!this.abi) {
@@ -143,13 +142,11 @@ export class SmartContractTransactionsOutcomeParser {
         return {
             returnCode: directCallOutcome.returnCode,
             returnMessage: directCallOutcome.returnMessage,
-            values: values,
+            values: values.map((value) => value.valueOf()),
         };
     }
 
-    protected findDirectSmartContractCallOutcome(
-        transactionOnNetwork: ITransactionOnNetwork,
-    ): SmartContractCallOutcome {
+    protected findDirectSmartContractCallOutcome(transactionOnNetwork: TransactionOnNetwork): SmartContractCallOutcome {
         let outcome = this.findDirectSmartContractCallOutcomeWithinSmartContractResults(transactionOnNetwork);
         if (outcome) {
             return outcome;
@@ -174,15 +171,15 @@ export class SmartContractTransactionsOutcomeParser {
     }
 
     protected findDirectSmartContractCallOutcomeWithinSmartContractResults(
-        transactionOnNetwork: ITransactionOnNetwork,
+        transactionOnNetwork: TransactionOnNetwork,
     ): SmartContractCallOutcome | null {
         const argSerializer = new ArgSerializer();
-        const eligibleResults: IContractResultItem[] = [];
+        const eligibleResults: SmartContractResult[] = [];
 
-        for (const result of transactionOnNetwork.contractResults.items) {
-            const matchesCriteriaOnData = result.data.startsWith(ARGUMENTS_SEPARATOR);
+        for (const result of transactionOnNetwork.smartContractResults) {
+            const matchesCriteriaOnData = result.data.toString().startsWith(ARGUMENTS_SEPARATOR);
             const matchesCriteriaOnReceiver = result.receiver.bech32() === transactionOnNetwork.sender.bech32();
-            const matchesCriteriaOnPreviousHash = result.previousHash === transactionOnNetwork.hash;
+            const matchesCriteriaOnPreviousHash = result;
 
             const matchesCriteria = matchesCriteriaOnData && matchesCriteriaOnReceiver && matchesCriteriaOnPreviousHash;
             if (matchesCriteria) {
@@ -201,22 +198,22 @@ export class SmartContractTransactionsOutcomeParser {
         }
 
         const [result] = eligibleResults;
-        const [_ignored, returnCode, ...returnDataParts] = argSerializer.stringToBuffers(result.data);
-
+        const [_ignored, returnCode, ...returnDataParts] = argSerializer.stringToBuffers(result.data.toString());
         return new SmartContractCallOutcome({
             function: transactionOnNetwork.function,
             returnCode: returnCode?.toString(),
-            returnMessage: result.returnMessage || returnCode?.toString(),
+            returnMessage: result.raw["returnMessage"] || returnCode?.toString(),
             returnDataParts: returnDataParts,
         });
     }
 
     protected findDirectSmartContractCallOutcomeIfError(
-        transactionOnNetwork: ITransactionOnNetwork,
+        transactionOnNetwork: TransactionOnNetwork,
     ): SmartContractCallOutcome | null {
+        console.log("findDirectSmartContractCallOutcomeIfError");
         const argSerializer = new ArgSerializer();
         const eventIdentifier = Events.SignalError;
-        const eligibleEvents: ITransactionEvent[] = [];
+        const eligibleEvents: TransactionEvent[] = [];
 
         // First, look in "logs":
         eligibleEvents.push(
@@ -224,8 +221,8 @@ export class SmartContractTransactionsOutcomeParser {
         );
 
         // Then, look in "logs" of "contractResults":
-        for (const result of transactionOnNetwork.contractResults.items) {
-            if (result.previousHash != transactionOnNetwork.hash) {
+        for (const result of transactionOnNetwork.smartContractResults) {
+            if (result.raw["prevTxHash"] != transactionOnNetwork.hash) {
                 continue;
             }
 
@@ -248,7 +245,7 @@ export class SmartContractTransactionsOutcomeParser {
         const parts = argSerializer.stringToBuffers(data);
         // Assumption: the last part is the return code.
         const returnCode = parts[parts.length - 1];
-
+        console.log(11111111, returnCode, parts);
         return new SmartContractCallOutcome({
             function: transactionOnNetwork.function,
             returnCode: returnCode?.toString() || eventIdentifier,
@@ -258,11 +255,11 @@ export class SmartContractTransactionsOutcomeParser {
     }
 
     protected findDirectSmartContractCallOutcomeWithinWriteLogEvents(
-        transactionOnNetwork: ITransactionOnNetwork,
+        transactionOnNetwork: TransactionOnNetwork,
     ): SmartContractCallOutcome | null {
         const argSerializer = new ArgSerializer();
         const eventIdentifier = Events.WriteLog;
-        const eligibleEvents: ITransactionEvent[] = [];
+        const eligibleEvents: TransactionEvent[] = [];
 
         // First, look in "logs":
         eligibleEvents.push(
@@ -270,8 +267,8 @@ export class SmartContractTransactionsOutcomeParser {
         );
 
         // Then, look in "logs" of "contractResults":
-        for (const result of transactionOnNetwork.contractResults.items) {
-            if (result.previousHash != transactionOnNetwork.hash) {
+        for (const result of transactionOnNetwork.smartContractResults) {
+            if (result.raw["prevTxHash"] != transactionOnNetwork.hash) {
                 continue;
             }
 

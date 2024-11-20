@@ -1,17 +1,10 @@
 export { ApiNetworkProvider } from "./apiNetworkProvider";
 export { ProxyNetworkProvider } from "./proxyNetworkProvider";
 
-export {
-    TransactionEventData,
-    TransactionEvent as TransactionEventOnNetwork,
-    TransactionEventTopic,
-} from "../transactionEvents";
-export { TransactionLogs as TransactionLogsOnNetwork } from "../transactionLogs";
 export { AccountOnNetwork } from "./accounts";
 export { ContractQueryResponse } from "./contractQueryResponse";
 export { ContractResultItem, ContractResults } from "./contractResults";
 export { TransactionReceipt } from "./transactionReceipt";
-export { TransactionStatus } from "./transactionStatus";
 
 export { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 export { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";

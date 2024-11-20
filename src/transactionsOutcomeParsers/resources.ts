@@ -1,18 +1,21 @@
+import { Address } from "../address";
 import { TransactionEvent } from "../transactionEvents";
 import { TransactionLogs } from "../transactionLogs";
 import { TransactionOnNetwork } from "../transactions";
 
 export class SmartContractResult {
-    sender: string;
-    receiver: string;
+    raw: Record<string, any>;
+    sender: Address;
+    receiver: Address;
     data: Uint8Array;
     logs: TransactionLogs;
 
     constructor(init: Partial<SmartContractResult>) {
-        this.sender = "";
-        this.receiver = "";
+        this.sender = Address.empty();
+        this.receiver = Address.empty();
         this.data = new Uint8Array();
         this.logs = new TransactionLogs({});
+        this.raw = {};
 
         Object.assign(this, init);
     }
@@ -57,9 +60,10 @@ export function gatherAllEvents(transactionOutcome: TransactionOnNetwork): Trans
 
     allEvents.push(...transactionOutcome.logs.events);
 
-    for (const item of transactionOutcome.contractResults.items) {
+    for (const item of transactionOutcome.smartContractResults) {
         allEvents.push(...item.logs.events);
     }
 
+    console.log({ allEvents: JSON.stringify(allEvents) });
     return allEvents;
 }

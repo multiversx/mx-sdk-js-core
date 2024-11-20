@@ -1,8 +1,7 @@
 import { bufferToBigInt } from "../abi/codec/utils";
 import { Address } from "../address";
 import { ErrParseTransactionOutcome } from "../errors";
-import { ITransactionEvent } from "../interfaceOfNetwork";
-import { TransactionEvent, TransactionEventTopic } from "../transactionEvents";
+import { TransactionEvent } from "../transactionEvents";
 import { TransactionOnNetwork } from "../transactions";
 import { findEventsByIdentifier } from "../transactionsOutcomeParsers/resources";
 import { MintNftOutput, SpecialRoleOutput } from "./resources";
@@ -52,7 +51,7 @@ export class TokenManagementTransactionsOutcomeParser {
         return registerEvents.map((registerEvent, index) => {
             const tokenIdentifier = this.extractTokenIdentifier(registerEvent);
             const encodedRoles = setRoleEvents[index].topics.slice(3);
-            const roles = encodedRoles.map((role) => role.toString());
+            const roles = encodedRoles.map((role) => this.decodeTopicAsString(role));
             return { tokenIdentifier, roles };
         });
     }
@@ -76,7 +75,7 @@ export class TokenManagementTransactionsOutcomeParser {
         const userAddress = event.address;
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const encodedRoles = event.topics.slice(3);
-        const roles = encodedRoles.map((role) => role.toString());
+        const roles = encodedRoles.map((role) => this.decodeTopicAsString(role));
 
         return { userAddress: userAddress, tokenIdentifier: tokenIdentifier, roles: roles };
     }
@@ -272,7 +271,7 @@ export class TokenManagementTransactionsOutcomeParser {
     parseUpdateAttributes(transaction: TransactionOnNetwork): {
         tokenIdentifier: string;
         nonce: bigint;
-        attributes: TransactionEventTopic;
+        attributes: Uint8Array;
     }[] {
         this.ensureNoError(transaction.logs.events);
 
@@ -283,11 +282,11 @@ export class TokenManagementTransactionsOutcomeParser {
     private getOutputForUpdateAttributesEvent(event: TransactionEvent): {
         tokenIdentifier: string;
         nonce: bigint;
-        attributes: TransactionEventTopic;
+        attributes: Uint8Array;
     } {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const attributes = event.topics[3] ? event.topics[3] : new TransactionEventTopic("");
+        const attributes = event.topics[3] ? event.topics[3] : Buffer.from("");
 
         return {
             tokenIdentifier: tokenIdentifier,
@@ -350,11 +349,11 @@ export class TokenManagementTransactionsOutcomeParser {
         };
     }
 
-    private ensureNoError(transactionEvents: ITransactionEvent[]) {
+    private ensureNoError(transactionEvents: TransactionEvent[]) {
         for (const event of transactionEvents) {
             if (event.identifier == "signalError") {
-                const data = event.dataPayload?.toString().slice(1) || "";
-                const message = event.topics[1].toString();
+                const data = Buffer.from(event.additionalData[0]?.toString().slice(1)).toString() || "";
+                const message = this.decodeTopicAsString(event.topics[1]);
 
                 throw new ErrParseTransactionOutcome(
                     `encountered signalError: ${message} (${Buffer.from(data, "hex").toString()})`,
@@ -364,14 +363,14 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private extractTokenIdentifier(event: TransactionEvent): string {
-        if (!event.topics[0].toString()?.length) {
+        if (!event.topics[0]?.length) {
             return "";
         }
         return event.topics[0].toString();
     }
 
     private extractNonce(event: TransactionEvent): bigint {
-        if (!event.topics[1].toString()?.length) {
+        if (!event.topics[1]?.length) {
             return BigInt(0);
         }
         const nonce = Buffer.from(event.topics[1]);
@@ -379,7 +378,7 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private extractAmount(event: TransactionEvent): bigint {
-        if (!event.topics[2].toString()?.length) {
+        if (!event.topics[2]?.length) {
             return BigInt(0);
         }
         const amount = Buffer.from(event.topics[2]);
@@ -387,10 +386,14 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private extractAddress(event: TransactionEvent): string {
-        if (!event.topics[3].toString()?.length) {
+        if (!event.topics[3]?.length) {
             return "";
         }
         const address = Buffer.from(event.topics[3]);
         return new Address(address).bech32();
+    }
+
+    private decodeTopicAsString(topic: Uint8Array): string {
+        return Buffer.from(topic).toString();
     }
 }

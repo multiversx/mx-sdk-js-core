@@ -177,21 +177,21 @@ export class Transaction {
     /**
      * Legacy method, use the "sender" property instead.
      */
-    getSender(): IAddress {
+    getSender(): Address {
         return Address.fromBech32(this.sender);
     }
 
     /**
      * Legacy method, use the "sender" property instead.
      */
-    setSender(sender: IAddress | string) {
+    setSender(sender: Address | string) {
         this.sender = typeof sender === "string" ? sender : sender.bech32();
     }
 
     /**
      * Legacy method, use the "receiver" property instead.
      */
-    getReceiver(): IAddress {
+    getReceiver(): Address {
         return Address.fromBech32(this.receiver);
     }
 
@@ -226,7 +226,7 @@ export class Transaction {
     /**
      * Legacy method, use the "guardian" property instead.
      */
-    getGuardian(): IAddress {
+    getGuardian(): Address {
         return new Address(this.guardian);
     }
 

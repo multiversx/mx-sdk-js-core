@@ -18,19 +18,25 @@ export class DelegationTransactionsOutcomeParser {
     private ensureNoError(transactionEvents: TransactionEvent[]) {
         for (const event of transactionEvents) {
             if (event.identifier == "signalError") {
-                const data = event.dataPayload.toString();
-                const message = event.topics[1].toString();
+                const data = Buffer.from(event.additionalData[0]?.toString().slice(1)).toString() || "";
+                const message = this.decodeTopicAsString(event.topics[1]);
 
-                throw new ErrParseTransactionOutcome(`encountered signalError: ${message} (${data})`);
+                throw new ErrParseTransactionOutcome(
+                    `encountered signalError: ${message} (${Buffer.from(data, "hex").toString()})`,
+                );
             }
         }
     }
 
     private extractContractAddress(event: TransactionEvent): string {
-        if (!event.topics[0]?.toString().length) {
+        if (!event.topics[0]?.length) {
             return "";
         }
         const address = Buffer.from(event.topics[0]);
-        return new Address(address).bech32();
+        return Address.fromBuffer(address).bech32();
+    }
+
+    private decodeTopicAsString(topic: Uint8Array): string {
+        return Buffer.from(topic).toString();
     }
 }

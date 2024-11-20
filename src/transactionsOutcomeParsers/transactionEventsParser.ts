@@ -29,7 +29,7 @@ export class TransactionEventsParser {
     }
 
     parseEvent(options: { event: TransactionEvent }): any {
-        const topics = options.event.topics.map((topic) => topic.valueOf());
+        const topics = options.event.topics.map((topic) => Buffer.from(topic));
         const abiIdentifier = this.firstTopicIsIdentifier ? topics[0]?.toString() : options.event.identifier;
 
         if (this.firstTopicIsIdentifier) {

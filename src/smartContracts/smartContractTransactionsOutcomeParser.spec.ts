@@ -1,15 +1,11 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
-import {
-    ContractResultItem,
-    ContractResults,
-    TransactionEventOnNetwork,
-    TransactionEventTopic,
-    TransactionLogsOnNetwork,
-} from "../networkProviders";
 import { loadAbiRegistry } from "../testutils";
+import { TransactionEvent } from "../transactionEvents";
+import { TransactionLogs } from "../transactionLogs";
 import { TransactionOnNetwork } from "../transactions";
+import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { SmartContractTransactionsOutcomeParser } from "./smartContractTransactionsOutcomeParser";
 
 describe("test smart contract transactions outcome parser", () => {
@@ -22,24 +18,15 @@ describe("test smart contract transactions outcome parser", () => {
 
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
-            logs: new TransactionLogsOnNetwork({
+            logs: new TransactionLogs({
                 events: [
-                    new TransactionEventOnNetwork({
+                    new TransactionEvent({
                         identifier: "SCDeploy",
-                        topics: [
-                            new TransactionEventTopic(contract.getPublicKey().toString("base64")),
-                            new TransactionEventTopic(deployer.getPublicKey().toString("base64")),
-                            new TransactionEventTopic(codeHash.toString("base64")),
-                        ],
+                        topics: [contract.getPublicKey(), deployer.getPublicKey(), codeHash],
                     }),
                 ],
             }),
-            contractResults: new ContractResults([
-                new ContractResultItem({
-                    nonce: 8,
-                    data: "@6f6b",
-                }),
-            ]),
+            smartContractResults: [new SmartContractResult({ data: Buffer.from("@6f6b") })],
         });
 
         const parsed = parser.parseDeploy({ transactionOnNetwork });
@@ -62,14 +49,11 @@ describe("test smart contract transactions outcome parser", () => {
 
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
-            logs: new TransactionLogsOnNetwork({
+            logs: new TransactionLogs({
                 events: [
-                    new TransactionEventOnNetwork({
+                    new TransactionEvent({
                         identifier: "signalError",
-                        topics: [
-                            new TransactionEventTopic(deployer.getPublicKey().toString("base64")),
-                            new TransactionEventTopic(Buffer.from("wrong number of arguments").toString("base64")),
-                        ],
+                        topics: [deployer.getPublicKey(), new Uint8Array(Buffer.from("wrong number of arguments"))],
                         data: "@75736572206572726f72",
                     }),
                 ],
@@ -87,12 +71,7 @@ describe("test smart contract transactions outcome parser", () => {
         const parser = new SmartContractTransactionsOutcomeParser();
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
-            contractResults: new ContractResults([
-                new ContractResultItem({
-                    nonce: 8,
-                    data: "@6f6b@2a",
-                }),
-            ]),
+            smartContractResults: [new SmartContractResult({ data: Buffer.from("@6f6b@2a") })],
         });
 
         const parsed = parser.parseExecute({ transactionOnNetwork });
@@ -102,7 +81,7 @@ describe("test smart contract transactions outcome parser", () => {
         assert.equal(parsed.returnMessage, "ok");
     });
 
-    it.only("parses execute outcome, with ABI", async function () {
+    it("parses execute outcome, with ABI", async function () {
         const parser = new SmartContractTransactionsOutcomeParser({
             abi: await loadAbiRegistry("src/testdata/answer.abi.json"),
         });
@@ -110,18 +89,12 @@ describe("test smart contract transactions outcome parser", () => {
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
             function: "getUltimateAnswer",
-            contractResults: new ContractResults([
-                new ContractResultItem({
-                    nonce: 8,
-                    data: "@6f6b@2a",
-                }),
-            ]),
+            smartContractResults: [new SmartContractResult({ data: Buffer.from("@6f6b@2a") })],
         });
 
         const parsed = parser.parseExecute({ transactionOnNetwork });
 
         // At this moment, U64Value.valueOf() returns a BigNumber. This might change in the future.
-        console.log(1111, parsed.values);
         assert.deepEqual(parsed.values, [new BigNumber("42")]);
         assert.equal(parsed.returnCode, "ok");
         assert.equal(parsed.returnMessage, "ok");
@@ -134,12 +107,7 @@ describe("test smart contract transactions outcome parser", () => {
 
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7,
-            contractResults: new ContractResults([
-                new ContractResultItem({
-                    nonce: 8,
-                    data: "@6f6b@2a",
-                }),
-            ]),
+            smartContractResults: [new SmartContractResult({ data: Buffer.from("@6f6b@2a") })],
         });
 
         assert.throws(() => {

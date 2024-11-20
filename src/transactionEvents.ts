@@ -3,14 +3,14 @@ import { Address } from "./address";
 export class TransactionEvent {
     address: Address = Address.empty();
     identifier: string = "";
-    topics: TransactionEventTopic[] = [];
+    topics: Uint8Array[] = [];
 
     /**
      * @deprecated Use "dataPayload" instead.
      */
     data: string = "";
-    dataPayload: TransactionEventData = new TransactionEventData(Buffer.from("", "utf8"));
-    additionalData: TransactionEventData[] = [];
+    dataPayload: Uint8Array = new Uint8Array();
+    additionalData: Uint8Array[] = [];
 
     constructor(init?: Partial<TransactionEvent>) {
         Object.assign(this, init);
@@ -26,64 +26,20 @@ export class TransactionEvent {
         let result = new TransactionEvent();
         result.address = new Address(responsePart.address);
         result.identifier = responsePart.identifier || "";
-        result.topics = (responsePart.topics || []).map((topic) => new TransactionEventTopic(topic));
+        result.topics = (responsePart.topics || []).map((topic) => Buffer.from(topic));
 
-        result.dataPayload = TransactionEventData.fromBase64(responsePart.data);
-        result.additionalData = (responsePart.additionalData || []).map(TransactionEventData.fromBase64);
+        result.dataPayload = Buffer.from(responsePart.data);
+        result.additionalData = (responsePart.additionalData || []).map((data) => Buffer.from(data));
         result.data = result.dataPayload.toString();
 
         return result;
     }
 
-    findFirstOrNoneTopic(predicate: (topic: TransactionEventTopic) => boolean): TransactionEventTopic | undefined {
+    findFirstOrNoneTopic(predicate: (topic: Uint8Array) => boolean): Uint8Array | undefined {
         return this.topics.filter((topic) => predicate(topic))[0];
     }
 
-    getLastTopic(): TransactionEventTopic {
+    getLastTopic(): Uint8Array {
         return this.topics[this.topics.length - 1];
-    }
-}
-
-export class TransactionEventData {
-    private readonly raw: Buffer;
-
-    constructor(data: Buffer) {
-        this.raw = data;
-    }
-
-    static fromBase64(str: string): TransactionEventData {
-        return new TransactionEventData(Buffer.from(str || "", "base64"));
-    }
-
-    toString(): string {
-        return this.raw.toString("utf8");
-    }
-
-    hex(): string {
-        return this.raw.toString("hex");
-    }
-
-    valueOf(): Buffer {
-        return this.raw;
-    }
-}
-
-export class TransactionEventTopic {
-    private readonly raw: Buffer;
-
-    constructor(topic: string) {
-        this.raw = Buffer.from(topic || "", "base64");
-    }
-
-    toString(): string {
-        return this.raw.toString("utf8");
-    }
-
-    hex(): string {
-        return this.raw.toString("hex");
-    }
-
-    valueOf(): Buffer {
-        return this.raw;
     }
 }

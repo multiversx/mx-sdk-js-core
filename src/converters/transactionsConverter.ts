@@ -1,9 +1,5 @@
 import { IPlainTransactionObject, ITransaction } from "../interface";
-import { IContractResultItem, ITransactionEvent } from "../interfaceOfNetwork";
 import { Transaction } from "../transaction";
-import { TransactionEvent, TransactionEventData, TransactionEventTopic } from "../transactionEvents";
-import { TransactionLogs } from "../transactionLogs";
-import { SmartContractResult } from "../transactionsOutcomeParsers/resources";
 
 export class TransactionsConverter {
     public transactionToPlainObject(transaction: ITransaction): IPlainTransactionObject {
@@ -64,42 +60,5 @@ export class TransactionsConverter {
 
     private bufferFromHex(value?: string) {
         return Buffer.from(value || "", "hex");
-    }
-
-    private smartContractResultOnNetworkToSmartContractResult(
-        resultOnNetwork: IContractResultItem,
-    ): SmartContractResult {
-        return new SmartContractResult({
-            sender: resultOnNetwork.sender.bech32(),
-            receiver: resultOnNetwork.receiver.bech32(),
-            data: Buffer.from(resultOnNetwork.data),
-            logs: new TransactionLogs({
-                address: resultOnNetwork.logs.address,
-                events: resultOnNetwork.logs.events.map((event) => this.eventOnNetworkToEvent(event)),
-            }),
-        });
-    }
-
-    private eventOnNetworkToEvent(eventOnNetwork: ITransactionEvent): TransactionEvent {
-        // Before Sirius, there was no "additionalData" field on transaction logs.
-        // After Sirius, the "additionalData" field includes the payload of the legacy "data" field, as well (as its first element):
-        // https://github.com/multiversx/mx-chain-go/blob/v1.6.18/process/transactionLog/process.go#L159
-        const legacyData = eventOnNetwork.dataPayload?.valueOf() || Buffer.from(eventOnNetwork.data || "");
-        const dataItems =
-            eventOnNetwork.additionalData?.map((data) => new TransactionEventData(Buffer.from(data.valueOf()))) || [];
-
-        if (dataItems.length === 0) {
-            if (legacyData.length) {
-                dataItems.push(new TransactionEventData(Buffer.from(legacyData)));
-            }
-        }
-
-        return new TransactionEvent({
-            address: eventOnNetwork.address,
-            identifier: eventOnNetwork.identifier,
-            topics: eventOnNetwork.topics.map((topic) => new TransactionEventTopic(topic.hex())),
-            dataPayload: new TransactionEventData(Buffer.from(legacyData)),
-            additionalData: dataItems,
-        });
     }
 }

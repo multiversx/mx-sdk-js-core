@@ -1,4 +1,3 @@
-import { TransactionStatus } from "../networkProviders";
 import { assert } from "chai";
 import { Address } from "../address";
 import {
@@ -9,6 +8,7 @@ import {
     TestWallet,
     Wait,
 } from "../testutils";
+import { TransactionStatus } from "../transactionStatus";
 import { TransactionWatcher } from "../transactionWatcher";
 import { Code } from "./code";
 import { ContractFunction } from "./function";

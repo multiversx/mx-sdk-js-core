@@ -37,6 +37,7 @@ export * from "./transactionComputer";
 export * from "./transactionPayload";
 export * from "./transactions";
 export * from "./transactionsOutcomeParsers";
+export * from "./transactionStatus";
 export * from "./transactionWatcher";
 export * from "./transfers";
 export * from "./utils";

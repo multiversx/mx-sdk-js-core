@@ -210,7 +210,6 @@ export class SmartContractTransactionsOutcomeParser {
     protected findDirectSmartContractCallOutcomeIfError(
         transactionOnNetwork: TransactionOnNetwork,
     ): SmartContractCallOutcome | null {
-        console.log("findDirectSmartContractCallOutcomeIfError");
         const argSerializer = new ArgSerializer();
         const eventIdentifier = Events.SignalError;
         const eligibleEvents: TransactionEvent[] = [];
@@ -245,7 +244,6 @@ export class SmartContractTransactionsOutcomeParser {
         const parts = argSerializer.stringToBuffers(data);
         // Assumption: the last part is the return code.
         const returnCode = parts[parts.length - 1];
-        console.log(11111111, returnCode, parts);
         return new SmartContractCallOutcome({
             function: transactionOnNetwork.function,
             returnCode: returnCode?.toString() || eventIdentifier,

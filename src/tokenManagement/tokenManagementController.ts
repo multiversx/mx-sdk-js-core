@@ -1,6 +1,5 @@
 import { IAccount } from "../accounts/interfaces";
 import { INetworkProvider } from "../networkProviders/interface";
-import { IESDTIssueOutcome } from "../tokenOperations";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionOnNetwork } from "../transactions";
@@ -38,12 +37,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedIssueFungible(txHash: string): Promise<IESDTIssueOutcome[]> {
+    async awaitCompletedIssueFungible(txHash: string): Promise<{ tokenIdentifier: string }[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseIssueFungible(transaction);
     }
 
-    parseIssueFungible(transactionOnNetwork: TransactionOnNetwork): IESDTIssueOutcome[] {
+    parseIssueFungible(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
         return this.parser.parseIssueFungible(transactionOnNetwork);
     }
 
@@ -82,7 +81,7 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedIssueNonFungible(txHash: string): Promise<IESDTIssueOutcome[]> {
+    async awaitCompletedIssueNonFungible(txHash: string): Promise<{ tokenIdentifier: string }[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseIssueNonFungible(transaction);
     }
@@ -104,12 +103,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedRegisterMetaEsdt(txHash: string): Promise<IESDTIssueOutcome[]> {
+    async awaitCompletedRegisterMetaEsdt(txHash: string): Promise<{ tokenIdentifier: string }[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseRegisterMetaEsdt(transaction);
     }
 
-    parseRegisterMetaEsdt(transactionOnNetwork: TransactionOnNetwork): IESDTIssueOutcome[] {
+    parseRegisterMetaEsdt(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
         return this.parser.parseRegisterMetaEsdt(transactionOnNetwork);
     }
 
@@ -126,12 +125,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedRegisterAndSettingRoles(txHash: string): Promise<IESDTIssueOutcome[]> {
+    async awaitCompletedRegisterAndSettingRoles(txHash: string): Promise<{ tokenIdentifier: string }[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseRegisterAndSetAllRoles(transaction);
     }
 
-    parseRegisterAndSetAllRoles(transactionOnNetwork: TransactionOnNetwork): IESDTIssueOutcome[] {
+    parseRegisterAndSetAllRoles(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
         return this.parser.parseRegisterMetaEsdt(transactionOnNetwork);
     }
 

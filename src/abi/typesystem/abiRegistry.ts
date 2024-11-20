@@ -133,7 +133,6 @@ export class AbiRegistry {
     }
 
     getEvent(name: string): EventDefinition {
-        console.log({ name });
         const result = this.events.find((e) => e.identifier == name);
         guardValueIsSetWithMessage(`event [${name}] not found`, result);
         return result!;

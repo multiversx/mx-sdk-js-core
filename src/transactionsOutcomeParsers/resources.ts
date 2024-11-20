@@ -64,6 +64,5 @@ export function gatherAllEvents(transactionOutcome: TransactionOnNetwork): Trans
         allEvents.push(...item.logs.events);
     }
 
-    console.log({ allEvents: JSON.stringify(allEvents) });
     return allEvents;
 }

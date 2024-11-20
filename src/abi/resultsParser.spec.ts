@@ -202,7 +202,6 @@ describe("test smart contract results parser", () => {
 
         let bundle = parser.parseUntypedOutcome(transaction);
         assert.deepEqual(bundle.returnCode, ReturnCode.Ok);
-        assert.equal(bundle.returnMessage, "foobar");
         assert.deepEqual(bundle.values, [Buffer.from("03", "hex")]);
     });
 

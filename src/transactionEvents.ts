@@ -23,6 +23,7 @@ export class TransactionEvent {
         data: string;
         additionalData?: string[];
     }): TransactionEvent {
+        console.log({ responsePart });
         let result = new TransactionEvent();
         result.address = new Address(responsePart.address);
         result.identifier = responsePart.identifier || "";

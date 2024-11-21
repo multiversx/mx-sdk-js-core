@@ -70,7 +70,7 @@ export class TransactionOnNetwork {
         processStatus?: TransactionStatus | undefined,
     ): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
-        result.smartContractResults = response.smartContractResults;
+        result.smartContractResults = response.smartContractResults ?? [];
         if (processStatus) {
             result.status = processStatus;
             result.isCompleted = result.status.isSuccessful() || result.status.isFailed();

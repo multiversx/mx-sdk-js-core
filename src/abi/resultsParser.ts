@@ -6,6 +6,7 @@ import { Address } from "../address";
 import { ErrCannotParseContractResults } from "../errors";
 import { IContractQueryResponse } from "../interfaceOfNetwork";
 import { Logger } from "../logger";
+import { TransactionEvent } from "../transactionEvents";
 import { TransactionLogs } from "../transactionLogs";
 import { TransactionOnNetwork } from "../transactions";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
@@ -36,12 +37,6 @@ interface IEventInputDefinition {
     name: string;
     type: Type;
     indexed: boolean;
-}
-
-interface ITransactionEvent {
-    readonly topics: { valueOf(): Uint8Array }[];
-    readonly dataPayload?: { valueOf(): Uint8Array };
-    readonly additionalData?: { valueOf(): Uint8Array }[];
 }
 
 interface IArgsSerializer {
@@ -240,7 +235,7 @@ export class ResultsParser {
             return null;
         }
 
-        let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventSignalError.data);
+        let { returnCode, returnDataParts } = this.sliceDataFieldInParts(Buffer.from(eventSignalError.data).toString());
         let lastTopic = eventSignalError.getLastTopic();
         let returnMessage = lastTopic?.toString() || returnCode.toString();
 
@@ -263,7 +258,7 @@ export class ResultsParser {
             return null;
         }
 
-        let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventTooMuchGas.data);
+        let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventTooMuchGas.data.toString());
 
         return {
             returnCode: returnCode,
@@ -287,7 +282,9 @@ export class ResultsParser {
             return null;
         }
 
-        let { returnCode, returnDataParts } = this.sliceDataFieldInParts(eventWriteLogWhereTopicIsSender.data);
+        let { returnCode, returnDataParts } = this.sliceDataFieldInParts(
+            eventWriteLogWhereTopicIsSender.data.toString(),
+        );
         let returnMessage = returnCode.toString();
 
         return {
@@ -322,7 +319,9 @@ export class ResultsParser {
             });
 
             if (writeLogWithReturnData) {
-                let { returnCode, returnDataParts } = this.sliceDataFieldInParts(writeLogWithReturnData.data);
+                let { returnCode, returnDataParts } = this.sliceDataFieldInParts(
+                    writeLogWithReturnData.data.toString(),
+                );
                 let returnMessage = returnCode.toString();
 
                 return {
@@ -341,7 +340,9 @@ export class ResultsParser {
             });
 
             if (writeLogWithReturnData) {
-                const { returnCode, returnDataParts } = this.sliceDataFieldInParts(writeLogWithReturnData.data);
+                const { returnCode, returnDataParts } = this.sliceDataFieldInParts(
+                    writeLogWithReturnData.data.toString(),
+                );
                 const returnMessage = returnCode.toString();
 
                 return {
@@ -382,7 +383,7 @@ export class ResultsParser {
     /**
      * Legacy method, use "TransactionEventsParser.parseEvent()" instead.
      */
-    parseEvent(transactionEvent: ITransactionEvent, eventDefinition: { inputs: IEventInputDefinition[] }): any {
+    parseEvent(transactionEvent: TransactionEvent, eventDefinition: { inputs: IEventInputDefinition[] }): any {
         // We skip the first topic, because, for log entries emitted by smart contracts, that's the same as the event identifier. See:
         // https://github.com/multiversx/mx-chain-vm-go/blob/v1.5.27/vmhost/contexts/output.go#L283
         const topics = transactionEvent.topics.map((topic) => Buffer.from(topic.valueOf())).slice(1);
@@ -391,9 +392,8 @@ export class ResultsParser {
         // After Sirius, the "additionalData" field includes the "data" field, as well (as the first element):
         // https://github.com/multiversx/mx-chain-go/blob/v1.6.18/process/transactionLog/process.go#L159
         // Right now, the logic below is duplicated (see "TransactionsConverter"). However, "ResultsParser" will be deprecated & removed at a later time.
-        const legacyData = transactionEvent.dataPayload?.valueOf() || Buffer.from([]);
-        const dataItems = transactionEvent.additionalData?.map((data) => Buffer.from(data.valueOf())) || [];
-
+        const legacyData = transactionEvent.data?.valueOf() || Buffer.from([]);
+        const dataItems = transactionEvent.additionalData?.map((data) => Buffer.from(data)) || [];
         if (dataItems.length === 0) {
             if (legacyData.length) {
                 dataItems.push(Buffer.from(legacyData));
@@ -419,7 +419,6 @@ export class ResultsParser {
         // "Indexed" ABI "event.inputs" correspond to "event.topics[1:]":
         const indexedInputs = options.eventDefinition.inputs.filter((input) => input.indexed);
         const decodedTopics = this.argsSerializer.buffersToValues(options.topics, indexedInputs);
-
         for (let i = 0; i < indexedInputs.length; i++) {
             result[indexedInputs[i].name] = decodedTopics[i].valueOf();
         }
@@ -427,9 +426,8 @@ export class ResultsParser {
         // "Non-indexed" ABI "event.inputs" correspond to "event.data":
         const nonIndexedInputs = options.eventDefinition.inputs.filter((input) => !input.indexed);
         const decodedDataParts = this.argsSerializer.buffersToValues(options.dataItems, nonIndexedInputs);
-
         for (let i = 0; i < nonIndexedInputs.length; i++) {
-            result[nonIndexedInputs[i].name] = decodedDataParts[i].valueOf();
+            result[nonIndexedInputs[i].name] = decodedDataParts[i]?.valueOf();
         }
 
         return result;

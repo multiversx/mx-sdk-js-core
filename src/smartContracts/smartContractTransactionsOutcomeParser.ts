@@ -1,4 +1,4 @@
-import { ArgSerializer, EndpointDefinition, ResultsParser, Type, UntypedOutcomeBundle } from "../abi";
+import { AbiRegistry, ArgSerializer } from "../abi";
 import { Address } from "../address";
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { Err } from "../errors";
@@ -12,32 +12,11 @@ enum Events {
     WriteLog = "writeLog",
 }
 
-interface IAbi {
-    getEndpoint(name: string): EndpointDefinition;
-}
-
-interface IParameterDefinition {
-    type: Type;
-}
-
-interface ILegacyResultsParser {
-    parseOutcomeFromUntypedBundle(
-        bundle: UntypedOutcomeBundle,
-        endpoint: { output: IParameterDefinition[] },
-    ): {
-        values: any[];
-        returnCode: { valueOf(): string };
-        returnMessage: string;
-    };
-}
-
 export class SmartContractTransactionsOutcomeParser {
-    private readonly abi?: IAbi;
-    private readonly legacyResultsParser: ILegacyResultsParser;
+    private readonly abi?: AbiRegistry;
 
-    constructor(options?: { abi?: IAbi; legacyResultsParser?: ILegacyResultsParser }) {
+    constructor(options?: { abi?: AbiRegistry }) {
         this.abi = options?.abi;
-        this.legacyResultsParser = options?.legacyResultsParser || new ResultsParser();
     }
 
     parseDeploy(options: { transactionOnNetwork: TransactionOnNetwork }): {
@@ -87,7 +66,7 @@ export class SmartContractTransactionsOutcomeParser {
     } {
         const topicForAddress = Buffer.from(event.topics[0].toString(), "base64").toString("hex");
         const topicForOwnerAddress = Buffer.from(event.topics[1].toString(), "base64").toString("hex");
-        const topicForCodeHash = event.topics[2];
+        const topicForCodeHash = Buffer.from(event.topics[2].toString(), "base64");
         const address = topicForAddress?.length ? new Address(topicForAddress).toBech32() : "";
         const ownerAddress = topicForOwnerAddress?.length ? new Address(topicForOwnerAddress).toBech32() : "";
         const codeHash = topicForCodeHash;
@@ -152,11 +131,13 @@ export class SmartContractTransactionsOutcomeParser {
         }
 
         outcome = this.findDirectSmartContractCallOutcomeIfError(transactionOnNetwork);
+
         if (outcome) {
             return outcome;
         }
 
         outcome = this.findDirectSmartContractCallOutcomeWithinWriteLogEvents(transactionOnNetwork);
+
         if (outcome) {
             return outcome;
         }
@@ -238,7 +219,7 @@ export class SmartContractTransactionsOutcomeParser {
         }
 
         const [event] = eligibleEvents;
-        const data = event.dataPayload?.valueOf().toString() || "";
+        const data = Buffer.from(event.data).toString();
         const lastTopic = event.getLastTopic()?.toString();
         const parts = argSerializer.stringToBuffers(data);
         // Assumption: the last part is the return code.
@@ -283,7 +264,7 @@ export class SmartContractTransactionsOutcomeParser {
         }
 
         const [event] = eligibleEvents;
-        const data = event.dataPayload?.valueOf().toString() || "";
+        const data = Buffer.from(event.data).toString();
         const [_ignored, returnCode, ...returnDataParts] = argSerializer.stringToBuffers(data);
 
         return new SmartContractCallOutcome({

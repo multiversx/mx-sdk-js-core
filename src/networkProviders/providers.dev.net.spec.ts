@@ -1,6 +1,7 @@
 import { AxiosHeaders } from "axios";
 import { assert } from "chai";
 import { Address } from "../address";
+import { b64ToHex } from "../testutils";
 import { MockQuery } from "../testutils/dummyQuery";
 import { TransactionOnNetwork } from "../transactions";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
@@ -295,18 +296,18 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.exists(proxyResponse.logs);
         assert.exists(apiResponse.logs.events);
         assert.exists(proxyResponse.logs.events);
-        assert.equal(apiResponse.logs.events[0].topics[0].toString(), "414c4943452d353632376631");
-        assert.equal(apiResponse.logs.events[0].topics[1].toString(), "");
-        assert.equal(apiResponse.logs.events[0].topics[2].toString(), "01");
+        assert.equal(b64ToHex(apiResponse.logs.events[0].topics[0].toString()), "414c4943452d353632376631");
+        assert.equal(b64ToHex(apiResponse.logs.events[0].topics[1].toString()), "");
+        assert.equal(b64ToHex(apiResponse.logs.events[0].topics[2].toString()), "01");
         assert.equal(
-            apiResponse.logs.events[0].topics[3].toString(),
+            b64ToHex(apiResponse.logs.events[0].topics[3].toString()),
             "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1",
         );
-        assert.equal(proxyResponse.logs.events[0].topics[0].toString(), "414c4943452d353632376631");
-        assert.equal(proxyResponse.logs.events[0].topics[1].toString(), "");
-        assert.equal(proxyResponse.logs.events[0].topics[2].toString(), "01");
+        assert.equal(b64ToHex(proxyResponse.logs.events[0].topics[0].toString()), "414c4943452d353632376631");
+        assert.equal(b64ToHex(proxyResponse.logs.events[0].topics[1].toString()), "");
+        assert.equal(b64ToHex(proxyResponse.logs.events[0].topics[2].toString()), "01");
         assert.equal(
-            proxyResponse.logs.events[0].topics[3].toString(),
+            b64ToHex(proxyResponse.logs.events[0].topics[3].toString()),
             "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1",
         );
     });
@@ -402,11 +403,8 @@ describe("test network providers on devnet: Proxy and API", function () {
             "a419271407a2ec217739811805e3a751e30dbc72ae0777e3b4c825f036995184",
         );
 
-        assert.equal(apiResponse.logs.events[0].data, Buffer.from("test").toString());
-        assert.equal(proxyResponse.logs.events[0].data, Buffer.from("test").toString());
-
-        assert.deepEqual(apiResponse.logs.events[0].dataPayload, Buffer.from("dGVzdA=="));
-        assert.deepEqual(proxyResponse.logs.events[0].dataPayload, Buffer.from("dGVzdA=="));
+        assert.deepEqual(apiResponse.logs.events[0].data, Buffer.from("dGVzdA=="));
+        assert.deepEqual(proxyResponse.logs.events[0].data, Buffer.from("dGVzdA=="));
 
         assert.deepEqual(apiResponse.logs.events[0].additionalData, [Buffer.from("dGVzdA==")]);
         assert.deepEqual(proxyResponse.logs.events[0].additionalData, [Buffer.from("dGVzdA==")]);

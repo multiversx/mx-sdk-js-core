@@ -25,7 +25,7 @@ describe("test smart contract transactions outcome parser", () => {
                         topics: [
                             new Uint8Array(Buffer.from(contract.getPublicKey().toString("base64"))),
                             new Uint8Array(Buffer.from(deployer.getPublicKey().toString("base64"))),
-                            codeHash,
+                            new Uint8Array(Buffer.from(codeHash.toString("base64"))),
                         ],
                     }),
                 ],
@@ -61,7 +61,7 @@ describe("test smart contract transactions outcome parser", () => {
                             deployer.getPublicKey().toString("base64"),
                             Buffer.from("wrong number of arguments").toString("base64"),
                         ]),
-                        dataPayload: Buffer.from("@75736572206572726f72"),
+                        data: Buffer.from("QDc1NzM2NTcyMjA2NTcyNzI2Zjcy", "base64"),
                     }),
                 ],
             }),

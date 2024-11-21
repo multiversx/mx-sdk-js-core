@@ -5,11 +5,7 @@ export class TransactionEvent {
     identifier: string = "";
     topics: Uint8Array[] = [];
 
-    /**
-     * @deprecated Use "dataPayload" instead.
-     */
-    data: string = "";
-    dataPayload: Uint8Array = new Uint8Array();
+    data: Uint8Array = new Uint8Array();
     additionalData: Uint8Array[] = [];
 
     constructor(init?: Partial<TransactionEvent>) {
@@ -28,7 +24,8 @@ export class TransactionEvent {
         result.identifier = responsePart.identifier || "";
         result.topics = (responsePart.topics || []).map((topic) => Buffer.from(topic));
 
-        result.dataPayload = Buffer.from(responsePart.data ?? "");
+        result.data = Buffer.from(responsePart.data ?? "", "base64");
+
         result.additionalData = (responsePart.additionalData || []).map((data) => Buffer.from(data));
 
         return result;

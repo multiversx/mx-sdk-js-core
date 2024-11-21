@@ -213,7 +213,7 @@ describe("test smart contract results parser", () => {
                     new TransactionEvent({
                         identifier: "signalError",
                         topics: [Buffer.from("something happened")],
-                        data: `@${Buffer.from("user error").toString("hex")}@07`,
+                        data: Buffer.from("QDc1NzM2NTcyMjA2NTcyNzI2ZjcyQDA3", "base64"),
                     }),
                 ],
             }),
@@ -238,7 +238,7 @@ describe("test smart contract results parser", () => {
                                 "base64",
                             ),
                         ],
-                        data: Buffer.from("QDZmNmI=", "base64").toString(),
+                        data: Buffer.from("QDZmNmI=", "base64"),
                     }),
                 ],
             }),
@@ -260,7 +260,7 @@ describe("test smart contract results parser", () => {
                 Buffer.from("cmzC1LRt1r10pMhNAnFb+FyudjGMq4G8CefCYdQUmmc=", "base64"),
                 Buffer.from("AAAADFdFR0xELTAxZTQ5ZAAAAAAAAAAAAAAAAWQ=", "base64"),
             ],
-            dataPayload: Buffer.from("AAAAAAAAA9sAAAA=", "base64"),
+            data: Buffer.from("AAAAAAAAA9sAAAA=", "base64"),
         });
 
         const bundle = parser.parseEvent(event, eventDefinition);
@@ -306,7 +306,7 @@ describe("test smart contract results parser", () => {
 
         const eventDefinition = abiRegistry.getEvent("foobar");
 
-        const event = {
+        const event = new TransactionEvent({
             topics: b64TopicsToBytes([
                 Buffer.from("not used").toString("base64"),
                 Buffer.from([42]).toString("base64"),
@@ -316,8 +316,8 @@ describe("test smart contract results parser", () => {
                 Buffer.from("test").toString("base64"),
                 Buffer.from([44]).toString("base64"),
             ]),
-            dataPayload: Buffer.from([42]),
-        };
+            data: Buffer.from([42]),
+        });
 
         const bundle = parser.parseEvent(event, eventDefinition);
         assert.deepEqual(bundle.a, [new BigNumber(42), "test", new BigNumber(43), "test"]);
@@ -353,15 +353,15 @@ describe("test smart contract results parser", () => {
 
         const eventDefinition = abiRegistry.getEvent("foobar");
 
-        const event = {
+        const event = new TransactionEvent({
             topics: b64TopicsToBytes([
                 Buffer.from("not used").toString("base64"),
                 Buffer.from([42]).toString("base64"),
             ]),
             additionalData: [Buffer.from([43]), Buffer.from([44])],
             // Will be ignored.
-            dataPayload: Buffer.from([43]),
-        };
+            data: new Uint8Array(Buffer.from([43])),
+        });
 
         const bundle = parser.parseEvent(event, eventDefinition);
         assert.deepEqual(bundle.a, new BigNumber(42));

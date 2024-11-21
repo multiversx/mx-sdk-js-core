@@ -94,3 +94,7 @@ export function createAccountBalance(egld: number): BigNumber {
 export function b64TopicsToBytes(topics: string[]): Uint8Array[] {
     return topics.map((topic) => Buffer.from(topic, "base64"));
 }
+
+export function b64ToHex(value: string): string {
+    return Buffer.from(value, "base64").toString("hex");
+}

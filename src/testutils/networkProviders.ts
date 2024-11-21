@@ -1,9 +1,10 @@
 import { Query } from "../abi";
 import { IAddress } from "../interface";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionStatus } from "../interfaceOfNetwork";
-import { ApiNetworkProvider, ProxyNetworkProvider, TransactionOnNetwork } from "../networkProviders";
+import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
 
 import { Transaction } from "../transaction";
+import { TransactionOnNetwork } from "../transactions";
 
 export function createLocalnetProvider(): INetworkProvider {
     return new ProxyNetworkProvider("http://localhost:7950", { timeout: 5000 });

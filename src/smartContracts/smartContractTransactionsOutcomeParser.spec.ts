@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
-import { loadAbiRegistry } from "../testutils";
+import { b64TopicsToBytes, loadAbiRegistry } from "../testutils";
 import { TransactionEvent } from "../transactionEvents";
 import { TransactionLogs } from "../transactionLogs";
 import { TransactionOnNetwork } from "../transactions";
@@ -57,11 +57,11 @@ describe("test smart contract transactions outcome parser", () => {
                 events: [
                     new TransactionEvent({
                         identifier: "signalError",
-                        topics: [
-                            new Uint8Array(Buffer.from(deployer.getPublicKey().toString("base64"))),
-                            new Uint8Array(Buffer.from("wrong number of arguments")),
-                        ],
-                        data: "@75736572206572726f72",
+                        topics: b64TopicsToBytes([
+                            deployer.getPublicKey().toString("base64"),
+                            Buffer.from("wrong number of arguments").toString("base64"),
+                        ]),
+                        dataPayload: Buffer.from("@75736572206572726f72"),
                     }),
                 ],
             }),

@@ -81,7 +81,7 @@ export class TransactionOnNetwork {
 
     static fromApiHttpResponse(txHash: string, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
-        result.smartContractResults = response.results;
+        result.smartContractResults = response.results ?? [];
         result.isCompleted = !result.status.isPending();
         return result;
     }
@@ -107,7 +107,6 @@ export class TransactionOnNetwork {
         result.blockNonce = response.blockNonce || 0;
         result.hyperblockNonce = response.hyperblockNonce || 0;
         result.hyperblockHash = response.hyperblockHash || "";
-        console.log({ logs: JSON.stringify(response.logs) });
         result.logs = TransactionLogs.fromHttpResponse(response.logs || {});
 
         return result;

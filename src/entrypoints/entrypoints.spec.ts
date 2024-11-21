@@ -58,7 +58,6 @@ describe("TestEntrypoint", () => {
             },
         );
 
-        console.log({ transaction });
         const txHash = await entrypoint.sendTransaction(transaction);
         const outcome = await controller.awaitCompletedDeploy(txHash);
 

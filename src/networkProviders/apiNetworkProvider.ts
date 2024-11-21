@@ -136,7 +136,6 @@ export class ApiNetworkProvider implements INetworkProvider {
 
     async getTransaction(txHash: string): Promise<TransactionOnNetwork> {
         const response = await this.doGetGeneric(`transactions/${txHash}`);
-        console.log({ response: JSON.stringify(response) });
         const transaction = TransactionOnNetwork.fromApiHttpResponse(txHash, response);
         return transaction;
     }

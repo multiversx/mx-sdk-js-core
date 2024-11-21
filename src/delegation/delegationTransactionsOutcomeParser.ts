@@ -33,7 +33,7 @@ export class DelegationTransactionsOutcomeParser {
             return "";
         }
         const address = Buffer.from(event.topics[0]);
-        return Address.fromBuffer(address).bech32();
+        return new Address(address).bech32();
     }
 
     private decodeTopicAsString(topic: Uint8Array): string {

@@ -108,7 +108,6 @@ export class DelegationTransactionsFactory {
 
     createTransactionForStakingNodes(sender: IAddress, options: resources.ManageNodesInput): Transaction {
         let dataParts = ["stakeNodes"];
-        console.log(options.publicKeys);
 
         for (const key of options.publicKeys) {
             dataParts = dataParts.concat(key.hex());

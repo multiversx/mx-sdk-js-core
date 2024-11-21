@@ -22,7 +22,11 @@ describe("test smart contract transactions outcome parser", () => {
                 events: [
                     new TransactionEvent({
                         identifier: "SCDeploy",
-                        topics: [contract.getPublicKey(), deployer.getPublicKey(), codeHash],
+                        topics: [
+                            new Uint8Array(Buffer.from(contract.getPublicKey().toString("base64"))),
+                            new Uint8Array(Buffer.from(deployer.getPublicKey().toString("base64"))),
+                            codeHash,
+                        ],
                     }),
                 ],
             }),
@@ -53,7 +57,10 @@ describe("test smart contract transactions outcome parser", () => {
                 events: [
                     new TransactionEvent({
                         identifier: "signalError",
-                        topics: [deployer.getPublicKey(), new Uint8Array(Buffer.from("wrong number of arguments"))],
+                        topics: [
+                            new Uint8Array(Buffer.from(deployer.getPublicKey().toString("base64"))),
+                            new Uint8Array(Buffer.from("wrong number of arguments")),
+                        ],
                         data: "@75736572206572726f72",
                     }),
                 ],

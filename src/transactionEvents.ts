@@ -23,16 +23,13 @@ export class TransactionEvent {
         data: string;
         additionalData?: string[];
     }): TransactionEvent {
-        console.log({ responsePart });
         let result = new TransactionEvent();
         result.address = new Address(responsePart.address);
         result.identifier = responsePart.identifier || "";
         result.topics = (responsePart.topics || []).map((topic) => Buffer.from(topic));
 
-        console.log(22222, { responsePart }, 333, responsePart.additionalData);
-        result.dataPayload = Buffer.from(responsePart.data);
+        result.dataPayload = Buffer.from(responsePart.data ?? "");
         result.additionalData = (responsePart.additionalData || []).map((data) => Buffer.from(data));
-        result.data = result.dataPayload?.toString();
 
         return result;
     }

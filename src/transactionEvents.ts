@@ -26,7 +26,7 @@ export class TransactionEvent {
 
         result.data = Buffer.from(responsePart.data ?? "", "base64");
 
-        result.additionalData = (responsePart.additionalData || []).map((data) => Buffer.from(data));
+        result.additionalData = (responsePart.additionalData || []).map((data) => Buffer.from(data, "base64"));
 
         return result;
     }

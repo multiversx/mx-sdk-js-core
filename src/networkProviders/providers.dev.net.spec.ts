@@ -403,11 +403,11 @@ describe("test network providers on devnet: Proxy and API", function () {
             "a419271407a2ec217739811805e3a751e30dbc72ae0777e3b4c825f036995184",
         );
 
-        assert.deepEqual(apiResponse.logs.events[0].data, Buffer.from("dGVzdA=="));
-        assert.deepEqual(proxyResponse.logs.events[0].data, Buffer.from("dGVzdA=="));
+        assert.deepEqual(apiResponse.logs.events[0].data, Buffer.from("dGVzdA==", "base64"));
+        assert.deepEqual(proxyResponse.logs.events[0].data, Buffer.from("dGVzdA==", "base64"));
 
-        assert.deepEqual(apiResponse.logs.events[0].additionalData, [Buffer.from("dGVzdA==")]);
-        assert.deepEqual(proxyResponse.logs.events[0].additionalData, [Buffer.from("dGVzdA==")]);
+        assert.deepEqual(apiResponse.logs.events[0].additionalData, [Buffer.from("dGVzdA==", "base64")]);
+        assert.deepEqual(proxyResponse.logs.events[0].additionalData, [Buffer.from("dGVzdA==", "base64")]);
     });
 
     it("should send both `Transaction` and `TransactionNext`", async function () {

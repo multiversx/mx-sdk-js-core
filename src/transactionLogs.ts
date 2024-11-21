@@ -13,6 +13,7 @@ export class TransactionLogs {
     static fromHttpResponse(logs: any): TransactionLogs {
         let result = new TransactionLogs();
         result.address = new Address(logs.address);
+        console.log({ events: JSON.stringify(logs.events) });
         result.events = (logs.events || []).map((event: any) => TransactionEvent.fromHttpResponse(event));
 
         return result;

@@ -70,7 +70,11 @@ export class TransactionOnNetwork {
         processStatus?: TransactionStatus | undefined,
     ): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
-        result.smartContractResults = response.smartContractResults ?? [];
+        result.smartContractResults =
+            response.smartContractResults?.map(
+                (result: Partial<SmartContractResult>) => new SmartContractResult({ ...result, raw: result }),
+            ) ?? [];
+
         if (processStatus) {
             result.status = processStatus;
             result.isCompleted = result.status.isSuccessful() || result.status.isFailed();
@@ -81,7 +85,10 @@ export class TransactionOnNetwork {
 
     static fromApiHttpResponse(txHash: string, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
-        result.smartContractResults = response.results ?? [];
+        result.smartContractResults =
+            response.smartContractResults?.map(
+                (result: Partial<SmartContractResult>) => new SmartContractResult({ ...result, raw: result }),
+            ) ?? [];
         result.isCompleted = !result.status.isPending();
         return result;
     }

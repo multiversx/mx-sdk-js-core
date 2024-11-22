@@ -86,7 +86,7 @@ export class TransactionOnNetwork {
     static fromApiHttpResponse(txHash: string, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.smartContractResults =
-            response.smartContractResults?.map(
+            response.results?.map(
                 (result: Partial<SmartContractResult>) => new SmartContractResult({ ...result, raw: result }),
             ) ?? [];
         result.isCompleted = !result.status.isPending();

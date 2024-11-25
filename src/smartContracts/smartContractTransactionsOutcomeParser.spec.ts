@@ -23,9 +23,9 @@ describe("test smart contract transactions outcome parser", () => {
                     new TransactionEvent({
                         identifier: "SCDeploy",
                         topics: [
-                            new Uint8Array(Buffer.from(contract.getPublicKey().toString("base64"))),
-                            new Uint8Array(Buffer.from(deployer.getPublicKey().toString("base64"))),
-                            new Uint8Array(Buffer.from(codeHash.toString("base64"))),
+                            new Uint8Array(Buffer.from(contract.getPublicKey().toString("base64"), "base64")),
+                            new Uint8Array(Buffer.from(deployer.getPublicKey().toString("base64"), "base64")),
+                            new Uint8Array(Buffer.from(codeHash.toString("base64"), "base64")),
                         ],
                     }),
                 ],

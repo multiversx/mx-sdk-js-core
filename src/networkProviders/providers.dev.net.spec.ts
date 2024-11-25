@@ -1,7 +1,6 @@
 import { AxiosHeaders } from "axios";
 import { assert } from "chai";
 import { Address } from "../address";
-import { b64ToHex } from "../testutils";
 import { MockQuery } from "../testutils/dummyQuery";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
@@ -296,18 +295,21 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.exists(proxyResponse.logs);
         assert.exists(apiResponse.logs.events);
         assert.exists(proxyResponse.logs.events);
-        assert.equal(b64ToHex(apiResponse.logs.events[0].topics[0].toString()), "414c4943452d353632376631");
-        assert.equal(b64ToHex(apiResponse.logs.events[0].topics[1].toString()), "");
-        assert.equal(b64ToHex(apiResponse.logs.events[0].topics[2].toString()), "01");
+        assert.equal(Buffer.from(apiResponse.logs.events[0].topics[0]).toString("hex"), "414c4943452d353632376631");
+        assert.equal(Buffer.from(apiResponse.logs.events[0].topics[1]).toString("hex"), "");
+        assert.equal(Buffer.from(apiResponse.logs.events[0].topics[2]).toString("hex"), "01");
         assert.equal(
-            b64ToHex(apiResponse.logs.events[0].topics[3].toString()),
+            Buffer.from(apiResponse.logs.events[0].topics[3]).toString("hex"),
             "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1",
         );
-        assert.equal(b64ToHex(proxyResponse.logs.events[0].topics[0].toString()), "414c4943452d353632376631");
-        assert.equal(b64ToHex(proxyResponse.logs.events[0].topics[1].toString()), "");
-        assert.equal(b64ToHex(proxyResponse.logs.events[0].topics[2].toString()), "01");
         assert.equal(
-            b64ToHex(proxyResponse.logs.events[0].topics[3].toString()),
+            Buffer.from(proxyResponse.logs.events[0].topics[0].toString()).toString("hex"),
+            "414c4943452d353632376631",
+        );
+        assert.equal(Buffer.from(proxyResponse.logs.events[0].topics[1].toString()).toString("hex"), "");
+        assert.equal(Buffer.from(proxyResponse.logs.events[0].topics[2].toString()).toString("hex"), "01");
+        assert.equal(
+            Buffer.from(proxyResponse.logs.events[0].topics[3]).toString("hex"),
             "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1",
         );
     });

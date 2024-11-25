@@ -64,9 +64,9 @@ export class SmartContractTransactionsOutcomeParser {
         ownerAddress: string;
         codeHash: Uint8Array;
     } {
-        const topicForAddress = Buffer.from(event.topics[0].toString(), "base64").toString("hex");
-        const topicForOwnerAddress = Buffer.from(event.topics[1].toString(), "base64").toString("hex");
-        const topicForCodeHash = Buffer.from(event.topics[2].toString(), "base64");
+        const topicForAddress = Buffer.from(event.topics[0]).toString("hex");
+        const topicForOwnerAddress = Buffer.from(event.topics[1]).toString("hex");
+        const topicForCodeHash = Buffer.from(event.topics[2]);
         const address = topicForAddress?.length ? new Address(topicForAddress).toBech32() : "";
         const ownerAddress = topicForOwnerAddress?.length ? new Address(topicForOwnerAddress).toBech32() : "";
         const codeHash = topicForCodeHash;

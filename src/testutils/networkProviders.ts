@@ -4,7 +4,7 @@ import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransaction
 import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
 
 import { Transaction } from "../transaction";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 
 export function createLocalnetProvider(): INetworkProvider {
     return new ProxyNetworkProvider("http://localhost:7950", { timeout: 5000 });

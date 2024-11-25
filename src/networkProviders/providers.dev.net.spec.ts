@@ -3,7 +3,7 @@ import { assert } from "chai";
 import { Address } from "../address";
 import { b64ToHex } from "../testutils";
 import { MockQuery } from "../testutils/dummyQuery";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { INetworkProvider, ITransactionNext } from "./interface";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";

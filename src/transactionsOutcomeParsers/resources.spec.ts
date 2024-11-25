@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { TransactionEvent } from "../transactionEvents";
 import { TransactionLogs } from "../transactionLogs";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { findEventsByFirstTopic, findEventsByIdentifier, SmartContractResult } from "./resources";
 
 describe("test resources", () => {

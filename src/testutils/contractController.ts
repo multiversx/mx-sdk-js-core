@@ -1,7 +1,7 @@
 import { Interaction, ResultsParser, TypedOutcomeBundle, UntypedOutcomeBundle } from "../abi";
 import { Logger } from "../logger";
 import { Transaction } from "../transaction";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionWatcher } from "../transactionWatcher";
 import { INetworkProvider } from "./networkProviders";
 

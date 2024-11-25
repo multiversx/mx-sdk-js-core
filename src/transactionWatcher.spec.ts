@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { MarkCompleted, MockNetworkProvider, Wait } from "./testutils";
 import { TransactionHash } from "./transaction";
-import { TransactionOnNetwork } from "./transactions";
+import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { TransactionStatus } from "./transactionStatus";
 import { TransactionWatcher } from "./transactionWatcher";
 

@@ -1,14 +1,5 @@
-import { ResultsParser } from "../abi";
 import { IPlainTransactionObject, ITransaction } from "../interface";
-import { IContractResultItem, ITransactionEvent, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { Transaction } from "../transaction";
-import {
-    SmartContractCallOutcome,
-    SmartContractResult,
-    TransactionEvent,
-    TransactionLogs,
-    TransactionOutcome,
-} from "../transactionsOutcomeParsers/resources";
 
 export class TransactionsConverter {
     public transactionToPlainObject(transaction: ITransaction): IPlainTransactionObject {
@@ -69,76 +60,5 @@ export class TransactionsConverter {
 
     private bufferFromHex(value?: string) {
         return Buffer.from(value || "", "hex");
-    }
-
-    /**
-     * @deprecated Where {@link TransactionOutcome} was needed (throughout the SDK), pass the {@link ITransactionOnNetwork} object instead.
-     *
-     * Summarizes the outcome of a transaction on the network, and maps it to the "standard" resources (according to the sdk-specs).
-     *
-     * In the future, this converter function will become obsolete,
-     * as the impedance mismatch between the network components and the "core" components will be reduced.
-     */
-    public transactionOnNetworkToOutcome(transactionOnNetwork: ITransactionOnNetwork): TransactionOutcome {
-        // In the future, this will not be needed because the transaction, as returned from the API,
-        // will hold the data corresponding to the direct smart contract call outcome (in case of smart contract calls).
-        const legacyResultsParser = new ResultsParser();
-        const callOutcomeBundle = legacyResultsParser.parseUntypedOutcome(transactionOnNetwork);
-        const callOutcome = new SmartContractCallOutcome({
-            function: transactionOnNetwork.function,
-            returnCode: callOutcomeBundle.returnCode.toString(),
-            returnMessage: callOutcomeBundle.returnMessage,
-            returnDataParts: callOutcomeBundle.values,
-        });
-
-        const contractResults = transactionOnNetwork.contractResults.items.map((result) =>
-            this.smartContractResultOnNetworkToSmartContractResult(result),
-        );
-
-        const logs = new TransactionLogs({
-            address: transactionOnNetwork.logs.address.bech32(),
-            events: transactionOnNetwork.logs.events.map((event) => this.eventOnNetworkToEvent(event)),
-        });
-
-        return new TransactionOutcome({
-            logs: logs,
-            smartContractResults: contractResults,
-            directSmartContractCallOutcome: callOutcome,
-        });
-    }
-
-    private smartContractResultOnNetworkToSmartContractResult(
-        resultOnNetwork: IContractResultItem,
-    ): SmartContractResult {
-        return new SmartContractResult({
-            sender: resultOnNetwork.sender.bech32(),
-            receiver: resultOnNetwork.receiver.bech32(),
-            data: Buffer.from(resultOnNetwork.data),
-            logs: new TransactionLogs({
-                address: resultOnNetwork.logs.address.bech32(),
-                events: resultOnNetwork.logs.events.map((event) => this.eventOnNetworkToEvent(event)),
-            }),
-        });
-    }
-
-    private eventOnNetworkToEvent(eventOnNetwork: ITransactionEvent): TransactionEvent {
-        // Before Sirius, there was no "additionalData" field on transaction logs.
-        // After Sirius, the "additionalData" field includes the payload of the legacy "data" field, as well (as its first element):
-        // https://github.com/multiversx/mx-chain-go/blob/v1.6.18/process/transactionLog/process.go#L159
-        const legacyData = eventOnNetwork.dataPayload?.valueOf() || Buffer.from(eventOnNetwork.data || "");
-        const dataItems = eventOnNetwork.additionalData?.map((data) => Buffer.from(data.valueOf())) || [];
-
-        if (dataItems.length === 0) {
-            if (legacyData.length) {
-                dataItems.push(Buffer.from(legacyData));
-            }
-        }
-
-        return new TransactionEvent({
-            address: eventOnNetwork.address.bech32(),
-            identifier: eventOnNetwork.identifier,
-            topics: eventOnNetwork.topics.map((topic) => Buffer.from(topic.hex(), "hex")),
-            dataItems: dataItems,
-        });
     }
 }

@@ -1,17 +1,13 @@
 import { Address } from "../address";
-import { TransactionsConverter } from "../converters/transactionsConverter";
 import { ErrParseTransactionOutcome } from "../errors";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { TransactionEvent, TransactionOutcome, findEventsByIdentifier } from "../transactionsOutcomeParsers/resources";
+import { TransactionEvent } from "../transactionEvents";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { findEventsByIdentifier } from "../transactionsOutcomeParsers/resources";
 
 export class DelegationTransactionsOutcomeParser {
     constructor() {}
 
-    parseCreateNewDelegationContract(
-        transaction: TransactionOutcome | ITransactionOnNetwork,
-    ): { contractAddress: string }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parseCreateNewDelegationContract(transaction: TransactionOnNetwork): { contractAddress: string }[] {
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "SCDeploy");
@@ -19,21 +15,10 @@ export class DelegationTransactionsOutcomeParser {
         return events.map((event) => ({ contractAddress: this.extractContractAddress(event) }));
     }
 
-    /**
-     * Temporary workaround, until "TransactionOnNetwork" completely replaces "TransactionOutcome".
-     */
-    private ensureTransactionOutcome(transaction: TransactionOutcome | ITransactionOnNetwork): TransactionOutcome {
-        if ("hash" in transaction) {
-            return new TransactionsConverter().transactionOnNetworkToOutcome(transaction);
-        }
-
-        return transaction;
-    }
-
     private ensureNoError(transactionEvents: TransactionEvent[]) {
         for (const event of transactionEvents) {
             if (event.identifier == "signalError") {
-                const data = Buffer.from(event.dataItems[0]?.toString().slice(1)).toString() || "";
+                const data = Buffer.from(event.additionalData[0]?.toString().slice(1)).toString() || "";
                 const message = this.decodeTopicAsString(event.topics[1]);
 
                 throw new ErrParseTransactionOutcome(
@@ -48,7 +33,7 @@ export class DelegationTransactionsOutcomeParser {
             return "";
         }
         const address = Buffer.from(event.topics[0]);
-        return Address.fromBuffer(address).bech32();
+        return new Address(address).toBech32();
     }
 
     private decodeTopicAsString(topic: Uint8Array): string {

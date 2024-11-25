@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { TransactionOnNetwork } from "./networkProviders";
+import { TransactionOnNetwork } from "./transactionOnNetwork";
 
 export interface ITransactionFetcher {
     /**

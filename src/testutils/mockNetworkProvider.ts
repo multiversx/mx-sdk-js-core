@@ -4,15 +4,11 @@ import { AsyncTimer } from "../asyncTimer";
 import * as errors from "../errors";
 import { ErrMock } from "../errors";
 import { IAddress } from "../interface";
-import {
-    IAccountOnNetwork,
-    IContractQueryResponse,
-    INetworkConfig,
-    ITransactionOnNetwork,
-    ITransactionStatus,
-} from "../interfaceOfNetwork";
-import { ContractResultItem, ContractResults, TransactionOnNetwork, TransactionStatus } from "../networkProviders";
+import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionStatus } from "../interfaceOfNetwork";
 import { Transaction, TransactionHash } from "../transaction";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { SmartContractResult } from "../transactionsOutcomeParsers";
+import { TransactionStatus } from "../transactionStatus";
 import { createAccountBalance } from "./utils";
 
 export class MockNetworkProvider {
@@ -48,7 +44,7 @@ export class MockNetworkProvider {
         }
     }
 
-    mockUpdateTransaction(hash: TransactionHash, mutate: (item: ITransactionOnNetwork) => void) {
+    mockUpdateTransaction(hash: TransactionHash, mutate: (item: TransactionOnNetwork) => void) {
         let transaction = this.transactions.get(hash.toString());
         if (transaction) {
             mutate(transaction);
@@ -66,12 +62,12 @@ export class MockNetworkProvider {
     }
 
     mockGetTransactionWithAnyHashAsNotarizedWithOneResult(returnCodeAndData: string) {
-        let contractResult = new ContractResultItem({ nonce: 1, data: returnCodeAndData });
+        let contractResult = new SmartContractResult({ data: Buffer.from(returnCodeAndData) });
 
         let predicate = (_hash: string) => true;
         let response = new TransactionOnNetwork({
             status: new TransactionStatus("executed"),
-            contractResults: new ContractResults([contractResult]),
+            smartContractResults: [contractResult],
             isCompleted: true,
         });
 

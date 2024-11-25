@@ -1,8 +1,7 @@
-import { Address } from "../address";
-import { ContractResults } from "./contractResults";
-import { IAddress, ITransaction, ITransactionNext } from "./interface";
+import { Address } from "./address";
+import { ITransaction, ITransactionNext } from "./networkProviders/interface";
 import { TransactionLogs } from "./transactionLogs";
-import { TransactionReceipt } from "./transactionReceipt";
+import { SmartContractResult } from "./transactionsOutcomeParsers";
 import { TransactionStatus } from "./transactionStatus";
 
 export function prepareTransactionForBroadcasting(transaction: ITransaction | ITransactionNext): any {
@@ -44,8 +43,8 @@ export class TransactionOnNetwork {
     round: number = 0;
     epoch: number = 0;
     value: string = "";
-    receiver: IAddress = Address.empty();
-    sender: IAddress = Address.empty();
+    receiver: Address = Address.empty();
+    sender: Address = Address.empty();
     gasLimit: number = 0;
     gasPrice: number = 0;
     function: string = "";
@@ -58,8 +57,7 @@ export class TransactionOnNetwork {
     hyperblockNonce: number = 0;
     hyperblockHash: string = "";
 
-    receipt: TransactionReceipt = new TransactionReceipt();
-    contractResults: ContractResults = new ContractResults([]);
+    smartContractResults: SmartContractResult[] = [];
     logs: TransactionLogs = new TransactionLogs();
 
     constructor(init?: Partial<TransactionOnNetwork>) {
@@ -72,7 +70,10 @@ export class TransactionOnNetwork {
         processStatus?: TransactionStatus | undefined,
     ): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
-        result.contractResults = ContractResults.fromProxyHttpResponse(response.smartContractResults || []);
+        result.smartContractResults =
+            response.smartContractResults?.map(
+                (result: Partial<SmartContractResult>) => new SmartContractResult({ ...result, raw: result }),
+            ) ?? [];
 
         if (processStatus) {
             result.status = processStatus;
@@ -84,7 +85,10 @@ export class TransactionOnNetwork {
 
     static fromApiHttpResponse(txHash: string, response: any): TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
-        result.contractResults = ContractResults.fromApiHttpResponse(response.results || []);
+        result.smartContractResults =
+            response.results?.map(
+                (result: Partial<SmartContractResult>) => new SmartContractResult({ ...result, raw: result }),
+            ) ?? [];
         result.isCompleted = !result.status.isPending();
         return result;
     }
@@ -110,8 +114,6 @@ export class TransactionOnNetwork {
         result.blockNonce = response.blockNonce || 0;
         result.hyperblockNonce = response.hyperblockNonce || 0;
         result.hyperblockHash = response.hyperblockHash || "";
-
-        result.receipt = TransactionReceipt.fromHttpResponse(response.receipt || {});
         result.logs = TransactionLogs.fromHttpResponse(response.logs || {});
 
         return result;

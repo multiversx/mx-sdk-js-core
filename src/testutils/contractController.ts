@@ -1,7 +1,7 @@
 import { Interaction, ResultsParser, TypedOutcomeBundle, UntypedOutcomeBundle } from "../abi";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { Logger } from "../logger";
 import { Transaction } from "../transaction";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionWatcher } from "../transactionWatcher";
 import { INetworkProvider } from "./networkProviders";
 
@@ -22,7 +22,7 @@ export class ContractController {
 
     async deploy(
         transaction: Transaction,
-    ): Promise<{ transactionOnNetwork: ITransactionOnNetwork; bundle: UntypedOutcomeBundle }> {
+    ): Promise<{ transactionOnNetwork: TransactionOnNetwork; bundle: UntypedOutcomeBundle }> {
         const txHash = await this.provider.sendTransaction(transaction);
         Logger.info(`ContractController.deploy [begin]: transaction = ${txHash}`);
 
@@ -36,7 +36,7 @@ export class ContractController {
     async execute(
         interaction: Interaction,
         transaction: Transaction,
-    ): Promise<{ transactionOnNetwork: ITransactionOnNetwork; bundle: TypedOutcomeBundle }> {
+    ): Promise<{ transactionOnNetwork: TransactionOnNetwork; bundle: TypedOutcomeBundle }> {
         const txHash = await this.provider.sendTransaction(transaction);
         Logger.info(
             `ContractController.execute [begin]: function = ${interaction.getFunction()}, transaction = ${txHash}`,

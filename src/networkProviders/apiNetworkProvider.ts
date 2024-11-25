@@ -1,4 +1,6 @@
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
+import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "../transactionOnNetwork";
+import { TransactionStatus } from "../transactionStatus";
 import { getAxios } from "../utils";
 import { numberToPaddedHex } from "../utils.codec";
 import { AccountOnNetwork, GuardianData } from "./accounts";
@@ -16,8 +18,6 @@ import { PairOnNetwork } from "./pairs";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
-import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "./transactions";
-import { TransactionStatus } from "./transactionStatus";
 import { extendUserAgentIfBackend } from "./userAgent";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".

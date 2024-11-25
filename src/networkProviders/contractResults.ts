@@ -1,6 +1,5 @@
 import { Address } from "../address";
-import { IAddress } from "./interface";
-import { TransactionLogs } from "./transactionLogs";
+import { TransactionLogs } from "../transactionLogs";
 
 export class ContractResults {
     readonly items: ContractResultItem[];
@@ -28,8 +27,8 @@ export class ContractResultItem {
     hash: string = "";
     nonce: number = 0;
     value: string = "";
-    receiver: IAddress = Address.empty();
-    sender: IAddress = Address.empty();
+    receiver: Address = Address.empty();
+    sender: Address = Address.empty();
     data: string = "";
     previousHash: string = "";
     originalHash: string = "";

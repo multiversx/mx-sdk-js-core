@@ -1,55 +1,43 @@
 import { bufferToBigInt } from "../abi/codec/utils";
 import { Address } from "../address";
-import { TransactionsConverter } from "../converters/transactionsConverter";
 import { ErrParseTransactionOutcome } from "../errors";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
-import { TransactionEvent, TransactionOutcome, findEventsByIdentifier } from "../transactionsOutcomeParsers/resources";
+import { TransactionEvent } from "../transactionEvents";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { findEventsByIdentifier } from "../transactionsOutcomeParsers/resources";
 import { MintNftOutput, SpecialRoleOutput } from "./resources";
 
 export class TokenManagementTransactionsOutcomeParser {
     constructor() {}
 
-    parseIssueFungible(transaction: TransactionOutcome | ITransactionOnNetwork): { tokenIdentifier: string }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parseIssueFungible(transaction: TransactionOnNetwork): { tokenIdentifier: string }[] {
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "issue");
         return events.map((event) => ({ tokenIdentifier: this.extractTokenIdentifier(event) }));
     }
 
-    parseIssueNonFungible(transaction: TransactionOutcome | ITransactionOnNetwork): { tokenIdentifier: string }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parseIssueNonFungible(transaction: TransactionOnNetwork): { tokenIdentifier: string }[] {
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "issueNonFungible");
         return events.map((event) => ({ tokenIdentifier: this.extractTokenIdentifier(event) }));
     }
 
-    parseIssueSemiFungible(transaction: TransactionOutcome | ITransactionOnNetwork): { tokenIdentifier: string }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parseIssueSemiFungible(transaction: TransactionOnNetwork): { tokenIdentifier: string }[] {
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "issueSemiFungible");
         return events.map((event) => ({ tokenIdentifier: this.extractTokenIdentifier(event) }));
     }
 
-    parseRegisterMetaEsdt(transaction: TransactionOutcome | ITransactionOnNetwork): { tokenIdentifier: string }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parseRegisterMetaEsdt(transaction: TransactionOnNetwork): { tokenIdentifier: string }[] {
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "registerMetaESDT");
         return events.map((event) => ({ tokenIdentifier: this.extractTokenIdentifier(event) }));
     }
 
-    parseRegisterAndSetAllRoles(
-        transaction: TransactionOutcome | ITransactionOnNetwork,
-    ): { tokenIdentifier: string; roles: string[] }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parseRegisterAndSetAllRoles(transaction: TransactionOnNetwork): { tokenIdentifier: string; roles: string[] }[] {
         this.ensureNoError(transaction.logs.events);
         const registerEvents = findEventsByIdentifier(transaction, "registerAndSetAllRoles");
         const setRoleEvents = findEventsByIdentifier(transaction, "ESDTSetRole");
@@ -68,21 +56,15 @@ export class TokenManagementTransactionsOutcomeParser {
         });
     }
 
-    parseSetBurnRoleGlobally(transaction: TransactionOutcome | ITransactionOnNetwork) {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parseSetBurnRoleGlobally(transaction: TransactionOnNetwork) {
         this.ensureNoError(transaction.logs.events);
     }
 
-    parseUnsetBurnRoleGlobally(transaction: TransactionOutcome | ITransactionOnNetwork) {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parseUnsetBurnRoleGlobally(transaction: TransactionOnNetwork) {
         this.ensureNoError(transaction.logs.events);
     }
 
-    parseSetSpecialRole(transaction: TransactionOutcome | ITransactionOnNetwork): SpecialRoleOutput[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parseSetSpecialRole(transaction: TransactionOnNetwork): SpecialRoleOutput[] {
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTSetRole");
@@ -98,9 +80,7 @@ export class TokenManagementTransactionsOutcomeParser {
         return { userAddress: userAddress, tokenIdentifier: tokenIdentifier, roles: roles };
     }
 
-    parseNftCreate(transaction: TransactionOutcome | ITransactionOnNetwork): MintNftOutput[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parseNftCreate(transaction: TransactionOnNetwork): MintNftOutput[] {
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTNFTCreate");
@@ -119,14 +99,12 @@ export class TokenManagementTransactionsOutcomeParser {
         return { tokenIdentifier: tokenIdentifier, nonce: nonce, initialQuantity: amount };
     }
 
-    parseLocalMint(transaction: TransactionOutcome | ITransactionOnNetwork): {
-        userAddress: string;
+    parseLocalMint(transaction: TransactionOnNetwork): {
+        userAddress: Address;
         tokenIdentifier: string;
         nonce: bigint;
         mintedSupply: bigint;
     }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTLocalMint");
@@ -134,7 +112,7 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private getOutputForLocalMintEvent(event: TransactionEvent): {
-        userAddress: string;
+        userAddress: Address;
         tokenIdentifier: string;
         nonce: bigint;
         mintedSupply: bigint;
@@ -152,14 +130,12 @@ export class TokenManagementTransactionsOutcomeParser {
         };
     }
 
-    parseLocalBurn(transaction: TransactionOutcome | ITransactionOnNetwork): {
-        userAddress: string;
+    parseLocalBurn(transaction: TransactionOnNetwork): {
+        userAddress: Address;
         tokenIdentifier: string;
         nonce: bigint;
         burntSupply: bigint;
     }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTLocalBurn");
@@ -167,7 +143,7 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private getOutputForLocalBurnEvent(event: TransactionEvent): {
-        userAddress: string;
+        userAddress: Address;
         tokenIdentifier: string;
         nonce: bigint;
         burntSupply: bigint;
@@ -185,32 +161,26 @@ export class TokenManagementTransactionsOutcomeParser {
         };
     }
 
-    parsePause(transaction: TransactionOutcome | ITransactionOnNetwork): { tokenIdentifier: string }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parsePause(transaction: TransactionOnNetwork): { tokenIdentifier: string }[] {
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTPause");
         return events.map((event) => ({ tokenIdentifier: this.extractTokenIdentifier(event) }));
     }
 
-    parseUnpause(transaction: TransactionOutcome | ITransactionOnNetwork): { tokenIdentifier: string }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
+    parseUnpause(transaction: TransactionOnNetwork): { tokenIdentifier: string }[] {
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTUnPause");
         return events.map((event) => ({ tokenIdentifier: this.extractTokenIdentifier(event) }));
     }
 
-    parseFreeze(transaction: TransactionOutcome | ITransactionOnNetwork): {
+    parseFreeze(transaction: TransactionOnNetwork): {
         userAddress: string;
         tokenIdentifier: string;
         nonce: bigint;
         balance: bigint;
     }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTFreeze");
@@ -236,14 +206,12 @@ export class TokenManagementTransactionsOutcomeParser {
         };
     }
 
-    parseUnfreeze(transaction: TransactionOutcome | ITransactionOnNetwork): {
+    parseUnfreeze(transaction: TransactionOnNetwork): {
         userAddress: string;
         tokenIdentifier: string;
         nonce: bigint;
         balance: bigint;
     }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTUnFreeze");
@@ -269,14 +237,12 @@ export class TokenManagementTransactionsOutcomeParser {
         };
     }
 
-    parseWipe(transaction: TransactionOutcome | ITransactionOnNetwork): {
+    parseWipe(transaction: TransactionOnNetwork): {
         userAddress: string;
         tokenIdentifier: string;
         nonce: bigint;
         balance: bigint;
     }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTWipe");
@@ -302,13 +268,11 @@ export class TokenManagementTransactionsOutcomeParser {
         };
     }
 
-    parseUpdateAttributes(transaction: TransactionOutcome | ITransactionOnNetwork): {
+    parseUpdateAttributes(transaction: TransactionOnNetwork): {
         tokenIdentifier: string;
         nonce: bigint;
         attributes: Uint8Array;
     }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTNFTUpdateAttributes");
@@ -322,7 +286,7 @@ export class TokenManagementTransactionsOutcomeParser {
     } {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const attributes = event.topics[3] ? event.topics[3] : new Uint8Array();
+        const attributes = event.topics[3] ? event.topics[3] : Buffer.from("");
 
         return {
             tokenIdentifier: tokenIdentifier,
@@ -331,13 +295,11 @@ export class TokenManagementTransactionsOutcomeParser {
         };
     }
 
-    parseAddQuantity(transaction: TransactionOutcome | ITransactionOnNetwork): {
+    parseAddQuantity(transaction: TransactionOnNetwork): {
         tokenIdentifier: string;
         nonce: bigint;
         addedQuantity: bigint;
     }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTNFTAddQuantity");
@@ -360,13 +322,11 @@ export class TokenManagementTransactionsOutcomeParser {
         };
     }
 
-    parseBurnQuantity(transaction: TransactionOutcome | ITransactionOnNetwork): {
+    parseBurnQuantity(transaction: TransactionOnNetwork): {
         tokenIdentifier: string;
         nonce: bigint;
         burntQuantity: bigint;
     }[] {
-        transaction = this.ensureTransactionOutcome(transaction);
-
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTNFTBurn");
@@ -389,21 +349,10 @@ export class TokenManagementTransactionsOutcomeParser {
         };
     }
 
-    /**
-     * Temporary workaround, until "TransactionOnNetwork" completely replaces "TransactionOutcome".
-     */
-    private ensureTransactionOutcome(transaction: TransactionOutcome | ITransactionOnNetwork): TransactionOutcome {
-        if ("hash" in transaction) {
-            return new TransactionsConverter().transactionOnNetworkToOutcome(transaction);
-        }
-
-        return transaction;
-    }
-
     private ensureNoError(transactionEvents: TransactionEvent[]) {
         for (const event of transactionEvents) {
             if (event.identifier == "signalError") {
-                const data = Buffer.from(event.dataItems[0]?.toString().slice(1)).toString() || "";
+                const data = Buffer.from(event.additionalData[0]?.toString().slice(1)).toString() || "";
                 const message = this.decodeTopicAsString(event.topics[1]);
 
                 throw new ErrParseTransactionOutcome(
@@ -417,7 +366,7 @@ export class TokenManagementTransactionsOutcomeParser {
         if (!event.topics[0]?.length) {
             return "";
         }
-        return this.decodeTopicAsString(event.topics[0]);
+        return event.topics[0].toString();
     }
 
     private extractNonce(event: TransactionEvent): bigint {
@@ -441,7 +390,7 @@ export class TokenManagementTransactionsOutcomeParser {
             return "";
         }
         const address = Buffer.from(event.topics[3]);
-        return Address.fromBuffer(address).bech32();
+        return new Address(address).toBech32();
     }
 
     private decodeTopicAsString(topic: Uint8Array): string {

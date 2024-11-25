@@ -1,21 +1,16 @@
 import { assert } from "chai";
-import { TransactionsConverter } from "../converters/transactionsConverter";
 import { createDevnetProvider } from "../testutils/networkProviders";
 import { SmartContractTransactionsOutcomeParser } from "./smartContractTransactionsOutcomeParser";
 
 describe("test smart contract transactions outcome parser on devnet", () => {
     const networkProvider = createDevnetProvider();
     const parser = new SmartContractTransactionsOutcomeParser();
-    const transactionsConverter = new TransactionsConverter();
 
     it("should parse outcome of deploy transactions (1)", async () => {
         const transactionHash = "5d2ff2af8eb3fe7f2acb7e29c0436854b4c6c44de02878b6afff582888024a55";
         const transactionOnNetwork = await networkProvider.getTransaction(transactionHash);
-        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
         const parsedGivenTransactionOnNetwork = parser.parseDeploy({ transactionOnNetwork });
-        const parsedGivenTransactionOutcome = parser.parseDeploy({ transactionOutcome });
 
-        assert.deepEqual(parsedGivenTransactionOnNetwork, parsedGivenTransactionOutcome);
         assert.equal(parsedGivenTransactionOnNetwork.returnCode, "ok");
         assert.deepEqual(parsedGivenTransactionOnNetwork.contracts, [
             {
@@ -29,11 +24,8 @@ describe("test smart contract transactions outcome parser on devnet", () => {
     it("should parse outcome of deploy transactions (2)", async () => {
         const transactionHash = "76683e926dad142fc9651afca208487f2a80d327fc87e5c876eec9d028196352";
         const transactionOnNetwork = await networkProvider.getTransaction(transactionHash);
-        const transactionOutcome = transactionsConverter.transactionOnNetworkToOutcome(transactionOnNetwork);
         const parsedGivenTransactionOnNetwork = parser.parseDeploy({ transactionOnNetwork });
-        const parsedGivenTransactionOutcome = parser.parseDeploy({ transactionOutcome });
 
-        assert.deepEqual(parsedGivenTransactionOnNetwork, parsedGivenTransactionOutcome);
         assert.equal(parsedGivenTransactionOnNetwork.returnCode, "execution failed");
         assert.lengthOf(parsedGivenTransactionOnNetwork.contracts, 0);
     });

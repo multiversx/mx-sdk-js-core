@@ -2,12 +2,11 @@ import { AxiosHeaders } from "axios";
 import { assert } from "chai";
 import { Address } from "../address";
 import { MockQuery } from "../testutils/dummyQuery";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { INetworkProvider, ITransactionNext } from "./interface";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { NonFungibleTokenOfAccountOnNetwork } from "./tokens";
-import { TransactionEventData } from "./transactionEvents";
-import { TransactionOnNetwork } from "./transactions";
 
 describe("test network providers on devnet: Proxy and API", function () {
     let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -296,18 +295,21 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.exists(proxyResponse.logs);
         assert.exists(apiResponse.logs.events);
         assert.exists(proxyResponse.logs.events);
-        assert.equal(apiResponse.logs.events[0].topics[0].hex(), "414c4943452d353632376631");
-        assert.equal(apiResponse.logs.events[0].topics[1].hex(), "");
-        assert.equal(apiResponse.logs.events[0].topics[2].hex(), "01");
+        assert.equal(Buffer.from(apiResponse.logs.events[0].topics[0]).toString("hex"), "414c4943452d353632376631");
+        assert.equal(Buffer.from(apiResponse.logs.events[0].topics[1]).toString("hex"), "");
+        assert.equal(Buffer.from(apiResponse.logs.events[0].topics[2]).toString("hex"), "01");
         assert.equal(
-            apiResponse.logs.events[0].topics[3].hex(),
+            Buffer.from(apiResponse.logs.events[0].topics[3]).toString("hex"),
             "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1",
         );
-        assert.equal(proxyResponse.logs.events[0].topics[0].hex(), "414c4943452d353632376631");
-        assert.equal(proxyResponse.logs.events[0].topics[1].hex(), "");
-        assert.equal(proxyResponse.logs.events[0].topics[2].hex(), "01");
         assert.equal(
-            proxyResponse.logs.events[0].topics[3].hex(),
+            Buffer.from(proxyResponse.logs.events[0].topics[0].toString()).toString("hex"),
+            "414c4943452d353632376631",
+        );
+        assert.equal(Buffer.from(proxyResponse.logs.events[0].topics[1].toString()).toString("hex"), "");
+        assert.equal(Buffer.from(proxyResponse.logs.events[0].topics[2].toString()).toString("hex"), "01");
+        assert.equal(
+            Buffer.from(proxyResponse.logs.events[0].topics[3]).toString("hex"),
             "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1",
         );
     });
@@ -403,14 +405,11 @@ describe("test network providers on devnet: Proxy and API", function () {
             "a419271407a2ec217739811805e3a751e30dbc72ae0777e3b4c825f036995184",
         );
 
-        assert.equal(apiResponse.logs.events[0].data, Buffer.from("test").toString());
-        assert.equal(proxyResponse.logs.events[0].data, Buffer.from("test").toString());
+        assert.deepEqual(apiResponse.logs.events[0].data, Buffer.from("dGVzdA==", "base64"));
+        assert.deepEqual(proxyResponse.logs.events[0].data, Buffer.from("dGVzdA==", "base64"));
 
-        assert.deepEqual(apiResponse.logs.events[0].dataPayload, TransactionEventData.fromBase64("dGVzdA=="));
-        assert.deepEqual(proxyResponse.logs.events[0].dataPayload, TransactionEventData.fromBase64("dGVzdA=="));
-
-        assert.deepEqual(apiResponse.logs.events[0].additionalData, [TransactionEventData.fromBase64("dGVzdA==")]);
-        assert.deepEqual(proxyResponse.logs.events[0].additionalData, [TransactionEventData.fromBase64("dGVzdA==")]);
+        assert.deepEqual(apiResponse.logs.events[0].additionalData, [Buffer.from("dGVzdA==", "base64")]);
+        assert.deepEqual(proxyResponse.logs.events[0].additionalData, [Buffer.from("dGVzdA==", "base64")]);
     });
 
     it("should send both `Transaction` and `TransactionNext`", async function () {

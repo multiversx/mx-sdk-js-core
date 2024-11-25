@@ -1,13 +1,11 @@
 import { assert } from "chai";
 import { promises } from "fs";
-import { TransactionsConverter } from "../converters/transactionsConverter";
 import { createMainnetProvider } from "../testutils/networkProviders";
 import { SmartContractTransactionsOutcomeParser } from "./smartContractTransactionsOutcomeParser";
 
 describe("test smart contract transactions outcome parser on mainnet", () => {
     const networkProvider = createMainnetProvider();
     const parser = new SmartContractTransactionsOutcomeParser();
-    const converter = new TransactionsConverter();
 
     it("should parse (execute_success)", async function () {
         this.timeout(3600000);
@@ -19,11 +17,8 @@ describe("test smart contract transactions outcome parser on mainnet", () => {
             console.log(i, hash);
 
             const transactionOnNetwork = await networkProvider.getTransaction(hash);
-            const transactionOutcome = converter.transactionOnNetworkToOutcome(transactionOnNetwork);
-            const parsedOutcomeGivenTransactionOutcome = parser.parseExecute({ transactionOutcome });
             const parsedOutcomeGivenTransactionOnNetwork = parser.parseExecute({ transactionOnNetwork });
 
-            assert.deepEqual(parsedOutcomeGivenTransactionOutcome, parsedOutcomeGivenTransactionOnNetwork);
             assert.equal(parsedOutcomeGivenTransactionOnNetwork.returnCode, "ok");
             assert.equal(parsedOutcomeGivenTransactionOnNetwork.returnMessage, "ok");
         }
@@ -39,11 +34,8 @@ describe("test smart contract transactions outcome parser on mainnet", () => {
             console.log(i, hash);
 
             const transactionOnNetwork = await networkProvider.getTransaction(hash);
-            const transactionOutcome = converter.transactionOnNetworkToOutcome(transactionOnNetwork);
-            const parsedOutcomeGivenTransactionOutcome = parser.parseExecute({ transactionOutcome });
             const parsedOutcomeGivenTransactionOnNetwork = parser.parseExecute({ transactionOnNetwork });
 
-            assert.deepEqual(parsedOutcomeGivenTransactionOutcome, parsedOutcomeGivenTransactionOnNetwork);
             assert.isTrue(parsedOutcomeGivenTransactionOnNetwork.returnCode.length > 0);
             assert.isTrue(parsedOutcomeGivenTransactionOnNetwork.returnMessage.length > 0);
             assert.lengthOf(parsedOutcomeGivenTransactionOnNetwork.values, 0);
@@ -60,11 +52,8 @@ describe("test smart contract transactions outcome parser on mainnet", () => {
             console.log(i, hash);
 
             const transactionOnNetwork = await networkProvider.getTransaction(hash);
-            const transactionOutcome = converter.transactionOnNetworkToOutcome(transactionOnNetwork);
-            const parsedOutcomeGivenTransactionOutcome = parser.parseExecute({ transactionOutcome });
             const parsedOutcomeGivenTransactionOnNetwork = parser.parseExecute({ transactionOnNetwork });
 
-            assert.deepEqual(parsedOutcomeGivenTransactionOutcome, parsedOutcomeGivenTransactionOnNetwork);
             assert.equal(parsedOutcomeGivenTransactionOnNetwork.returnCode, "ok");
             assert.equal(parsedOutcomeGivenTransactionOnNetwork.returnMessage, "ok");
         }
@@ -80,11 +69,8 @@ describe("test smart contract transactions outcome parser on mainnet", () => {
             console.log(i, hash);
 
             const transactionOnNetwork = await networkProvider.getTransaction(hash);
-            const transactionOutcome = converter.transactionOnNetworkToOutcome(transactionOnNetwork);
-            const parsedOutcomeGivenTransactionOutcome = parser.parseExecute({ transactionOutcome });
             const parsedOutcomeGivenTransactionOnNetwork = parser.parseExecute({ transactionOnNetwork });
 
-            assert.deepEqual(parsedOutcomeGivenTransactionOutcome, parsedOutcomeGivenTransactionOnNetwork);
             assert.isTrue(parsedOutcomeGivenTransactionOnNetwork.returnCode.length > 0);
             assert.isTrue(parsedOutcomeGivenTransactionOnNetwork.returnMessage.length > 0);
             assert.lengthOf(parsedOutcomeGivenTransactionOnNetwork.values, 0);
@@ -136,11 +122,8 @@ describe("test smart contract transactions outcome parser on mainnet", () => {
             console.log(i, hash);
 
             const transactionOnNetwork = await networkProvider.getTransaction(hash);
-            const transactionOutcome = converter.transactionOnNetworkToOutcome(transactionOnNetwork);
-            const parsedOutcomeGivenTransactionOutcome = parser.parseExecute({ transactionOutcome });
             const parsedOutcomeGivenTransactionOnNetwork = parser.parseExecute({ transactionOnNetwork });
 
-            assert.deepEqual(parsedOutcomeGivenTransactionOutcome, parsedOutcomeGivenTransactionOnNetwork);
             assert.equal(parsedOutcomeGivenTransactionOnNetwork.returnCode, "ok");
             assert.equal(parsedOutcomeGivenTransactionOnNetwork.returnMessage, "ok");
             assert.lengthOf(parsedOutcomeGivenTransactionOnNetwork.values, 0);

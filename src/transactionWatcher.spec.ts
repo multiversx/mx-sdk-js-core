@@ -1,7 +1,8 @@
 import { assert } from "chai";
-import { TransactionOnNetwork, TransactionStatus } from "./networkProviders";
 import { MarkCompleted, MockNetworkProvider, Wait } from "./testutils";
 import { TransactionHash } from "./transaction";
+import { TransactionOnNetwork } from "./transactionOnNetwork";
+import { TransactionStatus } from "./transactionStatus";
 import { TransactionWatcher } from "./transactionWatcher";
 
 describe("test transactionWatcher", () => {

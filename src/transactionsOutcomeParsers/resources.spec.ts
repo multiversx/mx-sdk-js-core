@@ -1,16 +1,12 @@
 import { assert } from "chai";
-import {
-    SmartContractResult,
-    TransactionEvent,
-    TransactionLogs,
-    TransactionOutcome,
-    findEventsByFirstTopic,
-    findEventsByIdentifier,
-} from "./resources";
+import { TransactionEvent } from "../transactionEvents";
+import { TransactionLogs } from "../transactionLogs";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { findEventsByFirstTopic, findEventsByIdentifier, SmartContractResult } from "./resources";
 
 describe("test resources", () => {
     it("finds events by identifier, by first topic", async function () {
-        const outcome = new TransactionOutcome({
+        const outcome = new TransactionOnNetwork({
             logs: new TransactionLogs({
                 events: [
                     new TransactionEvent({

@@ -2,11 +2,11 @@ import { AbiRegistry } from "../abi";
 import { IAccount } from "../accounts/interfaces";
 import { QueryRunnerAdapter } from "../adapters";
 import { IAddress } from "../interface";
-import { ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { INetworkProvider } from "../networkProviders/interface";
 import { SmartContractQueriesController } from "../smartContractQueriesController";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
@@ -89,7 +89,7 @@ export class SmartContractController {
         });
     }
 
-    parseDeploy(transactionOnNetwork: ITransactionOnNetwork): resources.SmartContractDeployOutcome {
+    parseDeploy(transactionOnNetwork: TransactionOnNetwork): resources.SmartContractDeployOutcome {
         return this.parser.parseDeploy({ transactionOnNetwork });
     }
 }

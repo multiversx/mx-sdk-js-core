@@ -1,5 +1,5 @@
 import { ITransaction as ITransactionAsInSpecs } from "../interface";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { AccountOnNetwork } from "./accounts";
 import { ContractQueryResponse } from "./contractQueryResponse";

@@ -116,3 +116,5 @@ export type MintNftOutput = {
     nonce: bigint;
     initialQuantity: bigint;
 };
+
+export type EsdtOutput = { tokenIdentifier: string };

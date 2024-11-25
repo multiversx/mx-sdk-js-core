@@ -4,7 +4,7 @@ import { ErrParseTransactionOutcome } from "../errors";
 import { b64TopicsToBytes } from "../testutils";
 import { TransactionEvent } from "../transactionEvents";
 import { TransactionLogs } from "../transactionLogs";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { TokenManagementTransactionsOutcomeParser } from "./tokenManagementTransactionsOutcomeParser";
 
@@ -21,11 +21,11 @@ describe("test token management transactions outcome parser", () => {
         });
 
         const logs = new TransactionLogs({ events: [event] });
-        const txOutcome = new TransactionOnNetwork({ logs: logs });
+        const transaction = new TransactionOnNetwork({ logs: logs });
 
         assert.throws(
             () => {
-                parser.parseIssueFungible(txOutcome);
+                parser.parseIssueFungible(transaction);
             },
             ErrParseTransactionOutcome,
             "encountered signalError: ticker name is not valid (user error)",
@@ -48,9 +48,9 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({ logs: logs });
+        const transaction = new TransactionOnNetwork({ logs: logs });
 
-        const outcome = parser.parseIssueFungible(txOutcome);
+        const outcome = parser.parseIssueFungible(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].tokenIdentifier, identifier);
     });
@@ -92,9 +92,9 @@ describe("test token management transactions outcome parser", () => {
             events: [firstEvent, secondEvent, thirdEvent],
         });
 
-        const txOutcome = new TransactionOnNetwork({ logs: logs });
+        const transaction = new TransactionOnNetwork({ logs: logs });
 
-        const outcome = parser.parseIssueNonFungible(txOutcome);
+        const outcome = parser.parseIssueNonFungible(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].tokenIdentifier, identifier);
     });
@@ -115,9 +115,9 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({ logs: logs });
+        const transaction = new TransactionOnNetwork({ logs: logs });
 
-        const outcome = parser.parseIssueSemiFungible(txOutcome);
+        const outcome = parser.parseIssueSemiFungible(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].tokenIdentifier, identifier);
     });
@@ -138,9 +138,9 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({ logs: logs });
+        const transaction = new TransactionOnNetwork({ logs: logs });
 
-        const outcome = parser.parseRegisterMetaEsdt(txOutcome);
+        const outcome = parser.parseRegisterMetaEsdt(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].tokenIdentifier, identifier);
     });
@@ -202,12 +202,12 @@ describe("test token management transactions outcome parser", () => {
             logs: resultLogs,
         });
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             smartContractResults: [scResult],
             logs: transactionLogs,
         });
 
-        const outcome = parser.parseRegisterAndSetAllRoles(txOutcome);
+        const outcome = parser.parseRegisterAndSetAllRoles(transaction);
         assert.lengthOf(outcome, 2);
 
         assert.equal(outcome[0].tokenIdentifier, firstIdentifier);
@@ -241,11 +241,11 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             logs: transactionLogs,
         });
 
-        const outcome = parser.parseSetSpecialRole(txOutcome);
+        const outcome = parser.parseSetSpecialRole(transaction);
         assert.lengthOf(outcome, 1);
         assert.deepEqual(
             outcome[0].userAddress,
@@ -278,11 +278,11 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             logs: transactionLogs,
         });
 
-        const outcome = parser.parseNftCreate(txOutcome);
+        const outcome = parser.parseNftCreate(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].tokenIdentifier, identifier);
         assert.equal(outcome[0].nonce, nonce);
@@ -307,11 +307,11 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             logs: transactionLogs,
         });
 
-        const outcome = parser.parseLocalMint(txOutcome);
+        const outcome = parser.parseLocalMint(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].userAddress, event.address);
         assert.equal(outcome[0].tokenIdentifier, identifier);
@@ -337,11 +337,11 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             logs: transactionLogs,
         });
 
-        const outcome = parser.parseLocalBurn(txOutcome);
+        const outcome = parser.parseLocalBurn(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].userAddress, event.address);
         assert.equal(outcome[0].tokenIdentifier, identifier);
@@ -365,11 +365,11 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             logs: transactionLogs,
         });
 
-        const outcome = parser.parsePause(txOutcome);
+        const outcome = parser.parsePause(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].tokenIdentifier, identifier);
     });
@@ -390,11 +390,11 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             logs: transactionLogs,
         });
 
-        const outcome = parser.parseUnpause(txOutcome);
+        const outcome = parser.parseUnpause(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].tokenIdentifier, identifier);
     });
@@ -427,11 +427,11 @@ describe("test token management transactions outcome parser", () => {
             }),
         ];
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             smartContractResults: scResult,
         });
 
-        const outcome = parser.parseFreeze(txOutcome);
+        const outcome = parser.parseFreeze(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].userAddress, address);
         assert.equal(outcome[0].tokenIdentifier, identifier);
@@ -467,11 +467,11 @@ describe("test token management transactions outcome parser", () => {
             }),
         ];
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             smartContractResults: scResult,
         });
 
-        const outcome = parser.parseUnfreeze(txOutcome);
+        const outcome = parser.parseUnfreeze(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].userAddress, address);
         assert.equal(outcome[0].tokenIdentifier, identifier);
@@ -507,9 +507,9 @@ describe("test token management transactions outcome parser", () => {
             }),
         ];
 
-        const txOutcome = new TransactionOnNetwork({ smartContractResults: scResult });
+        const transaction = new TransactionOnNetwork({ smartContractResults: scResult });
 
-        const outcome = parser.parseWipe(txOutcome);
+        const outcome = parser.parseWipe(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].userAddress, address);
         assert.equal(outcome[0].tokenIdentifier, identifier);
@@ -536,11 +536,11 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             logs: transactionLogs,
         });
 
-        const outcome = parser.parseUpdateAttributes(txOutcome);
+        const outcome = parser.parseUpdateAttributes(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].tokenIdentifier, identifier);
         assert.equal(outcome[0].nonce, nonce);
@@ -565,11 +565,11 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             logs: transactionLogs,
         });
 
-        const outcome = parser.parseAddQuantity(txOutcome);
+        const outcome = parser.parseAddQuantity(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].tokenIdentifier, identifier);
         assert.equal(outcome[0].nonce, nonce);
@@ -594,11 +594,11 @@ describe("test token management transactions outcome parser", () => {
             events: [event],
         });
 
-        const txOutcome = new TransactionOnNetwork({
+        const transaction = new TransactionOnNetwork({
             logs: transactionLogs,
         });
 
-        const outcome = parser.parseBurnQuantity(txOutcome);
+        const outcome = parser.parseBurnQuantity(transaction);
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].tokenIdentifier, identifier);
         assert.equal(outcome[0].nonce, nonce);

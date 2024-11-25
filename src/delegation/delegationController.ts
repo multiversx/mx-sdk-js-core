@@ -2,7 +2,7 @@ import { IAccount } from "../accounts/interfaces";
 import { INetworkProvider } from "../networkProviders/interface";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";

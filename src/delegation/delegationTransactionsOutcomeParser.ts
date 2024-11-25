@@ -1,7 +1,7 @@
 import { Address } from "../address";
 import { ErrParseTransactionOutcome } from "../errors";
 import { TransactionEvent } from "../transactionEvents";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { findEventsByIdentifier } from "../transactionsOutcomeParsers/resources";
 
 export class DelegationTransactionsOutcomeParser {
@@ -33,7 +33,7 @@ export class DelegationTransactionsOutcomeParser {
             return "";
         }
         const address = Buffer.from(event.topics[0]);
-        return new Address(address).bech32();
+        return new Address(address).toBech32();
     }
 
     private decodeTopicAsString(topic: Uint8Array): string {

@@ -2,7 +2,7 @@ import { IAccount } from "../accounts/interfaces";
 import { INetworkProvider } from "../networkProviders/interface";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TokenManagementTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import { TransactionWatcher } from "../transactionWatcher";
@@ -37,12 +37,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedIssueFungible(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedIssueFungible(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseIssueFungible(transaction);
     }
 
-    parseIssueFungible(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseIssueFungible(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseIssueFungible(transactionOnNetwork);
     }
 
@@ -59,12 +59,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedIssueSemiFungible(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedIssueSemiFungible(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseIssueSemiFungible(transaction);
     }
 
-    parseIssueSemiFungible(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseIssueSemiFungible(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseIssueSemiFungible(transactionOnNetwork);
     }
 
@@ -81,12 +81,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedIssueNonFungible(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedIssueNonFungible(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseIssueNonFungible(transaction);
     }
 
-    parseIssueNonFungible(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseIssueNonFungible(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseIssueNonFungible(transactionOnNetwork);
     }
 
@@ -103,12 +103,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedRegisterMetaEsdt(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedRegisterMetaEsdt(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseRegisterMetaEsdt(transaction);
     }
 
-    parseRegisterMetaEsdt(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseRegisterMetaEsdt(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseRegisterMetaEsdt(transactionOnNetwork);
     }
 
@@ -125,12 +125,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedRegisterAndSettingRoles(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedRegisterAndSettingRoles(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseRegisterAndSetAllRoles(transaction);
     }
 
-    parseRegisterAndSetAllRoles(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseRegisterAndSetAllRoles(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseRegisterMetaEsdt(transactionOnNetwork);
     }
 
@@ -285,12 +285,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedPause(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedPause(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parsePause(transaction);
     }
 
-    parsePause(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parsePause(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parsePause(transactionOnNetwork);
     }
 
@@ -307,12 +307,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedUnpause(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedUnpause(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseUnpause(transaction);
     }
 
-    parseUnpause(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseUnpause(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseUnpause(transactionOnNetwork);
     }
 
@@ -329,12 +329,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedFreeze(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedFreeze(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseFreeze(transaction);
     }
 
-    parseFreeze(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseFreeze(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseFreeze(transactionOnNetwork);
     }
 
@@ -351,12 +351,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedUnfreeze(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedUnfreeze(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseUnfreeze(transaction);
     }
 
-    parseUnfreeze(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseUnfreeze(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseUnfreeze(transactionOnNetwork);
     }
 
@@ -373,12 +373,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedWipe(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedWipe(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parser.parseWipe(transaction);
     }
 
-    parseWipe(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseWipe(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseWipe(transactionOnNetwork);
     }
 
@@ -395,12 +395,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedLocalMint(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedLocalMint(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseLocalMint(transaction);
     }
 
-    parseLocalMint(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseLocalMint(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseLocalMint(transactionOnNetwork);
     }
 
@@ -417,12 +417,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompleteLocalBurn(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompleteLocalBurn(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseLocalBurn(transaction);
     }
 
-    parseLocalBurn(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseLocalBurn(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseLocalBurn(transactionOnNetwork);
     }
 
@@ -439,12 +439,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedUpdateAttributes(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedUpdateAttributes(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseUpdateAttributes(transaction);
     }
 
-    parseUpdateAttributes(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseUpdateAttributes(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseUpdateAttributes(transactionOnNetwork);
     }
 
@@ -461,12 +461,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedAddQuantity(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedAddQuantity(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseAddQuantity(transaction);
     }
 
-    parseAddQuantity(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseAddQuantity(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseAddQuantity(transactionOnNetwork);
     }
 
@@ -483,12 +483,12 @@ export class TokenManagementController {
         return transaction;
     }
 
-    async awaitCompletedBurnQuantity(txHash: string): Promise<{ tokenIdentifier: string }[]> {
+    async awaitCompletedBurnQuantity(txHash: string): Promise<resources.EsdtOutput[]> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.parseBurnQuantity(transaction);
     }
 
-    parseBurnQuantity(transactionOnNetwork: TransactionOnNetwork): { tokenIdentifier: string }[] {
+    parseBurnQuantity(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseBurnQuantity(transactionOnNetwork);
     }
 }

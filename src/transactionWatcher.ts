@@ -10,7 +10,7 @@ import { ITransactionFetcher } from "./interface";
 import { ITransactionStatus } from "./interfaceOfNetwork";
 import { Logger } from "./logger";
 import { TransactionEvent } from "./transactionEvents";
-import { TransactionOnNetwork } from "./transactions";
+import { TransactionOnNetwork } from "./transactionOnNetwork";
 
 export type PredicateIsAwaitedStatus = (status: ITransactionStatus) => boolean;
 
@@ -224,7 +224,7 @@ export class TransactionWatcher {
         const result = [...transaction.logs.events];
 
         for (const resultItem of transaction.smartContractResults) {
-            result.push(...resultItem.logs.events);
+            result.push(...resultItem.logs?.events);
         }
 
         return result;

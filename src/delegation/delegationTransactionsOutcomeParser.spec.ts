@@ -3,7 +3,7 @@ import { Address } from "../address";
 import { b64TopicsToBytes } from "../testutils";
 import { TransactionEvent } from "../transactionEvents";
 import { TransactionLogs } from "../transactionLogs";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { DelegationTransactionsOutcomeParser } from "./delegationTransactionsOutcomeParser";
 
@@ -59,9 +59,9 @@ describe("test delegation transactions outcome parser", () => {
             ),
             logs: scResultLog,
         });
-        const txOutcome = new TransactionOnNetwork({ smartContractResults: [scResult], logs: logs });
+        const transaction = new TransactionOnNetwork({ smartContractResults: [scResult], logs: logs });
 
-        const outcome = parser.parseCreateNewDelegationContract(txOutcome);
+        const outcome = parser.parseCreateNewDelegationContract(transaction);
 
         assert.lengthOf(outcome, 1);
         assert.equal(outcome[0].contractAddress, contractAddress.toBech32());

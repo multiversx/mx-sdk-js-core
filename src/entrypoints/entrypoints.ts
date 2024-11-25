@@ -11,7 +11,7 @@ import { SmartContractController } from "../smartContracts/smartContractControll
 import { TokenManagementController } from "../tokenManagement";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionWatcher } from "../transactionWatcher";
 import { TransfersController } from "../transfers/transfersControllers";
 import { UserVerifier } from "../wallet";

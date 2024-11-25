@@ -6,7 +6,7 @@ import { ErrMock } from "../errors";
 import { IAddress } from "../interface";
 import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionStatus } from "../interfaceOfNetwork";
 import { Transaction, TransactionHash } from "../transaction";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { TransactionStatus } from "../transactionStatus";
 import { createAccountBalance } from "./utils";

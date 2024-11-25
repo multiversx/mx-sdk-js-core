@@ -1,7 +1,7 @@
 import { Address } from "../address";
 import { TransactionEvent } from "../transactionEvents";
 import { TransactionLogs } from "../transactionLogs";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 
 export class SmartContractResult {
     raw: Record<string, any>;

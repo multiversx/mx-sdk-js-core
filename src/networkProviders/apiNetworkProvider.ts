@@ -1,5 +1,5 @@
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
-import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "../transactions";
+import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { getAxios } from "../utils";
 import { numberToPaddedHex } from "../utils.codec";

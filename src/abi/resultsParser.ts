@@ -8,7 +8,7 @@ import { IContractQueryResponse } from "../interfaceOfNetwork";
 import { Logger } from "../logger";
 import { TransactionEvent } from "../transactionEvents";
 import { TransactionLogs } from "../transactionLogs";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { ArgSerializer } from "./argSerializer";
 import { TypedOutcomeBundle, UntypedOutcomeBundle } from "./interface";

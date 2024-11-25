@@ -3,7 +3,7 @@ import { Address } from "../address";
 import { ARGUMENTS_SEPARATOR } from "../constants";
 import { Err } from "../errors";
 import { TransactionEvent } from "../transactionEvents";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractCallOutcome, SmartContractResult } from "../transactionsOutcomeParsers/resources";
 
 enum Events {

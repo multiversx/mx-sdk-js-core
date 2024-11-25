@@ -22,7 +22,7 @@ export class TransactionEvent {
         let result = new TransactionEvent();
         result.address = new Address(responsePart.address);
         result.identifier = responsePart.identifier || "";
-        result.topics = (responsePart.topics || []).map((topic) => Buffer.from(topic));
+        result.topics = (responsePart.topics || []).map((topic) => Buffer.from(topic, "base64"));
 
         result.data = Buffer.from(responsePart.data ?? "", "base64");
 

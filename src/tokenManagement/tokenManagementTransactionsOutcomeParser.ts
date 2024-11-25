@@ -2,7 +2,7 @@ import { bufferToBigInt } from "../abi/codec/utils";
 import { Address } from "../address";
 import { ErrParseTransactionOutcome } from "../errors";
 import { TransactionEvent } from "../transactionEvents";
-import { TransactionOnNetwork } from "../transactions";
+import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { findEventsByIdentifier } from "../transactionsOutcomeParsers/resources";
 import { MintNftOutput, SpecialRoleOutput } from "./resources";
 
@@ -390,7 +390,7 @@ export class TokenManagementTransactionsOutcomeParser {
             return "";
         }
         const address = Buffer.from(event.topics[3]);
-        return new Address(address).bech32();
+        return new Address(address).toBech32();
     }
 
     private decodeTopicAsString(topic: Uint8Array): string {

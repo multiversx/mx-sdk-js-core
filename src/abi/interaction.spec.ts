@@ -237,7 +237,6 @@ describe("test smart contract interactor", function () {
                 value: BigInt(interactionQuery.value.toString()),
             }),
         );
-        console.log(22222, response);
         assert.isTrue(response.length == 1);
         assert.deepEqual(response[0], new BigNumber(42));
 
@@ -271,7 +270,6 @@ describe("test smart contract interactor", function () {
         let hash = await provider.sendTransaction(transaction);
         let responseExecute = await controller.awaitCompletedExecute(hash);
 
-        console.log(responseExecute, responseExecute.values[0]!.valueOf());
         assert.isTrue(responseExecute.values.length == 1);
         assert.deepEqual(responseExecute.values[0], new BigNumber(43));
         assert.isTrue(responseExecute.returnCode == "ok");
@@ -407,7 +405,6 @@ describe("test smart contract interactor", function () {
         hash = await provider.sendTransaction(startTransaction);
         response = await controller.awaitCompletedExecute(hash);
 
-        console.log({ response });
         assert.equal(statusTransaction.getData().toString(), "status@6c75636b79");
         assert.isTrue(response.returnCode == "ok");
         assert.isTrue(response.values.length == 1);

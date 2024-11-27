@@ -17,7 +17,7 @@ import { Interaction } from "./interaction";
 import { SmartContract } from "./smartContract";
 import { ManagedDecimalSignedValue, ManagedDecimalValue } from "./typesystem";
 
-describe("test smart contract interactor", function () {
+describe.only("test smart contract interactor", function () {
     let provider = createLocalnetProvider();
     let alice: TestWallet;
 

@@ -91,7 +91,6 @@ export class SmartContractTransactionsOutcomeParser {
         functionName?: string,
     ): resources.ParsedSmartContractCallOutcome {
         const directCallOutcome = this.findDirectSmartContractCallOutcome(transactionOnNetwork);
-        console.log({ directCallOutcome, abi: this.abi });
         if (!this.abi) {
             return {
                 values: directCallOutcome.returnDataParts,

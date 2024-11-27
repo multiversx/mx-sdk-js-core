@@ -154,7 +154,7 @@ export class SmartContractTransactionsOutcomeParser {
 
         for (const result of transactionOnNetwork.smartContractResults) {
             const matchesCriteriaOnData = result.data.toString().startsWith(ARGUMENTS_SEPARATOR);
-            const matchesCriteriaOnReceiver = result.receiver.bech32() === transactionOnNetwork.sender.bech32();
+            const matchesCriteriaOnReceiver = result.receiver.toBech32() === transactionOnNetwork.sender.toBech32();
             const matchesCriteriaOnPreviousHash = result;
 
             const matchesCriteria = matchesCriteriaOnData && matchesCriteriaOnReceiver && matchesCriteriaOnPreviousHash;

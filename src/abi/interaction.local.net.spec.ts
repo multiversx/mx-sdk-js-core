@@ -584,7 +584,7 @@ describe("test smart contract interactor", function () {
         response = await controller.awaitCompletedExecute(lotteryStatusTxHash);
         assert.isTrue(response.returnCode == "ok");
         assert.lengthOf(response.values, 1);
-        assert.equal(response[0].name, "Running");
+        assert.equal(response.values[0].name, "Running");
 
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
         let lotteryInfoTransaction = getLotteryInfoInteraction
@@ -599,7 +599,7 @@ describe("test smart contract interactor", function () {
         assert.lengthOf(response.values, 1);
 
         // Ignore "deadline" field in our test
-        let info = response[0].valueOf();
+        let info = response.values[0].valueOf();
         delete info.deadline;
 
         assert.deepEqual(info, {

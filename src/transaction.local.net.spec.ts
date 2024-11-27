@@ -1,8 +1,9 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Logger } from "./logger";
+import { INetworkProvider } from "./networkProviders/interface";
 import { loadTestWallets, TestWallet } from "./testutils";
-import { createLocalnetProvider, INetworkProvider } from "./testutils/networkProviders";
+import { createLocalnetProvider } from "./testutils/networkProviders";
 import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionComputer } from "./transactionComputer";

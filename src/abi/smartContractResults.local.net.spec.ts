@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { promises } from "fs";
-import { SmartContractTransactionsFactory } from "../smartContracts";
+import { SmartContractTransactionsFactory, SmartContractTransactionsOutcomeParser } from "../smartContracts";
 import { loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { TransactionComputer } from "../transactionComputer";
@@ -13,6 +13,7 @@ describe("fetch transactions from local testnet", function () {
     let alice: TestWallet;
     let provider = createLocalnetProvider();
     let watcher: TransactionWatcher;
+    let parser: SmartContractTransactionsOutcomeParser;
 
     before(async function () {
         ({ alice } = await loadTestWallets());
@@ -21,6 +22,8 @@ describe("fetch transactions from local testnet", function () {
                 return await provider.getTransaction(hash);
             },
         });
+
+        parser = new SmartContractTransactionsOutcomeParser();
     });
 
     it("counter smart contract", async function () {
@@ -67,11 +70,11 @@ describe("fetch transactions from local testnet", function () {
         const transactionOnNetworkDeploy = await provider.getTransaction(txHashDeploy);
         const transactionOnNetworkIncrement = await provider.getTransaction(txHashIncrement);
 
-        let bundle = resultsParser.parseUntypedOutcome(transactionOnNetworkDeploy);
-        assert.isTrue(bundle.returnCode.isSuccess());
+        let response = parser.parseExecute({ transactionOnNetwork: transactionOnNetworkDeploy });
+        assert.isTrue(response.returnCode == "ok");
 
-        bundle = resultsParser.parseUntypedOutcome(transactionOnNetworkIncrement);
-        assert.isTrue(bundle.returnCode.isSuccess());
+        response = parser.parseExecute({ transactionOnNetwork: transactionOnNetworkIncrement });
+        assert.isTrue(response.returnCode == "ok");
     });
 
     it("interact with counter smart contract using SmartContractTransactionsFactory", async function () {
@@ -124,10 +127,10 @@ describe("fetch transactions from local testnet", function () {
         let transactionOnNetworkDeploy = await provider.getTransaction(deployTxHash);
         let transactionOnNetworkIncrement = await provider.getTransaction(callTxHash);
 
-        let bundle = resultsParser.parseUntypedOutcome(transactionOnNetworkDeploy);
-        assert.isTrue(bundle.returnCode.isSuccess());
+        let response = parser.parseExecute({ transactionOnNetwork: transactionOnNetworkDeploy });
+        assert.isTrue(response.returnCode == "ok");
 
-        bundle = resultsParser.parseUntypedOutcome(transactionOnNetworkIncrement);
-        assert.isTrue(bundle.returnCode.isSuccess());
+        response = parser.parseExecute({ transactionOnNetwork: transactionOnNetworkIncrement });
+        assert.isTrue(response.returnCode == "ok");
     });
 });

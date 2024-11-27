@@ -9,7 +9,6 @@ require("./globals");
 export * from "./abi";
 export * from "./accountManagement";
 export * from "./accounts";
-export * from "./adapters";
 export * from "./address";
 export * from "./asyncTimer";
 export * from "./config";

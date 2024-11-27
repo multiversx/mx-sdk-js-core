@@ -15,7 +15,6 @@ export class ContractQueryRequest {
         request.funcName = query.function;
         request.value = query.value ? query.value.toString() : undefined;
         request.args = query.arguments?.map((x) => Buffer.from(x).toString("hex"));
-        console.log({ request });
         return request;
     }
 }

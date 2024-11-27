@@ -1,30 +1,28 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { promises } from "fs";
-import { QueryRunnerAdapter } from "../adapters/queryRunnerAdapter";
-import { SmartContractQueriesController } from "../smartContractQueriesController";
-import { SmartContractTransactionsFactory } from "../smartContracts";
+import { SmartContractQueryInput } from "../smartContractQuery";
+import {
+    SmartContractController,
+    SmartContractTransactionsFactory,
+    SmartContractTransactionsOutcomeParser,
+} from "../smartContracts";
 import { loadAbiRegistry, loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
-import { ContractController } from "../testutils/contractController";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { Interaction } from "./interaction";
-import { ResultsParser } from "./resultsParser";
-import { ReturnCode } from "./returnCode";
 import { SmartContract } from "./smartContract";
 import { ManagedDecimalSignedValue, ManagedDecimalValue } from "./typesystem";
 
 describe("test smart contract interactor", function () {
     let provider = createLocalnetProvider();
     let alice: TestWallet;
-    let resultsParser: ResultsParser;
 
     before(async function () {
         ({ alice } = await loadTestWallets());
-        resultsParser = new ResultsParser();
     });
 
     it("should interact with 'answer' (local testnet)", async function () {
@@ -32,7 +30,11 @@ describe("test smart contract interactor", function () {
 
         let abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
         let contract = new SmartContract({ abi: abiRegistry });
-        let controller = new ContractController(provider);
+        let controller = new SmartContractController({
+            chainID: "localnet",
+            networkProvider: provider,
+            abi: abiRegistry,
+        });
 
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
@@ -47,10 +49,9 @@ describe("test smart contract interactor", function () {
             chainID: network.ChainID,
         });
 
-        let {
-            bundle: { returnCode },
-        } = await controller.deploy(deployTransaction);
-        assert.isTrue(returnCode.isSuccess());
+        let deployTxHash = await provider.sendTransaction(deployTransaction);
+        let deployResponse = await controller.awaitCompletedDeploy(deployTxHash);
+        assert.isTrue(deployResponse.returnCode == "ok");
 
         const interaction = <Interaction>(
             contract.methods
@@ -59,12 +60,20 @@ describe("test smart contract interactor", function () {
                 .withChainID(network.ChainID)
                 .withSender(alice.address)
         );
+        const interactionQuery = interaction.buildQuery();
 
         // Query
-        let queryResponseBundle = await controller.query(interaction);
-        assert.lengthOf(queryResponseBundle.values, 1);
-        assert.deepEqual(queryResponseBundle.firstValue!.valueOf(), new BigNumber(42));
-        assert.isTrue(queryResponseBundle.returnCode.equals(ReturnCode.Ok));
+        const queryResponse = await controller.query(
+            new SmartContractQueryInput({
+                contract: interactionQuery.address,
+                arguments: interactionQuery.getEncodedArguments(),
+                function: interactionQuery.func.toString(),
+                caller: interactionQuery.caller,
+                value: BigInt(interactionQuery.value.toString()),
+            }),
+        );
+        assert.lengthOf(queryResponse, 1);
+        assert.deepEqual(queryResponse[0]!.valueOf(), new BigNumber(42));
 
         // Execute, do not wait for execution
         let transaction = interaction
@@ -79,11 +88,11 @@ describe("test smart contract interactor", function () {
         transaction = interaction.withSender(alice.address).useThenIncrementNonceOf(alice.account).buildTransaction();
 
         await signTransaction({ transaction: transaction, wallet: alice });
-        let { bundle: executionResultsBundle } = await controller.execute(interaction, transaction);
-
-        assert.lengthOf(executionResultsBundle.values, 1);
-        assert.deepEqual(executionResultsBundle.firstValue!.valueOf(), new BigNumber(42));
-        assert.isTrue(executionResultsBundle.returnCode.equals(ReturnCode.Ok));
+        let txHash = await provider.sendTransaction(transaction);
+        let response = await controller.awaitCompletedExecute(txHash);
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 1);
+        assert.deepEqual(response.values[0], new BigNumber(42));
     });
 
     it("should interact with 'answer' (local testnet) using the SmartContractTransactionsFactory", async function () {
@@ -123,16 +132,20 @@ describe("test smart contract interactor", function () {
         });
 
         const deployTxHash = await provider.sendTransaction(deployTransaction);
-        let transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(deployTxHash);
-        const untypedBundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
-        assert.isTrue(untypedBundle.returnCode.isSuccess());
 
-        const queryRunner = new QueryRunnerAdapter({ networkProvider: provider });
-        const queryController = new SmartContractQueriesController({ abi: abiRegistry, queryRunner: queryRunner });
+        const queryController = new SmartContractController({
+            chainID: "localnet",
+            networkProvider: provider,
+            abi: abiRegistry,
+        });
+
+        let transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(deployTxHash);
+        let response = queryController.parseExecute(transactionOnNetwork);
+        assert.isTrue(response.returnCode == "ok");
 
         const query = queryController.createQuery({
-            contract: contractAddress.bech32(),
-            caller: alice.address.bech32(),
+            contract: contractAddress,
+            caller: alice.address,
             function: "getUltimateAnswer",
             arguments: [],
         });
@@ -172,14 +185,11 @@ describe("test smart contract interactor", function () {
 
         const executeTxHash = await provider.sendTransaction(transaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(executeTxHash);
-        const typedBundle = resultsParser.parseOutcome(
-            transactionOnNetwork,
-            abiRegistry.getEndpoint("getUltimateAnswer"),
-        );
+        response = queryController.parseExecute(transactionOnNetwork);
 
-        assert.lengthOf(typedBundle.values, 1);
-        assert.deepEqual(typedBundle.firstValue!.valueOf(), new BigNumber(42));
-        assert.isTrue(typedBundle.returnCode.equals(ReturnCode.Ok));
+        assert.isTrue(response.values.length == 1);
+        assert.deepEqual(response.values[0], new BigNumber(42));
+        assert.isTrue(response.returnCode == "ok");
     });
 
     it("should interact with 'basic-features' (local testnet)", async function () {
@@ -187,7 +197,11 @@ describe("test smart contract interactor", function () {
 
         let abiRegistry = await loadAbiRegistry("src/testdata/basic-features.abi.json");
         let contract = new SmartContract({ abi: abiRegistry });
-        let controller = new ContractController(provider);
+        let controller = new SmartContractController({
+            chainID: "localnet",
+            networkProvider: provider,
+            abi: abiRegistry,
+        });
 
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
@@ -201,11 +215,9 @@ describe("test smart contract interactor", function () {
             initArguments: [],
             chainID: network.ChainID,
         });
-
-        let {
-            bundle: { returnCode },
-        } = await controller.deploy(deployTransaction);
-        assert.isTrue(returnCode.isSuccess());
+        let deployTxHash = await provider.sendTransaction(deployTransaction);
+        let deployResponse = await controller.awaitCompletedDeploy(deployTxHash);
+        assert.isTrue(deployResponse.returnCode == "ok");
 
         let returnEgldInteraction = <Interaction>(
             contract.methods
@@ -280,38 +292,44 @@ describe("test smart contract interactor", function () {
 
         // returnEgld()
         await signTransaction({ transaction: returnEgldTransaction, wallet: alice });
-        let { bundle: bundleEgld } = await controller.execute(returnEgldInteraction, returnEgldTransaction);
-        assert.isTrue(bundleEgld.returnCode.equals(ReturnCode.Ok));
-        assert.lengthOf(bundleEgld.values, 1);
-        assert.deepEqual(bundleEgld.values[0], new ManagedDecimalValue("0.000000000000000001", 18));
+        let txHash = await provider.sendTransaction(returnEgldTransaction);
+        let response = await controller.awaitCompletedExecute(txHash);
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 1);
+        assert.deepEqual(response.values[0], new ManagedDecimalValue("0.000000000000000001", 18));
 
         // addition with const decimals()
         await signTransaction({ transaction: additionTransaction, wallet: alice });
-        let { bundle: bundleAdditionConst } = await controller.execute(additionInteraction, additionTransaction);
-        assert.isTrue(bundleAdditionConst.returnCode.equals(ReturnCode.Ok));
-        assert.lengthOf(bundleAdditionConst.values, 1);
-        assert.deepEqual(bundleAdditionConst.values[0], new ManagedDecimalValue("5.2", 2));
+        txHash = await provider.sendTransaction(additionTransaction);
+        response = await controller.awaitCompletedExecute(txHash);
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 1);
+        assert.deepEqual(response.values[0], new ManagedDecimalValue("5.2", 2));
 
         // log
         await signTransaction({ transaction: mdLnTransaction, wallet: alice });
-        let { bundle: bundleMDLn } = await controller.execute(mdLnInteraction, mdLnTransaction);
-        assert.isTrue(bundleMDLn.returnCode.equals(ReturnCode.Ok));
-        assert.lengthOf(bundleMDLn.values, 1);
-        assert.deepEqual(bundleMDLn.values[0], new ManagedDecimalSignedValue("3.135553845", 9));
+        txHash = await provider.sendTransaction(mdLnTransaction);
+        response = await controller.awaitCompletedExecute(txHash);
+
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 1);
+        assert.deepEqual(response.values[0], new ManagedDecimalSignedValue("3.135553845", 9));
 
         // addition with var decimals
         await signTransaction({ transaction: additionVarTransaction, wallet: alice });
-        let { bundle: bundleAddition } = await controller.execute(additionVarInteraction, additionVarTransaction);
-        assert.isTrue(bundleAddition.returnCode.equals(ReturnCode.Ok));
-        assert.lengthOf(bundleAddition.values, 1);
-        assert.deepEqual(bundleAddition.values[0], new ManagedDecimalValue("9", 2));
+        txHash = await provider.sendTransaction(additionVarTransaction);
+        response = await controller.awaitCompletedExecute(txHash);
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 1);
+        assert.deepEqual(response.values[0], new ManagedDecimalValue("9", 2));
 
         // log
         await signTransaction({ transaction: lnVarTransaction, wallet: alice });
-        let { bundle: bundleLnVar } = await controller.execute(lnVarInteraction, lnVarTransaction);
-        assert.isTrue(bundleLnVar.returnCode.equals(ReturnCode.Ok));
-        assert.lengthOf(bundleLnVar.values, 1);
-        assert.deepEqual(bundleLnVar.values[0], new ManagedDecimalSignedValue("3.135553845", 9));
+        txHash = await provider.sendTransaction(lnVarTransaction);
+        response = await controller.awaitCompletedExecute(txHash);
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 1);
+        assert.deepEqual(response.values[0], new ManagedDecimalSignedValue("3.135553845", 9));
     });
 
     it("should interact with 'counter' (local testnet)", async function () {
@@ -319,7 +337,11 @@ describe("test smart contract interactor", function () {
 
         let abiRegistry = await loadAbiRegistry("src/testdata/counter.abi.json");
         let contract = new SmartContract({ abi: abiRegistry });
-        let controller = new ContractController(provider);
+        let controller = new SmartContractController({
+            chainID: "localnet",
+            networkProvider: provider,
+            abi: abiRegistry,
+        });
 
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
@@ -334,12 +356,11 @@ describe("test smart contract interactor", function () {
             chainID: network.ChainID,
         });
 
-        let {
-            bundle: { returnCode },
-        } = await controller.deploy(deployTransaction);
-        assert.isTrue(returnCode.isSuccess());
+        await provider.sendTransaction(deployTransaction);
+        let hash = await provider.sendTransaction(deployTransaction);
+        let responseExecute = await controller.awaitCompletedExecute(hash);
+        assert.isTrue(responseExecute.returnCode == "ok");
 
-        let getInteraction = <Interaction>contract.methods.get();
         let incrementInteraction = (<Interaction>contract.methods.increment())
             .withGasLimit(3000000)
             .withChainID(network.ChainID)
@@ -350,16 +371,27 @@ describe("test smart contract interactor", function () {
             .withSender(alice.address);
 
         // Query "get()"
-        let { firstValue: counterValue } = await controller.query(getInteraction);
-        assert.deepEqual(counterValue!.valueOf(), new BigNumber(1));
+
+        let interactionQuery = incrementInteraction.buildQuery();
+        let response = await controller.query(
+            new SmartContractQueryInput({
+                contract: interactionQuery.address,
+                arguments: interactionQuery.getEncodedArguments(),
+                function: interactionQuery.func.toString(),
+                caller: interactionQuery.caller,
+                value: BigInt(interactionQuery.value.toString()),
+            }),
+        );
+        assert.deepEqual(response[0]!.valueOf(), new BigNumber(1));
 
         // Increment, wait for execution.
         let incrementTransaction = incrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
         await signTransaction({ transaction: incrementTransaction, wallet: alice });
-        let {
-            bundle: { firstValue: valueAfterIncrement },
-        } = await controller.execute(incrementInteraction, incrementTransaction);
-        assert.deepEqual(valueAfterIncrement!.valueOf(), new BigNumber(2));
+
+        hash = await provider.sendTransaction(incrementTransaction);
+        responseExecute = await controller.awaitCompletedExecute(hash);
+        assert.isTrue(responseExecute.returnCode == "ok");
+        assert.deepEqual(responseExecute.values[0], new BigNumber(2));
 
         // Decrement twice. Wait for execution of the second transaction.
         let decrementTransaction = decrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
@@ -367,11 +399,12 @@ describe("test smart contract interactor", function () {
         await provider.sendTransaction(decrementTransaction);
 
         decrementTransaction = decrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
+
         await signTransaction({ transaction: decrementTransaction, wallet: alice });
-        let {
-            bundle: { firstValue: valueAfterDecrement },
-        } = await controller.execute(decrementInteraction, decrementTransaction);
-        assert.deepEqual(valueAfterDecrement!.valueOf(), new BigNumber(0));
+        hash = await provider.sendTransaction(decrementTransaction);
+        responseExecute = await controller.awaitCompletedExecute(hash);
+        assert.isTrue(responseExecute.returnCode == "ok");
+        assert.deepEqual(responseExecute.values[0], new BigNumber(0));
     });
 
     it("should interact with 'counter' (local testnet) using the SmartContractTransactionsFactory", async function () {
@@ -387,6 +420,7 @@ describe("test smart contract interactor", function () {
             config: config,
             abi: abiRegistry,
         });
+        const parser = new SmartContractTransactionsOutcomeParser();
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
 
@@ -412,11 +446,14 @@ describe("test smart contract interactor", function () {
 
         const deployTxHash = await provider.sendTransaction(deployTransaction);
         let transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(deployTxHash);
-        const untypedBundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
-        assert.isTrue(untypedBundle.returnCode.isSuccess());
+        let response = parser.parseExecute({ transactionOnNetwork });
+        assert.isTrue(response.returnCode == "ok");
 
-        const queryRunner = new QueryRunnerAdapter({ networkProvider: provider });
-        const queryController = new SmartContractQueriesController({ abi: abiRegistry, queryRunner: queryRunner });
+        const queryController = new SmartContractController({
+            chainID: "localnet",
+            networkProvider: provider,
+            abi: abiRegistry,
+        });
 
         let incrementTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
@@ -433,7 +470,7 @@ describe("test smart contract interactor", function () {
 
         // Query "get()"
         const query = queryController.createQuery({
-            contract: contractAddress.bech32(),
+            contract: contractAddress,
             function: "get",
             arguments: [],
         });
@@ -443,8 +480,9 @@ describe("test smart contract interactor", function () {
 
         const incrementTxHash = await provider.sendTransaction(incrementTransaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(incrementTxHash);
-        let typedBundle = resultsParser.parseOutcome(transactionOnNetwork, abiRegistry.getEndpoint("increment"));
-        assert.deepEqual(typedBundle.firstValue!.valueOf(), new BigNumber(2));
+
+        response = parser.parseExecute({ transactionOnNetwork });
+        assert.deepEqual(response.values[0], new BigNumber(2));
 
         let decrementTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
@@ -467,7 +505,7 @@ describe("test smart contract interactor", function () {
 
         const decrementTxHash = await provider.sendTransaction(decrementTransaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(decrementTxHash);
-        typedBundle = resultsParser.parseOutcome(transactionOnNetwork, abiRegistry.getEndpoint("decrement"));
+        response = parser.parseExecute({ transactionOnNetwork });
     });
 
     it("should interact with 'lottery-esdt' (local testnet)", async function () {
@@ -475,7 +513,11 @@ describe("test smart contract interactor", function () {
 
         let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
         let contract = new SmartContract({ abi: abiRegistry });
-        let controller = new ContractController(provider);
+        let controller = new SmartContractController({
+            chainID: "localnet",
+            networkProvider: provider,
+            abi: abiRegistry,
+        });
 
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
@@ -490,10 +532,10 @@ describe("test smart contract interactor", function () {
             chainID: network.ChainID,
         });
 
-        let {
-            bundle: { returnCode },
-        } = await controller.deploy(deployTransaction);
-        assert.isTrue(returnCode.isSuccess());
+        const deployTxHash = await provider.sendTransaction(deployTransaction);
+        let parsedResponse = await controller.awaitCompletedDeploy(deployTxHash);
+
+        assert.isTrue(parsedResponse.returnCode == "ok");
 
         let startInteraction = <Interaction>(
             contract.methods
@@ -526,9 +568,10 @@ describe("test smart contract interactor", function () {
             .buildTransaction();
 
         await signTransaction({ transaction: startTransaction, wallet: alice });
-        let { bundle: bundleStart } = await controller.execute(startInteraction, startTransaction);
-        assert.isTrue(bundleStart.returnCode.equals(ReturnCode.Ok));
-        assert.lengthOf(bundleStart.values, 0);
+        const startTxHash = await provider.sendTransaction(startTransaction);
+        let response = await controller.awaitCompletedExecute(startTxHash);
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 0);
 
         // status()
         let lotteryStatusTransaction = lotteryStatusInteraction
@@ -537,10 +580,11 @@ describe("test smart contract interactor", function () {
             .buildTransaction();
 
         await signTransaction({ transaction: lotteryStatusTransaction, wallet: alice });
-        let { bundle: bundleStatus } = await controller.execute(lotteryStatusInteraction, lotteryStatusTransaction);
-        assert.isTrue(bundleStatus.returnCode.equals(ReturnCode.Ok));
-        assert.lengthOf(bundleStatus.values, 1);
-        assert.equal(bundleStatus.firstValue!.valueOf().name, "Running");
+        const lotteryStatusTxHash = await provider.sendTransaction(lotteryStatusTransaction);
+        response = await controller.awaitCompletedExecute(lotteryStatusTxHash);
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 1);
+        assert.equal(response[0].name, "Running");
 
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
         let lotteryInfoTransaction = getLotteryInfoInteraction
@@ -549,12 +593,13 @@ describe("test smart contract interactor", function () {
             .buildTransaction();
 
         await signTransaction({ transaction: lotteryInfoTransaction, wallet: alice });
-        let { bundle: bundleLotteryInfo } = await controller.execute(getLotteryInfoInteraction, lotteryInfoTransaction);
-        assert.isTrue(bundleLotteryInfo.returnCode.equals(ReturnCode.Ok));
-        assert.lengthOf(bundleLotteryInfo.values, 1);
+        const lotteryInfoTxHash = await provider.sendTransaction(lotteryInfoTransaction);
+        response = await controller.awaitCompletedExecute(lotteryInfoTxHash);
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 1);
 
         // Ignore "deadline" field in our test
-        let info = bundleLotteryInfo.firstValue!.valueOf();
+        let info = response[0].valueOf();
         delete info.deadline;
 
         assert.deepEqual(info, {
@@ -571,6 +616,7 @@ describe("test smart contract interactor", function () {
         this.timeout(140000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
+        let parser = new SmartContractTransactionsOutcomeParser();
 
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
@@ -606,8 +652,8 @@ describe("test smart contract interactor", function () {
 
         const deployTxHash = await provider.sendTransaction(deployTransaction);
         let transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(deployTxHash);
-        const untypedBundle = resultsParser.parseUntypedOutcome(transactionOnNetwork);
-        assert.isTrue(untypedBundle.returnCode.isSuccess());
+        const deployResponse = parser.parseDeploy({ transactionOnNetwork });
+        assert.isTrue(deployResponse.returnCode == "ok");
 
         // start()
         let startTransaction = factory.createTransactionForExecute(alice.address, {
@@ -625,9 +671,9 @@ describe("test smart contract interactor", function () {
 
         const startTxHash = await provider.sendTransaction(startTransaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(startTxHash);
-        let typedBundle = resultsParser.parseOutcome(transactionOnNetwork, abiRegistry.getEndpoint("start"));
-        assert.equal(typedBundle.returnCode.valueOf(), "ok");
-        assert.lengthOf(typedBundle.values, 0);
+        let response = parser.parseExecute({ transactionOnNetwork });
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 0);
 
         // status()
         let lotteryStatusTransaction = factory.createTransactionForExecute(alice.address, {
@@ -645,10 +691,10 @@ describe("test smart contract interactor", function () {
 
         const statusTxHash = await provider.sendTransaction(lotteryStatusTransaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(statusTxHash);
-        typedBundle = resultsParser.parseOutcome(transactionOnNetwork, abiRegistry.getEndpoint("status"));
-        assert.equal(typedBundle.returnCode.valueOf(), "ok");
-        assert.lengthOf(typedBundle.values, 1);
-        assert.equal(typedBundle.firstValue!.valueOf().name, "Running");
+        response = parser.parseExecute({ transactionOnNetwork });
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 0);
+        assert.equal(response.values[0].name, "Running");
 
         // getlotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
         let lotteryInfoTransaction = factory.createTransactionForExecute(alice.address, {
@@ -666,12 +712,12 @@ describe("test smart contract interactor", function () {
 
         const infoTxHash = await provider.sendTransaction(lotteryInfoTransaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(infoTxHash);
-        typedBundle = resultsParser.parseOutcome(transactionOnNetwork, abiRegistry.getEndpoint("getLotteryInfo"));
-        assert.equal(typedBundle.returnCode.valueOf(), "ok");
-        assert.lengthOf(typedBundle.values, 1);
+        response = parser.parseExecute({ transactionOnNetwork });
+        assert.isTrue(response.returnCode == "ok");
+        assert.lengthOf(response.values, 0);
 
         // Ignore "deadline" field in our test
-        let info = typedBundle.firstValue!.valueOf();
+        let info = response.values[0]!.valueOf();
         delete info.deadline;
 
         assert.deepEqual(info, {

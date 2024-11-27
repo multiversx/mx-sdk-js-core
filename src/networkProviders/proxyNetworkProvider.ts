@@ -163,8 +163,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         try {
             const request = new ContractQueryRequest(query).toHttpRequest();
             const response = await this.doPostGeneric("vm-values/query", request);
-            console.log(111111, { response });
-            return SmartContractQueryResponse.fromHttpResponse(response, query.function);
+            return SmartContractQueryResponse.fromHttpResponse(response.data, query.function);
         } catch (error: any) {
             throw new ErrContractQuery(error);
         }

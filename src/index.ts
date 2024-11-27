@@ -28,7 +28,6 @@ export * from "./relayed";
 export * from "./relayedTransactionV1Builder";
 export * from "./relayedTransactionV2Builder";
 export * from "./signableMessage";
-export * from "./smartContractQueriesController";
 export * from "./tokenManagement";
 export * from "./tokens";
 export * from "./transaction";

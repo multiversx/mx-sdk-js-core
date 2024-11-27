@@ -40,7 +40,7 @@ export class Interaction {
     private gasLimit: IGasLimit = 0;
     private gasPrice: IGasPrice | undefined = undefined;
     private chainID: IChainID = "";
-    private querent: IAddress = Address.empty();
+    private querent: Address = Address.empty();
     private explicitReceiver?: IAddress;
     private sender: Address = Address.empty();
     private version: number = TRANSACTION_VERSION_DEFAULT;
@@ -186,7 +186,7 @@ export class Interaction {
     /**
      * Sets the "caller" field on contract queries.
      */
-    withQuerent(querent: IAddress): Interaction {
+    withQuerent(querent: Address): Interaction {
         this.querent = querent;
         return this;
     }

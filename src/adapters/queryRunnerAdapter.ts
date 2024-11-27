@@ -1,4 +1,3 @@
-import { Address } from "../address";
 import { IAddress } from "../interface";
 import { IContractQueryResponse } from "../interfaceOfNetwork";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
@@ -24,8 +23,8 @@ export class QueryRunnerAdapter {
 
     async runQuery(query: SmartContractQuery): Promise<SmartContractQueryResponse> {
         const adaptedQuery: IQuery = {
-            address: Address.fromBech32(query.contract),
-            caller: query.caller ? Address.fromBech32(query.caller) : undefined,
+            address: query.contract,
+            caller: query.caller ? query.caller : undefined,
             func: query.function,
             value: query.value,
             getEncodedArguments: () => query.arguments.map((arg) => Buffer.from(arg).toString("hex")),

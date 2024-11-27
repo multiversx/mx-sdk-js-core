@@ -28,6 +28,11 @@ export interface SmartContractDeployOutcome {
     returnMessage: string;
     contracts: DeployedSmartContract[];
 }
+export type ParsedSmartContractCallOutcome = {
+    values: any[];
+    returnCode: string;
+    returnMessage: string;
+};
 
 export class DeployedSmartContract {
     address: string;

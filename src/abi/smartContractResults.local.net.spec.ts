@@ -7,15 +7,12 @@ import { TransactionComputer } from "../transactionComputer";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction } from "./function";
-import { ResultsParser } from "./resultsParser";
 import { SmartContract } from "./smartContract";
 
 describe("fetch transactions from local testnet", function () {
     let alice: TestWallet;
     let provider = createLocalnetProvider();
     let watcher: TransactionWatcher;
-
-    let resultsParser = new ResultsParser();
 
     before(async function () {
         ({ alice } = await loadTestWallets());

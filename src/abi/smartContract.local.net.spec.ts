@@ -12,7 +12,6 @@ import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { decodeUnsignedNumber } from "./codec";
 import { ContractFunction } from "./function";
-import { ResultsParser } from "./resultsParser";
 import { SmartContract } from "./smartContract";
 import {
     AddressValue,
@@ -28,7 +27,6 @@ describe("test on local testnet", function () {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
     let provider = createLocalnetProvider();
     let watcher: TransactionWatcher;
-    let resultsParser = new ResultsParser();
 
     before(async function () {
         ({ alice, bob, carol } = await loadTestWallets());

@@ -5,6 +5,7 @@ import { Err } from "../errors";
 import { TransactionEvent } from "../transactionEvents";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractCallOutcome, SmartContractResult } from "../transactionsOutcomeParsers/resources";
+import * as resources from "./resources";
 
 enum Events {
     SCDeploy = "SCDeploy",
@@ -78,24 +79,19 @@ export class SmartContractTransactionsOutcomeParser {
         };
     }
 
-    parseExecute(options: { transactionOnNetwork: TransactionOnNetwork; function?: string }): {
-        values: any[];
-        returnCode: string;
-        returnMessage: string;
-    } {
+    parseExecute(options: {
+        transactionOnNetwork: TransactionOnNetwork;
+        function?: string;
+    }): resources.ParsedSmartContractCallOutcome {
         return this.parseExecuteGivenTransactionOnNetwork(options.transactionOnNetwork, options.function);
     }
 
     protected parseExecuteGivenTransactionOnNetwork(
         transactionOnNetwork: TransactionOnNetwork,
         functionName?: string,
-    ): {
-        values: any[];
-        returnCode: string;
-        returnMessage: string;
-    } {
+    ): resources.ParsedSmartContractCallOutcome {
         const directCallOutcome = this.findDirectSmartContractCallOutcome(transactionOnNetwork);
-
+        console.log({ directCallOutcome, abi: this.abi });
         if (!this.abi) {
             return {
                 values: directCallOutcome.returnDataParts,
@@ -220,7 +216,7 @@ export class SmartContractTransactionsOutcomeParser {
 
         const [event] = eligibleEvents;
         const data = Buffer.from(event.data).toString();
-        const lastTopic = event.getLastTopic()?.toString();
+        const lastTopic = event.topics[event.topics.length - 1]?.toString();
         const parts = argSerializer.stringToBuffers(data);
         // Assumption: the last part is the return code.
         const returnCode = parts[parts.length - 1];

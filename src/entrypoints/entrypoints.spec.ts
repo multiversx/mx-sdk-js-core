@@ -79,7 +79,7 @@ describe("TestEntrypoint", () => {
         const txHashExecute = await entrypoint.sendTransaction(executeTransaction);
         await entrypoint.awaitCompletedTransaction(txHashExecute);
 
-        const queryResult = await controller.queryContract(contractAddress, "getSum", []);
+        const queryResult = await controller.query({ contract: contractAddress, function: "getSum", arguments: [] });
         assert.equal(queryResult.length, 1);
         assert.equal(queryResult[0], 7);
     });

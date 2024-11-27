@@ -1,13 +1,11 @@
-import { AbiRegistry, ResultsParser } from "../abi";
+import { AbiRegistry, ArgSerializer } from "../abi";
 import { TransactionEvent } from "../transactionEvents";
 
 export class TransactionEventsParser {
-    private readonly legacyResultsParser: ResultsParser;
     private readonly abi: AbiRegistry;
     private readonly firstTopicIsIdentifier: boolean;
 
     constructor(options: { abi: AbiRegistry; firstTopicIsIdentifier?: boolean }) {
-        this.legacyResultsParser = new ResultsParser();
         this.abi = options.abi;
 
         // By default, we consider that the first topic is the event identifier.
@@ -39,12 +37,23 @@ export class TransactionEventsParser {
         const dataItems = options.event.additionalData.map((dataItem) => Buffer.from(dataItem));
         const eventDefinition = this.abi.getEvent(abiIdentifier);
 
-        const parsedEvent = this.legacyResultsParser.doParseEvent({
-            topics: topics,
-            dataItems: dataItems,
-            eventDefinition: eventDefinition,
-        });
+        const result: any = {};
+        const argsSerializer = new ArgSerializer();
 
-        return parsedEvent;
+        // "Indexed" ABI "event.inputs" correspond to "event.topics[1:]":
+        const indexedInputs = eventDefinition.inputs.filter((input) => input.indexed);
+        const decodedTopics = argsSerializer.buffersToValues(topics, indexedInputs);
+        for (let i = 0; i < indexedInputs.length; i++) {
+            result[indexedInputs[i].name] = decodedTopics[i].valueOf();
+        }
+
+        // "Non-indexed" ABI "event.inputs" correspond to "event.data":
+        const nonIndexedInputs = eventDefinition.inputs.filter((input) => !input.indexed);
+        const decodedDataParts = argsSerializer.buffersToValues(dataItems, nonIndexedInputs);
+        for (let i = 0; i < nonIndexedInputs.length; i++) {
+            result[nonIndexedInputs[i].name] = decodedDataParts[i]?.valueOf();
+        }
+
+        return result;
     }
 }

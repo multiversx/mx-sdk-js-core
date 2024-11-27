@@ -1,8 +1,8 @@
 import { ITransaction as ITransactionAsInSpecs } from "../interface";
+import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { AccountOnNetwork } from "./accounts";
-import { ContractQueryResponse } from "./contractQueryResponse";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkStake } from "./networkStake";
@@ -95,7 +95,7 @@ export interface INetworkProvider {
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
      */
-    queryContract(query: IContractQuery): Promise<ContractQueryResponse>;
+    queryContract(query: SmartContractQuery): Promise<SmartContractQueryResponse>;
 
     /**
      * Fetches the definition of a fungible token.

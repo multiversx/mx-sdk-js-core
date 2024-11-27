@@ -1,7 +1,7 @@
-import { Query } from "../abi";
 import { IAddress } from "../interface";
-import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionStatus } from "../interfaceOfNetwork";
+import { IAccountOnNetwork, INetworkConfig, ITransactionStatus } from "../interfaceOfNetwork";
 import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
+import { SmartContractQueryInput, SmartContractQueryResponse } from "../smartContractQuery";
 
 import { Transaction } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
@@ -38,5 +38,5 @@ export interface INetworkProvider {
     getTransactionStatus(txHash: string): Promise<ITransactionStatus>;
     sendTransaction(tx: Transaction): Promise<string>;
     simulateTransaction(tx: Transaction): Promise<any>;
-    queryContract(query: Query): Promise<IContractQueryResponse>;
+    queryContract(query: SmartContractQueryInput): Promise<SmartContractQueryResponse>;
 }

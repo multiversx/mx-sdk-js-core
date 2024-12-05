@@ -1,20 +1,17 @@
 import { assert } from "chai";
 import { promises } from "fs";
 import { Logger } from "../logger";
-import { SmartContractQueryInput } from "../smartContractQuery";
 import {
     SmartContractController,
     SmartContractTransactionsFactory,
     SmartContractTransactionsOutcomeParser,
 } from "../smartContracts";
-import { prepareDeployment } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { loadTestWallets, TestWallet } from "../testutils/wallets";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { decodeUnsignedNumber } from "./codec";
-import { ContractFunction } from "./function";
 import { SmartContract } from "./smartContract";
 import {
     AddressValue,
@@ -41,82 +38,6 @@ describe("test on local testnet", function () {
             },
         });
         parser = new SmartContractTransactionsOutcomeParser();
-    });
-
-    it("counter: should deploy, then simulate transactions", async function () {
-        this.timeout(60000);
-
-        TransactionWatcher.DefaultPollingInterval = 5000;
-        TransactionWatcher.DefaultTimeout = 50000;
-
-        let network = await provider.getNetworkConfig();
-        await alice.sync(provider);
-
-        // Deploy
-        let contract = new SmartContract({});
-
-        let transactionDeploy = await prepareDeployment({
-            contract: contract,
-            deployer: alice,
-            codePath: "src/testdata/counter.wasm",
-            gasLimit: 3000000,
-            initArguments: [],
-            chainID: network.ChainID,
-        });
-
-        // ++
-        let transactionIncrement = contract.call({
-            func: new ContractFunction("increment"),
-            gasLimit: 3000000,
-            chainID: network.ChainID,
-            caller: alice.address,
-        });
-        transactionIncrement.setNonce(alice.account.nonce);
-        transactionIncrement.applySignature(await alice.signer.sign(transactionIncrement.serializeForSigning()));
-
-        alice.account.incrementNonce();
-
-        // Now, let's build a few transactions, to be simulated
-        let simulateOne = contract.call({
-            func: new ContractFunction("increment"),
-            gasLimit: 100000,
-            chainID: network.ChainID,
-            caller: alice.address,
-        });
-        simulateOne.setSender(alice.address);
-
-        let simulateTwo = contract.call({
-            func: new ContractFunction("foobar"),
-            gasLimit: 500000,
-            chainID: network.ChainID,
-            caller: alice.address,
-        });
-        simulateTwo.setSender(alice.address);
-
-        simulateOne.setNonce(alice.account.nonce);
-        simulateTwo.setNonce(alice.account.nonce);
-
-        simulateOne.applySignature(await alice.signer.sign(simulateOne.serializeForSigning()));
-        simulateTwo.applySignature(await alice.signer.sign(simulateTwo.serializeForSigning()));
-
-        // Broadcast & execute
-        const txHashDeploy = await provider.sendTransaction(transactionDeploy);
-        const txHashIncrement = await provider.sendTransaction(transactionIncrement);
-
-        await watcher.awaitCompleted(txHashDeploy);
-        let transactionOnNetwork = await provider.getTransaction(txHashDeploy);
-        let response = parser.parseExecute({ transactionOnNetwork });
-
-        assert.isTrue(response.returnCode == "ok");
-
-        await watcher.awaitCompleted(txHashIncrement);
-        transactionOnNetwork = await provider.getTransaction(txHashIncrement);
-        response = parser.parseExecute({ transactionOnNetwork });
-        assert.isTrue(response.returnCode == "ok");
-
-        // Simulate
-        Logger.trace(JSON.stringify(await provider.simulateTransaction(simulateOne), null, 4));
-        Logger.trace(JSON.stringify(await provider.simulateTransaction(simulateTwo), null, 4));
     });
 
     it("counter: should deploy, then simulate transactions using SmartContractTransactionsFactory", async function () {
@@ -205,77 +126,6 @@ describe("test on local testnet", function () {
         Logger.trace(JSON.stringify(await provider.simulateTransaction(simulateTwo), null, 4));
     });
 
-    it("counter: should deploy, call and query contract", async function () {
-        this.timeout(80000);
-
-        TransactionWatcher.DefaultPollingInterval = 5000;
-        TransactionWatcher.DefaultTimeout = 50000;
-
-        let network = await provider.getNetworkConfig();
-        await alice.sync(provider);
-
-        // Deploy
-        let contract = new SmartContract({});
-
-        let transactionDeploy = await prepareDeployment({
-            contract: contract,
-            deployer: alice,
-            codePath: "src/testdata/counter.wasm",
-            gasLimit: 3000000,
-            initArguments: [],
-            chainID: network.ChainID,
-        });
-
-        // ++
-        let transactionIncrementFirst = contract.call({
-            func: new ContractFunction("increment"),
-            gasLimit: 2000000,
-            chainID: network.ChainID,
-            caller: alice.address,
-        });
-        transactionIncrementFirst.setNonce(alice.account.nonce);
-        transactionIncrementFirst.applySignature(
-            await alice.signer.sign(transactionIncrementFirst.serializeForSigning()),
-        );
-
-        alice.account.incrementNonce();
-
-        // ++
-        let transactionIncrementSecond = contract.call({
-            func: new ContractFunction("increment"),
-            gasLimit: 2000000,
-            chainID: network.ChainID,
-            caller: alice.address,
-        });
-        transactionIncrementSecond.setNonce(alice.account.nonce);
-        transactionIncrementSecond.applySignature(
-            await alice.signer.sign(transactionIncrementSecond.serializeForSigning()),
-        );
-
-        alice.account.incrementNonce();
-
-        // Broadcast & execute
-        await provider.sendTransaction(transactionDeploy);
-        await provider.sendTransaction(transactionIncrementFirst);
-        await provider.sendTransaction(transactionIncrementSecond);
-
-        await watcher.awaitCompleted(transactionDeploy.getHash().hex());
-        await watcher.awaitCompleted(transactionIncrementFirst.getHash().hex());
-        await watcher.awaitCompleted(transactionIncrementSecond.getHash().hex());
-
-        // Check counter
-        let query = contract.createQuery({ func: new ContractFunction("get") });
-        let queryResponse = await provider.queryContract(
-            new SmartContractQueryInput({
-                contract: query.address,
-                arguments: query.args,
-                function: query.func.toString(),
-            }),
-        );
-        assert.isTrue(queryResponse.returnDataParts.length == 1);
-        assert.equal(3, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
-    });
-
     it("counter: should deploy, call and query contract using SmartContractTransactionsFactory", async function () {
         this.timeout(80000);
 
@@ -354,116 +204,6 @@ describe("test on local testnet", function () {
         assert.equal(3, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
     });
 
-    it("erc20: should deploy, call and query contract", async function () {
-        this.timeout(60000);
-
-        TransactionWatcher.DefaultPollingInterval = 5000;
-        TransactionWatcher.DefaultTimeout = 50000;
-
-        let network = await provider.getNetworkConfig();
-        await alice.sync(provider);
-
-        // Deploy
-        let contract = new SmartContract({});
-
-        let transactionDeploy = await prepareDeployment({
-            contract: contract,
-            deployer: alice,
-            codePath: "src/testdata/erc20.wasm",
-            gasLimit: 50000000,
-            initArguments: [new U32Value(10000)],
-            chainID: network.ChainID,
-        });
-
-        // Minting
-        let transactionMintBob = contract.call({
-            func: new ContractFunction("transferToken"),
-            gasLimit: 9000000,
-            args: [new AddressValue(bob.address), new U32Value(1000)],
-            chainID: network.ChainID,
-            caller: alice.address,
-        });
-
-        let transactionMintCarol = contract.call({
-            func: new ContractFunction("transferToken"),
-            gasLimit: 9000000,
-            args: [new AddressValue(carol.address), new U32Value(1500)],
-            chainID: network.ChainID,
-            caller: alice.address,
-        });
-
-        // Apply nonces and sign the remaining transactions
-        transactionMintBob.setNonce(alice.account.nonce);
-        alice.account.incrementNonce();
-        transactionMintCarol.setNonce(alice.account.nonce);
-        alice.account.incrementNonce();
-
-        transactionMintBob.applySignature(await alice.signer.sign(transactionMintBob.serializeForSigning()));
-        transactionMintCarol.applySignature(await alice.signer.sign(transactionMintCarol.serializeForSigning()));
-
-        // Broadcast & execute
-        await provider.sendTransaction(transactionDeploy);
-        await provider.sendTransaction(transactionMintBob);
-        await provider.sendTransaction(transactionMintCarol);
-
-        await watcher.awaitCompleted(transactionDeploy.getHash().hex());
-        await watcher.awaitCompleted(transactionMintBob.getHash().hex());
-        await watcher.awaitCompleted(transactionMintCarol.getHash().hex());
-
-        // Query state, do some assertions
-        let query = contract.createQuery({ func: new ContractFunction("totalSupply") });
-        let queryResponse = await provider.queryContract(
-            new SmartContractQueryInput({
-                contract: query.address,
-                arguments: query.args,
-                function: query.func.toString(),
-            }),
-        );
-        assert.isTrue(queryResponse.returnDataParts.length == 1);
-        assert.equal(10000, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
-
-        query = contract.createQuery({
-            func: new ContractFunction("balanceOf"),
-            args: [new AddressValue(alice.address)],
-        });
-        queryResponse = await provider.queryContract(
-            new SmartContractQueryInput({
-                contract: query.address,
-                arguments: query.args,
-                function: query.func.toString(),
-            }),
-        );
-        assert.equal(7500, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
-
-        query = contract.createQuery({
-            func: new ContractFunction("balanceOf"),
-            args: [new AddressValue(bob.address)],
-        });
-        queryResponse = await provider.queryContract(
-            new SmartContractQueryInput({
-                contract: query.address,
-                arguments: query.args,
-                function: query.func.toString(),
-            }),
-        );
-
-        assert.equal(1000, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
-
-        query = contract.createQuery({
-            func: new ContractFunction("balanceOf"),
-            args: [new AddressValue(carol.address)],
-        });
-        queryResponse = await provider.queryContract(
-            new SmartContractQueryInput({
-                contract: query.address,
-                arguments: query.args,
-                function: query.func.toString(),
-            }),
-        );
-
-        assert.equal(1500, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
-    });
-
     it("erc20: should deploy, call and query contract using SmartContractTransactionsFactory", async function () {
         this.timeout(60000);
 
@@ -528,131 +268,43 @@ describe("test on local testnet", function () {
         await watcher.awaitCompleted(mintCarolTxHash);
 
         // Query state, do some assertions
-        const smartContractQueriesController = new SmartContractController({
+        const smartContractController = new SmartContractController({
             chainID: "localnet",
             networkProvider: provider,
         });
 
-        let query = smartContractQueriesController.createQuery({
+        let query = smartContractController.createQuery({
             contract: contractAddress,
             function: "totalSupply",
             arguments: [],
         });
-        let queryResponse = await smartContractQueriesController.runQuery(query);
+        let queryResponse = await smartContractController.runQuery(query);
         assert.lengthOf(queryResponse.returnDataParts, 1);
         assert.equal(10000, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
 
-        query = smartContractQueriesController.createQuery({
+        query = smartContractController.createQuery({
             contract: contractAddress,
             function: "balanceOf",
             arguments: [new AddressValue(alice.address)],
         });
-        queryResponse = await smartContractQueriesController.runQuery(query);
+        queryResponse = await smartContractController.runQuery(query);
         assert.equal(7500, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
 
-        query = smartContractQueriesController.createQuery({
+        query = smartContractController.createQuery({
             contract: contractAddress,
             function: "balanceOf",
             arguments: [new AddressValue(bob.address)],
         });
-        queryResponse = await smartContractQueriesController.runQuery(query);
+        queryResponse = await smartContractController.runQuery(query);
         assert.equal(1000, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
 
-        query = smartContractQueriesController.createQuery({
+        query = smartContractController.createQuery({
             contract: contractAddress,
             function: "balanceOf",
             arguments: [new AddressValue(carol.address)],
         });
-        queryResponse = await smartContractQueriesController.runQuery(query);
+        queryResponse = await smartContractController.runQuery(query);
         assert.equal(1500, decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])));
-    });
-
-    it("lottery: should deploy, call and query contract", async function () {
-        this.timeout(60000);
-
-        TransactionWatcher.DefaultPollingInterval = 5000;
-        TransactionWatcher.DefaultTimeout = 50000;
-
-        let network = await provider.getNetworkConfig();
-        await alice.sync(provider);
-
-        // Deploy
-        let contract = new SmartContract({});
-
-        let transactionDeploy = await prepareDeployment({
-            contract: contract,
-            deployer: alice,
-            codePath: "src/testdata/lottery-esdt.wasm",
-            gasLimit: 50000000,
-            initArguments: [],
-            chainID: network.ChainID,
-        });
-
-        // Start
-        let transactionStart = contract.call({
-            func: new ContractFunction("start"),
-            gasLimit: 10000000,
-            args: [
-                BytesValue.fromUTF8("lucky"),
-                new TokenIdentifierValue("EGLD"),
-                new BigUIntValue(1),
-                OptionValue.newMissing(),
-                OptionValue.newMissing(),
-                OptionValue.newProvided(new U32Value(1)),
-                OptionValue.newMissing(),
-                OptionValue.newMissing(),
-                OptionalValue.newMissing(),
-            ],
-            chainID: network.ChainID,
-            caller: alice.address,
-        });
-        // Apply nonces and sign the remaining transactions
-        transactionStart.setNonce(alice.account.nonce);
-
-        transactionStart.applySignature(await alice.signer.sign(transactionStart.serializeForSigning()));
-
-        // Broadcast & execute
-        await provider.sendTransaction(transactionDeploy);
-        await provider.sendTransaction(transactionStart);
-
-        await watcher.awaitAllEvents(transactionDeploy.getHash().hex(), ["SCDeploy"]);
-        await watcher.awaitAnyEvent(transactionStart.getHash().hex(), ["completedTxEvent"]);
-
-        // Let's check the SCRs
-        let transactionOnNetwork = await provider.getTransaction(transactionDeploy.getHash().hex());
-        let response = parser.parseExecute({ transactionOnNetwork });
-        assert.isTrue(response.returnCode == "ok");
-
-        transactionOnNetwork = await provider.getTransaction(transactionStart.getHash().hex());
-        response = parser.parseExecute({ transactionOnNetwork });
-        assert.isTrue(response.returnCode == "ok");
-
-        // Query state, do some assertions
-        let query = contract.createQuery({
-            func: new ContractFunction("status"),
-            args: [BytesValue.fromUTF8("lucky")],
-        });
-        let queryResponse = await provider.queryContract(
-            new SmartContractQueryInput({
-                contract: query.address,
-                arguments: query.args,
-                function: query.func.toString(),
-            }),
-        );
-        assert.equal(decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])), 1);
-
-        query = contract.createQuery({
-            func: new ContractFunction("status"),
-            args: [BytesValue.fromUTF8("missingLottery")],
-        });
-        queryResponse = await provider.queryContract(
-            new SmartContractQueryInput({
-                contract: query.address,
-                arguments: query.args,
-                function: query.func.toString(),
-            }),
-        );
-        assert.equal(decodeUnsignedNumber(Buffer.from(queryResponse.returnDataParts[0])), 0);
     });
 
     it("lottery: should deploy, call and query contract using SmartContractTransactionsFactory", async function () {

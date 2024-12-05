@@ -100,7 +100,6 @@ export class SmartContractTransactionsOutcomeParser {
         }
 
         functionName = functionName || directCallOutcome.function;
-
         if (!functionName) {
             throw new Err(
                 `Function name is not available in the transaction, thus endpoint definition (ABI) cannot be picked (for parsing). Maybe provide the "function" parameter explicitly?`,
@@ -121,6 +120,7 @@ export class SmartContractTransactionsOutcomeParser {
 
     protected findDirectSmartContractCallOutcome(transactionOnNetwork: TransactionOnNetwork): SmartContractCallOutcome {
         let outcome = this.findDirectSmartContractCallOutcomeWithinSmartContractResults(transactionOnNetwork);
+
         if (outcome) {
             return outcome;
         }

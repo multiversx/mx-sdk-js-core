@@ -17,7 +17,7 @@ import { Interaction } from "./interaction";
 import { SmartContract } from "./smartContract";
 import { ManagedDecimalSignedValue, ManagedDecimalValue } from "./typesystem";
 
-describe.only("test smart contract interactor", function () {
+describe("test smart contract interactor", function () {
     let provider = createLocalnetProvider();
     let alice: TestWallet;
 
@@ -73,7 +73,7 @@ describe.only("test smart contract interactor", function () {
             }),
         );
         assert.lengthOf(queryResponse, 1);
-        assert.deepEqual(queryResponse[0]!.valueOf(), new BigNumber(42));
+        assert.deepEqual(queryResponse[0], new BigNumber(42));
 
         // Execute, do not wait for execution
         let transaction = interaction
@@ -138,9 +138,8 @@ describe.only("test smart contract interactor", function () {
             networkProvider: provider,
             abi: abiRegistry,
         });
-
         let transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(deployTxHash);
-        let response = queryController.parseExecute(transactionOnNetwork);
+        let response = queryController.parseDeploy(transactionOnNetwork);
         assert.isTrue(response.returnCode == "ok");
 
         const query = queryController.createQuery({
@@ -185,10 +184,10 @@ describe.only("test smart contract interactor", function () {
 
         const executeTxHash = await provider.sendTransaction(transaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(executeTxHash);
-        response = queryController.parseExecute(transactionOnNetwork);
+        const responseD = queryController.parseExecute(transactionOnNetwork);
 
-        assert.isTrue(response.values.length == 1);
-        assert.deepEqual(response.values[0], new BigNumber(42));
+        assert.isTrue(response.contracts.length == 1);
+        assert.deepEqual(responseD.values[0], new BigNumber(42));
         assert.isTrue(response.returnCode == "ok");
     });
 
@@ -358,8 +357,8 @@ describe.only("test smart contract interactor", function () {
 
         await provider.sendTransaction(deployTransaction);
         let hash = await provider.sendTransaction(deployTransaction);
-        let responseExecute = await controller.awaitCompletedExecute(hash);
-        assert.isTrue(responseExecute.returnCode == "ok");
+        let responseDeploy = await controller.awaitCompletedDeploy(hash);
+        assert.isTrue(responseDeploy.returnCode == "ok");
 
         let incrementInteraction = (<Interaction>contract.methods.increment())
             .withGasLimit(3000000)
@@ -382,14 +381,14 @@ describe.only("test smart contract interactor", function () {
                 value: BigInt(interactionQuery.value.toString()),
             }),
         );
-        assert.deepEqual(response[0]!.valueOf(), new BigNumber(1));
+        assert.deepEqual(response[0], new BigNumber(1));
 
         // Increment, wait for execution.
         let incrementTransaction = incrementInteraction.useThenIncrementNonceOf(alice.account).buildTransaction();
         await signTransaction({ transaction: incrementTransaction, wallet: alice });
 
         hash = await provider.sendTransaction(incrementTransaction);
-        responseExecute = await controller.awaitCompletedExecute(hash);
+        let responseExecute = await controller.awaitCompletedExecute(hash);
         assert.isTrue(responseExecute.returnCode == "ok");
         assert.deepEqual(responseExecute.values[0], new BigNumber(2));
 
@@ -446,7 +445,7 @@ describe.only("test smart contract interactor", function () {
 
         const deployTxHash = await provider.sendTransaction(deployTransaction);
         let transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(deployTxHash);
-        let response = parser.parseExecute({ transactionOnNetwork });
+        let response = parser.parseExecute({ transactionOnNetwork, function: "deploy" });
         assert.isTrue(response.returnCode == "ok");
 
         const queryController = new SmartContractController({

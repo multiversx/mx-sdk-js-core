@@ -5,6 +5,7 @@ import { Err } from "../errors";
 import { TransactionEvent } from "../transactionEvents";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractCallOutcome, SmartContractResult } from "../transactionsOutcomeParsers/resources";
+import * as resources from "./resources";
 
 enum Events {
     SCDeploy = "SCDeploy",
@@ -78,24 +79,18 @@ export class SmartContractTransactionsOutcomeParser {
         };
     }
 
-    parseExecute(options: { transactionOnNetwork: TransactionOnNetwork; function?: string }): {
-        values: any[];
-        returnCode: string;
-        returnMessage: string;
-    } {
+    parseExecute(options: {
+        transactionOnNetwork: TransactionOnNetwork;
+        function?: string;
+    }): resources.ParsedSmartContractCallOutcome {
         return this.parseExecuteGivenTransactionOnNetwork(options.transactionOnNetwork, options.function);
     }
 
     protected parseExecuteGivenTransactionOnNetwork(
         transactionOnNetwork: TransactionOnNetwork,
         functionName?: string,
-    ): {
-        values: any[];
-        returnCode: string;
-        returnMessage: string;
-    } {
+    ): resources.ParsedSmartContractCallOutcome {
         const directCallOutcome = this.findDirectSmartContractCallOutcome(transactionOnNetwork);
-
         if (!this.abi) {
             return {
                 values: directCallOutcome.returnDataParts,
@@ -105,7 +100,6 @@ export class SmartContractTransactionsOutcomeParser {
         }
 
         functionName = functionName || directCallOutcome.function;
-
         if (!functionName) {
             throw new Err(
                 `Function name is not available in the transaction, thus endpoint definition (ABI) cannot be picked (for parsing). Maybe provide the "function" parameter explicitly?`,
@@ -126,6 +120,7 @@ export class SmartContractTransactionsOutcomeParser {
 
     protected findDirectSmartContractCallOutcome(transactionOnNetwork: TransactionOnNetwork): SmartContractCallOutcome {
         let outcome = this.findDirectSmartContractCallOutcomeWithinSmartContractResults(transactionOnNetwork);
+
         if (outcome) {
             return outcome;
         }
@@ -158,7 +153,7 @@ export class SmartContractTransactionsOutcomeParser {
 
         for (const result of transactionOnNetwork.smartContractResults) {
             const matchesCriteriaOnData = result.data.toString().startsWith(ARGUMENTS_SEPARATOR);
-            const matchesCriteriaOnReceiver = result.receiver.bech32() === transactionOnNetwork.sender.bech32();
+            const matchesCriteriaOnReceiver = result.receiver.toBech32() === transactionOnNetwork.sender.toBech32();
             const matchesCriteriaOnPreviousHash = result;
 
             const matchesCriteria = matchesCriteriaOnData && matchesCriteriaOnReceiver && matchesCriteriaOnPreviousHash;
@@ -220,7 +215,7 @@ export class SmartContractTransactionsOutcomeParser {
 
         const [event] = eligibleEvents;
         const data = Buffer.from(event.data).toString();
-        const lastTopic = event.getLastTopic()?.toString();
+        const lastTopic = event.topics[event.topics.length - 1]?.toString();
         const parts = argSerializer.stringToBuffers(data);
         // Assumption: the last part is the return code.
         const returnCode = parts[parts.length - 1];

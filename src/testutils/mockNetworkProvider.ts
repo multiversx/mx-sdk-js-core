@@ -1,40 +1,109 @@
-import { Query } from "../abi/query";
 import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
 import * as errors from "../errors";
 import { ErrMock } from "../errors";
-import { IAddress } from "../interface";
-import { IAccountOnNetwork, IContractQueryResponse, INetworkConfig, ITransactionStatus } from "../interfaceOfNetwork";
+import { IAccountOnNetwork } from "../interfaceOfNetwork";
+import {
+    AccountOnNetwork,
+    DefinitionOfFungibleTokenOnNetwork,
+    DefinitionOfTokenCollectionOnNetwork,
+    FungibleTokenOfAccountOnNetwork,
+    NetworkConfig,
+    NetworkGeneralStatistics,
+    NetworkStake,
+    NetworkStatus,
+    NonFungibleTokenOfAccountOnNetwork,
+} from "../networkProviders";
+import { IAddress, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "../networkProviders/interface";
+import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { Transaction, TransactionHash } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { TransactionStatus } from "../transactionStatus";
 import { createAccountBalance } from "./utils";
 
-export class MockNetworkProvider {
+export class MockNetworkProvider implements INetworkProvider {
     static AddressOfAlice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
     static AddressOfBob = new Address("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
     static AddressOfCarol = new Address("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
 
     private readonly transactions: Map<string, TransactionOnNetwork>;
     private nextTransactionTimelinePoints: any[] = [];
-    private readonly accounts: Map<string, IAccountOnNetwork>;
+    private readonly accounts: Map<string, AccountOnNetwork>;
     private readonly queryContractResponders: QueryContractResponder[] = [];
     private readonly getTransactionResponders: GetTransactionResponder[] = [];
 
     constructor() {
         this.transactions = new Map<string, TransactionOnNetwork>();
-        this.accounts = new Map<string, IAccountOnNetwork>();
+        this.accounts = new Map<string, AccountOnNetwork>();
 
-        this.accounts.set(MockNetworkProvider.AddressOfAlice.bech32(), {
-            nonce: 0,
-            balance: createAccountBalance(1000),
-        });
-        this.accounts.set(MockNetworkProvider.AddressOfBob.bech32(), { nonce: 5, balance: createAccountBalance(500) });
-        this.accounts.set(MockNetworkProvider.AddressOfCarol.bech32(), {
-            nonce: 42,
-            balance: createAccountBalance(300),
-        });
+        this.accounts.set(
+            MockNetworkProvider.AddressOfAlice.bech32(),
+            new AccountOnNetwork({
+                nonce: 0,
+                balance: createAccountBalance(1000),
+            }),
+        );
+        this.accounts.set(
+            MockNetworkProvider.AddressOfBob.bech32(),
+            new AccountOnNetwork({ nonce: 5, balance: createAccountBalance(500) }),
+        );
+        this.accounts.set(
+            MockNetworkProvider.AddressOfCarol.bech32(),
+            new AccountOnNetwork({
+                nonce: 42,
+                balance: createAccountBalance(300),
+            }),
+        );
+    }
+    getNetworkStatus(): Promise<NetworkStatus> {
+        throw new Error("Method not implemented.");
+    }
+    getNetworkStakeStatistics(): Promise<NetworkStake> {
+        throw new Error("Method not implemented.");
+    }
+    getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics> {
+        throw new Error("Method not implemented.");
+    }
+    getFungibleTokensOfAccount(
+        _address: IAddress,
+        _pagination?: IPagination,
+    ): Promise<FungibleTokenOfAccountOnNetwork[]> {
+        throw new Error("Method not implemented.");
+    }
+    getNonFungibleTokensOfAccount(
+        _address: IAddress,
+        _pagination?: IPagination,
+    ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+        throw new Error("Method not implemented.");
+    }
+    getFungibleTokenOfAccount(_address: IAddress, _tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
+        throw new Error("Method not implemented.");
+    }
+    getNonFungibleTokenOfAccount(
+        _address: IAddress,
+        _collection: string,
+        _nonce: number,
+    ): Promise<NonFungibleTokenOfAccountOnNetwork> {
+        throw new Error("Method not implemented.");
+    }
+    sendTransactions(_txs: (ITransaction | ITransactionNext)[]): Promise<string[]> {
+        throw new Error("Method not implemented.");
+    }
+    getDefinitionOfFungibleToken(_tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
+        throw new Error("Method not implemented.");
+    }
+    getDefinitionOfTokenCollection(_collection: string): Promise<DefinitionOfTokenCollectionOnNetwork> {
+        throw new Error("Method not implemented.");
+    }
+    getNonFungibleToken(_collection: string, _nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork> {
+        throw new Error("Method not implemented.");
+    }
+    doGetGeneric(_resourceUrl: string): Promise<any> {
+        throw new Error("Method not implemented.");
+    }
+    doPostGeneric(_resourceUrl: string, _payload: any): Promise<any> {
+        throw new Error("Method not implemented.");
     }
 
     mockUpdateAccount(address: Address, mutate: (item: IAccountOnNetwork) => void) {
@@ -56,12 +125,12 @@ export class MockNetworkProvider {
         this.transactions.set(hash.toString(), item);
     }
 
-    mockQueryContractOnFunction(functionName: string, response: IContractQueryResponse) {
-        let predicate = (query: Query) => query.func.toString() == functionName;
+    mockQueryContractOnFunction(functionName: string, response: SmartContractQueryResponse) {
+        let predicate = (query: SmartContractQuery) => query.function.toString() == functionName;
         this.queryContractResponders.push(new QueryContractResponder(predicate, response));
     }
 
-    mockGetTransactionWithAnyHashAsNotarizedWithOneResult(returnCodeAndData: string) {
+    mockGetTransactionWithAnyHashAsNotarizedWithOneResult(returnCodeAndData: string, functionName: string = "") {
         let contractResult = new SmartContractResult({ data: Buffer.from(returnCodeAndData) });
 
         let predicate = (_hash: string) => true;
@@ -69,6 +138,7 @@ export class MockNetworkProvider {
             status: new TransactionStatus("executed"),
             smartContractResults: [contractResult],
             isCompleted: true,
+            function: functionName,
         });
 
         this.getTransactionResponders.unshift(new GetTransactionResponder(predicate, response));
@@ -102,7 +172,7 @@ export class MockNetworkProvider {
         }
     }
 
-    async getAccount(address: IAddress): Promise<IAccountOnNetwork> {
+    async getAccount(address: IAddress): Promise<AccountOnNetwork> {
         let account = this.accounts.get(address.bech32());
         if (account) {
             return account;
@@ -147,16 +217,16 @@ export class MockNetworkProvider {
         throw new ErrMock("Transaction not found");
     }
 
-    async getTransactionStatus(txHash: string): Promise<ITransactionStatus> {
+    async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
         let transaction = await this.getTransaction(txHash);
         return transaction.status;
     }
 
-    async getNetworkConfig(): Promise<INetworkConfig> {
+    async getNetworkConfig(): Promise<NetworkConfig> {
         throw new errors.ErrNotImplemented();
     }
 
-    async queryContract(query: Query): Promise<IContractQueryResponse> {
+    async queryContract(query: SmartContractQuery): Promise<SmartContractQueryResponse> {
         for (const responder of this.queryContractResponders) {
             if (responder.matches(query)) {
                 return responder.response;
@@ -178,10 +248,10 @@ export class Wait {
 export class MarkCompleted {}
 
 class QueryContractResponder {
-    readonly matches: (query: Query) => boolean;
-    readonly response: IContractQueryResponse;
+    readonly matches: (query: SmartContractQuery) => boolean;
+    readonly response: SmartContractQueryResponse;
 
-    constructor(matches: (query: Query) => boolean, response: IContractQueryResponse) {
+    constructor(matches: (query: SmartContractQuery) => boolean, response: SmartContractQueryResponse) {
         this.matches = matches;
         this.response = response;
     }

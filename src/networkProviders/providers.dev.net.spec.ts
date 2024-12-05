@@ -1,7 +1,7 @@
 import { AxiosHeaders } from "axios";
 import { assert } from "chai";
 import { Address } from "../address";
-import { MockQuery } from "../testutils/dummyQuery";
+import { SmartContractQuery } from "../smartContractQuery";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { INetworkProvider, ITransactionNext } from "./interface";
@@ -379,20 +379,16 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(10000);
 
         // Query: get sum (of adder contract)
-        let query = new MockQuery({
-            address: new Address("erd1qqqqqqqqqqqqqpgqfzydqmdw7m2vazsp6u5p95yxz76t2p9rd8ss0zp9ts"),
-            func: "getSum",
+        let query = new SmartContractQuery({
+            contract: new Address("erd1qqqqqqqqqqqqqpgqfzydqmdw7m2vazsp6u5p95yxz76t2p9rd8ss0zp9ts"),
+            function: "getSum",
         });
 
         let apiResponse = await apiProvider.queryContract(query);
         let proxyResponse = await proxyProvider.queryContract(query);
 
-        // Ignore "gasUsed" due to numerical imprecision (API).
-        apiResponse.gasUsed = 0;
-        proxyResponse.gasUsed = 0;
-
         assert.deepEqual(apiResponse, proxyResponse);
-        assert.deepEqual(apiResponse.getReturnDataParts(), proxyResponse.getReturnDataParts());
+        assert.deepEqual(apiResponse.returnDataParts, proxyResponse.returnDataParts);
     });
 
     it("should handle events 'data' and 'additionalData'", async function () {

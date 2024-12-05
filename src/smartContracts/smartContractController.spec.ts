@@ -1,58 +1,57 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
-import { AbiRegistry, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "./abi";
-import { QueryRunnerAdapter } from "./adapters/queryRunnerAdapter";
-import { ContractQueryResponse } from "./networkProviders";
-import { SmartContractQueriesController } from "./smartContractQueriesController";
-import { SmartContractQueryResponse } from "./smartContractQuery";
-import { MockNetworkProvider, loadAbiRegistry } from "./testutils";
-import { bigIntToBuffer } from "./tokenOperations/codec";
+import { AbiRegistry, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "../abi";
+import { Address } from "../address";
+import { SmartContractQueryResponse } from "../smartContractQuery";
+import { MockNetworkProvider, loadAbiRegistry } from "../testutils";
+import { bigIntToBuffer } from "../tokenOperations/codec";
+import { SmartContractController } from "./smartContractController";
 
 describe("test smart contract queries controller", () => {
     describe("createQuery", () => {
         it("works without ABI, when arguments are buffers", function () {
-            const adapter = new QueryRunnerAdapter({ networkProvider: new MockNetworkProvider() });
-            const controller = new SmartContractQueriesController({
-                queryRunner: adapter,
+            const controller = new SmartContractController({
+                chainID: this.chainId,
+                networkProvider: this.networkProvider,
             });
 
             const query = controller.createQuery({
-                contract: "erd1foo",
+                contract: Address.empty(),
                 function: "bar",
                 arguments: [bigIntToBuffer(42), Buffer.from("abba")],
             });
 
-            assert.equal(query.contract, "erd1foo");
+            assert.deepEqual(query.contract, Address.empty());
             assert.equal(query.function, "bar");
             assert.deepEqual(query.arguments, [bigIntToBuffer(42), Buffer.from("abba")]);
         });
 
         it("works without ABI, when arguments are typed values", function () {
-            const adapter = new QueryRunnerAdapter({ networkProvider: new MockNetworkProvider() });
-            const controller = new SmartContractQueriesController({
-                queryRunner: adapter,
+            const controller = new SmartContractController({
+                chainID: this.chainId,
+                networkProvider: this.networkProvider,
             });
 
             const query = controller.createQuery({
-                contract: "erd1foo",
+                contract: Address.empty(),
                 function: "bar",
                 arguments: [new BigUIntValue(42), BytesValue.fromUTF8("abba")],
             });
 
-            assert.equal(query.contract, "erd1foo");
+            assert.deepEqual(query.contract, Address.empty());
             assert.equal(query.function, "bar");
             assert.deepEqual(query.arguments, [bigIntToBuffer(42), Buffer.from("abba")]);
         });
 
         it("fails without ABI, when arguments aren't buffers, nor typed values", function () {
-            const adapter = new QueryRunnerAdapter({ networkProvider: new MockNetworkProvider() });
-            const controller = new SmartContractQueriesController({
-                queryRunner: adapter,
+            const controller = new SmartContractController({
+                chainID: this.chainId,
+                networkProvider: this.networkProvider,
             });
 
             assert.throws(() => {
                 controller.createQuery({
-                    contract: "erd1foo",
+                    contract: Address.empty(),
                     function: "bar",
                     arguments: [42, "abba"],
                 });
@@ -60,41 +59,37 @@ describe("test smart contract queries controller", () => {
         });
 
         it("works with ABI, when arguments are native JS objects", async function () {
-            const adapter = new QueryRunnerAdapter({
-                networkProvider: new MockNetworkProvider(),
-            });
-            const controller = new SmartContractQueriesController({
+            const controller = new SmartContractController({
+                chainID: this.chainId,
+                networkProvider: this.networkProvider,
                 abi: await loadAbiRegistry("src/testdata/lottery-esdt.abi.json"),
-                queryRunner: adapter,
             });
 
             const query = controller.createQuery({
-                contract: "erd1foo",
+                contract: Address.empty(),
                 function: "getLotteryInfo",
                 arguments: ["myLottery"],
             });
 
-            assert.equal(query.contract, "erd1foo");
+            assert.deepEqual(query.contract, Address.empty());
             assert.equal(query.function, "getLotteryInfo");
             assert.deepEqual(query.arguments, [Buffer.from("myLottery")]);
         });
 
         it("works with ABI, when arguments typed values", async function () {
-            const adapter = new QueryRunnerAdapter({
-                networkProvider: new MockNetworkProvider(),
-            });
-            const controller = new SmartContractQueriesController({
+            const controller = new SmartContractController({
+                chainID: this.chainId,
+                networkProvider: this.networkProvider,
                 abi: await loadAbiRegistry("src/testdata/lottery-esdt.abi.json"),
-                queryRunner: adapter,
             });
 
             const query = controller.createQuery({
-                contract: "erd1foo",
+                contract: Address.empty(),
                 function: "getLotteryInfo",
                 arguments: [BytesValue.fromUTF8("myLottery")],
             });
 
-            assert.equal(query.contract, "erd1foo");
+            assert.deepEqual(query.contract, Address.empty());
             assert.equal(query.function, "getLotteryInfo");
             assert.deepEqual(query.arguments, [Buffer.from("myLottery")]);
         });
@@ -123,16 +118,14 @@ describe("test smart contract queries controller", () => {
                 ],
             });
 
-            const adapter = new QueryRunnerAdapter({
-                networkProvider: new MockNetworkProvider(),
-            });
-            const controller = new SmartContractQueriesController({
+            const controller = new SmartContractController({
+                chainID: this.chainId,
+                networkProvider: this.networkProvider,
                 abi: abi,
-                queryRunner: adapter,
             });
 
             const query = controller.createQuery({
-                contract: "erd1foo",
+                contract: Address.empty(),
                 function: "bar",
                 arguments: [
                     // Typed value
@@ -148,7 +141,7 @@ describe("test smart contract queries controller", () => {
                 ],
             });
 
-            assert.equal(query.contract, "erd1foo");
+            assert.deepEqual(query.contract, Address.empty());
             assert.equal(query.function, "bar");
             assert.deepEqual(query.arguments, [
                 Buffer.from("002a01", "hex"),
@@ -162,23 +155,24 @@ describe("test smart contract queries controller", () => {
     describe("runQuery", () => {
         it("calls queryContract on the network provider", async function () {
             const networkProvider = new MockNetworkProvider();
-            const adapter = new QueryRunnerAdapter({
+
+            const controller = new SmartContractController({
+                chainID: this.chainId,
                 networkProvider: networkProvider,
-            });
-            const controller = new SmartContractQueriesController({
-                queryRunner: adapter,
             });
 
             networkProvider.mockQueryContractOnFunction(
                 "bar",
-                new ContractQueryResponse({
-                    returnData: [Buffer.from("abba").toString("base64")],
+                new SmartContractQueryResponse({
+                    function: "bar",
+                    returnDataParts: [Buffer.from("YWJiYQ==", "base64")],
                     returnCode: "ok",
+                    returnMessage: "msg",
                 }),
             );
 
             const query = {
-                contract: "erd1qqqqqqqqqqqqqpgqvc7gdl0p4s97guh498wgz75k8sav6sjfjlwqh679jy",
+                contract: Address.fromBech32("erd1qqqqqqqqqqqqqpgqvc7gdl0p4s97guh498wgz75k8sav6sjfjlwqh679jy"),
                 function: "bar",
                 arguments: [],
             };
@@ -192,11 +186,9 @@ describe("test smart contract queries controller", () => {
 
     describe("parseQueryResponse", () => {
         it("works without ABI", function () {
-            const adapter = new QueryRunnerAdapter({
-                networkProvider: new MockNetworkProvider(),
-            });
-            const controller = new SmartContractQueriesController({
-                queryRunner: adapter,
+            const controller = new SmartContractController({
+                chainID: this.chainId,
+                networkProvider: this.networkProvider,
             });
 
             const response = new SmartContractQueryResponse({
@@ -212,12 +204,10 @@ describe("test smart contract queries controller", () => {
         });
 
         it("works with ABI", async function () {
-            const adapter = new QueryRunnerAdapter({
-                networkProvider: new MockNetworkProvider(),
-            });
-            const controller = new SmartContractQueriesController({
+            const controller = new SmartContractController({
+                chainID: this.chainId,
+                networkProvider: this.networkProvider,
                 abi: await loadAbiRegistry("src/testdata/lottery-esdt.abi.json"),
-                queryRunner: adapter,
             });
 
             const response = new SmartContractQueryResponse({

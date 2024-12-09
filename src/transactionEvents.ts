@@ -30,12 +30,4 @@ export class TransactionEvent {
 
         return result;
     }
-
-    findFirstOrNoneTopic(predicate: (topic: Uint8Array) => boolean): Uint8Array | undefined {
-        return this.topics.filter((topic) => predicate(topic))[0];
-    }
-
-    getLastTopic(): Uint8Array {
-        return this.topics[this.topics.length - 1];
-    }
 }

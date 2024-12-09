@@ -72,7 +72,13 @@ export class TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.smartContractResults =
             response.smartContractResults?.map(
-                (result: Partial<SmartContractResult>) => new SmartContractResult({ ...result, raw: result }),
+                (result: Partial<SmartContractResult>) =>
+                    new SmartContractResult({
+                        ...result,
+                        receiver: result.receiver ? new Address(result.receiver) : undefined,
+                        sender: result.sender ? new Address(result.sender) : undefined,
+                        raw: result,
+                    }),
             ) ?? [];
 
         if (processStatus) {
@@ -87,7 +93,13 @@ export class TransactionOnNetwork {
         let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.smartContractResults =
             response.results?.map(
-                (result: Partial<SmartContractResult>) => new SmartContractResult({ ...result, raw: result }),
+                (result: Partial<SmartContractResult>) =>
+                    new SmartContractResult({
+                        ...result,
+                        receiver: result.receiver ? new Address(result.receiver) : undefined,
+                        sender: result.sender ? new Address(result.sender) : undefined,
+                        raw: result,
+                    }),
             ) ?? [];
         result.isCompleted = !result.status.isPending();
         return result;
@@ -95,7 +107,6 @@ export class TransactionOnNetwork {
 
     private static fromHttpResponse(txHash: string, response: any): TransactionOnNetwork {
         let result = new TransactionOnNetwork();
-
         result.hash = txHash;
         result.type = response.type || "";
         result.nonce = response.nonce || 0;

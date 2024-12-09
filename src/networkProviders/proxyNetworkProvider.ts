@@ -1,13 +1,15 @@
+import { Address } from "../address";
+import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
+import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { getAxios } from "../utils";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig } from "./config";
-import { BaseUserAgent, EsdtContractAddress } from "./constants";
+import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
-import { ContractQueryResponse } from "./contractQueryResponse";
-import { IAddress, IContractQuery, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "./interface";
+import { IAddress, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkProviderConfig } from "./networkProviderConfig";
@@ -159,11 +161,11 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return response;
     }
 
-    async queryContract(query: IContractQuery): Promise<ContractQueryResponse> {
+    async queryContract(query: SmartContractQuery): Promise<SmartContractQueryResponse> {
         try {
             const request = new ContractQueryRequest(query).toHttpRequest();
             const response = await this.doPostGeneric("vm-values/query", request);
-            return ContractQueryResponse.fromHttpResponse(response.data);
+            return SmartContractQueryResponse.fromHttpResponse(response.data, query.function);
         } catch (error: any) {
             throw new ErrContractQuery(error);
         }
@@ -179,16 +181,16 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     private async getTokenProperties(identifier: string): Promise<Buffer[]> {
-        const encodedIdentifier = Buffer.from(identifier).toString("hex");
+        const encodedIdentifier = Buffer.from(identifier);
 
         const queryResponse = await this.queryContract({
-            address: EsdtContractAddress,
-            func: "getTokenProperties",
-            getEncodedArguments: () => [encodedIdentifier],
+            contract: Address.fromHex(ESDT_CONTRACT_ADDRESS_HEX),
+            function: "getTokenProperties",
+            arguments: [new Uint8Array(encodedIdentifier)],
         });
 
-        const properties = queryResponse.getReturnDataParts();
-        return properties;
+        const properties = queryResponse.returnDataParts;
+        return properties?.map((prop) => Buffer.from(prop));
     }
 
     async getDefinitionOfTokenCollection(collection: string): Promise<DefinitionOfTokenCollectionOnNetwork> {

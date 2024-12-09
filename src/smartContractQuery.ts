@@ -22,21 +22,13 @@ export class SmartContractQuery {
     }
 }
 
-export class SmartContractQueryInput {
+export type SmartContractQueryInput = {
     contract: Address;
     caller?: Address;
     value?: bigint;
     function: string;
     arguments: any[];
-
-    constructor(options: { contract: Address; caller?: Address; value?: bigint; function: string; arguments: any[] }) {
-        this.contract = options.contract;
-        this.caller = options.caller;
-        this.value = options.value;
-        this.function = options.function;
-        this.arguments = options.arguments;
-    }
-}
+};
 
 export class SmartContractQueryResponse {
     function: string;

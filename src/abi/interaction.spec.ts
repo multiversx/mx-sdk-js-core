@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
-import { SmartContractQueryInput, SmartContractQueryResponse } from "../smartContractQuery";
+import { SmartContractQueryResponse } from "../smartContractQuery";
 import { SmartContractController } from "../smartContracts";
 import {
     loadAbiRegistry,
@@ -228,15 +228,13 @@ describe("test smart contract interactor", function () {
         // Query;
 
         const interactionQuery = interaction.buildQuery();
-        let response = await controller.query(
-            new SmartContractQueryInput({
-                contract: interactionQuery.address,
-                arguments: interactionQuery.getEncodedArguments(),
-                function: interactionQuery.func.toString(),
-                caller: interactionQuery.caller,
-                value: BigInt(interactionQuery.value.toString()),
-            }),
-        );
+        let response = await controller.query({
+            contract: interactionQuery.address,
+            arguments: interactionQuery.getEncodedArguments(),
+            function: interactionQuery.func.toString(),
+            caller: interactionQuery.caller,
+            value: BigInt(interactionQuery.value.toString()),
+        });
         assert.isTrue(response.length == 1);
         assert.deepEqual(response[0], new BigNumber(42));
 
@@ -299,15 +297,13 @@ describe("test smart contract interactor", function () {
 
         // Query "get()"
         const interactionQuery = getInteraction.buildQuery();
-        let response = await controller.query(
-            new SmartContractQueryInput({
-                contract: interactionQuery.address,
-                arguments: interactionQuery.getEncodedArguments(),
-                function: interactionQuery.func.toString(),
-                caller: interactionQuery.caller,
-                value: BigInt(interactionQuery.value.toString()),
-            }),
-        );
+        let response = await controller.query({
+            contract: interactionQuery.address,
+            arguments: interactionQuery.getEncodedArguments(),
+            function: interactionQuery.func.toString(),
+            caller: interactionQuery.caller,
+            value: BigInt(interactionQuery.value.toString()),
+        });
         assert.deepEqual(response[0], new BigNumber(7));
 
         let incrementTransaction = incrementInteraction

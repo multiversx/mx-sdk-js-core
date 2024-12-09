@@ -14,9 +14,9 @@ import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { Interaction } from "./interaction";
 import { SmartContract } from "./smartContract";
-import { ManagedDecimalSignedValue, ManagedDecimalValue } from "./typesystem";
+import { ManagedDecimalValue } from "./typesystem";
 
-describe.only("test smart contract interactor", function () {
+describe("test smart contract interactor", function () {
     let provider = createLocalnetProvider();
     let alice: TestWallet;
 
@@ -224,7 +224,7 @@ describe.only("test smart contract interactor", function () {
         let response = await controller.awaitCompletedExecute(txHash);
         assert.isTrue(response.returnCode == "ok");
         assert.lengthOf(response.values, 1);
-        assert.deepEqual(response.values[0], new ManagedDecimalValue("0.000000000000000001", 18));
+        assert.deepEqual(response.values[0], new BigNumber("0.000000000000000001"));
 
         // addition with const decimals()
         await signTransaction({ transaction: additionTransaction, wallet: alice });
@@ -232,7 +232,7 @@ describe.only("test smart contract interactor", function () {
         response = await controller.awaitCompletedExecute(txHash);
         assert.isTrue(response.returnCode == "ok");
         assert.lengthOf(response.values, 1);
-        assert.deepEqual(response.values[0], new ManagedDecimalValue("5.2", 2));
+        assert.deepEqual(response.values[0], new BigNumber("5.2"));
 
         // log
         await signTransaction({ transaction: mdLnTransaction, wallet: alice });
@@ -241,7 +241,7 @@ describe.only("test smart contract interactor", function () {
 
         assert.isTrue(response.returnCode == "ok");
         assert.lengthOf(response.values, 1);
-        assert.deepEqual(response.values[0], new ManagedDecimalSignedValue("3.135553845", 9));
+        assert.deepEqual(response.values[0], new BigNumber("3.135553845"));
 
         // addition with var decimals
         await signTransaction({ transaction: additionVarTransaction, wallet: alice });
@@ -249,7 +249,7 @@ describe.only("test smart contract interactor", function () {
         response = await controller.awaitCompletedExecute(txHash);
         assert.isTrue(response.returnCode == "ok");
         assert.lengthOf(response.values, 1);
-        assert.deepEqual(response.values[0], new ManagedDecimalValue("9", 2));
+        assert.deepEqual(response.values[0], new BigNumber("9"));
 
         // log
         await signTransaction({ transaction: lnVarTransaction, wallet: alice });
@@ -257,7 +257,7 @@ describe.only("test smart contract interactor", function () {
         response = await controller.awaitCompletedExecute(txHash);
         assert.isTrue(response.returnCode == "ok");
         assert.lengthOf(response.values, 1);
-        assert.deepEqual(response.values[0], new ManagedDecimalSignedValue("3.135553845", 9));
+        assert.deepEqual(response.values[0], new BigNumber("3.135553845"));
     });
 
     it("should interact with 'counter' (local testnet) using the SmartContractTransactionsFactory", async function () {
@@ -273,7 +273,7 @@ describe.only("test smart contract interactor", function () {
             config: config,
             abi: abiRegistry,
         });
-        const parser = new SmartContractTransactionsOutcomeParser();
+        const parser = new SmartContractTransactionsOutcomeParser({ abi: abiRegistry });
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
 
@@ -299,8 +299,8 @@ describe.only("test smart contract interactor", function () {
 
         const deployTxHash = await provider.sendTransaction(deployTransaction);
         let transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(deployTxHash);
-        let response = parser.parseExecute({ transactionOnNetwork, function: "deploy" });
-        assert.isTrue(response.returnCode == "ok");
+        const deployResponse = parser.parseDeploy({ transactionOnNetwork });
+        assert.isTrue(deployResponse.returnCode == "ok");
 
         const queryController = new SmartContractController({
             chainID: "localnet",
@@ -334,8 +334,8 @@ describe.only("test smart contract interactor", function () {
         const incrementTxHash = await provider.sendTransaction(incrementTransaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(incrementTxHash);
 
-        response = parser.parseExecute({ transactionOnNetwork });
-        assert.deepEqual(response.values[0].valueOf(), new BigNumber(2));
+        let response = parser.parseExecute({ transactionOnNetwork });
+        assert.deepEqual(response.values[0], new BigNumber(2));
 
         let decrementTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
@@ -365,7 +365,7 @@ describe.only("test smart contract interactor", function () {
         this.timeout(140000);
 
         let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
-        let parser = new SmartContractTransactionsOutcomeParser();
+        let parser = new SmartContractTransactionsOutcomeParser({ abi: abiRegistry });
 
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
@@ -443,7 +443,6 @@ describe.only("test smart contract interactor", function () {
         response = parser.parseExecute({ transactionOnNetwork });
         assert.isTrue(response.returnCode == "ok");
         assert.lengthOf(response.values, 1);
-        console.log(response.values[0].valueOf());
         assert.equal(response.values[0].name, "Running");
 
         // getlotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
@@ -464,7 +463,7 @@ describe.only("test smart contract interactor", function () {
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(infoTxHash);
         response = parser.parseExecute({ transactionOnNetwork });
         assert.isTrue(response.returnCode == "ok");
-        assert.lengthOf(response.values, 0);
+        assert.lengthOf(response.values, 1);
 
         // Ignore "deadline" field in our test
         let info = response.values[0]!.valueOf();

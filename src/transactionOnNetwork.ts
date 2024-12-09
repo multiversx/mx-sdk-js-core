@@ -1,14 +1,10 @@
 import { Address } from "./address";
-import { ITransaction, ITransactionNext } from "./networkProviders/interface";
+import { ITransaction } from "./interface";
 import { TransactionLogs } from "./transactionLogs";
 import { SmartContractResult } from "./transactionsOutcomeParsers";
 import { TransactionStatus } from "./transactionStatus";
 
-export function prepareTransactionForBroadcasting(transaction: ITransaction | ITransactionNext): any {
-    if ("toSendable" in transaction) {
-        return transaction.toSendable();
-    }
-
+export function prepareTransactionForBroadcasting(transaction: ITransaction): any {
     return {
         nonce: Number(transaction.nonce),
         value: transaction.value.toString(),

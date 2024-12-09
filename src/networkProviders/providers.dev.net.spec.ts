@@ -1,10 +1,11 @@
 import { AxiosHeaders } from "axios";
 import { assert } from "chai";
 import { Address } from "../address";
+import { ITransaction } from "../interface";
 import { SmartContractQuery } from "../smartContractQuery";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
-import { INetworkProvider, ITransactionNext } from "./interface";
+import { INetworkProvider } from "./interface";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import { NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 
@@ -196,43 +197,46 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         const txs = [
             {
-                toSendable: function () {
-                    return {
-                        nonce: 42,
-                        value: "1",
-                        receiver: "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
-                        sender: "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
-                        gasPrice: 1000000000,
-                        gasLimit: 50000,
-                        chainID: "D",
-                        version: 1,
-                        signature:
-                            "c8eb539e486db7d703d8c70cab3b7679113f77c4685d8fcc94db027ceacc6b8605115034355386dffd7aa12e63dbefa03251a2f1b1d971f52250187298d12900",
-                    };
-                },
+                nonce: 42n,
+                value: 1n,
+                receiver: "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
+                sender: "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
+                data: new Uint8Array(Buffer.from("test")),
+                gasPrice: 1000000000n,
+                gasLimit: 50000n,
+                chainID: "D",
+                version: 1,
+                signature: new Uint8Array(
+                    Buffer.from(
+                        "c8eb539e486db7d703d8c70cab3b7679113f77c4685d8fcc94db027ceacc6b8605115034355386dffd7aa12e63dbefa03251a2f1b1d971f52250187298d12900",
+                    ),
+                ),
+                senderUsername: "",
+                receiverUsername: "",
+                guardian: "",
+                guardianSignature: new Uint8Array(),
+                options: 0,
             },
             {
-                toSendable: function () {
-                    return {
-                        nonce: 43,
-                        value: "1",
-                        receiver: "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
-                        sender: "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
-                        gasPrice: 1000000000,
-                        gasLimit: 50000,
-                        chainID: "D",
-                        version: 1,
-                        signature:
-                            "9c4c22d0ae1b5a10c39583a5ab9020b00b27aa69d4ac8ab4922620dbf0df4036ed890f9946d38a9d0c85d6ac485c0d9b2eac0005e752f249fd0ad863b0471d02",
-                    };
-                },
-            },
-            {
-                toSendable: function () {
-                    return {
-                        nonce: 44,
-                    };
-                },
+                nonce: 43n,
+                value: 1n,
+                receiver: "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
+                sender: "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
+                gasPrice: 1000000000n,
+                gasLimit: 50000n,
+                chainID: "D",
+                version: 1,
+                signature: new Uint8Array(
+                    Buffer.from(
+                        "9c4c22d0ae1b5a10c39583a5ab9020b00b27aa69d4ac8ab4922620dbf0df4036ed890f9946d38a9d0c85d6ac485c0d9b2eac0005e752f249fd0ad863b0471d02",
+                    ),
+                ),
+                senderUsername: "",
+                receiverUsername: "",
+                guardian: "",
+                guardianSignature: new Uint8Array(),
+                options: 0,
+                data: new Uint8Array(),
             },
         ];
 
@@ -408,27 +412,10 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.deepEqual(proxyResponse.logs.events[0].additionalData, [Buffer.from("dGVzdA==", "base64")]);
     });
 
-    it("should send both `Transaction` and `TransactionNext`", async function () {
+    it("should send both `Transaction` ", async function () {
         this.timeout(50000);
 
-        const transaction = {
-            toSendable: function () {
-                return {
-                    nonce: 7,
-                    value: "0",
-                    receiver: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
-                    sender: "erd1zztjf9fhwvuvquzsllknq4qcmffwad6n0hjtn5dyzytr5tgz7uas0mkgrq",
-                    gasPrice: 1000000000,
-                    gasLimit: 50000,
-                    chainID: "D",
-                    version: 2,
-                    signature:
-                        "149f1d8296efcb9489c5b3142ae659aacfa3a7daef3645f1d3747a96dc9cee377070dd8b83b322997c15ba3c305ac18daaee0fd25760eba334b14a9272b34802",
-                };
-            },
-        };
-
-        const transactionNext: ITransactionNext = {
+        const transaction: ITransaction = {
             nonce: BigInt(8),
             value: BigInt(0),
             receiver: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
@@ -449,13 +436,10 @@ describe("test network providers on devnet: Proxy and API", function () {
             options: 0,
         };
 
-        const apiLegacyTxHash = await apiProvider.sendTransaction(transaction);
-        const apiTxNextHash = await apiProvider.sendTransaction(transactionNext);
+        const apiTxNextHash = await apiProvider.sendTransaction(transaction);
 
-        const proxyLegacyTxHash = await proxyProvider.sendTransaction(transaction);
-        const proxyTxNextHash = await proxyProvider.sendTransaction(transactionNext);
+        const proxyTxNextHash = await proxyProvider.sendTransaction(transaction);
 
-        assert.equal(apiLegacyTxHash, proxyLegacyTxHash);
         assert.equal(apiTxNextHash, proxyTxNextHash);
     });
 });

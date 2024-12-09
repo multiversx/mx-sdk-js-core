@@ -124,27 +124,6 @@ export class Address {
         return Address.newFromHex(value, hrp);
     }
 
-    /**
-     * @deprecated Constructing an address object from another object is deprecated.
-     */
-    static fromAddress(address: Address): Address {
-        return new Address(address);
-    }
-
-    /**
-     * @deprecated Use the constructor, instead.
-     */
-    static fromBuffer(buffer: Buffer, hrp?: string): Address {
-        return new Address(buffer, hrp);
-    }
-
-    /**
-     * @deprecated Use {@link newFromBech32} or {@link newFromHex}.
-     */
-    static fromString(value: string, hrp?: string): Address {
-        return new Address(value, hrp);
-    }
-
     private static isValidHex(value: string) {
         return Buffer.from(value, "hex").length == PUBKEY_LENGTH;
     }

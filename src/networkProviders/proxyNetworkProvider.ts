@@ -1,3 +1,5 @@
+import { Address } from "../address";
+import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "../transactionOnNetwork";
@@ -5,7 +7,7 @@ import { TransactionStatus } from "../transactionStatus";
 import { getAxios } from "../utils";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig } from "./config";
-import { BaseUserAgent, EsdtContractAddress } from "./constants";
+import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { IAddress, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "./interface";
 import { NetworkConfig } from "./networkConfig";
@@ -182,7 +184,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         const encodedIdentifier = Buffer.from(identifier);
 
         const queryResponse = await this.queryContract({
-            contract: EsdtContractAddress,
+            contract: Address.fromHex(ESDT_CONTRACT_ADDRESS_HEX),
             function: "getTokenProperties",
             arguments: [new Uint8Array(encodedIdentifier)],
         });

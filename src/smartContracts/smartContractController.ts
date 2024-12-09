@@ -1,7 +1,6 @@
 import { AbiRegistry, ArgSerializer, isTyped, NativeSerializer } from "../abi";
 import { IAccount } from "../accounts/interfaces";
 import { Err, ErrSmartContractQuery } from "../errors";
-import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
 import { INetworkProvider } from "../networkProviders/interface";
 import { SmartContractQuery, SmartContractQueryInput, SmartContractQueryResponse } from "../smartContractQuery";
 import { Transaction } from "../transaction";
@@ -18,14 +17,10 @@ export class SmartContractController {
     private parser: SmartContractTransactionsOutcomeParser;
     private transactionWatcher: TransactionWatcher;
     private txComputer: TransactionComputer;
-    private networkProvider: ApiNetworkProvider | ProxyNetworkProvider | INetworkProvider;
+    private networkProvider: INetworkProvider;
     private abi?: AbiRegistry;
 
-    constructor(options: {
-        chainID: string;
-        networkProvider: ApiNetworkProvider | ProxyNetworkProvider | INetworkProvider;
-        abi?: AbiRegistry;
-    }) {
+    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: AbiRegistry }) {
         this.factory = new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
             abi: options.abi,

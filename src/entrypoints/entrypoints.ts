@@ -6,6 +6,7 @@ import { DelegationController } from "../delegation";
 import { ErrInvalidNetworkProviderKind } from "../errors";
 import { Message, MessageComputer } from "../message";
 import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
+import { INetworkProvider } from "../networkProviders/interface";
 import { RelayedController } from "../relayed/relayedController";
 import { SmartContractController } from "../smartContracts/smartContractController";
 import { TokenManagementController } from "../tokenManagement";
@@ -18,7 +19,7 @@ import { UserVerifier } from "../wallet";
 import { DevnetEntrypointConfig, MainnetEntrypointConfig, TestnetEntrypointConfig } from "./config";
 
 class NetworkEntrypoint {
-    private networkProvider: ApiNetworkProvider | ProxyNetworkProvider;
+    private networkProvider: INetworkProvider;
     private chainId: string;
 
     constructor(options: { networkProviderUrl: string; networkProviderKind: string; chainId: string }) {
@@ -80,7 +81,7 @@ class NetworkEntrypoint {
         return transactionAwaiter.awaitCompleted(txHash);
     }
 
-    createNetworkProvider(): ApiNetworkProvider | ProxyNetworkProvider {
+    createNetworkProvider(): INetworkProvider {
         return this.networkProvider;
     }
 

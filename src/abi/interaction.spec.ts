@@ -280,7 +280,7 @@ describe("test smart contract interactor", function () {
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
         let controller = new SmartContractController({ chainID: "D", networkProvider: provider, abi: abi });
 
-        let getInteraction = <Interaction>contract.methodsExplicit.get().check();
+        let getInteraction = <Interaction>contract.methodsExplicit.get();
         let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(543210);
         let decrementInteraction = (<Interaction>contract.methods.decrement()).withGasLimit(987654);
 
@@ -349,20 +349,21 @@ describe("test smart contract interactor", function () {
         let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new SmartContractController({ chainID: "D", networkProvider: provider, abi: abiRegistry });
 
-        let startInteraction = <Interaction>contract.methodsExplicit
-            .start([
-                BytesValue.fromUTF8("lucky"),
-                new TokenIdentifierValue("lucky-token"),
-                new BigUIntValue(1),
-                OptionValue.newMissing(),
-                OptionValue.newMissing(),
-                OptionValue.newProvided(new U32Value(1)),
-                OptionValue.newMissing(),
-                OptionValue.newMissing(),
-                OptionalValue.newMissing(),
-            ])
-            .withGasLimit(5000000)
-            .check();
+        let startInteraction = <Interaction>(
+            contract.methodsExplicit
+                .start([
+                    BytesValue.fromUTF8("lucky"),
+                    new TokenIdentifierValue("lucky-token"),
+                    new BigUIntValue(1),
+                    OptionValue.newMissing(),
+                    OptionValue.newMissing(),
+                    OptionValue.newProvided(new U32Value(1)),
+                    OptionValue.newMissing(),
+                    OptionValue.newMissing(),
+                    OptionalValue.newMissing(),
+                ])
+                .withGasLimit(5000000)
+        );
 
         let statusInteraction = <Interaction>contract.methods.status(["lucky"]).withGasLimit(5000000);
 

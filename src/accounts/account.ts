@@ -1,6 +1,6 @@
 import { Address } from "../address";
 import { LibraryConfig } from "../config";
-import { IAccountBalance, INonce } from "../interface";
+import { INonce } from "../interface";
 import { Mnemonic, UserSigner, UserWallet } from "../wallet";
 import { IAccount } from "./interfaces";
 
@@ -19,14 +19,6 @@ export class Account implements IAccount {
     nonce: INonce = 0;
 
     /**
-     * @deprecated This will be remove with the next release as not needed anymore.
-     */
-    /**
-     * The balance of the account.
-     */
-    balance: IAccountBalance = "0";
-
-    /**
      * The signer of the account.
      */
     private signer?: UserSigner;
@@ -37,17 +29,6 @@ export class Account implements IAccount {
     constructor(address: Address, signer?: UserSigner) {
         this.address = address;
         this.signer = signer;
-    }
-
-    /**
-     * @deprecated This will be remove with the next release as not needed anymore.
-     */
-    /**
-     * Updates account properties (such as nonce, balance).
-     */
-    update(obj: { nonce: INonce; balance: IAccountBalance }) {
-        this.nonce = obj.nonce;
-        this.balance = obj.balance;
     }
 
     /**
@@ -73,7 +54,6 @@ export class Account implements IAccount {
         return {
             address: this.address.bech32(),
             nonce: this.nonce.valueOf(),
-            balance: this.balance.toString(),
         };
     }
 

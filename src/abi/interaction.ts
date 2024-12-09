@@ -8,7 +8,6 @@ import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { ContractFunction } from "./function";
-import { InteractionChecker } from "./interactionChecker";
 import { CallArguments } from "./interface";
 import { Query } from "./query";
 import { EndpointDefinition, TypedValue } from "./typesystem";
@@ -193,14 +192,6 @@ export class Interaction {
 
     withExplicitReceiver(receiver: IAddress): Interaction {
         this.explicitReceiver = receiver;
-        return this;
-    }
-
-    /**
-     * To perform custom checking, extend {@link Interaction} and override this method.
-     */
-    check(): Interaction {
-        new InteractionChecker().checkInteraction(this, this.getEndpoint());
         return this;
     }
 }

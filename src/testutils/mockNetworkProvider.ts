@@ -2,6 +2,7 @@ import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
 import * as errors from "../errors";
 import { ErrMock } from "../errors";
+import { ITransaction } from "../interface";
 import { IAccountOnNetwork } from "../interfaceOfNetwork";
 import {
     AccountOnNetwork,
@@ -14,7 +15,7 @@ import {
     NetworkStatus,
     NonFungibleTokenOfAccountOnNetwork,
 } from "../networkProviders";
-import { IAddress, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "../networkProviders/interface";
+import { IAddress, INetworkProvider, IPagination } from "../networkProviders/interface";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { Transaction, TransactionHash } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
@@ -87,7 +88,7 @@ export class MockNetworkProvider implements INetworkProvider {
     ): Promise<NonFungibleTokenOfAccountOnNetwork> {
         throw new Error("Method not implemented.");
     }
-    sendTransactions(_txs: (ITransaction | ITransactionNext)[]): Promise<string[]> {
+    sendTransactions(_txs: ITransaction[]): Promise<string[]> {
         throw new Error("Method not implemented.");
     }
     getDefinitionOfFungibleToken(_tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {

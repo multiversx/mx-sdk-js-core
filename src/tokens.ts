@@ -339,17 +339,3 @@ export class TokenComputer {
 function decodeUnsignedNumber(arg: Buffer): number {
     return arg.readUIntBE(0, arg.length);
 }
-
-/**
- * @deprecated use {@link TokenTransfer} instead.
- */
-export class TokenPayment extends TokenTransfer {
-    constructor(tokenIdentifier: string, nonce: number, amountAsBigInteger: BigNumber.Value, numDecimals: number) {
-        super({
-            tokenIdentifier,
-            nonce,
-            amountAsBigInteger,
-            numDecimals,
-        });
-    }
-}

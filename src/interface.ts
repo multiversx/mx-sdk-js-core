@@ -83,11 +83,6 @@ export interface ITokenTransfer {
     valueOf(): BigNumber.Value;
 }
 
-/**
- * @deprecated Use {@link ITokenTransfer} instead.
- */
-export type ITokenPayment = ITokenTransfer;
-
 export interface ITransaction {
     sender: string;
     receiver: string;

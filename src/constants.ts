@@ -26,28 +26,3 @@ export const SDK_JS_SIGNER = "sdk-js";
 export const UNKNOWN_SIGNER = "unknown";
 
 export const EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER = "EGLD-000000";
-
-/**
- * @deprecated
- */
-export const DEFAULT_HRP = "erd";
-
-/**
- * @deprecated
- */
-export const BECH32_ADDRESS_LENGTH = 62;
-
-/**
- * @deprecated Use {@link CONTRACT_DEPLOY_ADDRESS_HEX} instead.
- */
-export const CONTRACT_DEPLOY_ADDRESS = "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu";
-
-/**
- * @deprecated Use {@link DELEGATION_MANAGER_SC_ADDRESS_HEX} instead.
- */
-export const DELEGATION_MANAGER_SC_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6";
-
-/**
- * @deprecated Use {@link 000000000000000000010000000000000000000000000000000000000002ffff} instead.
- */
-export const ESDT_CONTRACT_ADDRESS = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";

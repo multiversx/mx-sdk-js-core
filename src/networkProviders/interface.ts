@@ -1,4 +1,4 @@
-import { ITransaction as ITransactionAsInSpecs } from "../interface";
+import { ITransaction } from "../interface";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
@@ -79,12 +79,12 @@ export interface INetworkProvider {
     /**
      * Broadcasts an already-signed transaction.
      */
-    sendTransaction(tx: ITransaction | ITransactionNext): Promise<string>;
+    sendTransaction(tx: ITransaction): Promise<string>;
 
     /**
      * Broadcasts a list of already-signed transactions.
      */
-    sendTransactions(txs: (ITransaction | ITransactionNext)[]): Promise<string[]>;
+    sendTransactions(txs: ITransaction[]): Promise<string[]>;
 
     /**
      * Simulates the processing of an already-signed transaction.
@@ -136,15 +136,6 @@ export interface IPagination {
     size: number;
 }
 
-export interface ITransaction {
-    toSendable(): any;
-}
-
 export interface IAddress {
     bech32(): string;
 }
-
-/**
- * @deprecated This will be removed with the next release (replaced by the `ITransaction` interface from "src/interface.ts").
- */
-export type ITransactionNext = ITransactionAsInSpecs;

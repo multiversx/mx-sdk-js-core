@@ -113,11 +113,11 @@ describe("test smart contract interactor", function () {
 
         const executeTxHash = await provider.sendTransaction(transaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(executeTxHash);
-        const responseD = queryController.parseExecute(transactionOnNetwork);
+        const executeResponse = queryController.parseExecute(transactionOnNetwork);
 
-        assert.isTrue(response.contracts.length == 1);
-        assert.deepEqual(responseD.values[0], new BigNumber(42));
-        assert.isTrue(response.returnCode == "ok");
+        assert.isTrue(executeResponse.values.length == 1);
+        assert.deepEqual(executeResponse.values[0], new BigNumber(42));
+        assert.isTrue(executeResponse.returnCode == "ok");
     });
 
     it("should interact with 'basic-features' (local testnet)", async function () {

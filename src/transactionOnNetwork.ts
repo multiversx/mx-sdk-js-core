@@ -8,8 +8,8 @@ export function prepareTransactionForBroadcasting(transaction: Transaction): any
     return {
         nonce: Number(transaction.nonce),
         value: transaction.value.toString(),
-        receiver: transaction.receiver,
-        sender: transaction.sender,
+        receiver: transaction.receiver.bech32(),
+        sender: transaction.sender.bech32(),
         senderUsername: transaction.senderUsername
             ? Buffer.from(transaction.senderUsername).toString("base64")
             : undefined,
@@ -22,7 +22,7 @@ export function prepareTransactionForBroadcasting(transaction: Transaction): any
         chainID: transaction.chainID,
         version: transaction.version,
         options: transaction.options,
-        guardian: transaction.guardian || undefined,
+        guardian: transaction.guardian.isEmpty() ? undefined : transaction.guardian.bech32(),
         signature: Buffer.from(transaction.signature).toString("hex"),
         guardianSignature:
             transaction.guardianSignature.length === 0

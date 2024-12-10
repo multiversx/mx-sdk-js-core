@@ -55,7 +55,7 @@ describe("test transaction", function () {
 
         await alice.sync(provider);
         await bob.sync(provider);
-        let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
+        let initialBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
         transactionOne.setNonce(alice.account.nonce);
         alice.account.incrementNonce();
@@ -71,7 +71,7 @@ describe("test transaction", function () {
         await watcher.awaitCompleted(transactionTwo.getHash().hex());
 
         await bob.sync(provider);
-        let newBalanceOfBob = new BigNumber(bob.account.balance.toString());
+        let newBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
         assert.deepEqual(TokenTransfer.egldFromAmount(85).valueOf(), newBalanceOfBob.minus(initialBalanceOfBob));
     });
@@ -94,7 +94,7 @@ describe("test transaction", function () {
 
         await alice.sync(provider);
         await bob.sync(provider);
-        let initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
+        let initialBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
         transactionOne.setNonce(alice.account.nonce);
         await signTransaction({ transaction: transactionOne, wallet: alice });
@@ -102,7 +102,7 @@ describe("test transaction", function () {
         await watcher.awaitCompleted(transactionOne.getHash().hex());
 
         await bob.sync(provider);
-        let newBalanceOfBob = new BigNumber(bob.account.balance.toString());
+        let newBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
         assert.deepEqual(TokenTransfer.egldFromAmount(42).valueOf(), newBalanceOfBob.minus(initialBalanceOfBob));
     });
@@ -155,7 +155,7 @@ describe("test transaction", function () {
 
         await alice.sync(provider);
         await bob.sync(provider);
-        const initialBalanceOfBob = new BigNumber(bob.account.balance.toString());
+        const initialBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
         const transaction = factory.createTransactionForNativeTokenTransfer(alice.address, {
             receiver: bob.address,
@@ -170,7 +170,7 @@ describe("test transaction", function () {
         await watcher.awaitCompleted(txHash);
 
         await bob.sync(provider);
-        const newBalanceOfBob = new BigNumber(bob.account.balance.toString());
+        const newBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
         assert.deepEqual(TokenTransfer.egldFromAmount(42).valueOf(), newBalanceOfBob.minus(initialBalanceOfBob));
     });

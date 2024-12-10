@@ -1,6 +1,7 @@
 import { Address } from "../address";
 import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
+import { ITransaction } from "../interface";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
@@ -9,7 +10,7 @@ import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig } from "./config";
 import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
-import { IAddress, INetworkProvider, IPagination, ITransaction, ITransactionNext } from "./interface";
+import { IAddress, INetworkProvider, IPagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkProviderConfig } from "./networkProviderConfig";
@@ -136,13 +137,13 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return status;
     }
 
-    async sendTransaction(tx: ITransaction | ITransactionNext): Promise<string> {
+    async sendTransaction(tx: ITransaction): Promise<string> {
         const transaction = prepareTransactionForBroadcasting(tx);
         const response = await this.doPostGeneric("transaction/send", transaction);
         return response.txHash;
     }
 
-    async sendTransactions(txs: (ITransaction | ITransactionNext)[]): Promise<string[]> {
+    async sendTransactions(txs: ITransaction[]): Promise<string[]> {
         const data = txs.map((tx) => prepareTransactionForBroadcasting(tx));
 
         const response = await this.doPostGeneric("transaction/send-multiple", data);
@@ -155,7 +156,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return hashes;
     }
 
-    async simulateTransaction(tx: ITransaction | ITransactionNext): Promise<any> {
+    async simulateTransaction(tx: ITransaction): Promise<any> {
         const transaction = prepareTransactionForBroadcasting(tx);
         const response = await this.doPostGeneric("transaction/simulate", transaction);
         return response;

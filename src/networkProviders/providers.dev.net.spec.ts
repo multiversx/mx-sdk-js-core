@@ -192,7 +192,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         proxyResponse.decimals = 0;
     }
 
-    it.only("should be able to send transaction(s)", async function () {
+    it("should be able to send transaction(s)", async function () {
         this.timeout(5000);
 
         const txs = [
@@ -208,6 +208,13 @@ describe("test network providers on devnet: Proxy and API", function () {
                     "498d5abb9f8eb69cc75f24320e8929dadbfa855ffac220d5e92175a83be68e0437801af3a1411e3d839738230097a1c38da5c8c4df3f345defc5d40300675900",
                     "hex",
                 ),
+                senderUsername: "",
+                receiverUsername: "",
+                guardian: "",
+                guardianSignature: new Uint8Array(),
+                options: 0,
+                data: new Uint8Array(),
+                value: 0n,
             },
 
             {
@@ -222,6 +229,13 @@ describe("test network providers on devnet: Proxy and API", function () {
                     "341a2f3b738fbd20692e3bbd1cb36cb5f4ce9c0a9acc0cf4322269c0fcf34fd6bb59cd94062a9a4730e47f41b1ef3e29b69c6ab2a2a4dca9c9a7724681bc1708",
                     "hex",
                 ),
+                value: 0n,
+                senderUsername: "",
+                receiverUsername: "",
+                guardian: "",
+                guardianSignature: new Uint8Array(),
+                options: 0,
+                data: new Uint8Array(),
             },
             {
                 nonce: 77n,
@@ -229,6 +243,16 @@ describe("test network providers on devnet: Proxy and API", function () {
                 receiver: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
                 sender: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
                 gasLimit: 50000n,
+                gasPrice: 1000000000n,
+                value: 0n,
+                senderUsername: "",
+                receiverUsername: "",
+                guardian: "",
+                guardianSignature: new Uint8Array(),
+                options: 0,
+                data: new Uint8Array(),
+                version: 1,
+                signature: new Uint8Array(),
             },
         ];
 
@@ -404,7 +428,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.deepEqual(proxyResponse.logs.events[0].additionalData, [Buffer.from("dGVzdA==", "base64")]);
     });
 
-    it.only("should send both `Transaction` ", async function () {
+    it("should send both `Transaction` ", async function () {
         this.timeout(50000);
 
         const transaction: ITransaction = {

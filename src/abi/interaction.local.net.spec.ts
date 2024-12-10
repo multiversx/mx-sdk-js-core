@@ -139,7 +139,7 @@ describe("test smart contract interactor", function () {
             contract: contract,
             deployer: alice,
             codePath: "src/testdata/basic-features.wasm",
-            gasLimit: 600000000,
+            gasLimit: 600000000n,
             initArguments: [],
             chainID: network.ChainID,
         });

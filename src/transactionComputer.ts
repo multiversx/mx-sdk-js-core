@@ -50,7 +50,6 @@ export class TransactionComputer {
         this.ensureValidTransactionFields(transaction);
 
         const plainTransaction = this.toPlainObject(transaction);
-        console.log({ plainTransaction });
         const serialized = JSON.stringify(plainTransaction);
         return new Uint8Array(Buffer.from(serialized));
     }

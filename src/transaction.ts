@@ -3,24 +3,10 @@ import { Address } from "./address";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
 import { TransactionsConverter } from "./converters/transactionsConverter";
 import { Hash } from "./hash";
-import {
-    IAddress,
-    IChainID,
-    IGasLimit,
-    IGasPrice,
-    INonce,
-    IPlainTransactionObject,
-    ISignature,
-    ITransactionOptions,
-    ITransactionPayload,
-    ITransactionValue,
-    ITransactionVersion,
-} from "./interface";
+import { IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionValue } from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
-import { TransactionOptions, TransactionVersion } from "./networkParams";
 import { interpretSignatureAsBuffer } from "./signature";
 import { TransactionComputer } from "./transactionComputer";
-import { TransactionPayload } from "./transactionPayload";
 
 /**
  * An abstraction for creating and signing transactions.
@@ -37,14 +23,14 @@ export class Transaction {
     public value: bigint;
 
     /**
-     * The address of the sender, in bech32 format.
+     * The address of the sender.
      */
-    public sender: string;
+    public sender: Address;
 
     /**
-     * The address of the receiver, in bech32 format.
+     * The address of the receiver.
      */
-    public receiver: string;
+    public receiver: Address;
 
     /**
      * The username of the sender.
@@ -89,7 +75,7 @@ export class Transaction {
     /**
      * The address of the guardian, in bech32 format.
      */
-    public guardian: string;
+    public guardian: Address;
 
     /**
      * The signature.
@@ -105,19 +91,19 @@ export class Transaction {
      * Creates a new Transaction object.
      */
     public constructor(options: {
-        nonce?: INonce | bigint;
-        value?: ITransactionValue | bigint;
-        sender: IAddress | string;
-        receiver: IAddress | string;
+        nonce?: bigint;
+        value?: bigint;
+        sender: Address;
+        receiver: Address;
         senderUsername?: string;
         receiverUsername?: string;
-        gasPrice?: IGasPrice | bigint;
-        gasLimit: IGasLimit | bigint;
-        data?: ITransactionPayload | Uint8Array;
-        chainID: IChainID | string;
-        version?: ITransactionVersion | number;
-        options?: ITransactionOptions | number;
-        guardian?: IAddress | string;
+        gasPrice?: bigint;
+        gasLimit: bigint;
+        data?: Uint8Array;
+        chainID: string;
+        version?: number;
+        options?: number;
+        guardian?: Address;
         signature?: Uint8Array;
         guardianSignature?: Uint8Array;
     }) {
@@ -125,8 +111,8 @@ export class Transaction {
         // We still rely on "bigNumber" for value, because client code might be passing a BigNumber object as a legacy "ITransactionValue",
         // and we want to keep compatibility.
         this.value = options.value ? BigInt(new BigNumber(options.value.toString()).toFixed(0)) : 0n;
-        this.sender = this.addressAsBech32(options.sender);
-        this.receiver = this.addressAsBech32(options.receiver);
+        this.sender = options.sender;
+        this.receiver = options.receiver;
         this.senderUsername = options.senderUsername || "";
         this.receiverUsername = options.receiverUsername || "";
         this.gasPrice = BigInt(options.gasPrice?.valueOf() || TRANSACTION_MIN_GAS_PRICE);
@@ -135,14 +121,10 @@ export class Transaction {
         this.chainID = options.chainID.valueOf();
         this.version = Number(options.version?.valueOf() || TRANSACTION_VERSION_DEFAULT);
         this.options = Number(options.options?.valueOf() || TRANSACTION_OPTIONS_DEFAULT);
-        this.guardian = options.guardian ? this.addressAsBech32(options.guardian) : "";
+        this.guardian = options.guardian ?? Address.empty();
 
         this.signature = options.signature || Buffer.from([]);
         this.guardianSignature = options.guardianSignature || Buffer.from([]);
-    }
-
-    private addressAsBech32(address: IAddress | string): string {
-        return typeof address === "string" ? address : address.bech32();
     }
 
     /**
@@ -178,21 +160,21 @@ export class Transaction {
      * Legacy method, use the "sender" property instead.
      */
     getSender(): Address {
-        return Address.fromBech32(this.sender);
+        return this.sender;
     }
 
     /**
      * Legacy method, use the "sender" property instead.
      */
-    setSender(sender: Address | string) {
-        this.sender = typeof sender === "string" ? sender : sender.bech32();
+    setSender(sender: Address) {
+        this.sender = sender;
     }
 
     /**
      * Legacy method, use the "receiver" property instead.
      */
     getReceiver(): Address {
-        return Address.fromBech32(this.receiver);
+        return this.receiver;
     }
 
     /**
@@ -227,7 +209,7 @@ export class Transaction {
      * Legacy method, use the "guardian" property instead.
      */
     getGuardian(): Address {
-        return new Address(this.guardian);
+        return this.guardian;
     }
 
     /**
@@ -261,43 +243,43 @@ export class Transaction {
     /**
      * Legacy method, use the "data" property instead.
      */
-    getData(): ITransactionPayload {
-        return new TransactionPayload(Buffer.from(this.data));
+    getData(): Uint8Array {
+        return this.data;
     }
 
     /**
      * Legacy method, use the "chainID" property instead.
      */
-    getChainID(): IChainID {
+    getChainID(): string {
         return this.chainID;
     }
 
     /**
      * Legacy method, use the "chainID" property instead.
      */
-    setChainID(chainID: IChainID | string) {
-        this.chainID = chainID.valueOf();
+    setChainID(chainID: string) {
+        this.chainID = chainID;
     }
 
     /**
      * Legacy method, use the "version" property instead.
      */
-    getVersion(): TransactionVersion {
-        return new TransactionVersion(this.version);
+    getVersion(): number {
+        return this.version;
     }
 
     /**
      * Legacy method, use the "version" property instead.
      */
-    setVersion(version: ITransactionVersion | number) {
-        this.version = version.valueOf();
+    setVersion(version: number) {
+        this.version = version;
     }
 
     /**
      * Legacy method, use the "options" property instead.
      */
-    getOptions(): TransactionOptions {
-        return new TransactionOptions(this.options.valueOf());
+    getOptions(): number {
+        return this.options;
     }
 
     /**
@@ -305,8 +287,8 @@ export class Transaction {
      *
      * Question for review: check how the options are set by sdk-dapp, wallet, ledger, extension.
      */
-    setOptions(options: ITransactionOptions | number) {
-        this.options = options.valueOf();
+    setOptions(options: number) {
+        this.options = options;
     }
 
     /**
@@ -326,8 +308,8 @@ export class Transaction {
     /**
      * Legacy method, use the "guardian" property instead.
      */
-    setGuardian(guardian: IAddress | string) {
-        this.guardian = typeof guardian === "string" ? guardian : guardian.bech32();
+    setGuardian(guardian: Address) {
+        this.guardian = guardian;
     }
 
     /**
@@ -352,9 +334,9 @@ export class Transaction {
      * Checks the integrity of the guarded transaction
      */
     isGuardedTransaction(): boolean {
-        const hasGuardian = this.guardian.length > 0;
+        const hasGuardian = !this.guardian.isEmpty;
         const hasGuardianSignature = this.guardianSignature.length > 0;
-        return this.getOptions().isWithGuardian() && hasGuardian && hasGuardianSignature;
+        return hasGuardian && hasGuardianSignature;
     }
 
     /**

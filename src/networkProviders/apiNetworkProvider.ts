@@ -1,6 +1,6 @@
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
-import { ITransaction } from "../interface";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
+import { Transaction } from "../transaction";
 import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { getAxios } from "../utils";
@@ -147,17 +147,17 @@ export class ApiNetworkProvider implements INetworkProvider {
         return status;
     }
 
-    async sendTransaction(tx: ITransaction): Promise<string> {
+    async sendTransaction(tx: Transaction): Promise<string> {
         const transaction = prepareTransactionForBroadcasting(tx);
         const response = await this.doPostGeneric("transactions", transaction);
         return response.txHash;
     }
 
-    async sendTransactions(txs: ITransaction[]): Promise<string[]> {
+    async sendTransactions(txs: Transaction[]): Promise<string[]> {
         return await this.backingProxyNetworkProvider.sendTransactions(txs);
     }
 
-    async simulateTransaction(tx: ITransaction): Promise<any> {
+    async simulateTransaction(tx: Transaction): Promise<any> {
         return await this.backingProxyNetworkProvider.simulateTransaction(tx);
     }
 

@@ -2,7 +2,6 @@ import BigNumber from "bignumber.js";
 import { AddressValue, ArgSerializer, BytesValue, U64Value } from "../abi";
 import { Address } from "../address";
 import { ErrInvalidInnerTransaction } from "../errors";
-import { ITransaction } from "../interface";
 import { Transaction } from "../transaction";
 
 const JSONbig = require("json-bigint");
@@ -23,7 +22,7 @@ export class RelayedTransactionsFactory {
         this.config = options.config;
     }
 
-    createRelayedV1Transaction(relayerAddress: Address, options: { innerTransaction: ITransaction }): Transaction {
+    createRelayedV1Transaction(relayerAddress: Address, options: { innerTransaction: Transaction }): Transaction {
         if (!options.innerTransaction.gasLimit) {
             throw new ErrInvalidInnerTransaction("The gas limit is not set for the inner transaction");
         }
@@ -40,7 +39,7 @@ export class RelayedTransactionsFactory {
 
         return new Transaction({
             chainID: this.config.chainID,
-            sender: relayerAddress.bech32(),
+            sender: relayerAddress,
             receiver: options.innerTransaction.sender,
             gasLimit: gasLimit,
             data: Buffer.from(data),
@@ -50,7 +49,7 @@ export class RelayedTransactionsFactory {
     createRelayedV2Transaction(
         relayerAddress: Address,
         options: {
-            innerTransaction: ITransaction;
+            innerTransaction: Transaction;
             innerTransactionGasLimit: bigint;
         },
     ): Transaction {
@@ -63,7 +62,7 @@ export class RelayedTransactionsFactory {
         }
 
         const { argumentsString } = new ArgSerializer().valuesToString([
-            new AddressValue(Address.fromBech32(options.innerTransaction.receiver)),
+            new AddressValue(options.innerTransaction.receiver),
             new U64Value(new BigNumber(options.innerTransaction.nonce.toString())),
             new BytesValue(Buffer.from(options.innerTransaction.data)),
             new BytesValue(Buffer.from(options.innerTransaction.signature)),
@@ -75,7 +74,7 @@ export class RelayedTransactionsFactory {
         const gasLimit = options.innerTransactionGasLimit + this.config.minGasLimit + additionalGasForDataLength;
 
         return new Transaction({
-            sender: relayerAddress.bech32(),
+            sender: relayerAddress,
             receiver: options.innerTransaction.sender,
             value: 0n,
             gasLimit: gasLimit,
@@ -86,11 +85,11 @@ export class RelayedTransactionsFactory {
         });
     }
 
-    private prepareInnerTransactionForRelayedV1(innerTransaction: ITransaction): string {
+    private prepareInnerTransactionForRelayedV1(innerTransaction: Transaction): string {
         const txObject = {
             nonce: innerTransaction.nonce,
-            sender: Address.newFromBech32(innerTransaction.sender).getPublicKey().toString("base64"),
-            receiver: Address.newFromBech32(innerTransaction.receiver).getPublicKey().toString("base64"),
+            sender: innerTransaction.sender.getPublicKey().toString("base64"),
+            receiver: innerTransaction.receiver.getPublicKey().toString("base64"),
             value: innerTransaction.value,
             gasPrice: innerTransaction.gasPrice,
             gasLimit: innerTransaction.gasLimit,
@@ -100,7 +99,7 @@ export class RelayedTransactionsFactory {
             version: innerTransaction.version,
             options: innerTransaction.options.valueOf() == 0 ? undefined : innerTransaction.options,
             guardian: innerTransaction.guardian
-                ? Address.newFromBech32(innerTransaction.guardian).getPublicKey().toString("base64")
+                ? innerTransaction.guardian.getPublicKey().toString("base64")
                 : undefined,
             guardianSignature: innerTransaction.guardianSignature.length
                 ? Buffer.from(innerTransaction.guardianSignature).toString("base64")

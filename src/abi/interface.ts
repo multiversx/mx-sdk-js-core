@@ -1,5 +1,5 @@
 import { Address } from "../address";
-import { IChainID, IGasLimit, IGasPrice, ITransactionValue } from "../interface";
+import { ITransactionValue } from "../interface";
 import { Transaction } from "../transaction";
 import { ReturnCode } from "./returnCode";
 import { TypedValue } from "./typesystem";
@@ -33,10 +33,10 @@ export interface DeployArguments {
     code: ICode;
     codeMetadata?: ICodeMetadata;
     initArguments?: any[];
-    value?: ITransactionValue;
-    gasLimit: IGasLimit;
-    gasPrice?: IGasPrice;
-    chainID: IChainID;
+    value?: bigint;
+    gasLimit: bigint;
+    gasPrice?: bigint;
+    chainID: string;
     deployer: Address;
 }
 
@@ -44,21 +44,21 @@ export interface UpgradeArguments {
     code: ICode;
     codeMetadata?: ICodeMetadata;
     initArguments?: any[];
-    value?: ITransactionValue;
-    gasLimit: IGasLimit;
-    gasPrice?: IGasPrice;
-    chainID: IChainID;
+    value?: bigint;
+    gasLimit: bigint;
+    gasPrice?: bigint;
+    chainID: string;
     caller: Address;
 }
 
 export interface CallArguments {
     func: IContractFunction;
     args?: any[];
-    value?: ITransactionValue;
-    gasLimit: IGasLimit;
+    value?: bigint;
+    gasLimit: bigint;
     receiver?: Address;
-    gasPrice?: IGasPrice;
-    chainID: IChainID;
+    gasPrice?: bigint;
+    chainID: string;
     caller: Address;
 }
 

@@ -1,5 +1,4 @@
 import { Address } from "../address";
-import { IAddress } from "../interface";
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "../transactionBuilder";
 import { SaveKeyValueInput, SetGuardianInput } from "./resources";
@@ -23,7 +22,7 @@ export class AccountTransactionsFactory {
         this.config = options.config;
     }
 
-    createTransactionForSavingKeyValue(sender: IAddress, options: SaveKeyValueInput): Transaction {
+    createTransactionForSavingKeyValue(sender: Address, options: SaveKeyValueInput): Transaction {
         const functionName = "SaveKeyValue";
         const keyValueParts = this.computeDataPartsForSavingKeyValue(options.keyValuePairs);
         const dataParts = [functionName, ...keyValueParts];
@@ -61,7 +60,7 @@ export class AccountTransactionsFactory {
         return dataParts;
     }
 
-    createTransactionForSettingGuardian(sender: IAddress, options: SetGuardianInput): Transaction {
+    createTransactionForSettingGuardian(sender: Address, options: SetGuardianInput): Transaction {
         const dataParts = [
             "SetGuardian",
             Address.fromBech32(options.guardianAddress.bech32()).toHex(),
@@ -78,7 +77,7 @@ export class AccountTransactionsFactory {
         }).build();
     }
 
-    createTransactionForGuardingAccount(sender: IAddress): Transaction {
+    createTransactionForGuardingAccount(sender: Address): Transaction {
         const dataParts = ["GuardAccount"];
 
         return new TransactionBuilder({
@@ -91,7 +90,7 @@ export class AccountTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnguardingAccount(sender: IAddress): Transaction {
+    createTransactionForUnguardingAccount(sender: Address): Transaction {
         const dataParts = ["UnGuardAccount"];
 
         return new TransactionBuilder({

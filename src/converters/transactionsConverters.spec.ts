@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import { Address } from "../address";
 import { Transaction } from "../transaction";
 import { TransactionsConverter } from "./transactionsConverter";
 
@@ -7,14 +8,14 @@ describe("test transactions converter", async () => {
         const converter = new TransactionsConverter();
 
         const transaction = new Transaction({
-            nonce: 90,
+            nonce: 90n,
             value: BigInt("123456789000000000000000000000"),
-            sender: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
-            receiver: "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
+            sender: Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            receiver: Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"),
             senderUsername: "alice",
             receiverUsername: "bob",
-            gasPrice: 1000000000,
-            gasLimit: 80000,
+            gasPrice: 1000000000n,
+            gasLimit: 80000n,
             data: Buffer.from("hello"),
             chainID: "localnet",
             version: 2,

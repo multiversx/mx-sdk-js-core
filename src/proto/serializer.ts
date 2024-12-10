@@ -3,7 +3,7 @@ import { bigIntToBuffer } from "../abi/codec/utils";
 import { Address } from "../address";
 import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED } from "../constants";
 import * as errors from "../errors";
-import { ITransaction, ITransactionValue } from "../interface";
+import { ITransactionValue } from "../interface";
 import { Transaction } from "../transaction";
 
 /**
@@ -25,11 +25,11 @@ export class ProtoSerializer {
         return buffer;
     }
 
-    private convertToProtoMessage(transaction: ITransaction) {
+    private convertToProtoMessage(transaction: Transaction) {
         const proto = require("./compiled").proto;
 
-        const receiverPubkey = new Address(transaction.receiver).getPublicKey();
-        const senderPubkey = new Address(transaction.sender).getPublicKey();
+        const receiverPubkey = transaction.receiver.getPublicKey();
+        const senderPubkey = transaction.sender.getPublicKey();
 
         let protoTransaction = new proto.Transaction({
             // mx-chain-go's serializer handles nonce == 0 differently, thus we treat 0 as "undefined".
@@ -79,13 +79,13 @@ export class ProtoSerializer {
         return buffer;
     }
 
-    private isGuardedTransaction(transaction: ITransaction): boolean {
-        const hasGuardian = transaction.guardian.length > 0;
+    private isGuardedTransaction(transaction: Transaction): boolean {
+        const hasGuardian = !transaction.guardian.isEmpty();
         const hasGuardianSignature = transaction.guardianSignature.length > 0;
         return this.isWithGuardian(transaction) && hasGuardian && hasGuardianSignature;
     }
 
-    private isWithGuardian(transaction: ITransaction): boolean {
+    private isWithGuardian(transaction: Transaction): boolean {
         return (transaction.options & TRANSACTION_OPTIONS_TX_GUARDED) == TRANSACTION_OPTIONS_TX_GUARDED;
     }
 

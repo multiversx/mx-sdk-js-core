@@ -1,13 +1,14 @@
-import { IPlainTransactionObject, ITransaction } from "../interface";
+import { Address } from "../address";
+import { IPlainTransactionObject } from "../interface";
 import { Transaction } from "../transaction";
 
 export class TransactionsConverter {
-    public transactionToPlainObject(transaction: ITransaction): IPlainTransactionObject {
+    public transactionToPlainObject(transaction: Transaction): IPlainTransactionObject {
         const plainObject = {
             nonce: Number(transaction.nonce),
             value: transaction.value.toString(),
-            receiver: transaction.receiver,
-            sender: transaction.sender,
+            receiver: transaction.receiver.bech32(),
+            sender: transaction.sender.bech32(),
             senderUsername: this.toBase64OrUndefined(transaction.senderUsername),
             receiverUsername: this.toBase64OrUndefined(transaction.receiverUsername),
             gasPrice: Number(transaction.gasPrice),
@@ -16,7 +17,7 @@ export class TransactionsConverter {
             chainID: transaction.chainID.valueOf(),
             version: transaction.version,
             options: transaction.options == 0 ? undefined : transaction.options,
-            guardian: transaction.guardian ? transaction.guardian : undefined,
+            guardian: transaction.guardian.isEmpty() ? undefined : transaction.guardian.bech32(),
             signature: this.toHexOrUndefined(transaction.signature),
             guardianSignature: this.toHexOrUndefined(transaction.guardianSignature),
         };
@@ -36,11 +37,11 @@ export class TransactionsConverter {
         const transaction = new Transaction({
             nonce: BigInt(object.nonce),
             value: BigInt(object.value || ""),
-            receiver: object.receiver,
+            receiver: Address.newFromBech32(object.receiver),
             receiverUsername: this.bufferFromBase64(object.receiverUsername).toString(),
-            sender: object.sender,
+            sender: Address.newFromBech32(object.sender),
             senderUsername: this.bufferFromBase64(object.senderUsername).toString(),
-            guardian: object.guardian,
+            guardian: object.guardian ? Address.newFromBech32(object.guardian) : Address.empty(),
             gasPrice: BigInt(object.gasPrice),
             gasLimit: BigInt(object.gasLimit),
             data: this.bufferFromBase64(object.data),

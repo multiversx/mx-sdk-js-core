@@ -21,11 +21,11 @@ describe("test delegation transactions factory", function () {
             amount: value,
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(
-            transaction.receiver,
-            Address.fromHex(DELEGATION_MANAGER_SC_ADDRESS_HEX, config.addressHrp).bech32(),
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
         );
+        assert.deepEqual(transaction.receiver, Address.fromHex(DELEGATION_MANAGER_SC_ADDRESS_HEX, config.addressHrp));
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("createNewDelegationContract@010f0cf064dd59200000@0a"));
         assert.equal(transaction.gasLimit, 60126500n);
@@ -57,8 +57,14 @@ describe("test delegation transactions factory", function () {
             signedMessages: [mockMessage.getSignature()],
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(
             transaction.data,
@@ -84,8 +90,14 @@ describe("test delegation transactions factory", function () {
             publicKeys: [publicKey],
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(
             transaction.data,
@@ -110,8 +122,14 @@ describe("test delegation transactions factory", function () {
             publicKeys: [publicKey],
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(
             transaction.data,
@@ -136,8 +154,14 @@ describe("test delegation transactions factory", function () {
             publicKeys: [publicKey],
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(
             transaction.data,
@@ -163,8 +187,14 @@ describe("test delegation transactions factory", function () {
             publicKeys: [publicKey],
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(
             transaction.data,
@@ -177,8 +207,10 @@ describe("test delegation transactions factory", function () {
     });
 
     it("should create 'Transaction' for unjailing nodes", async function () {
-        const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        const sender = Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        const delegationContract = Address.newFromBech32(
+            "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc",
+        );
         const publicKey = new ValidatorPublicKey(
             Buffer.from(
                 "be2e593ff10899a2ee8e1d5c8094e36c9f48e04b87e129991ff09475808743e07bb41bf6e7bc1463fa554c4b46594b98",
@@ -190,8 +222,14 @@ describe("test delegation transactions factory", function () {
             publicKeys: [publicKey],
             amount: 25000000000000000000n,
         });
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(
             transaction.data,
@@ -203,8 +241,10 @@ describe("test delegation transactions factory", function () {
     });
 
     it("should create 'Transaction' for changing service fee", async function () {
-        const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        const sender = Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        const delegationContract = Address.newFromBech32(
+            "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc",
+        );
         const serviceFee = 10n;
 
         const transaction = delegationFactory.createTransactionForChangingServiceFee(sender, {
@@ -212,8 +252,14 @@ describe("test delegation transactions factory", function () {
             serviceFee: serviceFee,
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("changeServiceFee@0a"));
         assert.equal(transaction.value, 0n);
@@ -229,8 +275,14 @@ describe("test delegation transactions factory", function () {
             delegationCap: delegationCap,
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("modifyTotalDelegationCap@010f0cf064dd59200000"));
         assert.equal(transaction.value, 0n);
@@ -244,8 +296,14 @@ describe("test delegation transactions factory", function () {
             delegationContract: delegationContract,
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("setAutomaticActivation@74727565"));
         assert.equal(transaction.value, 0n);
@@ -259,8 +317,14 @@ describe("test delegation transactions factory", function () {
             delegationContract: delegationContract,
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("setAutomaticActivation@66616c7365"));
         assert.equal(transaction.value, 0n);
@@ -274,8 +338,14 @@ describe("test delegation transactions factory", function () {
             delegationContract: delegationContract,
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("setCheckCapOnReDelegateRewards@74727565"));
         assert.equal(transaction.value, 0n);
@@ -289,16 +359,24 @@ describe("test delegation transactions factory", function () {
             delegationContract: delegationContract,
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("setCheckCapOnReDelegateRewards@66616c7365"));
         assert.equal(transaction.value, 0n);
     });
 
     it("should create 'Transaction' for setting metadata", async function () {
-        const sender = Address.fromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        const delegationContract = Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        const sender = Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
+        const delegationContract = Address.newFromBech32(
+            "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc",
+        );
 
         const transaction = delegationFactory.createTransactionForSettingMetadata(sender, {
             delegationContract: delegationContract,
@@ -307,8 +385,14 @@ describe("test delegation transactions factory", function () {
             identifier: "identifier",
         });
 
-        assert.equal(transaction.sender, "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc"),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("setMetaData@6e616d65@77656273697465@6964656e746966696572"));
         assert.equal(transaction.value, 0n);

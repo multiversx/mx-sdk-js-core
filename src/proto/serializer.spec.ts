@@ -1,11 +1,9 @@
 import { assert } from "chai";
 import { Address } from "../address";
-import { TransactionVersion } from "../networkParams";
 import { Signature } from "../signature";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
-import { TransactionPayload } from "../transactionPayload";
 import { ProtoSerializer } from "./serializer";
 
 describe("serialize transactions", () => {
@@ -18,11 +16,11 @@ describe("serialize transactions", () => {
 
     it("with no data, no value", async () => {
         let transaction = new Transaction({
-            nonce: 89,
-            value: 0,
+            nonce: 89n,
+            value: 0n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasLimit: 50000,
+            gasLimit: 50000n,
             chainID: "local-testnet",
         });
 
@@ -38,12 +36,12 @@ describe("serialize transactions", () => {
 
     it("with data, no value", async () => {
         let transaction = new Transaction({
-            nonce: 90,
-            value: 0,
+            nonce: 90n,
+            value: 0n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
+            gasLimit: 80000n,
+            data: Buffer.from("hello"),
             chainID: "local-testnet",
         });
 
@@ -59,12 +57,12 @@ describe("serialize transactions", () => {
 
     it("with data, with value", async () => {
         let transaction = new Transaction({
-            nonce: 91,
-            value: TokenTransfer.egldFromAmount(10),
+            nonce: 91n,
+            value: TokenTransfer.egldFromAmount(10).amount,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasLimit: 100000,
-            data: new TransactionPayload("for the book"),
+            gasLimit: 100000n,
+            data: Buffer.from("for the book"),
             chainID: "local-testnet",
         });
 
@@ -80,12 +78,12 @@ describe("serialize transactions", () => {
 
     it("with data, with large value", async () => {
         let transaction = new Transaction({
-            nonce: 92,
-            value: "123456789000000000000000000000",
+            nonce: 92n,
+            value: 123456789000000000000000000000n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasLimit: 100000,
-            data: new TransactionPayload("for the spaceship"),
+            gasLimit: 100000n,
+            data: Buffer.from("for the spaceship"),
             chainID: "local-testnet",
         });
 
@@ -101,14 +99,14 @@ describe("serialize transactions", () => {
 
     it("with nonce = 0", async () => {
         let transaction = new Transaction({
-            nonce: 0,
-            value: "0",
+            nonce: 0n,
+            value: 0n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
+            gasLimit: 80000n,
+            data: Buffer.from("hello"),
             chainID: "local-testnet",
-            version: new TransactionVersion(1),
+            version: 1,
         });
 
         transaction.applySignature(
@@ -126,13 +124,13 @@ describe("serialize transactions", () => {
 
     it("with usernames", async () => {
         const transaction = new Transaction({
-            nonce: 204,
-            value: "1000000000000000000",
+            nonce: 204n,
+            value: 1000000000000000000n,
             sender: Address.fromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
             receiver: Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
             senderUsername: "carol",
             receiverUsername: "alice",
-            gasLimit: 50000,
+            gasLimit: 50000n,
             chainID: "T",
         });
 

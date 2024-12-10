@@ -247,12 +247,12 @@ export class SmartContract implements ISmartContract {
         });
 
         args = args || [];
-        value = value || 0;
+        value = value || 0n;
 
         const transaction = factory.createTransactionForExecute(caller, {
             contract: receiver ? receiver : this.getAddress(),
             function: func.toString(),
-            gasLimit: BigInt(gasLimit.valueOf()),
+            gasLimit: gasLimit,
             arguments: args,
         });
 

@@ -7,7 +7,6 @@ import { createLocalnetProvider } from "./testutils/networkProviders";
 import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionComputer } from "./transactionComputer";
-import { TransactionPayload } from "./transactionPayload";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 import { TransactionWatcher } from "./transactionWatcher";
 import { TransferTransactionsFactory } from "./transfers/transferTransactionsFactory";
@@ -40,16 +39,16 @@ describe("test transaction", function () {
         let transactionOne = new Transaction({
             sender: alice.address,
             receiver: bob.address,
-            value: TokenTransfer.egldFromAmount(42),
-            gasLimit: network.MinGasLimit,
+            value: TokenTransfer.egldFromAmount(42).amount,
+            gasLimit: BigInt(network.MinGasLimit),
             chainID: network.ChainID,
         });
 
         let transactionTwo = new Transaction({
             sender: alice.address,
             receiver: bob.address,
-            value: TokenTransfer.egldFromAmount(43),
-            gasLimit: network.MinGasLimit,
+            value: TokenTransfer.egldFromAmount(43).amount,
+            gasLimit: BigInt(network.MinGasLimit),
             chainID: network.ChainID,
         });
 
@@ -87,8 +86,8 @@ describe("test transaction", function () {
         let transactionOne = new Transaction({
             sender: alice.address,
             receiver: bob.address,
-            value: TokenTransfer.egldFromAmount(42),
-            gasLimit: network.MinGasLimit,
+            value: TokenTransfer.egldFromAmount(42).amount,
+            gasLimit: BigInt(network.MinGasLimit),
             chainID: network.ChainID,
         });
 
@@ -116,19 +115,19 @@ describe("test transaction", function () {
 
         let transactionOne = new Transaction({
             sender: alice.address,
-            data: new TransactionPayload("helloWorld"),
-            gasLimit: 70000,
+            data: Buffer.from("helloWorld"),
+            gasLimit: 70000n,
             receiver: alice.address,
-            value: TokenTransfer.egldFromAmount(1000),
+            value: TokenTransfer.egldFromAmount(1000).amount,
             chainID: network.ChainID,
         });
 
         let transactionTwo = new Transaction({
             sender: alice.address,
-            data: new TransactionPayload("helloWorld"),
-            gasLimit: 70000,
+            data: Buffer.from("helloWorld"),
+            gasLimit: 70000n,
             receiver: alice.address,
-            value: TokenTransfer.egldFromAmount(1000000),
+            value: TokenTransfer.egldFromAmount(1000000).amount,
             chainID: network.ChainID,
         });
 

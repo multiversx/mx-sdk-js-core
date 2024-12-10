@@ -36,8 +36,8 @@ describe("test transfer transactions factory", function () {
             nativeAmount: 1000000000000000000n,
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, bob.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, bob);
         assert.equal(transaction.value.valueOf(), 1000000000000000000n);
         assert.equal(transaction.gasLimit.valueOf(), 50000n);
         assert.deepEqual(transaction.data, new Uint8Array());
@@ -50,8 +50,8 @@ describe("test transfer transactions factory", function () {
             data: Buffer.from("test data"),
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, bob.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, bob);
         assert.equal(transaction.value.valueOf(), 1000000000000000000n);
         assert.equal(transaction.gasLimit.valueOf(), 63500n);
         assert.deepEqual(transaction.data, Buffer.from("test data"));
@@ -66,8 +66,8 @@ describe("test transfer transactions factory", function () {
             tokenTransfers: [transfer],
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, bob.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, bob);
         assert.equal(transaction.value.valueOf(), 0n);
         assert.equal(transaction.gasLimit.valueOf(), 410000n);
         assert.deepEqual(transaction.data.toString(), "ESDTTransfer@464f4f2d313233343536@0f4240");
@@ -82,8 +82,8 @@ describe("test transfer transactions factory", function () {
             tokenTransfers: [transfer],
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, alice.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, alice);
         assert.equal(transaction.value.valueOf(), 0n);
         assert.equal(transaction.gasLimit.valueOf(), 1210500n);
         assert.deepEqual(
@@ -101,8 +101,8 @@ describe("test transfer transactions factory", function () {
             tokenTransfers: [transfer],
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, alice.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, alice);
         assert.equal(transaction.value.valueOf(), 0n);
         assert.equal(transaction.gasLimit.valueOf(), 1219500n);
         assert.deepEqual(
@@ -123,8 +123,8 @@ describe("test transfer transactions factory", function () {
             tokenTransfers: [firstTransfer, secondTransfer],
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, alice.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, alice);
         assert.equal(transaction.value.valueOf(), 0n);
         assert.equal(transaction.gasLimit.valueOf(), 1466000n);
         assert.deepEqual(
@@ -152,8 +152,8 @@ describe("test transfer transactions factory", function () {
             tokenTransfers: [firstTransfer, secondTransfer],
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, alice.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, alice);
         assert.equal(transaction.value.valueOf(), 0n);
         assert.equal(transaction.gasLimit.valueOf(), 1484000n);
         assert.deepEqual(
@@ -188,8 +188,8 @@ describe("test transfer transactions factory", function () {
             nativeAmount: 1000000000000000000n,
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, bob.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, bob);
         assert.equal(transaction.value.valueOf(), 1000000000000000000n);
         assert.equal(transaction.gasLimit.valueOf(), 50000n);
     });
@@ -201,8 +201,8 @@ describe("test transfer transactions factory", function () {
             data: Buffer.from("hello"),
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, bob.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, bob);
         assert.equal(transaction.value.valueOf(), 1000000000000000000n);
         assert.equal(transaction.gasLimit.valueOf(), 57500n);
         assert.deepEqual(transaction.data, Buffer.from("hello"));
@@ -214,8 +214,8 @@ describe("test transfer transactions factory", function () {
             data: Buffer.from("hello"),
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, bob.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, bob);
         assert.equal(transaction.gasLimit.valueOf(), 57500n);
         assert.deepEqual(transaction.data, Buffer.from("hello"));
     });
@@ -233,8 +233,8 @@ describe("test transfer transactions factory", function () {
             tokenTransfers: [firstTransfer, secondTransfer],
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, alice.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, alice);
         assert.equal(transaction.value.valueOf(), 0n);
         assert.equal(transaction.gasLimit.valueOf(), 1727500n);
         assert.deepEqual(
@@ -256,8 +256,8 @@ describe("test transfer transactions factory", function () {
             tokenTransfers: [firstTransfer, secondTransfer],
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, alice.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, alice);
         assert.equal(transaction.value.valueOf(), 0n);
         assert.equal(transaction.gasLimit.valueOf(), 1745500n);
         assert.deepEqual(
@@ -275,8 +275,8 @@ describe("test transfer transactions factory", function () {
             tokenTransfers: [firstTransfer],
         });
 
-        assert.equal(transaction.sender, alice.toBech32());
-        assert.equal(transaction.receiver, alice.toBech32());
+        assert.equal(transaction.sender, alice);
+        assert.equal(transaction.receiver, alice);
         assert.equal(transaction.value.valueOf(), 0n);
         assert.equal(transaction.gasLimit.valueOf(), 1_243_500n);
         assert.deepEqual(

@@ -2,7 +2,6 @@ import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
 import * as errors from "../errors";
 import { ErrMock } from "../errors";
-import { ITransaction } from "../interface";
 import { IAccountOnNetwork } from "../interfaceOfNetwork";
 import {
     AccountOnNetwork,
@@ -88,7 +87,7 @@ export class MockNetworkProvider implements INetworkProvider {
     ): Promise<NonFungibleTokenOfAccountOnNetwork> {
         throw new Error("Method not implemented.");
     }
-    sendTransactions(_txs: ITransaction[]): Promise<string[]> {
+    sendTransactions(_txs: Transaction[]): Promise<string[]> {
         throw new Error("Method not implemented.");
     }
     getDefinitionOfFungibleToken(_tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
@@ -173,7 +172,7 @@ export class MockNetworkProvider implements INetworkProvider {
         }
     }
 
-    async getAccount(address: IAddress): Promise<AccountOnNetwork> {
+    async getAccount(address: Address): Promise<AccountOnNetwork> {
         let account = this.accounts.get(address.bech32());
         if (account) {
             return account;
@@ -188,7 +187,7 @@ export class MockNetworkProvider implements INetworkProvider {
             new TransactionOnNetwork({
                 sender: transaction.getSender(),
                 receiver: transaction.getReceiver(),
-                data: transaction.getData().valueOf(),
+                data: Buffer.from(transaction.data),
                 status: new TransactionStatus("pending"),
             }),
         );

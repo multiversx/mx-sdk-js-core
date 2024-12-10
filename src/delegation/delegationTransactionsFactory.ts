@@ -2,7 +2,6 @@ import { ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../abi";
 import { Address } from "../address";
 import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../constants";
 import { Err } from "../errors";
-import { IAddress } from "../interface";
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "../transactionBuilder";
 import * as resources from "./resources";
@@ -36,7 +35,7 @@ export class DelegationTransactionsFactory {
     }
 
     createTransactionForNewDelegationContract(
-        sender: IAddress,
+        sender: Address,
         options: resources.NewDelegationContractInput,
     ): Transaction {
         const dataParts = [
@@ -61,7 +60,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForAddingNodes(sender: IAddress, options: resources.AddNodesInput): Transaction {
+    createTransactionForAddingNodes(sender: Address, options: resources.AddNodesInput): Transaction {
         if (options.publicKeys.length !== options.signedMessages.length) {
             throw new Err("The number of public keys should match the number of signed messages");
         }
@@ -88,7 +87,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForRemovingNodes(sender: IAddress, options: resources.ManageNodesInput): Transaction {
+    createTransactionForRemovingNodes(sender: Address, options: resources.ManageNodesInput): Transaction {
         const dataParts = ["removeNodes"];
 
         for (const key of options.publicKeys) {
@@ -106,7 +105,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForStakingNodes(sender: IAddress, options: resources.ManageNodesInput): Transaction {
+    createTransactionForStakingNodes(sender: Address, options: resources.ManageNodesInput): Transaction {
         let dataParts = ["stakeNodes"];
 
         for (const key of options.publicKeys) {
@@ -129,7 +128,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnbondingNodes(sender: IAddress, options: resources.ManageNodesInput): Transaction {
+    createTransactionForUnbondingNodes(sender: Address, options: resources.ManageNodesInput): Transaction {
         let dataParts = ["unBondNodes"];
 
         for (const key of options.publicKeys) {
@@ -152,7 +151,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnstakingNodes(sender: IAddress, options: resources.ManageNodesInput): Transaction {
+    createTransactionForUnstakingNodes(sender: Address, options: resources.ManageNodesInput): Transaction {
         let dataParts = ["unStakeNodes"];
 
         for (const key of options.publicKeys) {
@@ -175,7 +174,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnjailingNodes(sender: IAddress, options: resources.UnjailingNodesInput): Transaction {
+    createTransactionForUnjailingNodes(sender: Address, options: resources.UnjailingNodesInput): Transaction {
         const dataParts = ["unJailNodes"];
 
         for (const key of options.publicKeys) {
@@ -194,7 +193,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForChangingServiceFee(sender: IAddress, options: resources.ChangeServiceFee): Transaction {
+    createTransactionForChangingServiceFee(sender: Address, options: resources.ChangeServiceFee): Transaction {
         const dataParts = [
             "changeServiceFee",
             this.argSerializer.valuesToStrings([new BigUIntValue(options.serviceFee)])[0],
@@ -213,7 +212,7 @@ export class DelegationTransactionsFactory {
     }
 
     createTransactionForModifyingDelegationCap(
-        sender: IAddress,
+        sender: Address,
         options: resources.ModifyDelegationCapInput,
     ): Transaction {
         const dataParts = [
@@ -234,7 +233,7 @@ export class DelegationTransactionsFactory {
     }
 
     createTransactionForSettingAutomaticActivation(
-        sender: IAddress,
+        sender: Address,
         options: resources.ManageDelegationContractInput,
     ): Transaction {
         const dataParts = ["setAutomaticActivation", this.argSerializer.valuesToStrings([new StringValue("true")])[0]];
@@ -252,7 +251,7 @@ export class DelegationTransactionsFactory {
     }
 
     createTransactionForUnsettingAutomaticActivation(
-        sender: IAddress,
+        sender: Address,
         options: resources.ManageDelegationContractInput,
     ): Transaction {
         const dataParts = ["setAutomaticActivation", this.argSerializer.valuesToStrings([new StringValue("false")])[0]];
@@ -270,7 +269,7 @@ export class DelegationTransactionsFactory {
     }
 
     createTransactionForSettingCapCheckOnRedelegateRewards(
-        sender: IAddress,
+        sender: Address,
         options: resources.ManageDelegationContractInput,
     ): Transaction {
         const dataParts = [
@@ -291,7 +290,7 @@ export class DelegationTransactionsFactory {
     }
 
     createTransactionForUnsettingCapCheckOnRedelegateRewards(
-        sender: IAddress,
+        sender: Address,
         options: resources.ManageDelegationContractInput,
     ): Transaction {
         const dataParts = [
@@ -311,7 +310,7 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForSettingMetadata(sender: IAddress, options: resources.SetContractMetadataInput): Transaction {
+    createTransactionForSettingMetadata(sender: Address, options: resources.SetContractMetadataInput): Transaction {
         const dataParts = [
             "setMetaData",
             ...this.argSerializer.valuesToStrings([
@@ -334,29 +333,29 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForWithdrawing(_sender: IAddress, _options: resources.ManageDelegationContractInput): Transaction {
+    createTransactionForWithdrawing(_sender: Address, _options: resources.ManageDelegationContractInput): Transaction {
         throw new Error("Method not implemented.");
     }
 
-    createTransactionForUndelegating(_sender: IAddress, _options: resources.DelegateActionsInput): Transaction {
+    createTransactionForUndelegating(_sender: Address, _options: resources.DelegateActionsInput): Transaction {
         throw new Error("Method not implemented.");
     }
 
     createTransactionForRedelegatingRewards(
-        _sender: IAddress,
+        _sender: Address,
         _options: resources.ManageDelegationContractInput,
     ): Transaction {
         throw new Error("Method not implemented.");
     }
 
     createTransactionForClaimingRewards(
-        _sender: IAddress,
+        _sender: Address,
         _options: resources.ManageDelegationContractInput,
     ): Transaction {
         throw new Error("Method not implemented.");
     }
 
-    createTransactionForDelegating(_sender: IAddress, _options: resources.DelegateActionsInput): Transaction {
+    createTransactionForDelegating(_sender: Address, _options: resources.DelegateActionsInput): Transaction {
         throw new Error("Method not implemented.");
     }
 

@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import { Address } from "../address";
 import { TestWallet, loadTestWallets } from "../testutils";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
@@ -17,8 +18,8 @@ describe("test relayed transactions factory", function () {
 
     it("should throw exception when creating relayed v1 transaction with invalid inner transaction", async function () {
         let innerTransaction = new Transaction({
-            sender: alice.address.bech32(),
-            receiver: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+            sender: alice.address,
+            receiver: Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
             gasLimit: 10000000n,
             data: Buffer.from("getContractConfig"),
             chainID: config.chainID,
@@ -40,8 +41,8 @@ describe("test relayed transactions factory", function () {
 
     it("should create relayed v1 transaction", async function () {
         let innerTransaction = new Transaction({
-            sender: bob.address.bech32(),
-            receiver: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+            sender: bob.address,
+            receiver: Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
             gasLimit: 60000000n,
             data: Buffer.from("getContractConfig"),
             chainID: config.chainID,
@@ -71,8 +72,8 @@ describe("test relayed transactions factory", function () {
 
     it("should create relayed v1 transaction with usernames", async function () {
         let innerTransaction = new Transaction({
-            sender: carol.address.bech32(),
-            receiver: alice.address.bech32(),
+            sender: carol.address,
+            receiver: alice.address,
             gasLimit: 50000n,
             chainID: config.chainID,
             nonce: 208n,
@@ -104,8 +105,8 @@ describe("test relayed transactions factory", function () {
 
     it("should create relayed v1 transaction with big value", async function () {
         let innerTransaction = new Transaction({
-            sender: carol.address.bech32(),
-            receiver: alice.address.bech32(),
+            sender: carol.address,
+            receiver: alice.address,
             gasLimit: 50000n,
             chainID: config.chainID,
             nonce: 208n,
@@ -137,15 +138,15 @@ describe("test relayed transactions factory", function () {
 
     it("should create relayed v1 transaction with guarded inner transaction", async function () {
         let innerTransaction = new Transaction({
-            sender: bob.address.bech32(),
-            receiver: "erd1qqqqqqqqqqqqqpgq54tsxmej537z9leghvp69hfu4f8gg5eu396q83gnnz",
+            sender: bob.address,
+            receiver: Address.newFromBech32("erd1qqqqqqqqqqqqqpgq54tsxmej537z9leghvp69hfu4f8gg5eu396q83gnnz"),
             gasLimit: 60000000n,
             chainID: config.chainID,
             data: Buffer.from("getContractConfig"),
             nonce: 198n,
             version: 2,
             options: 2,
-            guardian: grace.address.bech32(),
+            guardian: grace.address,
         });
 
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
@@ -172,15 +173,15 @@ describe("test relayed transactions factory", function () {
 
     it("should create guarded relayed v1 transaction with guarded inner transaction", async function () {
         let innerTransaction = new Transaction({
-            sender: bob.address.bech32(),
-            receiver: "erd1qqqqqqqqqqqqqpgq54tsxmej537z9leghvp69hfu4f8gg5eu396q83gnnz",
+            sender: bob.address,
+            receiver: Address.newFromBech32("erd1qqqqqqqqqqqqqpgq54tsxmej537z9leghvp69hfu4f8gg5eu396q83gnnz"),
             gasLimit: 60000000n,
             chainID: config.chainID,
             data: Buffer.from("addNumber"),
             nonce: 198n,
             version: 2,
             options: 2,
-            guardian: grace.address.bech32(),
+            guardian: grace.address,
         });
 
         const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
@@ -192,7 +193,7 @@ describe("test relayed transactions factory", function () {
         });
         relayedTransaction.nonce = 2627n;
         relayedTransaction.options = 2;
-        relayedTransaction.guardian = frank.address.bech32();
+        relayedTransaction.guardian = frank.address;
 
         const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
         relayedTransaction.signature = await alice.signer.sign(serializedRelayedTransaction);
@@ -210,8 +211,8 @@ describe("test relayed transactions factory", function () {
 
     it("should throw exception when creating relayed v2 transaction with invalid inner transaction", async function () {
         let innerTransaction = new Transaction({
-            sender: bob.address.bech32(),
-            receiver: bob.address.bech32(),
+            sender: bob.address,
+            receiver: bob.address,
             gasLimit: 50000n,
             chainID: config.chainID,
         });
@@ -237,8 +238,8 @@ describe("test relayed transactions factory", function () {
 
     it("should create relayed v2 transaction", async function () {
         let innerTransaction = new Transaction({
-            sender: bob.address.bech32(),
-            receiver: "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+            sender: bob.address,
+            receiver: Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"),
             gasLimit: 0n,
             chainID: config.chainID,
             data: Buffer.from("getContractConfig"),

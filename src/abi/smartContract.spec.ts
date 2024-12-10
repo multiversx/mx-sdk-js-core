@@ -42,7 +42,7 @@ describe("test contract", () => {
         let contract = new SmartContract();
         let deployTransaction = contract.deploy({
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
-            gasLimit: 1000000,
+            gasLimit: 1000000n,
             chainID: chainID,
             deployer: alice.address,
         });
@@ -97,7 +97,7 @@ describe("test contract", () => {
         let callTransactionOne = contract.call({
             func: new ContractFunction("helloEarth"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
-            gasLimit: 150000,
+            gasLimit: 150000n,
             chainID: chainID,
             caller: alice.address,
         });
@@ -105,7 +105,7 @@ describe("test contract", () => {
         let callTransactionTwo = contract.call({
             func: new ContractFunction("helloMars"),
             args: [new U32Value(5), BytesValue.fromHex("0123")],
-            gasLimit: 1500000,
+            gasLimit: 1500000n,
             chainID: chainID,
             caller: alice.address,
         });
@@ -161,7 +161,7 @@ describe("test contract", () => {
 
         let deployTransaction = contract.upgrade({
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
-            gasLimit: 1000000,
+            gasLimit: 1000000n,
             chainID: chainID,
             caller: alice.address,
         });
@@ -233,7 +233,7 @@ describe("test contract", () => {
                 func: "foo",
                 args: [new U8Value(1), new U8Value(2), new U8Value(3)],
                 chainID: "D",
-                gasLimit: 1000000,
+                gasLimit: 1000000n,
                 caller: callerAddress,
             });
         }, "Wrong number of arguments for endpoint foo: expected between 0 and 1 arguments, have 3");
@@ -243,7 +243,7 @@ describe("test contract", () => {
             func: "foo",
             args: [[new U8Value(1), new U8Value(2), new U8Value(3)]],
             chainID: "D",
-            gasLimit: 1000000,
+            gasLimit: 1000000n,
             caller: callerAddress,
         });
 
@@ -252,7 +252,7 @@ describe("test contract", () => {
             func: "foo",
             args: [[1, 2, 3]],
             chainID: "D",
-            gasLimit: 1000000,
+            gasLimit: 1000000n,
             caller: callerAddress,
         });
 
@@ -302,7 +302,7 @@ describe("test contract", () => {
                 func: "foo",
                 args: [new U8Value(1), new U8Value(2), new U8Value(3)],
                 chainID: "D",
-                gasLimit: 1000000,
+                gasLimit: 1000000n,
                 caller: callerAddress,
             });
         }, "Invalid argument: Wrong argument type for endpoint foo: typed value provided; expected variadic type, have U8Value");
@@ -312,7 +312,7 @@ describe("test contract", () => {
             func: "foo",
             args: [VariadicValue.fromItems(new U8Value(1), new U8Value(2), new U8Value(3))],
             chainID: "D",
-            gasLimit: 1000000,
+            gasLimit: 1000000n,
             caller: callerAddress,
         });
 
@@ -321,7 +321,7 @@ describe("test contract", () => {
             func: "foo",
             args: [1, 2, 3],
             chainID: "D",
-            gasLimit: 1000000,
+            gasLimit: 1000000n,
             caller: callerAddress,
         });
 

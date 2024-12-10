@@ -67,7 +67,7 @@ import {
 export namespace NativeTypes {
     export type NativeBuffer = Buffer | string;
     export type NativeBytes = Buffer | { valueOf(): Buffer } | string;
-    export type NativeAddress = string | Buffer | IAddress | { getAddress(): IAddress };
+    export type NativeAddress = string | Buffer | Address | { getAddress(): IAddress };
     export type NativeBigNumber = BigNumber.Value | bigint;
 }
 
@@ -403,9 +403,9 @@ export namespace NativeSerializer {
     export function convertNativeToAddress(
         native: NativeTypes.NativeAddress,
         errorContext: ArgumentErrorContext,
-    ): IAddress {
+    ): Address {
         if ((<any>native).bech32) {
-            return <IAddress>native;
+            return <Address>native;
         }
         if ((<any>native).getAddress) {
             return (<any>native).getAddress();

@@ -1,10 +1,10 @@
 import { Address } from "./address";
-import { ITransaction } from "./interface";
+import { Transaction } from "./transaction";
 import { TransactionLogs } from "./transactionLogs";
 import { SmartContractResult } from "./transactionsOutcomeParsers";
 import { TransactionStatus } from "./transactionStatus";
 
-export function prepareTransactionForBroadcasting(transaction: ITransaction): any {
+export function prepareTransactionForBroadcasting(transaction: Transaction): any {
     return {
         nonce: Number(transaction.nonce),
         value: transaction.value.toString(),

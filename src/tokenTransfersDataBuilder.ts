@@ -1,5 +1,5 @@
 import { AddressValue, ArgSerializer, BigUIntValue, TokenIdentifierValue, TypedValue, U32Value } from "./abi";
-import { IAddress } from "./interface";
+import { Address } from "./address";
 import { TokenComputer, TokenTransfer } from "./tokens";
 
 export class TokenTransfersDataBuilder {
@@ -20,7 +20,7 @@ export class TokenTransfersDataBuilder {
         return ["ESDTTransfer", ...args];
     }
 
-    buildDataPartsForSingleESDTNFTTransfer(transfer: TokenTransfer, receiver: IAddress) {
+    buildDataPartsForSingleESDTNFTTransfer(transfer: TokenTransfer, receiver: Address) {
         const token = transfer.token;
         const identifier = this.tokenComputer.extractIdentifierFromExtendedIdentifier(token.identifier);
 
@@ -34,7 +34,7 @@ export class TokenTransfersDataBuilder {
         return ["ESDTNFTTransfer", ...args];
     }
 
-    buildDataPartsForMultiESDTNFTTransfer(receiver: IAddress, transfers: TokenTransfer[]) {
+    buildDataPartsForMultiESDTNFTTransfer(receiver: Address, transfers: TokenTransfer[]) {
         const argsTyped: TypedValue[] = [new AddressValue(receiver), new U32Value(transfers.length)];
 
         for (const transfer of transfers) {

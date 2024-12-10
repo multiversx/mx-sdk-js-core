@@ -190,8 +190,8 @@ describe("test smart contract interactor", function () {
             transaction,
             new Transaction({
                 chainID: "T",
-                sender: alice.toBech32(),
-                receiver: dummyAddress.toBech32(),
+                sender: alice,
+                receiver: dummyAddress,
                 data: Buffer.from("ESDTTransfer@464f4f2d616263646566@64@676574556c74696d617465416e73776572"),
                 gasLimit: 543210n,
                 value: 0n,

@@ -197,47 +197,44 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         const txs = [
             {
-                nonce: 42n,
-                value: 1n,
-                receiver: "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
-                sender: "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
-                data: new Uint8Array(Buffer.from("test")),
+                nonce: 103n,
+                receiver: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
+                sender: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
                 gasPrice: 1000000000n,
-                gasLimit: 100000n,
+                gasLimit: 50000n,
                 chainID: "D",
                 version: 2,
                 signature: Buffer.from(
-                    "c8eb539e486db7d703d8c70cab3b7679113f77c4685d8fcc94db027ceacc6b8605115034355386dffd7aa12e63dbefa03251a2f1b1d971f52250187298d12900",
+                    "498d5abb9f8eb69cc75f24320e8929dadbfa855ffac220d5e92175a83be68e0437801af3a1411e3d839738230097a1c38da5c8c4df3f345defc5d40300675900",
                     "hex",
                 ),
             },
 
             {
-                nonce: 43n,
-                value: 1n,
-                receiver: "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
-                sender: "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
+                nonce: 104n,
+                receiver: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
+                sender: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
                 gasPrice: 1000000000n,
-                gasLimit: 100000n,
+                gasLimit: 50000n,
                 chainID: "D",
                 version: 2,
                 signature: Buffer.from(
-                    "9c4c22d0ae1b5a10c39583a5ab9020b00b27aa69d4ac8ab4922620dbf0df4036ed890f9946d38a9d0c85d6ac485c0d9b2eac0005e752f249fd0ad863b0471d02",
+                    "341a2f3b738fbd20692e3bbd1cb36cb5f4ce9c0a9acc0cf4322269c0fcf34fd6bb59cd94062a9a4730e47f41b1ef3e29b69c6ab2a2a4dca9c9a7724681bc1708",
                     "hex",
                 ),
             },
             {
-                nonce: 44n,
+                nonce: 77n,
                 chainID: "D",
-                receiver: "erd1testnlersh4z0wsv8kjx39me4rmnvjkwu8dsaea7ukdvvc9z396qykv7z7",
-                sender: "erd15x2panzqvfxul2lvstfrmdcl5t4frnsylfrhng8uunwdssxw4y9succ9sq",
-                gasLimit: 100000n,
+                receiver: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
+                sender: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
+                gasLimit: 50000n,
             },
         ];
 
         const expectedHashes = [
-            "6e2fa63ea02937f00d7549f3e4eb9af241e4ac13027aa65a5300816163626c01",
-            "37d7e84313a5baea2a61c6ab10bb29b52bc54f7ac9e3918a9faeb1e08f42081c",
+            "61b4f2561fc57bfb8b8971ed23cd64259b664bc0404ea7a0449def8ceef24b08",
+            "30274b60b5635f981fa89ccfe726a34ca7121caa5d34123021c77a5c64cc9163",
             null,
         ];
 

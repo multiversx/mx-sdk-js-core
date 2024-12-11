@@ -111,7 +111,7 @@ export class TransactionComputer {
             receiverUsername: this.toBase64OrUndefined(transaction.receiverUsername),
             gasPrice: Number(transaction.gasPrice),
             gasLimit: Number(transaction.gasLimit),
-            data: transaction.data.length > 0 ? Buffer.from(transaction.data).toString("base64") : undefined,
+            data: this.toBase64OrUndefined(transaction.data),
         };
 
         if (withSignature) {

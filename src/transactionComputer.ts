@@ -121,7 +121,7 @@ export class TransactionComputer {
         obj.chainID = transaction.chainID;
         obj.version = transaction.version;
         obj.options = transaction.options ? transaction.options : undefined;
-        obj.guardian = transaction.guardian.isEmpty() ? undefined : transaction.guardian;
+        obj.guardian = transaction.guardian.isEmpty() ? undefined : transaction.guardian.bech32();
 
         return obj;
     }
@@ -131,7 +131,6 @@ export class TransactionComputer {
     }
 
     private toBase64OrUndefined(value?: string | Uint8Array) {
-        console.log(1121, value && value.length ? Buffer.from(value).toString("base64") : undefined);
         return value && value.length ? Buffer.from(value).toString("base64") : undefined;
     }
 

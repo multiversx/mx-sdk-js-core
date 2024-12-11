@@ -87,12 +87,12 @@ export class RelayedTransactionsFactory {
 
     private prepareInnerTransactionForRelayedV1(innerTransaction: Transaction): string {
         const txObject = {
-            nonce: Number(innerTransaction.nonce),
+            nonce: innerTransaction.nonce,
             sender: innerTransaction.sender.getPublicKey().toString("base64"),
             receiver: innerTransaction.receiver.getPublicKey().toString("base64"),
-            value: innerTransaction.value.toString(),
-            gasPrice: Number(innerTransaction.gasPrice),
-            gasLimit: Number(innerTransaction.gasLimit),
+            value: innerTransaction.value,
+            gasPrice: innerTransaction.gasPrice,
+            gasLimit: innerTransaction.gasLimit,
             data: Buffer.from(innerTransaction.data).toString("base64"),
             signature: Buffer.from(innerTransaction.signature).toString("base64"),
             chainID: Buffer.from(innerTransaction.chainID).toString("base64"),

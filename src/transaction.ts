@@ -1,11 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
-import {
-    TRANSACTION_MIN_GAS_PRICE,
-    TRANSACTION_OPTIONS_DEFAULT,
-    TRANSACTION_OPTIONS_TX_GUARDED,
-    TRANSACTION_VERSION_DEFAULT,
-} from "./constants";
+import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
 import { TransactionsConverter } from "./converters/transactionsConverter";
 import { Hash } from "./hash";
 import { IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionValue } from "./interface";
@@ -339,10 +334,10 @@ export class Transaction {
      * Checks the integrity of the guarded transaction
      */
     isGuardedTransaction(): boolean {
+        const computer = new TransactionComputer();
         const hasGuardian = !this.guardian.isEmpty();
         const hasGuardianSignature = this.guardianSignature.length > 0;
-        const isGuardedSet = (this.options & TRANSACTION_OPTIONS_TX_GUARDED) == TRANSACTION_OPTIONS_TX_GUARDED;
-        return isGuardedSet && hasGuardian && hasGuardianSignature;
+        return computer.hasOptionsSetForGuardedTransaction(this) && hasGuardian && hasGuardianSignature;
     }
 
     /**

@@ -211,7 +211,7 @@ describe("test transaction", async () => {
     it("should sign & compute hash (with data, with value) (legacy)", async () => {
         const transaction = new Transaction({
             nonce: 91n,
-            value: 1000000000000000000n,
+            value: 10000000000000000000n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             gasPrice: BigInt(minGasPrice),

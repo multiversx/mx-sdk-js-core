@@ -71,7 +71,7 @@ export class TransactionComputer {
 
     computeTransactionHash(transaction: Transaction): Uint8Array {
         const serializer = new ProtoSerializer();
-        const buffer = serializer.serializeTransaction(new Transaction(transaction));
+        const buffer = serializer.serializeTransaction(transaction);
         const hash = createTransactionHasher(TRANSACTION_HASH_LENGTH).update(buffer).digest("hex");
 
         return Buffer.from(hash, "hex");

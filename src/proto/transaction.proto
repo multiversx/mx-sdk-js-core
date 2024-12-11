@@ -25,4 +25,6 @@ message Transaction {
 	uint32   Options                       = 13;
 	bytes    GuardianAddr                  = 14;
 	bytes    GuardianSignature             = 15;
+	bytes    Relayer                       = 16;
+	bytes    RelayerSignature              = 17;
 }

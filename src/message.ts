@@ -65,7 +65,7 @@ export class MessageComputer {
         return {
             message: Buffer.from(message.data).toString("hex"),
             signature: message.signature ? Buffer.from(message.signature).toString("hex") : "",
-            address: message.address ? message.address.bech32() : "",
+            address: message.address ? message.address.toBech32() : "",
             version: message.version,
             signer: message.signer,
         };

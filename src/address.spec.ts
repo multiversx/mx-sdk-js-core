@@ -35,7 +35,7 @@ describe("test address", () => {
         const nobody = Address.empty();
 
         assert.isEmpty(nobody.hex());
-        assert.isEmpty(nobody.bech32());
+        assert.isEmpty(nobody.toBech32());
         assert.deepEqual(nobody.toJSON(), { bech32: "", pubkey: "" });
     });
 

@@ -175,7 +175,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         let proxyItemResponse = await proxyProvider.getNonFungibleTokenOfAccount(dan, item.collection, item.nonce);
 
         removeInconsistencyForNonFungibleTokenOfAccount(apiItemResponse, proxyItemResponse);
-        assert.deepEqual(apiResponse, proxyResponse, `user: ${dan.bech32()}, token: ${item.identifier}`);
+        assert.deepEqual(apiResponse, proxyResponse, `user: ${dan.toBech32()}, token: ${item.identifier}`);
     });
 
     // TODO: Strive to have as little differences as possible between Proxy and API.

@@ -22,7 +22,7 @@ export class AddressValue extends PrimitiveValue {
 
     constructor(value: Address) {
         super(new AddressType());
-        this.value = Address.newFromBech32(value.bech32());
+        this.value = Address.newFromBech32(value.toBech32());
     }
 
     getClassName(): string {

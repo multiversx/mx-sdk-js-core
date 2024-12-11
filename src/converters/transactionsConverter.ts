@@ -7,8 +7,8 @@ export class TransactionsConverter {
         const plainObject = {
             nonce: Number(transaction.nonce),
             value: transaction.value.toString(),
-            receiver: transaction.receiver.bech32(),
-            sender: transaction.sender.bech32(),
+            receiver: transaction.receiver.toBech32(),
+            sender: transaction.sender.toBech32(),
             senderUsername: this.toBase64OrUndefined(transaction.senderUsername),
             receiverUsername: this.toBase64OrUndefined(transaction.receiverUsername),
             gasPrice: Number(transaction.gasPrice),
@@ -17,7 +17,7 @@ export class TransactionsConverter {
             chainID: transaction.chainID.valueOf(),
             version: transaction.version,
             options: transaction.options == 0 ? undefined : transaction.options,
-            guardian: transaction.guardian.isEmpty() ? undefined : transaction.guardian.bech32(),
+            guardian: transaction.guardian.isEmpty() ? undefined : transaction.guardian.toBech32(),
             signature: this.toHexOrUndefined(transaction.signature),
             guardianSignature: this.toHexOrUndefined(transaction.guardianSignature),
         };

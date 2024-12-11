@@ -52,7 +52,7 @@ export class Account implements IAccount {
      */
     toJSON(): any {
         return {
-            address: this.address.bech32(),
+            address: this.address.toBech32(),
             nonce: this.nonce.valueOf(),
         };
     }

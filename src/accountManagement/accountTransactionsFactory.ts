@@ -63,7 +63,7 @@ export class AccountTransactionsFactory {
     createTransactionForSettingGuardian(sender: Address, options: SetGuardianInput): Transaction {
         const dataParts = [
             "SetGuardian",
-            Address.fromBech32(options.guardianAddress.bech32()).toHex(),
+            Address.fromBech32(options.guardianAddress.toBech32()).toHex(),
             Buffer.from(options.serviceID).toString("hex"),
         ];
 

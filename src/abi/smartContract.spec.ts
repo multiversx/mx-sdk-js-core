@@ -29,10 +29,13 @@ describe("test contract", () => {
         let owner = new Address("93ee6143cdc10ce79f15b2a6c2ad38e9b6021c72a1779051f47154fd54cfbd5e");
 
         let firstContractAddress = SmartContract.computeAddress(owner, 0);
-        assert.equal(firstContractAddress.bech32(), "erd1qqqqqqqqqqqqqpgqhdjjyq8dr7v5yq9tv6v5vt9tfvd00vg7h40q6779zn");
+        assert.equal(firstContractAddress.toBech32(), "erd1qqqqqqqqqqqqqpgqhdjjyq8dr7v5yq9tv6v5vt9tfvd00vg7h40q6779zn");
 
         let secondContractAddress = SmartContract.computeAddress(owner, 1);
-        assert.equal(secondContractAddress.bech32(), "erd1qqqqqqqqqqqqqpgqde8eqjywyu6zlxjxuxqfg5kgtmn3setxh40qen8egy");
+        assert.equal(
+            secondContractAddress.toBech32(),
+            "erd1qqqqqqqqqqqqqpgqde8eqjywyu6zlxjxuxqfg5kgtmn3setxh40qen8egy",
+        );
     });
 
     it("should deploy", async () => {
@@ -60,7 +63,10 @@ describe("test contract", () => {
 
         // Compute & set the contract address
         contract.setAddress(SmartContract.computeAddress(alice.address, 42));
-        assert.equal(contract.getAddress().bech32(), "erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q");
+        assert.equal(
+            contract.getAddress().toBech32(),
+            "erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q",
+        );
 
         // Sign the transaction
         deployTransaction.applySignature(await alice.signer.sign(deployTransaction.serializeForSigning()));

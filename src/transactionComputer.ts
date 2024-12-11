@@ -105,8 +105,8 @@ export class TransactionComputer {
         let obj: any = {
             nonce: Number(transaction.nonce),
             value: transaction.value.toString(),
-            receiver: transaction.receiver.bech32(),
-            sender: transaction.sender.bech32(),
+            receiver: transaction.receiver.toBech32(),
+            sender: transaction.sender.toBech32(),
             senderUsername: this.toBase64OrUndefined(transaction.senderUsername),
             receiverUsername: this.toBase64OrUndefined(transaction.receiverUsername),
             gasPrice: Number(transaction.gasPrice),
@@ -121,7 +121,7 @@ export class TransactionComputer {
         obj.chainID = transaction.chainID;
         obj.version = transaction.version;
         obj.options = transaction.options ? transaction.options : undefined;
-        obj.guardian = transaction.guardian.isEmpty() ? undefined : transaction.guardian.bech32();
+        obj.guardian = transaction.guardian.isEmpty() ? undefined : transaction.guardian.toBech32();
 
         return obj;
     }

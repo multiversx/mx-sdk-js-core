@@ -65,7 +65,7 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     async getAccount(address: IAddress): Promise<AccountOnNetwork> {
-        const response = await this.doGetGeneric(`accounts/${address.bech32()}`);
+        const response = await this.doGetGeneric(`accounts/${address.toBech32()}`);
         const account = AccountOnNetwork.fromHttpResponse(response);
         return account;
     }
@@ -80,7 +80,7 @@ export class ApiNetworkProvider implements INetworkProvider {
     ): Promise<FungibleTokenOfAccountOnNetwork[]> {
         pagination = pagination || defaultPagination;
 
-        const url = `accounts/${address.bech32()}/tokens?${this.buildPaginationParams(pagination)}`;
+        const url = `accounts/${address.toBech32()}/tokens?${this.buildPaginationParams(pagination)}`;
         const response: any[] = await this.doGetGeneric(url);
         const tokens = response.map((item) => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
 
@@ -95,7 +95,7 @@ export class ApiNetworkProvider implements INetworkProvider {
     ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
         pagination = pagination || defaultPagination;
 
-        const url = `accounts/${address.bech32()}/nfts?${this.buildPaginationParams(pagination)}`;
+        const url = `accounts/${address.toBech32()}/nfts?${this.buildPaginationParams(pagination)}`;
         const response: any[] = await this.doGetGeneric(url);
         const tokens = response.map((item) => NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(item));
 
@@ -108,7 +108,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         address: IAddress,
         tokenIdentifier: string,
     ): Promise<FungibleTokenOfAccountOnNetwork> {
-        const response = await this.doGetGeneric(`accounts/${address.bech32()}/tokens/${tokenIdentifier}`);
+        const response = await this.doGetGeneric(`accounts/${address.toBech32()}/tokens/${tokenIdentifier}`);
         const tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response);
         return tokenData;
     }
@@ -119,7 +119,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         nonce: number,
     ): Promise<NonFungibleTokenOfAccountOnNetwork> {
         const nonceAsHex = numberToPaddedHex(nonce);
-        const response = await this.doGetGeneric(`accounts/${address.bech32()}/nfts/${collection}-${nonceAsHex}`);
+        const response = await this.doGetGeneric(`accounts/${address.toBech32()}/nfts/${collection}-${nonceAsHex}`);
         const tokenData = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);
         return tokenData;
     }

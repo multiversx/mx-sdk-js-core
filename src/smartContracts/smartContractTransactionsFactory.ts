@@ -185,7 +185,7 @@ export class SmartContractTransactionsFactory {
         contract: Address;
         newOwner: Address;
     }): Transaction {
-        const dataParts = ["ChangeOwnerAddress", Address.fromBech32(options.newOwner.bech32()).toHex()];
+        const dataParts = ["ChangeOwnerAddress", Address.fromBech32(options.newOwner.toBech32()).toHex()];
 
         return new TransactionBuilder({
             config: this.config,

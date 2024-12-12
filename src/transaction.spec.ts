@@ -755,8 +755,8 @@ describe("test transaction", async () => {
     it("should serialize transaction with relayer", async () => {
         const transaction = new Transaction({
             chainID: networkConfig.ChainID,
-            sender: wallets.alice.address.bech32(),
-            receiver: wallets.alice.address.bech32(),
+            sender: wallets.alice.address.toBech32(),
+            receiver: wallets.alice.address.toBech32(),
             relayer: wallets.bob.address,
             gasLimit: 50000n,
             value: 0n,
@@ -776,8 +776,8 @@ describe("test transaction", async () => {
     it("should test relayed v3", async () => {
         const transaction = new Transaction({
             chainID: networkConfig.ChainID,
-            sender: wallets.alice.address.bech32(),
-            receiver: wallets.alice.address.bech32(),
+            sender: wallets.alice.address.toBech32(),
+            receiver: wallets.alice.address.toBech32(),
             senderUsername: "alice",
             receiverUsername: "bob",
             gasLimit: 80000n,

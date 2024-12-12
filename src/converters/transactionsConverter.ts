@@ -26,7 +26,7 @@ export class TransactionsConverter {
             chainID: transaction.chainID.valueOf(),
             version: transaction.version,
             options: transaction.options == 0 ? undefined : transaction.options,
-            relayer: !transaction.relayer || transaction.relayer.isEmpty() ? undefined : transaction.relayer.toBech32(),
+            relayer: transaction.relayer.isEmpty() ? undefined : transaction.relayer.toBech32(),
             guardian: transaction.guardian ? transaction.guardian : undefined,
             signature: this.toHexOrUndefined(transaction.signature),
             guardianSignature: this.toHexOrUndefined(transaction.guardianSignature),

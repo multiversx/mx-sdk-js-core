@@ -105,8 +105,8 @@ export interface ITransaction {
     version: number;
     options: number;
     guardian: string;
-    relayer?: Address;
+    relayer: Address;
     signature: Uint8Array;
     guardianSignature: Uint8Array;
-    relayerSignature?: Uint8Array;
+    relayerSignature: Uint8Array;
 }

@@ -1,5 +1,4 @@
 import BigNumber from "bignumber.js";
-import { Address } from "./address";
 import {
     MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS,
     TRANSACTION_OPTIONS_TX_GUARDED,
@@ -95,15 +94,8 @@ export class TransactionComputer {
         transaction.guardian = guardian;
     }
 
-    applyRelayer(transaction: ITransaction, relayer: Address) {
-        transaction.relayer = relayer;
-    }
-
     isRelayedV3Transaction(transaction: ITransaction) {
-        if (transaction.relayer && !transaction.relayer.isEmpty()) {
-            return true;
-        }
-        return false;
+        return !transaction.relayer.isEmpty();
     }
 
     applyOptionsForHashSigning(transaction: ITransaction) {

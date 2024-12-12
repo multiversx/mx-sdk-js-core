@@ -92,9 +92,10 @@ export class Transaction {
     public guardian: string;
 
     /**
-     * The relayer, in address format, next version all the other addresses will not be string anymore.
+     * The relayer address.
+     *  Note: in the next major version, `sender`, `receiver` and `guardian` will also have the type `Address`, instead of `string`.
      */
-    public relayer?: Address;
+    public relayer: Address;
 
     /**
      * The signature.
@@ -148,7 +149,7 @@ export class Transaction {
         this.version = Number(options.version?.valueOf() || TRANSACTION_VERSION_DEFAULT);
         this.options = Number(options.options?.valueOf() || TRANSACTION_OPTIONS_DEFAULT);
         this.guardian = options.guardian ? this.addressAsBech32(options.guardian) : "";
-        this.relayer = options.relayer?.isEmpty() ? undefined : options.relayer;
+        this.relayer = options.relayer ? options.relayer : Address.empty();
 
         this.signature = options.signature || Buffer.from([]);
         this.guardianSignature = options.guardianSignature || Buffer.from([]);

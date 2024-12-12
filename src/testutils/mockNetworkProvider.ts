@@ -14,7 +14,7 @@ import {
     NetworkStatus,
     NonFungibleTokenOfAccountOnNetwork,
 } from "../networkProviders";
-import { IAddress, INetworkProvider, IPagination } from "../networkProviders/interface";
+import { INetworkProvider, IPagination } from "../networkProviders/interface";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { Transaction, TransactionHash } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
@@ -66,22 +66,22 @@ export class MockNetworkProvider implements INetworkProvider {
         throw new Error("Method not implemented.");
     }
     getFungibleTokensOfAccount(
-        _address: IAddress,
+        _address: Address,
         _pagination?: IPagination,
     ): Promise<FungibleTokenOfAccountOnNetwork[]> {
         throw new Error("Method not implemented.");
     }
     getNonFungibleTokensOfAccount(
-        _address: IAddress,
+        _address: Address,
         _pagination?: IPagination,
     ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
         throw new Error("Method not implemented.");
     }
-    getFungibleTokenOfAccount(_address: IAddress, _tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
+    getFungibleTokenOfAccount(_address: Address, _tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
         throw new Error("Method not implemented.");
     }
     getNonFungibleTokenOfAccount(
-        _address: IAddress,
+        _address: Address,
         _collection: string,
         _nonce: number,
     ): Promise<NonFungibleTokenOfAccountOnNetwork> {

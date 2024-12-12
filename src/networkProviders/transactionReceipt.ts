@@ -1,9 +1,8 @@
 import { Address } from "../address";
-import { IAddress } from "./interface";
 
 export class TransactionReceipt {
     value: string = "";
-    sender: IAddress = Address.empty();
+    sender: Address = Address.empty();
     data: string = "";
     hash: string = "";
 

@@ -1,12 +1,11 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
-import { IAddress } from "./interface";
 
 /**
  * A plain view of an account, as queried from the Network.
  */
 export class AccountOnNetwork {
-    address: IAddress = Address.empty();
+    address: Address = Address.empty();
     nonce: number = 0;
     balance: BigNumber = new BigNumber(0);
     code: string = "";
@@ -54,7 +53,7 @@ export class GuardianData {
         return result;
     }
 
-    getCurrentGuardianAddress(): IAddress | undefined {
+    getCurrentGuardianAddress(): Address | undefined {
         if (!this.guarded) {
             return undefined;
         }
@@ -65,7 +64,7 @@ export class GuardianData {
 
 class Guardian {
     activationEpoch: number = 0;
-    address: IAddress = Address.empty();
+    address: Address = Address.empty();
     serviceUID: string = "";
 
     static fromHttpResponse(responsePart: any): Guardian {

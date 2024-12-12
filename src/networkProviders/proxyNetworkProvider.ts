@@ -10,7 +10,7 @@ import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig } from "./config";
 import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
-import { IAddress, INetworkProvider, IPagination } from "./interface";
+import { INetworkProvider, IPagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkProviderConfig } from "./networkProviderConfig";
@@ -58,20 +58,20 @@ export class ProxyNetworkProvider implements INetworkProvider {
         throw new Error("Method not implemented.");
     }
 
-    async getAccount(address: IAddress): Promise<AccountOnNetwork> {
+    async getAccount(address: Address): Promise<AccountOnNetwork> {
         const response = await this.doGetGeneric(`address/${address.bech32()}`);
         const account = AccountOnNetwork.fromHttpResponse(response.account);
         return account;
     }
 
-    async getGuardianData(address: IAddress): Promise<GuardianData> {
+    async getGuardianData(address: Address): Promise<GuardianData> {
         const response = await this.doGetGeneric(`address/${address.bech32()}/guardian-data`);
         const accountGuardian = GuardianData.fromHttpResponse(response.guardianData);
         return accountGuardian;
     }
 
     async getFungibleTokensOfAccount(
-        address: IAddress,
+        address: Address,
         _pagination?: IPagination,
     ): Promise<FungibleTokenOfAccountOnNetwork[]> {
         const url = `address/${address.bech32()}/esdt`;
@@ -87,7 +87,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getNonFungibleTokensOfAccount(
-        address: IAddress,
+        address: Address,
         _pagination?: IPagination,
     ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
         const url = `address/${address.bech32()}/esdt`;
@@ -105,7 +105,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getFungibleTokenOfAccount(
-        address: IAddress,
+        address: Address,
         tokenIdentifier: string,
     ): Promise<FungibleTokenOfAccountOnNetwork> {
         const response = await this.doGetGeneric(`address/${address.bech32()}/esdt/${tokenIdentifier}`);
@@ -114,7 +114,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getNonFungibleTokenOfAccount(
-        address: IAddress,
+        address: Address,
         collection: string,
         nonce: number,
     ): Promise<NonFungibleTokenOfAccountOnNetwork> {

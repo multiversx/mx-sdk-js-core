@@ -1,7 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "../address";
 import { numberToPaddedHex } from "../utils.codec";
-import { IAddress } from "./interface";
 
 export class FungibleTokenOfAccountOnNetwork {
     identifier: string = "";
@@ -27,7 +26,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
     nonce: number = 0;
     type: string = "";
     name: string = "";
-    creator: IAddress = Address.empty();
+    creator: Address = Address.empty();
     supply: BigNumber = new BigNumber(0);
     decimals: number = 0;
     royalties: BigNumber = new BigNumber(0);

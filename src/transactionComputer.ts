@@ -94,6 +94,10 @@ export class TransactionComputer {
         transaction.guardian = guardian;
     }
 
+    isRelayedV3Transaction(transaction: Transaction) {
+        return !transaction.relayer.isEmpty();
+    }
+
     applyOptionsForHashSigning(transaction: Transaction) {
         if (transaction.version < MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS) {
             transaction.version = MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS;
@@ -122,6 +126,7 @@ export class TransactionComputer {
         obj.version = transaction.version;
         obj.options = transaction.options ? transaction.options : undefined;
         obj.guardian = transaction.guardian.isEmpty() ? undefined : transaction.guardian.toBech32();
+        obj.relayer = transaction.relayer?.isEmpty() ? undefined : transaction.relayer?.toBech32();
 
         return obj;
     }

@@ -784,8 +784,49 @@ describe("test transaction", async () => {
             version: 2,
             options: undefined,
             guardian: undefined,
+            relayer: undefined,
             signature: undefined,
             guardianSignature: undefined,
+            relayerSignature: undefined,
         });
+    });
+    it("should serialize transaction with relayer", async () => {
+        const transaction = new Transaction({
+            chainID: networkConfig.ChainID,
+            sender: wallets.alice.address,
+            receiver: wallets.alice.address,
+            relayer: wallets.bob.address,
+            gasLimit: 50000n,
+            value: 0n,
+            version: 2,
+            nonce: 89n,
+        });
+
+        const serializedTransactionBytes = transactionComputer.computeBytesForSigning(transaction);
+        const serializedTransaction = Buffer.from(serializedTransactionBytes).toString();
+
+        assert.equal(
+            serializedTransaction,
+            `{"nonce":89,"value":"0","receiver":"erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th","sender":"erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th","gasPrice":1000000000,"gasLimit":50000,"chainID":"D","version":2,"relayer":"erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"}`,
+        );
+    });
+
+    it("should test relayed v3", async () => {
+        const transaction = new Transaction({
+            chainID: networkConfig.ChainID,
+            sender: wallets.alice.address,
+            receiver: wallets.alice.address,
+            senderUsername: "alice",
+            receiverUsername: "bob",
+            gasLimit: 80000n,
+            value: 0n,
+            version: 2,
+            nonce: 89n,
+            data: Buffer.from("hello"),
+        });
+
+        assert.isFalse(transactionComputer.isRelayedV3Transaction(transaction));
+        transaction.relayer = wallets.carol.address;
+        assert.isTrue(transactionComputer.isRelayedV3Transaction(transaction));
     });
 });

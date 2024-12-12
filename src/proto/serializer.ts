@@ -67,7 +67,7 @@ export class ProtoSerializer {
         return protoTransaction;
     }
 
-    private isRelayedTransaction(transaction: ITransaction) {
+    private isRelayedTransaction(transaction: Transaction) {
         return !transaction.relayer.isEmpty();
     }
 

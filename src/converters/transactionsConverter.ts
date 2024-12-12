@@ -1,3 +1,4 @@
+import { Address } from "../address";
 import { IPlainTransactionObject, ITransaction } from "../interface";
 import { IContractResultItem, ITransactionEvent, ITransactionOnNetwork } from "../interfaceOfNetwork";
 import { ResultsParser } from "../smartcontracts";
@@ -25,9 +26,11 @@ export class TransactionsConverter {
             chainID: transaction.chainID.valueOf(),
             version: transaction.version,
             options: transaction.options == 0 ? undefined : transaction.options,
+            relayer: transaction.relayer.isEmpty() ? undefined : transaction.relayer.toBech32(),
             guardian: transaction.guardian ? transaction.guardian : undefined,
             signature: this.toHexOrUndefined(transaction.signature),
             guardianSignature: this.toHexOrUndefined(transaction.guardianSignature),
+            relayerSignature: this.toHexOrUndefined(transaction.relayerSignature),
         };
 
         return plainObject;
@@ -46,6 +49,7 @@ export class TransactionsConverter {
             nonce: BigInt(object.nonce),
             value: BigInt(object.value || ""),
             receiver: object.receiver,
+            relayer: object.relayer ? Address.newFromBech32(object.relayer) : Address.empty(),
             receiverUsername: this.bufferFromBase64(object.receiverUsername).toString(),
             sender: object.sender,
             senderUsername: this.bufferFromBase64(object.senderUsername).toString(),
@@ -58,6 +62,7 @@ export class TransactionsConverter {
             options: Number(object.options),
             signature: this.bufferFromHex(object.signature),
             guardianSignature: this.bufferFromHex(object.guardianSignature),
+            relayerSignature: this.bufferFromHex(object.relayerSignature),
         });
 
         return transaction;

@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { Address } from "./address";
 import { ITransactionOnNetwork } from "./interfaceOfNetwork";
 
 export interface ITransactionFetcher {
@@ -16,6 +17,7 @@ export interface IPlainTransactionObject {
     receiverUsername?: string;
     senderUsername?: string;
     guardian?: string;
+    relayer?: string;
     gasPrice: number;
     gasLimit: number;
     data?: string;
@@ -24,6 +26,7 @@ export interface IPlainTransactionObject {
     options?: number;
     signature?: string;
     guardianSignature?: string;
+    relayerSignature?: string;
 }
 
 export interface ISignature {
@@ -102,6 +105,8 @@ export interface ITransaction {
     version: number;
     options: number;
     guardian: string;
+    relayer: Address;
     signature: Uint8Array;
     guardianSignature: Uint8Array;
+    relayerSignature: Uint8Array;
 }

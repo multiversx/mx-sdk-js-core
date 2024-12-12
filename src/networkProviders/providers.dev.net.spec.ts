@@ -452,6 +452,8 @@ describe("test network providers on devnet: Proxy and API", function () {
             guardian: "",
             guardianSignature: new Uint8Array(),
             options: 0,
+            relayer: Address.empty(),
+            relayerSignature: new Uint8Array(),
         };
 
         const apiLegacyTxHash = await apiProvider.sendTransaction(transaction);

@@ -1,3 +1,5 @@
+import { assert } from "chai";
+import { Address } from "../address";
 import {
     ContractResultItem,
     ContractResults,
@@ -7,8 +9,6 @@ import {
     TransactionLogsOnNetwork,
     TransactionOnNetwork,
 } from "../networkProviders";
-import { assert } from "chai";
-import { Address } from "../address";
 import { Transaction } from "../transaction";
 import {
     SmartContractCallOutcome,
@@ -58,7 +58,9 @@ describe("test transactions converter", async () => {
             options: undefined,
             guardian: undefined,
             signature: undefined,
+            relayer: undefined,
             guardianSignature: undefined,
+            relayerSignature: undefined,
         });
     });
 

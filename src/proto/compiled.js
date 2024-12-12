@@ -46,6 +46,8 @@
              * @property {number|null} [Options] Transaction Options
              * @property {Uint8Array|null} [GuardianAddr] Transaction GuardianAddr
              * @property {Uint8Array|null} [GuardianSignature] Transaction GuardianSignature
+             * @property {Uint8Array|null} [Relayer] Transaction Relayer
+             * @property {Uint8Array|null} [RelayerSignature] Transaction RelayerSignature
              */
     
             /**
@@ -184,6 +186,22 @@
             Transaction.prototype.GuardianSignature = $util.newBuffer([]);
     
             /**
+             * Transaction Relayer.
+             * @member {Uint8Array} Relayer
+             * @memberof proto.Transaction
+             * @instance
+             */
+            Transaction.prototype.Relayer = $util.newBuffer([]);
+    
+            /**
+             * Transaction RelayerSignature.
+             * @member {Uint8Array} RelayerSignature
+             * @memberof proto.Transaction
+             * @instance
+             */
+            Transaction.prototype.RelayerSignature = $util.newBuffer([]);
+    
+            /**
              * Creates a new Transaction instance using the specified properties.
              * @function create
              * @memberof proto.Transaction
@@ -237,6 +255,10 @@
                     writer.uint32(/* id 14, wireType 2 =*/114).bytes(message.GuardianAddr);
                 if (message.GuardianSignature != null && Object.hasOwnProperty.call(message, "GuardianSignature"))
                     writer.uint32(/* id 15, wireType 2 =*/122).bytes(message.GuardianSignature);
+                if (message.Relayer != null && Object.hasOwnProperty.call(message, "Relayer"))
+                    writer.uint32(/* id 16, wireType 2 =*/130).bytes(message.Relayer);
+                if (message.RelayerSignature != null && Object.hasOwnProperty.call(message, "RelayerSignature"))
+                    writer.uint32(/* id 17, wireType 2 =*/138).bytes(message.RelayerSignature);
                 return writer;
             };
     
@@ -331,6 +353,14 @@
                             message.GuardianSignature = reader.bytes();
                             break;
                         }
+                    case 16: {
+                            message.Relayer = reader.bytes();
+                            break;
+                        }
+                    case 17: {
+                            message.RelayerSignature = reader.bytes();
+                            break;
+                        }
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -411,6 +441,12 @@
                 if (message.GuardianSignature != null && message.hasOwnProperty("GuardianSignature"))
                     if (!(message.GuardianSignature && typeof message.GuardianSignature.length === "number" || $util.isString(message.GuardianSignature)))
                         return "GuardianSignature: buffer expected";
+                if (message.Relayer != null && message.hasOwnProperty("Relayer"))
+                    if (!(message.Relayer && typeof message.Relayer.length === "number" || $util.isString(message.Relayer)))
+                        return "Relayer: buffer expected";
+                if (message.RelayerSignature != null && message.hasOwnProperty("RelayerSignature"))
+                    if (!(message.RelayerSignature && typeof message.RelayerSignature.length === "number" || $util.isString(message.RelayerSignature)))
+                        return "RelayerSignature: buffer expected";
                 return null;
             };
     
@@ -507,6 +543,16 @@
                         $util.base64.decode(object.GuardianSignature, message.GuardianSignature = $util.newBuffer($util.base64.length(object.GuardianSignature)), 0);
                     else if (object.GuardianSignature.length >= 0)
                         message.GuardianSignature = object.GuardianSignature;
+                if (object.Relayer != null)
+                    if (typeof object.Relayer === "string")
+                        $util.base64.decode(object.Relayer, message.Relayer = $util.newBuffer($util.base64.length(object.Relayer)), 0);
+                    else if (object.Relayer.length >= 0)
+                        message.Relayer = object.Relayer;
+                if (object.RelayerSignature != null)
+                    if (typeof object.RelayerSignature === "string")
+                        $util.base64.decode(object.RelayerSignature, message.RelayerSignature = $util.newBuffer($util.base64.length(object.RelayerSignature)), 0);
+                    else if (object.RelayerSignature.length >= 0)
+                        message.RelayerSignature = object.RelayerSignature;
                 return message;
             };
     
@@ -611,6 +657,20 @@
                         if (options.bytes !== Array)
                             object.GuardianSignature = $util.newBuffer(object.GuardianSignature);
                     }
+                    if (options.bytes === String)
+                        object.Relayer = "";
+                    else {
+                        object.Relayer = [];
+                        if (options.bytes !== Array)
+                            object.Relayer = $util.newBuffer(object.Relayer);
+                    }
+                    if (options.bytes === String)
+                        object.RelayerSignature = "";
+                    else {
+                        object.RelayerSignature = [];
+                        if (options.bytes !== Array)
+                            object.RelayerSignature = $util.newBuffer(object.RelayerSignature);
+                    }
                 }
                 if (message.Nonce != null && message.hasOwnProperty("Nonce"))
                     if (typeof message.Nonce === "number")
@@ -651,6 +711,10 @@
                     object.GuardianAddr = options.bytes === String ? $util.base64.encode(message.GuardianAddr, 0, message.GuardianAddr.length) : options.bytes === Array ? Array.prototype.slice.call(message.GuardianAddr) : message.GuardianAddr;
                 if (message.GuardianSignature != null && message.hasOwnProperty("GuardianSignature"))
                     object.GuardianSignature = options.bytes === String ? $util.base64.encode(message.GuardianSignature, 0, message.GuardianSignature.length) : options.bytes === Array ? Array.prototype.slice.call(message.GuardianSignature) : message.GuardianSignature;
+                if (message.Relayer != null && message.hasOwnProperty("Relayer"))
+                    object.Relayer = options.bytes === String ? $util.base64.encode(message.Relayer, 0, message.Relayer.length) : options.bytes === Array ? Array.prototype.slice.call(message.Relayer) : message.Relayer;
+                if (message.RelayerSignature != null && message.hasOwnProperty("RelayerSignature"))
+                    object.RelayerSignature = options.bytes === String ? $util.base64.encode(message.RelayerSignature, 0, message.RelayerSignature.length) : options.bytes === Array ? Array.prototype.slice.call(message.RelayerSignature) : message.RelayerSignature;
                 return object;
             };
     

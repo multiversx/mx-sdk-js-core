@@ -1,7 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
-import { TransactionsConverter } from "./converters/transactionsConverter";
 import { Hash } from "./hash";
 import { IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionValue } from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
@@ -341,27 +340,66 @@ export class Transaction {
     }
 
     /**
-     * Legacy method, use "TransactionsConverter.transactionToPlainObject()" instead.
-     *
      * Converts the transaction object into a ready-to-serialize, plain JavaScript object.
      * This function is called internally within the signing procedure.
      */
     toPlainObject(): IPlainTransactionObject {
-        // Ideally, "converters" package should be outside of "core", and not referenced here.
-        const converter = new TransactionsConverter();
-        return converter.transactionToPlainObject(this);
+        const plainObject = {
+            nonce: Number(this.nonce),
+            value: this.value.toString(),
+            receiver: this.receiver.toBech32(),
+            sender: this.sender.toBech32(),
+            senderUsername: this.toBase64OrUndefined(this.senderUsername),
+            receiverUsername: this.toBase64OrUndefined(this.receiverUsername),
+            gasPrice: Number(this.gasPrice),
+            gasLimit: Number(this.gasLimit),
+            data: this.toBase64OrUndefined(this.data),
+            chainID: this.chainID.valueOf(),
+            version: this.version,
+            options: this.options == 0 ? undefined : this.options,
+            guardian: this.guardian.isEmpty() ? undefined : this.guardian.toBech32(),
+            signature: this.toHexOrUndefined(this.signature),
+            guardianSignature: this.toHexOrUndefined(this.guardianSignature),
+        };
+
+        return plainObject;
     }
 
     /**
-     * Legacy method, use "TransactionsConverter.plainObjectToTransaction()" instead.
+     * Legacy method, use "Transaction.newFromPlainObject()" instead.
      * Converts a plain object transaction into a Transaction Object.
      *
      * @param plainObjectTransaction Raw data of a transaction, usually obtained by calling toPlainObject()
      */
     static fromPlainObject(plainObjectTransaction: IPlainTransactionObject): Transaction {
-        // Ideally, "converters" package should be outside of "core", and not referenced here.
-        const converter = new TransactionsConverter();
-        return converter.plainObjectToTransaction(plainObjectTransaction);
+        return Transaction.newFromPlainObject(plainObjectTransaction);
+    }
+
+    /**
+     * Converts a plain object transaction into a Transaction Object.
+     *
+     * @param plainObjectTransaction Raw data of a transaction, usually obtained by calling toPlainObject()
+     */
+    static newFromPlainObject(object: IPlainTransactionObject): Transaction {
+        const transaction = new Transaction({
+            nonce: BigInt(object.nonce),
+            value: BigInt(object.value || ""),
+            receiver: Address.newFromBech32(object.receiver),
+            receiverUsername: Buffer.from(object.receiverUsername || "", "base64").toString(),
+            sender: Address.newFromBech32(object.sender),
+            senderUsername: Buffer.from(object.senderUsername || "", "base64").toString(),
+            guardian: object.guardian ? Address.newFromBech32(object.guardian) : Address.empty(),
+            gasPrice: BigInt(object.gasPrice),
+            gasLimit: BigInt(object.gasLimit),
+            data: Buffer.from(object.data || "", "base64"),
+            chainID: String(object.chainID),
+            version: Number(object.version),
+            options: Number(object.options),
+            signature: Buffer.from(object.signature || "", "hex"),
+            guardianSignature: Buffer.from(object.guardianSignature || "", "hex"),
+        });
+
+        return transaction;
     }
 
     /**
@@ -402,6 +440,14 @@ export class Transaction {
         const computer = new TransactionComputer();
         const fee = computer.computeTransactionFee(this, networkConfig);
         return new BigNumber(fee.toString());
+    }
+
+    private toBase64OrUndefined(value?: string | Uint8Array) {
+        return value && value.length ? Buffer.from(value).toString("base64") : undefined;
+    }
+
+    private toHexOrUndefined(value?: Uint8Array) {
+        return value && value.length ? Buffer.from(value).toString("hex") : undefined;
     }
 }
 

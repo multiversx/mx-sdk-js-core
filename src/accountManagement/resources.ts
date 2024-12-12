@@ -1,4 +1,4 @@
-import { IAddress } from "../interface";
+import { Address } from "../address";
 
-export type SetGuardianInput = { guardianAddress: IAddress; serviceID: string };
+export type SetGuardianInput = { guardianAddress: Address; serviceID: string };
 export type SaveKeyValueInput = { keyValuePairs: Map<Uint8Array, Uint8Array> };

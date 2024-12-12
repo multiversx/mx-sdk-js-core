@@ -1,6 +1,5 @@
 import { assert } from "chai";
 import { Address } from "../address";
-import { Signature } from "../signature";
 import { loadTestWallets, TestWallet } from "../testutils";
 import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
@@ -110,8 +109,9 @@ describe("serialize transactions", () => {
         });
 
         transaction.applySignature(
-            new Signature(
+            Buffer.from(
                 "dfa3e9f2fdec60dcb353bac3b3435b4a2ff251e7e98eaf8620f46c731fc70c8ba5615fd4e208b05e75fe0f7dc44b7a99567e29f94fcd91efac7e67b182cd2a04",
+                "hex",
             ),
         );
 

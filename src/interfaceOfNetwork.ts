@@ -1,9 +1,8 @@
 import { Address } from "./address";
-import { IAccountBalance, IAddress } from "./interface";
 
 export interface IAccountOnNetwork {
-    nonce: number;
-    balance: IAccountBalance;
+    nonce: bigint;
+    balance: bigint;
 }
 
 export interface INetworkConfig {
@@ -19,8 +18,8 @@ export interface ITransactionOnNetwork {
     hash: string;
     type: string;
     value: string;
-    receiver: IAddress;
-    sender: IAddress;
+    receiver: Address;
+    sender: Address;
     function?: string;
     data: Buffer;
     status: ITransactionStatus;
@@ -49,8 +48,8 @@ export interface IContractResults {
 export interface IContractResultItem {
     hash: string;
     nonce: number;
-    receiver: IAddress;
-    sender: IAddress;
+    receiver: Address;
+    sender: Address;
     data: string;
     returnMessage: string;
     logs: ITransactionLogs;

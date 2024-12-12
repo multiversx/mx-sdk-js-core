@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { Address } from "../address";
 
 /**
@@ -6,8 +5,8 @@ import { Address } from "../address";
  */
 export class AccountOnNetwork {
     address: Address = Address.empty();
-    nonce: number = 0;
-    balance: BigNumber = new BigNumber(0);
+    nonce: bigint = 0n;
+    balance: bigint = 0n;
     code: string = "";
     userName: string = "";
 
@@ -19,8 +18,8 @@ export class AccountOnNetwork {
         let result = new AccountOnNetwork();
 
         result.address = new Address(payload["address"] || "");
-        result.nonce = Number(payload["nonce"] || 0);
-        result.balance = new BigNumber(payload["balance"] || 0);
+        result.nonce = BigInt(payload["nonce"] || 0);
+        result.balance = BigInt(payload["balance"] || 0);
         result.code = payload["code"] || "";
         result.userName = payload["username"] || "";
 

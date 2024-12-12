@@ -1,6 +1,5 @@
 import { Address } from "../address";
 import { LibraryConfig } from "../config";
-import { INonce } from "../interface";
 import { Mnemonic, UserSigner, UserWallet } from "../wallet";
 import { IAccount } from "./interfaces";
 
@@ -16,7 +15,7 @@ export class Account implements IAccount {
     /**
      * The nonce of the account (the account sequence number).
      */
-    nonce: INonce = 0;
+    nonce: bigint = 0n;
 
     /**
      * The signer of the account.
@@ -35,15 +34,15 @@ export class Account implements IAccount {
      * Increments (locally) the nonce (the account sequence number).
      */
     incrementNonce() {
-        this.nonce = this.nonce.valueOf() + 1;
+        this.nonce = this.nonce + 1n;
     }
 
     /**
      * Gets then increments (locally) the nonce (the account sequence number).
      */
-    getNonceThenIncrement(): INonce {
+    getNonceThenIncrement(): bigint {
         let nonce = this.nonce;
-        this.nonce = this.nonce.valueOf() + 1;
+        this.nonce = this.nonce + 1n;
         return nonce;
     }
 

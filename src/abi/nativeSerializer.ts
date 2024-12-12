@@ -2,7 +2,6 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../address";
 import { ErrInvalidArgument } from "../errors";
-import { IAddress } from "../interface";
 import { numberToPaddedHex } from "../utils.codec";
 import { ArgumentErrorContext } from "./argumentErrorContext";
 import {
@@ -67,7 +66,7 @@ import {
 export namespace NativeTypes {
     export type NativeBuffer = Buffer | string;
     export type NativeBytes = Buffer | { valueOf(): Buffer } | string;
-    export type NativeAddress = string | Buffer | Address | { getAddress(): IAddress };
+    export type NativeAddress = string | Buffer | Address | { getAddress(): Address };
     export type NativeBigNumber = BigNumber.Value | bigint;
 }
 

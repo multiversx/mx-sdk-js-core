@@ -503,9 +503,6 @@ describe("test transaction", async () => {
         assert.equal(tx2.getValue().toString(), "123456789000000000000000000000");
 
         const tx3 = new Transaction({
-            // Passing a BigNumber is not recommended.
-            // However, ITransactionValue interface is permissive, and developers may mistakenly pass such objects as values.
-            // TokenTransfer objects or simple strings (see above) are preferred, instead.
             value: BigInt("123456789000000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,

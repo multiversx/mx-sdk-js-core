@@ -40,18 +40,18 @@ export class MockNetworkProvider implements INetworkProvider {
         this.accounts.set(
             MockNetworkProvider.AddressOfAlice.toBech32(),
             new AccountOnNetwork({
-                nonce: 0,
+                nonce: 0n,
                 balance: createAccountBalance(1000),
             }),
         );
         this.accounts.set(
             MockNetworkProvider.AddressOfBob.toBech32(),
-            new AccountOnNetwork({ nonce: 5, balance: createAccountBalance(500) }),
+            new AccountOnNetwork({ nonce: 5n, balance: createAccountBalance(500) }),
         );
         this.accounts.set(
             MockNetworkProvider.AddressOfCarol.toBech32(),
             new AccountOnNetwork({
-                nonce: 42,
+                nonce: 42n,
                 balance: createAccountBalance(300),
             }),
         );

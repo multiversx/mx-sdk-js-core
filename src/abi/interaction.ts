@@ -2,7 +2,7 @@ import { Account } from "../accounts";
 import { Address } from "../address";
 import { Compatibility } from "../compatibility";
 import { TRANSACTION_VERSION_DEFAULT } from "../constants";
-import { IAddress, IChainID, IGasLimit, IGasPrice, INonce, ITokenTransfer, ITransactionValue } from "../interface";
+import { ITokenTransfer } from "../interface";
 import { SmartContractTransactionsFactory } from "../smartContracts";
 import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
@@ -34,13 +34,13 @@ export class Interaction {
     private readonly function: ContractFunction;
     private readonly args: TypedValue[];
 
-    private nonce: INonce = 0;
-    private value: ITransactionValue = "0";
-    private gasLimit: IGasLimit = 0;
-    private gasPrice: IGasPrice | undefined = undefined;
-    private chainID: IChainID = "";
+    private nonce: bigint = 0n;
+    private value: bigint = 0n;
+    private gasLimit: bigint = 0n;
+    private gasPrice: bigint | undefined = undefined;
+    private chainID: string = "";
     private querent: Address = Address.empty();
-    private explicitReceiver?: IAddress;
+    private explicitReceiver?: Address;
     private sender: Address = Address.empty();
     private version: number = TRANSACTION_VERSION_DEFAULT;
 
@@ -53,7 +53,7 @@ export class Interaction {
         this.tokenTransfers = [];
     }
 
-    getContractAddress(): IAddress {
+    getContractAddress(): Address {
         return this.contract.getAddress();
     }
 
@@ -69,7 +69,7 @@ export class Interaction {
         return this.args;
     }
 
-    getValue(): ITransactionValue {
+    getValue(): bigint {
         return this.value;
     }
 
@@ -77,11 +77,11 @@ export class Interaction {
         return this.tokenTransfers;
     }
 
-    getGasLimit(): IGasLimit {
+    getGasLimit(): bigint {
         return this.gasLimit;
     }
 
-    getExplicitReceiver(): IAddress | undefined {
+    getExplicitReceiver(): Address | undefined {
         return this.explicitReceiver;
     }
 
@@ -128,7 +128,7 @@ export class Interaction {
         });
     }
 
-    withValue(value: ITransactionValue): Interaction {
+    withValue(value: bigint): Interaction {
         this.value = value;
         return this;
     }
@@ -148,17 +148,17 @@ export class Interaction {
         return this;
     }
 
-    withGasLimit(gasLimit: IGasLimit): Interaction {
+    withGasLimit(gasLimit: bigint): Interaction {
         this.gasLimit = gasLimit;
         return this;
     }
 
-    withGasPrice(gasPrice: IGasPrice): Interaction {
+    withGasPrice(gasPrice: bigint): Interaction {
         this.gasPrice = gasPrice;
         return this;
     }
 
-    withNonce(nonce: INonce): Interaction {
+    withNonce(nonce: bigint): Interaction {
         this.nonce = nonce;
         return this;
     }
@@ -167,7 +167,7 @@ export class Interaction {
         return this.withNonce(account.getNonceThenIncrement());
     }
 
-    withChainID(chainID: IChainID): Interaction {
+    withChainID(chainID: string): Interaction {
         this.chainID = chainID;
         return this;
     }
@@ -190,7 +190,7 @@ export class Interaction {
         return this;
     }
 
-    withExplicitReceiver(receiver: IAddress): Interaction {
+    withExplicitReceiver(receiver: Address): Interaction {
         this.explicitReceiver = receiver;
         return this;
     }

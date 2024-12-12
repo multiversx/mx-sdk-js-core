@@ -21,7 +21,7 @@ describe("TestEntrypoint", () => {
     it("native transfer", async () => {
         const controller = entrypoint.createTransfersController();
         const sender = Account.newFromPem(alicePem.pemFileText);
-        sender.nonce = 77777;
+        sender.nonce = 77777n;
 
         const transaction = await controller.createTransactionForTransfer(
             sender,
@@ -87,10 +87,10 @@ describe("TestEntrypoint", () => {
     it("create relayed transaction", async function () {
         const transferController = entrypoint.createTransfersController();
         const sender = Account.newFromPem(alicePem.pemFileText);
-        sender.nonce = 77777;
+        sender.nonce = 77777n;
 
         const relayer = Account.newFromPem(bobPem.pemFileText);
-        relayer.nonce = 7;
+        relayer.nonce = 7n;
 
         const transaction = await transferController.createTransactionForTransfer(
             sender,

@@ -77,6 +77,12 @@ export class Transaction {
     public guardian: Address;
 
     /**
+     * The relayer address.
+     *  Note: in the next major version, `sender`, `receiver` and `guardian` will also have the type `Address`, instead of `string`.
+     */
+    public relayer: Address;
+
+    /**
      * The signature.
      */
     public signature: Uint8Array;
@@ -85,6 +91,11 @@ export class Transaction {
      * The signature of the guardian.
      */
     public guardianSignature: Uint8Array;
+
+    /**
+     * The signature of the relayer.
+     */
+    public relayerSignature: Uint8Array;
 
     /**
      * Creates a new Transaction object.
@@ -103,8 +114,10 @@ export class Transaction {
         version?: number;
         options?: number;
         guardian?: Address;
+        relayer?: Address;
         signature?: Uint8Array;
         guardianSignature?: Uint8Array;
+        relayerSignature?: Uint8Array;
     }) {
         this.nonce = BigInt(options.nonce?.valueOf() || 0n);
         // We still rely on "bigNumber" for value, because client code might be passing a BigNumber object as a legacy "ITransactionValue",
@@ -121,9 +134,11 @@ export class Transaction {
         this.version = Number(options.version?.valueOf() || TRANSACTION_VERSION_DEFAULT);
         this.options = Number(options.options?.valueOf() || TRANSACTION_OPTIONS_DEFAULT);
         this.guardian = options.guardian ?? Address.empty();
+        this.relayer = options.relayer ? options.relayer : Address.empty();
 
         this.signature = options.signature || Buffer.from([]);
         this.guardianSignature = options.guardianSignature || Buffer.from([]);
+        this.relayerSignature = options.relayerSignature || Buffer.from([]);
     }
 
     /**
@@ -358,8 +373,10 @@ export class Transaction {
             version: this.version,
             options: this.options == 0 ? undefined : this.options,
             guardian: this.guardian.isEmpty() ? undefined : this.guardian.toBech32(),
+            relayer: this.relayer.isEmpty() ? undefined : this.relayer.toBech32(),
             signature: this.toHexOrUndefined(this.signature),
             guardianSignature: this.toHexOrUndefined(this.guardianSignature),
+            relayerSignature: this.toHexOrUndefined(this.relayerSignature),
         };
 
         return plainObject;
@@ -389,6 +406,7 @@ export class Transaction {
             sender: Address.newFromBech32(object.sender),
             senderUsername: Buffer.from(object.senderUsername || "", "base64").toString(),
             guardian: object.guardian ? Address.newFromBech32(object.guardian) : Address.empty(),
+            relayer: object.relayer ? Address.newFromBech32(object.relayer) : Address.empty(),
             gasPrice: BigInt(object.gasPrice),
             gasLimit: BigInt(object.gasLimit),
             data: Buffer.from(object.data || "", "base64"),
@@ -397,6 +415,7 @@ export class Transaction {
             options: Number(object.options),
             signature: Buffer.from(object.signature || "", "hex"),
             guardianSignature: Buffer.from(object.guardianSignature || "", "hex"),
+            relayerSignature: Buffer.from(object.relayerSignature || "", "hex"),
         });
 
         return transaction;

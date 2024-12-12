@@ -16,6 +16,7 @@ export interface IPlainTransactionObject {
     receiverUsername?: string;
     senderUsername?: string;
     guardian?: string;
+    relayer?: string;
     gasPrice: number;
     gasLimit: number;
     data?: string;
@@ -24,6 +25,7 @@ export interface IPlainTransactionObject {
     options?: number;
     signature?: string;
     guardianSignature?: string;
+    relayerSignature?: string;
 }
 
 export interface ISignature {

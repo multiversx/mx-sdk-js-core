@@ -2,7 +2,6 @@ import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, StringValue } fr
 import { Address } from "../address";
 import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
 import { ErrBadUsage } from "../errors";
-import { IAddress } from "../interface";
 import { Logger } from "../logger";
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "../transactionBuilder";
@@ -55,7 +54,7 @@ export class TokenManagementTransactionsFactory {
         this.esdtContractAddress = Address.fromHex(ESDT_CONTRACT_ADDRESS_HEX, this.config.addressHrp);
     }
 
-    createTransactionForIssuingFungible(sender: IAddress, options: resources.IssueFungibleInput): Transaction {
+    createTransactionForIssuingFungible(sender: Address, options: resources.IssueFungibleInput): Transaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const args = [
@@ -90,7 +89,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForIssuingSemiFungible(sender: IAddress, options: resources.IssueSemiFungibleInput): Transaction {
+    createTransactionForIssuingSemiFungible(sender: Address, options: resources.IssueSemiFungibleInput): Transaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const args = [
@@ -125,7 +124,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForIssuingNonFungible(sender: IAddress, options: resources.IssueNonFungibleInput): Transaction {
+    createTransactionForIssuingNonFungible(sender: Address, options: resources.IssueNonFungibleInput): Transaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const args = [
@@ -160,7 +159,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForRegisteringMetaESDT(sender: IAddress, options: resources.RegisterMetaESDTInput): Transaction {
+    createTransactionForRegisteringMetaESDT(sender: Address, options: resources.RegisterMetaESDTInput): Transaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const args = [
@@ -197,7 +196,7 @@ export class TokenManagementTransactionsFactory {
     }
 
     createTransactionForRegisteringAndSettingRoles(
-        sender: IAddress,
+        sender: Address,
         options: resources.RegisterRolesInput,
     ): Transaction {
         this.notifyAboutUnsettingBurnRoleGlobally();
@@ -224,7 +223,7 @@ export class TokenManagementTransactionsFactory {
     }
 
     createTransactionForSettingBurnRoleGlobally(
-        sender: IAddress,
+        sender: Address,
         options: resources.BurnRoleGloballyInput,
     ): Transaction {
         const dataParts = [
@@ -243,7 +242,7 @@ export class TokenManagementTransactionsFactory {
     }
 
     createTransactionForUnsettingBurnRoleGlobally(
-        sender: IAddress,
+        sender: Address,
         options: resources.BurnRoleGloballyInput,
     ): Transaction {
         const dataParts = [
@@ -262,7 +261,7 @@ export class TokenManagementTransactionsFactory {
     }
 
     createTransactionForSettingSpecialRoleOnFungibleToken(
-        sender: IAddress,
+        sender: Address,
         options: resources.FungibleSpecialRoleInput,
     ): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
@@ -284,7 +283,7 @@ export class TokenManagementTransactionsFactory {
     }
 
     createTransactionForSettingSpecialRoleOnSemiFungibleToken(
-        sender: IAddress,
+        sender: Address,
         options: resources.SemiFungibleSpecialRoleInput,
     ): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
@@ -308,14 +307,14 @@ export class TokenManagementTransactionsFactory {
     }
 
     createTransactionForSettingSpecialRoleOnMetaESDT(
-        sender: IAddress,
+        sender: Address,
         options: resources.SemiFungibleSpecialRoleInput,
     ): Transaction {
         return this.createTransactionForSettingSpecialRoleOnSemiFungibleToken(sender, options);
     }
 
     createTransactionForSettingSpecialRoleOnNonFungibleToken(
-        sender: IAddress,
+        sender: Address,
         options: resources.SpecialRoleInput,
     ): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
@@ -342,7 +341,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForCreatingNFT(sender: IAddress, options: resources.MintInput): Transaction {
+    createTransactionForCreatingNFT(sender: Address, options: resources.MintInput): Transaction {
         const dataParts = [
             "ESDTNFTCreate",
             ...this.argSerializer.valuesToStrings([
@@ -370,7 +369,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForPausing(sender: IAddress, options: resources.PausingInput): Transaction {
+    createTransactionForPausing(sender: Address, options: resources.PausingInput): Transaction {
         const dataParts = ["pause", ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)])];
 
         return new TransactionBuilder({
@@ -383,7 +382,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnpausing(sender: IAddress, options: resources.PausingInput): Transaction {
+    createTransactionForUnpausing(sender: Address, options: resources.PausingInput): Transaction {
         const dataParts = [
             "unPause",
             ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
@@ -399,7 +398,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForFreezing(sender: IAddress, options: resources.ManagementInput): Transaction {
+    createTransactionForFreezing(sender: Address, options: resources.ManagementInput): Transaction {
         const dataParts = [
             "freeze",
             ...this.argSerializer.valuesToStrings([
@@ -418,7 +417,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUnfreezing(sender: IAddress, options: resources.ManagementInput): Transaction {
+    createTransactionForUnfreezing(sender: Address, options: resources.ManagementInput): Transaction {
         const dataParts = [
             "UnFreeze",
             ...this.argSerializer.valuesToStrings([
@@ -437,7 +436,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForWiping(sender: IAddress, options: resources.ManagementInput): Transaction {
+    createTransactionForWiping(sender: Address, options: resources.ManagementInput): Transaction {
         const dataParts = [
             "wipe",
             ...this.argSerializer.valuesToStrings([
@@ -456,7 +455,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForLocalMint(sender: IAddress, options: resources.LocalMintInput): Transaction {
+    createTransactionForLocalMint(sender: Address, options: resources.LocalMintInput): Transaction {
         const dataParts = [
             "ESDTLocalMint",
             ...this.argSerializer.valuesToStrings([
@@ -475,7 +474,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForLocalBurning(sender: IAddress, options: resources.LocalBurnInput): Transaction {
+    createTransactionForLocalBurning(sender: Address, options: resources.LocalBurnInput): Transaction {
         const dataParts = [
             "ESDTLocalBurn",
             ...this.argSerializer.valuesToStrings([
@@ -494,7 +493,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUpdatingAttributes(sender: IAddress, options: resources.UpdateAttributesInput): Transaction {
+    createTransactionForUpdatingAttributes(sender: Address, options: resources.UpdateAttributesInput): Transaction {
         const dataParts = [
             "ESDTNFTUpdateAttributes",
             ...this.argSerializer.valuesToStrings([
@@ -514,7 +513,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForAddingQuantity(sender: IAddress, options: resources.UpdateQuantityInput): Transaction {
+    createTransactionForAddingQuantity(sender: Address, options: resources.UpdateQuantityInput): Transaction {
         const dataParts = [
             "ESDTNFTAddQuantity",
             ...this.argSerializer.valuesToStrings([
@@ -534,7 +533,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForBurningQuantity(sender: IAddress, options: resources.UpdateQuantityInput): Transaction {
+    createTransactionForBurningQuantity(sender: Address, options: resources.UpdateQuantityInput): Transaction {
         const dataParts = [
             "ESDTNFTBurn",
             ...this.argSerializer.valuesToStrings([
@@ -554,7 +553,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForModifyingRoyalties(sender: IAddress, options: resources.ModifyRoyaltiesInput): Transaction {
+    createTransactionForModifyingRoyalties(sender: Address, options: resources.ModifyRoyaltiesInput): Transaction {
         const dataParts = [
             "ESDTModifyRoyalties",
             ...this.argSerializer.valuesToStrings([
@@ -574,7 +573,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForSettingNewUris(sender: IAddress, options: resources.SetNewUriInput): Transaction {
+    createTransactionForSettingNewUris(sender: Address, options: resources.SetNewUriInput): Transaction {
         if (!options.newUris.length) {
             throw new ErrBadUsage("No URIs provided");
         }
@@ -598,7 +597,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForModifyingCreator(sender: IAddress, options: resources.ModifyCreatorInput): Transaction {
+    createTransactionForModifyingCreator(sender: Address, options: resources.ModifyCreatorInput): Transaction {
         const dataParts = [
             "ESDTModifyCreator",
             ...this.argSerializer.valuesToStrings([
@@ -617,7 +616,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUpdatingMetadata(sender: IAddress, options: resources.ManageMetadataInput): Transaction {
+    createTransactionForUpdatingMetadata(sender: Address, options: resources.ManageMetadataInput): Transaction {
         const dataParts = [
             "ESDTMetaDataUpdate",
             ...this.argSerializer.valuesToStrings([
@@ -641,7 +640,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForMetadataRecreate(sender: IAddress, options: resources.ManageMetadataInput): Transaction {
+    createTransactionForMetadataRecreate(sender: Address, options: resources.ManageMetadataInput): Transaction {
         const dataParts = [
             "ESDTMetaDataRecreate",
             ...this.argSerializer.valuesToStrings([
@@ -666,7 +665,7 @@ export class TokenManagementTransactionsFactory {
     }
 
     createTransactionForChangingTokenToDynamic(
-        sender: IAddress,
+        sender: Address,
         options: resources.ChangeTokenToDynamicInput,
     ): Transaction {
         const dataParts = [
@@ -684,7 +683,7 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
-    createTransactionForUpdatingTokenId(sender: IAddress, options: resources.UpdateTokenIDInput): Transaction {
+    createTransactionForUpdatingTokenId(sender: Address, options: resources.UpdateTokenIDInput): Transaction {
         const dataParts = [
             "updateTokenID",
             ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
@@ -701,7 +700,7 @@ export class TokenManagementTransactionsFactory {
     }
 
     createTransactionForRegisteringDynamicToken(
-        sender: IAddress,
+        sender: Address,
         options: resources.RegisteringDynamicTokenInput,
     ): Transaction {
         const dataParts = [
@@ -725,7 +724,7 @@ export class TokenManagementTransactionsFactory {
     }
 
     createTransactionForRegisteringDynamicAndSettingRoles(
-        sender: IAddress,
+        sender: Address,
         options: resources.RegisteringDynamicTokenInput,
     ): Transaction {
         const dataParts = [

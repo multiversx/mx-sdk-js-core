@@ -1,5 +1,6 @@
+import { Address } from "./address";
 import { ARGUMENTS_SEPARATOR } from "./constants";
-import { IAddress, ITransactionPayload } from "./interface";
+import { ITransactionPayload } from "./interface";
 import { Transaction } from "./transaction";
 import { TransactionPayload } from "./transactionPayload";
 
@@ -14,8 +15,8 @@ interface Config {
  */
 export class TransactionBuilder {
     private config: Config;
-    private sender: IAddress;
-    private receiver: IAddress;
+    private sender: Address;
+    private receiver: Address;
     private dataParts: string[];
     private providedGasLimit: bigint;
     private addDataMovementGas: boolean;
@@ -23,8 +24,8 @@ export class TransactionBuilder {
 
     constructor(options: {
         config: Config;
-        sender: IAddress;
-        receiver: IAddress;
+        sender: Address;
+        receiver: Address;
         dataParts: string[];
         gasLimit: bigint;
         addDataMovementGas: boolean;
@@ -59,8 +60,8 @@ export class TransactionBuilder {
         const gasLimit = this.computeGasLimit(data);
 
         return new Transaction({
-            sender: this.sender.bech32(),
-            receiver: this.receiver.bech32(),
+            sender: this.sender,
+            receiver: this.receiver,
             gasLimit: gasLimit,
             value: this.amount || 0n,
             data: data.valueOf(),

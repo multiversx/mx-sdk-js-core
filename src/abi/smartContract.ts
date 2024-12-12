@@ -247,12 +247,12 @@ export class SmartContract implements ISmartContract {
         });
 
         args = args || [];
-        value = value || 0;
+        value = value || 0n;
 
         const transaction = factory.createTransactionForExecute(caller, {
             contract: receiver ? receiver : this.getAddress(),
             function: func.toString(),
-            gasLimit: BigInt(gasLimit.valueOf()),
+            gasLimit: gasLimit,
             arguments: args,
         });
 
@@ -276,7 +276,7 @@ export class SmartContract implements ISmartContract {
     }
 
     private ensureHasAddress() {
-        if (!this.getAddress().bech32()) {
+        if (!this.getAddress().toBech32()) {
             throw new ErrContractHasNoAddress();
         }
     }
@@ -289,7 +289,7 @@ export class SmartContract implements ISmartContract {
      * @param nonce The owner nonce used for the deployment transaction
      */
     static computeAddress(owner: Address, nonce: INonce): Address {
-        const deployer = Address.fromBech32(owner.bech32());
+        const deployer = Address.fromBech32(owner.toBech32());
         const addressComputer = new AddressComputer();
         return addressComputer.computeContractAddress(deployer, BigInt(nonce.valueOf()));
     }

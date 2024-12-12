@@ -1,15 +1,12 @@
-import { UserPublicKey, UserVerifier } from "./wallet";
-import BigNumber from "bignumber.js";
+import { Buffer } from "buffer";
 import { assert } from "chai";
 import { Address } from "./address";
-import { MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS } from "./constants";
-import { TransactionOptions, TransactionVersion } from "./networkParams";
+import { MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS, TRANSACTION_OPTIONS_DEFAULT } from "./constants";
 import { ProtoSerializer } from "./proto";
 import { TestWallet, loadTestWallets } from "./testutils";
-import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionComputer } from "./transactionComputer";
-import { TransactionPayload } from "./transactionPayload";
+import { UserPublicKey, UserVerifier } from "./wallet";
 
 describe("test transaction", async () => {
     let wallets: Record<string, TestWallet>;
@@ -32,8 +29,8 @@ describe("test transaction", async () => {
     it("should serialize transaction for signing (without data)", async () => {
         const transaction = new Transaction({
             chainID: networkConfig.ChainID,
-            sender: wallets.alice.address.bech32(),
-            receiver: wallets.bob.address.bech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
             gasLimit: 50000n,
             value: 0n,
             version: 2,
@@ -52,8 +49,8 @@ describe("test transaction", async () => {
     it("should serialize transaction for signing (with data)", async () => {
         const transaction = new Transaction({
             chainID: networkConfig.ChainID,
-            sender: wallets.alice.address.bech32(),
-            receiver: wallets.bob.address.bech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
             gasLimit: 70000n,
             value: 1000000000000000000n,
             version: 2,
@@ -72,12 +69,12 @@ describe("test transaction", async () => {
 
     it("should sign transaction (with no data, no value) (legacy)", async () => {
         const transaction = new Transaction({
-            nonce: 89,
-            value: "0",
+            nonce: 89n,
+            value: 0n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: minGasLimit,
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: BigInt(minGasLimit),
             chainID: "local-testnet",
         });
 
@@ -95,13 +92,13 @@ describe("test transaction", async () => {
 
     it("should sign transaction (with data, no value) (legacy)", async () => {
         const transaction = new Transaction({
-            nonce: 90,
-            value: "0",
+            nonce: 90n,
+            value: 0n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: 80000n,
+            data: Buffer.from("hello"),
             chainID: "local-testnet",
         });
 
@@ -120,8 +117,8 @@ describe("test transaction", async () => {
     it("should sign transaction (with usernames)", async () => {
         const transaction = new Transaction({
             chainID: "T",
-            sender: wallets.carol.address.bech32(),
-            receiver: wallets.alice.address.bech32(),
+            sender: wallets.carol.address,
+            receiver: wallets.alice.address,
             gasLimit: 50000n,
             value: 1000000000000000000n,
             version: 2,
@@ -143,8 +140,8 @@ describe("test transaction", async () => {
     it("should compute hash", async () => {
         const transaction = new Transaction({
             chainID: networkConfig.ChainID,
-            sender: wallets.alice.address.bech32(),
-            receiver: wallets.alice.address.bech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.alice.address,
             gasLimit: 100000n,
             value: 1000000000000n,
             version: 2,
@@ -168,8 +165,8 @@ describe("test transaction", async () => {
     it("should compute hash (with usernames)", async () => {
         const transaction = new Transaction({
             chainID: networkConfig.ChainID,
-            sender: wallets.alice.address.bech32(),
-            receiver: wallets.alice.address.bech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.alice.address,
             gasLimit: 100000n,
             value: 1000000000000n,
             version: 2,
@@ -194,16 +191,16 @@ describe("test transaction", async () => {
 
     it("should sign & compute hash (with data, with opaque, unused options) (legacy)", async () => {
         const transaction = new Transaction({
-            nonce: 89,
-            value: "0",
+            nonce: 89n,
+            value: 0n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: minGasLimit,
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: BigInt(minGasLimit),
             chainID: "local-testnet",
             // The protocol ignores the options when version == 1
-            version: new TransactionVersion(1),
-            options: new TransactionOptions(1),
+            version: 1,
+            options: 1,
         });
 
         assert.throws(() => {
@@ -213,13 +210,13 @@ describe("test transaction", async () => {
 
     it("should sign & compute hash (with data, with value) (legacy)", async () => {
         const transaction = new Transaction({
-            nonce: 91,
-            value: TokenTransfer.egldFromAmount(10),
+            nonce: 91n,
+            value: 10000000000000000000n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: 100000,
-            data: new TransactionPayload("for the book"),
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: 100000n,
+            data: Buffer.from("for the book"),
             chainID: "local-testnet",
         });
 
@@ -237,13 +234,13 @@ describe("test transaction", async () => {
 
     it("should sign & compute hash (with data, with large value) (legacy)", async () => {
         const transaction = new Transaction({
-            nonce: 92,
-            value: TokenTransfer.egldFromBigInteger("123456789000000000000000000000"),
+            nonce: 92n,
+            value: BigInt("123456789000000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: 100000,
-            data: new TransactionPayload("for the spaceship"),
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: 100000n,
+            data: Buffer.from("for the spaceship"),
             chainID: "local-testnet",
         });
 
@@ -261,15 +258,15 @@ describe("test transaction", async () => {
 
     it("should sign & compute hash (with nonce = 0) (legacy)", async () => {
         const transaction = new Transaction({
-            nonce: 0,
-            value: 0,
+            nonce: 0n,
+            value: 0n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: 80000n,
+            data: Buffer.from("hello"),
             chainID: "local-testnet",
-            version: new TransactionVersion(1),
+            version: 1,
         });
 
         transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
@@ -286,12 +283,12 @@ describe("test transaction", async () => {
 
     it("should sign & compute hash (without options field, should be omitted) (legacy)", async () => {
         const transaction = new Transaction({
-            nonce: 89,
-            value: 0,
+            nonce: 89n,
+            value: 0n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: minGasLimit,
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: BigInt(minGasLimit),
             chainID: "local-testnet",
         });
 
@@ -312,12 +309,12 @@ describe("test transaction", async () => {
 
     it("should sign & compute hash (with guardian field, should be omitted) (legacy)", async () => {
         const transaction = new Transaction({
-            nonce: 89,
-            value: 0,
+            nonce: 89n,
+            value: 0n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: minGasLimit,
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: BigInt(minGasLimit),
             chainID: "local-testnet",
         });
 
@@ -338,13 +335,13 @@ describe("test transaction", async () => {
 
     it("should sign & compute hash (with usernames) (legacy)", async () => {
         const transaction = new Transaction({
-            nonce: 204,
-            value: "1000000000000000000",
+            nonce: 204n,
+            value: 1000000000000000000n,
             sender: Address.fromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
             receiver: Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
             senderUsername: "carol",
             receiverUsername: "alice",
-            gasLimit: 50000,
+            gasLimit: 50000n,
             chainID: "T",
         });
 
@@ -365,8 +362,8 @@ describe("test transaction", async () => {
 
         const transaction = new Transaction({
             chainID: "local-testnet",
-            sender: alice.address.bech32(),
-            receiver: wallets.bob.address.bech32(),
+            sender: alice.address,
+            receiver: wallets.bob.address,
             gasLimit: 150000n,
             gasPrice: 1000000000n,
             data: new Uint8Array(Buffer.from("test data field")),
@@ -374,7 +371,7 @@ describe("test transaction", async () => {
             options: 2,
             nonce: 92n,
             value: 123456789000000000000000000000n,
-            guardian: "erd1x23lzn8483xs2su4fak0r0dqx6w38enpmmqf2yrkylwq7mfnvyhsxqw57y",
+            guardian: Address.fromBech32("erd1x23lzn8483xs2su4fak0r0dqx6w38enpmmqf2yrkylwq7mfnvyhsxqw57y"),
         });
         transaction.guardianSignature = new Uint8Array(64);
         transaction.signature = await alice.signer.sign(transactionComputer.computeBytesForSigning(transaction));
@@ -396,12 +393,12 @@ describe("test transaction", async () => {
 
     it("computes fee (legacy)", () => {
         const transaction = new Transaction({
-            nonce: 92,
-            value: TokenTransfer.egldFromBigInteger("123456789000000000000000000000"),
+            nonce: 92n,
+            value: BigInt("123456789000000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: minGasLimit,
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: BigInt(minGasLimit),
             chainID: "local-testnet",
         });
 
@@ -412,10 +409,10 @@ describe("test transaction", async () => {
     it("computes fee", async () => {
         const transaction = new Transaction({
             chainID: "D",
-            sender: wallets.alice.address.bech32(),
-            receiver: wallets.alice.address.bech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.alice.address,
             gasLimit: 50000n,
-            gasPrice: minGasPrice,
+            gasPrice: BigInt(minGasPrice),
         });
 
         const gasLimit = transactionComputer.computeTransactionFee(transaction, networkConfig);
@@ -425,8 +422,8 @@ describe("test transaction", async () => {
     it("computes fee, but should throw `NotEnoughGas` error", async () => {
         const transaction = new Transaction({
             chainID: networkConfig.ChainID,
-            sender: wallets.alice.address.bech32(),
-            receiver: wallets.alice.address.bech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.alice.address,
             gasLimit: 50000n,
             data: Buffer.from("toolittlegaslimit"),
         });
@@ -438,13 +435,13 @@ describe("test transaction", async () => {
 
     it("computes fee (with data field) (legacy)", () => {
         let transaction = new Transaction({
-            nonce: 92,
-            value: TokenTransfer.egldFromBigInteger("123456789000000000000000000000"),
+            nonce: 92n,
+            value: BigInt("123456789000000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            data: new TransactionPayload("testdata"),
-            gasPrice: minGasPrice,
-            gasLimit: minGasLimit + 12010,
+            data: Buffer.from("testdata"),
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: BigInt(minGasLimit + 12010),
             chainID: "local-testnet",
         });
 
@@ -455,10 +452,10 @@ describe("test transaction", async () => {
     it("computes fee (with data field)", async () => {
         const transaction = new Transaction({
             chainID: networkConfig.ChainID,
-            sender: wallets.alice.address.bech32(),
-            receiver: wallets.alice.address.bech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.alice.address,
             gasLimit: 50000n + 12010n,
-            gasPrice: minGasPrice,
+            gasPrice: BigInt(minGasPrice),
             data: Buffer.from("testdata"),
         });
 
@@ -469,15 +466,15 @@ describe("test transaction", async () => {
     it("should convert transaction to plain object and back", () => {
         const sender = wallets.alice.address;
         const transaction = new Transaction({
-            nonce: 90,
-            value: "123456789000000000000000000000",
+            nonce: 90n,
+            value: 123456789000000000000000000000n,
             sender: sender,
             receiver: wallets.bob.address,
             senderUsername: "alice",
             receiverUsername: "bob",
-            gasPrice: minGasPrice,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: 80000n,
+            data: Buffer.from("hello"),
             chainID: "local-testnet",
         });
 
@@ -488,19 +485,19 @@ describe("test transaction", async () => {
 
     it("should handle large values", () => {
         const tx1 = new Transaction({
-            value: "123456789000000000000000000000",
+            value: 123456789000000000000000000000n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasLimit: 50000,
+            gasLimit: 50000n,
             chainID: "local-testnet",
         });
         assert.equal(tx1.getValue().toString(), "123456789000000000000000000000");
 
         const tx2 = new Transaction({
-            value: TokenTransfer.egldFromBigInteger("123456789000000000000000000000"),
+            value: 123456789000000000000000000000n,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasLimit: 50000,
+            gasLimit: 50000n,
             chainID: "local-testnet",
         });
         assert.equal(tx2.getValue().toString(), "123456789000000000000000000000");
@@ -509,10 +506,10 @@ describe("test transaction", async () => {
             // Passing a BigNumber is not recommended.
             // However, ITransactionValue interface is permissive, and developers may mistakenly pass such objects as values.
             // TokenTransfer objects or simple strings (see above) are preferred, instead.
-            value: new BigNumber("123456789000000000000000000000"),
+            value: BigInt("123456789000000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasLimit: 50000,
+            gasLimit: 50000n,
             chainID: "local-testnet",
         });
         assert.equal(tx3.getValue().toString(), "123456789000000000000000000000");
@@ -520,88 +517,88 @@ describe("test transaction", async () => {
 
     it("checks correctly the version and options of the transaction", async () => {
         let transaction = new Transaction({
-            nonce: 90,
-            value: new BigNumber("1000000000000000000"),
+            nonce: 90n,
+            value: BigInt("1000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: 80000n,
+            data: Buffer.from("hello"),
             chainID: "local-testnet",
-            version: new TransactionVersion(1),
-            options: TransactionOptions.withDefaultOptions(),
+            version: 1,
+            options: TRANSACTION_OPTIONS_DEFAULT,
         });
         assert.isFalse(transaction.isGuardedTransaction());
 
         transaction = new Transaction({
-            nonce: 90,
-            value: new BigNumber("1000000000000000000"),
+            nonce: 90n,
+            value: BigInt("1000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: 80000n,
+            data: Buffer.from("hello"),
             chainID: "local-testnet",
-            version: new TransactionVersion(1),
-            options: TransactionOptions.withOptions({ guarded: true }),
+            version: 1,
+            options: 2,
         });
         assert.isFalse(transaction.isGuardedTransaction());
 
         transaction = new Transaction({
-            nonce: 90,
-            value: new BigNumber("1000000000000000000"),
+            nonce: 90n,
+            value: BigInt("1000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: 80000n,
+            data: Buffer.from("hello"),
             chainID: "local-testnet",
-            version: new TransactionVersion(2),
-            options: TransactionOptions.withOptions({ guarded: true }),
+            version: 2,
+            options: 2,
         });
         assert.isFalse(transaction.isGuardedTransaction());
 
         transaction = new Transaction({
-            nonce: 90,
-            value: new BigNumber("1000000000000000000"),
+            nonce: 90n,
+            value: BigInt("1000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
+            gasPrice: BigInt(minGasPrice),
+            gasLimit: 80000n,
+            data: Buffer.from("hello"),
             chainID: "local-testnet",
-            version: new TransactionVersion(2),
-            options: TransactionOptions.withOptions({ guarded: true }),
+            version: 2,
+            options: 2,
         });
         assert.isFalse(transaction.isGuardedTransaction());
 
         transaction = new Transaction({
-            nonce: 90,
-            value: new BigNumber("1000000000000000000"),
+            nonce: 90n,
+            value: BigInt("1000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
+            gasPrice: BigInt(minGasPrice),
             guardian: wallets.bob.address,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
+            gasLimit: 80000n,
+            data: Buffer.from("hello"),
             chainID: "local-testnet",
-            version: new TransactionVersion(2),
-            options: TransactionOptions.withOptions({ guarded: true }),
+            version: 2,
+            options: 2,
         });
         assert.isFalse(transaction.isGuardedTransaction());
 
         transaction = new Transaction({
-            nonce: 90,
-            value: new BigNumber("1000000000000000000"),
+            nonce: 90n,
+            value: BigInt("1000000000000000000"),
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
-            gasPrice: minGasPrice,
+            gasPrice: BigInt(minGasPrice),
             guardian: wallets.bob.address,
-            gasLimit: 80000,
-            data: new TransactionPayload("hello"),
+            gasLimit: 80000n,
+            data: Buffer.from("hello"),
             chainID: "local-testnet",
-            version: new TransactionVersion(2),
-            options: TransactionOptions.withOptions({ guarded: true }),
+            version: 2,
+            options: 2,
         });
         transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
         transaction.applyGuardianSignature(transaction.getSignature());
@@ -612,8 +609,8 @@ describe("test transaction", async () => {
         let transaction = new Transaction({
             nonce: 89n,
             value: 0n,
-            sender: wallets.alice.address.toBech32(),
-            receiver: wallets.bob.address.toBech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
             gasLimit: 50000n,
             gasPrice: 1000000000n,
             chainID: "integration tests chain ID",
@@ -633,25 +630,25 @@ describe("test transaction", async () => {
         let transaction = new Transaction({
             nonce: 89n,
             value: 0n,
-            sender: wallets.alice.address.toBech32(),
-            receiver: wallets.bob.address.toBech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
             gasLimit: 50000n,
             chainID: "localnet",
         });
 
-        transactionComputer.applyGuardian(transaction, wallets.carol.address.toBech32());
+        transactionComputer.applyGuardian(transaction, wallets.carol.address);
 
         assert.equal(transaction.version, 2);
         assert.equal(transaction.options, 2);
-        assert.equal(transaction.guardian, wallets.carol.address.toBech32());
+        assert.equal(transaction.guardian, wallets.carol.address);
     });
 
     it("should apply guardian with options set for hash signing", async () => {
         let transaction = new Transaction({
             nonce: 89n,
             value: 0n,
-            sender: wallets.alice.address.toBech32(),
-            receiver: wallets.bob.address.toBech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
             gasLimit: 50000n,
             chainID: "localnet",
             version: 1,
@@ -661,20 +658,20 @@ describe("test transaction", async () => {
         assert.equal(transaction.version, 2);
         assert.equal(transaction.options, 1);
 
-        transactionComputer.applyGuardian(transaction, wallets.carol.address.toBech32());
+        transactionComputer.applyGuardian(transaction, wallets.carol.address);
         assert.equal(transaction.version, 2);
         assert.equal(transaction.options, 3);
     });
 
     it("should ensure transaction is valid", async () => {
         let transaction = new Transaction({
-            sender: "invalidAddress",
-            receiver: wallets.bob.address.toBech32(),
+            sender: Address.empty(),
+            receiver: wallets.bob.address,
             gasLimit: 50000n,
             chainID: "",
         });
 
-        transaction.sender = wallets.alice.address.toBech32();
+        transaction.sender = wallets.alice.address;
 
         assert.throws(() => {
             transactionComputer.computeBytesForSigning(transaction);
@@ -696,8 +693,8 @@ describe("test transaction", async () => {
 
     it("should compute bytes to verify transaction signature", async () => {
         let transaction = new Transaction({
-            sender: wallets.alice.address.toBech32(),
-            receiver: wallets.bob.address.toBech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
             gasLimit: 50000n,
             chainID: "D",
             nonce: 7n,
@@ -725,8 +722,8 @@ describe("test transaction", async () => {
 
     it("should compute bytes to verify transaction signature (signed by hash)", async () => {
         let transaction = new Transaction({
-            sender: wallets.alice.address.toBech32(),
-            receiver: wallets.bob.address.toBech32(),
+            sender: wallets.alice.address,
+            receiver: wallets.bob.address,
             gasLimit: 50000n,
             chainID: "D",
             nonce: 7n,

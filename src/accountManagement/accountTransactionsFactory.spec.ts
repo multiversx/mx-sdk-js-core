@@ -15,8 +15,14 @@ describe("test account transactions factory", function () {
             keyValuePairs: keyValuePairs,
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
         assert.equal(Buffer.from(transaction.data).toString(), "SaveKeyValue@6b657930@76616c756530");
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
@@ -24,8 +30,8 @@ describe("test account transactions factory", function () {
     });
 
     it("should create 'Transaction' for setting guardian", async function () {
-        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        const guardian = Address.fromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+        const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const guardian = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const serviceID = "MultiversXTCSService";
 
         const transaction = factory.createTransactionForSettingGuardian(sender, {
@@ -33,8 +39,14 @@ describe("test account transactions factory", function () {
             serviceID: serviceID,
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
         assert.equal(
             Buffer.from(transaction.data).toString(),
             "SetGuardian@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@4d756c7469766572735854435353657276696365",
@@ -49,8 +61,14 @@ describe("test account transactions factory", function () {
 
         const transaction = factory.createTransactionForGuardingAccount(sender);
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
         assert.equal(Buffer.from(transaction.data).toString(), "GuardAccount");
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
@@ -62,8 +80,14 @@ describe("test account transactions factory", function () {
 
         const transaction = factory.createTransactionForUnguardingAccount(sender);
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
         assert.equal(Buffer.from(transaction.data).toString(), "UnGuardAccount");
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);

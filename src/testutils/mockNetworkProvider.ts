@@ -2,7 +2,6 @@ import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
 import * as errors from "../errors";
 import { ErrMock } from "../errors";
-import { ITransaction } from "../interface";
 import { IAccountOnNetwork } from "../interfaceOfNetwork";
 import {
     AccountOnNetwork,
@@ -39,18 +38,18 @@ export class MockNetworkProvider implements INetworkProvider {
         this.accounts = new Map<string, AccountOnNetwork>();
 
         this.accounts.set(
-            MockNetworkProvider.AddressOfAlice.bech32(),
+            MockNetworkProvider.AddressOfAlice.toBech32(),
             new AccountOnNetwork({
                 nonce: 0,
                 balance: createAccountBalance(1000),
             }),
         );
         this.accounts.set(
-            MockNetworkProvider.AddressOfBob.bech32(),
+            MockNetworkProvider.AddressOfBob.toBech32(),
             new AccountOnNetwork({ nonce: 5, balance: createAccountBalance(500) }),
         );
         this.accounts.set(
-            MockNetworkProvider.AddressOfCarol.bech32(),
+            MockNetworkProvider.AddressOfCarol.toBech32(),
             new AccountOnNetwork({
                 nonce: 42,
                 balance: createAccountBalance(300),
@@ -88,7 +87,7 @@ export class MockNetworkProvider implements INetworkProvider {
     ): Promise<NonFungibleTokenOfAccountOnNetwork> {
         throw new Error("Method not implemented.");
     }
-    sendTransactions(_txs: ITransaction[]): Promise<string[]> {
+    sendTransactions(_txs: Transaction[]): Promise<string[]> {
         throw new Error("Method not implemented.");
     }
     getDefinitionOfFungibleToken(_tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
@@ -108,7 +107,7 @@ export class MockNetworkProvider implements INetworkProvider {
     }
 
     mockUpdateAccount(address: Address, mutate: (item: IAccountOnNetwork) => void) {
-        let account = this.accounts.get(address.bech32());
+        let account = this.accounts.get(address.toBech32());
         if (account) {
             mutate(account);
         }
@@ -173,8 +172,8 @@ export class MockNetworkProvider implements INetworkProvider {
         }
     }
 
-    async getAccount(address: IAddress): Promise<AccountOnNetwork> {
-        let account = this.accounts.get(address.bech32());
+    async getAccount(address: Address): Promise<AccountOnNetwork> {
+        let account = this.accounts.get(address.toBech32());
         if (account) {
             return account;
         }
@@ -188,7 +187,7 @@ export class MockNetworkProvider implements INetworkProvider {
             new TransactionOnNetwork({
                 sender: transaction.getSender(),
                 receiver: transaction.getReceiver(),
-                data: transaction.getData().valueOf(),
+                data: Buffer.from(transaction.data),
                 status: new TransactionStatus("pending"),
             }),
         );

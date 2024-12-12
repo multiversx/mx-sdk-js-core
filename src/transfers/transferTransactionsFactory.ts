@@ -1,21 +1,12 @@
 import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "../abi";
+import { Address } from "../address";
 import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
 import { Err, ErrBadUsage } from "../errors";
-import {
-    IAddress,
-    IChainID,
-    IGasLimit,
-    IGasPrice,
-    INonce,
-    ITokenTransfer,
-    ITransactionPayload,
-    ITransactionValue,
-} from "../interface";
+import { ITokenTransfer } from "../interface";
 import { TokenComputer, TokenTransfer } from "../tokens";
 import { TokenTransfersDataBuilder } from "../tokenTransfersDataBuilder";
 import { Transaction } from "../transaction";
 import { TransactionBuilder } from "../transactionBuilder";
-import { TransactionPayload } from "../transactionPayload";
 import * as resources from "./resources";
 
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
@@ -82,17 +73,14 @@ export class TransferTransactionsFactory {
         }
     }
 
-    createTransactionForNativeTokenTransfer(
-        sender: IAddress,
-        options: resources.NativeTokenTransferInput,
-    ): Transaction {
+    createTransactionForNativeTokenTransfer(sender: Address, options: resources.NativeTokenTransferInput): Transaction {
         this.ensureConfigIsDefined();
 
         const data = options.data || new Uint8Array();
 
         return new Transaction({
-            sender: sender.bech32(),
-            receiver: options.receiver.bech32(),
+            sender: sender,
+            receiver: options.receiver,
             chainID: this.config!.chainID,
             gasLimit: this.computeGasForMoveBalance(this.config!, data),
             data: data,
@@ -100,7 +88,7 @@ export class TransferTransactionsFactory {
         });
     }
 
-    createTransactionForESDTTokenTransfer(sender: IAddress, options: resources.CustomTokenTransferInput): Transaction {
+    createTransactionForESDTTokenTransfer(sender: Address, options: resources.CustomTokenTransferInput): Transaction {
         this.ensureConfigIsDefined();
 
         const numberOfTransfers = options.tokenTransfers.length;
@@ -128,7 +116,7 @@ export class TransferTransactionsFactory {
         }).build();
     }
 
-    createTransactionForTransfer(sender: IAddress, options: resources.CreateTransferTransactionInput): Transaction {
+    createTransactionForTransfer(sender: Address, options: resources.CreateTransferTransactionInput): Transaction {
         const nativeAmount = options.nativeAmount ?? 0n;
         let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
         const numberOfTokens = tokenTransfers.length;
@@ -161,14 +149,14 @@ export class TransferTransactionsFactory {
      * Use {@link createTransactionForNativeTokenTransfer} instead.
      */
     createEGLDTransfer(args: {
-        nonce?: INonce;
-        value: ITransactionValue;
-        receiver: IAddress;
-        sender: IAddress;
-        gasPrice?: IGasPrice;
-        gasLimit?: IGasLimit;
-        data?: ITransactionPayload;
-        chainID: IChainID;
+        nonce?: bigint;
+        value: bigint;
+        receiver: Address;
+        sender: Address;
+        gasPrice?: bigint;
+        gasLimit?: bigint;
+        data?: Uint8Array;
+        chainID: string;
     }) {
         if (!this.isGasEstimatorDefined()) {
             throw new Err(
@@ -176,7 +164,7 @@ export class TransferTransactionsFactory {
             );
         }
 
-        const dataLength = args.data?.length() || 0;
+        const dataLength = args.data?.length || 0;
         const estimatedGasLimit = this.gasEstimator!.forEGLDTransfer(dataLength);
 
         return new Transaction({
@@ -185,7 +173,7 @@ export class TransferTransactionsFactory {
             receiver: args.receiver,
             sender: args.sender,
             gasPrice: args.gasPrice,
-            gasLimit: args.gasLimit || estimatedGasLimit,
+            gasLimit: args.gasLimit || BigInt(estimatedGasLimit),
             data: args.data,
             chainID: args.chainID,
         });
@@ -197,12 +185,12 @@ export class TransferTransactionsFactory {
      */
     createESDTTransfer(args: {
         tokenTransfer: ITokenTransfer;
-        nonce?: INonce;
-        receiver: IAddress;
-        sender: IAddress;
-        gasPrice?: IGasPrice;
-        gasLimit?: IGasLimit;
-        chainID: IChainID;
+        nonce?: bigint;
+        receiver: Address;
+        sender: Address;
+        gasPrice?: bigint;
+        gasLimit?: bigint;
+        chainID: string;
     }) {
         if (!this.isGasEstimatorDefined()) {
             throw new Err(
@@ -218,8 +206,8 @@ export class TransferTransactionsFactory {
         ]);
 
         const data = `ESDTTransfer@${argumentsString}`;
-        const transactionPayload = new TransactionPayload(data);
-        const dataLength = transactionPayload.length() || 0;
+        const transactionPayload = Buffer.from(data);
+        const dataLength = transactionPayload.length || 0;
         const estimatedGasLimit = this.gasEstimator!.forESDTTransfer(dataLength);
 
         return new Transaction({
@@ -227,7 +215,7 @@ export class TransferTransactionsFactory {
             receiver: args.receiver,
             sender: args.sender,
             gasPrice: args.gasPrice,
-            gasLimit: args.gasLimit || estimatedGasLimit,
+            gasLimit: args.gasLimit || BigInt(estimatedGasLimit),
             data: transactionPayload,
             chainID: args.chainID,
         });
@@ -239,12 +227,12 @@ export class TransferTransactionsFactory {
      */
     createESDTNFTTransfer(args: {
         tokenTransfer: ITokenTransfer;
-        nonce?: INonce;
-        destination: IAddress;
-        sender: IAddress;
-        gasPrice?: IGasPrice;
-        gasLimit?: IGasLimit;
-        chainID: IChainID;
+        nonce?: bigint;
+        destination: Address;
+        sender: Address;
+        gasPrice?: bigint;
+        gasLimit?: bigint;
+        chainID: string;
     }) {
         if (!this.isGasEstimatorDefined()) {
             throw new Err(
@@ -264,8 +252,8 @@ export class TransferTransactionsFactory {
         ]);
 
         const data = `ESDTNFTTransfer@${argumentsString}`;
-        const transactionPayload = new TransactionPayload(data);
-        const dataLength = transactionPayload.length() || 0;
+        const transactionPayload = Buffer.from(data);
+        const dataLength = transactionPayload.length || 0;
         const estimatedGasLimit = this.gasEstimator!.forESDTNFTTransfer(dataLength);
 
         return new Transaction({
@@ -273,7 +261,7 @@ export class TransferTransactionsFactory {
             receiver: args.sender,
             sender: args.sender,
             gasPrice: args.gasPrice,
-            gasLimit: args.gasLimit || estimatedGasLimit,
+            gasLimit: args.gasLimit || BigInt(estimatedGasLimit),
             data: transactionPayload,
             chainID: args.chainID,
         });
@@ -285,12 +273,12 @@ export class TransferTransactionsFactory {
      */
     createMultiESDTNFTTransfer(args: {
         tokenTransfers: ITokenTransfer[];
-        nonce?: INonce;
-        destination: IAddress;
-        sender: IAddress;
-        gasPrice?: IGasPrice;
-        gasLimit?: IGasLimit;
-        chainID: IChainID;
+        nonce?: bigint;
+        destination: Address;
+        sender: Address;
+        gasPrice?: bigint;
+        gasLimit?: bigint;
+        chainID: string;
     }) {
         if (!this.isGasEstimatorDefined()) {
             throw new Err(
@@ -320,8 +308,8 @@ export class TransferTransactionsFactory {
 
         const { argumentsString } = new ArgSerializer().valuesToString(parts);
         const data = `MultiESDTNFTTransfer@${argumentsString}`;
-        const transactionPayload = new TransactionPayload(data);
-        const dataLength = transactionPayload.length() || 0;
+        const transactionPayload = Buffer.from(data);
+        const dataLength = transactionPayload.length || 0;
         const estimatedGasLimit = this.gasEstimator!.forMultiESDTNFTTransfer(dataLength, args.tokenTransfers.length);
 
         return new Transaction({
@@ -329,16 +317,16 @@ export class TransferTransactionsFactory {
             receiver: args.sender,
             sender: args.sender,
             gasPrice: args.gasPrice,
-            gasLimit: args.gasLimit || estimatedGasLimit,
+            gasLimit: args.gasLimit || BigInt(estimatedGasLimit),
             data: transactionPayload,
             chainID: args.chainID,
         });
     }
 
     private createSingleESDTTransferTransaction(
-        sender: IAddress,
+        sender: Address,
         options: {
-            receiver: IAddress;
+            receiver: Address;
             tokenTransfers: TokenTransfer[];
         },
     ): Transaction {
@@ -360,7 +348,7 @@ export class TransferTransactionsFactory {
         }).build();
     }
 
-    private buildTransferData(transfer: TokenTransfer, options: { sender: IAddress; receiver: IAddress }) {
+    private buildTransferData(transfer: TokenTransfer, options: { sender: Address; receiver: Address }) {
         let dataParts: string[] = [];
         let extraGasForTransfer: bigint;
         let receiver = options.receiver;
@@ -379,7 +367,7 @@ export class TransferTransactionsFactory {
         return { dataParts, extraGasForTransfer, receiver };
     }
 
-    private buildMultiESDTNFTTransferData(transfer: TokenTransfer[], receiver: IAddress) {
+    private buildMultiESDTNFTTransferData(transfer: TokenTransfer[], receiver: Address) {
         return {
             dataParts: this.tokenTransfersDataBuilder!.buildDataPartsForMultiESDTNFTTransfer(receiver, transfer),
             extraGasForTransfer:
@@ -395,7 +383,7 @@ export class TransferTransactionsFactory {
         };
     }
 
-    private buildSingleESDTNFTTransferData(transfer: TokenTransfer, receiver: IAddress) {
+    private buildSingleESDTNFTTransferData(transfer: TokenTransfer, receiver: Address) {
         return {
             dataParts: this.tokenTransfersDataBuilder!.buildDataPartsForSingleESDTNFTTransfer(transfer, receiver),
             extraGasForTransfer: this.config!.gasLimitESDTNFTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER),

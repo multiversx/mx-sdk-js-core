@@ -1,15 +1,15 @@
 import { Address } from "./address";
-import { ITransaction } from "./interface";
+import { Transaction } from "./transaction";
 import { TransactionLogs } from "./transactionLogs";
 import { SmartContractResult } from "./transactionsOutcomeParsers";
 import { TransactionStatus } from "./transactionStatus";
 
-export function prepareTransactionForBroadcasting(transaction: ITransaction): any {
+export function prepareTransactionForBroadcasting(transaction: Transaction): any {
     return {
         nonce: Number(transaction.nonce),
         value: transaction.value.toString(),
-        receiver: transaction.receiver,
-        sender: transaction.sender,
+        receiver: transaction.receiver.toBech32(),
+        sender: transaction.sender.toBech32(),
         senderUsername: transaction.senderUsername
             ? Buffer.from(transaction.senderUsername).toString("base64")
             : undefined,
@@ -22,7 +22,7 @@ export function prepareTransactionForBroadcasting(transaction: ITransaction): an
         chainID: transaction.chainID,
         version: transaction.version,
         options: transaction.options,
-        guardian: transaction.guardian || undefined,
+        guardian: transaction.guardian.isEmpty() ? undefined : transaction.guardian.toBech32(),
         signature: Buffer.from(transaction.signature).toString("hex"),
         guardianSignature:
             transaction.guardianSignature.length === 0

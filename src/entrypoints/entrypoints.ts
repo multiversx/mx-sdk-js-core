@@ -40,7 +40,7 @@ class NetworkEntrypoint {
     }
 
     verifyTransactionSignature(transaction: Transaction): boolean {
-        const verifier = UserVerifier.fromAddress(Address.fromBech32(transaction.sender));
+        const verifier = UserVerifier.fromAddress(transaction.sender);
         const txComputer = new TransactionComputer();
         return verifier.verify(txComputer.computeBytesForVerifying(transaction), transaction.signature);
     }

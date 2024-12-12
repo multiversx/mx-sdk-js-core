@@ -1,8 +1,8 @@
 import { Address } from "../address";
 import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
-import { ITransaction } from "../interface";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
+import { Transaction } from "../transaction";
 import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { getAxios } from "../utils";
@@ -137,13 +137,13 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return status;
     }
 
-    async sendTransaction(tx: ITransaction): Promise<string> {
+    async sendTransaction(tx: Transaction): Promise<string> {
         const transaction = prepareTransactionForBroadcasting(tx);
         const response = await this.doPostGeneric("transaction/send", transaction);
         return response.txHash;
     }
 
-    async sendTransactions(txs: ITransaction[]): Promise<string[]> {
+    async sendTransactions(txs: Transaction[]): Promise<string[]> {
         const data = txs.map((tx) => prepareTransactionForBroadcasting(tx));
 
         const response = await this.doPostGeneric("transaction/send-multiple", data);
@@ -156,7 +156,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return hashes;
     }
 
-    async simulateTransaction(tx: ITransaction): Promise<any> {
+    async simulateTransaction(tx: Transaction): Promise<any> {
         const transaction = prepareTransactionForBroadcasting(tx);
         const response = await this.doPostGeneric("transaction/simulate", transaction);
         return response;

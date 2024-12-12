@@ -1,11 +1,11 @@
 import BigNumber from "bignumber.js";
+import { Address } from "./address";
 import {
     MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS,
     TRANSACTION_OPTIONS_TX_GUARDED,
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
 } from "./constants";
 import * as errors from "./errors";
-import { ITransaction } from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
 import { ProtoSerializer } from "./proto";
 import { Transaction } from "./transaction";
@@ -46,7 +46,7 @@ export class TransactionComputer {
         return feeForMove + processingFee;
     }
 
-    computeBytesForSigning(transaction: ITransaction): Uint8Array {
+    computeBytesForSigning(transaction: Transaction): Uint8Array {
         this.ensureValidTransactionFields(transaction);
 
         const plainTransaction = this.toPlainObject(transaction);
@@ -54,7 +54,7 @@ export class TransactionComputer {
         return new Uint8Array(Buffer.from(serialized));
     }
 
-    computeBytesForVerifying(transaction: ITransaction): Uint8Array {
+    computeBytesForVerifying(transaction: Transaction): Uint8Array {
         const isTxSignedByHash = this.hasOptionsSetForHashSigning(transaction);
 
         if (isTxSignedByHash) {
@@ -63,29 +63,29 @@ export class TransactionComputer {
         return this.computeBytesForSigning(transaction);
     }
 
-    computeHashForSigning(transaction: ITransaction): Uint8Array {
+    computeHashForSigning(transaction: Transaction): Uint8Array {
         const plainTransaction = this.toPlainObject(transaction);
         const signable = Buffer.from(JSON.stringify(plainTransaction));
         return createKeccakHash("keccak256").update(signable).digest();
     }
 
-    computeTransactionHash(transaction: ITransaction): Uint8Array {
+    computeTransactionHash(transaction: Transaction): Uint8Array {
         const serializer = new ProtoSerializer();
-        const buffer = serializer.serializeTransaction(new Transaction(transaction));
+        const buffer = serializer.serializeTransaction(transaction);
         const hash = createTransactionHasher(TRANSACTION_HASH_LENGTH).update(buffer).digest("hex");
 
         return Buffer.from(hash, "hex");
     }
 
-    hasOptionsSetForGuardedTransaction(transaction: ITransaction): boolean {
+    hasOptionsSetForGuardedTransaction(transaction: Transaction): boolean {
         return (transaction.options & TRANSACTION_OPTIONS_TX_GUARDED) == TRANSACTION_OPTIONS_TX_GUARDED;
     }
 
-    hasOptionsSetForHashSigning(transaction: ITransaction): boolean {
+    hasOptionsSetForHashSigning(transaction: Transaction): boolean {
         return (transaction.options & TRANSACTION_OPTIONS_TX_HASH_SIGN) == TRANSACTION_OPTIONS_TX_HASH_SIGN;
     }
 
-    applyGuardian(transaction: ITransaction, guardian: string) {
+    applyGuardian(transaction: Transaction, guardian: Address) {
         if (transaction.version < MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS) {
             transaction.version = MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS;
         }
@@ -94,19 +94,19 @@ export class TransactionComputer {
         transaction.guardian = guardian;
     }
 
-    applyOptionsForHashSigning(transaction: ITransaction) {
+    applyOptionsForHashSigning(transaction: Transaction) {
         if (transaction.version < MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS) {
             transaction.version = MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS;
         }
         transaction.options = transaction.options | TRANSACTION_OPTIONS_TX_HASH_SIGN;
     }
 
-    private toPlainObject(transaction: ITransaction, withSignature?: boolean) {
+    private toPlainObject(transaction: Transaction, withSignature?: boolean) {
         let obj: any = {
             nonce: Number(transaction.nonce),
             value: transaction.value.toString(),
-            receiver: transaction.receiver,
-            sender: transaction.sender,
+            receiver: transaction.receiver.toBech32(),
+            sender: transaction.sender.toBech32(),
             senderUsername: this.toBase64OrUndefined(transaction.senderUsername),
             receiverUsername: this.toBase64OrUndefined(transaction.receiverUsername),
             gasPrice: Number(transaction.gasPrice),
@@ -121,7 +121,7 @@ export class TransactionComputer {
         obj.chainID = transaction.chainID;
         obj.version = transaction.version;
         obj.options = transaction.options ? transaction.options : undefined;
-        obj.guardian = transaction.guardian ? transaction.guardian : undefined;
+        obj.guardian = transaction.guardian.isEmpty() ? undefined : transaction.guardian.toBech32();
 
         return obj;
     }
@@ -134,7 +134,7 @@ export class TransactionComputer {
         return value && value.length ? Buffer.from(value).toString("base64") : undefined;
     }
 
-    private ensureValidTransactionFields(transaction: ITransaction) {
+    private ensureValidTransactionFields(transaction: Transaction) {
         if (!transaction.chainID.length) {
             throw new errors.ErrBadUsage("The `chainID` field is not set");
         }

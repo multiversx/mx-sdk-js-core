@@ -1,8 +1,8 @@
 import { AxiosHeaders } from "axios";
 import { assert } from "chai";
 import { Address } from "../address";
-import { ITransaction } from "../interface";
 import { SmartContractQuery } from "../smartContractQuery";
+import { Transaction } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { INetworkProvider } from "./interface";
@@ -175,7 +175,7 @@ describe("test network providers on devnet: Proxy and API", function () {
         let proxyItemResponse = await proxyProvider.getNonFungibleTokenOfAccount(dan, item.collection, item.nonce);
 
         removeInconsistencyForNonFungibleTokenOfAccount(apiItemResponse, proxyItemResponse);
-        assert.deepEqual(apiResponse, proxyResponse, `user: ${dan.bech32()}, token: ${item.identifier}`);
+        assert.deepEqual(apiResponse, proxyResponse, `user: ${dan.toBech32()}, token: ${item.identifier}`);
     });
 
     // TODO: Strive to have as little differences as possible between Proxy and API.
@@ -196,10 +196,10 @@ describe("test network providers on devnet: Proxy and API", function () {
         this.timeout(5000);
 
         const txs = [
-            {
+            new Transaction({
                 nonce: 103n,
-                receiver: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
-                sender: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
+                receiver: Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl"),
+                sender: Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl"),
                 gasPrice: 1000000000n,
                 gasLimit: 50000n,
                 chainID: "D",
@@ -208,19 +208,12 @@ describe("test network providers on devnet: Proxy and API", function () {
                     "498d5abb9f8eb69cc75f24320e8929dadbfa855ffac220d5e92175a83be68e0437801af3a1411e3d839738230097a1c38da5c8c4df3f345defc5d40300675900",
                     "hex",
                 ),
-                senderUsername: "",
-                receiverUsername: "",
-                guardian: "",
-                guardianSignature: new Uint8Array(),
-                options: 0,
-                data: new Uint8Array(),
-                value: 0n,
-            },
+            }),
 
-            {
+            new Transaction({
                 nonce: 104n,
-                receiver: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
-                sender: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
+                receiver: Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl"),
+                sender: Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl"),
                 gasPrice: 1000000000n,
                 gasLimit: 50000n,
                 chainID: "D",
@@ -229,31 +222,15 @@ describe("test network providers on devnet: Proxy and API", function () {
                     "341a2f3b738fbd20692e3bbd1cb36cb5f4ce9c0a9acc0cf4322269c0fcf34fd6bb59cd94062a9a4730e47f41b1ef3e29b69c6ab2a2a4dca9c9a7724681bc1708",
                     "hex",
                 ),
-                value: 0n,
-                senderUsername: "",
-                receiverUsername: "",
-                guardian: "",
-                guardianSignature: new Uint8Array(),
-                options: 0,
-                data: new Uint8Array(),
-            },
-            {
+            }),
+            new Transaction({
                 nonce: 77n,
                 chainID: "D",
-                receiver: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
-                sender: "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl",
+                receiver: Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl"),
+                sender: Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl"),
                 gasLimit: 50000n,
                 gasPrice: 1000000000n,
-                value: 0n,
-                senderUsername: "",
-                receiverUsername: "",
-                guardian: "",
-                guardianSignature: new Uint8Array(),
-                options: 0,
-                data: new Uint8Array(),
-                version: 1,
-                signature: new Uint8Array(),
-            },
+            }),
         ];
 
         const expectedHashes = [
@@ -431,11 +408,11 @@ describe("test network providers on devnet: Proxy and API", function () {
     it("should send both `Transaction` ", async function () {
         this.timeout(50000);
 
-        const transaction: ITransaction = {
+        const transaction = new Transaction({
             nonce: BigInt(8),
             value: BigInt(0),
-            receiver: "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th",
-            sender: "erd1zztjf9fhwvuvquzsllknq4qcmffwad6n0hjtn5dyzytr5tgz7uas0mkgrq",
+            receiver: Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            sender: Address.newFromBech32("erd1zztjf9fhwvuvquzsllknq4qcmffwad6n0hjtn5dyzytr5tgz7uas0mkgrq"),
             data: new Uint8Array(Buffer.from("test")),
             gasPrice: BigInt(1000000000),
             gasLimit: BigInt(80000),
@@ -445,12 +422,7 @@ describe("test network providers on devnet: Proxy and API", function () {
                 "3fa42d97b4f85442850340a11411a3cbd63885e06ff3f84c7a75d0ef59c780f7a18aa4f331cf460300bc8bd99352aea10b7c3bc17e40287337ae9f9842470205",
                 "hex",
             ),
-            senderUsername: "",
-            receiverUsername: "",
-            guardian: "",
-            guardianSignature: new Uint8Array(),
-            options: 0,
-        };
+        });
 
         const apiTxNextHash = await apiProvider.sendTransaction(transaction);
 

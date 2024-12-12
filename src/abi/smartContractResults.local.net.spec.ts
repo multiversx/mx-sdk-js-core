@@ -42,7 +42,7 @@ describe("fetch transactions from local testnet", function () {
             contract: contract,
             deployer: alice,
             codePath: "src/testdata/counter.wasm",
-            gasLimit: 3000000,
+            gasLimit: 3000000n,
             initArguments: [],
             chainID: network.ChainID,
         });
@@ -50,7 +50,7 @@ describe("fetch transactions from local testnet", function () {
         // ++
         let transactionIncrement = contract.call({
             func: new ContractFunction("increment"),
-            gasLimit: 3000000,
+            gasLimit: 3000000n,
             chainID: network.ChainID,
             caller: alice.address,
         });

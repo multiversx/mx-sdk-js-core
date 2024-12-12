@@ -82,21 +82,3 @@ export interface ITokenTransfer {
     readonly amountAsBigInteger: BigNumber.Value;
     valueOf(): BigNumber.Value;
 }
-
-export interface ITransaction {
-    sender: string;
-    receiver: string;
-    gasLimit: bigint;
-    chainID: string;
-    nonce: bigint;
-    value: bigint;
-    senderUsername: string;
-    receiverUsername: string;
-    gasPrice: bigint;
-    data: Uint8Array;
-    version: number;
-    options: number;
-    guardian: string;
-    signature: Uint8Array;
-    guardianSignature: Uint8Array;
-}

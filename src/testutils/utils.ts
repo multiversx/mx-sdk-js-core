@@ -2,7 +2,6 @@ import BigNumber from "bignumber.js";
 import * as fs from "fs";
 import { PathLike } from "fs";
 import { AbiRegistry, Code, SmartContract, TypedValue } from "../abi";
-import { IChainID, IGasLimit } from "../interface";
 import { Transaction } from "../transaction";
 import { TransactionWatcher } from "../transactionWatcher";
 import { getAxios } from "../utils";
@@ -13,8 +12,8 @@ export async function prepareDeployment(obj: {
     contract: SmartContract;
     codePath: string;
     initArguments: TypedValue[];
-    gasLimit: IGasLimit;
-    chainID: IChainID;
+    gasLimit: bigint;
+    chainID: string;
 }): Promise<Transaction> {
     let contract = obj.contract;
     let deployer = obj.deployer;

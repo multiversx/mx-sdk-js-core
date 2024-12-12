@@ -1,5 +1,4 @@
 import { Address } from "../../address";
-import { IAddress } from "../../interface";
 import { PrimitiveType, PrimitiveValue } from "./types";
 
 export class AddressType extends PrimitiveType {
@@ -21,9 +20,9 @@ export class AddressValue extends PrimitiveValue {
     static ClassName = "AddressValue";
     private readonly value: Address;
 
-    constructor(value: IAddress) {
+    constructor(value: Address) {
         super(new AddressType());
-        this.value = Address.newFromBech32(value.bech32());
+        this.value = Address.newFromBech32(value.toBech32());
     }
 
     getClassName(): string {

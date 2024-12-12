@@ -59,7 +59,7 @@ describe("test smart contract interactor", function () {
         const hexBar = "4241522d356263303866";
         const hexLKMEX = "4c4b4d45582d616162393130";
         const hexNFT = "4d4f532d623962346232";
-        const hexContractAddress = new Address(contract.getAddress().bech32()).hex();
+        const hexContractAddress = new Address(contract.getAddress().toBech32()).hex();
         const hexDummyFunction = "64756d6d79";
 
         // ESDT, single
@@ -76,8 +76,8 @@ describe("test smart contract interactor", function () {
             .withSingleESDTNFTTransfer(LKMEX(123456, 123.456))
             .buildTransaction();
 
-        assert.equal(transaction.getSender().bech32(), alice.bech32());
-        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getSender().toBech32(), alice.toBech32());
+        assert.equal(transaction.getReceiver().toBech32(), alice.toBech32());
         assert.equal(
             transaction.getData().toString(),
             `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`,
@@ -89,8 +89,8 @@ describe("test smart contract interactor", function () {
             .withSender(alice)
             .buildTransaction();
 
-        assert.equal(transaction.getSender().bech32(), alice.bech32());
-        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getSender().toBech32(), alice.toBech32());
+        assert.equal(transaction.getReceiver().toBech32(), alice.toBech32());
         assert.equal(
             transaction.getData().toString(),
             `ESDTNFTTransfer@${hexLKMEX}@01e240@06b14bd1e6eea00000@${hexContractAddress}@${hexDummyFunction}`,
@@ -102,8 +102,8 @@ describe("test smart contract interactor", function () {
             .withSingleESDTNFTTransfer(nonFungibleToken(1))
             .buildTransaction();
 
-        assert.equal(transaction.getSender().bech32(), alice.bech32());
-        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getSender().toBech32(), alice.toBech32());
+        assert.equal(transaction.getReceiver().toBech32(), alice.toBech32());
         assert.equal(
             transaction.getData().toString(),
             `ESDTNFTTransfer@${hexNFT}@01@01@${hexContractAddress}@${hexDummyFunction}`,
@@ -115,8 +115,8 @@ describe("test smart contract interactor", function () {
             .withSender(alice)
             .buildTransaction();
 
-        assert.equal(transaction.getSender().bech32(), alice.bech32());
-        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getSender().toBech32(), alice.toBech32());
+        assert.equal(transaction.getReceiver().toBech32(), alice.toBech32());
         assert.equal(
             transaction.getData().toString(),
             `ESDTNFTTransfer@${hexNFT}@01@01@${hexContractAddress}@${hexDummyFunction}`,
@@ -128,8 +128,8 @@ describe("test smart contract interactor", function () {
             .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)])
             .buildTransaction();
 
-        assert.equal(transaction.getSender().bech32(), alice.bech32());
-        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getSender().toBech32(), alice.toBech32());
+        assert.equal(transaction.getReceiver().toBech32(), alice.toBech32());
         assert.equal(
             transaction.getData().toString(),
             `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexFoo}@@03@${hexBar}@@0c44@${hexDummyFunction}`,
@@ -141,8 +141,8 @@ describe("test smart contract interactor", function () {
             .withSender(alice)
             .buildTransaction();
 
-        assert.equal(transaction.getSender().bech32(), alice.bech32());
-        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getSender().toBech32(), alice.toBech32());
+        assert.equal(transaction.getReceiver().toBech32(), alice.toBech32());
         assert.equal(
             transaction.getData().toString(),
             `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexFoo}@@03@${hexBar}@@0c44@${hexDummyFunction}`,
@@ -154,8 +154,8 @@ describe("test smart contract interactor", function () {
             .withMultiESDTNFTTransfer([nonFungibleToken(1), nonFungibleToken(42)])
             .buildTransaction();
 
-        assert.equal(transaction.getSender().bech32(), alice.bech32());
-        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getSender().toBech32(), alice.toBech32());
+        assert.equal(transaction.getReceiver().toBech32(), alice.toBech32());
         assert.equal(
             transaction.getData().toString(),
             `MultiESDTNFTTransfer@${hexContractAddress}@02@${hexNFT}@01@01@${hexNFT}@2a@01@${hexDummyFunction}`,
@@ -167,8 +167,8 @@ describe("test smart contract interactor", function () {
             .withSender(alice)
             .buildTransaction();
 
-        assert.equal(transaction.getSender().bech32(), alice.bech32());
-        assert.equal(transaction.getReceiver().bech32(), alice.bech32());
+        assert.equal(transaction.getSender().toBech32(), alice.toBech32());
+        assert.equal(transaction.getReceiver().toBech32(), alice.toBech32());
     });
 
     it("should create transaction, with ABI, with transfer & execute", async function () {
@@ -190,8 +190,8 @@ describe("test smart contract interactor", function () {
             transaction,
             new Transaction({
                 chainID: "T",
-                sender: alice.toBech32(),
-                receiver: dummyAddress.toBech32(),
+                sender: alice,
+                receiver: dummyAddress,
                 data: Buffer.from("ESDTTransfer@464f4f2d616263646566@64@676574556c74696d617465416e73776572"),
                 gasLimit: 543210n,
                 value: 0n,

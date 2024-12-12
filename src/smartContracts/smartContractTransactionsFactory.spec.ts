@@ -62,8 +62,14 @@ describe("test smart contract transactions factory", function () {
             arguments: args,
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu"),
+        );
         assert.deepEqual(transaction.data, Buffer.from(`${bytecode}@0500@0504@01`));
         assert.equal(transaction.gasLimit.valueOf(), gasLimit);
         assert.equal(transaction.value, 0n);
@@ -92,8 +98,14 @@ describe("test smart contract transactions factory", function () {
             arguments: args,
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4"),
+        );
         assert.deepEqual(transaction.data, Buffer.from("add@07"));
         assert.equal(transaction.gasLimit, gasLimit);
         assert.equal(transaction.value, 0n);
@@ -124,8 +136,14 @@ describe("test smart contract transactions factory", function () {
             nativeTransferAmount: egldAmount,
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4"),
+        );
         assert.deepEqual(transaction.data, Buffer.from("add@07"));
         assert.equal(transaction.gasLimit, gasLimit);
         assert.equal(transaction.value, 1000000000000000000n);
@@ -158,8 +176,14 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [transfer],
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4"),
+        );
         assert.deepEqual(transaction.data, Buffer.from("ESDTTransfer@464f4f2d366365313762@0a@616464@07"));
         assert.equal(transaction.gasLimit, gasLimit);
         assert.equal(transaction.value, 0n);
@@ -195,8 +219,14 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [fooTransfer, barTransfer],
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
 
         assert.deepEqual(
             transaction.data,
@@ -237,8 +267,14 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [transfer],
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
 
         assert.isDefined(transaction.data);
         assert.deepEqual(
@@ -282,8 +318,14 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [firstTransfer, secondTransfer],
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
 
         assert.isDefined(transaction.data);
         assert.deepEqual(
@@ -329,8 +371,14 @@ describe("test smart contract transactions factory", function () {
             tokenTransfers: [firstTransfer, secondTransfer],
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
 
         assert.isDefined(transaction.data);
         assert.deepEqual(
@@ -366,8 +414,14 @@ describe("test smart contract transactions factory", function () {
             arguments: args,
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4"),
+        );
         assert.deepEqual(transaction.data!, Buffer.from(`upgradeContract@${bytecode}@0504@07`));
         assert.equal(transaction.gasLimit, gasLimit);
         assert.equal(transaction.value, 0n);
@@ -472,16 +526,22 @@ describe("test smart contract transactions factory", function () {
     });
 
     it("should create 'Transaction' for claiming developer rewards", async function () {
-        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        const contract = Address.fromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
 
         const transaction = factory.createTransactionForClaimingDeveloperRewards({
             sender: sender,
             contract: contract,
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4"),
+        );
         assert.equal(Buffer.from(transaction.data).toString(), "ClaimDeveloperRewards");
         assert.equal(transaction.gasLimit, 6000000n);
         assert.equal(transaction.value, 0n);
@@ -498,8 +558,14 @@ describe("test smart contract transactions factory", function () {
             newOwner: newOwner,
         });
 
-        assert.equal(transaction.sender, "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        assert.equal(transaction.receiver, "erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4"),
+        );
         assert.equal(
             Buffer.from(transaction.data).toString(),
             "ChangeOwnerAddress@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8",

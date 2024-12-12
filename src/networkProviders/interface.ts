@@ -1,5 +1,5 @@
-import { ITransaction } from "../interface";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
+import { Transaction } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { AccountOnNetwork } from "./accounts";
@@ -79,18 +79,18 @@ export interface INetworkProvider {
     /**
      * Broadcasts an already-signed transaction.
      */
-    sendTransaction(tx: ITransaction): Promise<string>;
+    sendTransaction(tx: Transaction): Promise<string>;
 
     /**
      * Broadcasts a list of already-signed transactions.
      */
-    sendTransactions(txs: ITransaction[]): Promise<string[]>;
+    sendTransactions(txs: Transaction[]): Promise<string[]>;
 
     /**
      * Simulates the processing of an already-signed transaction.
      *
      */
-    simulateTransaction(tx: ITransaction): Promise<any>;
+    simulateTransaction(tx: Transaction): Promise<any>;
 
     /**
      * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.

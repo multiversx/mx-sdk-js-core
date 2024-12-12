@@ -1,5 +1,4 @@
 import { Address } from "../address";
-import { IAddress } from "../interface";
 
 export type IssueFungibleInput = IssueInput & { initialSupply: bigint; numDecimals: bigint };
 
@@ -19,7 +18,7 @@ export type IssueInput = {
 };
 
 export type FungibleSpecialRoleInput = {
-    user: IAddress;
+    user: Address;
     tokenIdentifier: string;
     addRoleLocalMint: boolean;
     addRoleLocalBurn: boolean;
@@ -28,7 +27,7 @@ export type FungibleSpecialRoleInput = {
 export type SemiFungibleSpecialRoleInput = SpecialRoleInput & { addRoleNFTAddQuantity: boolean };
 
 export type SpecialRoleInput = {
-    user: IAddress;
+    user: Address;
     tokenIdentifier: string;
     addRoleNFTCreate: boolean;
     addRoleNFTBurn: boolean;
@@ -50,7 +49,7 @@ export type MintInput = {
     attributes: Uint8Array;
     uris: string[];
 };
-export type ManagementInput = { user: IAddress; tokenIdentifier: string };
+export type ManagementInput = { user: Address; tokenIdentifier: string };
 export type PausingInput = { tokenIdentifier: string };
 export type LocalBurnInput = { tokenIdentifier: string; supplyToBurn: bigint };
 export type LocalMintInput = { tokenIdentifier: string; supplyToMint: bigint };

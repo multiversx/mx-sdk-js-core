@@ -108,7 +108,7 @@ export class Transaction {
     public guardianSignature: Uint8Array;
 
     /**
-     * The signature of the guardian.
+     * The signature of the relayer.
      */
     public relayerSignature: Uint8Array;
 

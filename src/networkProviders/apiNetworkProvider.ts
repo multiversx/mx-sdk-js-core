@@ -1,3 +1,4 @@
+import { Address } from "../address";
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { Transaction } from "../transaction";
@@ -9,7 +10,7 @@ import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig, defaultPagination } from "./config";
 import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
-import { IAddress, INetworkProvider, IPagination } from "./interface";
+import { INetworkProvider, IPagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkProviderConfig } from "./networkProviderConfig";
@@ -64,18 +65,18 @@ export class ApiNetworkProvider implements INetworkProvider {
         return stats;
     }
 
-    async getAccount(address: IAddress): Promise<AccountOnNetwork> {
+    async getAccount(address: Address): Promise<AccountOnNetwork> {
         const response = await this.doGetGeneric(`accounts/${address.bech32()}`);
         const account = AccountOnNetwork.fromHttpResponse(response);
         return account;
     }
 
-    async getGuardianData(address: IAddress): Promise<GuardianData> {
+    async getGuardianData(address: Address): Promise<GuardianData> {
         return await this.backingProxyNetworkProvider.getGuardianData(address);
     }
 
     async getFungibleTokensOfAccount(
-        address: IAddress,
+        address: Address,
         pagination?: IPagination,
     ): Promise<FungibleTokenOfAccountOnNetwork[]> {
         pagination = pagination || defaultPagination;
@@ -90,7 +91,7 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     async getNonFungibleTokensOfAccount(
-        address: IAddress,
+        address: Address,
         pagination?: IPagination,
     ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
         pagination = pagination || defaultPagination;
@@ -105,7 +106,7 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     async getFungibleTokenOfAccount(
-        address: IAddress,
+        address: Address,
         tokenIdentifier: string,
     ): Promise<FungibleTokenOfAccountOnNetwork> {
         const response = await this.doGetGeneric(`accounts/${address.bech32()}/tokens/${tokenIdentifier}`);
@@ -114,7 +115,7 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     async getNonFungibleTokenOfAccount(
-        address: IAddress,
+        address: Address,
         collection: string,
         nonce: number,
     ): Promise<NonFungibleTokenOfAccountOnNetwork> {

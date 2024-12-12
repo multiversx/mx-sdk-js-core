@@ -1,3 +1,4 @@
+import { Address } from "../address";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { Transaction } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
@@ -37,31 +38,31 @@ export interface INetworkProvider {
     /**
      * Fetches the state of an account.
      */
-    getAccount(address: IAddress): Promise<AccountOnNetwork>;
+    getAccount(address: Address): Promise<AccountOnNetwork>;
 
     /**
      * Fetches data about the fungible tokens held by an account.
      */
-    getFungibleTokensOfAccount(address: IAddress, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: Address, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
     getNonFungibleTokensOfAccount(
-        address: IAddress,
+        address: Address,
         pagination?: IPagination,
     ): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
 
     /**
      * Fetches data about a specific fungible token held by an account.
      */
-    getFungibleTokenOfAccount(address: IAddress, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork>;
+    getFungibleTokenOfAccount(address: Address, tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches data about a specific non-fungible token (instance) held by an account.
      */
     getNonFungibleTokenOfAccount(
-        address: IAddress,
+        address: Address,
         collection: string,
         nonce: number,
     ): Promise<NonFungibleTokenOfAccountOnNetwork>;
@@ -124,8 +125,8 @@ export interface INetworkProvider {
 }
 
 export interface IContractQuery {
-    address: IAddress;
-    caller?: IAddress;
+    address: Address;
+    caller?: Address;
     func: { toString(): string };
     value?: { toString(): string };
     getEncodedArguments(): string[];
@@ -134,8 +135,4 @@ export interface IContractQuery {
 export interface IPagination {
     from: number;
     size: number;
-}
-
-export interface IAddress {
-    bech32(): string;
 }

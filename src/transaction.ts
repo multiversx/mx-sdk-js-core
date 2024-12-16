@@ -2,7 +2,7 @@ import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
 import { Hash } from "./hash";
-import { IGasLimit, IGasPrice, INonce, IPlainTransactionObject, ISignature, ITransactionValue } from "./interface";
+import { IPlainTransactionObject } from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
 import { interpretSignatureAsBuffer } from "./signature";
 import { TransactionComputer } from "./transactionComputer";
@@ -119,20 +119,18 @@ export class Transaction {
         guardianSignature?: Uint8Array;
         relayerSignature?: Uint8Array;
     }) {
-        this.nonce = BigInt(options.nonce?.valueOf() || 0n);
-        // We still rely on "bigNumber" for value, because client code might be passing a BigNumber object as a legacy "ITransactionValue",
-        // and we want to keep compatibility.
-        this.value = options.value ? BigInt(new BigNumber(options.value.toString()).toFixed(0)) : 0n;
+        this.nonce = options.nonce ?? 0n;
+        this.value = options.value ?? 0n;
         this.sender = options.sender;
         this.receiver = options.receiver;
         this.senderUsername = options.senderUsername || "";
         this.receiverUsername = options.receiverUsername || "";
-        this.gasPrice = BigInt(options.gasPrice?.valueOf() || TRANSACTION_MIN_GAS_PRICE);
-        this.gasLimit = BigInt(options.gasLimit.valueOf());
-        this.data = options.data?.valueOf() || new Uint8Array();
+        this.gasPrice = options.gasPrice ?? BigInt(TRANSACTION_MIN_GAS_PRICE);
+        this.gasLimit = options.gasLimit;
+        this.data = options.data ?? new Uint8Array();
         this.chainID = options.chainID.valueOf();
-        this.version = Number(options.version?.valueOf() || TRANSACTION_VERSION_DEFAULT);
-        this.options = Number(options.options?.valueOf() || TRANSACTION_OPTIONS_DEFAULT);
+        this.version = options.version ?? TRANSACTION_VERSION_DEFAULT;
+        this.options = options.options ?? TRANSACTION_OPTIONS_DEFAULT;
         this.guardian = options.guardian ?? Address.empty();
         this.relayer = options.relayer ? options.relayer : Address.empty();
 
@@ -144,30 +142,30 @@ export class Transaction {
     /**
      * Legacy method, use the "nonce" property instead.
      */
-    getNonce(): INonce {
-        return Number(this.nonce);
+    getNonce(): bigint {
+        return this.nonce;
     }
 
     /**
      * Legacy method, use the "nonce" property instead.
      * Sets the account sequence number of the sender. Must be done prior signing.
      */
-    setNonce(nonce: INonce | bigint) {
-        this.nonce = BigInt(nonce.valueOf());
+    setNonce(nonce: bigint) {
+        this.nonce = nonce;
     }
 
     /**
      * Legacy method, use the "value" property instead.
      */
-    getValue(): ITransactionValue {
+    getValue(): bigint {
         return this.value;
     }
 
     /**
      * Legacy method, use the "value" property instead.
      */
-    setValue(value: ITransactionValue | bigint) {
-        this.value = BigInt(value.toString());
+    setValue(value: bigint) {
+        this.value = value;
     }
 
     /**
@@ -229,29 +227,29 @@ export class Transaction {
     /**
      * Legacy method, use the "gasPrice" property instead.
      */
-    getGasPrice(): IGasPrice {
-        return Number(this.gasPrice);
+    getGasPrice(): bigint {
+        return this.gasPrice;
     }
 
     /**
      * Legacy method, use the "gasPrice" property instead.
      */
-    setGasPrice(gasPrice: IGasPrice | bigint) {
-        this.gasPrice = BigInt(gasPrice.valueOf());
+    setGasPrice(gasPrice: bigint) {
+        this.gasPrice = gasPrice;
     }
 
     /**
      * Legacy method, use the "gasLimit" property instead.
      */
-    getGasLimit(): IGasLimit {
-        return Number(this.gasLimit);
+    getGasLimit(): bigint {
+        return this.gasLimit;
     }
 
     /**
      * Legacy method, use the "gasLimit" property instead.
      */
-    setGasLimit(gasLimit: IGasLimit | bigint) {
-        this.gasLimit = BigInt(gasLimit.valueOf());
+    setGasLimit(gasLimit: bigint) {
+        this.gasLimit = gasLimit;
     }
 
     /**
@@ -412,7 +410,7 @@ export class Transaction {
             data: Buffer.from(object.data || "", "base64"),
             chainID: String(object.chainID),
             version: Number(object.version),
-            options: Number(object.options),
+            options: object.options ? Number(object.options) : undefined,
             signature: Buffer.from(object.signature || "", "hex"),
             guardianSignature: Buffer.from(object.guardianSignature || "", "hex"),
             relayerSignature: Buffer.from(object.relayerSignature || "", "hex"),
@@ -427,7 +425,7 @@ export class Transaction {
      *
      * @param signature The signature, as computed by a signer.
      */
-    applySignature(signature: ISignature | Uint8Array) {
+    applySignature(signature: Uint8Array) {
         this.signature = interpretSignatureAsBuffer(signature);
     }
 
@@ -437,7 +435,7 @@ export class Transaction {
      *
      * @param guardianSignature The signature, as computed by a signer.
      */
-    applyGuardianSignature(guardianSignature: ISignature | Uint8Array) {
+    applyGuardianSignature(guardianSignature: Uint8Array) {
         this.guardianSignature = interpretSignatureAsBuffer(guardianSignature);
     }
 

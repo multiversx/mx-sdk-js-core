@@ -1,5 +1,4 @@
 import { Address } from "../address";
-import { ITransactionValue } from "../interface";
 import { ArgSerializer } from "./argSerializer";
 import { IContractFunction } from "./interface";
 import { TypedValue } from "./typesystem";
@@ -9,20 +8,20 @@ export class Query {
     address: Address;
     func: IContractFunction;
     args: TypedValue[];
-    value: ITransactionValue;
+    value: bigint;
 
     constructor(obj: {
         caller?: Address;
         address: Address;
         func: IContractFunction;
         args?: TypedValue[];
-        value?: ITransactionValue;
+        value?: bigint;
     }) {
         this.caller = obj.caller || Address.empty();
         this.address = obj.address;
         this.func = obj.func;
         this.args = obj.args || [];
-        this.value = obj.value || 0;
+        this.value = obj.value || 0n;
     }
 
     getEncodedArguments(): string[] {

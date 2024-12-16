@@ -2,7 +2,6 @@ import { Address, AddressComputer } from "../address";
 import { Compatibility } from "../compatibility";
 import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
 import { ErrContractHasNoAddress } from "../errors";
-import { INonce } from "../interface";
 import { Transaction } from "../transaction";
 import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { guardValueIsSet } from "../utils";
@@ -151,9 +150,9 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc,
         });
 
-        transaction.setChainID(chainID);
-        transaction.setValue(value ?? 0);
-        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE);
+        transaction.chainID = chainID;
+        transaction.value = value ?? 0n;
+        transaction.gasPrice = gasPrice ?? BigInt(TRANSACTION_MIN_GAS_PRICE);
 
         return transaction;
     }
@@ -222,8 +221,8 @@ export class SmartContract implements ISmartContract {
         });
 
         transaction.setChainID(chainID);
-        transaction.setValue(value ?? 0);
-        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE);
+        transaction.value = value ?? 0n;
+        transaction.gasPrice = gasPrice ?? BigInt(TRANSACTION_MIN_GAS_PRICE);
 
         return transaction;
     }
@@ -258,7 +257,7 @@ export class SmartContract implements ISmartContract {
 
         transaction.setChainID(chainID);
         transaction.setValue(value);
-        transaction.setGasPrice(gasPrice ?? TRANSACTION_MIN_GAS_PRICE);
+        transaction.gasPrice = gasPrice ?? BigInt(TRANSACTION_MIN_GAS_PRICE);
 
         return transaction;
     }
@@ -288,7 +287,7 @@ export class SmartContract implements ISmartContract {
      * @param owner The owner of the Smart Contract
      * @param nonce The owner nonce used for the deployment transaction
      */
-    static computeAddress(owner: Address, nonce: INonce): Address {
+    static computeAddress(owner: Address, nonce: bigint): Address {
         const deployer = Address.fromBech32(owner.toBech32());
         const addressComputer = new AddressComputer();
         return addressComputer.computeContractAddress(deployer, BigInt(nonce.valueOf()));

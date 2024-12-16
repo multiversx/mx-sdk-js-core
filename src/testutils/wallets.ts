@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as path from "path";
 import { Account } from "../accounts";
 import { Address } from "../address";
-import { IAddress } from "../interface";
 import { IAccountOnNetwork } from "../interfaceOfNetwork";
 import { getAxios } from "../utils";
 import { UserSecretKey, UserSigner } from "./../wallet";
@@ -12,7 +11,7 @@ import { isOnBrowserTests } from "./utils";
 export const DummyMnemonicOf12Words = "matter trumpet twenty parade fame north lift sail valve salon foster cinnamon";
 
 interface IAccountFetcher {
-    getAccount(address: IAddress): Promise<IAccountOnNetwork>;
+    getAccount(address: Address): Promise<IAccountOnNetwork>;
 }
 
 export async function loadAndSyncTestWallets(provider: IAccountFetcher): Promise<Record<string, TestWallet>> {

@@ -28,10 +28,10 @@ describe("test contract", () => {
     it("should compute contract address", async () => {
         let owner = new Address("93ee6143cdc10ce79f15b2a6c2ad38e9b6021c72a1779051f47154fd54cfbd5e");
 
-        let firstContractAddress = SmartContract.computeAddress(owner, 0);
+        let firstContractAddress = SmartContract.computeAddress(owner, 0n);
         assert.equal(firstContractAddress.toBech32(), "erd1qqqqqqqqqqqqqpgqhdjjyq8dr7v5yq9tv6v5vt9tfvd00vg7h40q6779zn");
 
-        let secondContractAddress = SmartContract.computeAddress(owner, 1);
+        let secondContractAddress = SmartContract.computeAddress(owner, 1n);
         assert.equal(
             secondContractAddress.toBech32(),
             "erd1qqqqqqqqqqqqqpgqde8eqjywyu6zlxjxuxqfg5kgtmn3setxh40qen8egy",
@@ -51,18 +51,18 @@ describe("test contract", () => {
         });
 
         provider.mockUpdateAccount(alice.address, (account) => {
-            account.nonce = 42;
+            account.nonce = 42n;
         });
 
         await alice.sync(provider);
-        deployTransaction.setNonce(alice.account.nonce);
+        deployTransaction.nonce = alice.account.nonce;
 
         assert.equal(deployTransaction.getData().valueOf().toString(), "01020304@0500@0100");
-        assert.equal(deployTransaction.getGasLimit().valueOf(), 1000000);
-        assert.equal(deployTransaction.getNonce().valueOf(), 42);
+        assert.equal(deployTransaction.gasLimit, 1000000n);
+        assert.equal(deployTransaction.nonce, 42n);
 
         // Compute & set the contract address
-        contract.setAddress(SmartContract.computeAddress(alice.address, 42));
+        contract.setAddress(SmartContract.computeAddress(alice.address, 42n));
         assert.equal(
             contract.getAddress().toBech32(),
             "erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q",
@@ -97,7 +97,7 @@ describe("test contract", () => {
         });
 
         provider.mockUpdateAccount(alice.address, (account) => {
-            account.nonce = 42;
+            account.nonce = 42n;
         });
 
         let callTransactionOne = contract.call({
@@ -117,16 +117,16 @@ describe("test contract", () => {
         });
 
         await alice.sync(provider);
-        callTransactionOne.setNonce(alice.account.nonce);
+        callTransactionOne.nonce = alice.account.nonce;
         alice.account.incrementNonce();
-        callTransactionTwo.setNonce(alice.account.nonce);
+        callTransactionTwo.nonce = alice.account.nonce;
 
-        assert.equal(callTransactionOne.getNonce().valueOf(), 42);
+        assert.equal(callTransactionOne.nonce, 42n);
         assert.equal(callTransactionOne.getData().valueOf().toString(), "helloEarth@05@0123");
-        assert.equal(callTransactionOne.getGasLimit().valueOf(), 150000);
-        assert.equal(callTransactionTwo.getNonce().valueOf(), 43);
+        assert.equal(callTransactionOne.gasLimit, 150000n);
+        assert.equal(callTransactionTwo.nonce, 43n);
         assert.equal(callTransactionTwo.getData().valueOf().toString(), "helloMars@05@0123");
-        assert.equal(callTransactionTwo.getGasLimit().valueOf(), 1500000);
+        assert.equal(callTransactionTwo.gasLimit, 1500000n);
 
         // Sign transactions, broadcast them
         callTransactionOne.applySignature(await alice.signer.sign(callTransactionOne.serializeForSigning()));
@@ -173,15 +173,15 @@ describe("test contract", () => {
         });
 
         provider.mockUpdateAccount(alice.address, (account) => {
-            account.nonce = 42;
+            account.nonce = 42n;
         });
 
         await alice.sync(provider);
-        deployTransaction.setNonce(alice.account.nonce);
+        deployTransaction.nonce = alice.account.nonce;
 
         assert.equal(deployTransaction.getData().valueOf().toString(), "upgradeContract@01020304@0100");
-        assert.equal(deployTransaction.getGasLimit().valueOf(), 1000000);
-        assert.equal(deployTransaction.getNonce().valueOf(), 42);
+        assert.equal(deployTransaction.gasLimit, 1000000n);
+        assert.equal(deployTransaction.nonce, 42n);
 
         // Sign the transaction
         deployTransaction.applySignature(await alice.signer.sign(deployTransaction.serializeForSigning()));

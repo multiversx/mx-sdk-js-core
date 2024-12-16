@@ -33,15 +33,15 @@ describe("test smart contract interactor", function () {
 
         let transaction = interaction
             .withSender(alice.address)
-            .withNonce(7)
-            .withValue(TokenTransfer.egldFromAmount(1))
-            .withGasLimit(20000000)
+            .withNonce(7n)
+            .withValue(TokenTransfer.egldFromAmount(1).amount)
+            .withGasLimit(20000000n)
             .buildTransaction();
 
         assert.deepEqual(transaction.getReceiver(), dummyAddress);
         assert.equal(transaction.getValue().toString(), "1000000000000000000");
-        assert.equal(transaction.getNonce(), 7);
-        assert.equal(transaction.getGasLimit().valueOf(), 20000000);
+        assert.equal(transaction.getNonce(), 7n);
+        assert.equal(transaction.getGasLimit().valueOf(), 20000000n);
     });
 
     it("should set transfers (payments) on contract calls (transfer and execute)", async function () {
@@ -181,9 +181,9 @@ describe("test smart contract interactor", function () {
             .getUltimateAnswer()
             .withChainID("T")
             .withSender(alice)
-            .withGasLimit(543210)
+            .withGasLimit(543210n)
             .withSingleESDTTransfer(new TokenTransfer({ token, amount: 100n }))
-            .withNonce(42)
+            .withNonce(42n)
             .buildTransaction();
 
         assert.deepEqual(
@@ -208,12 +208,12 @@ describe("test smart contract interactor", function () {
         let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new SmartContractController({ chainID: "D", networkProvider: provider, abi: abiRegistry });
 
-        let interaction = <Interaction>contract.methods.getUltimateAnswer().withGasLimit(543210).withChainID("T");
+        let interaction = <Interaction>contract.methods.getUltimateAnswer().withGasLimit(543210n).withChainID("T");
 
         assert.equal(contract.getAddress(), dummyAddress);
         assert.deepEqual(interaction.getFunction(), new ContractFunction("getUltimateAnswer"));
         assert.lengthOf(interaction.getArguments(), 0);
-        assert.deepEqual(interaction.getGasLimit(), 543210);
+        assert.deepEqual(interaction.getGasLimit(), 543210n);
 
         provider.mockQueryContractOnFunction(
             "getUltimateAnswer",
@@ -239,29 +239,29 @@ describe("test smart contract interactor", function () {
         assert.deepEqual(response[0], new BigNumber(42));
 
         // Execute, do not wait for execution
-        let transaction = interaction.withSender(alice.address).withNonce(0).buildTransaction();
+        let transaction = interaction.withSender(alice.address).withNonce(0n).buildTransaction();
         transaction.setSender(alice.address);
         transaction.applySignature(await alice.signer.sign(transaction.serializeForSigning()));
         await provider.sendTransaction(transaction);
-        assert.equal(transaction.getNonce().valueOf(), 0);
+        assert.equal(transaction.getNonce().valueOf(), 0n);
         assert.equal(transaction.getData().toString(), "getUltimateAnswer");
         assert.equal(
             transaction.getHash().toString(),
             "3579ad09099feb9755c860ddd225251170806d833342e912fccdfe2ed5c3a364",
         );
 
-        transaction = interaction.withNonce(1).buildTransaction();
+        transaction = interaction.withNonce(1n).buildTransaction();
         transaction.setSender(alice.address);
         transaction.applySignature(await alice.signer.sign(transaction.serializeForSigning()));
         await provider.sendTransaction(transaction);
-        assert.equal(transaction.getNonce().valueOf(), 1);
+        assert.equal(transaction.getNonce(), 1n);
         assert.equal(
             transaction.getHash().toString(),
             "ad513ce7c5d371d30e48f073326899766736eac1ac231d847d45bc3facbcb496",
         );
 
         // Execute, and wait for execution
-        transaction = interaction.withNonce(2).buildTransaction();
+        transaction = interaction.withNonce(2n).buildTransaction();
         transaction.setSender(alice.address);
         transaction.applySignature(await alice.signer.sign(transaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@2bs", "getUltimateAnswer");
@@ -281,8 +281,8 @@ describe("test smart contract interactor", function () {
         let controller = new SmartContractController({ chainID: "D", networkProvider: provider, abi: abi });
 
         let getInteraction = <Interaction>contract.methodsExplicit.get();
-        let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(543210);
-        let decrementInteraction = (<Interaction>contract.methods.decrement()).withGasLimit(987654);
+        let incrementInteraction = (<Interaction>contract.methods.increment()).withGasLimit(543210n);
+        let decrementInteraction = (<Interaction>contract.methods.decrement()).withGasLimit(987654n);
 
         // For "get()", return fake 7
         provider.mockQueryContractOnFunction(
@@ -308,7 +308,7 @@ describe("test smart contract interactor", function () {
 
         let incrementTransaction = incrementInteraction
             .withSender(alice.address)
-            .withNonce(14)
+            .withNonce(14n)
             .withChainID("mock")
             .buildTransaction();
 
@@ -322,19 +322,19 @@ describe("test smart contract interactor", function () {
         // Decrement #1
         let decrementTransaction = decrementInteraction
             .withSender(alice.address)
-            .withNonce(15)
+            .withNonce(15n)
             .withChainID("mock")
             .buildTransaction();
 
         decrementTransaction.applySignature(await alice.signer.sign(decrementTransaction.serializeForSigning()));
         await provider.sendTransaction(decrementTransaction);
         // Decrement #2
-        decrementTransaction = decrementInteraction.withNonce(16).buildTransaction();
+        decrementTransaction = decrementInteraction.withNonce(16n).buildTransaction();
         decrementTransaction.applySignature(await alice.signer.sign(decrementTransaction.serializeForSigning()));
         await provider.sendTransaction(decrementTransaction);
         // Decrement #3
 
-        decrementTransaction = decrementInteraction.withNonce(17).buildTransaction();
+        decrementTransaction = decrementInteraction.withNonce(17n).buildTransaction();
         decrementTransaction.applySignature(await alice.signer.sign(decrementTransaction.serializeForSigning()));
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@05", "decrement");
         hash = await provider.sendTransaction(decrementTransaction);
@@ -362,17 +362,17 @@ describe("test smart contract interactor", function () {
                     OptionValue.newMissing(),
                     OptionalValue.newMissing(),
                 ])
-                .withGasLimit(5000000)
+                .withGasLimit(5000000n)
         );
 
-        let statusInteraction = <Interaction>contract.methods.status(["lucky"]).withGasLimit(5000000);
+        let statusInteraction = <Interaction>contract.methods.status(["lucky"]).withGasLimit(5000000n);
 
-        let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo(["lucky"]).withGasLimit(5000000);
+        let getLotteryInfoInteraction = <Interaction>contract.methods.getLotteryInfo(["lucky"]).withGasLimit(5000000n);
 
         // start()
         let startTransaction = startInteraction
             .withSender(alice.address)
-            .withNonce(14)
+            .withNonce(14n)
             .withChainID("mock")
             .buildTransaction();
 
@@ -392,7 +392,7 @@ describe("test smart contract interactor", function () {
         // status() (this is a view function, but for the sake of the test, we'll execute it)
         let statusTransaction = statusInteraction
             .withSender(alice.address)
-            .withNonce(15)
+            .withNonce(15n)
             .withChainID("mock")
             .buildTransaction();
 
@@ -410,7 +410,7 @@ describe("test smart contract interactor", function () {
         // lotteryInfo() (this is a view function, but for the sake of the test, we'll execute it)
         let getLotteryInfoTransaction = getLotteryInfoInteraction
             .withSender(alice.address)
-            .withNonce(15)
+            .withNonce(15n)
             .withChainID("mock")
             .buildTransaction();
 

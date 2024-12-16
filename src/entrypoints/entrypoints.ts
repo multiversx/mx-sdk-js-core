@@ -64,7 +64,7 @@ class NetworkEntrypoint {
         return verifier.verify(messageComputer.computeBytesForVerifying(message), message.signature);
     }
 
-    async recallAccountNonce(address: Address): Promise<number> {
+    async recallAccountNonce(address: Address): Promise<bigint> {
         return (await this.networkProvider.getAccount(address)).nonce;
     }
 

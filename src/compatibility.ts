@@ -1,5 +1,4 @@
 import { Address } from "./address";
-import { IAddress } from "./interface";
 
 /**
  * For internal use only.
@@ -8,7 +7,7 @@ export class Compatibility {
     /**
      * For internal use only.
      */
-    static guardAddressIsSetAndNonZero(address: IAddress | undefined, context: string, resolution: string) {
+    static guardAddressIsSetAndNonZero(address: Address | undefined, context: string, resolution: string) {
         if (!address || address.bech32() == "") {
             console.warn(
                 `${context}: address should be set; ${resolution}. In the future, this will throw an exception instead of emitting a WARN.`,

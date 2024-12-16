@@ -1,7 +1,6 @@
 import BigNumber from "bignumber.js";
 import * as contractsCodecUtils from "./abi/codec/utils";
 import { Address } from "./address";
-import { IAddress } from "./interface";
 
 export function numberToPaddedHex(value: bigint | number | BigNumber.Value) {
     let hexableNumber: { toString(radix?: number): string };
@@ -54,7 +53,7 @@ export function bigIntToHex(value: BigNumber.Value): string {
     return contractsCodecUtils.getHexMagnitudeOfBigInt(value);
 }
 
-export function addressToHex(address: IAddress): string {
+export function addressToHex(address: Address): string {
     const buffer = Address.fromBech32(address.toString()).pubkey();
     return buffer.toString("hex");
 }

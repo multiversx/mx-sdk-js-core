@@ -1,5 +1,4 @@
 import { Address } from "../address";
-import { ITransactionValue } from "../interface";
 import { Transaction } from "../transaction";
 import { ReturnCode } from "./returnCode";
 import { TypedValue } from "./typesystem";
@@ -65,7 +64,7 @@ export interface CallArguments {
 export interface QueryArguments {
     func: IContractFunction;
     args?: TypedValue[];
-    value?: ITransactionValue;
+    value?: bigint;
     caller?: Address;
 }
 

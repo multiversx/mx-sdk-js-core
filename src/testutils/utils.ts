@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import * as fs from "fs";
 import { PathLike } from "fs";
 import { AbiRegistry, Code, SmartContract, TypedValue } from "../abi";
@@ -86,8 +85,8 @@ export function setupUnitTestWatcherTimeouts() {
     TransactionWatcher.DefaultTimeout = 42 * 42;
 }
 
-export function createAccountBalance(egld: number): BigNumber {
-    return new BigNumber(egld.toString() + "0".repeat(18));
+export function createAccountBalance(egld: number): bigint {
+    return BigInt(egld.toString() + "0".repeat(18));
 }
 
 export function b64TopicsToBytes(topics: string[]): Uint8Array[] {

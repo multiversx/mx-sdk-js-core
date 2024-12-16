@@ -150,10 +150,10 @@ describe("test smart contract interactor", function () {
         let returnEgldInteraction = <Interaction>(
             contract.methods
                 .returns_egld_decimal([])
-                .withGasLimit(10000000)
+                .withGasLimit(10000000n)
                 .withChainID(network.ChainID)
                 .withSender(alice.address)
-                .withValue(1)
+                .withValue(1n)
         );
 
         // returnEgld()
@@ -164,10 +164,10 @@ describe("test smart contract interactor", function () {
 
         let additionInteraction = <Interaction>contract.methods
             .managed_decimal_addition([new ManagedDecimalValue("2.5", 2), new ManagedDecimalValue("2.7", 2)])
-            .withGasLimit(10000000)
+            .withGasLimit(10000000n)
             .withChainID(network.ChainID)
             .withSender(alice.address)
-            .withValue(0);
+            .withValue(0n);
 
         // addition()
         let additionTransaction = additionInteraction
@@ -178,10 +178,10 @@ describe("test smart contract interactor", function () {
         // log
         let mdLnInteraction = <Interaction>contract.methods
             .managed_decimal_ln([new ManagedDecimalValue("23", 9)])
-            .withGasLimit(10000000)
+            .withGasLimit(10000000n)
             .withChainID(network.ChainID)
             .withSender(alice.address)
-            .withValue(0);
+            .withValue(0n);
 
         // mdLn()
         let mdLnTransaction = mdLnInteraction
@@ -194,10 +194,10 @@ describe("test smart contract interactor", function () {
                 new ManagedDecimalValue("4", 2, true),
                 new ManagedDecimalValue("5", 2, true),
             ])
-            .withGasLimit(50000000)
+            .withGasLimit(50000000n)
             .withChainID(network.ChainID)
             .withSender(alice.address)
-            .withValue(0);
+            .withValue(0n);
 
         // addition()
         let additionVarTransaction = additionVarInteraction
@@ -207,10 +207,10 @@ describe("test smart contract interactor", function () {
 
         let lnVarInteraction = <Interaction>contract.methods
             .managed_decimal_ln_var([new ManagedDecimalValue("23", 9, true)])
-            .withGasLimit(50000000)
+            .withGasLimit(50000000n)
             .withChainID(network.ChainID)
             .withSender(alice.address)
-            .withValue(0);
+            .withValue(0n);
 
         // managed_decimal_ln_var()
         let lnVarTransaction = lnVarInteraction

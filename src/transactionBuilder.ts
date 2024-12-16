@@ -1,8 +1,6 @@
 import { Address } from "./address";
 import { ARGUMENTS_SEPARATOR } from "./constants";
-import { ITransactionPayload } from "./interface";
 import { Transaction } from "./transaction";
-import { TransactionPayload } from "./transactionPayload";
 
 interface Config {
     chainID: string;
@@ -40,19 +38,19 @@ export class TransactionBuilder {
         this.amount = options.amount;
     }
 
-    private computeGasLimit(payload: ITransactionPayload): bigint {
+    private computeGasLimit(payload: Uint8Array): bigint {
         if (!this.addDataMovementGas) {
             return this.providedGasLimit;
         }
 
-        const dataMovementGas = this.config.minGasLimit + this.config.gasLimitPerByte * BigInt(payload.length());
+        const dataMovementGas = this.config.minGasLimit + this.config.gasLimitPerByte * BigInt(payload.length);
         const gasLimit = dataMovementGas + this.providedGasLimit;
         return gasLimit;
     }
 
-    private buildTransactionPayload(): TransactionPayload {
+    private buildTransactionPayload(): Uint8Array {
         const data = this.dataParts.join(ARGUMENTS_SEPARATOR);
-        return new TransactionPayload(data);
+        return Buffer.from(data);
     }
 
     build(): Transaction {

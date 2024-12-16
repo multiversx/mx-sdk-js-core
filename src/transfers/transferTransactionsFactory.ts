@@ -2,7 +2,6 @@ import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, TypedValue, U16V
 import { Address } from "../address";
 import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
 import { Err, ErrBadUsage } from "../errors";
-import { ITokenTransfer } from "../interface";
 import { TokenComputer, TokenTransfer } from "../tokens";
 import { TokenTransfersDataBuilder } from "../tokenTransfersDataBuilder";
 import { Transaction } from "../transaction";
@@ -184,7 +183,7 @@ export class TransferTransactionsFactory {
      * Use {@link createTransactionForESDTTokenTransfer} instead.
      */
     createESDTTransfer(args: {
-        tokenTransfer: ITokenTransfer;
+        tokenTransfer: TokenTransfer;
         nonce?: bigint;
         receiver: Address;
         sender: Address;
@@ -226,7 +225,7 @@ export class TransferTransactionsFactory {
      * Use {@link createTransactionForESDTTokenTransfer} instead.
      */
     createESDTNFTTransfer(args: {
-        tokenTransfer: ITokenTransfer;
+        tokenTransfer: TokenTransfer;
         nonce?: bigint;
         destination: Address;
         sender: Address;
@@ -272,7 +271,7 @@ export class TransferTransactionsFactory {
      * Use {@link createTransactionForESDTTokenTransfer} instead.
      */
     createMultiESDTNFTTransfer(args: {
-        tokenTransfers: ITokenTransfer[];
+        tokenTransfers: TokenTransfer[];
         nonce?: bigint;
         destination: Address;
         sender: Address;

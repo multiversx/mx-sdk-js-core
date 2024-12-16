@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 
 export interface ITransactionFetcher {
@@ -26,21 +25,4 @@ export interface IPlainTransactionObject {
     signature?: string;
     guardianSignature?: string;
     relayerSignature?: string;
-}
-
-export interface ITransactionPayload {
-    length(): number;
-    encoded(): string;
-    toString(): string;
-    valueOf(): Buffer;
-}
-
-/**
- * Legacy interface. The class `TokenTransfer` can be used instead, where necessary.
- */
-export interface ITokenTransfer {
-    readonly tokenIdentifier: string;
-    readonly nonce: number;
-    readonly amountAsBigInteger: BigNumber.Value;
-    valueOf(): BigNumber.Value;
 }

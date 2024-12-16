@@ -13,11 +13,6 @@ const PUBKEY_LENGTH = 32;
 
 const SMART_CONTRACT_HEX_PUBKEY_PREFIX = "0".repeat(16);
 
-interface IAddress {
-    getPublicKey(): Buffer;
-    getHrp(): string;
-}
-
 /**
  * An Address, as an immutable object.
  */
@@ -275,7 +270,7 @@ export class AddressComputer {
         this.numberOfShardsWithoutMeta = numberOfShardsWithoutMeta || CURRENT_NUMBER_OF_SHARDS_WITHOUT_META;
     }
 
-    computeContractAddress(deployer: IAddress, deploymentNonce: bigint): Address {
+    computeContractAddress(deployer: Address, deploymentNonce: bigint): Address {
         const initialPadding = Buffer.alloc(8, 0);
         const ownerPubkey = deployer.getPublicKey();
         const shardSelector = ownerPubkey.slice(30);
@@ -293,7 +288,7 @@ export class AddressComputer {
         return new Address(addressBytes);
     }
 
-    getShardOfAddress(address: IAddress): number {
+    getShardOfAddress(address: Address): number {
         return this.getShardOfPubkey(address.getPublicKey(), this.numberOfShardsWithoutMeta);
     }
 

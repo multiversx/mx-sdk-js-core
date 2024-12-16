@@ -2,7 +2,6 @@ import { Account } from "../accounts";
 import { Address } from "../address";
 import { Compatibility } from "../compatibility";
 import { TRANSACTION_VERSION_DEFAULT } from "../constants";
-import { ITokenTransfer } from "../interface";
 import { SmartContractTransactionsFactory } from "../smartContracts";
 import { TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
@@ -73,7 +72,7 @@ export class Interaction {
         return this.value;
     }
 
-    getTokenTransfers(): ITokenTransfer[] {
+    getTokenTransfers(): TokenTransfer[] {
         return this.tokenTransfers;
     }
 
@@ -133,17 +132,17 @@ export class Interaction {
         return this;
     }
 
-    withSingleESDTTransfer(transfer: ITokenTransfer): Interaction {
+    withSingleESDTTransfer(transfer: TokenTransfer): Interaction {
         this.tokenTransfers = [transfer].map((transfer) => new TokenTransfer(transfer));
         return this;
     }
 
-    withSingleESDTNFTTransfer(transfer: ITokenTransfer): Interaction {
+    withSingleESDTNFTTransfer(transfer: TokenTransfer): Interaction {
         this.tokenTransfers = [transfer].map((transfer) => new TokenTransfer(transfer));
         return this;
     }
 
-    withMultiESDTNFTTransfer(transfers: ITokenTransfer[]): Interaction {
+    withMultiESDTNFTTransfer(transfers: TokenTransfer[]): Interaction {
         this.tokenTransfers = transfers.map((transfer) => new TokenTransfer(transfer));
         return this;
     }

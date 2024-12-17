@@ -20,12 +20,12 @@ describe("test address", () => {
     });
 
     it("should create address (custom hrp)", async () => {
-        let address = Address.fromHex(aliceHex, "test");
+        let address = Address.newFromHex(aliceHex, "test");
         assert.deepEqual(address.getPublicKey(), Buffer.from(aliceHex, "hex"));
         assert.equal(address.getHrp(), "test");
         assert.equal(address.toBech32(), "test1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ss5hqhtr");
 
-        address = Address.fromHex(bobHex, "xerd");
+        address = Address.newFromHex(bobHex, "xerd");
         assert.deepEqual(address.getPublicKey(), Buffer.from(bobHex, "hex"));
         assert.equal(address.getHrp(), "xerd");
         assert.equal(address.toBech32(), "xerd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruq9thc9j");
@@ -34,7 +34,7 @@ describe("test address", () => {
     it("should create empty address", async () => {
         const nobody = Address.empty();
 
-        assert.isEmpty(nobody.hex());
+        assert.isEmpty(nobody.toHex());
         assert.isEmpty(nobody.toBech32());
         assert.deepEqual(nobody.toJSON(), { bech32: "", pubkey: "" });
     });

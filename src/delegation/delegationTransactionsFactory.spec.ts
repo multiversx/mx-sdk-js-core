@@ -25,7 +25,10 @@ describe("test delegation transactions factory", function () {
             transaction.sender,
             Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
         );
-        assert.deepEqual(transaction.receiver, Address.fromHex(DELEGATION_MANAGER_SC_ADDRESS_HEX, config.addressHrp));
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromHex(DELEGATION_MANAGER_SC_ADDRESS_HEX, config.addressHrp),
+        );
         assert.isDefined(transaction.data);
         assert.deepEqual(transaction.data, Buffer.from("createNewDelegationContract@010f0cf064dd59200000@0a"));
         assert.equal(transaction.gasLimit, 60126500n);

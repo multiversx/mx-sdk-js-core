@@ -43,7 +43,7 @@ export class SmartContractTransactionsFactory {
         this.abi = options.abi;
         this.tokenComputer = new TokenComputer();
         this.dataArgsBuilder = new TokenTransfersDataBuilder();
-        this.contractDeployAddress = Address.fromHex(CONTRACT_DEPLOY_ADDRESS_HEX, this.config.addressHrp);
+        this.contractDeployAddress = Address.newFromHex(CONTRACT_DEPLOY_ADDRESS_HEX, this.config.addressHrp);
     }
 
     createTransactionForDeploy(sender: Address, options: resources.ContractDeployInput): Transaction {
@@ -185,7 +185,7 @@ export class SmartContractTransactionsFactory {
         contract: Address;
         newOwner: Address;
     }): Transaction {
-        const dataParts = ["ChangeOwnerAddress", Address.fromBech32(options.newOwner.toBech32()).toHex()];
+        const dataParts = ["ChangeOwnerAddress", Address.newFromBech32(options.newOwner.toBech32()).toHex()];
 
         return new TransactionBuilder({
             config: this.config,

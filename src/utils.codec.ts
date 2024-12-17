@@ -54,6 +54,6 @@ export function bigIntToHex(value: BigNumber.Value): string {
 }
 
 export function addressToHex(address: Address): string {
-    const buffer = Address.fromBech32(address.toString()).pubkey();
+    const buffer = Address.newFromBech32(address.toString()).getPublicKey();
     return buffer.toString("hex");
 }

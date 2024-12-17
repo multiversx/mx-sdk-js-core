@@ -34,7 +34,7 @@ describe("test smart contract interactor", function () {
         let transaction = interaction
             .withSender(alice.address)
             .withNonce(7n)
-            .withValue(TokenTransfer.egldFromAmount(1).amount)
+            .withValue(TokenTransfer.newFromNativeAmount(1000000000000000000n).amount)
             .withGasLimit(20000000n)
             .buildTransaction();
 
@@ -49,11 +49,17 @@ describe("test smart contract interactor", function () {
         let dummyFunction = new ContractFunction("dummy");
         let alice = new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
-        const TokenFoo = (amount: BigNumber.Value) => TokenTransfer.fungibleFromAmount("FOO-6ce17b", amount, 0);
-        const TokenBar = (amount: BigNumber.Value) => TokenTransfer.fungibleFromAmount("BAR-5bc08f", amount, 3);
+        const TokenFoo = (amount: BigNumber.Value) =>
+            new TokenTransfer({ token: new Token({ identifier: "FOO-6ce17b" }), amount: BigInt(amount.toString()) });
+        const TokenBar = (amount: BigNumber.Value) =>
+            new TokenTransfer({ token: new Token({ identifier: "BAR-5bc08f" }), amount: BigInt(amount.toString()) });
         const LKMEX = (nonce: number, amount: BigNumber.Value) =>
-            TokenTransfer.metaEsdtFromAmount("LKMEX-aab910", nonce, amount, 18);
-        const nonFungibleToken = (nonce: number) => TokenTransfer.nonFungible("MOS-b9b4b2", nonce);
+            new TokenTransfer({
+                token: new Token({ identifier: "LKMEX-aab910", nonce: BigInt(nonce) }),
+                amount: BigInt(amount.toString()),
+            });
+        const nonFungibleToken = (nonce: number) =>
+            new TokenTransfer({ token: new Token({ identifier: "MOS-b9b4b2", nonce: BigInt(nonce) }), amount: 1n });
 
         const hexFoo = "464f4f2d366365313762";
         const hexBar = "4241522d356263303866";
@@ -73,7 +79,7 @@ describe("test smart contract interactor", function () {
         // Meta ESDT (special SFT), single
         transaction = new Interaction(contract, dummyFunction, [])
             .withSender(alice)
-            .withSingleESDTNFTTransfer(LKMEX(123456, 123.456))
+            .withSingleESDTNFTTransfer(LKMEX(123456, "123456000000000000000"))
             .buildTransaction();
 
         assert.equal(transaction.getSender().toBech32(), alice.toBech32());
@@ -85,7 +91,7 @@ describe("test smart contract interactor", function () {
 
         // Meta ESDT (special SFT), single, but using "withSender()" (recommended)
         transaction = new Interaction(contract, dummyFunction, [])
-            .withSingleESDTNFTTransfer(LKMEX(123456, 123.456))
+            .withSingleESDTNFTTransfer(LKMEX(123456, 123456000000000000000))
             .withSender(alice)
             .buildTransaction();
 
@@ -125,7 +131,7 @@ describe("test smart contract interactor", function () {
         // ESDT, multiple
         transaction = new Interaction(contract, dummyFunction, [])
             .withSender(alice)
-            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)])
+            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3140)])
             .buildTransaction();
 
         assert.equal(transaction.getSender().toBech32(), alice.toBech32());
@@ -137,7 +143,7 @@ describe("test smart contract interactor", function () {
 
         // ESDT, multiple, but using "withSender()" (recommended)
         transaction = new Interaction(contract, dummyFunction, [])
-            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3.14)])
+            .withMultiESDTNFTTransfer([TokenFoo(3), TokenBar(3140)])
             .withSender(alice)
             .buildTransaction();
 

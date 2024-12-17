@@ -57,7 +57,7 @@ describe("test tokens and token computer", async () => {
     });
 });
 
-describe("test token transfer (legacy)", () => {
+describe("test token transfer", () => {
     it("should work with custom token type", () => {
         const identifier = "MEXFARML-28d646";
         const nonce = 12345678n;
@@ -71,7 +71,7 @@ describe("test token transfer (legacy)", () => {
         assert.equal(transfer.toString(), "100000000000000000");
     });
 
-    it("should work with NFTs (legacy)", () => {
+    it("should work with NFTs", () => {
         const identifier = "TEST-38f249";
         const nonce = 1n;
         const transfer = new TokenTransfer({ token: new Token({ identifier, nonce }), amount: 1n });

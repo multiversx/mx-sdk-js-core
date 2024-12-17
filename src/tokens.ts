@@ -85,7 +85,7 @@ export class TokenTransfer {
         }
     }
 
-    static newFromEgldAmount(amount: bigint): TokenTransfer {
+    static newFromNativeAmount(amount: bigint): TokenTransfer {
         const token = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
         return new TokenTransfer({ token, amount });
     }
@@ -95,7 +95,7 @@ export class TokenTransfer {
     }
 
     /**
-     * Legacy function. Use the constructor instead: new TokenTransfer({ token, amount });
+     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
      */
     static egldFromAmount(amount: BigNumber.Value) {
         const amountAsBigInteger = new BigNumber(amount).shiftedBy(EGLDNumDecimals).decimalPlaces(0);
@@ -103,7 +103,7 @@ export class TokenTransfer {
     }
 
     /**
-     * Legacy function. Use the constructor instead: new TokenTransfer({ token, amount });
+     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
      */
     static egldFromBigInteger(amountAsBigInteger: BigNumber.Value) {
         return new TokenTransfer({
@@ -115,7 +115,7 @@ export class TokenTransfer {
     }
 
     /**
-     * Legacy function. Use the constructor instead: new TokenTransfer({ token, amount });
+     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
      */
     static fungibleFromAmount(tokenIdentifier: string, amount: BigNumber.Value, numDecimals: number) {
         const amountAsBigInteger = new BigNumber(amount).shiftedBy(numDecimals).decimalPlaces(0);
@@ -123,7 +123,7 @@ export class TokenTransfer {
     }
 
     /**
-     * Legacy function. Use the constructor instead: new TokenTransfer({ token, amount });
+     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
      */
     static fungibleFromBigInteger(
         tokenIdentifier: string,
@@ -139,7 +139,7 @@ export class TokenTransfer {
     }
 
     /**
-     * Legacy function. Use the constructor instead: new TokenTransfer({ token, amount });
+     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
      */
     static nonFungible(tokenIdentifier: string, nonce: number) {
         return new TokenTransfer({
@@ -151,7 +151,7 @@ export class TokenTransfer {
     }
 
     /**
-     * Legacy function. Use the constructor instead: new TokenTransfer({ token, amount });
+     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
      */
     static semiFungible(tokenIdentifier: string, nonce: number, quantity: number) {
         return new TokenTransfer({
@@ -163,7 +163,7 @@ export class TokenTransfer {
     }
 
     /**
-     * Legacy function. Use the constructor instead: new TokenTransfer({ token, amount });
+     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
      */
     static metaEsdtFromAmount(tokenIdentifier: string, nonce: number, amount: BigNumber.Value, numDecimals: number) {
         const amountAsBigInteger = new BigNumber(amount).shiftedBy(numDecimals).decimalPlaces(0);
@@ -171,7 +171,7 @@ export class TokenTransfer {
     }
 
     /**
-     * Legacy function. Use the constructor instead: new TokenTransfer({ token, amount });
+     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
      */
     static metaEsdtFromBigInteger(
         tokenIdentifier: string,
@@ -192,14 +192,14 @@ export class TokenTransfer {
     }
 
     /**
-     * Legacy function. Use the "amount" field instead.
+     * @deprecated Use the "amount" field instead.
      */
     valueOf(): BigNumber {
         return new BigNumber(this.amount.toString());
     }
 
     /**
-     * Legacy function. For formatting and parsing amounts, use "sdk-dapp" or "bignumber.js" directly.
+     * @deprecated For formatting and parsing amounts, use "sdk-dapp" or "bignumber.js" directly.
      */
     toPrettyString(): string {
         return `${this.toAmount()} ${this.tokenIdentifier}`;
@@ -210,7 +210,7 @@ export class TokenTransfer {
     }
 
     /**
-     * Legacy function. Within your code, don't mix native values (EGLD) and custom (ESDT) tokens.
+     * @deprecated Within your code, don't mix native values (EGLD) and custom (ESDT) tokens.
      * See "TransferTransactionsFactory.createTransactionForNativeTokenTransfer()" vs. "TransferTransactionsFactory.createTransactionForESDTTokenTransfer()".
      */
     isEgld(): boolean {
@@ -218,7 +218,7 @@ export class TokenTransfer {
     }
 
     /**
-     * Legacy function. Use "TokenComputer.isFungible(token)" instead.
+     * @deprecated Use "TokenComputer.isFungible(token)" instead.
      */
     isFungible(): boolean {
         return this.token.nonce == 0n;

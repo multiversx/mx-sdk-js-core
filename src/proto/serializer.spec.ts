@@ -57,7 +57,7 @@ describe("serialize transactions", () => {
     it("with data, with value", async () => {
         let transaction = new Transaction({
             nonce: 91n,
-            value: TokenTransfer.egldFromAmount(10).amount,
+            value: TokenTransfer.newFromNativeAmount(10000000000000000000n).amount,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             gasLimit: 100000n,

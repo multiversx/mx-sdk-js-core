@@ -132,7 +132,7 @@ export class TransferTransactionsFactory {
             });
         }
 
-        const nativeTransfer = nativeAmount ? TokenTransfer.newFromEgldAmount(nativeAmount) : undefined;
+        const nativeTransfer = nativeAmount ? TokenTransfer.newFromNativeAmount(nativeAmount) : undefined;
         if (nativeTransfer) {
             tokenTransfers.push(nativeTransfer);
         }
@@ -199,9 +199,9 @@ export class TransferTransactionsFactory {
 
         const { argumentsString } = new ArgSerializer().valuesToString([
             // The token identifier
-            BytesValue.fromUTF8(args.tokenTransfer.tokenIdentifier),
+            BytesValue.fromUTF8(args.tokenTransfer.token.identifier),
             // The transfered amount
-            new BigUIntValue(args.tokenTransfer.valueOf()),
+            new BigUIntValue(args.tokenTransfer.amount),
         ]);
 
         const data = `ESDTTransfer@${argumentsString}`;
@@ -241,11 +241,11 @@ export class TransferTransactionsFactory {
 
         const { argumentsString } = new ArgSerializer().valuesToString([
             // The token identifier
-            BytesValue.fromUTF8(args.tokenTransfer.tokenIdentifier),
+            BytesValue.fromUTF8(args.tokenTransfer.token.identifier),
             // The nonce of the token
-            new U64Value(args.tokenTransfer.nonce),
+            new U64Value(args.tokenTransfer.token.nonce),
             // The transferred quantity
-            new BigUIntValue(args.tokenTransfer.valueOf()),
+            new BigUIntValue(args.tokenTransfer.amount),
             // The destination address
             new AddressValue(args.destination),
         ]);
@@ -296,11 +296,11 @@ export class TransferTransactionsFactory {
             parts.push(
                 ...[
                     // The token identifier
-                    BytesValue.fromUTF8(payment.tokenIdentifier),
+                    BytesValue.fromUTF8(payment.token.identifier),
                     // The nonce of the token
-                    new U64Value(payment.nonce),
+                    new U64Value(payment.token.nonce),
                     // The transfered quantity
-                    new BigUIntValue(payment.valueOf()),
+                    new BigUIntValue(payment.amount),
                 ],
             );
         }

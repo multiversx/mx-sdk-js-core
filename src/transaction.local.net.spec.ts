@@ -39,7 +39,7 @@ describe("test transaction", function () {
         let transactionOne = new Transaction({
             sender: alice.address,
             receiver: bob.address,
-            value: TokenTransfer.newFromNativeAmount(42n).amount,
+            value: TokenTransfer.newFromNativeAmount(42000000000000000000n).amount,
             gasLimit: BigInt(network.MinGasLimit),
             chainID: network.ChainID,
         });
@@ -47,7 +47,7 @@ describe("test transaction", function () {
         let transactionTwo = new Transaction({
             sender: alice.address,
             receiver: bob.address,
-            value: TokenTransfer.newFromNativeAmount(43n).amount,
+            value: TokenTransfer.newFromNativeAmount(43000000000000000000n).amount,
             gasLimit: BigInt(network.MinGasLimit),
             chainID: network.ChainID,
         });
@@ -73,7 +73,7 @@ describe("test transaction", function () {
         let newBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
         assert.deepEqual(
-            TokenTransfer.newFromNativeAmount(85n).amount,
+            TokenTransfer.newFromNativeAmount(85000000000000000000n).amount,
             BigInt(newBalanceOfBob.minus(initialBalanceOfBob).toString()),
         );
     });
@@ -178,7 +178,7 @@ describe("test transaction", function () {
         const newBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
         assert.deepEqual(
-            TokenTransfer.newFromNativeAmount(42n).amount,
+            TokenTransfer.newFromNativeAmount(42000000000000000000n).amount,
             BigInt(newBalanceOfBob.minus(initialBalanceOfBob).toString()),
         );
     });

@@ -59,13 +59,13 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getAccount(address: Address): Promise<AccountOnNetwork> {
-        const response = await this.doGetGeneric(`address/${address.bech32()}`);
+        const response = await this.doGetGeneric(`address/${address.toBech32()}`);
         const account = AccountOnNetwork.fromHttpResponse(response.account);
         return account;
     }
 
     async getGuardianData(address: Address): Promise<GuardianData> {
-        const response = await this.doGetGeneric(`address/${address.bech32()}/guardian-data`);
+        const response = await this.doGetGeneric(`address/${address.toBech32()}/guardian-data`);
         const accountGuardian = GuardianData.fromHttpResponse(response.guardianData);
         return accountGuardian;
     }
@@ -74,7 +74,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         address: Address,
         _pagination?: IPagination,
     ): Promise<FungibleTokenOfAccountOnNetwork[]> {
-        const url = `address/${address.bech32()}/esdt`;
+        const url = `address/${address.toBech32()}/esdt`;
         const response = await this.doGetGeneric(url);
         const responseItems: any[] = Object.values(response.esdts);
         // Skip NFTs / SFTs.
@@ -90,7 +90,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         address: Address,
         _pagination?: IPagination,
     ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
-        const url = `address/${address.bech32()}/esdt`;
+        const url = `address/${address.toBech32()}/esdt`;
         const response = await this.doGetGeneric(url);
         const responseItems: any[] = Object.values(response.esdts);
         // Skip fungible tokens.
@@ -108,7 +108,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         address: Address,
         tokenIdentifier: string,
     ): Promise<FungibleTokenOfAccountOnNetwork> {
-        const response = await this.doGetGeneric(`address/${address.bech32()}/esdt/${tokenIdentifier}`);
+        const response = await this.doGetGeneric(`address/${address.toBech32()}/esdt/${tokenIdentifier}`);
         const tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response.tokenData);
         return tokenData;
     }
@@ -119,7 +119,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         nonce: number,
     ): Promise<NonFungibleTokenOfAccountOnNetwork> {
         const response = await this.doGetGeneric(
-            `address/${address.bech32()}/nft/${collection}/nonce/${nonce.valueOf()}`,
+            `address/${address.toBech32()}/nft/${collection}/nonce/${nonce.valueOf()}`,
         );
         const tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponseByNonce(response.tokenData);
         return tokenData;
@@ -185,7 +185,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         const encodedIdentifier = Buffer.from(identifier);
 
         const queryResponse = await this.queryContract({
-            contract: Address.fromHex(ESDT_CONTRACT_ADDRESS_HEX),
+            contract: Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX),
             function: "getTokenProperties",
             arguments: [new Uint8Array(encodedIdentifier)],
         });

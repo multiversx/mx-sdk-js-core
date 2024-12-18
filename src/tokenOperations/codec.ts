@@ -22,7 +22,7 @@ export function bigIntToBuffer(value: BigNumber.Value): Buffer {
     return contractsCodecUtils.bigIntToBuffer(value);
 }
 
-export { addressToHex, bigIntToHex, utf8ToHex } from "../utils.codec";
+export { bigIntToHex, utf8ToHex } from "../utils.codec";
 
 export function bufferToHex(value: Buffer) {
     const hex = value.toString("hex");

@@ -31,7 +31,7 @@ export class DelegationTransactionsFactory {
     constructor(options: { config: IConfig }) {
         this.config = options.config;
         this.argSerializer = new ArgSerializer();
-        this.delegationManagerAddress = Address.fromHex(DELEGATION_MANAGER_SC_ADDRESS_HEX, this.config.addressHrp);
+        this.delegationManagerAddress = Address.newFromHex(DELEGATION_MANAGER_SC_ADDRESS_HEX, this.config.addressHrp);
     }
 
     createTransactionForNewDelegationContract(

@@ -93,7 +93,7 @@ export class Address {
     }
 
     /**
-     * Use {@link newFromBech32} instead.
+     * @deprecated Use {@link newFromBech32} instead.
      */
     static fromBech32(value: string): Address {
         // On this legacy flow, we do not accept addresses with custom hrp (in order to avoid behavioral breaking changes).
@@ -113,7 +113,7 @@ export class Address {
     }
 
     /**
-     * Use {@link newFromHex} instead.
+     * @deprecated Use {@link newFromHex} instead.
      */
     static fromHex(value: string, hrp?: string): Address {
         return Address.newFromHex(value, hrp);
@@ -147,7 +147,7 @@ export class Address {
     }
 
     /**
-     * Use {@link toHex} instead.
+     * @deprecated Use {@link toHex} instead.
      */
     hex(): string {
         return this.toHex();
@@ -165,7 +165,7 @@ export class Address {
     }
 
     /**
-     * Use {@link toBech32} instead.
+     * @deprecated Use {@link toBech32} instead.
      */
     bech32(): string {
         return this.toBech32();
@@ -179,13 +179,13 @@ export class Address {
             return "";
         }
 
-        let words = bech32.toWords(this.pubkey());
+        let words = bech32.toWords(this.getPublicKey());
         let address = bech32.encode(this.hrp, words);
         return address;
     }
 
     /**
-     * Use {@link getPublicKey} instead.
+     * @deprecated Use {@link getPublicKey} instead.
      */
     pubkey(): Buffer {
         return this.getPublicKey();
@@ -249,7 +249,7 @@ export class Address {
     }
 
     /**
-     * Use {@link isSmartContract} instead.
+     * @deprecated Use {@link isSmartContract} instead.
      */
     isContractAddress(): boolean {
         return this.isSmartContract();

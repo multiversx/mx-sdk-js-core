@@ -86,7 +86,7 @@ export class MessageComputer {
 
         let address: Address | undefined = undefined;
         if (packedMessage.address) {
-            address = Address.fromBech32(packedMessage.address);
+            address = Address.newFromBech32(packedMessage.address);
         }
 
         const version = packedMessage.version || DEFAULT_MESSAGE_VERSION;

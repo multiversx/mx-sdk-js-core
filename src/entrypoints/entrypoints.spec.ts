@@ -42,8 +42,7 @@ describe("TestEntrypoint", () => {
         this.timeout(30000);
         const abi = await loadAbiRegistry("src/testdata/adder.abi.json");
         const sender = Account.newFromPem(alicePem.pemFileText);
-        const accountAddress = new Address(sender.address);
-        sender.nonce = await entrypoint.recallAccountNonce(accountAddress);
+        sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 
         const controller = entrypoint.createSmartContractController(abi);
         const bytecode = readFileSync("src/testdata/adder.wasm");
@@ -63,7 +62,7 @@ describe("TestEntrypoint", () => {
 
         assert.equal(outcome.contracts.length, 1);
 
-        const contractAddress = Address.fromBech32(outcome.contracts[0].address);
+        const contractAddress = Address.newFromBech32(outcome.contracts[0].address);
 
         const executeTransaction = await controller.createTransactionForExecute(
             sender,

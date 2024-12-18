@@ -51,7 +51,7 @@ export class TokenManagementTransactionsFactory {
         this.argSerializer = new ArgSerializer();
         this.trueAsString = "true";
         this.falseAsString = "false";
-        this.esdtContractAddress = Address.fromHex(ESDT_CONTRACT_ADDRESS_HEX, this.config.addressHrp);
+        this.esdtContractAddress = Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, this.config.addressHrp);
     }
 
     createTransactionForIssuingFungible(sender: Address, options: resources.IssueFungibleInput): Transaction {

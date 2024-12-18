@@ -1,9 +1,9 @@
+import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Address } from "../address";
 import { ContractFunction } from "./function";
 import { Query } from "./query";
 import { BigUIntValue, U32Value } from "./typesystem";
-import BigNumber from "bignumber.js";
 import { BytesValue } from "./typesystem/bytes";
 
 describe("test smart contract queries", () => {

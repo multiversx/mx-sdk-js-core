@@ -1,6 +1,6 @@
 import { Address } from "../address";
 import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
-import { Err, ErrBadUsage } from "../errors";
+import { ErrBadUsage } from "../errors";
 import { TokenComputer, TokenTransfer } from "../tokens";
 import { TokenTransfersDataBuilder } from "../tokenTransfersDataBuilder";
 import { Transaction } from "../transaction";
@@ -33,15 +33,7 @@ export class TransferTransactionsFactory {
         this.tokenTransfersDataBuilder = new TokenTransfersDataBuilder();
     }
 
-    private ensureConfigIsDefined() {
-        if (this.config === undefined) {
-            throw new Err("'config' is not defined");
-        }
-    }
-
     createTransactionForNativeTokenTransfer(sender: Address, options: resources.NativeTokenTransferInput): Transaction {
-        this.ensureConfigIsDefined();
-
         const data = options.data || new Uint8Array();
 
         return new Transaction({
@@ -55,8 +47,6 @@ export class TransferTransactionsFactory {
     }
 
     createTransactionForESDTTokenTransfer(sender: Address, options: resources.CustomTokenTransferInput): Transaction {
-        this.ensureConfigIsDefined();
-
         const numberOfTransfers = options.tokenTransfers.length;
 
         if (numberOfTransfers === 0) {
@@ -117,8 +107,6 @@ export class TransferTransactionsFactory {
             tokenTransfers: TokenTransfer[];
         },
     ): Transaction {
-        this.ensureConfigIsDefined();
-
         const transfer = options.tokenTransfers[0];
         const { dataParts, extraGasForTransfer, receiver } = this.buildTransferData(transfer, {
             sender,

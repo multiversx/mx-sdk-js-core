@@ -37,7 +37,7 @@ describe("CodeMetadata Class Tests", function () {
             CodeMetadata.ByteZero.Upgradeable | CodeMetadata.ByteZero.Readable,
             CodeMetadata.ByteOne.Payable | CodeMetadata.ByteOne.PayableBySc,
         ]);
-        const metadata = CodeMetadata.fromBuffer(buffer);
+        const metadata = CodeMetadata.newFromBuffer(buffer);
 
         assert.isTrue(metadata.upgradeable);
         assert.isTrue(metadata.readable);
@@ -47,7 +47,7 @@ describe("CodeMetadata Class Tests", function () {
 
     it("should create from buffer correctly when some flags are set", function () {
         const buffer = Buffer.from([CodeMetadata.ByteZero.Upgradeable, CodeMetadata.ByteOne.PayableBySc]);
-        const metadata = CodeMetadata.fromBuffer(buffer);
+        const metadata = CodeMetadata.newFromBuffer(buffer);
 
         assert.isTrue(metadata.upgradeable);
         assert.isFalse(metadata.readable);
@@ -60,7 +60,7 @@ describe("CodeMetadata Class Tests", function () {
 
         assert.throws(
             () => {
-                CodeMetadata.fromBuffer(buffer);
+                CodeMetadata.newFromBuffer(buffer);
             },
             Error,
             "code metadata buffer has length 1, expected 2",
@@ -69,7 +69,7 @@ describe("CodeMetadata Class Tests", function () {
 
     it("should test code metadata from bytes", () => {
         const bytes = new Uint8Array([1, 0]);
-        const codeMetadata = CodeMetadata.fromBytes(bytes);
+        const codeMetadata = CodeMetadata.newFromBytes(bytes);
 
         assert.equal(codeMetadata.toString(), "0100");
         assert.deepEqual(codeMetadata.toJSON(), {

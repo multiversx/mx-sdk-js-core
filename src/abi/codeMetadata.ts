@@ -41,14 +41,14 @@ export class CodeMetadata {
         this.payableBySc = payableBySc;
     }
 
-    static fromBytes(bytes: Uint8Array): CodeMetadata {
-        return CodeMetadata.fromBuffer(Buffer.from(bytes));
+    static newFromBytes(bytes: Uint8Array): CodeMetadata {
+        return CodeMetadata.newFromBuffer(Buffer.from(bytes));
     }
 
     /**
      * Creates a metadata object from a buffer.
      */
-    static fromBuffer(buffer: Buffer): CodeMetadata {
+    static newFromBuffer(buffer: Buffer): CodeMetadata {
         if (buffer.length != CodeMetadataLength) {
             throw new Error(`code metadata buffer has length ${buffer.length}, expected ${CodeMetadataLength}`);
         }

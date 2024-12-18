@@ -165,7 +165,7 @@ export class SmartContract implements ISmartContract {
     } {
         let metadata: CodeMetadata;
         if (codeMetadata) {
-            metadata = CodeMetadata.fromBytes(Buffer.from(codeMetadata.toString(), "hex"));
+            metadata = CodeMetadata.newFromBytes(Buffer.from(codeMetadata.toString(), "hex"));
         } else {
             metadata = new CodeMetadata();
         }

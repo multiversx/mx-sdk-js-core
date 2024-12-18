@@ -1,7 +1,6 @@
-import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, TypedValue, U16Value, U64Value } from "../abi";
 import { Address } from "../address";
 import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
-import { Err, ErrBadUsage } from "../errors";
+import { ErrBadUsage } from "../errors";
 import { TokenComputer, TokenTransfer } from "../tokens";
 import { TokenTransfersDataBuilder } from "../tokenTransfersDataBuilder";
 import { Transaction } from "../transaction";
@@ -20,13 +19,6 @@ interface IConfig {
     gasLimitMultiESDTNFTTransfer: bigint;
 }
 
-interface IGasEstimator {
-    forEGLDTransfer(dataLength: number): number;
-    forESDTTransfer(dataLength: number): number;
-    forESDTNFTTransfer(dataLength: number): number;
-    forMultiESDTNFTTransfer(dataLength: number, numTransfers: number): number;
-}
-
 /**
  * Use this class to create transactions for native token transfers (EGLD) or custom tokens transfers (ESDT/NTF/MetaESDT).
  */
@@ -34,47 +26,14 @@ export class TransferTransactionsFactory {
     private readonly config?: IConfig;
     private readonly tokenTransfersDataBuilder?: TokenTransfersDataBuilder;
     private readonly tokenComputer?: TokenComputer;
-    private readonly gasEstimator?: IGasEstimator;
 
-    /**
-     * Should be instantiated using `Config`.
-     * Instantiating this class using GasEstimator represents the legacy version of this class.
-     * The legacy version contains methods like `createEGLDTransfer`, `createESDTTransfer`, `createESDTNFTTransfer` and `createMultiESDTNFTTransfer`.
-     * This was done in order to minimize breaking changes in client code.
-     */
-    constructor(options: IGasEstimator | { config: IConfig }) {
-        if (this.isGasEstimator(options)) {
-            this.gasEstimator = options;
-        } else {
-            this.config = options.config;
-            this.tokenComputer = new TokenComputer();
-            this.tokenTransfersDataBuilder = new TokenTransfersDataBuilder();
-        }
-    }
-
-    private isGasEstimator(options: any): options is IGasEstimator {
-        return (
-            typeof options === "object" &&
-            typeof options.forEGLDTransfer === "function" &&
-            typeof options.forESDTTransfer === "function" &&
-            typeof options.forESDTNFTTransfer === "function" &&
-            typeof options.forMultiESDTNFTTransfer === "function"
-        );
-    }
-
-    private isGasEstimatorDefined(): boolean {
-        return this.gasEstimator !== undefined;
-    }
-
-    private ensureConfigIsDefined() {
-        if (this.config === undefined) {
-            throw new Err("'config' is not defined");
-        }
+    constructor(options: { config: IConfig }) {
+        this.config = options.config;
+        this.tokenComputer = new TokenComputer();
+        this.tokenTransfersDataBuilder = new TokenTransfersDataBuilder();
     }
 
     createTransactionForNativeTokenTransfer(sender: Address, options: resources.NativeTokenTransferInput): Transaction {
-        this.ensureConfigIsDefined();
-
         const data = options.data || new Uint8Array();
 
         return new Transaction({
@@ -88,8 +47,6 @@ export class TransferTransactionsFactory {
     }
 
     createTransactionForESDTTokenTransfer(sender: Address, options: resources.CustomTokenTransferInput): Transaction {
-        this.ensureConfigIsDefined();
-
         const numberOfTransfers = options.tokenTransfers.length;
 
         if (numberOfTransfers === 0) {
@@ -143,185 +100,6 @@ export class TransferTransactionsFactory {
         });
     }
 
-    /**
-     * This is a legacy method. Can only be used if the class was instantiated using `GasEstimator`.
-     * Use {@link createTransactionForNativeTokenTransfer} instead.
-     */
-    createEGLDTransfer(args: {
-        nonce?: bigint;
-        value: bigint;
-        receiver: Address;
-        sender: Address;
-        gasPrice?: bigint;
-        gasLimit?: bigint;
-        data?: Uint8Array;
-        chainID: string;
-    }) {
-        if (!this.isGasEstimatorDefined()) {
-            throw new Err(
-                "You are calling a legacy function to create an EGLD transfer transaction. If this is your intent, then instantiate the class using a `GasEstimator`. Or, instead, use the new, recommended `createTransactionForNativeTokenTransfer` method.",
-            );
-        }
-
-        const dataLength = args.data?.length || 0;
-        const estimatedGasLimit = this.gasEstimator!.forEGLDTransfer(dataLength);
-
-        return new Transaction({
-            nonce: args.nonce,
-            value: args.value,
-            receiver: args.receiver,
-            sender: args.sender,
-            gasPrice: args.gasPrice,
-            gasLimit: args.gasLimit || BigInt(estimatedGasLimit),
-            data: args.data,
-            chainID: args.chainID,
-        });
-    }
-
-    /**
-     * This is a legacy method. Can only be used if the class was instantiated using `GasEstimator`.
-     * Use {@link createTransactionForESDTTokenTransfer} instead.
-     */
-    createESDTTransfer(args: {
-        tokenTransfer: TokenTransfer;
-        nonce?: bigint;
-        receiver: Address;
-        sender: Address;
-        gasPrice?: bigint;
-        gasLimit?: bigint;
-        chainID: string;
-    }) {
-        if (!this.isGasEstimatorDefined()) {
-            throw new Err(
-                "You are calling a legacy function to create an ESDT transfer transaction. If this is your intent, then instantiate the class using a `GasEstimator`. Or, instead, use the new, recommended `createTransactionForESDTTokenTransfer` method.",
-            );
-        }
-
-        const { argumentsString } = new ArgSerializer().valuesToString([
-            // The token identifier
-            BytesValue.fromUTF8(args.tokenTransfer.token.identifier),
-            // The transfered amount
-            new BigUIntValue(args.tokenTransfer.amount),
-        ]);
-
-        const data = `ESDTTransfer@${argumentsString}`;
-        const transactionPayload = Buffer.from(data);
-        const dataLength = transactionPayload.length || 0;
-        const estimatedGasLimit = this.gasEstimator!.forESDTTransfer(dataLength);
-
-        return new Transaction({
-            nonce: args.nonce,
-            receiver: args.receiver,
-            sender: args.sender,
-            gasPrice: args.gasPrice,
-            gasLimit: args.gasLimit || BigInt(estimatedGasLimit),
-            data: transactionPayload,
-            chainID: args.chainID,
-        });
-    }
-
-    /**
-     * This is a legacy method. Can only be used if the class was instantiated using `GasEstimator`.
-     * Use {@link createTransactionForESDTTokenTransfer} instead.
-     */
-    createESDTNFTTransfer(args: {
-        tokenTransfer: TokenTransfer;
-        nonce?: bigint;
-        destination: Address;
-        sender: Address;
-        gasPrice?: bigint;
-        gasLimit?: bigint;
-        chainID: string;
-    }) {
-        if (!this.isGasEstimatorDefined()) {
-            throw new Err(
-                "You are calling a legacy function to create an ESDTNFT transfer transaction. If this is your intent, then instantiate the class using a `GasEstimator`. Or, instead, use the new, recommended `createTransactionForESDTTokenTransfer` method.",
-            );
-        }
-
-        const { argumentsString } = new ArgSerializer().valuesToString([
-            // The token identifier
-            BytesValue.fromUTF8(args.tokenTransfer.token.identifier),
-            // The nonce of the token
-            new U64Value(args.tokenTransfer.token.nonce),
-            // The transferred quantity
-            new BigUIntValue(args.tokenTransfer.amount),
-            // The destination address
-            new AddressValue(args.destination),
-        ]);
-
-        const data = `ESDTNFTTransfer@${argumentsString}`;
-        const transactionPayload = Buffer.from(data);
-        const dataLength = transactionPayload.length || 0;
-        const estimatedGasLimit = this.gasEstimator!.forESDTNFTTransfer(dataLength);
-
-        return new Transaction({
-            nonce: args.nonce,
-            receiver: args.sender,
-            sender: args.sender,
-            gasPrice: args.gasPrice,
-            gasLimit: args.gasLimit || BigInt(estimatedGasLimit),
-            data: transactionPayload,
-            chainID: args.chainID,
-        });
-    }
-
-    /**
-     * This is a legacy method. Can only be used if the class was instantiated using `GasEstimator`.
-     * Use {@link createTransactionForESDTTokenTransfer} instead.
-     */
-    createMultiESDTNFTTransfer(args: {
-        tokenTransfers: TokenTransfer[];
-        nonce?: bigint;
-        destination: Address;
-        sender: Address;
-        gasPrice?: bigint;
-        gasLimit?: bigint;
-        chainID: string;
-    }) {
-        if (!this.isGasEstimatorDefined()) {
-            throw new Err(
-                "You are calling a legacy function to create a MultiESDTNFT transfer transaction. If this is your intent, then instantiate the class using a `GasEstimator`. Or, instead, use the new, recommended `createTransactionForESDTTokenTransfer` method.",
-            );
-        }
-
-        const parts: TypedValue[] = [
-            // The destination address
-            new AddressValue(args.destination),
-            // Number of tokens
-            new U16Value(args.tokenTransfers.length),
-        ];
-
-        for (const payment of args.tokenTransfers) {
-            parts.push(
-                ...[
-                    // The token identifier
-                    BytesValue.fromUTF8(payment.token.identifier),
-                    // The nonce of the token
-                    new U64Value(payment.token.nonce),
-                    // The transfered quantity
-                    new BigUIntValue(payment.amount),
-                ],
-            );
-        }
-
-        const { argumentsString } = new ArgSerializer().valuesToString(parts);
-        const data = `MultiESDTNFTTransfer@${argumentsString}`;
-        const transactionPayload = Buffer.from(data);
-        const dataLength = transactionPayload.length || 0;
-        const estimatedGasLimit = this.gasEstimator!.forMultiESDTNFTTransfer(dataLength, args.tokenTransfers.length);
-
-        return new Transaction({
-            nonce: args.nonce,
-            receiver: args.sender,
-            sender: args.sender,
-            gasPrice: args.gasPrice,
-            gasLimit: args.gasLimit || BigInt(estimatedGasLimit),
-            data: transactionPayload,
-            chainID: args.chainID,
-        });
-    }
-
     private createSingleESDTTransferTransaction(
         sender: Address,
         options: {
@@ -329,8 +107,6 @@ export class TransferTransactionsFactory {
             tokenTransfers: TokenTransfer[];
         },
     ): Transaction {
-        this.ensureConfigIsDefined();
-
         const transfer = options.tokenTransfers[0];
         const { dataParts, extraGasForTransfer, receiver } = this.buildTransferData(transfer, {
             sender,

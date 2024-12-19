@@ -274,12 +274,18 @@ describe("test network providers on devnet: Proxy and API", function () {
     ) {
         // Proxy and API exhibit differences in the "function" field, in case of move-balance transactions.
         apiResponse.function = proxyResponse.function;
-
+        apiResponse.raw = {};
+        apiResponse.smartContractResults.map((x) => (x.raw = {}));
+        apiResponse.smartContractResults.map((x) => x.logs.events.map((e) => (e.raw = {})));
+        apiResponse.logs.events.map((e) => (e.raw = {}));
         // Ignore fields which are not present on API response:
         proxyResponse.epoch = 0;
-        proxyResponse.blockNonce = 0;
-        proxyResponse.hyperblockNonce = 0;
-        proxyResponse.hyperblockHash = "";
+        proxyResponse.blockHash = "";
+        proxyResponse.miniblockHash = "";
+        proxyResponse.raw = {};
+        proxyResponse.smartContractResults.map((x) => (x.raw = {}));
+        proxyResponse.smartContractResults.map((x) => x.logs.events.map((e) => (e.raw = {})));
+        proxyResponse.logs.events.map((e) => (e.raw = {}));
     }
 
     it("should have the same response for transactions with events", async function () {

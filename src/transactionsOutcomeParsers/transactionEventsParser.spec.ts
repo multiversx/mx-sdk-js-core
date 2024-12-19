@@ -42,7 +42,7 @@ describe("test transaction events parser", () => {
         });
 
         const transactionOnNetwork = new TransactionOnNetwork({
-            nonce: 7,
+            nonce: 7n,
             smartContractResults: [
                 new SmartContractResult({
                     data: Buffer.from("@6f6b"),
@@ -92,7 +92,7 @@ describe("test transaction events parser", () => {
         });
 
         const transactionOnNetwork = new TransactionOnNetwork({
-            nonce: 7,
+            nonce: 7n,
             smartContractResults: [new SmartContractResult({ data: Buffer.from("@6f6b") })],
             logs: new TransactionLogs({
                 events: [

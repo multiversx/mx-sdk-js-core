@@ -32,26 +32,29 @@ export function prepareTransactionForBroadcasting(transaction: Transaction): any
 }
 
 export class TransactionOnNetwork {
+    raw: Record<string, any> = {};
     isCompleted?: boolean;
     hash: string = "";
     type: string = "";
-    nonce: number = 0;
-    round: number = 0;
+    nonce: bigint = 0n;
+    round: bigint = 0n;
     epoch: number = 0;
-    value: string = "";
+    value: bigint = 0n;
     receiver: Address = Address.empty();
     sender: Address = Address.empty();
-    gasLimit: number = 0;
-    gasPrice: number = 0;
+    senderShard: number = 0;
+    receiverShard: number = 0;
+    gasLimit: bigint = 0n;
+    gasPrice: bigint = 0n;
     function: string = "";
     data: Buffer = Buffer.from([]);
+    version: number = 0;
+    options: number = 0;
     signature: string = "";
     status: TransactionStatus = TransactionStatus.createUnknown();
     timestamp: number = 0;
-
-    blockNonce: number = 0;
-    hyperblockNonce: number = 0;
-    hyperblockHash: string = "";
+    miniblockHash: string = "";
+    blockHash: string = "";
 
     smartContractResults: SmartContractResult[] = [];
     logs: TransactionLogs = new TransactionLogs();
@@ -105,23 +108,25 @@ export class TransactionOnNetwork {
         let result = new TransactionOnNetwork();
         result.hash = txHash;
         result.type = response.type || "";
-        result.nonce = response.nonce || 0;
-        result.round = response.round;
+        result.nonce = BigInt(response.nonce || 0);
+        result.round = BigInt(response.round || 0);
         result.epoch = response.epoch || 0;
-        result.value = (response.value || 0).toString();
+        result.value = BigInt((response.value || 0).toString());
         result.sender = new Address(response.sender);
         result.receiver = new Address(response.receiver);
-        result.gasPrice = response.gasPrice || 0;
-        result.gasLimit = response.gasLimit || 0;
+        result.gasPrice = BigInt(response.gasPrice) || 0n;
+        result.gasLimit = BigInt(response.gasLimit) || 0n;
         result.function = response.function || "";
+        result.data = Buffer.from(response.data || "", "base64");
+        result.version = response.version || 1;
+        result.options = response.options || 0;
         result.data = Buffer.from(response.data || "", "base64");
         result.status = new TransactionStatus(response.status);
         result.timestamp = response.timestamp || 0;
-
-        result.blockNonce = response.blockNonce || 0;
-        result.hyperblockNonce = response.hyperblockNonce || 0;
-        result.hyperblockHash = response.hyperblockHash || "";
+        result.miniblockHash = response.miniblockHash || "";
+        result.blockHash = response.blockHash || "";
         result.logs = TransactionLogs.fromHttpResponse(response.logs || {});
+        // result.raw = response;
 
         return result;
     }

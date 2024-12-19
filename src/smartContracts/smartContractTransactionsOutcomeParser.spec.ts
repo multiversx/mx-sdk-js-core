@@ -17,7 +17,7 @@ describe("test smart contract transactions outcome parser", () => {
         const parser = new SmartContractTransactionsOutcomeParser();
 
         const transactionOnNetwork = new TransactionOnNetwork({
-            nonce: 7,
+            nonce: 7n,
             logs: new TransactionLogs({
                 events: [
                     new TransactionEvent({
@@ -52,7 +52,7 @@ describe("test smart contract transactions outcome parser", () => {
         const parser = new SmartContractTransactionsOutcomeParser();
 
         const transactionOnNetwork = new TransactionOnNetwork({
-            nonce: 7,
+            nonce: 7n,
             logs: new TransactionLogs({
                 events: [
                     new TransactionEvent({
@@ -77,7 +77,7 @@ describe("test smart contract transactions outcome parser", () => {
     it("parses execute outcome, without ABI", function () {
         const parser = new SmartContractTransactionsOutcomeParser();
         const transactionOnNetwork = new TransactionOnNetwork({
-            nonce: 7,
+            nonce: 7n,
             smartContractResults: [new SmartContractResult({ data: Buffer.from("@6f6b@2a") })],
         });
 
@@ -94,7 +94,7 @@ describe("test smart contract transactions outcome parser", () => {
         });
 
         const transactionOnNetwork = new TransactionOnNetwork({
-            nonce: 7,
+            nonce: 7n,
             function: "getUltimateAnswer",
             smartContractResults: [new SmartContractResult({ data: Buffer.from("@6f6b@2a") })],
         });
@@ -113,7 +113,7 @@ describe("test smart contract transactions outcome parser", () => {
         });
 
         const transactionOnNetwork = new TransactionOnNetwork({
-            nonce: 7,
+            nonce: 7n,
             smartContractResults: [new SmartContractResult({ data: Buffer.from("@6f6b@2a") })],
         });
 

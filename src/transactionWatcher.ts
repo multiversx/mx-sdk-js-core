@@ -81,7 +81,7 @@ export class TransactionWatcher {
      */
     public async awaitCompleted(transactionOrTxHash: ITransaction | string): Promise<TransactionOnNetwork> {
         const isCompleted = (transactionOnNetwork: TransactionOnNetwork) => {
-            return transactionOnNetwork.status.isCompleted();
+            return transactionOnNetwork.status.isStatusCompleted();
         };
 
         const doFetch = async () => {

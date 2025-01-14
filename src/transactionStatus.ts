@@ -7,11 +7,17 @@ export class TransactionStatus {
      */
     readonly status: string;
 
+    readonly isCompleted: boolean;
+
+    readonly isSuccessfull: boolean;
+
     /**
      * Creates a new TransactionStatus object.
      */
     constructor(status: string) {
         this.status = (status || "").toLowerCase();
+        this.isCompleted = this.isStatusCompleted();
+        this.isSuccessfull = this.isStatusSuccessful();
     }
 
     /**
@@ -30,23 +36,23 @@ export class TransactionStatus {
 
     /**
      * Returns whether the transaction has been executed (not necessarily with success).
-     * @deprecated This will be remove next version, please use {@link isCompleted} instead.
+     * @deprecated This will be remove next version, please use {@link isStatusCompleted} instead.
      */
     isExecuted(): boolean {
-        return this.isSuccessful() || this.isFailed() || this.isInvalid();
+        return this.isStatusSuccessful() || this.isFailed() || this.isInvalid();
     }
 
     /**
      * Returns whether the transaction has been conpleted (not necessarily with success).
      */
-    isCompleted(): boolean {
-        return this.isSuccessful() || this.isFailed() || this.isInvalid();
+    isStatusCompleted(): boolean {
+        return this.isStatusSuccessful() || this.isFailed() || this.isInvalid();
     }
 
     /**
      * Returns whether the transaction has been executed successfully.
      */
-    isSuccessful(): boolean {
+    isStatusSuccessful(): boolean {
         return this.status == "executed" || this.status == "success" || this.status == "successful";
     }
 

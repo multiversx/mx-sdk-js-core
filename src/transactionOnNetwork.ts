@@ -50,7 +50,7 @@ export class TransactionOnNetwork {
     data: Buffer = Buffer.from([]);
     version: number = 0;
     options: number = 0;
-    signature: string = "";
+    signature?: Uint8Array;
     status: TransactionStatus = TransactionStatus.createUnknown();
     timestamp: number = 0;
     miniblockHash: string = "";
@@ -82,7 +82,7 @@ export class TransactionOnNetwork {
 
         if (processStatus) {
             result.status = processStatus;
-            result.isCompleted = result.status.isCompleted();
+            result.isCompleted = result.status.isStatusCompleted();
         }
 
         return result;

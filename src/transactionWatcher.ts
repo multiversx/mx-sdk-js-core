@@ -81,10 +81,7 @@ export class TransactionWatcher {
      */
     public async awaitCompleted(transactionOrTxHash: ITransaction | string): Promise<TransactionOnNetwork> {
         const isCompleted = (transactionOnNetwork: TransactionOnNetwork) => {
-            if (transactionOnNetwork.isCompleted === undefined) {
-                throw new ErrIsCompletedFieldIsMissingOnTransaction();
-            }
-            return transactionOnNetwork.isCompleted;
+            return transactionOnNetwork.status.isExecuted();
         };
 
         const doFetch = async () => {

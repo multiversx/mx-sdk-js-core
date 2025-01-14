@@ -50,7 +50,7 @@ export class TransactionOnNetwork {
     data: Buffer = Buffer.from([]);
     version: number = 0;
     options: number = 0;
-    signature?: Uint8Array;
+    signature: Uint8Array = new Uint8Array();
     status: TransactionStatus = TransactionStatus.createUnknown();
     timestamp: number = 0;
     miniblockHash: string = "";
@@ -82,7 +82,7 @@ export class TransactionOnNetwork {
 
         if (processStatus) {
             result.status = processStatus;
-            result.isCompleted = result.status.isStatusCompleted();
+            result.isCompleted = result.status.isSuccessful() || result.status.isFailed();
         }
 
         return result;
@@ -126,7 +126,7 @@ export class TransactionOnNetwork {
         result.miniblockHash = response.miniblockHash || "";
         result.blockHash = response.blockHash || "";
         result.logs = TransactionLogs.fromHttpResponse(response.logs || {});
-        result.raw = response;
+        // result.raw = response;
 
         return result;
     }

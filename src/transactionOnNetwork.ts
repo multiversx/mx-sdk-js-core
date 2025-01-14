@@ -82,7 +82,7 @@ export class TransactionOnNetwork {
 
         if (processStatus) {
             result.status = processStatus;
-            result.isCompleted = result.status.isExecuted();
+            result.isCompleted = result.status.isCompleted();
         }
 
         return result;

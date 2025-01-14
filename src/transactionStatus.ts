@@ -25,16 +25,21 @@ export class TransactionStatus {
      * Returns whether the transaction is pending (e.g. in mempool).
      */
     isPending(): boolean {
-        return (
-            this.status == "received" ||
-            this.status == "pending"
-        );
+        return this.status == "received" || this.status == "pending";
     }
 
     /**
      * Returns whether the transaction has been executed (not necessarily with success).
+     * @deprecated This will be remove next version, please use {@link isCompleted} instead.
      */
     isExecuted(): boolean {
+        return this.isSuccessful() || this.isFailed() || this.isInvalid();
+    }
+
+    /**
+     * Returns whether the transaction has been conpleted (not necessarily with success).
+     */
+    isCompleted(): boolean {
         return this.isSuccessful() || this.isFailed() || this.isInvalid();
     }
 
@@ -42,23 +47,14 @@ export class TransactionStatus {
      * Returns whether the transaction has been executed successfully.
      */
     isSuccessful(): boolean {
-        return (
-            this.status == "executed" ||
-            this.status == "success" ||
-            this.status == "successful"
-        );
+        return this.status == "executed" || this.status == "success" || this.status == "successful";
     }
 
     /**
      * Returns whether the transaction has been executed, but with a failure.
      */
     isFailed(): boolean {
-        return (
-            this.status == "fail" ||
-            this.status == "failed" ||
-            this.status == "unsuccessful" ||
-            this.isInvalid()
-        );
+        return this.status == "fail" || this.status == "failed" || this.status == "unsuccessful" || this.isInvalid();
     }
 
     /**

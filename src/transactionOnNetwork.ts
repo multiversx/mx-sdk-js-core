@@ -126,7 +126,7 @@ export class TransactionOnNetwork {
         result.miniblockHash = response.miniblockHash || "";
         result.blockHash = response.blockHash || "";
         result.logs = TransactionLogs.fromHttpResponse(response.logs || {});
-        // result.raw = response;
+        result.raw = response;
 
         return result;
     }

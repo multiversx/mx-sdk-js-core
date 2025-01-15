@@ -1,13 +1,22 @@
 import { Address } from "../address";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
+import { Token } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { AccountOnNetwork } from "./accounts";
+import { BlockOnNetwork } from "./blockOnNetwork";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
+import {
+    AccountStorage,
+    AccountStorageEntry,
+    AwaitingOptions,
+    GetBlockArguments,
+    TransactionCostEstimationResponse,
+} from "./resources";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 
@@ -26,19 +35,90 @@ export interface INetworkProvider {
     getNetworkStatus(): Promise<NetworkStatus>;
 
     /**
-     * Fetches stake statistics.
+     * Fetches a block by nonce or by hash.
      */
-    getNetworkStakeStatistics(): Promise<NetworkStake>;
+    getBlock(blockArgs: GetBlockArguments): Promise<BlockOnNetwork>;
 
     /**
-     * Fetches general statistics.
+     * Fetches the latest block of a shard.
      */
-    getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics>;
+    getLatestBlock(shard: number): Promise<BlockOnNetwork>;
 
     /**
      * Fetches the state of an account.
      */
     getAccount(address: Address): Promise<AccountOnNetwork>;
+
+    /**
+     * Fetches the storage (key-value pairs) of an account.
+     */
+    getAccountStorage(address: Address): Promise<AccountStorage>;
+
+    /**
+     * Fetches a specific storage entry of an account.
+     */
+    getAccountStorageEntry(address: Address, entryKey: string): Promise<AccountStorageEntry>;
+
+    /**
+     * Waits until an account satisfies a given condition.
+     * Can throw:
+     * - ErrAwaitConditionNotReached
+     */
+    awaitAccountOnCondition(
+        address: Address,
+        condition: (account: AccountOnNetwork) => boolean,
+        options?: AwaitingOptions,
+    ): AccountOnNetwork;
+
+    /**
+     * Broadcasts an already-signed transaction.
+     */
+    sendTransaction(tx: Transaction): Promise<string>;
+
+    /**
+     * Simulates the processing of an already-signed transaction.
+     *
+     */
+    simulateTransaction(tx: Transaction): Promise<TransactionOnNetwork>;
+
+    /**
+     * Estimates the cost of a transaction.
+     *
+     */
+    estimateTransactionCost(tx: Transaction): Promise<TransactionCostEstimationResponse>;
+
+    /**
+     * Broadcasts a list of already-signed transactions.
+     */
+    sendTransactions(txs: Transaction[]): Promise<string[]>;
+
+    /**
+     * Fetches the state of a transaction.
+     */
+    getTransaction(txHash: string, withProcessStatus?: boolean): Promise<TransactionOnNetwork>;
+
+    /**
+     * Waits until the transaction satisfies a given condition.
+     * Can throw:
+     * - ErrAwaitConditionNotReached
+     */
+    awaitTransactionOnCondition(
+        transactionHash: string,
+        condition: (account: TransactionOnNetwork) => boolean,
+        options?: AwaitingOptions,
+    ): Promise<TransactionOnNetwork>;
+
+    /**
+     * Waits until the transaction is completely processed.
+     * Can throw:
+     * - ErrAwaitConditionNotReached
+     */
+    awaitTransactionCompleted(transactionHash: string, options?: AwaitingOptions): Promise<TransactionOnNetwork>;
+
+    /**
+     * Fetches the balance of an account, for a given token.
+     */
+    getTokenOfAccount(address: Address, token: Token): Promise<FungibleTokenOfAccountOnNetwork>;
 
     /**
      * Fetches data about the fungible tokens held by an account.
@@ -68,37 +148,6 @@ export interface INetworkProvider {
     ): Promise<NonFungibleTokenOfAccountOnNetwork>;
 
     /**
-     * Fetches the state of a transaction.
-     */
-    getTransaction(txHash: string, withProcessStatus?: boolean): Promise<TransactionOnNetwork>;
-
-    /**
-     * Queries the status of a transaction.
-     */
-    getTransactionStatus(txHash: string): Promise<TransactionStatus>;
-
-    /**
-     * Broadcasts an already-signed transaction.
-     */
-    sendTransaction(tx: Transaction): Promise<string>;
-
-    /**
-     * Broadcasts a list of already-signed transactions.
-     */
-    sendTransactions(txs: Transaction[]): Promise<string[]>;
-
-    /**
-     * Simulates the processing of an already-signed transaction.
-     *
-     */
-    simulateTransaction(tx: Transaction): Promise<any>;
-
-    /**
-     * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
-     */
-    queryContract(query: SmartContractQuery): Promise<SmartContractQueryResponse>;
-
-    /**
      * Fetches the definition of a fungible token.
      */
     getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork>;
@@ -109,9 +158,29 @@ export interface INetworkProvider {
     getDefinitionOfTokenCollection(collection: string): Promise<DefinitionOfTokenCollectionOnNetwork>;
 
     /**
+     * Queries a Smart Contract - runs a pure function defined by the contract and returns its results.
+     */
+    queryContract(query: SmartContractQuery): Promise<SmartContractQueryResponse>;
+
+    /**
      * Fetches data about a specific non-fungible token (instance).
      */
     getNonFungibleToken(collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork>;
+
+    /**
+     * Fetches stake statistics.
+     */
+    getNetworkStakeStatistics(): Promise<NetworkStake>;
+
+    /**
+     * Fetches general statistics.
+     */
+    getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics>;
+
+    /**
+     * Queries the status of a transaction.
+     */
+    getTransactionStatus(txHash: string): Promise<TransactionStatus>;
 
     /**
      * Performs a generic GET action against the provider (useful for new HTTP endpoints).
@@ -122,14 +191,6 @@ export interface INetworkProvider {
      * Performs a generic POST action against the provider (useful for new HTTP endpoints).
      */
     doPostGeneric(resourceUrl: string, payload: any): Promise<any>;
-}
-
-export interface IContractQuery {
-    address: Address;
-    caller?: Address;
-    func: { toString(): string };
-    value?: { toString(): string };
-    getEncodedArguments(): string[];
 }
 
 export interface IPagination {

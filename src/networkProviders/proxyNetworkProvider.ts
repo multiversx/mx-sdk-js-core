@@ -1,12 +1,15 @@
 import { Address } from "../address";
-import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
+import { ESDT_CONTRACT_ADDRESS_HEX, METACHAIN_ID } from "../constants";
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
+import { Token } from "../tokens";
 import { Transaction } from "../transaction";
-import { TransactionOnNetwork, prepareTransactionForBroadcasting } from "../transactionOnNetwork";
+import { prepareTransactionForBroadcasting, TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
+import { TransactionWatcher } from "../transactionWatcher";
 import { getAxios } from "../utils";
 import { AccountOnNetwork, GuardianData } from "./accounts";
+import { BlockOnNetwork } from "./blockOnNetwork";
 import { defaultAxiosConfig } from "./config";
 import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
@@ -16,6 +19,13 @@ import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkProviderConfig } from "./networkProviderConfig";
 import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
+import {
+    AccountStorage,
+    AccountStorageEntry,
+    AwaitingOptions,
+    GetBlockArguments,
+    TransactionCostEstimationResponse,
+} from "./resources";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { extendUserAgentIfBackend } from "./userAgent";
@@ -40,8 +50,8 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return networkConfig;
     }
 
-    async getNetworkStatus(): Promise<NetworkStatus> {
-        const response = await this.doGetGeneric("network/status/4294967295");
+    async getNetworkStatus(shard: number = METACHAIN_ID): Promise<NetworkStatus> {
+        const response = await this.doGetGeneric(`network/status/${shard}`);
         const networkStatus = NetworkStatus.fromHttpResponse(response.status);
         return networkStatus;
     }
@@ -58,6 +68,22 @@ export class ProxyNetworkProvider implements INetworkProvider {
         throw new Error("Method not implemented.");
     }
 
+    async getBlock(blockArgs: GetBlockArguments): Promise<BlockOnNetwork> {
+        let response = {};
+        if (blockArgs.blockHash) {
+            response = await this.doGetGeneric(`block/${blockArgs.shard}/by-hash/${blockArgs.blockHash}`);
+        } else if (blockArgs.blockNonce) {
+            response = await this.doGetGeneric(`block/${blockArgs.shard}/by-nonce/${blockArgs.blockNonce}`);
+        } else throw new Error("Block hash or block nonce not provided.");
+        return BlockOnNetwork.fromHttpResponse(response);
+    }
+
+    async getLatestBlock(shard: number): Promise<BlockOnNetwork> {
+        const blockNonce = (await this.getNetworkStatus(shard)).Nonce;
+        const response = await this.doGetGeneric(`block/${shard}/by-nonce/${blockNonce}`);
+        return BlockOnNetwork.fromHttpResponse(response);
+    }
+
     async getAccount(address: Address): Promise<AccountOnNetwork> {
         const response = await this.doGetGeneric(`address/${address.toBech32()}`);
         const account = AccountOnNetwork.fromHttpResponse(response.account);
@@ -68,6 +94,109 @@ export class ProxyNetworkProvider implements INetworkProvider {
         const response = await this.doGetGeneric(`address/${address.toBech32()}/guardian-data`);
         const accountGuardian = GuardianData.fromHttpResponse(response.guardianData);
         return accountGuardian;
+    }
+
+    async getAccountStorage(address: Address): Promise<AccountStorage> {
+        const response = await this.doGetGeneric(`address/${address.toBech32()}/keys`);
+        const account = AccountStorage.fromHttpResponse(response);
+        return account;
+    }
+
+    async getAccountStorageEntry(address: Address, entryKey: string): Promise<AccountStorageEntry> {
+        const keyAsHex = Buffer.from(entryKey).toString("hex");
+        const response = await this.doGetGeneric(`address/${address.toBech32()}/keys/${keyAsHex}`);
+        const account = AccountStorageEntry.fromHttpResponse(response, entryKey);
+        return account;
+    }
+
+    awaitAccountOnCondition(
+        _address: Address,
+        _condition: (account: AccountOnNetwork) => boolean,
+        options?: AwaitingOptions,
+    ): AccountOnNetwork {
+        if (!options) {
+            options = new AwaitingOptions();
+        }
+        throw new Error("Method not implemented.");
+    }
+
+    async sendTransaction(tx: Transaction): Promise<string> {
+        const transaction = prepareTransactionForBroadcasting(tx);
+        const response = await this.doPostGeneric("transaction/send", transaction);
+        return response.txHash;
+    }
+
+    async simulateTransaction(tx: Transaction): Promise<any> {
+        const transaction = prepareTransactionForBroadcasting(tx);
+        const response = await this.doPostGeneric("transaction/simulate", transaction);
+        return response;
+    }
+
+    async estimateTransactionCost(tx: Transaction): Promise<TransactionCostEstimationResponse> {
+        const transaction = prepareTransactionForBroadcasting(tx);
+        const response = await this.doPostGeneric("transaction/cost", transaction);
+        return TransactionCostEstimationResponse.fromHttpResponse(response);
+    }
+
+    async sendTransactions(txs: Transaction[]): Promise<string[]> {
+        const data = txs.map((tx) => prepareTransactionForBroadcasting(tx));
+
+        const response = await this.doPostGeneric("transaction/send-multiple", data);
+        const hashes = Array(txs.length).fill(null);
+
+        for (let i = 0; i < txs.length; i++) {
+            hashes[i] = response.txsHashes[i.toString()] || null;
+        }
+
+        return hashes;
+    }
+
+    async getTransaction(txHash: string, _?: boolean): Promise<TransactionOnNetwork> {
+        const url = this.buildUrlWithQueryParameters(`transaction/${txHash}`, { withResults: "true" });
+        const [data, status] = await Promise.all([this.doGetGeneric(url), this.getTransactionStatus(txHash)]);
+        return TransactionOnNetwork.fromProxyHttpResponse(txHash, data.transaction, status);
+    }
+
+    async awaitTransactionOnCondition(
+        transactionHash: string,
+        condition: (account: TransactionOnNetwork) => boolean,
+        options?: AwaitingOptions,
+    ): Promise<TransactionOnNetwork> {
+        if (!options) {
+            options = new AwaitingOptions();
+        }
+
+        const awaiter = new TransactionWatcher(this, {
+            patienceMilliseconds: options.patienceInMilliseconds,
+            pollingIntervalMilliseconds: options.pollingIntervalInMilliseconds,
+            timeoutMilliseconds: options.timeoutInMilliseconds,
+        });
+        return await awaiter.awaitOnCondition(transactionHash, condition);
+    }
+
+    async awaitTransactionCompleted(transactionHash: string, options?: AwaitingOptions): Promise<TransactionOnNetwork> {
+        if (!options) {
+            options = new AwaitingOptions();
+        }
+
+        const awaiter = new TransactionWatcher(this, {
+            patienceMilliseconds: options.patienceInMilliseconds,
+            pollingIntervalMilliseconds: options.pollingIntervalInMilliseconds,
+            timeoutMilliseconds: options.timeoutInMilliseconds,
+        });
+        return await awaiter.awaitCompleted(transactionHash);
+    }
+
+    async getTokenOfAccount(address: Address, token: Token): Promise<FungibleTokenOfAccountOnNetwork> {
+        let response;
+        if (token.nonce === 0n) {
+            response = await this.doGetGeneric(`address/${address.toBech32()}/esdt/${token.identifier}`);
+        } else {
+            response = await this.doGetGeneric(
+                `address/${address.toBech32()}/nft/${token.identifier}/nonce/${token.nonce}`,
+            );
+        }
+        return FungibleTokenOfAccountOnNetwork.fromHttpResponse(response);
     }
 
     async getFungibleTokensOfAccount(
@@ -125,41 +254,19 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokenData;
     }
 
-    async getTransaction(txHash: string, _?: boolean): Promise<TransactionOnNetwork> {
-        const url = this.buildUrlWithQueryParameters(`transaction/${txHash}`, { withResults: "true" });
-        const [data, status] = await Promise.all([this.doGetGeneric(url), this.getTransactionStatus(txHash)]);
-        return TransactionOnNetwork.fromProxyHttpResponse(txHash, data.transaction, status);
-    }
-
     async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
         const response = await this.doGetGeneric(`transaction/${txHash}/process-status`);
         const status = new TransactionStatus(response.status);
         return status;
     }
 
-    async sendTransaction(tx: Transaction): Promise<string> {
-        const transaction = prepareTransactionForBroadcasting(tx);
-        const response = await this.doPostGeneric("transaction/send", transaction);
-        return response.txHash;
-    }
-
-    async sendTransactions(txs: Transaction[]): Promise<string[]> {
-        const data = txs.map((tx) => prepareTransactionForBroadcasting(tx));
-
-        const response = await this.doPostGeneric("transaction/send-multiple", data);
-        const hashes = Array(txs.length).fill(null);
-
-        for (let i = 0; i < txs.length; i++) {
-            hashes[i] = response.txsHashes[i.toString()] || null;
-        }
-
-        return hashes;
-    }
-
-    async simulateTransaction(tx: Transaction): Promise<any> {
-        const transaction = prepareTransactionForBroadcasting(tx);
-        const response = await this.doPostGeneric("transaction/simulate", transaction);
-        return response;
+    async getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
+        const properties = await this.getTokenProperties(tokenIdentifier);
+        const definition = DefinitionOfFungibleTokenOnNetwork.fromResponseOfGetTokenProperties(
+            tokenIdentifier,
+            properties,
+        );
+        return definition;
     }
 
     async queryContract(query: SmartContractQuery): Promise<SmartContractQueryResponse> {
@@ -170,15 +277,6 @@ export class ProxyNetworkProvider implements INetworkProvider {
         } catch (error: any) {
             throw new ErrContractQuery(error);
         }
-    }
-
-    async getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
-        const properties = await this.getTokenProperties(tokenIdentifier);
-        const definition = DefinitionOfFungibleTokenOnNetwork.fromResponseOfGetTokenProperties(
-            tokenIdentifier,
-            properties,
-        );
-        return definition;
     }
 
     private async getTokenProperties(identifier: string): Promise<Buffer[]> {

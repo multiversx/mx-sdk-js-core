@@ -121,7 +121,7 @@ export class MockNetworkProvider implements INetworkProvider {
     }
 
     mockPutTransaction(hash: TransactionHash, item: TransactionOnNetwork) {
-        item.isCompleted = false;
+        item.status = TransactionStatus.createUnknown();
         this.transactions.set(hash.toString(), item);
     }
 
@@ -137,7 +137,6 @@ export class MockNetworkProvider implements INetworkProvider {
         let response = new TransactionOnNetwork({
             status: new TransactionStatus("executed"),
             smartContractResults: [contractResult],
-            isCompleted: true,
             function: functionName,
         });
 
@@ -164,7 +163,7 @@ export class MockNetworkProvider implements INetworkProvider {
                 });
             } else if (point instanceof MarkCompleted) {
                 this.mockUpdateTransaction(hash, (transaction) => {
-                    transaction.isCompleted = true;
+                    transaction.status = new TransactionStatus("success");
                 });
             } else if (point instanceof Wait) {
                 await timeline.start(point.milliseconds);

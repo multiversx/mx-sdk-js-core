@@ -1,6 +1,7 @@
 import { Address } from "./address";
 
 export class TransactionEvent {
+    raw: Record<string, any> = {};
     address: Address = Address.empty();
     identifier: string = "";
     topics: Uint8Array[] = [];
@@ -25,8 +26,8 @@ export class TransactionEvent {
         result.topics = (responsePart.topics || []).map((topic) => Buffer.from(topic, "base64"));
 
         result.data = Buffer.from(responsePart.data ?? "", "base64");
-
         result.additionalData = (responsePart.additionalData || []).map((data) => Buffer.from(data, "base64"));
+        result.raw = responsePart;
 
         return result;
     }

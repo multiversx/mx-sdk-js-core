@@ -22,10 +22,10 @@ import {
     AwaitingOptions,
     BlockOnNetwork,
     GetBlockArguments,
+    TokenAmountOnNetwork,
     TransactionCostEstimationResponse,
 } from "./resources";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
-import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { extendUserAgentIfBackend } from "./userAgent";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
@@ -54,16 +54,16 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return networkStatus;
     }
     async getBlock(blockArgs: GetBlockArguments): Promise<BlockOnNetwork> {
-        let response = {};
+        let response;
         if (blockArgs.blockHash) {
             response = await this.doGetGeneric(`block/${blockArgs.shard}/by-hash/${blockArgs.blockHash}`);
         } else if (blockArgs.blockNonce) {
             response = await this.doGetGeneric(`block/${blockArgs.shard}/by-nonce/${blockArgs.blockNonce}`);
         } else throw new Error("Block hash or block nonce not provided.");
-        return BlockOnNetwork.fromHttpResponse(response);
+        return BlockOnNetwork.fromHttpResponse(response.block);
     }
 
-    async getLatestBlock(shard: number): Promise<BlockOnNetwork> {
+    async getLatestBlock(shard: number = METACHAIN_ID): Promise<BlockOnNetwork> {
         const blockNonce = (await this.getNetworkStatus(shard)).Nonce;
         const response = await this.doGetGeneric(`block/${shard}/by-nonce/${blockNonce}`);
         return BlockOnNetwork.fromHttpResponse(response);
@@ -71,7 +71,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
 
     async getAccount(address: Address): Promise<AccountOnNetwork> {
         const response = await this.doGetGeneric(`address/${address.toBech32()}`);
-        const account = AccountOnNetwork.fromHttpResponse(response.account);
+        const account = AccountOnNetwork.fromProxyHttpResponse(response.account);
         return account;
     }
 
@@ -89,7 +89,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
 
     async getAccountStorageEntry(address: Address, entryKey: string): Promise<AccountStorageEntry> {
         const keyAsHex = Buffer.from(entryKey).toString("hex");
-        const response = await this.doGetGeneric(`address/${address.toBech32()}/keys/${keyAsHex}`);
+        const response = await this.doGetGeneric(`address/${address.toBech32()}/key/${keyAsHex}`);
         const account = AccountStorageEntry.fromHttpResponse(response, entryKey);
         return account;
     }
@@ -172,7 +172,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return await awaiter.awaitCompleted(transactionHash);
     }
 
-    async getTokenOfAccount(address: Address, token: Token): Promise<FungibleTokenOfAccountOnNetwork> {
+    async getTokenOfAccount(address: Address, token: Token): Promise<TokenAmountOnNetwork> {
         let response;
         if (token.nonce === 0n) {
             response = await this.doGetGeneric(`address/${address.toBech32()}/esdt/${token.identifier}`);
@@ -181,40 +181,28 @@ export class ProxyNetworkProvider implements INetworkProvider {
                 `address/${address.toBech32()}/nft/${token.identifier}/nonce/${token.nonce}`,
             );
         }
-        return FungibleTokenOfAccountOnNetwork.fromHttpResponse(response);
+        return TokenAmountOnNetwork.fromProxyResponse(response);
     }
 
-    async getFungibleTokensOfAccount(
-        address: Address,
-        _pagination?: IPagination,
-    ): Promise<FungibleTokenOfAccountOnNetwork[]> {
+    async getFungibleTokensOfAccount(address: Address, _pagination?: IPagination): Promise<TokenAmountOnNetwork[]> {
         const url = `address/${address.toBech32()}/esdt`;
         const response = await this.doGetGeneric(url);
         const responseItems: any[] = Object.values(response.esdts);
         // Skip NFTs / SFTs.
         const responseItemsFiltered = responseItems.filter((item) => !item.nonce);
-        const tokens = responseItemsFiltered.map((item) => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
+        const tokens = responseItemsFiltered.map((item) => TokenAmountOnNetwork.fromProxyResponse(item));
 
-        // TODO: Fix sorting
-        tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(
-        address: Address,
-        _pagination?: IPagination,
-    ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+    async getNonFungibleTokensOfAccount(address: Address, _pagination?: IPagination): Promise<TokenAmountOnNetwork[]> {
         const url = `address/${address.toBech32()}/esdt`;
         const response = await this.doGetGeneric(url);
         const responseItems: any[] = Object.values(response.esdts);
         // Skip fungible tokens.
         const responseItemsFiltered = responseItems.filter((item) => item.nonce >= 0);
-        const tokens = responseItemsFiltered.map((item) =>
-            NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponse(item),
-        );
+        const tokens = responseItemsFiltered.map((item) => TokenAmountOnNetwork.fromProxyResponse(item));
 
-        // TODO: Fix sorting
-        tokens.sort((a, b) => a.identifier.localeCompare(b.identifier));
         return tokens;
     }
 

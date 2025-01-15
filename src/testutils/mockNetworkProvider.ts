@@ -7,10 +7,8 @@ import {
     AccountOnNetwork,
     DefinitionOfFungibleTokenOnNetwork,
     DefinitionOfTokenCollectionOnNetwork,
-    FungibleTokenOfAccountOnNetwork,
     NetworkConfig,
     NetworkStatus,
-    NonFungibleTokenOfAccountOnNetwork,
 } from "../networkProviders";
 import { INetworkProvider, IPagination } from "../networkProviders/interface";
 import {
@@ -18,6 +16,7 @@ import {
     AccountStorageEntry,
     AwaitingOptions,
     BlockOnNetwork,
+    TokenAmountOnNetwork,
     TransactionCostEstimationResponse,
 } from "../networkProviders/resources";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
@@ -94,23 +93,17 @@ export class MockNetworkProvider implements INetworkProvider {
     awaitTransactionCompleted(_transactionHash: string, _options?: AwaitingOptions): Promise<TransactionOnNetwork> {
         throw new Error("Method not implemented.");
     }
-    getTokenOfAccount(_address: Address, _token: Token): Promise<FungibleTokenOfAccountOnNetwork> {
+    getTokenOfAccount(_address: Address, _token: Token): Promise<TokenAmountOnNetwork> {
         throw new Error("Method not implemented.");
     }
     getNetworkStatus(): Promise<NetworkStatus> {
         throw new Error("Method not implemented.");
     }
 
-    getFungibleTokensOfAccount(
-        _address: Address,
-        _pagination?: IPagination,
-    ): Promise<FungibleTokenOfAccountOnNetwork[]> {
+    getFungibleTokensOfAccount(_address: Address, _pagination?: IPagination): Promise<TokenAmountOnNetwork[]> {
         throw new Error("Method not implemented.");
     }
-    getNonFungibleTokensOfAccount(
-        _address: Address,
-        _pagination?: IPagination,
-    ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+    getNonFungibleTokensOfAccount(_address: Address, _pagination?: IPagination): Promise<TokenAmountOnNetwork[]> {
         throw new Error("Method not implemented.");
     }
     sendTransactions(_txs: Transaction[]): Promise<string[]> {

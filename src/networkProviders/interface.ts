@@ -12,10 +12,10 @@ import {
     AwaitingOptions,
     BlockOnNetwork,
     GetBlockArguments,
+    TokenAmountOnNetwork,
     TransactionCostEstimationResponse,
 } from "./resources";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
-import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
@@ -115,20 +115,17 @@ export interface INetworkProvider {
     /**
      * Fetches the balance of an account, for a given token.
      */
-    getTokenOfAccount(address: Address, token: Token): Promise<FungibleTokenOfAccountOnNetwork>;
+    getTokenOfAccount(address: Address, token: Token): Promise<TokenAmountOnNetwork>;
 
     /**
      * Fetches data about the fungible tokens held by an account.
      */
-    getFungibleTokensOfAccount(address: Address, pagination?: IPagination): Promise<FungibleTokenOfAccountOnNetwork[]>;
+    getFungibleTokensOfAccount(address: Address, pagination?: IPagination): Promise<TokenAmountOnNetwork[]>;
 
     /**
      * Fetches data about the non-fungible tokens held by account.
      */
-    getNonFungibleTokensOfAccount(
-        address: Address,
-        pagination?: IPagination,
-    ): Promise<NonFungibleTokenOfAccountOnNetwork[]>;
+    getNonFungibleTokensOfAccount(address: Address, pagination?: IPagination): Promise<TokenAmountOnNetwork[]>;
 
     /**
      * Fetches the definition of a fungible token.

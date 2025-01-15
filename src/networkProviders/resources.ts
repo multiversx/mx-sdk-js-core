@@ -1,5 +1,6 @@
 import { BytesValue } from "../abi";
 import { Address } from "../address";
+import { Token } from "../tokens";
 import { TransactionStatus } from "../transactionStatus";
 import {
     DEFAULT_ACCOUNT_AWAITING_PATIENCE_IN_MILLISECONDS,
@@ -22,20 +23,17 @@ export class AccountStorage {
         let result = new AccountStorage();
 
         const pairs = payload["pairs"] || {};
-        const entries: AccountStorageEntry[] = [];
+        const entries: AccountStorageEntry[] = Object.entries(pairs).map(([key, value]) => {
+            const decodedKey = Buffer.from(key, "hex").toString("utf8");
+            const val: string = value ? (value as string).toString() : "";
+            const decodedValue = Buffer.from(val).toString();
 
-        for (const element of pairs.items) {
-            const decodedKey = BytesValue.fromHex(element.key).toString();
-            const decodedValue = BytesValue.fromHex(element.value);
-            entries.push(
-                new AccountStorageEntry({
-                    raw: { key: element.value },
-                    key: decodedKey,
-                    value: decodedValue.toString(),
-                }),
-            );
-        }
-
+            return new AccountStorageEntry({
+                raw: { [key]: value },
+                key: decodedKey,
+                value: decodedValue,
+            });
+        });
         result.raw = payload;
         result.entries = entries;
         result.blockCoordinates = BlockCoordinates.fromHttpResponse(payload);
@@ -97,7 +95,7 @@ export class BlockOnNetwork {
         blockOnNetwork.raw = payload;
         blockOnNetwork.shard = Number(payload["shard"]) ?? 0;
         blockOnNetwork.nonce = BigInt(payload["nonce"] ?? 0);
-        blockOnNetwork.hash = payload["hash"];
+        blockOnNetwork.hash = payload["hash"] ?? "";
         blockOnNetwork.previousHash = payload["prevBlockHash"] ?? payload["prevHash"] ?? "";
         blockOnNetwork.timestamp = Number(payload["timestamp"] ?? 0);
         blockOnNetwork.round = Number(payload["round"] ?? 0);
@@ -175,5 +173,35 @@ export class GetBlockArguments {
     blockHash?: string;
     constructor(init?: Partial<GetBlockArguments>) {
         Object.assign(this, init);
+    }
+}
+
+export class TokenAmountOnNetwork {
+    raw: Record<string, any> = {};
+    token: Token = new Token({ identifier: "" });
+    amount: bigint = 0n;
+    block_coordinates?: BlockCoordinates;
+    constructor(init?: Partial<GetBlockArguments>) {
+        Object.assign(this, init);
+    }
+
+    static fromProxyResponse(payload: any): TokenAmountOnNetwork {
+        const result = new TokenAmountOnNetwork();
+
+        result.raw = payload;
+        result.amount = BigInt(payload["balance"] ?? 0);
+        result.token = new Token({ identifier: payload["tokenIdentifier"] ?? "", nonce: payload["nonce"] ?? 0 });
+
+        return result;
+    }
+
+    static fromApiResponse(payload: any): TokenAmountOnNetwork {
+        const result = new TokenAmountOnNetwork();
+
+        result.raw = payload;
+        result.amount = BigInt(payload["balance"] ?? 0);
+        result.token = new Token({ identifier: payload["identifier"] ?? "", nonce: payload["nonce"] ?? 0 });
+
+        return result;
     }
 }

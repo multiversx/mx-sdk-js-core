@@ -23,10 +23,10 @@ import {
     AwaitingOptions,
     BlockOnNetwork,
     GetBlockArguments,
+    TokenAmountOnNetwork,
     TransactionCostEstimationResponse,
 } from "./resources";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
-import { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } from "./tokens";
 import { extendUserAgentIfBackend } from "./userAgent";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".
@@ -72,7 +72,7 @@ export class ApiNetworkProvider implements INetworkProvider {
 
     async getAccount(address: Address): Promise<AccountOnNetwork> {
         const response = await this.doGetGeneric(`accounts/${address.toBech32()}`);
-        const account = AccountOnNetwork.fromHttpResponse(response);
+        const account = AccountOnNetwork.fromApiHttpResponse(response);
         return account;
     }
 
@@ -155,7 +155,7 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     //TODO check this
-    async getTokenOfAccount(address: Address, token: Token): Promise<FungibleTokenOfAccountOnNetwork> {
+    async getTokenOfAccount(address: Address, token: Token): Promise<TokenAmountOnNetwork> {
         let response;
         if (token.nonce === 0n) {
             response = await this.doGetGeneric(`accounts/${address.toBech32()}/tokens/${token.identifier}`);
@@ -164,34 +164,28 @@ export class ApiNetworkProvider implements INetworkProvider {
                 `accounts/${address.toBech32()}/nfts/${token.identifier}/nonce/${token.nonce}`,
             );
         }
-        return FungibleTokenOfAccountOnNetwork.fromHttpResponse(response);
+        return TokenAmountOnNetwork.fromApiResponse(response);
     }
 
     async getGuardianData(address: Address): Promise<GuardianData> {
         return await this.backingProxyNetworkProvider.getGuardianData(address);
     }
 
-    async getFungibleTokensOfAccount(
-        address: Address,
-        pagination?: IPagination,
-    ): Promise<FungibleTokenOfAccountOnNetwork[]> {
+    async getFungibleTokensOfAccount(address: Address, pagination?: IPagination): Promise<TokenAmountOnNetwork[]> {
         pagination = pagination || defaultPagination;
 
         const url = `accounts/${address.toBech32()}/tokens?${this.buildPaginationParams(pagination)}`;
         const response: any[] = await this.doGetGeneric(url);
-        const tokens = response.map((item) => FungibleTokenOfAccountOnNetwork.fromHttpResponse(item));
+        const tokens = response.map((item) => TokenAmountOnNetwork.fromApiResponse(item));
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(
-        address: Address,
-        pagination?: IPagination,
-    ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
+    async getNonFungibleTokensOfAccount(address: Address, pagination?: IPagination): Promise<TokenAmountOnNetwork[]> {
         pagination = pagination || defaultPagination;
 
         const url = `accounts/${address.toBech32()}/nfts?${this.buildPaginationParams(pagination)}`;
         const response: any[] = await this.doGetGeneric(url);
-        const tokens = response.map((item) => NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(item));
+        const tokens = response.map((item) => TokenAmountOnNetwork.fromApiResponse(item));
         return tokens;
     }
 

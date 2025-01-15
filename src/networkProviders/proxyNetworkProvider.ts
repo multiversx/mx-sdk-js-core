@@ -15,9 +15,7 @@ import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { INetworkProvider, IPagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
-import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkProviderConfig } from "./networkProviderConfig";
-import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
 import {
     AccountStorage,
@@ -55,19 +53,6 @@ export class ProxyNetworkProvider implements INetworkProvider {
         const networkStatus = NetworkStatus.fromHttpResponse(response.status);
         return networkStatus;
     }
-
-    async getNetworkStakeStatistics(): Promise<NetworkStake> {
-        // TODO: Implement wrt.:
-        // https://github.com/multiversx/mx-api-service/blob/main/src/endpoints/stake/stake.service.ts
-        throw new Error("Method not implemented.");
-    }
-
-    async getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics> {
-        // TODO: Implement wrt. (full implementation may not be possible):
-        // https://github.com/multiversx/mx-api-service/blob/main/src/endpoints/network/network.service.ts
-        throw new Error("Method not implemented.");
-    }
-
     async getBlock(blockArgs: GetBlockArguments): Promise<BlockOnNetwork> {
         let response = {};
         if (blockArgs.blockHash) {

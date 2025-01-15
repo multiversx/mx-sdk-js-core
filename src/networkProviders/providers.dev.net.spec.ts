@@ -106,22 +106,6 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.approximately(apiResponse.NoncesPassedInCurrentEpoch, proxyResponse.NoncesPassedInCurrentEpoch, 1);
     });
 
-    // TODO: Enable test after implementing ProxyNetworkProvider.getNetworkStakeStatistics().
-    it.skip("should have same response for getNetworkStakeStatistics()", async function () {
-        let apiResponse = await apiProvider.getNetworkStakeStatistics();
-        let proxyResponse = await proxyProvider.getNetworkStakeStatistics();
-
-        assert.deepEqual(apiResponse, proxyResponse);
-    });
-
-    // TODO: Enable test after implementing ProxyNetworkProvider.getNetworkGeneralStatistics().
-    it.skip("should have same response for getNetworkGeneralStatistics()", async function () {
-        let apiResponse = await apiProvider.getNetworkGeneralStatistics();
-        let proxyResponse = await proxyProvider.getNetworkGeneralStatistics();
-
-        assert.deepEqual(apiResponse, proxyResponse);
-    });
-
     it("should have same response for getAccount()", async function () {
         let apiResponse = await apiProvider.getAccount(alice);
         let proxyResponse = await proxyProvider.getAccount(alice);
@@ -315,22 +299,6 @@ describe("test network providers on devnet: Proxy and API", function () {
             Buffer.from(proxyResponse.logs.events[0].topics[3]).toString("hex"),
             "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1",
         );
-    });
-
-    it("should have same response for getTransactionStatus()", async function () {
-        this.timeout(20000);
-
-        let hashes = [
-            "08acf8cbd71306a56eb58f9593cb2e23f109c94e27acdd906c82a5c3a5f84d9d",
-            "410efb1db2ab86678b8dbc503beb695b5b7d52754fb0de86c09cbb433de5f6a8",
-        ];
-
-        for (const hash of hashes) {
-            let apiResponse = await apiProvider.getTransactionStatus(hash);
-            let proxyResponse = await proxyProvider.getTransactionStatus(hash);
-
-            assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
-        }
     });
 
     it("should have same response for getDefinitionOfFungibleToken()", async function () {

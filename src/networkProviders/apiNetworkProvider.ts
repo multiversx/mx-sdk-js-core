@@ -5,7 +5,6 @@ import { SmartContractQuery, SmartContractQueryResponse } from "../smartContract
 import { Token } from "../tokens";
 import { Transaction } from "../transaction";
 import { prepareTransactionForBroadcasting, TransactionOnNetwork } from "../transactionOnNetwork";
-import { TransactionStatus } from "../transactionStatus";
 import { TransactionWatcher } from "../transactionWatcher";
 import { getAxios } from "../utils";
 import { numberToPaddedHex } from "../utils.codec";
@@ -16,9 +15,7 @@ import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
 import { INetworkProvider, IPagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
-import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
 import { NetworkProviderConfig } from "./networkProviderConfig";
-import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
 import { PairOnNetwork } from "./pairs";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
@@ -62,18 +59,6 @@ export class ApiNetworkProvider implements INetworkProvider {
 
     async getNetworkStatus(shard: number = METACHAIN_ID): Promise<NetworkStatus> {
         return await this.backingProxyNetworkProvider.getNetworkStatus(shard);
-    }
-
-    async getNetworkStakeStatistics(): Promise<NetworkStake> {
-        const response = await this.doGetGeneric("stake");
-        const networkStake = NetworkStake.fromHttpResponse(response);
-        return networkStake;
-    }
-
-    async getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics> {
-        const response = await this.doGetGeneric("stats");
-        const stats = NetworkGeneralStatistics.fromHttpResponse(response);
-        return stats;
     }
 
     async getBlock(blockArgs: GetBlockArguments): Promise<BlockOnNetwork> {
@@ -139,12 +124,6 @@ export class ApiNetworkProvider implements INetworkProvider {
         const response = await this.doGetGeneric(`transactions/${txHash}`);
         const transaction = TransactionOnNetwork.fromApiHttpResponse(txHash, response);
         return transaction;
-    }
-
-    async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
-        const response = await this.doGetGeneric(`transactions/${txHash}?fields=status`);
-        const status = new TransactionStatus(response.status);
-        return status;
     }
 
     async awaitTransactionOnCondition(

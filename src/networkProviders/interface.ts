@@ -3,12 +3,9 @@ import { SmartContractQuery, SmartContractQueryResponse } from "../smartContract
 import { Token } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
-import { TransactionStatus } from "../transactionStatus";
 import { AccountOnNetwork } from "./accounts";
 import { BlockOnNetwork } from "./blockOnNetwork";
 import { NetworkConfig } from "./networkConfig";
-import { NetworkGeneralStatistics } from "./networkGeneralStatistics";
-import { NetworkStake } from "./networkStake";
 import { NetworkStatus } from "./networkStatus";
 import {
     AccountStorage,
@@ -166,21 +163,6 @@ export interface INetworkProvider {
      * Fetches data about a specific non-fungible token (instance).
      */
     getNonFungibleToken(collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork>;
-
-    /**
-     * Fetches stake statistics.
-     */
-    getNetworkStakeStatistics(): Promise<NetworkStake>;
-
-    /**
-     * Fetches general statistics.
-     */
-    getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics>;
-
-    /**
-     * Queries the status of a transaction.
-     */
-    getTransactionStatus(txHash: string): Promise<TransactionStatus>;
 
     /**
      * Performs a generic GET action against the provider (useful for new HTTP endpoints).

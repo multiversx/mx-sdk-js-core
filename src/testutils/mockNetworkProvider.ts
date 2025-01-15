@@ -9,8 +9,6 @@ import {
     DefinitionOfTokenCollectionOnNetwork,
     FungibleTokenOfAccountOnNetwork,
     NetworkConfig,
-    NetworkGeneralStatistics,
-    NetworkStake,
     NetworkStatus,
     NonFungibleTokenOfAccountOnNetwork,
 } from "../networkProviders";
@@ -102,12 +100,7 @@ export class MockNetworkProvider implements INetworkProvider {
     getNetworkStatus(): Promise<NetworkStatus> {
         throw new Error("Method not implemented.");
     }
-    getNetworkStakeStatistics(): Promise<NetworkStake> {
-        throw new Error("Method not implemented.");
-    }
-    getNetworkGeneralStatistics(): Promise<NetworkGeneralStatistics> {
-        throw new Error("Method not implemented.");
-    }
+
     getFungibleTokensOfAccount(
         _address: Address,
         _pagination?: IPagination,
@@ -257,11 +250,6 @@ export class MockNetworkProvider implements INetworkProvider {
         }
 
         throw new ErrMock("Transaction not found");
-    }
-
-    async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
-        let transaction = await this.getTransaction(txHash);
-        return transaction.status;
     }
 
     async getNetworkConfig(): Promise<NetworkConfig> {

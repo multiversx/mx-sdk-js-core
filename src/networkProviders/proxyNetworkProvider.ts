@@ -9,7 +9,6 @@ import { TransactionStatus } from "../transactionStatus";
 import { TransactionWatcher } from "../transactionWatcher";
 import { getAxios } from "../utils";
 import { AccountOnNetwork, GuardianData } from "./accounts";
-import { BlockOnNetwork } from "./blockOnNetwork";
 import { defaultAxiosConfig } from "./config";
 import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
@@ -21,6 +20,7 @@ import {
     AccountStorage,
     AccountStorageEntry,
     AwaitingOptions,
+    BlockOnNetwork,
     GetBlockArguments,
     TransactionCostEstimationResponse,
 } from "./resources";
@@ -218,27 +218,6 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokens;
     }
 
-    async getFungibleTokenOfAccount(
-        address: Address,
-        tokenIdentifier: string,
-    ): Promise<FungibleTokenOfAccountOnNetwork> {
-        const response = await this.doGetGeneric(`address/${address.toBech32()}/esdt/${tokenIdentifier}`);
-        const tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response.tokenData);
-        return tokenData;
-    }
-
-    async getNonFungibleTokenOfAccount(
-        address: Address,
-        collection: string,
-        nonce: number,
-    ): Promise<NonFungibleTokenOfAccountOnNetwork> {
-        const response = await this.doGetGeneric(
-            `address/${address.toBech32()}/nft/${collection}/nonce/${nonce.valueOf()}`,
-        );
-        const tokenData = NonFungibleTokenOfAccountOnNetwork.fromProxyHttpResponseByNonce(response.tokenData);
-        return tokenData;
-    }
-
     async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
         const response = await this.doGetGeneric(`transaction/${txHash}/process-status`);
         const status = new TransactionStatus(response.status);
@@ -284,10 +263,6 @@ export class ProxyNetworkProvider implements INetworkProvider {
             properties,
         );
         return definition;
-    }
-
-    async getNonFungibleToken(_collection: string, _nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork> {
-        throw new Error("Method not implemented.");
     }
 
     async doGetGeneric(resourceUrl: string): Promise<any> {

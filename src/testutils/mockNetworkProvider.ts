@@ -12,12 +12,12 @@ import {
     NetworkStatus,
     NonFungibleTokenOfAccountOnNetwork,
 } from "../networkProviders";
-import { BlockOnNetwork } from "../networkProviders/blockOnNetwork";
 import { INetworkProvider, IPagination } from "../networkProviders/interface";
 import {
     AccountStorage,
     AccountStorageEntry,
     AwaitingOptions,
+    BlockOnNetwork,
     TransactionCostEstimationResponse,
 } from "../networkProviders/resources";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
@@ -113,16 +113,6 @@ export class MockNetworkProvider implements INetworkProvider {
     ): Promise<NonFungibleTokenOfAccountOnNetwork[]> {
         throw new Error("Method not implemented.");
     }
-    getFungibleTokenOfAccount(_address: Address, _tokenIdentifier: string): Promise<FungibleTokenOfAccountOnNetwork> {
-        throw new Error("Method not implemented.");
-    }
-    getNonFungibleTokenOfAccount(
-        _address: Address,
-        _collection: string,
-        _nonce: number,
-    ): Promise<NonFungibleTokenOfAccountOnNetwork> {
-        throw new Error("Method not implemented.");
-    }
     sendTransactions(_txs: Transaction[]): Promise<string[]> {
         throw new Error("Method not implemented.");
     }
@@ -130,9 +120,6 @@ export class MockNetworkProvider implements INetworkProvider {
         throw new Error("Method not implemented.");
     }
     getDefinitionOfTokenCollection(_collection: string): Promise<DefinitionOfTokenCollectionOnNetwork> {
-        throw new Error("Method not implemented.");
-    }
-    getNonFungibleToken(_collection: string, _nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork> {
         throw new Error("Method not implemented.");
     }
     doGetGeneric(_resourceUrl: string): Promise<any> {

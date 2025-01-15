@@ -7,9 +7,7 @@ import { Transaction } from "../transaction";
 import { prepareTransactionForBroadcasting, TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionWatcher } from "../transactionWatcher";
 import { getAxios } from "../utils";
-import { numberToPaddedHex } from "../utils.codec";
 import { AccountOnNetwork, GuardianData } from "./accounts";
-import { BlockOnNetwork } from "./blockOnNetwork";
 import { defaultAxiosConfig, defaultPagination } from "./config";
 import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
@@ -23,6 +21,7 @@ import {
     AccountStorage,
     AccountStorageEntry,
     AwaitingOptions,
+    BlockOnNetwork,
     GetBlockArguments,
     TransactionCostEstimationResponse,
 } from "./resources";
@@ -196,26 +195,6 @@ export class ApiNetworkProvider implements INetworkProvider {
         return tokens;
     }
 
-    async getFungibleTokenOfAccount(
-        address: Address,
-        tokenIdentifier: string,
-    ): Promise<FungibleTokenOfAccountOnNetwork> {
-        const response = await this.doGetGeneric(`accounts/${address.toBech32()}/tokens/${tokenIdentifier}`);
-        const tokenData = FungibleTokenOfAccountOnNetwork.fromHttpResponse(response);
-        return tokenData;
-    }
-
-    async getNonFungibleTokenOfAccount(
-        address: Address,
-        collection: string,
-        nonce: number,
-    ): Promise<NonFungibleTokenOfAccountOnNetwork> {
-        const nonceAsHex = numberToPaddedHex(nonce);
-        const response = await this.doGetGeneric(`accounts/${address.toBech32()}/nfts/${collection}-${nonceAsHex}`);
-        const tokenData = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);
-        return tokenData;
-    }
-
     async getDefinitionOfFungibleToken(tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {
         const response = await this.doGetGeneric(`tokens/${tokenIdentifier}`);
         const definition = DefinitionOfFungibleTokenOnNetwork.fromApiHttpResponse(response);
@@ -226,13 +205,6 @@ export class ApiNetworkProvider implements INetworkProvider {
         const response = await this.doGetGeneric(`collections/${collection}`);
         const definition = DefinitionOfTokenCollectionOnNetwork.fromApiHttpResponse(response);
         return definition;
-    }
-
-    async getNonFungibleToken(collection: string, nonce: number): Promise<NonFungibleTokenOfAccountOnNetwork> {
-        const nonceAsHex = numberToPaddedHex(nonce);
-        const response = await this.doGetGeneric(`nfts/${collection}-${nonceAsHex}`);
-        const token = NonFungibleTokenOfAccountOnNetwork.fromApiHttpResponse(response);
-        return token;
     }
 
     async getMexPairs(pagination?: IPagination): Promise<PairOnNetwork[]> {

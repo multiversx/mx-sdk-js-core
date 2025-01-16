@@ -111,10 +111,10 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return response.txHash;
     }
 
-    async simulateTransaction(tx: Transaction): Promise<any> {
+    async simulateTransaction(tx: Transaction): Promise<TransactionOnNetwork> {
         const transaction = prepareTransactionForBroadcasting(tx);
         const response = await this.doPostGeneric("transaction/simulate", transaction);
-        return response;
+        return TransactionOnNetwork.fromProxyHttpResponse("txHash", response.transaction);
     }
 
     async estimateTransactionCost(tx: Transaction): Promise<TransactionCostEstimationResponse> {
@@ -132,7 +132,6 @@ export class ProxyNetworkProvider implements INetworkProvider {
         for (let i = 0; i < txs.length; i++) {
             hashes[i] = response.txsHashes[i.toString()] || null;
         }
-
         return hashes;
     }
 
@@ -181,7 +180,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
                 `address/${address.toBech32()}/nft/${token.identifier}/nonce/${token.nonce}`,
             );
         }
-        return TokenAmountOnNetwork.fromProxyResponse(response);
+        return TokenAmountOnNetwork.fromProxyResponse(response["tokenData"]);
     }
 
     async getFungibleTokensOfAccount(address: Address, _pagination?: IPagination): Promise<TokenAmountOnNetwork[]> {

@@ -9,7 +9,7 @@ import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 
-describe.only("ProxyNetworkProvider Tests", () => {
+describe.only("ProxyNetworkProvider Tests", function () {
     const proxy = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
 
     it("should fetch network configuration", async () => {
@@ -328,7 +328,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
         assert.equal(txOnNetwork.smartContractResults[0].data, "@6f6b", "base64");
     });
 
-    it("should estimate transaction cost", async () => {
+    it("should estimate transaction cost", async function () {
         const bob = await loadTestWallet("bob");
         const transactionComputer = new TransactionComputer();
         const transaction = new Transaction({
@@ -344,7 +344,8 @@ describe.only("ProxyNetworkProvider Tests", () => {
         assert.equal(response.gasLimit, 74000);
     });
 
-    it("should send and await for completed transaction", async () => {
+    it("should send and await for completed transaction", async function () {
+        this.timeout(30000);
         const bob = await loadTestWallet("bob");
         const transactionComputer = new TransactionComputer();
         let transaction = new Transaction({

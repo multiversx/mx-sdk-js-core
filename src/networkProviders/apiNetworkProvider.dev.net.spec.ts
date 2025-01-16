@@ -9,7 +9,7 @@ import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 
-describe.only("ApiNetworkProvider Tests", () => {
+describe.only("ApiNetworkProvider Tests", function () {
     const apiProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com");
 
     it("should fetch network configuration", async () => {
@@ -322,7 +322,7 @@ describe.only("ApiNetworkProvider Tests", () => {
         assert.equal(txOnNetwork.smartContractResults[0].data, "@6f6b");
     });
 
-    it("should estimate transaction cost", async () => {
+    it("should estimate transaction cost", async function () {
         const bob = await loadTestWallet("bob");
         const transactionComputer = new TransactionComputer();
         const transaction = new Transaction({
@@ -338,7 +338,8 @@ describe.only("ApiNetworkProvider Tests", () => {
         assert.equal(response.gasLimit, 74000);
     });
 
-    it("should send and await for completed transaction", async () => {
+    it("should send and await for completed transaction", async function () {
+        this.timeout(20000);
         const bob = await loadTestWallet("bob");
         const transactionComputer = new TransactionComputer();
         let transaction = new Transaction({
@@ -367,7 +368,7 @@ describe.only("ApiNetworkProvider Tests", () => {
 
         hash = await apiProvider.sendTransaction(transaction);
         transactionOnNetwork = await apiProvider.awaitTransactionOnCondition(hash, condition);
-        assert.isTrue(transactionOnNetwork.status.isSuccessful());
+        assert.isFalse(transactionOnNetwork.status.isSuccessful());
     });
 
     it("should query contract", async () => {

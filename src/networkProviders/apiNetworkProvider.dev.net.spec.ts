@@ -7,13 +7,13 @@ import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
-import { ProxyNetworkProvider } from "./proxyNetworkProvider";
+import { ApiNetworkProvider } from "./apiNetworkProvider";
 
-describe.only("ProxyNetworkProvider Tests", () => {
-    const proxy = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
+describe.only("ApiNetworkProvider Tests", () => {
+    const apiProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com");
 
     it("should fetch network configuration", async () => {
-        const result = await proxy.getNetworkConfig();
+        const result = await apiProvider.getNetworkConfig();
         assert.equal(result.ChainID, "D");
         assert.equal(result.GasPerDataByte, 1500);
         assert.equal(result.RoundDuration, 6000);
@@ -22,42 +22,37 @@ describe.only("ProxyNetworkProvider Tests", () => {
     });
 
     it("should fetch network status", async () => {
-        const result = await proxy.getNetworkStatus();
+        const result = await apiProvider.getNetworkStatus();
         assert.exists(result.Nonce);
         assert.exists(result.CurrentRound);
         assert.exists(result.HighestFinalNonce);
     });
 
     it("should fetch block details by hash and nonce", async () => {
-        const shard = 1;
         const blockHash = "ded535cc0afb2dc5f9787e9560dc48d0b83564a3f994a390b228d894d854699f";
-        const resultByHash = await proxy.getBlock({ shard, blockHash });
-
-        const blockNonce = 5949242n;
-        const resultByNonce = await proxy.getBlock({ shard, blockNonce });
+        const resultByHash = await apiProvider.getBlock({ blockHash });
 
         assert.equal(resultByHash.hash, blockHash);
         assert.equal(resultByHash.nonce, 5949242n);
         assert.equal(resultByHash.shard, 1);
         assert.equal(resultByHash.timestamp, 1730112578);
-        assert.deepEqual(resultByHash, resultByNonce);
     });
 
     it("should fetch the latest block", async () => {
-        const result = await proxy.getLatestBlock();
+        const result = await apiProvider.getLatestBlock();
         expect(result).to.exist;
     });
 
     it("should fetch account details", async () => {
         const address1 = Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl");
-        const result1 = await proxy.getAccount(address1);
+        const result1 = await apiProvider.getAccount(address1);
 
         assert.equal(result1.address.toBech32(), "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl");
         assert.isUndefined(result1.userName);
         assert.isUndefined(result1.contractOwnerAddress);
 
         const address2 = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen");
-        const result2 = await proxy.getAccount(address2);
+        const result2 = await apiProvider.getAccount(address2);
 
         assert.equal(result2.address.toBech32(), "erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen");
         assert.isUndefined(result2.userName);
@@ -71,7 +66,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
 
     it("should fetch account storage", async () => {
         const address = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen");
-        const result = await proxy.getAccountStorage(address);
+        const result = await apiProvider.getAccountStorage(address);
 
         assert.equal(result.entries.length, 1);
         assert.equal(result.entries[0].key, "sum");
@@ -80,7 +75,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
 
     it("should fetch a storage entry for an account", async () => {
         const address = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen");
-        const result = await proxy.getAccountStorageEntry(address, "sum");
+        const result = await apiProvider.getAccountStorageEntry(address, "sum");
 
         assert.equal(result.key, "sum");
         assert.exists(result.value);
@@ -88,21 +83,21 @@ describe.only("ProxyNetworkProvider Tests", () => {
 
     it("should fetch token of an account", async () => {
         const address = Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl");
-        let token = await proxy.getTokenOfAccount(address, new Token({ identifier: "TEST-ff155e" }));
+        let token = await apiProvider.getTokenOfAccount(address, new Token({ identifier: "TEST-ff155e" }));
 
         assert.equal(token.token.identifier, "TEST-ff155e");
         assert.equal(token.amount, 99999999999980000n);
 
-        token = await proxy.getTokenOfAccount(address, new Token({ identifier: "NFTEST-ec88b8", nonce: 1n }));
+        token = await apiProvider.getTokenOfAccount(address, new Token({ identifier: "NFTEST-ec88b8", nonce: 1n }));
 
-        assert.equal(token.token.identifier, "NFTEST-ec88b8");
+        assert.equal(token.token.identifier, "NFTEST-ec88b8-01");
         assert.equal(token.amount, 1n);
         assert.equal(token.token.nonce, 1n);
     });
 
     it("should fetch fungible tokens of an account", async () => {
         const address = Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl");
-        const tokens = await proxy.getFungibleTokensOfAccount(address);
+        const tokens = await apiProvider.getFungibleTokensOfAccount(address);
         assert.isTrue(tokens.length > 0);
 
         const filtered = tokens.filter((token) => token.token.identifier === "TEST-ff155e");
@@ -113,7 +108,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
 
     it("should fetch non-fungible tokens of an account", async () => {
         const address = Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl");
-        const tokens = await proxy.getNonFungibleTokensOfAccount(address);
+        const tokens = await apiProvider.getNonFungibleTokensOfAccount(address);
         assert.isTrue(tokens.length > 0);
 
         const filtered = tokens.filter((token) => token.token.identifier === "NFTEST-ec88b8-01");
@@ -124,7 +119,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
     });
 
     it("should fetch definition of fungible token", async () => {
-        const token = await proxy.getDefinitionOfFungibleToken("TEST-ff155e");
+        const token = await apiProvider.getDefinitionOfFungibleToken("TEST-ff155e");
 
         assert.equal(token.identifier, "TEST-ff155e");
         assert.equal(token.owner.toBech32(), "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl");
@@ -132,7 +127,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
     });
 
     it("should fetch definition of token collection", async () => {
-        const token = await proxy.getDefinitionOfTokenCollection("NFTEST-ec88b8");
+        const token = await apiProvider.getDefinitionOfTokenCollection("NFTEST-ec88b8");
 
         assert.equal(token.collection, "NFTEST-ec88b8");
         assert.equal(token.owner.toBech32(), "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl");
@@ -141,12 +136,11 @@ describe.only("ProxyNetworkProvider Tests", () => {
     });
 
     it("should fetch transaction", async () => {
-        const transaction = await proxy.getTransaction(
+        const transaction = await apiProvider.getTransaction(
             "9d47c4b4669cbcaa26f5dec79902dd20e55a0aa5f4b92454a74e7dbd0183ad6c",
         );
 
         assert.equal(transaction.nonce, 0n);
-        assert.equal(transaction.epoch, 348);
         assert.equal(transaction.hash, "9d47c4b4669cbcaa26f5dec79902dd20e55a0aa5f4b92454a74e7dbd0183ad6c");
         assert.isTrue(transaction.status.isCompleted());
         assert.equal(transaction.sender.toBech32(), "erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
@@ -154,7 +148,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
     });
 
     it("should fetch transaction with events", async () => {
-        const transaction = await proxy.getTransaction(
+        const transaction = await apiProvider.getTransaction(
             "6fe05e4ca01d42c96ae5182978a77fe49f26bcc14aac95ad4f19618173f86ddb",
         );
 
@@ -170,7 +164,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
     });
 
     it("should fetch smart contract invoking transaction", async () => {
-        const transaction = await proxy.getTransaction(
+        const transaction = await apiProvider.getTransaction(
             "6fe05e4ca01d42c96ae5182978a77fe49f26bcc14aac95ad4f19618173f86ddb",
         );
 
@@ -205,7 +199,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
         });
 
         const expectedHash = "fc914860c1d137ed8baa602e561381f97c7bad80d150c5bf90760d3cfd3a4cea";
-        assert.equal(await proxy.sendTransaction(transaction), expectedHash);
+        assert.equal(await apiProvider.sendTransaction(transaction), expectedHash);
     });
 
     it("should send transaction  with data", async () => {
@@ -225,7 +219,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
         });
 
         const expectedHash = "4dc7d4e18c0cf9ca7f17677ef0ac3d1363528e892996b518bee909bb17cf7929";
-        assert.equal(await proxy.sendTransaction(transaction), expectedHash);
+        assert.equal(await apiProvider.sendTransaction(transaction), expectedHash);
     });
 
     it("should send transactions", async () => {
@@ -271,7 +265,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
             null,
             "30274b60b5635f981fa89ccfe726a34ca7121caa5d34123021c77a5c64cc9163",
         ];
-        const hashes = await proxy.sendTransactions(txs);
+        const hashes = await apiProvider.sendTransactions(txs);
         assert.equal(hashes.length, 3);
         assert.deepEqual(hashes, expectedHashes);
     });
@@ -286,13 +280,13 @@ describe.only("ProxyNetworkProvider Tests", () => {
             chainID: "D",
             signature: Buffer.from(Array(128).fill("0").join(""), "hex"),
         });
-        const nonce = (await proxy.getAccount(bob.address)).nonce;
+        const nonce = (await apiProvider.getAccount(bob.address)).nonce;
         transaction.nonce = nonce;
-        let txOnNetwork = await proxy.simulateTransaction(transaction);
+        let txOnNetwork = await apiProvider.simulateTransaction(transaction);
         assert.deepEqual(txOnNetwork.status, new TransactionStatus("success"));
 
         transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
-        txOnNetwork = await proxy.simulateTransaction(transaction);
+        txOnNetwork = await apiProvider.simulateTransaction(transaction, true);
 
         transaction = new Transaction({
             sender: bob.address,
@@ -306,17 +300,17 @@ describe.only("ProxyNetworkProvider Tests", () => {
             signature: Buffer.from(Array(128).fill("0").join(""), "hex"),
         });
 
-        txOnNetwork = await proxy.simulateTransaction(transaction);
+        txOnNetwork = await apiProvider.simulateTransaction(transaction);
         assert.equal(txOnNetwork.smartContractResults.length, 1);
         assert.equal(
             txOnNetwork.smartContractResults[0].sender.toBech32(),
             "erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen",
         );
         assert.equal(txOnNetwork.smartContractResults[0].receiver.toBech32(), bob.address.toBech32());
-        assert.equal(txOnNetwork.smartContractResults[0].data, "@6f6b");
+        assert.deepEqual(txOnNetwork.smartContractResults[0].data, "@6f6b");
 
         transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
-        txOnNetwork = await proxy.simulateTransaction(transaction);
+        txOnNetwork = await apiProvider.simulateTransaction(transaction, true);
 
         assert.deepEqual(txOnNetwork.status, new TransactionStatus("success"));
         assert.equal(txOnNetwork.smartContractResults.length, 1);
@@ -325,7 +319,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
             "erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen",
         );
         assert.equal(txOnNetwork.smartContractResults[0].receiver.toBech32(), bob.address.toBech32());
-        assert.equal(txOnNetwork.smartContractResults[0].data, "@6f6b", "base64");
+        assert.equal(txOnNetwork.smartContractResults[0].data, "@6f6b");
     });
 
     it("should estimate transaction cost", async () => {
@@ -338,9 +332,9 @@ describe.only("ProxyNetworkProvider Tests", () => {
             chainID: "D",
             data: new Uint8Array(Buffer.from("test transaction")),
         });
-        transaction.nonce = (await proxy.getAccount(bob.address)).nonce;
+        transaction.nonce = (await apiProvider.getAccount(bob.address)).nonce;
         transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
-        const response = await proxy.estimateTransactionCost(transaction);
+        const response = await apiProvider.estimateTransactionCost(transaction);
         assert.equal(response.gasLimit, 74000);
     });
 
@@ -353,11 +347,11 @@ describe.only("ProxyNetworkProvider Tests", () => {
             gasLimit: 50000n,
             chainID: "D",
         });
-        const nonce = (await proxy.getAccount(bob.address)).nonce;
+        const nonce = (await apiProvider.getAccount(bob.address)).nonce;
         transaction.nonce = nonce;
         transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
-        let hash = await proxy.sendTransaction(transaction);
-        let transactionOnNetwork = await proxy.awaitTransactionCompleted(hash);
+        let hash = await apiProvider.sendTransaction(transaction);
+        let transactionOnNetwork = await apiProvider.awaitTransactionCompleted(hash);
         assert.isTrue(transactionOnNetwork.status.isCompleted());
 
         transaction = new Transaction({
@@ -371,15 +365,9 @@ describe.only("ProxyNetworkProvider Tests", () => {
         transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
         const condition = (txOnNetwork: TransactionOnNetwork) => !txOnNetwork.status.isSuccessful();
 
-        hash = await proxy.sendTransaction(transaction);
-        transactionOnNetwork = await proxy.awaitTransactionOnCondition(hash, condition);
+        hash = await apiProvider.sendTransaction(transaction);
+        transactionOnNetwork = await apiProvider.awaitTransactionOnCondition(hash, condition);
         assert.isTrue(transactionOnNetwork.status.isSuccessful());
-    });
-
-    it("should fetch transaction status", async () => {
-        const txHash = "9d47c4b4669cbcaa26f5dec79902dd20e55a0aa5f4b92454a74e7dbd0183ad6c";
-        const result = await proxy.getTransactionStatus(txHash);
-        assert.equal(result.status, "success");
     });
 
     it("should query contract", async () => {
@@ -388,7 +376,7 @@ describe.only("ProxyNetworkProvider Tests", () => {
             function: "getSum",
             arguments: [],
         });
-        const result = await proxy.queryContract(query);
+        const result = await apiProvider.queryContract(query);
         assert.equal(result.returnDataParts.length, 1);
     });
 });

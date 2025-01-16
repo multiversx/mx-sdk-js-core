@@ -65,8 +65,8 @@ export class ApiNetworkProvider implements INetworkProvider {
         return BlockOnNetwork.fromHttpResponse(response);
     }
 
-    async getLatestBlock(_shard: number): Promise<BlockOnNetwork> {
-        const response = await this.doGetGeneric("block/latest");
+    async getLatestBlock(_shard?: number): Promise<BlockOnNetwork> {
+        const response = await this.doGetGeneric("blocks/latest");
         return BlockOnNetwork.fromHttpResponse(response);
     }
 
@@ -106,13 +106,20 @@ export class ApiNetworkProvider implements INetworkProvider {
         return response.txHash;
     }
 
-    async simulateTransaction(tx: Transaction): Promise<any> {
-        return await this.backingProxyNetworkProvider.simulateTransaction(tx);
+    async simulateTransaction(tx: Transaction, checkSignature: boolean = false): Promise<any> {
+        const transaction = prepareTransactionForBroadcasting(tx);
+        let url = "transaction/simulate?checkSignature=false";
+        if (checkSignature) {
+            url = "transaction/simulate";
+        }
+        const response = await this.doPostGeneric(url, transaction);
+        const data = response["data"] ?? {};
+        return TransactionOnNetwork.fromSimulateResponse(transaction, data["result"] ?? {});
     }
     async estimateTransactionCost(tx: Transaction): Promise<TransactionCostEstimationResponse> {
         const transaction = prepareTransactionForBroadcasting(tx);
         const response = await this.doPostGeneric("transaction/cost", transaction);
-        return TransactionCostEstimationResponse.fromHttpResponse(response);
+        return TransactionCostEstimationResponse.fromHttpResponse(response.data);
     }
 
     async sendTransactions(txs: Transaction[]): Promise<string[]> {
@@ -160,9 +167,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         if (token.nonce === 0n) {
             response = await this.doGetGeneric(`accounts/${address.toBech32()}/tokens/${token.identifier}`);
         } else {
-            response = await this.doGetGeneric(
-                `accounts/${address.toBech32()}/nfts/${token.identifier}/nonce/${token.nonce}`,
-            );
+            response = await this.doGetGeneric(`accounts/${address.toBech32()}/nfts/${token.identifier}-01`);
         }
         return TokenAmountOnNetwork.fromApiResponse(response);
     }

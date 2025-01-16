@@ -111,10 +111,14 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return response.txHash;
     }
 
-    async simulateTransaction(tx: Transaction): Promise<TransactionOnNetwork> {
+    async simulateTransaction(tx: Transaction, checkSignature: boolean = false): Promise<any> {
         const transaction = prepareTransactionForBroadcasting(tx);
-        const response = await this.doPostGeneric("transaction/simulate", transaction);
-        return TransactionOnNetwork.fromProxyHttpResponse("txHash", response.transaction);
+        let url = "transaction/simulate?checkSignature=false";
+        if (checkSignature) {
+            url = "transaction/simulate";
+        }
+        const response = await this.doPostGeneric(url, transaction);
+        return TransactionOnNetwork.fromSimulateResponse(transaction, response["result"] ?? {});
     }
 
     async estimateTransactionCost(tx: Transaction): Promise<TransactionCostEstimationResponse> {

@@ -158,7 +158,6 @@ export class TransactionCostEstimationResponse {
 
     static fromHttpResponse(payload: any): TransactionCostEstimationResponse {
         const result = new TransactionCostEstimationResponse();
-
         result.raw = payload;
         result.gasLimit = payload["txGasUnits"] ?? 0;
         result.status = new TransactionStatus("");

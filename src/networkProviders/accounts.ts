@@ -29,15 +29,15 @@ export class AccountOnNetwork {
     static fromApiHttpResponse(payload: any): AccountOnNetwork {
         let result = new AccountOnNetwork();
 
-        result.address = new Address(payload["address"] || "");
+        result.address = payload["address"] ? new Address(payload["address"]) : Address.empty();
         result.nonce = BigInt(payload["nonce"] || 0);
         result.balance = BigInt(payload["balance"] || 0);
-        result.userName = payload["username"] || "";
+        result.userName = payload["username"] || undefined;
 
         result.contractCodeHash = payload["codeHash"] || "";
         result.contractCode = Buffer.from(payload["code"] || "");
         result.contractDeveloperReward = payload["developerReward"] || 0n;
-        result.contractOwnerAddress = new Address(payload["ownerAddress"] || "");
+        result.contractOwnerAddress = payload["ownerAddress"] ? new Address(payload["ownerAddress"]) : undefined;
         result.isContractUpgradable = Boolean(payload["isUpgradeable"]);
         result.isContractReadable = Boolean(payload["isReadable"]);
         result.isContractPayable = Boolean(payload["isPayable"]);

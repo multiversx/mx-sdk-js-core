@@ -5,6 +5,7 @@ import { SmartContractQuery, SmartContractQueryResponse } from "../smartContract
 import { Token, TokenComputer } from "../tokens";
 import { Transaction } from "../transaction";
 import { prepareTransactionForBroadcasting, TransactionOnNetwork } from "../transactionOnNetwork";
+import { TransactionStatus } from "../transactionStatus";
 import { TransactionWatcher } from "../transactionWatcher";
 import { getAxios } from "../utils";
 import { AccountOnNetwork, GuardianData } from "./accounts";
@@ -130,6 +131,12 @@ export class ApiNetworkProvider implements INetworkProvider {
         const response = await this.doGetGeneric(`transactions/${txHash}`);
         const transaction = TransactionOnNetwork.fromApiHttpResponse(txHash, response);
         return transaction;
+    }
+
+    async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
+        const response = await this.doGetGeneric(`transactions/${txHash}?fields=status`);
+        const status = new TransactionStatus(response.status);
+        return status;
     }
 
     async awaitTransactionOnCondition(

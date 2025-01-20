@@ -3,6 +3,7 @@ import { SmartContractQuery, SmartContractQueryResponse } from "../smartContract
 import { Token } from "../tokens";
 import { Transaction } from "../transaction";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { TransactionStatus } from "../transactionStatus";
 import { AccountOnNetwork } from "./accounts";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStatus } from "./networkStatus";
@@ -93,6 +94,11 @@ export interface INetworkProvider {
      * Fetches the state of a transaction.
      */
     getTransaction(txHash: string, withProcessStatus?: boolean): Promise<TransactionOnNetwork>;
+
+    /**
+     * Fetches the status of a transaction.
+     */
+    getTransactionStatus(txHash: string): Promise<TransactionStatus>;
 
     /**
      * Waits until the transaction is completely processed.

@@ -186,6 +186,12 @@ describe("ApiNetworkProvider Tests", function () {
         assert.equal(transaction.hash, "6fe05e4ca01d42c96ae5182978a77fe49f26bcc14aac95ad4f19618173f86ddb");
     });
 
+    it("should fetch transaction status", async () => {
+        const txHash = "9d47c4b4669cbcaa26f5dec79902dd20e55a0aa5f4b92454a74e7dbd0183ad6c";
+        const result = await apiProvider.getTransactionStatus(txHash);
+        assert.equal(result.status, "success");
+    });
+
     it("should send transaction", async () => {
         const transaction = new Transaction({
             sender: Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl"),

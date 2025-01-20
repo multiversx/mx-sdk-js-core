@@ -23,6 +23,8 @@ import {
     U32Value,
 } from "./typesystem";
 
+const JSONbig = require("json-bigint")({ constructorAction: "ignore" });
+
 describe("test on local testnet", function () {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
     let provider = createLocalnetProvider();
@@ -122,8 +124,8 @@ describe("test on local testnet", function () {
         assert.isTrue(response.returnCode == "ok");
 
         // Simulate
-        Logger.trace(JSON.stringify(await provider.simulateTransaction(simulateOne), null, 4));
-        Logger.trace(JSON.stringify(await provider.simulateTransaction(simulateTwo), null, 4));
+        Logger.trace(JSONbig.parse(await provider.simulateTransaction(simulateOne), null, 4));
+        Logger.trace(JSONbig.parse(await provider.simulateTransaction(simulateTwo), null, 4));
     });
 
     it("counter: should deploy, call and query contract using SmartContractTransactionsFactory", async function () {

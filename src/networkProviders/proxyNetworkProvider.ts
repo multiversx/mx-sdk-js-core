@@ -64,7 +64,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
     }
 
     async getLatestBlock(shard: number = METACHAIN_ID): Promise<BlockOnNetwork> {
-        const blockNonce = (await this.getNetworkStatus(shard)).Nonce;
+        const blockNonce = (await this.getNetworkStatus(shard)).BlockNonce;
         const response = await this.doGetGeneric(`block/${shard}/by-nonce/${blockNonce}`);
         return BlockOnNetwork.fromHttpResponse(response);
     }

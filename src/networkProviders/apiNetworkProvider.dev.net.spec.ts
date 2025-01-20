@@ -24,9 +24,12 @@ describe.only("ApiNetworkProvider Tests", function () {
 
     it("should fetch network status", async () => {
         const result = await apiProvider.getNetworkStatus();
-        assert.exists(result.Nonce);
+        assert.exists(result.BlockNonce);
         assert.exists(result.CurrentRound);
+        assert.exists(result.BlockTimestamp);
+        assert.exists(result.CurrentEpoch);
         assert.exists(result.HighestFinalNonce);
+        assert.exists(result.raw);
     });
 
     it("should fetch block details by hash and nonce", async () => {

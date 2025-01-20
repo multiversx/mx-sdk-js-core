@@ -2,63 +2,39 @@
  * An object holding network status configuration parameters.
  */
 export class NetworkStatus {
-    private static default: NetworkStatus;
+    raw: Record<string, any> = {};
 
     /**
-     * The current round.
+     * The block nonce.
      */
-    public CurrentRound: number;
+    public BlockTimestamp: number;
 
     /**
-     * The epoch number.
+     * The block nonce.
      */
-    public EpochNumber: number;
+    public BlockNonce: bigint;
 
     /**
      * The Highest final nonce.
      */
-    public HighestFinalNonce: number;
+    public HighestFinalNonce: bigint;
 
     /**
-     * The erd nonce.
+     * The current round.
      */
-    public Nonce: number;
+    public CurrentRound: bigint;
 
     /**
-     * The nonce at epoch start.
+     * The epoch number.
      */
-    public NonceAtEpochStart: number;
-
-    /**
-     * The nonces passed in current epoch.
-     */
-    public NoncesPassedInCurrentEpoch: number;
-
-    /**
-     * The round at epoch start
-     */
-    public RoundAtEpochStart: number;
-
-    /**
-     * The rounds passed in current epoch
-     */
-    public RoundsPassedInCurrentEpoch: number;
-
-    /**
-     * The rounds per epoch
-     */
-    public RoundsPerEpoch: number;
+    public CurrentEpoch: number;
 
     constructor() {
-        this.CurrentRound = 0;
-        this.EpochNumber = 0;
-        this.HighestFinalNonce = 0;
-        this.Nonce = 0;
-        this.NonceAtEpochStart = 0;
-        this.NoncesPassedInCurrentEpoch = 0;
-        this.RoundAtEpochStart = 0;
-        this.RoundsPassedInCurrentEpoch = 0;
-        this.RoundsPerEpoch = 0;
+        this.CurrentRound = 0n;
+        this.CurrentEpoch = 0;
+        this.HighestFinalNonce = 0n;
+        this.BlockNonce = 0n;
+        this.BlockTimestamp = 0;
     }
 
     /**
@@ -67,15 +43,12 @@ export class NetworkStatus {
     static fromHttpResponse(payload: any): NetworkStatus {
         let networkStatus = new NetworkStatus();
 
-        networkStatus.CurrentRound = Number(payload["erd_current_round"]);
-        networkStatus.EpochNumber = Number(payload["erd_epoch_number"]);
-        networkStatus.HighestFinalNonce = Number(payload["erd_highest_final_nonce"]);
-        networkStatus.Nonce = Number(payload["erd_nonce"]);
-        networkStatus.NonceAtEpochStart = Number(payload["erd_nonce_at_epoch_start"]);
-        networkStatus.NoncesPassedInCurrentEpoch = Number(payload["erd_nonces_passed_in_current_epoch"]);
-        networkStatus.RoundAtEpochStart = Number(payload["erd_round_at_epoch_start"]);
-        networkStatus.RoundsPassedInCurrentEpoch = Number(payload["erd_rounds_passed_in_current_epoch"]);
-        networkStatus.RoundsPerEpoch = Number(payload["erd_rounds_per_epoch"]);
+        networkStatus.raw = payload;
+        networkStatus.CurrentRound = BigInt(payload["erd_current_round"]);
+        networkStatus.CurrentEpoch = Number(payload["erd_epoch_number"]);
+        networkStatus.HighestFinalNonce = BigInt(payload["erd_highest_final_nonce"]);
+        networkStatus.BlockNonce = BigInt(payload["erd_nonce"]);
+        networkStatus.BlockTimestamp = Number(payload["erd_block_timestamp"]);
 
         return networkStatus;
     }

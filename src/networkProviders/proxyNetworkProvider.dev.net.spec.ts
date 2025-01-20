@@ -9,7 +9,7 @@ import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 
-describe.only("ProxyNetworkProvider Tests", function () {
+describe("ProxyNetworkProvider Tests", function () {
     const proxy = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
 
     it("should fetch network configuration", async () => {

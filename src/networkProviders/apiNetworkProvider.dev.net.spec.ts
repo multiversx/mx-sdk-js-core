@@ -9,7 +9,7 @@ import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionStatus } from "../transactionStatus";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 
-describe.only("ApiNetworkProvider Tests", function () {
+describe("ApiNetworkProvider Tests", function () {
     const apiProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com");
 
     it("should fetch network configuration", async () => {

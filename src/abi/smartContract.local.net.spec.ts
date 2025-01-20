@@ -42,7 +42,7 @@ describe("test on local testnet", function () {
         parser = new SmartContractTransactionsOutcomeParser();
     });
 
-    it.only("counter: should deploy, then simulate transactions using SmartContractTransactionsFactory", async function () {
+    it("counter: should deploy, then simulate transactions using SmartContractTransactionsFactory", async function () {
         this.timeout(60000);
 
         TransactionWatcher.DefaultPollingInterval = 5000;
@@ -58,7 +58,7 @@ describe("test on local testnet", function () {
 
         const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
-            gasLimit: 3000000n,
+            gasLimit: 4000000n,
         });
         deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
 
@@ -73,7 +73,7 @@ describe("test on local testnet", function () {
         const smartContractCallTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "increment",
-            gasLimit: 3000000n,
+            gasLimit: 4000000n,
         });
         smartContractCallTransaction.nonce = BigInt(alice.account.nonce.valueOf());
         smartContractCallTransaction.signature = await alice.signer.sign(
@@ -85,7 +85,7 @@ describe("test on local testnet", function () {
         const simulateOne = factory.createTransactionForExecute(alice.address, {
             function: "increment",
             contract: contractAddress,
-            gasLimit: 100000n,
+            gasLimit: 200000n,
         });
 
         simulateOne.nonce = BigInt(alice.account.nonce.valueOf());
@@ -98,7 +98,7 @@ describe("test on local testnet", function () {
         const simulateTwo = factory.createTransactionForExecute(alice.address, {
             function: "foobar",
             contract: contractAddress,
-            gasLimit: 500000n,
+            gasLimit: 700000n,
         });
 
         simulateTwo.nonce = BigInt(alice.account.nonce.valueOf());

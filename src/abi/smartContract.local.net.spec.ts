@@ -42,7 +42,7 @@ describe("test on local testnet", function () {
         parser = new SmartContractTransactionsOutcomeParser();
     });
 
-    it("counter: should deploy, then simulate transactions using SmartContractTransactionsFactory", async function () {
+    it.only("counter: should deploy, then simulate transactions using SmartContractTransactionsFactory", async function () {
         this.timeout(60000);
 
         TransactionWatcher.DefaultPollingInterval = 5000;

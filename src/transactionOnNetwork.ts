@@ -89,6 +89,7 @@ export class TransactionOnNetwork {
     }
 
     static fromSimulateResponse(originalTx: Transaction, response: any): TransactionOnNetwork {
+        console.log(response);
         const status = new TransactionStatus(response["status"]);
         const txHash = response["hash"] ?? "";
         const scResults: SmartContractResult[] = [];

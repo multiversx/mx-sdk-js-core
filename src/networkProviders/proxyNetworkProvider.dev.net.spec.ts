@@ -15,10 +15,11 @@ describe.only("ProxyNetworkProvider Tests", function () {
     it("should fetch network configuration", async () => {
         const result = await proxy.getNetworkConfig();
         assert.equal(result.ChainID, "D");
-        assert.equal(result.GasPerDataByte, 1500);
+        assert.equal(result.GasPerDataByte, 1500n);
         assert.equal(result.RoundDuration, 6000);
-        assert.equal(result.MinGasLimit, 50000);
-        assert.equal(result.MinGasPrice, 1_000_000_000);
+        assert.equal(result.MinGasLimit, 50000n);
+        assert.equal(result.MinGasPrice, 1_000_000_000n);
+        assert.exists(result.raw);
     });
 
     it("should fetch network status", async () => {

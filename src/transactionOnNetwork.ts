@@ -68,7 +68,7 @@ export class TransactionOnNetwork {
         response: any,
         processStatus?: TransactionStatus | undefined,
     ): TransactionOnNetwork {
-        let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
+        const result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.smartContractResults =
             response.smartContractResults?.map(
                 (result: Partial<SmartContractResult>) =>
@@ -134,7 +134,7 @@ export class TransactionOnNetwork {
     }
 
     static fromApiHttpResponse(txHash: string, response: any): TransactionOnNetwork {
-        let result = TransactionOnNetwork.fromHttpResponse(txHash, response);
+        const result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.smartContractResults =
             response.results?.map(
                 (result: Partial<SmartContractResult>) =>

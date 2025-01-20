@@ -27,7 +27,7 @@ export class AccountOnNetwork {
     }
 
     static fromApiHttpResponse(payload: any): AccountOnNetwork {
-        let result = new AccountOnNetwork();
+        const result = new AccountOnNetwork();
 
         result.address = payload["address"] ? new Address(payload["address"]) : Address.empty();
         result.nonce = BigInt(payload["nonce"] || 0);
@@ -47,7 +47,7 @@ export class AccountOnNetwork {
     }
 
     static fromProxyHttpResponse(payload: any): AccountOnNetwork {
-        let result = new AccountOnNetwork();
+        const result = new AccountOnNetwork();
 
         result.address = payload["address"] ? new Address(payload["address"]) : Address.empty();
         result.nonce = BigInt(payload["nonce"] || 0);

@@ -21,7 +21,6 @@ import {
     AccountStorageEntry,
     AwaitingOptions,
     BlockOnNetwork,
-    GetBlockArguments,
     TokenAmountOnNetwork,
     TransactionCostEstimationResponse,
 } from "./resources";
@@ -53,12 +52,12 @@ export class ProxyNetworkProvider implements INetworkProvider {
         const networkStatus = NetworkStatus.fromHttpResponse(response.status);
         return networkStatus;
     }
-    async getBlock(blockArgs: GetBlockArguments): Promise<BlockOnNetwork> {
+    async getBlock(args: { shard: number; blockHash?: string; blockNonce?: bigint }): Promise<BlockOnNetwork> {
         let response;
-        if (blockArgs.blockHash) {
-            response = await this.doGetGeneric(`block/${blockArgs.shard}/by-hash/${blockArgs.blockHash}`);
-        } else if (blockArgs.blockNonce) {
-            response = await this.doGetGeneric(`block/${blockArgs.shard}/by-nonce/${blockArgs.blockNonce}`);
+        if (args.blockHash) {
+            response = await this.doGetGeneric(`block/${args.shard}/by-hash/${args.blockHash}`);
+        } else if (args.blockNonce) {
+            response = await this.doGetGeneric(`block/${args.shard}/by-nonce/${args.blockNonce}`);
         } else throw new Error("Block hash or block nonce not provided.");
         return BlockOnNetwork.fromHttpResponse(response.block);
     }

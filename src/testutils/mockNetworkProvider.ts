@@ -232,6 +232,11 @@ export class MockNetworkProvider implements INetworkProvider {
         throw new ErrMock("Transaction not found");
     }
 
+    async getTransactionStatus(txHash: string): Promise<TransactionStatus> {
+        let transaction = await this.getTransaction(txHash);
+        return transaction.status;
+    }
+
     async getNetworkConfig(): Promise<NetworkConfig> {
         throw new errors.ErrNotImplemented();
     }

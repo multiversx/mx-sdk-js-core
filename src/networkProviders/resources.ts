@@ -166,21 +166,12 @@ export class TransactionCostEstimationResponse {
     }
 }
 
-export class GetBlockArguments {
-    shard?: number;
-    blockNonce?: bigint;
-    blockHash?: string;
-    constructor(init?: Partial<GetBlockArguments>) {
-        Object.assign(this, init);
-    }
-}
-
 export class TokenAmountOnNetwork {
     raw: Record<string, any> = {};
     token: Token = new Token({ identifier: "" });
     amount: bigint = 0n;
     block_coordinates?: BlockCoordinates;
-    constructor(init?: Partial<GetBlockArguments>) {
+    constructor(init?: Partial<TokenAmountOnNetwork>) {
         Object.assign(this, init);
     }
 

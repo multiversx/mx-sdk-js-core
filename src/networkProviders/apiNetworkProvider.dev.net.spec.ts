@@ -34,7 +34,7 @@ describe("ApiNetworkProvider Tests", function () {
 
     it("should fetch block details by hash and nonce", async () => {
         const blockHash = "ded535cc0afb2dc5f9787e9560dc48d0b83564a3f994a390b228d894d854699f";
-        const resultByHash = await apiProvider.getBlock({ blockHash });
+        const resultByHash = await apiProvider.getBlock(blockHash);
 
         assert.equal(resultByHash.hash, blockHash);
         assert.equal(resultByHash.nonce, 5949242n);

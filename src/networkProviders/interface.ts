@@ -11,8 +11,6 @@ import {
     AccountStorage,
     AccountStorageEntry,
     AwaitingOptions,
-    BlockOnNetwork,
-    GetBlockArguments,
     TokenAmountOnNetwork,
     TransactionCostEstimationResponse,
 } from "./resources";
@@ -31,16 +29,6 @@ export interface INetworkProvider {
      * Fetches the Network status.
      */
     getNetworkStatus(): Promise<NetworkStatus>;
-
-    /**
-     * Fetches a block by nonce or by hash.
-     */
-    getBlock(blockArgs: GetBlockArguments): Promise<BlockOnNetwork>;
-
-    /**
-     * Fetches the latest block of a shard.
-     */
-    getLatestBlock(shard: number): Promise<BlockOnNetwork>;
 
     /**
      * Fetches the state of an account.

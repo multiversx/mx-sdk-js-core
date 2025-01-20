@@ -23,7 +23,6 @@ import {
     AccountStorageEntry,
     AwaitingOptions,
     BlockOnNetwork,
-    GetBlockArguments,
     TokenAmountOnNetwork,
     TransactionCostEstimationResponse,
 } from "./resources";
@@ -61,12 +60,12 @@ export class ApiNetworkProvider implements INetworkProvider {
         return await this.backingProxyNetworkProvider.getNetworkStatus(shard);
     }
 
-    async getBlock(blockArgs: GetBlockArguments): Promise<BlockOnNetwork> {
-        const response = await this.doGetGeneric(`blocks/${blockArgs.blockHash}`);
+    async getBlock(blockHash: string): Promise<BlockOnNetwork> {
+        const response = await this.doGetGeneric(`blocks/${blockHash}`);
         return BlockOnNetwork.fromHttpResponse(response);
     }
 
-    async getLatestBlock(_shard?: number): Promise<BlockOnNetwork> {
+    async getLatestBlock(): Promise<BlockOnNetwork> {
         const response = await this.doGetGeneric("blocks/latest");
         return BlockOnNetwork.fromHttpResponse(response);
     }

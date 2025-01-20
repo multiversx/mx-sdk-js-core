@@ -55,6 +55,10 @@ export class AccountOnNetwork {
         result.userName = payload["username"] || undefined;
 
         const codeMetadata = payload["codeMetadata"] ?? null;
+        result.isContractUpgradable = false;
+        result.isContractReadable = false;
+        result.isContractPayable = false;
+        result.isContractPayableByContract = false;
         if (codeMetadata) {
             const metadataBuffer = Buffer.from(codeMetadata, "base64");
             const metadata = CodeMetadata.newFromBytes(metadataBuffer);

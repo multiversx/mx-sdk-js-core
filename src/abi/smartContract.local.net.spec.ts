@@ -6,6 +6,7 @@ import {
     SmartContractTransactionsFactory,
     SmartContractTransactionsOutcomeParser,
 } from "../smartContracts";
+import { parseBigIntJSON } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { loadTestWallets, TestWallet } from "../testutils/wallets";
 import { TransactionComputer } from "../transactionComputer";
@@ -22,8 +23,6 @@ import {
     TokenIdentifierValue,
     U32Value,
 } from "./typesystem";
-
-const JSONbig = require("json-bigint")({ constructorAction: "ignore" });
 
 describe("test on local testnet", function () {
     let alice: TestWallet, bob: TestWallet, carol: TestWallet;
@@ -42,7 +41,7 @@ describe("test on local testnet", function () {
         parser = new SmartContractTransactionsOutcomeParser();
     });
 
-    it("counter: should deploy, then simulate transactions using SmartContractTransactionsFactory", async function () {
+    it.only("counter: should deploy, then simulate transactions using SmartContractTransactionsFactory", async function () {
         this.timeout(60000);
 
         TransactionWatcher.DefaultPollingInterval = 5000;
@@ -111,7 +110,7 @@ describe("test on local testnet", function () {
         // Broadcast & execute
         const deployTxHash = await provider.sendTransaction(deployTransaction);
         const callTxHash = await provider.sendTransaction(smartContractCallTransaction);
-
+        console.log({ deployTxHash, callTxHash });
         await watcher.awaitCompleted(deployTxHash);
         let transactionOnNetwork = await provider.getTransaction(deployTxHash);
         let response = parser.parseExecute({ transactionOnNetwork });
@@ -124,8 +123,8 @@ describe("test on local testnet", function () {
         assert.isTrue(response.returnCode == "ok");
 
         // Simulate
-        Logger.trace(JSONbig.parse(await provider.simulateTransaction(simulateOne), null, 4));
-        Logger.trace(JSONbig.parse(await provider.simulateTransaction(simulateTwo), null, 4));
+        Logger.trace(parseBigIntJSON(await provider.simulateTransaction(simulateOne)));
+        Logger.trace(parseBigIntJSON(await provider.simulateTransaction(simulateTwo)));
     });
 
     it("counter: should deploy, call and query contract using SmartContractTransactionsFactory", async function () {

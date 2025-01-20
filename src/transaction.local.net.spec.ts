@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Logger } from "./logger";
 import { INetworkProvider } from "./networkProviders/interface";
-import { loadTestWallets, TestWallet } from "./testutils";
+import { loadTestWallets, parseBigIntJSON, TestWallet } from "./testutils";
 import { createLocalnetProvider } from "./testutils/networkProviders";
 import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
@@ -114,7 +114,6 @@ describe("test transaction", function () {
 
     it("should simulate transactions", async function () {
         this.timeout(20000);
-        const JSONbig = require("json-bigint")({ constructorAction: "ignore" });
 
         let provider = createLocalnetProvider();
         let network = await provider.getNetworkConfig();
@@ -144,8 +143,8 @@ describe("test transaction", function () {
         await signTransaction({ transaction: transactionOne, wallet: alice });
         await signTransaction({ transaction: transactionTwo, wallet: alice });
 
-        Logger.trace(JSONbig.parse(await provider.simulateTransaction(transactionOne), null, 4));
-        Logger.trace(JSONbig.parse(await provider.simulateTransaction(transactionTwo), null, 4));
+        Logger.trace(parseBigIntJSON(await provider.simulateTransaction(transactionOne)));
+        Logger.trace(parseBigIntJSON(await provider.simulateTransaction(transactionTwo)));
     });
 
     it("should create transaction using the TokenTransferFactory", async function () {

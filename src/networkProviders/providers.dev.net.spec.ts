@@ -27,8 +27,8 @@ describe("test network providers on devnet: Proxy and API", function () {
         const apiResponse = await apiProviderWithoutConfig.getNetworkConfig();
         const proxyResponse = await proxyProviderWithoutConfig.getNetworkConfig();
 
-        assert.equal(apiResponse.ChainID, "D");
-        assert.equal(proxyResponse.ChainID, "D");
+        assert.equal(apiResponse.chainID, "D");
+        assert.equal(proxyResponse.chainID, "D");
     });
 
     it("should have same response for getNetworkConfig()", async function () {

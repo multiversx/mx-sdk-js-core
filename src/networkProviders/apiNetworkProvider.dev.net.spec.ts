@@ -14,21 +14,21 @@ describe("ApiNetworkProvider Tests", function () {
 
     it("should fetch network configuration", async () => {
         const result = await apiProvider.getNetworkConfig();
-        assert.equal(result.ChainID, "D");
-        assert.equal(result.GasPerDataByte, 1500n);
-        assert.equal(result.RoundDuration, 6000);
-        assert.equal(result.MinGasLimit, 50000n);
-        assert.equal(result.MinGasPrice, 1_000_000_000n);
+        assert.equal(result.chainID, "D");
+        assert.equal(result.gasPerDataByte, 1500n);
+        assert.equal(result.roundDuration, 6000);
+        assert.equal(result.minGasLimit, 50000n);
+        assert.equal(result.minGasPrice, 1_000_000_000n);
         assert.exists(result.raw);
     });
 
     it("should fetch network status", async () => {
         const result = await apiProvider.getNetworkStatus();
-        assert.exists(result.BlockNonce);
-        assert.exists(result.CurrentRound);
-        assert.exists(result.BlockTimestamp);
-        assert.exists(result.CurrentEpoch);
-        assert.exists(result.HighestFinalNonce);
+        assert.exists(result.blockNonce);
+        assert.exists(result.currentRound);
+        assert.exists(result.blockTimestamp);
+        assert.exists(result.currentEpoch);
+        assert.exists(result.highestFinalNonce);
         assert.exists(result.raw);
     });
 

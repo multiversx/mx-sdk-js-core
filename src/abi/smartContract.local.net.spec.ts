@@ -50,7 +50,7 @@ describe("test on local testnet", function () {
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
-        const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
+        const config = new TransactionsFactoryConfig({ chainID: network.chainID });
         const factory = new SmartContractTransactionsFactory({ config: config });
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
@@ -136,7 +136,7 @@ describe("test on local testnet", function () {
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
-        const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
+        const config = new TransactionsFactoryConfig({ chainID: network.chainID });
         const factory = new SmartContractTransactionsFactory({ config: config });
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
@@ -214,7 +214,7 @@ describe("test on local testnet", function () {
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
-        const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
+        const config = new TransactionsFactoryConfig({ chainID: network.chainID });
         const factory = new SmartContractTransactionsFactory({ config: config });
 
         const bytecode = await promises.readFile("src/testdata/erc20.wasm");
@@ -317,7 +317,7 @@ describe("test on local testnet", function () {
         let network = await provider.getNetworkConfig();
         await alice.sync(provider);
 
-        const config = new TransactionsFactoryConfig({ chainID: network.ChainID });
+        const config = new TransactionsFactoryConfig({ chainID: network.chainID });
         const factory = new SmartContractTransactionsFactory({ config: config });
 
         const bytecode = await promises.readFile("src/testdata/lottery-esdt.wasm");

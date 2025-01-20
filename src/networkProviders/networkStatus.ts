@@ -7,34 +7,34 @@ export class NetworkStatus {
     /**
      * The block nonce.
      */
-    public BlockTimestamp: number;
+    public blockTimestamp: number;
 
     /**
      * The block nonce.
      */
-    public BlockNonce: bigint;
+    public blockNonce: bigint;
 
     /**
      * The Highest final nonce.
      */
-    public HighestFinalNonce: bigint;
+    public highestFinalNonce: bigint;
 
     /**
      * The current round.
      */
-    public CurrentRound: bigint;
+    public currentRound: bigint;
 
     /**
      * The epoch number.
      */
-    public CurrentEpoch: number;
+    public currentEpoch: number;
 
     constructor() {
-        this.CurrentRound = 0n;
-        this.CurrentEpoch = 0;
-        this.HighestFinalNonce = 0n;
-        this.BlockNonce = 0n;
-        this.BlockTimestamp = 0;
+        this.currentRound = 0n;
+        this.currentEpoch = 0;
+        this.highestFinalNonce = 0n;
+        this.blockNonce = 0n;
+        this.blockTimestamp = 0;
     }
 
     /**
@@ -44,11 +44,11 @@ export class NetworkStatus {
         let networkStatus = new NetworkStatus();
 
         networkStatus.raw = payload;
-        networkStatus.CurrentRound = BigInt(payload["erd_current_round"]);
-        networkStatus.CurrentEpoch = Number(payload["erd_epoch_number"]);
-        networkStatus.HighestFinalNonce = BigInt(payload["erd_highest_final_nonce"]);
-        networkStatus.BlockNonce = BigInt(payload["erd_nonce"]);
-        networkStatus.BlockTimestamp = Number(payload["erd_block_timestamp"]);
+        networkStatus.currentRound = BigInt(payload["erd_current_round"]);
+        networkStatus.currentEpoch = Number(payload["erd_epoch_number"]);
+        networkStatus.highestFinalNonce = BigInt(payload["erd_highest_final_nonce"]);
+        networkStatus.blockNonce = BigInt(payload["erd_nonce"]);
+        networkStatus.blockTimestamp = Number(payload["erd_block_timestamp"]);
 
         return networkStatus;
     }

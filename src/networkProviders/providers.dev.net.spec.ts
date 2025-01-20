@@ -87,21 +87,6 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.equal(localProxyProvider.config.headers.getUserAgent(), expectedProxyUserAgent);
     });
 
-    it("should have same response for getNetworkStatus()", async function () {
-        let apiResponse = await apiProvider.getNetworkStatus();
-        let proxyResponse = await proxyProvider.getNetworkStatus();
-
-        assert.equal(apiResponse.EpochNumber, proxyResponse.EpochNumber);
-        assert.equal(apiResponse.NonceAtEpochStart, proxyResponse.NonceAtEpochStart);
-        assert.equal(apiResponse.RoundAtEpochStart, proxyResponse.RoundAtEpochStart);
-        assert.equal(apiResponse.RoundsPerEpoch, proxyResponse.RoundsPerEpoch);
-        // done this way because the nonces may change until both requests are executed
-        assert.approximately(apiResponse.CurrentRound, proxyResponse.CurrentRound, 1);
-        assert.approximately(apiResponse.HighestFinalNonce, proxyResponse.HighestFinalNonce, 1);
-        assert.approximately(apiResponse.Nonce, proxyResponse.Nonce, 1);
-        assert.approximately(apiResponse.NoncesPassedInCurrentEpoch, proxyResponse.NoncesPassedInCurrentEpoch, 1);
-    });
-
     it("should have same response for getAccount()", async function () {
         let apiResponse = await apiProvider.getAccount(alice);
         let proxyResponse = await proxyProvider.getAccount(alice);

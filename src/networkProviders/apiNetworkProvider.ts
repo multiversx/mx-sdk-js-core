@@ -2,7 +2,7 @@ import { Address } from "../address";
 import { METACHAIN_ID } from "../constants";
 import { ErrContractQuery, ErrNetworkProvider } from "../errors";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
-import { Token } from "../tokens";
+import { Token, TokenComputer } from "../tokens";
 import { Transaction } from "../transaction";
 import { prepareTransactionForBroadcasting, TransactionOnNetwork } from "../transactionOnNetwork";
 import { TransactionWatcher } from "../transactionWatcher";
@@ -161,13 +161,13 @@ export class ApiNetworkProvider implements INetworkProvider {
         return await awaiter.awaitCompleted(transactionHash);
     }
 
-    //TODO check this
     async getTokenOfAccount(address: Address, token: Token): Promise<TokenAmountOnNetwork> {
         let response;
         if (token.nonce === 0n) {
             response = await this.doGetGeneric(`accounts/${address.toBech32()}/tokens/${token.identifier}`);
         } else {
-            response = await this.doGetGeneric(`accounts/${address.toBech32()}/nfts/${token.identifier}-01`);
+            const identifier = new TokenComputer().computeExtendedIdentifier(token);
+            response = await this.doGetGeneric(`accounts/${address.toBech32()}/nfts/${identifier}`);
         }
         return TokenAmountOnNetwork.fromApiResponse(response);
     }

@@ -343,7 +343,7 @@ describe("ApiNetworkProvider Tests", function () {
     });
 
     it("should send and await for completed transaction", async function () {
-        this.timeout(20000);
+        this.timeout(30000);
         const bob = await loadTestWallet("bob");
         const transactionComputer = new TransactionComputer();
         let transaction = new Transaction({

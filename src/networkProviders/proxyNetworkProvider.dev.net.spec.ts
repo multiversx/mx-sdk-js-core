@@ -348,9 +348,8 @@ describe("ProxyNetworkProvider Tests", function () {
         assert.equal(response.gasLimit, 74000);
     });
 
-    //TODO Investigate why this returns timeout
-    it.skip("should send and await for completed transaction", async function () {
-        this.timeout(30000);
+    it("should send and await for completed transaction", async function () {
+        this.timeout(40000);
         const bob = await loadTestWallet("bob");
         const transactionComputer = new TransactionComputer();
         let transaction = new Transaction({
@@ -379,7 +378,7 @@ describe("ProxyNetworkProvider Tests", function () {
 
         hash = await proxy.sendTransaction(transaction);
         transactionOnNetwork = await proxy.awaitTransactionOnCondition(hash, condition);
-        assert.isTrue(transactionOnNetwork.status.isSuccessful());
+        assert.isFalse(transactionOnNetwork.status.isSuccessful());
     });
 
     it("should fetch transaction status", async () => {

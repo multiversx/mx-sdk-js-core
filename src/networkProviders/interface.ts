@@ -54,7 +54,7 @@ export interface INetworkProvider {
         address: Address,
         condition: (account: AccountOnNetwork) => boolean,
         options?: AwaitingOptions,
-    ): AccountOnNetwork;
+    ): Promise<AccountOnNetwork>;
 
     /**
      * Broadcasts an already-signed transaction.

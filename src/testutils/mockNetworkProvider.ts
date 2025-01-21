@@ -77,7 +77,7 @@ export class MockNetworkProvider implements INetworkProvider {
         _address: Address,
         _condition: (account: AccountOnNetwork) => boolean,
         _options?: AwaitingOptions,
-    ): AccountOnNetwork {
+    ): Promise<AccountOnNetwork> {
         throw new Error("Method not implemented.");
     }
     estimateTransactionCost(_tx: Transaction): Promise<TransactionCostResponse> {
@@ -159,6 +159,27 @@ export class MockNetworkProvider implements INetworkProvider {
         this.getTransactionResponders.unshift(new GetTransactionResponder(predicate, response));
     }
 
+    mockAccountBalanceTimelineByAddress(address: Address, timelinePoints: Array<MarkCompleted | Wait>): void {
+        const executeTimeline = async () => {
+            for (const point of timelinePoints) {
+                if (point instanceof MarkCompleted) {
+                    // Mark account condition as reached
+                    this.mockUpdateAccount(address, (account) => {
+                        account.balance += createAccountBalance(7);
+                    });
+                } else if (point instanceof Wait) {
+                    // Wait for the specified time
+                    await this.sleep(point.milliseconds);
+                }
+            }
+        };
+
+        // Start the timeline execution in a separate async "thread"
+        executeTimeline().catch((err) => {
+            console.error("Error executing timeline:", err);
+        });
+    }
+
     async mockTransactionTimeline(transaction: Transaction, timelinePoints: any[]): Promise<void> {
         return this.mockTransactionTimelineByHash(transaction.getHash(), timelinePoints);
     }
@@ -185,6 +206,10 @@ export class MockNetworkProvider implements INetworkProvider {
                 await timeline.start(point.milliseconds);
             }
         }
+    }
+
+    private sleep(milliseconds: number): Promise<void> {
+        return new Promise((resolve) => setTimeout(resolve, milliseconds));
     }
 
     async getAccount(address: Address): Promise<AccountOnNetwork> {

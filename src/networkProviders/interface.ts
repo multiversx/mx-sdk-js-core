@@ -12,7 +12,7 @@ import {
     AccountStorageEntry,
     AwaitingOptions,
     TokenAmountOnNetwork,
-    TransactionCostEstimationResponse,
+    TransactionCostResponse,
 } from "./resources";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 
@@ -71,12 +71,12 @@ export interface INetworkProvider {
      * Estimates the cost of a transaction.
      *
      */
-    estimateTransactionCost(tx: Transaction): Promise<TransactionCostEstimationResponse>;
+    estimateTransactionCost(tx: Transaction): Promise<TransactionCostResponse>;
 
     /**
      * Broadcasts a list of already-signed transactions.
      */
-    sendTransactions(txs: Transaction[]): Promise<string[]>;
+    sendTransactions(txs: Transaction[]): Promise<[number, string[]]>;
 
     /**
      * Fetches the state of a transaction.

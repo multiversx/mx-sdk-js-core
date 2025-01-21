@@ -108,7 +108,7 @@ export class BlockOnNetwork {
 export class BlockCoordinates {
     nonce: bigint = 0n;
     hash: string = "";
-    rootHash?: string;
+    rootHash: string = "";
     constructor(init?: Partial<BlockCoordinates>) {
         Object.assign(this, init);
     }
@@ -129,6 +129,7 @@ export class AccountStorageEntry {
     address: Address = Address.empty();
     key: string = "";
     value: string = "";
+
     constructor(init?: Partial<AccountStorageEntry>) {
         Object.assign(this, init);
     }
@@ -151,13 +152,13 @@ export class AwaitingOptions {
     patienceInMilliseconds: number = DEFAULT_ACCOUNT_AWAITING_PATIENCE_IN_MILLISECONDS;
 }
 
-export class TransactionCostEstimationResponse {
+export class TransactionCostResponse {
     raw: Record<string, any> = {};
     gasLimit: number = 0;
     status: TransactionStatus = TransactionStatus.createUnknown();
 
-    static fromHttpResponse(payload: any): TransactionCostEstimationResponse {
-        const result = new TransactionCostEstimationResponse();
+    static fromHttpResponse(payload: any): TransactionCostResponse {
+        const result = new TransactionCostResponse();
         result.raw = payload;
         result.gasLimit = payload["txGasUnits"] ?? 0;
         result.status = new TransactionStatus("");
@@ -171,6 +172,7 @@ export class TokenAmountOnNetwork {
     token: Token = new Token({ identifier: "" });
     amount: bigint = 0n;
     block_coordinates?: BlockCoordinates;
+
     constructor(init?: Partial<TokenAmountOnNetwork>) {
         Object.assign(this, init);
     }

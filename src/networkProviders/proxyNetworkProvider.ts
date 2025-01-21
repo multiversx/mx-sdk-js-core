@@ -12,7 +12,7 @@ import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig } from "./config";
 import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
-import { INetworkProvider, IPagination } from "./interface";
+import { INetworkProvider } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkProviderConfig } from "./networkProviderConfig";
 import { NetworkStatus } from "./networkStatus";
@@ -22,7 +22,7 @@ import {
     AwaitingOptions,
     BlockOnNetwork,
     TokenAmountOnNetwork,
-    TransactionCostEstimationResponse,
+    TransactionCostResponse,
 } from "./resources";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { extendUserAgentIfBackend } from "./userAgent";
@@ -52,6 +52,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         const networkStatus = NetworkStatus.fromHttpResponse(response.status);
         return networkStatus;
     }
+
     async getBlock(args: { shard: number; blockHash?: string; blockNonce?: bigint }): Promise<BlockOnNetwork> {
         let response;
         if (args.blockHash) {
@@ -120,25 +121,26 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return TransactionOnNetwork.fromSimulateResponse(transaction, response["result"] ?? {});
     }
 
-    async estimateTransactionCost(tx: Transaction): Promise<TransactionCostEstimationResponse> {
+    async estimateTransactionCost(tx: Transaction): Promise<TransactionCostResponse> {
         const transaction = prepareTransactionForBroadcasting(tx);
         const response = await this.doPostGeneric("transaction/cost", transaction);
-        return TransactionCostEstimationResponse.fromHttpResponse(response);
+        return TransactionCostResponse.fromHttpResponse(response);
     }
 
-    async sendTransactions(txs: Transaction[]): Promise<string[]> {
+    async sendTransactions(txs: Transaction[]): Promise<[number, string[]]> {
         const data = txs.map((tx) => prepareTransactionForBroadcasting(tx));
 
         const response = await this.doPostGeneric("transaction/send-multiple", data);
+        const numSent = Number(response["numOfSentTxs"] ?? 0);
         const hashes = Array(txs.length).fill(null);
 
         for (let i = 0; i < txs.length; i++) {
             hashes[i] = response.txsHashes[i.toString()] || null;
         }
-        return hashes;
+        return [numSent, hashes];
     }
 
-    async getTransaction(txHash: string, _?: boolean): Promise<TransactionOnNetwork> {
+    async getTransaction(txHash: string): Promise<TransactionOnNetwork> {
         const url = this.buildUrlWithQueryParameters(`transaction/${txHash}`, { withResults: "true" });
         const [data, status] = await Promise.all([this.doGetGeneric(url), this.getTransactionStatus(txHash)]);
         return TransactionOnNetwork.fromProxyHttpResponse(txHash, data.transaction, status);
@@ -186,7 +188,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return TokenAmountOnNetwork.fromProxyResponse(response["tokenData"]);
     }
 
-    async getFungibleTokensOfAccount(address: Address, _pagination?: IPagination): Promise<TokenAmountOnNetwork[]> {
+    async getFungibleTokensOfAccount(address: Address): Promise<TokenAmountOnNetwork[]> {
         const url = `address/${address.toBech32()}/esdt`;
         const response = await this.doGetGeneric(url);
         const responseItems: any[] = Object.values(response.esdts);
@@ -197,7 +199,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return tokens;
     }
 
-    async getNonFungibleTokensOfAccount(address: Address, _pagination?: IPagination): Promise<TokenAmountOnNetwork[]> {
+    async getNonFungibleTokensOfAccount(address: Address): Promise<TokenAmountOnNetwork[]> {
         const url = `address/${address.toBech32()}/esdt`;
         const response = await this.doGetGeneric(url);
         const responseItems: any[] = Object.values(response.esdts);

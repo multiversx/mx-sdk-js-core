@@ -17,7 +17,7 @@ import {
     AwaitingOptions,
     BlockOnNetwork,
     TokenAmountOnNetwork,
-    TransactionCostEstimationResponse,
+    TransactionCostResponse,
 } from "../networkProviders/resources";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { Token } from "../tokens";
@@ -80,7 +80,7 @@ export class MockNetworkProvider implements INetworkProvider {
     ): AccountOnNetwork {
         throw new Error("Method not implemented.");
     }
-    estimateTransactionCost(_tx: Transaction): Promise<TransactionCostEstimationResponse> {
+    estimateTransactionCost(_tx: Transaction): Promise<TransactionCostResponse> {
         throw new Error("Method not implemented.");
     }
     awaitTransactionOnCondition(

@@ -31,9 +31,9 @@ export class NetworkConfig {
     public extraGasLimitForGuardedTransactions: bigint;
 
     /**
-     * The number of rounds per epoch.
+     * The number of shards.
      */
-    public numberOfShards: number;
+    public numShards: number;
 
     /**
      * The round duration.
@@ -42,7 +42,7 @@ export class NetworkConfig {
     /**
      * The number of rounds per epoch.
      */
-    public roundsPerEpoch: number;
+    public numRoundsPerEpoch: number;
 
     /**
      * The genesis timestamp
@@ -50,16 +50,16 @@ export class NetworkConfig {
     public genesisTimestamp: number;
 
     constructor() {
-        this.chainID = "T";
-        this.gasPerDataByte = 1500n;
+        this.chainID = "";
+        this.gasPerDataByte = 0n;
         this.genesisTimestamp = 0;
         this.roundDuration = 0;
-        this.roundsPerEpoch = 0;
-        this.minGasLimit = 50000n;
-        this.minGasPrice = 1000000000n;
+        this.numRoundsPerEpoch = 0;
+        this.minGasLimit = 0n;
+        this.minGasPrice = 0n;
         this.extraGasLimitForGuardedTransactions = 0n;
         this.gasPriceModifier = 1;
-        this.numberOfShards = 0;
+        this.numShards = 0;
     }
 
     /**
@@ -75,9 +75,9 @@ export class NetworkConfig {
         networkConfig.minGasLimit = BigInt(payload["erd_min_gas_limit"]);
         networkConfig.minGasPrice = BigInt(payload["erd_min_gas_price"]);
         networkConfig.extraGasLimitForGuardedTransactions = BigInt(payload["erd_extra_gas_limit_guarded_tx"]);
-        networkConfig.numberOfShards = Number(payload["erd_num_shards_without_meta"]);
+        networkConfig.numShards = Number(payload["erd_num_shards_without_meta"]);
         networkConfig.roundDuration = Number(payload["erd_round_duration"]);
-        networkConfig.roundsPerEpoch = Number(payload["erd_rounds_per_epoch"]);
+        networkConfig.numRoundsPerEpoch = Number(payload["erd_rounds_per_epoch"]);
         networkConfig.genesisTimestamp = Number(payload["erd_start_time"]);
 
         return networkConfig;

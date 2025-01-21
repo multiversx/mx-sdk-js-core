@@ -275,8 +275,8 @@ describe("ProxyNetworkProvider Tests", function () {
             null,
             "30274b60b5635f981fa89ccfe726a34ca7121caa5d34123021c77a5c64cc9163",
         ];
-        const hashes = await proxy.sendTransactions(txs);
-        assert.equal(hashes.length, 3);
+        const [numOfSentTxs, hashes] = await proxy.sendTransactions(txs);
+        assert.equal(numOfSentTxs, 2);
         assert.deepEqual(hashes, expectedHashes);
     });
 

@@ -143,9 +143,10 @@ describe("test network providers on devnet: Proxy and API", function () {
 
         assert.equal(await apiProvider.sendTransaction(txs[0]), expectedHashes[0]);
         assert.equal(await proxyProvider.sendTransaction(txs[1]), expectedHashes[1]);
-
-        assert.deepEqual(await apiProvider.sendTransactions(txs), expectedHashes);
-        assert.deepEqual(await proxyProvider.sendTransactions(txs), expectedHashes);
+        const [, apiHashes] = await apiProvider.sendTransactions(txs);
+        const [, proxyHashes] = await proxyProvider.sendTransactions(txs);
+        assert.deepEqual(apiHashes, expectedHashes);
+        assert.deepEqual(proxyHashes, expectedHashes);
     });
 
     it("should have same response for getTransaction()", async function () {

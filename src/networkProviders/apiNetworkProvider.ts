@@ -8,7 +8,7 @@ import { prepareTransactionForBroadcasting, TransactionOnNetwork } from "../tran
 import { TransactionStatus } from "../transactionStatus";
 import { TransactionWatcher } from "../transactionWatcher";
 import { getAxios } from "../utils";
-import { AccountOnNetwork, GuardianData } from "./accounts";
+import { AccountOnNetwork } from "./accounts";
 import { defaultAxiosConfig, defaultPagination } from "./config";
 import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
@@ -16,7 +16,6 @@ import { INetworkProvider, IPagination } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkProviderConfig } from "./networkProviderConfig";
 import { NetworkStatus } from "./networkStatus";
-import { PairOnNetwork } from "./pairs";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 import {
     AccountStorage,
@@ -24,7 +23,7 @@ import {
     AwaitingOptions,
     BlockOnNetwork,
     TokenAmountOnNetwork,
-    TransactionCostEstimationResponse,
+    TransactionCostResponse,
 } from "./resources";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
 import { extendUserAgentIfBackend } from "./userAgent";
@@ -116,14 +115,24 @@ export class ApiNetworkProvider implements INetworkProvider {
         const data = response["data"] ?? {};
         return TransactionOnNetwork.fromSimulateResponse(transaction, data["result"] ?? {});
     }
-    async estimateTransactionCost(tx: Transaction): Promise<TransactionCostEstimationResponse> {
+
+    async estimateTransactionCost(tx: Transaction): Promise<TransactionCostResponse> {
         const transaction = prepareTransactionForBroadcasting(tx);
         const response = await this.doPostGeneric("transaction/cost", transaction);
-        return TransactionCostEstimationResponse.fromHttpResponse(response.data);
+        return TransactionCostResponse.fromHttpResponse(response.data);
     }
 
-    async sendTransactions(txs: Transaction[]): Promise<string[]> {
-        return await this.backingProxyNetworkProvider.sendTransactions(txs);
+    async sendTransactions(txs: Transaction[]): Promise<[number, string[]]> {
+        const data = txs.map((tx) => prepareTransactionForBroadcasting(tx));
+
+        const response = await this.doPostGeneric("transaction/send-multiple", data);
+        const numSent = Number(response.data["numOfSentTxs"] ?? 0);
+        const hashes = Array(txs.length).fill(null);
+
+        for (let i = 0; i < txs.length; i++) {
+            hashes[i] = response.data.txsHashes[i.toString()] || null;
+        }
+        return [numSent, hashes];
     }
 
     async getTransaction(txHash: string): Promise<TransactionOnNetwork> {
@@ -154,6 +163,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         });
         return await awaiter.awaitOnCondition(transactionHash, condition);
     }
+
     async awaitTransactionCompleted(transactionHash: string, options?: AwaitingOptions): Promise<TransactionOnNetwork> {
         if (!options) {
             options = new AwaitingOptions();
@@ -176,10 +186,6 @@ export class ApiNetworkProvider implements INetworkProvider {
             response = await this.doGetGeneric(`accounts/${address.toBech32()}/nfts/${identifier}`);
         }
         return TokenAmountOnNetwork.fromApiResponse(response);
-    }
-
-    async getGuardianData(address: Address): Promise<GuardianData> {
-        return await this.backingProxyNetworkProvider.getGuardianData(address);
     }
 
     async getFungibleTokensOfAccount(address: Address, pagination?: IPagination): Promise<TokenAmountOnNetwork[]> {
@@ -210,17 +216,6 @@ export class ApiNetworkProvider implements INetworkProvider {
         const response = await this.doGetGeneric(`collections/${collection}`);
         const definition = DefinitionOfTokenCollectionOnNetwork.fromApiHttpResponse(response);
         return definition;
-    }
-
-    async getMexPairs(pagination?: IPagination): Promise<PairOnNetwork[]> {
-        let url = `mex/pairs`;
-        if (pagination) {
-            url = `${url}?from=${pagination.from}&size=${pagination.size}`;
-        }
-
-        const response: any[] = await this.doGetGeneric(url);
-
-        return response.map((item) => PairOnNetwork.fromApiHttpResponse(item));
     }
 
     async queryContract(query: SmartContractQuery): Promise<SmartContractQueryResponse> {

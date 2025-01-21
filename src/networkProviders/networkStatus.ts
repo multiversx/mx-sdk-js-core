@@ -5,7 +5,7 @@ export class NetworkStatus {
     raw: Record<string, any> = {};
 
     /**
-     * The block nonce.
+     * The block timestamp.
      */
     public blockTimestamp: number;
 
@@ -15,7 +15,7 @@ export class NetworkStatus {
     public blockNonce: bigint;
 
     /**
-     * The Highest final nonce.
+     * The highest final nonce.
      */
     public highestFinalNonce: bigint;
 
@@ -25,7 +25,7 @@ export class NetworkStatus {
     public currentRound: bigint;
 
     /**
-     * The epoch number.
+     * The current epoch.
      */
     public currentEpoch: number;
 

@@ -12,10 +12,10 @@ interface IAccountFetcher {
 }
 
 export class AccountAwaiter {
-    private fetcher: IAccountFetcher;
-    private pollingIntervalInMilliseconds: number;
-    private timeoutIntervalInMilliseconds: number;
-    private patienceTimeInMilliseconds: number;
+    private readonly fetcher: IAccountFetcher;
+    private readonly pollingIntervalInMilliseconds: number;
+    private readonly timeoutIntervalInMilliseconds: number;
+    private readonly patienceTimeInMilliseconds: number;
 
     /**
      * AccountAwaiter allows one to await until a specific event occurs on a given address.

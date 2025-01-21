@@ -457,3 +457,12 @@ export class ErrInvalidNetworkProviderKind extends Err {
         super("Invalid network provider kind. Choose between `api` and `proxy`.");
     }
 }
+
+/**
+ * Signals that the account condition was not reached
+ */
+export class ExpectedAccountConditionNotReachedError extends Err {
+    public constructor() {
+        super("The expected account condition was not reached.");
+    }
+}

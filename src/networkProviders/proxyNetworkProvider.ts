@@ -8,6 +8,7 @@ import { prepareTransactionForBroadcasting, TransactionOnNetwork } from "../tran
 import { TransactionStatus } from "../transactionStatus";
 import { TransactionWatcher } from "../transactionWatcher";
 import { getAxios } from "../utils";
+import { AccountAwaiter } from "./accountAwaiter";
 import { AccountOnNetwork, GuardianData } from "./accounts";
 import { defaultAxiosConfig } from "./config";
 import { BaseUserAgent } from "./constants";
@@ -94,15 +95,21 @@ export class ProxyNetworkProvider implements INetworkProvider {
         return account;
     }
 
-    awaitAccountOnCondition(
-        _address: Address,
-        _condition: (account: AccountOnNetwork) => boolean,
+    async awaitAccountOnCondition(
+        address: Address,
+        condition: (account: AccountOnNetwork) => boolean,
         options?: AwaitingOptions,
-    ): AccountOnNetwork {
+    ): Promise<AccountOnNetwork> {
         if (!options) {
             options = new AwaitingOptions();
         }
-        throw new Error("Method not implemented.");
+        const awaiter = new AccountAwaiter({
+            fetcher: this,
+            patienceTimeInMilliseconds: options.patienceInMilliseconds,
+            pollingIntervalInMilliseconds: options.pollingIntervalInMilliseconds,
+            timeoutIntervalInMilliseconds: options.timeoutInMilliseconds,
+        });
+        return await awaiter.awaitOnCondition(address, condition);
     }
 
     async sendTransaction(tx: Transaction): Promise<string> {

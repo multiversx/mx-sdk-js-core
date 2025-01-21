@@ -100,10 +100,10 @@ export function b64ToHex(value: string): string {
 export function importJsonBig(value: string): string {
     return Buffer.from(value, "base64").toString("hex");
 }
-export const parseBigIntJSON = (jsonString: any): any => {
+export const stringifyBigIntJSON = (jsonString: any): any => {
     const JSONBig = require("json-bigint")({ constructorAction: "ignore" });
     try {
-        return JSONBig({ useNativeBigInt: true }).parse(jsonString);
+        return JSONBig.stringify(jsonString);
     } catch (error) {
         throw new Error(`Failed to parse JSON: ${error.message}`);
     }

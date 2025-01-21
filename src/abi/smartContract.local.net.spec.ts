@@ -6,7 +6,7 @@ import {
     SmartContractTransactionsFactory,
     SmartContractTransactionsOutcomeParser,
 } from "../smartContracts";
-import { parseBigIntJSON } from "../testutils";
+import { stringifyBigIntJSON } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { loadTestWallets, TestWallet } from "../testutils/wallets";
 import { TransactionComputer } from "../transactionComputer";
@@ -110,7 +110,6 @@ describe("test on local testnet", function () {
         // Broadcast & execute
         const deployTxHash = await provider.sendTransaction(deployTransaction);
         const callTxHash = await provider.sendTransaction(smartContractCallTransaction);
-        console.log({ deployTxHash, callTxHash });
         await watcher.awaitCompleted(deployTxHash);
         let transactionOnNetwork = await provider.getTransaction(deployTxHash);
         let response = parser.parseExecute({ transactionOnNetwork });
@@ -123,8 +122,8 @@ describe("test on local testnet", function () {
         assert.isTrue(response.returnCode == "ok");
 
         // Simulate
-        Logger.trace(parseBigIntJSON(await provider.simulateTransaction(simulateOne)));
-        Logger.trace(parseBigIntJSON(await provider.simulateTransaction(simulateTwo)));
+        Logger.trace(stringifyBigIntJSON(await provider.simulateTransaction(simulateOne)));
+        Logger.trace(stringifyBigIntJSON(await provider.simulateTransaction(simulateTwo)));
     });
 
     it("counter: should deploy, call and query contract using SmartContractTransactionsFactory", async function () {

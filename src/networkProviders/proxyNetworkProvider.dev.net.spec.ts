@@ -349,7 +349,7 @@ describe("ProxyNetworkProvider Tests", function () {
     });
 
     it("should send and await for completed transaction", async function () {
-        this.timeout(40000);
+        this.timeout(50000);
         const bob = await loadTestWallet("bob");
         const transactionComputer = new TransactionComputer();
         let transaction = new Transaction({

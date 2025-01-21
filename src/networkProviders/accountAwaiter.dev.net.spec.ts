@@ -42,7 +42,7 @@ describe("AccountAwaiter Tests", () => {
     });
 
     it("should await for account balance increase on the network", async function () {
-        this.timeout(10000);
+        this.timeout(20000);
         const alice = await loadTestWallet("alice");
         const aliceAddress = alice.getAddress();
         const frank = Address.newFromBech32("erd1kdl46yctawygtwg2k462307dmz2v55c605737dp3zkxh04sct7asqylhyv");

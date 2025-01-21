@@ -106,7 +106,7 @@ export class MockNetworkProvider implements INetworkProvider {
     getNonFungibleTokensOfAccount(_address: Address, _pagination?: IPagination): Promise<TokenAmountOnNetwork[]> {
         throw new Error("Method not implemented.");
     }
-    sendTransactions(_txs: Transaction[]): Promise<string[]> {
+    sendTransactions(_txs: Transaction[]): Promise<[number, string[]]> {
         throw new Error("Method not implemented.");
     }
     getDefinitionOfFungibleToken(_tokenIdentifier: string): Promise<DefinitionOfFungibleTokenOnNetwork> {

@@ -170,6 +170,22 @@ describe("test network providers on devnet: Proxy and API", function () {
         }
     });
 
+    it("should have same response for getTransactionStatus()", async function () {
+        this.timeout(20000);
+
+        let hashes = [
+            "08acf8cbd71306a56eb58f9593cb2e23f109c94e27acdd906c82a5c3a5f84d9d",
+            "410efb1db2ab86678b8dbc503beb695b5b7d52754fb0de86c09cbb433de5f6a8",
+        ];
+
+        for (const hash of hashes) {
+            let apiResponse = await apiProvider.getTransactionStatus(hash);
+            let proxyResponse = await proxyProvider.getTransactionStatus(hash);
+
+            assert.deepEqual(apiResponse, proxyResponse, `transaction: ${hash}`);
+        }
+    });
+
     // TODO: Strive to have as little differences as possible between Proxy and API.
     function ignoreKnownTransactionDifferencesBetweenProviders(
         apiResponse: TransactionOnNetwork,

@@ -8,6 +8,7 @@ import {
     ChangeToDynamicOutput,
     MintNftOutput,
     ModifyingCreatorOutput,
+    ModifyRoyaltiesOutput,
     RegisterDynamicOutput,
     SpecialRoleOutput,
     UpdateAttibutesOutput,
@@ -356,26 +357,22 @@ export class TokenManagementTransactionsOutcomeParser {
         };
     }
 
-    parseModifyRoyalties(transaction: TransactionOnNetwork): import("./resources").EsdtOutput[] {
+    parseModifyRoyalties(transaction: TransactionOnNetwork): ModifyRoyaltiesOutput[] {
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTModifyRoyalties");
         return events.map((event) => this.getOutputForESDTModifyRoyaltiesEvent(event));
     }
 
-    private getOutputForESDTModifyRoyaltiesEvent(event: TransactionEvent): {
-        tokenIdentifier: string;
-        nonce: bigint;
-        royalties: bigint;
-    } {
+    private getOutputForESDTModifyRoyaltiesEvent(event: TransactionEvent): ModifyRoyaltiesOutput {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const royalties = this.extractAmount(event);
+        const royalties = !event.topics[2]?.length ? 0 : Number();
 
         return {
             tokenIdentifier: tokenIdentifier,
             nonce: nonce,
-            royalties: royalties,
+            royalties,
         };
     }
 

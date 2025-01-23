@@ -604,4 +604,33 @@ describe("test token management transactions outcome parser", () => {
         assert.equal(outcome[0].nonce, nonce);
         assert.equal(outcome[0].burntQuantity, burntQuantity);
     });
+
+    it.only("should test parse modify royalties", () => {
+        const identifier = "TEST-e2b0f9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
+        const nonce = BigInt(1);
+        const royalties = 20;
+
+        const encodedTopics = [base64Identifier, "AQ==", "", "FA=="];
+        const event = new TransactionEvent({
+            address: new Address("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+            identifier: "ESDTModifyRoyalties",
+            topics: b64TopicsToBytes(encodedTopics),
+        });
+
+        const transactionLogs = new TransactionLogs({
+            address: new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            events: [event],
+        });
+
+        const transaction = new TransactionOnNetwork({
+            logs: transactionLogs,
+        });
+
+        const outcome = parser.parseModifyRoyalties(transaction);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.equal(outcome[0].royalties, royalties);
+    });
 });

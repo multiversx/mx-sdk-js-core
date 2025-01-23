@@ -605,11 +605,11 @@ describe("test token management transactions outcome parser", () => {
         assert.equal(outcome[0].burntQuantity, burntQuantity);
     });
 
-    it.only("should test parse modify royalties", () => {
+    it("should test parse modify royalties", () => {
         const identifier = "TEST-e2b0f9";
         const base64Identifier = Buffer.from(identifier).toString("base64");
         const nonce = BigInt(1);
-        const royalties = 20;
+        const royalties = 20n;
 
         const encodedTopics = [base64Identifier, "AQ==", "", "FA=="];
         const event = new TransactionEvent({
@@ -632,5 +632,232 @@ describe("test token management transactions outcome parser", () => {
         assert.equal(outcome[0].tokenIdentifier, identifier);
         assert.equal(outcome[0].nonce, nonce);
         assert.equal(outcome[0].royalties, royalties);
+    });
+
+    it("should test parse set new uris", () => {
+        const identifier = "TEST-e2b0f9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
+        const nonce = BigInt(1);
+        const uri = "thisianuri.com";
+
+        const encodedTopics = [base64Identifier, "AQ==", "", "dGhpc2lhbnVyaS5jb20="];
+        const event = new TransactionEvent({
+            address: new Address("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+            identifier: "ESDTSetNewURIs",
+            topics: b64TopicsToBytes(encodedTopics),
+        });
+
+        const transactionLogs = new TransactionLogs({
+            address: new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            events: [event],
+        });
+
+        const transaction = new TransactionOnNetwork({
+            logs: transactionLogs,
+        });
+
+        const outcome = parser.parseSetNewUris(transaction);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.equal(outcome[0].uri, uri);
+    });
+
+    it("should test parse modify creator", () => {
+        const identifier = "TEST-e2b0f9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
+        const nonce = BigInt(1);
+
+        const encodedTopics = [base64Identifier, "AQ=="];
+        const event = new TransactionEvent({
+            address: new Address("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+            identifier: "ESDTModifyCreator",
+            topics: b64TopicsToBytes(encodedTopics),
+        });
+
+        const transactionLogs = new TransactionLogs({
+            address: new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            events: [event],
+        });
+
+        const transaction = new TransactionOnNetwork({
+            logs: transactionLogs,
+        });
+
+        const outcome = parser.parseModifyCreator(transaction);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+    });
+
+    it("should test parse update metadata", () => {
+        const identifier = "TEST-e2b0f9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
+        const nonce = BigInt(1);
+        const metadata = new Uint8Array(
+            Buffer.from(
+                "CAUSAgABIlQIARIHVEVTVE5GVBogATlHLv9ohncamC8wg9pdQh8kwpGB5jiIIo3IHKYNaeEgHioIbmV3X2hhc2gyDnRoaXNpYW51cmkuY29tOgkAAAAAAAAAAwUqHgjH9a4DEMf1rgMYx/WuAyDH9a4DKMb1rgMwx/WuAw==",
+                "base64",
+            ),
+        );
+
+        const encodedTopics = [
+            base64Identifier,
+            "AQ==",
+            "",
+            "CAUSAgABIlQIARIHVEVTVE5GVBogATlHLv9ohncamC8wg9pdQh8kwpGB5jiIIo3IHKYNaeEgHioIbmV3X2hhc2gyDnRoaXNpYW51cmkuY29tOgkAAAAAAAAAAwUqHgjH9a4DEMf1rgMYx/WuAyDH9a4DKMb1rgMwx/WuAw==",
+        ];
+        const event = new TransactionEvent({
+            address: new Address("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+            identifier: "ESDTMetaDataUpdate",
+            topics: b64TopicsToBytes(encodedTopics),
+        });
+
+        const transactionLogs = new TransactionLogs({
+            address: new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            events: [event],
+        });
+
+        const transaction = new TransactionOnNetwork({
+            logs: transactionLogs,
+        });
+
+        const outcome = parser.parseUpdateMetadata(transaction);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.deepEqual(outcome[0].metadata, metadata);
+    });
+
+    it("should test parse recreate metadata", () => {
+        const identifier = "TEST-e2b0f9";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
+        const nonce = BigInt(1);
+        const metadata = new Uint8Array(
+            Buffer.from(
+                "CAUSAgABIlAIARIHVEVTVE5GVBogATlHLv9ohncamC8wg9pdQh8kwpGB5jiIIo3IHKYNaeEgHioSbmV3X2hhc2hfcmVjcmVhdGVkMgA6CQAAAAAAAABkASoeCMj1rgMQyPWuAxjI9a4DIMj1rgMoyPWuAzDI9a4D",
+                "base64",
+            ),
+        );
+
+        const encodedTopics = [
+            base64Identifier,
+            "AQ==",
+            "",
+            "CAUSAgABIlAIARIHVEVTVE5GVBogATlHLv9ohncamC8wg9pdQh8kwpGB5jiIIo3IHKYNaeEgHioSbmV3X2hhc2hfcmVjcmVhdGVkMgA6CQAAAAAAAABkASoeCMj1rgMQyPWuAxjI9a4DIMj1rgMoyPWuAzDI9a4D",
+        ];
+        const event = new TransactionEvent({
+            address: new Address("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+            identifier: "ESDTMetaDataRecreate",
+            topics: b64TopicsToBytes(encodedTopics),
+        });
+
+        const transactionLogs = new TransactionLogs({
+            address: new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            events: [event],
+        });
+
+        const transaction = new TransactionOnNetwork({
+            logs: transactionLogs,
+        });
+
+        const outcome = parser.parseMetadataRecreate(transaction);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].nonce, nonce);
+        assert.deepEqual(outcome[0].metadata, metadata);
+    });
+
+    it("should test parse change to dynamic", () => {
+        const identifier = "LKXOXNO-503365";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
+        const tokenName = "LKXOXNO";
+        const tokenTicker = "LKXOXNO";
+        const tokenType = "DynamicMetaESDT";
+
+        const encodedTopics = [base64Identifier, "TEtYT1hOTw==", "TEtYT1hOTw==", "RHluYW1pY01ldGFFU0RU"];
+        const event = new TransactionEvent({
+            address: new Address("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+            identifier: "changeToDynamic",
+            topics: b64TopicsToBytes(encodedTopics),
+        });
+
+        const transactionLogs = new TransactionLogs({
+            address: new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            events: [event],
+        });
+
+        const transaction = new TransactionOnNetwork({
+            logs: transactionLogs,
+        });
+
+        const outcome = parser.parseChangeTokenToDynamic(transaction);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].tokenName, tokenName);
+        assert.equal(outcome[0].tickerName, tokenTicker);
+        assert.deepEqual(outcome[0].tokenType, tokenType);
+    });
+
+    it("should test parse register dynamic", () => {
+        const identifier = "TEST-9bbb21";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
+        const tokenName = "TESTNFT";
+        const tokenTicker = "TEST";
+        const tokenType = "DynamicNonFungibleESDT";
+
+        const encodedTopics = [base64Identifier, "VEVTVE5GVA==", "VEVTVA==", "RHluYW1pY05vbkZ1bmdpYmxlRVNEVA=="];
+        const event = new TransactionEvent({
+            address: new Address("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+            identifier: "registerDynamic",
+            topics: b64TopicsToBytes(encodedTopics),
+        });
+
+        const transactionLogs = new TransactionLogs({
+            address: new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            events: [event],
+        });
+
+        const transaction = new TransactionOnNetwork({
+            logs: transactionLogs,
+        });
+
+        const outcome = parser.parseRegisterDynamicToken(transaction);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].tokenName, tokenName);
+        assert.equal(outcome[0].tokenTicker, tokenTicker);
+        assert.deepEqual(outcome[0].tokenType, tokenType);
+    });
+
+    it("should test parse register dynamic", () => {
+        const identifier = "TEST-9bbb21";
+        const base64Identifier = Buffer.from(identifier).toString("base64");
+        const tokenName = "TESTNFT";
+        const tokenTicker = "TEST";
+        const tokenType = "DynamicNonFungibleESDT";
+
+        const encodedTopics = [base64Identifier, "VEVTVE5GVA==", "VEVTVA==", "RHluYW1pY05vbkZ1bmdpYmxlRVNEVA=="];
+        const event = new TransactionEvent({
+            address: new Address("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2"),
+            identifier: "registerAndSetAllRolesDynamic",
+            topics: b64TopicsToBytes(encodedTopics),
+        });
+
+        const transactionLogs = new TransactionLogs({
+            address: new Address("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            events: [event],
+        });
+
+        const transaction = new TransactionOnNetwork({
+            logs: transactionLogs,
+        });
+
+        const outcome = parser.parseRegisterDynamicTokenAndSettingRoles(transaction);
+        assert.lengthOf(outcome, 1);
+        assert.equal(outcome[0].tokenIdentifier, identifier);
+        assert.equal(outcome[0].tokenName, tokenName);
+        assert.equal(outcome[0].tokenTicker, tokenTicker);
+        assert.deepEqual(outcome[0].tokenType, tokenType);
     });
 });

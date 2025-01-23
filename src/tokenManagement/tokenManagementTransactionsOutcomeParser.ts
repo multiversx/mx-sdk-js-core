@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { bufferToBigInt } from "../abi/codec/utils";
 import { Address } from "../address";
 import { ErrParseTransactionOutcome } from "../errors";
@@ -10,6 +11,7 @@ import {
     ModifyingCreatorOutput,
     ModifyRoyaltiesOutput,
     RegisterDynamicOutput,
+    SetNewUrisOutput,
     SpecialRoleOutput,
     UpdateAttibutesOutput,
 } from "./resources";
@@ -367,7 +369,9 @@ export class TokenManagementTransactionsOutcomeParser {
     private getOutputForESDTModifyRoyaltiesEvent(event: TransactionEvent): ModifyRoyaltiesOutput {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const royalties = !event.topics[2]?.length ? 0 : Number();
+        const royalties = !event.topics[3]?.length
+            ? BigInt(0)
+            : BigInt(new BigNumber(Buffer.from(event.topics[3]).toString("hex"), 16).toFixed());
 
         return {
             tokenIdentifier: tokenIdentifier,
@@ -376,27 +380,18 @@ export class TokenManagementTransactionsOutcomeParser {
         };
     }
 
-    parseSetNewUris(transaction: TransactionOnNetwork): import("./resources").EsdtOutput[] {
+    parseSetNewUris(transaction: TransactionOnNetwork): SetNewUrisOutput[] {
         this.ensureNoError(transaction.logs.events);
 
         const events = findEventsByIdentifier(transaction, "ESDTSetNewURIs");
         return events.map((event) => this.getOutputForESDTSetNewURIsEvent(event));
     }
 
-    private getOutputForESDTSetNewURIsEvent(event: TransactionEvent): {
-        tokenIdentifier: string;
-        nonce: bigint;
-        royalties: bigint;
-    } {
+    private getOutputForESDTSetNewURIsEvent(event: TransactionEvent): SetNewUrisOutput {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const royalties = this.extractAmount(event);
-
-        return {
-            tokenIdentifier: tokenIdentifier,
-            nonce: nonce,
-            royalties: royalties,
-        };
+        const uri = !event.topics[3]?.length ? "" : event.topics[3].toString();
+        return { tokenIdentifier, nonce, uri };
     }
 
     parseModifyCreator(transaction: TransactionOnNetwork): ModifyingCreatorOutput[] {
@@ -409,9 +404,8 @@ export class TokenManagementTransactionsOutcomeParser {
     private getOutputForESDTModifyCreatorEvent(event: TransactionEvent): ModifyingCreatorOutput {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const creator = Address.newFromBech32(this.extractAddress(event));
 
-        return { tokenIdentifier, nonce, creator };
+        return { tokenIdentifier, nonce };
     }
 
     parseUpdateMetadata(transaction: TransactionOnNetwork): UpdateAttibutesOutput[] {
@@ -424,9 +418,9 @@ export class TokenManagementTransactionsOutcomeParser {
     private getOutputForESDTUpdateMetadataEvent(event: TransactionEvent): UpdateAttibutesOutput {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const caller = Address.newFromBech32(this.extractAddress(event));
+        const metadata = !event.topics[3]?.length ? new Uint8Array() : new Uint8Array(Buffer.from(event.topics[3]));
 
-        return { tokenIdentifier, nonce, caller };
+        return { tokenIdentifier, nonce, metadata };
     }
 
     parseMetadataRecreate(transaction: TransactionOnNetwork): UpdateAttibutesOutput[] {
@@ -439,9 +433,9 @@ export class TokenManagementTransactionsOutcomeParser {
     private getOutputForESDTMetadataRecreateEvent(event: TransactionEvent): UpdateAttibutesOutput {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const caller = this.extractAddress(event);
+        const metadata = !event.topics[3]?.length ? new Uint8Array() : new Uint8Array(Buffer.from(event.topics[3]));
 
-        return { tokenIdentifier, nonce, caller: Address.newFromBech32(caller) };
+        return { tokenIdentifier, nonce, metadata };
     }
 
     parseChangeTokenToDynamic(transaction: TransactionOnNetwork): ChangeToDynamicOutput[] {
@@ -452,11 +446,12 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private getOutputForChangeToDynamicEvent(event: TransactionEvent): ChangeToDynamicOutput {
-        const tokenName = event.topics[1]?.length ? "" : event.topics[1].toString();
-        const tokenTicker = event.topics[2]?.length ? "" : event.topics[2].toString();
-        const tokenType = event.topics[3]?.length ? "" : event.topics[3].toString();
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const tokenName = !event.topics[1]?.length ? "" : event.topics[1].toString();
+        const tickerName = !event.topics[2]?.length ? "" : event.topics[2].toString();
+        const tokenType = !event.topics[3]?.length ? "" : event.topics[3].toString();
 
-        return { tokenName, tokenTicker, tokenType };
+        return { tokenIdentifier, tokenName, tickerName, tokenType };
     }
 
     parseRegisterDynamicToken(transaction: TransactionOnNetwork): RegisterDynamicOutput[] {
@@ -467,11 +462,11 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private getOutputForRegisterDynamicToken(event: TransactionEvent): RegisterDynamicOutput {
-        const tokenIdentifier = event.topics[0]?.length ? "" : event.topics[0].toString();
-        const tokenName = event.topics[1]?.length ? "" : event.topics[1].toString();
-        const tokenTicker = event.topics[2]?.length ? "" : event.topics[2].toString();
-        const tokenType = event.topics[3]?.length ? "" : event.topics[3].toString();
-        const numOfDecimals = event.topics[4]?.length ? 0 : Number(Buffer.from(event.topics[4]).toString());
+        const tokenIdentifier = !event.topics[0]?.length ? "" : event.topics[0].toString();
+        const tokenName = !event.topics[1]?.length ? "" : event.topics[1].toString();
+        const tokenTicker = !event.topics[2]?.length ? "" : event.topics[2].toString();
+        const tokenType = !event.topics[3]?.length ? "" : event.topics[3].toString();
+        const numOfDecimals = !event.topics[4]?.length ? 0 : Number(Buffer.from(event.topics[4]).toString());
 
         return { tokenIdentifier, tokenName, tokenTicker, tokenType, numOfDecimals };
     }
@@ -484,11 +479,11 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private getOutputForRegisterDynamicTokenAndSettingRoles(event: TransactionEvent): RegisterDynamicOutput {
-        const tokenIdentifier = event.topics[0]?.length ? "" : event.topics[0].toString();
-        const tokenName = event.topics[1]?.length ? "" : event.topics[1].toString();
-        const tokenTicker = event.topics[2]?.length ? "" : event.topics[2].toString();
-        const tokenType = event.topics[3]?.length ? "" : event.topics[3].toString();
-        const numOfDecimals = event.topics[4]?.length ? 0 : Number(Buffer.from(event.topics[4]).toString());
+        const tokenIdentifier = !event.topics[0]?.length ? "" : event.topics[0].toString();
+        const tokenName = !event.topics[1]?.length ? "" : event.topics[1].toString();
+        const tokenTicker = !event.topics[2]?.length ? "" : event.topics[2].toString();
+        const tokenType = !event.topics[3]?.length ? "" : event.topics[3].toString();
+        const numOfDecimals = !event.topics[4]?.length ? 0 : Number(Buffer.from(event.topics[4]).toString());
 
         return { tokenIdentifier, tokenName, tokenTicker, tokenType, numOfDecimals };
     }

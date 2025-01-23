@@ -28,7 +28,7 @@ export function prepareTransactionForBroadcasting(transaction: ITransaction | IT
         version: transaction.version,
         options: transaction.options,
         guardian: transaction.guardian || undefined,
-        relayer: transaction.relayer.bech32() || undefined,
+        relayer: transaction.relayer.toBech32() || undefined,
         relayerSignature:
             transaction.relayerSignature.length === 0
                 ? undefined

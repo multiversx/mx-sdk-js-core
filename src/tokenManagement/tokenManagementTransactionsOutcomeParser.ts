@@ -390,7 +390,7 @@ export class TokenManagementTransactionsOutcomeParser {
     private getOutputForESDTSetNewURIsEvent(event: TransactionEvent): SetNewUrisOutput {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const uri = !event.topics[3]?.length ? "" : event.topics[3].toString();
+        const uri = event.topics[3]?.length ? event.topics[3].toString() : "";
         return { tokenIdentifier, nonce, uri };
     }
 
@@ -418,7 +418,7 @@ export class TokenManagementTransactionsOutcomeParser {
     private getOutputForESDTUpdateMetadataEvent(event: TransactionEvent): UpdateAttibutesOutput {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const metadata = !event.topics[3]?.length ? new Uint8Array() : new Uint8Array(Buffer.from(event.topics[3]));
+        const metadata = event.topics[3]?.length ? new Uint8Array(Buffer.from(event.topics[3])) : new Uint8Array();
 
         return { tokenIdentifier, nonce, metadata };
     }
@@ -433,7 +433,7 @@ export class TokenManagementTransactionsOutcomeParser {
     private getOutputForESDTMetadataRecreateEvent(event: TransactionEvent): UpdateAttibutesOutput {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const metadata = !event.topics[3]?.length ? new Uint8Array() : new Uint8Array(Buffer.from(event.topics[3]));
+        const metadata = event.topics[3]?.length ? new Uint8Array(Buffer.from(event.topics[3])) : new Uint8Array();
 
         return { tokenIdentifier, nonce, metadata };
     }
@@ -447,9 +447,9 @@ export class TokenManagementTransactionsOutcomeParser {
 
     private getOutputForChangeToDynamicEvent(event: TransactionEvent): ChangeToDynamicOutput {
         const tokenIdentifier = this.extractTokenIdentifier(event);
-        const tokenName = !event.topics[1]?.length ? "" : event.topics[1].toString();
-        const tickerName = !event.topics[2]?.length ? "" : event.topics[2].toString();
-        const tokenType = !event.topics[3]?.length ? "" : event.topics[3].toString();
+        const tokenName = event.topics[1]?.length ? event.topics[1].toString() : "";
+        const tickerName = event.topics[2]?.length ? event.topics[2].toString() : "";
+        const tokenType = event.topics[3]?.length ? event.topics[3].toString() : "";
 
         return { tokenIdentifier, tokenName, tickerName, tokenType };
     }
@@ -462,11 +462,11 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private getOutputForRegisterDynamicToken(event: TransactionEvent): RegisterDynamicOutput {
-        const tokenIdentifier = !event.topics[0]?.length ? "" : event.topics[0].toString();
-        const tokenName = !event.topics[1]?.length ? "" : event.topics[1].toString();
-        const tokenTicker = !event.topics[2]?.length ? "" : event.topics[2].toString();
-        const tokenType = !event.topics[3]?.length ? "" : event.topics[3].toString();
-        const numOfDecimals = !event.topics[4]?.length ? 0 : Number(Buffer.from(event.topics[4]).toString());
+        const tokenIdentifier = event.topics[0]?.length ? event.topics[0].toString() : "";
+        const tokenName = event.topics[1]?.length ? event.topics[1].toString() : "";
+        const tokenTicker = event.topics[2]?.length ? event.topics[2].toString() : "";
+        const tokenType = event.topics[3]?.length ? event.topics[3].toString() : "";
+        const numOfDecimals = event.topics[4]?.length ? Number(Buffer.from(event.topics[4]).toString()) : 0;
 
         return { tokenIdentifier, tokenName, tokenTicker, tokenType, numOfDecimals };
     }
@@ -479,11 +479,11 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private getOutputForRegisterDynamicTokenAndSettingRoles(event: TransactionEvent): RegisterDynamicOutput {
-        const tokenIdentifier = !event.topics[0]?.length ? "" : event.topics[0].toString();
-        const tokenName = !event.topics[1]?.length ? "" : event.topics[1].toString();
-        const tokenTicker = !event.topics[2]?.length ? "" : event.topics[2].toString();
-        const tokenType = !event.topics[3]?.length ? "" : event.topics[3].toString();
-        const numOfDecimals = !event.topics[4]?.length ? 0 : Number(Buffer.from(event.topics[4]).toString());
+        const tokenIdentifier = event.topics[0]?.length ? event.topics[0].toString() : "";
+        const tokenName = event.topics[1]?.length ? event.topics[1].toString() : "";
+        const tokenTicker = event.topics[2]?.length ? event.topics[2].toString() : "";
+        const tokenType = event.topics[3]?.length ? event.topics[3].toString() : "";
+        const numOfDecimals = event.topics[4]?.length ? Number(Buffer.from(event.topics[4]).toString()) : 0;
 
         return { tokenIdentifier, tokenName, tokenTicker, tokenType, numOfDecimals };
     }

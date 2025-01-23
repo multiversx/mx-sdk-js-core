@@ -333,30 +333,86 @@ export class DelegationTransactionsFactory {
         }).build();
     }
 
-    createTransactionForWithdrawing(_sender: Address, _options: resources.ManageDelegationContractInput): Transaction {
-        throw new Error("Method not implemented.");
-    }
+    createTransactionForDelegating(sender: Address, options: resources.DelegateActionsInput): Transaction {
+        const dataParts = ["delegate"];
+        const gasLimit =
+            this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
 
-    createTransactionForUndelegating(_sender: Address, _options: resources.DelegateActionsInput): Transaction {
-        throw new Error("Method not implemented.");
-    }
-
-    createTransactionForRedelegatingRewards(
-        _sender: Address,
-        _options: resources.ManageDelegationContractInput,
-    ): Transaction {
-        throw new Error("Method not implemented.");
+        return new TransactionBuilder({
+            config: this.config,
+            sender: sender,
+            receiver: options.delegationContract,
+            dataParts: dataParts,
+            gasLimit: gasLimit,
+            amount: options.amount,
+            addDataMovementGas: false,
+        }).build();
     }
 
     createTransactionForClaimingRewards(
-        _sender: Address,
-        _options: resources.ManageDelegationContractInput,
+        sender: Address,
+        options: resources.ManageDelegationContractInput,
     ): Transaction {
-        throw new Error("Method not implemented.");
+        const dataParts = ["claimRewards"];
+        const gasLimit =
+            this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: sender,
+            receiver: options.delegationContract,
+            dataParts: dataParts,
+            gasLimit: gasLimit,
+            addDataMovementGas: false,
+        }).build();
     }
 
-    createTransactionForDelegating(_sender: Address, _options: resources.DelegateActionsInput): Transaction {
-        throw new Error("Method not implemented.");
+    createTransactionForRedelegatingRewards(
+        sender: Address,
+        options: resources.ManageDelegationContractInput,
+    ): Transaction {
+        const dataParts = ["reDelegateRewards"];
+        const gasLimit =
+            this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: sender,
+            receiver: options.delegationContract,
+            dataParts: dataParts,
+            gasLimit: gasLimit,
+            addDataMovementGas: false,
+        }).build();
+    }
+
+    createTransactionForUndelegating(sender: Address, options: resources.DelegateActionsInput): Transaction {
+        const dataParts = ["unDelegate", this.argSerializer.valuesToStrings([new BigUIntValue(options.amount)])[0]];
+        const gasLimit =
+            this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: sender,
+            receiver: options.delegationContract,
+            dataParts: dataParts,
+            gasLimit: gasLimit,
+            addDataMovementGas: false,
+        }).build();
+    }
+
+    createTransactionForWithdrawing(sender: Address, options: resources.ManageDelegationContractInput): Transaction {
+        const dataParts = ["withdraw"];
+        const gasLimit =
+            this.config.gasLimitDelegationOperations + this.config.additionalGasLimitForDelegationOperations;
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: sender,
+            receiver: options.delegationContract,
+            dataParts: dataParts,
+            gasLimit: gasLimit,
+            addDataMovementGas: false,
+        }).build();
     }
 
     private computeExecutionGasLimitForNodesManagement(numNodes: number): bigint {

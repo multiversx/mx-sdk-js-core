@@ -1,7 +1,9 @@
 import { AxiosHeaders } from "axios";
 import { assert } from "chai";
 import { Address } from "../address";
+import { loadTestWallet } from "../testutils";
 import { MockQuery } from "../testutils/dummyQuery";
+import { TransactionComputer } from "../transactionComputer";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { INetworkProvider, ITransactionNext } from "./interface";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
@@ -191,6 +193,42 @@ describe("test network providers on devnet: Proxy and API", function () {
         apiResponse.decimals = 0;
         proxyResponse.decimals = 0;
     }
+
+    it("should be able to send transaction with relayer", async function () {
+        this.timeout(5000);
+        const grace = await loadTestWallet("grace");
+        const relayer = await loadTestWallet("alice");
+        const transactionComputer = new TransactionComputer();
+        const nonce = (await apiProvider.getAccount(grace.getAddress())).nonce;
+        const transaction: ITransactionNext = {
+            receiver: grace.getAddress().bech32(),
+            sender: grace.getAddress().bech32(),
+            gasPrice: BigInt(1000000000),
+            gasLimit: BigInt(150000),
+            chainID: "D",
+            version: 1,
+            nonce: BigInt(nonce),
+            relayer: relayer.getAddress(),
+            value: BigInt(1),
+            senderUsername: "",
+            receiverUsername: "",
+            guardian: "",
+            guardianSignature: new Uint8Array(),
+            options: 0,
+            data: new Uint8Array(),
+            signature: new Uint8Array(),
+            relayerSignature: new Uint8Array(),
+        };
+        transaction.signature = await grace.signer.sign(transactionComputer.computeBytesForSigning(transaction));
+
+        const buffer = transactionComputer.computeBytesForSigning(transaction);
+
+        const signature = await relayer.signer.sign(Buffer.from(buffer));
+        transaction.relayerSignature = signature;
+
+        const hash = await proxyProvider.sendTransaction(transaction);
+        assert.isNotNull(hash);
+    });
 
     it("should be able to send transaction(s)", async function () {
         this.timeout(5000);

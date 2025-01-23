@@ -374,6 +374,7 @@ describe("test delegation transactions factory", function () {
         assert.deepEqual(transaction.data, Buffer.from("delegate"));
         assert.equal(transaction.value, 1000000000000000000n);
     });
+
     it("should create 'Transaction' for claiming rewards", async function () {
         const sender = Address.newFromBech32("erd18s6a06ktr2v6fgxv4ffhauxvptssnaqlds45qgsrucemlwc8rawq553rt2");
         const delegationContract = Address.newFromHex(DELEGATION_MANAGER_SC_ADDRESS_HEX);

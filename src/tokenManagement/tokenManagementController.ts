@@ -491,4 +491,200 @@ export class TokenManagementController {
     parseBurnQuantity(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
         return this.parser.parseBurnQuantity(transactionOnNetwork);
     }
+
+    async createTransactionForModifyingRoyalties(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.ModifyRoyaltiesInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForModifyingRoyalties(sender.address, options);
+
+        transaction.nonce = nonce;
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async awaitCompletedModifyRoyalties(txHash: string): Promise<resources.EsdtOutput[]> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.parseModifyRoyalties(transaction);
+    }
+
+    parseModifyRoyalties(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
+        return this.parser.parseModifyRoyalties(transactionOnNetwork);
+    }
+
+    async createTransactionForSettingNewUris(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.SetNewUriInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForSettingNewUris(sender.address, options);
+
+        transaction.nonce = nonce;
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async awaitCompletedSetNewUris(txHash: string): Promise<resources.EsdtOutput[]> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.parseSetNewUris(transaction);
+    }
+
+    parseSetNewUris(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
+        return this.parser.parseSetNewUris(transactionOnNetwork);
+    }
+
+    async createTransactionForModifyingCreator(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.SetNewUriInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForModifyingCreator(sender.address, options);
+
+        transaction.nonce = nonce;
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async awaitCompletedModifyCreator(txHash: string): Promise<resources.ModifyingCreatorOutput[]> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.parseModifyCreator(transaction);
+    }
+
+    parseModifyCreator(transactionOnNetwork: TransactionOnNetwork): resources.ModifyingCreatorOutput[] {
+        return this.parser.parseModifyCreator(transactionOnNetwork);
+    }
+
+    async createTransactionForUpdatingMetadata(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.SetNewUriInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForModifyingCreator(sender.address, options);
+
+        transaction.nonce = nonce;
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async awaitCompletedUpdateMetadata(txHash: string): Promise<resources.EsdtOutput[]> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.parseUpdateMetadata(transaction);
+    }
+
+    parseUpdateMetadata(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
+        return this.parser.parseUpdateMetadata(transactionOnNetwork);
+    }
+
+    async createTransactionForMetadataRecreate(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.SetNewUriInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForMetadataRecreate(sender.address, options);
+
+        transaction.nonce = nonce;
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async awaitCompletedMetadataRecreate(txHash: string): Promise<resources.EsdtOutput[]> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.parseMetadataRecreate(transaction);
+    }
+
+    parseMetadataRecreate(transactionOnNetwork: TransactionOnNetwork): resources.EsdtOutput[] {
+        return this.parser.parseMetadataRecreate(transactionOnNetwork);
+    }
+
+    async createTransactionForChangingTokenToDynamic(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.SetNewUriInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForChangingTokenToDynamic(sender.address, options);
+
+        transaction.nonce = nonce;
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async awaitCompletedChangeTokenToDynamic(txHash: string): Promise<resources.ChangeToDynamicOutput[]> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.parseChangeTokenToDynamic(transaction);
+    }
+
+    parseChangeTokenToDynamic(transactionOnNetwork: TransactionOnNetwork): resources.ChangeToDynamicOutput[] {
+        return this.parser.parseChangeTokenToDynamic(transactionOnNetwork);
+    }
+
+    async createTransactionForUpdatingTokenId(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.UpdateTokenIDInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUpdatingTokenId(sender.address, options);
+
+        transaction.nonce = nonce;
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async awaitCompletedUpdateTokenId(txHash: string): Promise<TransactionOnNetwork> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return transaction;
+    }
+
+    async createTransactionForRegisteringDynamicToken(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.RegisteringDynamicTokenInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForRegisteringDynamicToken(sender.address, options);
+
+        transaction.nonce = nonce;
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async awaitCompletedRegisterDynamicToken(txHash: string): Promise<resources.EsdtOutput[]> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.parseRegisterDynamicToken(transaction);
+    }
+
+    parseRegisterDynamicToken(transactionOnNetwork: TransactionOnNetwork): resources.RegisterDynamicOutput[] {
+        return this.parser.parseRegisterDynamicToken(transactionOnNetwork);
+    }
+
+    async createTransactionForRegisteringDynamicTokenAndSettingRoles(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.RegisteringDynamicTokenInput,
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForRegisteringDynamicAndSettingRoles(sender.address, options);
+
+        transaction.nonce = nonce;
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async awaitCompletedRegisterDynamicTokenAndSettingRoles(txHash: string): Promise<resources.EsdtOutput[]> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.parseRegisterDynamicTokenAndSettingRoles(transaction);
+    }
+
+    parseRegisterDynamicTokenAndSettingRoles(
+        transactionOnNetwork: TransactionOnNetwork,
+    ): resources.RegisterDynamicOutput[] {
+        return this.parser.parseRegisterDynamicTokenAndSettingRoles(transactionOnNetwork);
+    }
 }

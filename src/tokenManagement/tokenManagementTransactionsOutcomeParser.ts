@@ -1,10 +1,20 @@
+import BigNumber from "bignumber.js";
 import { bufferToBigInt } from "../abi/codec/utils";
 import { Address } from "../address";
 import { ErrParseTransactionOutcome } from "../errors";
 import { TransactionEvent } from "../transactionEvents";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { findEventsByIdentifier } from "../transactionsOutcomeParsers/resources";
-import { MintNftOutput, SpecialRoleOutput } from "./resources";
+import {
+    ChangeToDynamicOutput,
+    MintNftOutput,
+    ModifyingCreatorOutput,
+    ModifyRoyaltiesOutput,
+    RegisterDynamicOutput,
+    SetNewUrisOutput,
+    SpecialRoleOutput,
+    UpdateAttibutesOutput,
+} from "./resources";
 
 export class TokenManagementTransactionsOutcomeParser {
     constructor() {}
@@ -347,6 +357,135 @@ export class TokenManagementTransactionsOutcomeParser {
             nonce: nonce,
             burntQuantity: burntQuantity,
         };
+    }
+
+    parseModifyRoyalties(transaction: TransactionOnNetwork): ModifyRoyaltiesOutput[] {
+        this.ensureNoError(transaction.logs.events);
+
+        const events = findEventsByIdentifier(transaction, "ESDTModifyRoyalties");
+        return events.map((event) => this.getOutputForESDTModifyRoyaltiesEvent(event));
+    }
+
+    private getOutputForESDTModifyRoyaltiesEvent(event: TransactionEvent): ModifyRoyaltiesOutput {
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const royalties = !event.topics[3]?.length
+            ? BigInt(0)
+            : BigInt(new BigNumber(Buffer.from(event.topics[3]).toString("hex"), 16).toFixed());
+
+        return {
+            tokenIdentifier: tokenIdentifier,
+            nonce: nonce,
+            royalties,
+        };
+    }
+
+    parseSetNewUris(transaction: TransactionOnNetwork): SetNewUrisOutput[] {
+        this.ensureNoError(transaction.logs.events);
+
+        const events = findEventsByIdentifier(transaction, "ESDTSetNewURIs");
+        return events.map((event) => this.getOutputForESDTSetNewURIsEvent(event));
+    }
+
+    private getOutputForESDTSetNewURIsEvent(event: TransactionEvent): SetNewUrisOutput {
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const uri = event.topics[3]?.length ? event.topics[3].toString() : "";
+        return { tokenIdentifier, nonce, uri };
+    }
+
+    parseModifyCreator(transaction: TransactionOnNetwork): ModifyingCreatorOutput[] {
+        this.ensureNoError(transaction.logs.events);
+
+        const events = findEventsByIdentifier(transaction, "ESDTModifyCreator");
+        return events.map((event) => this.getOutputForESDTModifyCreatorEvent(event));
+    }
+
+    private getOutputForESDTModifyCreatorEvent(event: TransactionEvent): ModifyingCreatorOutput {
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+
+        return { tokenIdentifier, nonce };
+    }
+
+    parseUpdateMetadata(transaction: TransactionOnNetwork): UpdateAttibutesOutput[] {
+        this.ensureNoError(transaction.logs.events);
+
+        const events = findEventsByIdentifier(transaction, "ESDTMetaDataUpdate");
+        return events.map((event) => this.getOutputForESDTUpdateMetadataEvent(event));
+    }
+
+    private getOutputForESDTUpdateMetadataEvent(event: TransactionEvent): UpdateAttibutesOutput {
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const metadata = event.topics[3]?.length ? new Uint8Array(Buffer.from(event.topics[3])) : new Uint8Array();
+
+        return { tokenIdentifier, nonce, metadata };
+    }
+
+    parseMetadataRecreate(transaction: TransactionOnNetwork): UpdateAttibutesOutput[] {
+        this.ensureNoError(transaction.logs.events);
+
+        const events = findEventsByIdentifier(transaction, "ESDTMetaDataRecreate");
+        return events.map((event) => this.getOutputForESDTMetadataRecreateEvent(event));
+    }
+
+    private getOutputForESDTMetadataRecreateEvent(event: TransactionEvent): UpdateAttibutesOutput {
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const nonce = this.extractNonce(event);
+        const metadata = event.topics[3]?.length ? new Uint8Array(Buffer.from(event.topics[3])) : new Uint8Array();
+
+        return { tokenIdentifier, nonce, metadata };
+    }
+
+    parseChangeTokenToDynamic(transaction: TransactionOnNetwork): ChangeToDynamicOutput[] {
+        this.ensureNoError(transaction.logs.events);
+
+        const events = findEventsByIdentifier(transaction, "changeToDynamic");
+        return events.map((event) => this.getOutputForChangeToDynamicEvent(event));
+    }
+
+    private getOutputForChangeToDynamicEvent(event: TransactionEvent): ChangeToDynamicOutput {
+        const tokenIdentifier = this.extractTokenIdentifier(event);
+        const tokenName = event.topics[1]?.length ? event.topics[1].toString() : "";
+        const tickerName = event.topics[2]?.length ? event.topics[2].toString() : "";
+        const tokenType = event.topics[3]?.length ? event.topics[3].toString() : "";
+
+        return { tokenIdentifier, tokenName, tickerName, tokenType };
+    }
+
+    parseRegisterDynamicToken(transaction: TransactionOnNetwork): RegisterDynamicOutput[] {
+        this.ensureNoError(transaction.logs.events);
+
+        const events = findEventsByIdentifier(transaction, "registerDynamic");
+        return events.map((event) => this.getOutputForRegisterDynamicToken(event));
+    }
+
+    private getOutputForRegisterDynamicToken(event: TransactionEvent): RegisterDynamicOutput {
+        const tokenIdentifier = event.topics[0]?.length ? event.topics[0].toString() : "";
+        const tokenName = event.topics[1]?.length ? event.topics[1].toString() : "";
+        const tokenTicker = event.topics[2]?.length ? event.topics[2].toString() : "";
+        const tokenType = event.topics[3]?.length ? event.topics[3].toString() : "";
+        const numOfDecimals = event.topics[4]?.length ? Number(Buffer.from(event.topics[4]).toString()) : 0;
+
+        return { tokenIdentifier, tokenName, tokenTicker, tokenType, numOfDecimals };
+    }
+
+    parseRegisterDynamicTokenAndSettingRoles(transaction: TransactionOnNetwork): RegisterDynamicOutput[] {
+        this.ensureNoError(transaction.logs.events);
+
+        const events = findEventsByIdentifier(transaction, "registerAndSetAllRolesDynamic");
+        return events.map((event) => this.getOutputForRegisterDynamicTokenAndSettingRoles(event));
+    }
+
+    private getOutputForRegisterDynamicTokenAndSettingRoles(event: TransactionEvent): RegisterDynamicOutput {
+        const tokenIdentifier = event.topics[0]?.length ? event.topics[0].toString() : "";
+        const tokenName = event.topics[1]?.length ? event.topics[1].toString() : "";
+        const tokenTicker = event.topics[2]?.length ? event.topics[2].toString() : "";
+        const tokenType = event.topics[3]?.length ? event.topics[3].toString() : "";
+        const numOfDecimals = event.topics[4]?.length ? Number(Buffer.from(event.topics[4]).toString()) : 0;
+
+        return { tokenIdentifier, tokenName, tokenTicker, tokenType, numOfDecimals };
     }
 
     private ensureNoError(transactionEvents: TransactionEvent[]) {

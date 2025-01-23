@@ -117,3 +117,21 @@ export type MintNftOutput = {
 };
 
 export type EsdtOutput = { tokenIdentifier: string };
+export type ModifyRoyaltiesOutput = { tokenIdentifier: string; nonce: bigint; royalties: bigint };
+export type SetNewUrisOutput = { tokenIdentifier: string; nonce: bigint; uri: string };
+export type ModifyingCreatorOutput = { tokenIdentifier: string; nonce: bigint };
+export type UpdateAttibutesOutput = { tokenIdentifier: string; nonce: bigint; metadata: Uint8Array };
+export type ChangeToDynamicOutput = {
+    tokenIdentifier: string;
+    tokenName: string;
+    tickerName: string;
+    tokenType: string;
+};
+export type UpdateTokenIDOutput = { caller: Address; tokenIdentifier: string; token: string };
+export type RegisterDynamicOutput = {
+    tokenIdentifier: string;
+    tokenName: string;
+    tokenTicker: string;
+    tokenType: string;
+    numOfDecimals: number;
+};

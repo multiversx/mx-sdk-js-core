@@ -28,6 +28,11 @@ export function prepareTransactionForBroadcasting(transaction: ITransaction | IT
         version: transaction.version,
         options: transaction.options,
         guardian: transaction.guardian || undefined,
+        relayer: transaction.relayer.toBech32() || undefined,
+        relayerSignature:
+            transaction.relayerSignature.length === 0
+                ? undefined
+                : Buffer.from(transaction.relayerSignature).toString("hex"),
         signature: Buffer.from(transaction.signature).toString("hex"),
         guardianSignature:
             transaction.guardianSignature.length === 0

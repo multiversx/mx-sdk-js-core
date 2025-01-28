@@ -17,7 +17,11 @@ export class PubkeyEncryptor {
 
         // For the nonce we use a random component and a deterministic one based on the message
         //  - this is so we won't completely rely on the random number generator
-        const nonceDeterministic = crypto.createHash('sha256').update(data).digest().slice(0, PubKeyEncNonceLength / 2);
+        const nonceDeterministic = crypto
+            .createHash("sha256")
+            .update(data)
+            .digest()
+            .slice(0, PubKeyEncNonceLength / 2);
         const nonceRandom = nacl.randomBytes(PubKeyEncNonceLength / 2);
         const nonce = Buffer.concat([nonceDeterministic, nonceRandom]);
         const encryptedMessage = nacl.box(data, nonce, recipientDHPubKey, edhConvertedSecretKey);
@@ -25,23 +29,24 @@ export class PubkeyEncryptor {
         // Note that the ciphertext is already authenticated for the ephemeral key - but we want it authenticated by
         //  the ed25519 key which the user interacts with. A signature over H(ciphertext | edhPubKey)
         //  would be enough
-        const authMessage = crypto.createHash('sha256').update(
-            Buffer.concat([encryptedMessage, edhPair.publicKey])
-        ).digest();
+        const authMessage = crypto
+            .createHash("sha256")
+            .update(Buffer.concat([encryptedMessage, edhPair.publicKey]))
+            .digest();
 
         const signature = authSecretKey.sign(authMessage);
 
         return new X25519EncryptedData({
             version: PubKeyEncVersion,
-            nonce: Buffer.from(nonce).toString('hex'),
+            nonce: Buffer.from(nonce).toString("hex"),
             cipher: PubKeyEncCipher,
-            ciphertext: Buffer.from(encryptedMessage).toString('hex'),
-            mac: signature.toString('hex'),
+            ciphertext: Buffer.from(encryptedMessage).toString("hex"),
+            mac: Buffer.from(signature).toString("hex"),
             identities: {
                 recipient: recipientPubKey.hex(),
-                ephemeralPubKey: Buffer.from(edhPair.publicKey).toString('hex'),
+                ephemeralPubKey: Buffer.from(edhPair.publicKey).toString("hex"),
                 originatorPubKey: authSecretKey.generatePublicKey().hex(),
-            }
+            },
         });
     }
 }

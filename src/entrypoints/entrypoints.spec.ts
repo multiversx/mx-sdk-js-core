@@ -1,26 +1,24 @@
 import { assert } from "chai";
 import { readFileSync } from "fs";
+import path from "path";
 import { Account } from "../accounts/account";
 import { Address } from "../address";
-import { loadAbiRegistry, loadTestWallet, TestWallet } from "../testutils";
+import { loadAbiRegistry } from "../testutils";
 import { TransactionComputer } from "../transactionComputer";
 import { DevnetEntrypoint } from "./entrypoints";
 
 describe("TestEntrypoint", () => {
     const entrypoint = new DevnetEntrypoint();
-    let alicePem: TestWallet;
-    let bobPem: TestWallet;
     let txComputer: TransactionComputer;
 
     before(async function () {
-        alicePem = await loadTestWallet("alice");
-        bobPem = await loadTestWallet("bob");
         txComputer = new TransactionComputer();
     });
 
     it("native transfer", async () => {
         const controller = entrypoint.createTransfersController();
-        const sender = Account.newFromPem(alicePem.pemFileText);
+        const filePath = path.join("src", "testdata", "testwallets", "alice.pem");
+        const sender = await Account.newFromPem(filePath);
         sender.nonce = 77777n;
 
         const transaction = await controller.createTransactionForTransfer(
@@ -41,7 +39,8 @@ describe("TestEntrypoint", () => {
     it("contract flow", async function () {
         this.timeout(30000);
         const abi = await loadAbiRegistry("src/testdata/adder.abi.json");
-        const sender = Account.newFromPem(alicePem.pemFileText);
+        const filePath = path.join("src", "testdata", "testwallets", "alice.pem");
+        const sender = await Account.newFromPem(filePath);
         sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 
         const controller = entrypoint.createSmartContractController(abi);
@@ -85,10 +84,12 @@ describe("TestEntrypoint", () => {
 
     it("create relayed transaction", async function () {
         const transferController = entrypoint.createTransfersController();
-        const sender = Account.newFromPem(alicePem.pemFileText);
+        const filePath = path.join("src", "testdata", "testwallets", "alice.pem");
+        const sender = await Account.newFromPem(filePath);
         sender.nonce = 77777n;
 
-        const relayer = Account.newFromPem(bobPem.pemFileText);
+        const bobPath = path.join("src", "testdata", "testwallets", "alice.pem");
+        const relayer = await Account.newFromPem(bobPath);
         relayer.nonce = 7n;
 
         const transaction = await transferController.createTransactionForTransfer(
@@ -101,7 +102,7 @@ describe("TestEntrypoint", () => {
         );
         const innerTransactionGasLimit = transaction.gasLimit;
         transaction.gasLimit = BigInt(0);
-        transaction.signature = await sender.sign(txComputer.computeBytesForSigning(transaction));
+        transaction.signature = sender.sign(txComputer.computeBytesForSigning(transaction));
 
         const relayedController = entrypoint.createRelayedController();
         const relayedTransaction = await relayedController.createRelayedV2Transaction(
@@ -120,5 +121,13 @@ describe("TestEntrypoint", () => {
             ),
         );
         assert.equal(relayedTransaction.gasLimit, 442000n);
+    });
+
+    it("create account", async () => {
+        const account = await entrypoint.createAccount();
+        assert.isNotNull(account);
+        assert.isNotNull(account.address);
+        assert.equal(account.secretKey.valueOf().length, 32);
+        assert.equal(account.publicKey.valueOf().length, 32);
     });
 });

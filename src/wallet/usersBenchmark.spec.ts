@@ -28,7 +28,7 @@ describe("behchmark sign and verify", () => {
 
         for (let i = 0; i < n; i++) {
             const signature = secretKeys[i].sign(messages[i]);
-            goodSignatures.push(signature);
+            goodSignatures.push(Buffer.from(signature));
         }
 
         console.timeEnd("sign");

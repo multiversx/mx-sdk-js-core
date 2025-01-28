@@ -1,5 +1,6 @@
 import * as ed from "@noble/ed25519";
 import { sha512 } from "@noble/hashes/sha512";
+import nacl from "tweetnacl";
 import { Address } from "../address";
 import { guardLength } from "./assertions";
 import { parseUserKey } from "./pem";
@@ -36,9 +37,15 @@ export class UserSecretKey {
         return new UserPublicKey(buffer);
     }
 
-    sign(message: Buffer | Uint8Array): Buffer {
+    static generate(): UserSecretKey {
+        const keyPair = nacl.sign.keyPair(); // Generates a new signing keypair
+        const secretKey = keyPair.secretKey.subarray(0, 32); // Extract only the private key part
+        return new UserSecretKey(secretKey);
+    }
+
+    sign(message: Buffer | Uint8Array): Uint8Array {
         const signature = ed.sync.sign(new Uint8Array(message), new Uint8Array(this.buffer));
-        return Buffer.from(signature);
+        return signature;
     }
 
     hex(): string {

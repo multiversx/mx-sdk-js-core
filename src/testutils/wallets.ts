@@ -103,7 +103,7 @@ export class TestWallet {
         this.signer = new UserSigner(UserSecretKey.fromString(secretKeyHex));
         this.keyFileObject = keyFileObject;
         this.pemFileText = pemFileText;
-        this.account = new Account(this.address);
+        this.account = new Account(new UserSecretKey(this.secretKey));
     }
 
     getAddress(): Address {

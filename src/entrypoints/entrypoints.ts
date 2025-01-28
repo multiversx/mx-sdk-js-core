@@ -1,5 +1,6 @@
 import { AbiRegistry } from "../abi";
 import { AccountController, AccountTransactionsFactory } from "../accountManagement";
+import { Account } from "../accounts";
 import { IAccount } from "../accounts/interfaces";
 import { Address } from "../address";
 import { DelegationController, DelegationTransactionsFactory } from "../delegation";
@@ -19,7 +20,7 @@ import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
 import { TransferTransactionsFactory } from "../transfers";
 import { TransfersController } from "../transfers/transfersControllers";
-import { UserVerifier } from "../wallet";
+import { UserSecretKey, UserVerifier } from "../wallet";
 import { DevnetEntrypointConfig, MainnetEntrypointConfig, TestnetEntrypointConfig } from "./config";
 
 class NetworkEntrypoint {
@@ -38,6 +39,15 @@ class NetworkEntrypoint {
         this.chainId = options.chainId;
     }
 
+    async createAccount(): Promise<Account> {
+        const secretKey = UserSecretKey.generate();
+        return new Account(secretKey);
+    }
+
+    async getAirdrop(_address: Address): Promise<void> {
+        throw new Error("Not implemented");
+    }
+
     async signTransaction(transaction: Transaction, account: IAccount): Promise<void> {
         const txComputer = new TransactionComputer();
         transaction.signature = await account.sign(txComputer.computeBytesForSigning(transaction));
@@ -47,11 +57,6 @@ class NetworkEntrypoint {
         const verifier = UserVerifier.fromAddress(transaction.sender);
         const txComputer = new TransactionComputer();
         return verifier.verify(txComputer.computeBytesForVerifying(transaction), transaction.signature);
-    }
-
-    async signMessage(message: Message, account: IAccount): Promise<void> {
-        const messageComputer = new MessageComputer();
-        message.signature = await account.sign(messageComputer.computeBytesForSigning(message));
     }
 
     verifyMessageSignature(message: Message): boolean {

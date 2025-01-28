@@ -11,34 +11,55 @@ export class PemEntry {
 
     static fromTextAll(pemText: string): PemEntry[] {
         const lines = PemEntry.cleanLines(pemText.split("\n"));
-        // Group lines based on whether they include "-----"
-        const groupedLines: { [key: string]: string[] } = PemEntry.groupLines(lines);
-        const messageLinesGroups = Object.values(groupedLines).filter((_, idx) => idx % 2 === 1) as string[][];
-        const messageBase64s = messageLinesGroups.map((lines) => lines.join(""));
-        const labels = PemEntry.parseLabels(lines);
 
-        return messageBase64s.map((messageBase64, index) => {
-            const messageHex = new TextDecoder().decode(base64.toByteArray(messageBase64));
+        // Group PEM entries into blocks of header, content, and footer
+        const blocks: string[][] = PemEntry.groupBlocks(lines);
+
+        return blocks.map((block) => {
+            // Extract label from the header line
+            const header = block[0];
+            const footer = block[block.length - 1];
+            if (!header.startsWith("-----BEGIN PRIVATE KEY for") || !footer.startsWith("-----END PRIVATE KEY for")) {
+                throw new Error("Invalid PEM format");
+            }
+
+            const label = header.replace("-----BEGIN PRIVATE KEY for", "").replace("-----", "").trim();
+
+            // Join all content lines between header and footer
+            const base64Message = block.slice(1, block.length - 1).join("");
+
+            // Decode Base64 to Uint8Array
+            const messageHex = new TextDecoder().decode(base64.toByteArray(base64Message));
             const messageBytes = Uint8Array.from(Buffer.from(messageHex, "hex"));
-            return new PemEntry(labels[index], messageBytes);
+
+            return new PemEntry(label, messageBytes);
         });
     }
 
-    private static groupLines(lines: string[]): { [key: string]: string[] } {
-        return lines.reduce(
-            (acc, line) => {
-                const isHeaderOrFooter = line.includes("-----");
-                const key = isHeaderOrFooter ? "headers" : "messages";
+    private static groupBlocks(lines: string[]): string[][] {
+        const blocks: string[][] = [];
+        let currentBlock: string[] = [];
 
-                if (!acc[key]) {
-                    acc[key] = [];
+        for (const line of lines) {
+            if (line.startsWith("-----BEGIN PRIVATE KEY for")) {
+                if (currentBlock.length > 0) {
+                    blocks.push(currentBlock);
                 }
-                acc[key].push(line);
+                currentBlock = [line]; // Start a new block
+            } else if (line.startsWith("-----END PRIVATE KEY for")) {
+                currentBlock.push(line);
+                blocks.push(currentBlock); // Finalize the current block
+                currentBlock = [];
+            } else {
+                currentBlock.push(line); // Add content to the current block
+            }
+        }
 
-                return acc;
-            },
-            { headers: [], messages: [] } as { [key: string]: string[] },
-        );
+        if (currentBlock.length > 0) {
+            throw new Error("Invalid PEM format: Missing END line for a block");
+        }
+
+        return blocks;
     }
 
     toText(): string {
@@ -57,15 +78,11 @@ export class PemEntry {
         return lines.map((line) => line.trim()).filter((line) => line.length > 0);
     }
 
-    private static parseLabels(headers: string[]): string[] {
-        const marker = "-----BEGIN PRIVATE KEY for";
-        return headers
-            .filter((line) => line.startsWith(marker))
-            .map((line) => line.replace(marker, "").replace(/-/g, "").trim());
-    }
-
     private static wrapText(text: string, width: number): string[] {
-        const regex = new RegExp(`.{1,${width}}`, "g"); // Match chunks of up to `width` characters
-        return text.match(regex) || [];
+        const lines: string[] = [];
+        for (let i = 0; i < text.length; i += width) {
+            lines.push(text.slice(i, i + width));
+        }
+        return lines;
     }
 }

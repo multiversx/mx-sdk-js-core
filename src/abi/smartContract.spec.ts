@@ -8,6 +8,7 @@ import {
     TestWallet,
     Wait,
 } from "../testutils";
+import { TransactionComputer } from "../transactionComputer";
 import { TransactionStatus } from "../transactionStatus";
 import { TransactionWatcher } from "../transactionWatcher";
 import { Code } from "./code";
@@ -73,6 +74,8 @@ describe("test contract", () => {
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);
+        const computer = new TransactionComputer();
+        const hashString = computer.computeTransactionHash(deployTransaction);
 
         await Promise.all([
             provider.mockTransactionTimeline(deployTransaction, [
@@ -82,7 +85,7 @@ describe("test contract", () => {
                 new TransactionStatus("executed"),
                 new MarkCompleted(),
             ]),
-            watcher.awaitCompleted(deployTransaction.getHash().hex()),
+            watcher.awaitCompleted(hashString),
         ]);
 
         assert.isTrue((await provider.getTransaction(hash)).status.isCompleted());
@@ -150,8 +153,8 @@ describe("test contract", () => {
                 new TransactionStatus("executed"),
                 new MarkCompleted(),
             ]),
-            watcher.awaitCompleted(callTransactionOne.getHash().hex()),
-            watcher.awaitCompleted(callTransactionTwo.getHash().hex()),
+            watcher.awaitCompleted(hashOne),
+            watcher.awaitCompleted(hashTwo),
         ]);
 
         assert.isTrue((await provider.getTransaction(hashOne)).status.isCompleted());
@@ -197,7 +200,7 @@ describe("test contract", () => {
                 new TransactionStatus("executed"),
                 new MarkCompleted(),
             ]),
-            watcher.awaitCompleted(deployTransaction.getHash().hex()),
+            watcher.awaitCompleted(hash),
         ]);
 
         assert.isTrue((await provider.getTransaction(hash)).status.isCompleted());

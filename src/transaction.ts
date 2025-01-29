@@ -1,7 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
-import { Hash } from "./hash";
 import { IPlainTransactionObject } from "./interface";
 import { INetworkConfig } from "./interfaceOfNetwork";
 import { interpretSignatureAsBuffer } from "./signature";
@@ -325,13 +324,6 @@ export class Transaction {
     }
 
     /**
-     * Legacy method, use "TransactionComputer.computeTransactionHash()" instead.
-     */
-    getHash(): TransactionHash {
-        return TransactionHash.compute(this);
-    }
-
-    /**
      * Legacy method, use "TransactionComputer.computeBytesForSigning()" instead.
      * Serializes a transaction to a sequence of bytes, ready to be signed.
      * This function is called internally by signers.
@@ -465,25 +457,5 @@ export class Transaction {
 
     private toHexOrUndefined(value?: Uint8Array) {
         return value && value.length ? Buffer.from(value).toString("hex") : undefined;
-    }
-}
-
-/**
- * Legacy class, use "TransactionComputer.computeTransactionHash()" instead.
- * An abstraction for handling and computing transaction hashes.
- */
-export class TransactionHash extends Hash {
-    constructor(hash: string) {
-        super(hash);
-    }
-
-    /**
-     * Legacy method, use "TransactionComputer.computeTransactionHash()" instead.
-     * Computes the hash of a transaction.
-     */
-    static compute(transaction: Transaction): TransactionHash {
-        const computer = new TransactionComputer();
-        const hash = computer.computeTransactionHash(transaction);
-        return new TransactionHash(Buffer.from(hash).toString("hex"));
     }
 }

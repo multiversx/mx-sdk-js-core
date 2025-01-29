@@ -19,13 +19,11 @@ export class KeyPair {
         return new KeyPair(secretKey);
     }
 
-    sign(data: Uint8Array): Uint8Array {
-        // Signs the data using the secret key of the keypair
+    async sign(data: Uint8Array): Promise<Uint8Array> {
         return this.secretKey.sign(data);
     }
 
-    verify(data: Uint8Array, signature: Uint8Array): boolean {
-        // Verifies the data using the public key of the keypair
+    async verify(data: Uint8Array, signature: Uint8Array): Promise<boolean> {
         return this.publicKey.verify(data, signature);
     }
 

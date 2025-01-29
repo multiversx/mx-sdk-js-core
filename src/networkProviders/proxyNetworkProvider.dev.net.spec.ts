@@ -13,6 +13,7 @@ import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 
 describe("ProxyNetworkProvider Tests", function () {
     const proxy = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
+    const transactionComputer = new TransactionComputer();
 
     it("should fetch network configuration", async () => {
         const result = await proxy.getNetworkConfig();
@@ -284,7 +285,7 @@ describe("ProxyNetworkProvider Tests", function () {
 
     it("should simulate transaction", async () => {
         const bob = await loadTestWallet("bob");
-        const transactionComputer = new TransactionComputer();
+
         let transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,
@@ -336,7 +337,6 @@ describe("ProxyNetworkProvider Tests", function () {
 
     it("should estimate transaction cost", async function () {
         const bob = await loadTestWallet("bob");
-        const transactionComputer = new TransactionComputer();
         const transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,
@@ -353,7 +353,6 @@ describe("ProxyNetworkProvider Tests", function () {
     it("should send and await for completed transaction", async function () {
         this.timeout(50000);
         const bob = await loadTestWallet("bob");
-        const transactionComputer = new TransactionComputer();
         let transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,

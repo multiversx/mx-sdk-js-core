@@ -28,8 +28,8 @@ export interface IPlainTransactionObject {
 }
 
 export interface INetworkConfig {
-    MinGasLimit: number;
-    GasPerDataByte: number;
-    GasPriceModifier: number;
-    ChainID: string;
+    minGasLimit: bigint;
+    gasPerDataByte: bigint;
+    gasPriceModifier: number;
+    chainID: string;
 }

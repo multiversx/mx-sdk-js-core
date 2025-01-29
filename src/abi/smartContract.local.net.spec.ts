@@ -29,6 +29,7 @@ describe("test on local testnet", function () {
     let provider = createLocalnetProvider();
     let watcher: TransactionWatcher;
     let parser: SmartContractTransactionsOutcomeParser;
+    const transactionComputer = new TransactionComputer();
 
     before(async function () {
         ({ alice, bob, carol } = await loadTestWallets());
@@ -61,7 +62,6 @@ describe("test on local testnet", function () {
         });
         deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
 
-        const transactionComputer = new TransactionComputer();
         deployTransaction.signature = await alice.signer.sign(
             Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
         );
@@ -146,7 +146,6 @@ describe("test on local testnet", function () {
         });
         deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
 
-        const transactionComputer = new TransactionComputer();
         deployTransaction.signature = await alice.signer.sign(
             Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
         );
@@ -224,7 +223,6 @@ describe("test on local testnet", function () {
             arguments: [new U32Value(10000)],
         });
         deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
-        const transactionComputer = new TransactionComputer();
         deployTransaction.signature = await alice.signer.sign(
             Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
         );
@@ -327,7 +325,6 @@ describe("test on local testnet", function () {
         });
         deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
 
-        const transactionComputer = new TransactionComputer();
         deployTransaction.signature = await alice.signer.sign(
             Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
         );

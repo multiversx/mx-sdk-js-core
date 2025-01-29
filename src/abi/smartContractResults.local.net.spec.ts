@@ -15,6 +15,7 @@ describe("fetch transactions from local testnet", function () {
     let watcher: TransactionWatcher;
     let parser: SmartContractTransactionsOutcomeParser;
     const transactionComputer = new TransactionComputer();
+
     before(async function () {
         ({ alice } = await loadTestWallets());
         watcher = new TransactionWatcher({
@@ -99,7 +100,6 @@ describe("fetch transactions from local testnet", function () {
         });
         deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
 
-        const transactionComputer = new TransactionComputer();
         deployTransaction.signature = await alice.signer.sign(
             Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
         );

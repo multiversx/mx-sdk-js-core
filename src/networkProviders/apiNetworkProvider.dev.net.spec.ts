@@ -13,6 +13,7 @@ import { ApiNetworkProvider } from "./apiNetworkProvider";
 
 describe("ApiNetworkProvider Tests", function () {
     const apiProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com");
+    const transactionComputer = new TransactionComputer();
 
     it("should fetch network configuration", async () => {
         const result = await apiProvider.getNetworkConfig();
@@ -284,7 +285,6 @@ describe("ApiNetworkProvider Tests", function () {
 
     it("should simulate transaction", async () => {
         const bob = await loadTestWallet("bob");
-        const transactionComputer = new TransactionComputer();
         let transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,
@@ -336,7 +336,6 @@ describe("ApiNetworkProvider Tests", function () {
 
     it("should estimate transaction cost", async function () {
         const bob = await loadTestWallet("bob");
-        const transactionComputer = new TransactionComputer();
         const transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,
@@ -353,7 +352,6 @@ describe("ApiNetworkProvider Tests", function () {
     it("should send and await for completed transaction", async function () {
         this.timeout(30000);
         const bob = await loadTestWallet("bob");
-        const transactionComputer = new TransactionComputer();
         let transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,

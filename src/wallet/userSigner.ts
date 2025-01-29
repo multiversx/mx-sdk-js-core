@@ -23,7 +23,7 @@ export class UserSigner {
         return new UserSigner(secretKey);
     }
 
-    async sign(data: Buffer | Uint8Array): Promise<Uint8Array> {
+    async sign(data: Uint8Array): Promise<Uint8Array> {
         try {
             const signature = this.secretKey.sign(data);
             return signature;

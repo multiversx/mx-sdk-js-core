@@ -1,5 +1,3 @@
-import * as base64 from "base64-js"; // For Base64 encoding and decoding
-
 export class PemEntry {
     label: string;
     message: Uint8Array;
@@ -29,8 +27,7 @@ export class PemEntry {
             const base64Message = block.slice(1, block.length - 1).join("");
 
             // Decode Base64 to Uint8Array
-            const messageHex = new TextDecoder().decode(base64.toByteArray(base64Message));
-            const messageBytes = Uint8Array.from(Buffer.from(messageHex, "hex"));
+            const messageBytes = Buffer.from(Buffer.from(base64Message, "base64").toString(), "hex");
 
             return new PemEntry(label, messageBytes);
         });
@@ -67,7 +64,7 @@ export class PemEntry {
         const footer = `-----END PRIVATE KEY for ${this.label}-----`;
 
         const messageHex = Buffer.from(this.message).toString("hex");
-        const messageBase64 = base64.fromByteArray(Buffer.from(messageHex, "utf-8"));
+        const messageBase64 = Buffer.from(messageHex, "utf-8").toString("base64");
         const payloadLines = PemEntry.wrapText(messageBase64, 64);
         const payload = payloadLines.join("\n");
 

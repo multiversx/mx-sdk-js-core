@@ -8,11 +8,8 @@ import { DevnetEntrypoint } from "./entrypoints";
 
 describe("TestEntrypoint", () => {
     const entrypoint = new DevnetEntrypoint();
-    let txComputer: TransactionComputer;
 
-    before(async function () {
-        txComputer = new TransactionComputer();
-    });
+    before(async function () {});
 
     it("native transfer", async () => {
         const controller = entrypoint.createTransfersController();
@@ -101,7 +98,7 @@ describe("TestEntrypoint", () => {
         );
         const innerTransactionGasLimit = transaction.gasLimit;
         transaction.gasLimit = BigInt(0);
-        transaction.signature = sender.sign(txComputer.computeBytesForSigning(transaction));
+        transaction.signature = sender.signTransaction(transaction);
 
         const relayedController = entrypoint.createRelayedController();
         const relayedTransaction = await relayedController.createRelayedV2Transaction(

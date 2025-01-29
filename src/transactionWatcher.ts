@@ -7,12 +7,12 @@ import {
     ErrIsCompletedFieldIsMissingOnTransaction,
 } from "./errors";
 import { ITransactionFetcher } from "./interface";
-import { ITransactionStatus } from "./interfaceOfNetwork";
 import { Logger } from "./logger";
 import { TransactionEvent } from "./transactionEvents";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
+import { TransactionStatus } from "./transactionStatus";
 
-export type PredicateIsAwaitedStatus = (status: ITransactionStatus) => boolean;
+export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
 
 /**
  * Internal interface: a transaction, as seen from the perspective of a {@link TransactionWatcher}.
@@ -29,7 +29,7 @@ export class TransactionWatcher {
     static DefaultTimeout: number = TransactionWatcher.DefaultPollingInterval * 15;
     static DefaultPatience: number = 0;
 
-    static NoopOnStatusReceived = (_: ITransactionStatus) => {};
+    static NoopOnStatusReceived = (_: TransactionStatus) => {};
 
     protected readonly fetcher: ITransactionFetcher;
     protected readonly pollingIntervalMilliseconds: number;

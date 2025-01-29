@@ -6,7 +6,7 @@ import {
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
 } from "./constants";
 import * as errors from "./errors";
-import { INetworkConfig } from "./interfaceOfNetwork";
+import { INetworkConfig } from "./interface";
 import { ProtoSerializer } from "./proto";
 import { Transaction } from "./transaction";
 
@@ -25,7 +25,7 @@ export class TransactionComputer {
         networkConfig: INetworkConfig,
     ): bigint {
         const moveBalanceGas = BigInt(
-            networkConfig.MinGasLimit + transaction.data.length * networkConfig.GasPerDataByte,
+            networkConfig.minGasLimit + BigInt(transaction.data.length) * networkConfig.gasPerDataByte,
         );
         if (moveBalanceGas > transaction.gasLimit) {
             throw new errors.ErrNotEnoughGas(parseInt(transaction.gasLimit.toString(), 10));
@@ -39,7 +39,7 @@ export class TransactionComputer {
 
         const diff = transaction.gasLimit - moveBalanceGas;
         const modifiedGasPrice = BigInt(
-            new BigNumber(gasPrice.toString()).multipliedBy(new BigNumber(networkConfig.GasPriceModifier)).toFixed(0),
+            new BigNumber(gasPrice.toString()).multipliedBy(new BigNumber(networkConfig.gasPriceModifier)).toFixed(0),
         );
         const processingFee = diff * modifiedGasPrice;
 

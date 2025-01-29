@@ -12,6 +12,7 @@ import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 describe("ProxyNetworkProvider Tests", function () {
     const proxy = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
     const transactionComputer = new TransactionComputer();
+
     it("should fetch network configuration", async () => {
         const result = await proxy.getNetworkConfig();
         assert.equal(result.chainID, "D");

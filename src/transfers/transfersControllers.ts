@@ -1,7 +1,7 @@
 import { IAccount } from "../accounts/interfaces";
-import { Transaction } from "../transaction";
-import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
+import { Transaction } from "../core/transaction";
+import { TransactionComputer } from "../core/transactionComputer";
+import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import * as resources from "./resources";
 import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 

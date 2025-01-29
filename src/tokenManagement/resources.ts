@@ -1,4 +1,4 @@
-import { Address } from "../address";
+import { Address } from "../core/address";
 
 export type IssueFungibleInput = IssueInput & { initialSupply: bigint; numDecimals: bigint };
 

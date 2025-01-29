@@ -1,11 +1,11 @@
 import { IAccount } from "../accounts/interfaces";
+import { Transaction } from "../core/transaction";
+import { TransactionComputer } from "../core/transactionComputer";
+import { TransactionOnNetwork } from "../core/transactionOnNetwork";
+import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
+import { TransactionWatcher } from "../core/transactionWatcher";
 import { INetworkProvider } from "../networkProviders/interface";
-import { Transaction } from "../transaction";
-import { TransactionComputer } from "../transactionComputer";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TokenManagementTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
-import { TransactionWatcher } from "../transactionWatcher";
 import * as resources from "./resources";
 import { TokenManagementTransactionsFactory } from "./tokenManagementTransactionsFactory";
 

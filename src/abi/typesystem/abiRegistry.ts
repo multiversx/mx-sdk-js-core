@@ -1,5 +1,5 @@
-import * as errors from "../../errors";
-import { guardValueIsSetWithMessage } from "../../utils";
+import * as errors from "../../core/errors";
+import { guardValueIsSetWithMessage } from "../../core/utils";
 import { EndpointDefinition, EndpointParameterDefinition } from "./endpoint";
 import { EnumType } from "./enum";
 import { EventDefinition, EventTopicDefinition } from "./event";

@@ -1,4 +1,4 @@
-import * as errors from "../../errors";
+import * as errors from "../../core/errors";
 import { TypeExpressionParser } from "./typeExpressionParser";
 import { Type, TypedValue } from "./types";
 

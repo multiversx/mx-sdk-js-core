@@ -1,7 +1,10 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
-import { Address } from "../address";
-import { SmartContractQueryResponse } from "../smartContractQuery";
+import { Address } from "../core/address";
+import { SmartContractQueryResponse } from "../core/smartContractQuery";
+import { Token, TokenTransfer } from "../core/tokens";
+import { Transaction } from "../core/transaction";
+import { TransactionComputer } from "../core/transactionComputer";
 import { SmartContractController } from "../smartContracts";
 import {
     loadAbiRegistry,
@@ -10,9 +13,6 @@ import {
     setupUnitTestWatcherTimeouts,
     TestWallet,
 } from "../testutils";
-import { Token, TokenTransfer } from "../tokens";
-import { Transaction } from "../transaction";
-import { TransactionComputer } from "../transactionComputer";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { SmartContract } from "./smartContract";

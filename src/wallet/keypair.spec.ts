@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { Address, Transaction, TransactionComputer } from "..";
+import { Address, Transaction, TransactionComputer } from "../core";
 import { KeyPair } from "./keypair";
 import { UserSecretKey } from "./userKeys";
 

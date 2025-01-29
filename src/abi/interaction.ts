@@ -1,11 +1,11 @@
 import { Account } from "../accounts";
-import { Address } from "../address";
-import { Compatibility } from "../compatibility";
-import { TRANSACTION_VERSION_DEFAULT } from "../constants";
+import { Address } from "../core/address";
+import { Compatibility } from "../core/compatibility";
+import { TRANSACTION_VERSION_DEFAULT } from "../core/constants";
+import { TokenTransfer } from "../core/tokens";
+import { Transaction } from "../core/transaction";
+import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { SmartContractTransactionsFactory } from "../smartContracts";
-import { TokenTransfer } from "../tokens";
-import { Transaction } from "../transaction";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { ContractFunction } from "./function";
 import { CallArguments } from "./interface";
 import { Query } from "./query";

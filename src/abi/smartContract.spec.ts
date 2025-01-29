@@ -1,5 +1,8 @@
 import { assert } from "chai";
-import { Address } from "../address";
+import { Address } from "../core/address";
+import { TransactionComputer } from "../core/transactionComputer";
+import { TransactionStatus } from "../core/transactionStatus";
+import { TransactionWatcher } from "../core/transactionWatcher";
 import {
     loadTestWallets,
     MarkCompleted,
@@ -8,9 +11,6 @@ import {
     TestWallet,
     Wait,
 } from "../testutils";
-import { TransactionComputer } from "../transactionComputer";
-import { TransactionStatus } from "../transactionStatus";
-import { TransactionWatcher } from "../transactionWatcher";
 import { Code } from "./code";
 import { ContractFunction } from "./function";
 import { SmartContract } from "./smartContract";

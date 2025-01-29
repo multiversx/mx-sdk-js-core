@@ -1,9 +1,9 @@
 import { AbiRegistry, ArgSerializer } from "../abi";
-import { Address } from "../address";
-import { ARGUMENTS_SEPARATOR } from "../constants";
-import { Err } from "../errors";
-import { TransactionEvent } from "../transactionEvents";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { Address } from "../core/address";
+import { ARGUMENTS_SEPARATOR } from "../core/constants";
+import { Err } from "../core/errors";
+import { TransactionEvent } from "../core/transactionEvents";
+import { TransactionOnNetwork } from "../core/transactionOnNetwork";
 import { SmartContractCallOutcome, SmartContractResult } from "../transactionsOutcomeParsers/resources";
 import * as resources from "./resources";
 

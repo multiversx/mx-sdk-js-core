@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import * as contractsCodecUtils from "./abi/codec/utils";
+import * as contractsCodecUtils from "../abi/codec/utils";
 
 export function numberToPaddedHex(value: bigint | number | BigNumber.Value) {
     let hexableNumber: { toString(radix?: number): string };

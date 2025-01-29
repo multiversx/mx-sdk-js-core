@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
-import { Address } from "../address";
+import { Address } from "../core/address";
 import { ContractFunction } from "./function";
 import { Query } from "./query";
 import { BigUIntValue, U32Value } from "./typesystem";

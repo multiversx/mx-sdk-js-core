@@ -1,11 +1,11 @@
 import { assert } from "chai";
 import { promises } from "fs";
+import { TransactionComputer } from "../core/transactionComputer";
+import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
+import { TransactionWatcher } from "../core/transactionWatcher";
 import { SmartContractTransactionsFactory, SmartContractTransactionsOutcomeParser } from "../smartContracts";
 import { loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
-import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
-import { TransactionWatcher } from "../transactionWatcher";
 import { ContractFunction } from "./function";
 import { SmartContract } from "./smartContract";
 

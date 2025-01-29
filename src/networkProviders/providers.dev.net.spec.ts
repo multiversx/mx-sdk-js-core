@@ -1,9 +1,6 @@
 import { AxiosHeaders } from "axios";
 import { assert } from "chai";
-import { Address } from "../address";
-import { SmartContractQuery } from "../smartContractQuery";
-import { Transaction } from "../transaction";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { Address, SmartContractQuery, Transaction, TransactionOnNetwork } from "../core";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 import { INetworkProvider } from "./interface";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";

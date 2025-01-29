@@ -1,5 +1,5 @@
-import { Address } from "../address";
-import { Transaction } from "../transaction";
+import { Address } from "../core/address";
+import { Transaction } from "../core/transaction";
 import { ReturnCode } from "./returnCode";
 import { TypedValue } from "./typesystem";
 

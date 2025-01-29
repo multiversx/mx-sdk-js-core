@@ -1,4 +1,4 @@
-import { SmartContractQuery } from "../smartContractQuery";
+import { SmartContractQuery } from "../core/smartContractQuery";
 
 export class ContractQueryRequest {
     private readonly query: SmartContractQuery;

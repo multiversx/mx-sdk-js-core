@@ -1,4 +1,4 @@
-import { Address } from "../../address";
+import { Address } from "../../core/address";
 import { AddressValue } from "../typesystem";
 
 export class AddressBinaryCodec {

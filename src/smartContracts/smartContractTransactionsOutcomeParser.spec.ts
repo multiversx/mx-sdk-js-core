@@ -1,10 +1,7 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
-import { Address } from "../address";
+import { Address, TransactionEvent, TransactionLogs, TransactionOnNetwork } from "../core";
 import { b64TopicsToBytes, loadAbiRegistry } from "../testutils";
-import { TransactionEvent } from "../transactionEvents";
-import { TransactionLogs } from "../transactionLogs";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { SmartContractTransactionsOutcomeParser } from "./smartContractTransactionsOutcomeParser";
 

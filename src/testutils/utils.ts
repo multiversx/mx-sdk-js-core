@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import { PathLike } from "fs";
 import { AbiRegistry, Code, SmartContract, TypedValue } from "../abi";
-import { Transaction } from "../transaction";
-import { TransactionComputer } from "../transactionComputer";
-import { TransactionWatcher } from "../transactionWatcher";
-import { getAxios } from "../utils";
+import { Transaction } from "../core/transaction";
+import { TransactionComputer } from "../core/transactionComputer";
+import { TransactionWatcher } from "../core/transactionWatcher";
+import { getAxios } from "../core/utils";
 import { TestWallet } from "./wallets";
 
 export async function prepareDeployment(obj: {

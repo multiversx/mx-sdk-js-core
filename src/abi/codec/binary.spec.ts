@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
-import { Address } from "../../address";
-import * as errors from "../../errors";
+import { Address } from "../../core/address";
+import * as errors from "../../core/errors";
 import {
     AddressType,
     AddressValue,
@@ -13,10 +13,16 @@ import {
     BigUIntValue,
     BooleanType,
     BooleanValue,
+    BytesType,
+    BytesValue,
     EnumType,
     EnumValue,
     EnumVariantDefinition,
+    ExplicitEnumType,
+    ExplicitEnumValue,
+    ExplicitEnumVariantDefinition,
     Field,
+    FieldDefinition,
     I16Type,
     I16Value,
     I32Type,
@@ -45,9 +51,6 @@ import {
     U8Type,
     U8Value,
 } from "../typesystem";
-import { BytesType, BytesValue } from "../typesystem/bytes";
-import { ExplicitEnumType, ExplicitEnumValue, ExplicitEnumVariantDefinition } from "../typesystem/explicit-enum";
-import { FieldDefinition } from "../typesystem/fields";
 import { BinaryCodec, BinaryCodecConstraints } from "./binary";
 import { isMsbOne } from "./utils";
 

@@ -1,7 +1,7 @@
+import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { Address } from "./address";
 import { Transaction } from "./transaction";
 import { TransactionLogs } from "./transactionLogs";
-import { SmartContractResult } from "./transactionsOutcomeParsers";
 import { TransactionStatus } from "./transactionStatus";
 
 export function prepareTransactionForBroadcasting(transaction: Transaction): any {

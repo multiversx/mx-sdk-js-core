@@ -1,4 +1,4 @@
-import { Address } from "../address";
+import { Address } from "../core/address";
 import { ArgSerializer } from "./argSerializer";
 import { IContractFunction } from "./interface";
 import { TypedValue } from "./typesystem";

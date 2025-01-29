@@ -1,6 +1,10 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { promises } from "fs";
+import { Transaction } from "../core/transaction";
+import { TransactionComputer } from "../core/transactionComputer";
+import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
+import { TransactionWatcher } from "../core/transactionWatcher";
 import {
     SmartContractController,
     SmartContractTransactionsFactory,
@@ -8,10 +12,6 @@ import {
 } from "../smartContracts";
 import { loadAbiRegistry, loadTestWallets, prepareDeployment, TestWallet } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
-import { Transaction } from "../transaction";
-import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
-import { TransactionWatcher } from "../transactionWatcher";
 import { Interaction } from "./interaction";
 import { SmartContract } from "./smartContract";
 import { ManagedDecimalValue } from "./typesystem";

@@ -1,4 +1,4 @@
-import { Address } from "../address";
+import { Address } from "../core/address";
 import { ValidatorPublicKey } from "../wallet";
 
 export type NewDelegationContractInput = { totalDelegationCap: bigint; serviceFee: bigint; amount: bigint };

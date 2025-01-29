@@ -1,9 +1,9 @@
 import * as bech32 from "bech32";
 import BigNumber from "bignumber.js";
+import { bigIntToBuffer } from "../tokenOperations/codec";
 import { LibraryConfig } from "./config";
 import { CURRENT_NUMBER_OF_SHARDS_WITHOUT_META, METACHAIN_ID, WasmVirtualMachine } from "./constants";
 import * as errors from "./errors";
-import { bigIntToBuffer } from "./tokenOperations/codec";
 const createKeccakHash = require("keccak");
 
 /**

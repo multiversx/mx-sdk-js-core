@@ -1,5 +1,5 @@
 import { derivePath } from "ed25519-hd-key";
-import { ErrBadMnemonicEntropy, ErrWrongMnemonic } from "../errors";
+import { ErrBadMnemonicEntropy, ErrWrongMnemonic } from "../core/errors";
 import { UserSecretKey } from "./userKeys";
 
 const MNEMONIC_STRENGTH = 256;

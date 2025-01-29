@@ -1,8 +1,6 @@
 import { assert } from "chai";
-import { Address } from "../address";
-import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../constants";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
-import { ValidatorPublicKey } from "../wallet";
+import { Address, TransactionsFactoryConfig, ValidatorPublicKey } from "../core";
+import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../core/constants";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
 
 describe("test delegation transactions factory", function () {

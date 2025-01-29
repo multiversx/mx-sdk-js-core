@@ -1,4 +1,4 @@
-import { guardValueIsSet } from "../../utils";
+import { guardValueIsSet } from "../../core/utils";
 import { CustomType, TypedValue } from "./types";
 
 export class ExplicitEnumType extends CustomType {

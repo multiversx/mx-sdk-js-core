@@ -1,4 +1,4 @@
-import { ARGUMENTS_SEPARATOR } from "../constants";
+import { ARGUMENTS_SEPARATOR } from "../core/constants";
 import { BinaryCodec } from "./codec";
 import { Type, TypedValue, U32Type, U32Value } from "./typesystem";
 import { OptionalType, OptionalValue } from "./typesystem/algebraic";

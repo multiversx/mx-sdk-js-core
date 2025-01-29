@@ -1,8 +1,8 @@
 import BigNumber from "bignumber.js";
 import { AddressValue, ArgSerializer, BytesValue, U64Value } from "../abi";
-import { Address } from "../address";
-import { ErrInvalidInnerTransaction } from "../errors";
-import { Transaction } from "../transaction";
+import { Address } from "../core/address";
+import { ErrInvalidInnerTransaction } from "../core/errors";
+import { Transaction } from "../core/transaction";
 
 const JSONbig = require("json-bigint");
 

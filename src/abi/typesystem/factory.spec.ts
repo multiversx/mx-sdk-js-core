@@ -1,9 +1,9 @@
 import { assert } from "chai";
-import { TokenIdentifierType } from "./tokenIdentifier";
-import { Address } from "../../address";
+import { Address } from "../../core/address";
+import { AddressType } from "./address";
 import { createListOfAddresses, createListOfTokenIdentifiers } from "./factory";
 import { ListType } from "./generic";
-import { AddressType } from "./address";
+import { TokenIdentifierType } from "./tokenIdentifier";
 
 describe("test factory", () => {
     it("should create lists of addresses", () => {

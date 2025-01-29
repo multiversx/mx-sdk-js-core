@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { Address } from "../address";
+import { Address } from "../core/address";
 
 export class PairOnNetwork {
     address: Address = Address.empty();

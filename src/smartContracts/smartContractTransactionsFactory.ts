@@ -1,15 +1,15 @@
 import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../abi";
 import { NativeSerializer } from "../abi/nativeSerializer";
 import { isTyped } from "../abi/typesystem";
-import { Address } from "../address";
-import { CONTRACT_DEPLOY_ADDRESS_HEX, VM_TYPE_WASM_VM } from "../constants";
-import { Err } from "../errors";
-import { Logger } from "../logger";
-import { TokenComputer, TokenTransfer } from "../tokens";
-import { TokenTransfersDataBuilder } from "../tokenTransfersDataBuilder";
-import { Transaction } from "../transaction";
-import { TransactionBuilder } from "../transactionBuilder";
-import { byteArrayToHex, utf8ToHex } from "../utils.codec";
+import { Address } from "../core/address";
+import { CONTRACT_DEPLOY_ADDRESS_HEX, VM_TYPE_WASM_VM } from "../core/constants";
+import { Err } from "../core/errors";
+import { Logger } from "../core/logger";
+import { TokenComputer, TokenTransfer } from "../core/tokens";
+import { TokenTransfersDataBuilder } from "../core/tokenTransfersDataBuilder";
+import { Transaction } from "../core/transaction";
+import { TransactionBuilder } from "../core/transactionBuilder";
+import { byteArrayToHex, utf8ToHex } from "../core/utils.codec";
 import * as resources from "./resources";
 
 interface IConfig {

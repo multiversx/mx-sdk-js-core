@@ -1,5 +1,5 @@
-import * as errors from "../../errors";
-import { guardTrue } from "../../utils";
+import * as errors from "../../core/errors";
+import { guardTrue } from "../../core/utils";
 import {
     ArrayVec,
     ArrayVecType,

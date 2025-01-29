@@ -1,10 +1,8 @@
 import { assert } from "chai";
-import { Address } from "../address";
+import { Address, Transaction, TransactionComputer } from "../core";
 import { MarkCompleted, MockNetworkProvider, Wait } from "../testutils/mockNetworkProvider";
 import { createAccountBalance } from "../testutils/utils";
 import { loadTestWallet } from "../testutils/wallets";
-import { Transaction } from "../transaction";
-import { TransactionComputer } from "../transactionComputer";
 import { AccountAwaiter } from "./accountAwaiter";
 import { AccountOnNetwork } from "./accounts";
 import { ApiNetworkProvider } from "./apiNetworkProvider";

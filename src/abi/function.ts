@@ -1,4 +1,4 @@
-import * as errors from "../errors";
+import * as errors from "../core/errors";
 
 /**
  * A function of a Smart Contract, as an abstraction.

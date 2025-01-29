@@ -1,5 +1,5 @@
-import { Address } from "../address";
-import { TransactionLogs } from "../transactionLogs";
+import { Address } from "../core/address";
+import { TransactionLogs } from "../core/transactionLogs";
 
 export class ContractResults {
     readonly items: ContractResultItem[];

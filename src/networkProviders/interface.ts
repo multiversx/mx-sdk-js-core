@@ -1,9 +1,9 @@
-import { Address } from "../address";
-import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
-import { Token } from "../tokens";
-import { Transaction } from "../transaction";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
-import { TransactionStatus } from "../transactionStatus";
+import { Address } from "../core/address";
+import { SmartContractQuery, SmartContractQueryResponse } from "../core/smartContractQuery";
+import { Token } from "../core/tokens";
+import { Transaction } from "../core/transaction";
+import { TransactionOnNetwork } from "../core/transactionOnNetwork";
+import { TransactionStatus } from "../core/transactionStatus";
 import { AccountOnNetwork } from "./accounts";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStatus } from "./networkStatus";

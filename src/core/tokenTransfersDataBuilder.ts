@@ -1,4 +1,4 @@
-import { AddressValue, ArgSerializer, BigUIntValue, TokenIdentifierValue, TypedValue, U32Value } from "./abi";
+import { AddressValue, ArgSerializer, BigUIntValue, TokenIdentifierValue, TypedValue, U32Value } from "../abi";
 import { Address } from "./address";
 import { TokenComputer, TokenTransfer } from "./tokens";
 

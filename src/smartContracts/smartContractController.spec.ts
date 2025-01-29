@@ -1,8 +1,7 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { AbiRegistry, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "../abi";
-import { Address } from "../address";
-import { SmartContractQueryResponse } from "../smartContractQuery";
+import { Address, SmartContractQueryResponse } from "../core";
 import { MockNetworkProvider, loadAbiRegistry } from "../testutils";
 import { bigIntToBuffer } from "../tokenOperations/codec";
 import { SmartContractController } from "./smartContractController";

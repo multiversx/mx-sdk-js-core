@@ -1,8 +1,6 @@
 import { assert } from "chai";
 import { resolve } from "path";
-import { Address } from "../address";
-import { Message } from "../message";
-import { Transaction } from "../transaction";
+import { Address, Message, Transaction } from "../core";
 import { KeyPair, UserSecretKey } from "../wallet";
 import { Account } from "./account";
 

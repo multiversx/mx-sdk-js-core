@@ -23,6 +23,7 @@ describe("test smart contract interactor", function () {
     let provider = new MockNetworkProvider();
     let alice: TestWallet;
     const transactionComputer = new TransactionComputer();
+
     before(async function () {
         ({ alice } = await loadTestWallets());
     });

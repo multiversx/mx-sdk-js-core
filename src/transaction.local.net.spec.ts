@@ -14,6 +14,7 @@ import { TransferTransactionsFactory } from "./transfers/transferTransactionsFac
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;
     const transactionComputer = new TransactionComputer();
+
     before(async function () {
         ({ alice, bob } = await loadTestWallets());
     });
@@ -56,8 +57,7 @@ describe("test transaction", function () {
         await bob.sync(provider);
         let initialBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
-        transactionOne.nonce = alice.account.nonce;
-        alice.account.incrementNonce();
+        transactionOne.nonce = alice.account.getNonceThenIncrement();
         transactionTwo.nonce = alice.account.nonce;
 
         await signTransaction({ transaction: transactionOne, wallet: alice });

@@ -21,7 +21,7 @@ interface ISmartContractWithinInteraction {
 }
 
 /**
- * @deprecated component. Use "SmartContractTransactionsFactory" (for transactions) or "SmartContractQueriesController" (for queries), instead.
+ * @deprecated component. Use "SmartContractTransactionsFactory" (for transactions) or "SmartContractController" (for queries), instead.
  *
  * Interactions can be seen as mutable transaction & query builders.
  *

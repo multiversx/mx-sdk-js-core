@@ -227,8 +227,8 @@ describe("test contract", () => {
             ],
         });
 
-        const callerAddress = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        const contractAddress = Address.fromBech32("erd1qqqqqqqqqqqqqpgqaxa53w6uk43n6dhyt2la6cd5lyv32qn4396qfsqlnk");
+        const callerAddress = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqaxa53w6uk43n6dhyt2la6cd5lyv32qn4396qfsqlnk");
 
         const contract = new SmartContract({
             abi,
@@ -296,8 +296,8 @@ describe("test contract", () => {
             ],
         });
 
-        const callerAddress = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        const contractAddress = Address.fromBech32("erd1qqqqqqqqqqqqqpgqaxa53w6uk43n6dhyt2la6cd5lyv32qn4396qfsqlnk");
+        const callerAddress = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqaxa53w6uk43n6dhyt2la6cd5lyv32qn4396qfsqlnk");
 
         const contract = new SmartContract({
             abi,

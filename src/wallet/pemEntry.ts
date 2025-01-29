@@ -27,8 +27,7 @@ export class PemEntry {
             const base64Message = block.slice(1, block.length - 1).join("");
 
             // Decode Base64 to Uint8Array
-            const messageHex = new TextDecoder().decode(Buffer.from(base64Message, "base64"));
-            const messageBytes = Uint8Array.from(Buffer.from(messageHex, "hex"));
+            const messageBytes = Buffer.from(Buffer.from(base64Message, "base64").toString(), "hex");
 
             return new PemEntry(label, messageBytes);
         });

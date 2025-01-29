@@ -4,8 +4,6 @@
  * @packageDocumentation
  */
 
-require("./globals");
-
 export * from "./abi";
 export * from "./accountManagement";
 export * from "./accounts";

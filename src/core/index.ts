@@ -1,3 +1,5 @@
+require("./globals");
+
 export * from "./address";
 export * from "./asyncTimer";
 export * from "./config";

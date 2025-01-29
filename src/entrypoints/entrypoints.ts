@@ -1,21 +1,26 @@
 import { AbiRegistry } from "../abi";
-import { AccountController } from "../accountManagement";
+import { AccountController, AccountTransactionsFactory } from "../accountManagement";
+import { Account } from "../accounts";
 import { IAccount } from "../accounts/interfaces";
 import { Address } from "../address";
-import { DelegationController } from "../delegation";
+import { DelegationController, DelegationTransactionsFactory } from "../delegation";
 import { ErrInvalidNetworkProviderKind } from "../errors";
 import { Message, MessageComputer } from "../message";
 import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
 import { INetworkProvider } from "../networkProviders/interface";
+import { RelayedTransactionsFactory } from "../relayed";
 import { RelayedController } from "../relayed/relayedController";
+import { SmartContractTransactionsFactory } from "../smartContracts";
 import { SmartContractController } from "../smartContracts/smartContractController";
-import { TokenManagementController } from "../tokenManagement";
+import { TokenManagementController, TokenManagementTransactionsFactory } from "../tokenManagement";
 import { Transaction } from "../transaction";
 import { TransactionComputer } from "../transactionComputer";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TransactionWatcher } from "../transactionWatcher";
+import { TransferTransactionsFactory } from "../transfers";
 import { TransfersController } from "../transfers/transfersControllers";
-import { UserVerifier } from "../wallet";
+import { UserSecretKey, UserVerifier } from "../wallet";
 import { DevnetEntrypointConfig, MainnetEntrypointConfig, TestnetEntrypointConfig } from "./config";
 
 class NetworkEntrypoint {
@@ -34,6 +39,15 @@ class NetworkEntrypoint {
         this.chainId = options.chainId;
     }
 
+    async createAccount(): Promise<Account> {
+        const secretKey = UserSecretKey.generate();
+        return new Account(secretKey);
+    }
+
+    async getAirdrop(_address: Address): Promise<void> {
+        throw new Error("Not implemented");
+    }
+
     async signTransaction(transaction: Transaction, account: IAccount): Promise<void> {
         const txComputer = new TransactionComputer();
         transaction.signature = await account.sign(txComputer.computeBytesForSigning(transaction));
@@ -43,11 +57,6 @@ class NetworkEntrypoint {
         const verifier = UserVerifier.fromAddress(transaction.sender);
         const txComputer = new TransactionComputer();
         return verifier.verify(txComputer.computeBytesForVerifying(transaction), transaction.signature);
-    }
-
-    async signMessage(message: Message, account: IAccount): Promise<void> {
-        const messageComputer = new MessageComputer();
-        message.signature = await account.sign(messageComputer.computeBytesForSigning(message));
     }
 
     verifyMessageSignature(message: Message): boolean {
@@ -81,6 +90,10 @@ class NetworkEntrypoint {
         return transactionAwaiter.awaitCompleted(txHash);
     }
 
+    getTransaction(txHash: string): Promise<TransactionOnNetwork> {
+        return this.networkProvider.getTransaction(txHash);
+    }
+
     createNetworkProvider(): INetworkProvider {
         return this.networkProvider;
     }
@@ -89,24 +102,54 @@ class NetworkEntrypoint {
         return new DelegationController({ chainID: this.chainId, networkProvider: this.networkProvider });
     }
 
+    createDelegationTransactionsFactory(): DelegationTransactionsFactory {
+        return new DelegationTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: this.chainId }) });
+    }
+
     createAccountController(): AccountController {
         return new AccountController({ chainID: this.chainId });
+    }
+
+    createAccountTransactionsFactory(): AccountTransactionsFactory {
+        return new AccountTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: this.chainId }) });
     }
 
     createRelayedController(): RelayedController {
         return new RelayedController({ chainID: this.chainId });
     }
 
+    createRelayedTransactionsFactory(): RelayedTransactionsFactory {
+        return new RelayedTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: this.chainId }) });
+    }
+
     createSmartContractController(abi?: AbiRegistry): SmartContractController {
         return new SmartContractController({ chainID: this.chainId, networkProvider: this.networkProvider, abi });
+    }
+
+    createSmartContractTransactionsFactory(): SmartContractTransactionsFactory {
+        return new SmartContractTransactionsFactory({
+            config: new TransactionsFactoryConfig({ chainID: this.chainId }),
+        });
     }
 
     createTokenManagementController(): TokenManagementController {
         return new TokenManagementController({ chainID: this.chainId, networkProvider: this.networkProvider });
     }
 
+    createTokenManagementTransactionsFactory(): TokenManagementTransactionsFactory {
+        return new TokenManagementTransactionsFactory({
+            config: new TransactionsFactoryConfig({ chainID: this.chainId }),
+        });
+    }
+
     createTransfersController(): TransfersController {
         return new TransfersController({ chainID: this.chainId });
+    }
+
+    createTransfersTransactionsFactory(): TransferTransactionsFactory {
+        return new TransferTransactionsFactory({
+            config: new TransactionsFactoryConfig({ chainID: this.chainId }),
+        });
     }
 }
 

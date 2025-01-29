@@ -1,5 +1,6 @@
-import { readFileSync } from "fs";
-import path from "path";
+import { PathLike, readFileSync, writeFileSync } from "fs";
+import path, { isAbsolute, join, resolve } from "path";
+import { LibraryConfig } from "../config";
 import { Err } from "../errors";
 import { Logger } from "../logger";
 import { CipherAlgorithm, Decryptor, EncryptedData, Encryptor, KeyDerivationFunction, Randomness } from "./crypto";
@@ -241,5 +242,14 @@ export class UserWallet {
             kind: this.kind,
             crypto: cryptoSection,
         };
+    }
+
+    save(path: PathLike, addressHrp: string = LibraryConfig.DefaultAddressHrp): void {
+        const resolvedPath = isAbsolute(path.toString())
+            ? resolve(path.toString())
+            : resolve(join(process.cwd(), path.toString()));
+
+        const jsonContent = this.toJSON(addressHrp);
+        writeFileSync(resolvedPath, jsonContent, { encoding: "utf-8" });
     }
 }

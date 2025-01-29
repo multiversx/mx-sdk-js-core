@@ -228,8 +228,8 @@ export class MockNetworkProvider implements INetworkProvider {
         this.mockPutTransaction(
             computer.computeTransactionHash(transaction),
             new TransactionOnNetwork({
-                sender: transaction.getSender(),
-                receiver: transaction.getReceiver(),
+                sender: transaction.sender,
+                receiver: transaction.receiver,
                 data: Buffer.from(transaction.data),
                 status: new TransactionStatus("pending"),
             }),

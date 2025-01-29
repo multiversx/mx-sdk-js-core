@@ -33,22 +33,22 @@ export class TokenTransfer {
     readonly amount: bigint;
 
     /**
-     * Legacy field. Use "token.identifier" instead.
+     * @deprecated field. Use "token.identifier" instead.
      */
     readonly tokenIdentifier: string;
 
     /**
-     * Legacy field. Use "token.nonce" instead.
+     * @deprecated field. Use "token.nonce" instead.
      */
     readonly nonce: number;
 
     /**
-     * Legacy field. Use "amount" instead.
+     * @deprecated field. Use "amount" instead.
      */
     readonly amountAsBigInteger: BigNumber;
 
     /**
-     * Legacy field. The number of decimals is not a concern of "sdk-core".
+     * @deprecated field. The number of decimals is not a concern of "sdk-core".
      * For formatting and parsing amounts, use "sdk-dapp" or "bignumber.js" directly.
      */
     readonly numDecimals: number;

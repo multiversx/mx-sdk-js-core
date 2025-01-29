@@ -139,14 +139,14 @@ export class Transaction {
     }
 
     /**
-     * Legacy method, use the "nonce" property instead.
+     * @deprecated method, use the "nonce" property instead.
      */
     getNonce(): bigint {
         return this.nonce;
     }
 
     /**
-     * Legacy method, use the "nonce" property instead.
+     * @deprecated method, use the "nonce" property instead.
      * Sets the account sequence number of the sender. Must be done prior signing.
      */
     setNonce(nonce: bigint) {
@@ -154,147 +154,147 @@ export class Transaction {
     }
 
     /**
-     * Legacy method, use the "value" property instead.
+     * @deprecated method, use the "value" property instead.
      */
     getValue(): bigint {
         return this.value;
     }
 
     /**
-     * Legacy method, use the "value" property instead.
+     * @deprecated method, use the "value" property instead.
      */
     setValue(value: bigint) {
         this.value = value;
     }
 
     /**
-     * Legacy method, use the "sender" property instead.
+     * @deprecated method, use the "sender" property instead.
      */
     getSender(): Address {
         return this.sender;
     }
 
     /**
-     * Legacy method, use the "sender" property instead.
+     * @deprecated method, use the "sender" property instead.
      */
     setSender(sender: Address) {
         this.sender = sender;
     }
 
     /**
-     * Legacy method, use the "receiver" property instead.
+     * @deprecated method, use the "receiver" property instead.
      */
     getReceiver(): Address {
         return this.receiver;
     }
 
     /**
-     * Legacy method, use the "senderUsername" property instead.
+     * @deprecated method, use the "senderUsername" property instead.
      */
     getSenderUsername(): string {
         return this.senderUsername;
     }
 
     /**
-     * Legacy method, use the "senderUsername" property instead.
+     * @deprecated method, use the "senderUsername" property instead.
      */
     setSenderUsername(senderUsername: string) {
         this.senderUsername = senderUsername;
     }
 
     /**
-     * Legacy method, use the "receiverUsername" property instead.
+     * @deprecated method, use the "receiverUsername" property instead.
      */
     getReceiverUsername(): string {
         return this.receiverUsername;
     }
 
     /**
-     * Legacy method, use the "receiverUsername" property instead.
+     * @deprecated method, use the "receiverUsername" property instead.
      */
     setReceiverUsername(receiverUsername: string) {
         this.receiverUsername = receiverUsername;
     }
 
     /**
-     * Legacy method, use the "guardian" property instead.
+     * @deprecated method, use the "guardian" property instead.
      */
     getGuardian(): Address {
         return this.guardian;
     }
 
     /**
-     * Legacy method, use the "gasPrice" property instead.
+     * @deprecated method, use the "gasPrice" property instead.
      */
     getGasPrice(): bigint {
         return this.gasPrice;
     }
 
     /**
-     * Legacy method, use the "gasPrice" property instead.
+     * @deprecated method, use the "gasPrice" property instead.
      */
     setGasPrice(gasPrice: bigint) {
         this.gasPrice = gasPrice;
     }
 
     /**
-     * Legacy method, use the "gasLimit" property instead.
+     * @deprecated method, use the "gasLimit" property instead.
      */
     getGasLimit(): bigint {
         return this.gasLimit;
     }
 
     /**
-     * Legacy method, use the "gasLimit" property instead.
+     * @deprecated method, use the "gasLimit" property instead.
      */
     setGasLimit(gasLimit: bigint) {
         this.gasLimit = gasLimit;
     }
 
     /**
-     * Legacy method, use the "data" property instead.
+     * @deprecated method, use the "data" property instead.
      */
     getData(): Uint8Array {
         return this.data;
     }
 
     /**
-     * Legacy method, use the "chainID" property instead.
+     * @deprecated method, use the "chainID" property instead.
      */
     getChainID(): string {
         return this.chainID;
     }
 
     /**
-     * Legacy method, use the "chainID" property instead.
+     * @deprecated method, use the "chainID" property instead.
      */
     setChainID(chainID: string) {
         this.chainID = chainID;
     }
 
     /**
-     * Legacy method, use the "version" property instead.
+     * @deprecated method, use the "version" property instead.
      */
     getVersion(): number {
         return this.version;
     }
 
     /**
-     * Legacy method, use the "version" property instead.
+     * @deprecated method, use the "version" property instead.
      */
     setVersion(version: number) {
         this.version = version;
     }
 
     /**
-     * Legacy method, use the "options" property instead.
+     * @deprecated method, use the "options" property instead.
      */
     getOptions(): number {
         return this.options;
     }
 
     /**
-     * Legacy method, use the "options" property instead.
+     * @deprecated method, use the "options" property instead.
      *
      * Question for review: check how the options are set by sdk-dapp, wallet, ledger, extension.
      */
@@ -303,28 +303,28 @@ export class Transaction {
     }
 
     /**
-     * Legacy method, use the "signature" property instead.
+     * @deprecated method, use the "signature" property instead.
      */
     getSignature(): Buffer {
         return Buffer.from(this.signature);
     }
 
     /**
-     * Legacy method, use the "guardianSignature" property instead.
+     * @deprecated method, use the "guardianSignature" property instead.
      */
     getGuardianSignature(): Buffer {
         return Buffer.from(this.guardianSignature);
     }
 
     /**
-     * Legacy method, use the "guardian" property instead.
+     * @deprecated method, use the "guardian" property instead.
      */
     setGuardian(guardian: Address) {
         this.guardian = guardian;
     }
 
     /**
-     * Legacy method, use "TransactionComputer.computeBytesForSigning()" instead.
+     * @deprecated method, use "TransactionComputer.computeBytesForSigning()" instead.
      * Serializes a transaction to a sequence of bytes, ready to be signed.
      * This function is called internally by signers.
      */
@@ -373,7 +373,7 @@ export class Transaction {
     }
 
     /**
-     * Legacy method, use "Transaction.newFromPlainObject()" instead.
+     * @deprecated method, use "Transaction.newFromPlainObject()" instead.
      * Converts a plain object transaction into a Transaction Object.
      *
      * @param plainObjectTransaction Raw data of a transaction, usually obtained by calling toPlainObject()
@@ -412,7 +412,7 @@ export class Transaction {
     }
 
     /**
-     * Legacy method, use the "signature" property instead.
+     * @deprecated method, use the "signature" property instead.
      * Applies the signature on the transaction.
      *
      * @param signature The signature, as computed by a signer.
@@ -422,7 +422,7 @@ export class Transaction {
     }
 
     /**
-     * Legacy method, use the "guardianSignature" property instead.
+     * @deprecated method, use the "guardianSignature" property instead.
      * Applies the guardian signature on the transaction.
      *
      * @param guardianSignature The signature, as computed by a signer.
@@ -440,7 +440,7 @@ export class Transaction {
     }
 
     /**
-     * Legacy method, use "TransactionComputer.computeTransactionFee()" instead.
+     * @deprecated method, use "TransactionComputer.computeTransactionFee()" instead.
      *
      * Computes the current transaction fee based on the {@link NetworkConfig} and transaction properties
      * @param networkConfig {@link NetworkConfig}

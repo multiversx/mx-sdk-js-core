@@ -13,6 +13,7 @@ import { TransferTransactionsFactory } from "./transfers/transferTransactionsFac
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;
+    const transactionComputer = new TransactionComputer();
 
     before(async function () {
         ({ alice, bob } = await loadTestWallets());
@@ -56,9 +57,8 @@ describe("test transaction", function () {
         await bob.sync(provider);
         let initialBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
-        transactionOne.setNonce(alice.account.nonce);
-        alice.account.incrementNonce();
-        transactionTwo.setNonce(alice.account.nonce);
+        transactionOne.nonce = alice.account.getNonceThenIncrement();
+        transactionTwo.nonce = alice.account.nonce;
 
         await signTransaction({ transaction: transactionOne, wallet: alice });
         await signTransaction({ transaction: transactionTwo, wallet: alice });
@@ -98,7 +98,7 @@ describe("test transaction", function () {
         await bob.sync(provider);
         let initialBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
-        transactionOne.setNonce(alice.account.nonce);
+        transactionOne.nonce = alice.account.nonce;
         await signTransaction({ transaction: transactionOne, wallet: alice });
         const hashOne = await provider.sendTransaction(transactionOne);
         await watcher.awaitCompleted(hashOne);
@@ -137,8 +137,8 @@ describe("test transaction", function () {
             chainID: network.chainID,
         });
 
-        transactionOne.setNonce(alice.account.nonce);
-        transactionTwo.setNonce(alice.account.nonce);
+        transactionOne.nonce = alice.account.nonce;
+        transactionTwo.nonce = alice.account.nonce;
 
         await signTransaction({ transaction: transactionOne, wallet: alice });
         await signTransaction({ transaction: transactionTwo, wallet: alice });
@@ -168,7 +168,6 @@ describe("test transaction", function () {
         });
         transaction.nonce = BigInt(alice.account.nonce.valueOf());
 
-        const transactionComputer = new TransactionComputer();
         transaction.signature = await alice.signer.sign(transactionComputer.computeBytesForSigning(transaction));
 
         const txHash = await provider.sendTransaction(transaction);
@@ -187,8 +186,8 @@ describe("test transaction", function () {
         const transaction = options.transaction;
         const wallet = options.wallet;
 
-        const serialized = transaction.serializeForSigning();
+        const serialized = transactionComputer.computeBytesForSigning(transaction);
         const signature = await wallet.signer.sign(serialized);
-        transaction.applySignature(signature);
+        transaction.signature = signature;
     }
 });

@@ -78,10 +78,12 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
+        transaction.signature = await wallets.alice.signer.sign(
+            transactionComputer.computeBytesForSigning(transaction),
+        );
 
         assert.equal(
-            transaction.getSignature().toString("hex"),
+            Buffer.from(transaction.signature).toString("hex"),
             "3f08a1dd64fbb627d10b048e0b45b1390f29bb0e457762a2ccb710b029f299022a67a4b8e45cf62f4314afec2e56b5574c71e38df96cc41fae757b7ee5062503",
         );
         assert.equal(
@@ -102,10 +104,12 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
+        transaction.signature = await wallets.alice.signer.sign(
+            transactionComputer.computeBytesForSigning(transaction),
+        );
 
         assert.equal(
-            transaction.getSignature().toString("hex"),
+            Buffer.from(transaction.signature).toString("hex"),
             "f9e8c1caf7f36b99e7e76ee1118bf71b55cde11a2356e2b3adf15f4ad711d2e1982469cbba7eb0afbf74e8a8f78e549b9410cd86eeaa88fcba62611ac9f6e30e",
         );
         assert.equal(
@@ -198,7 +202,7 @@ describe("test transaction", async () => {
         });
 
         assert.throws(() => {
-            transaction.serializeForSigning();
+            transactionComputer.computeBytesForSigning(transaction);
         }, `Non-empty transaction options requires transaction version >= ${MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS}`);
     });
 
@@ -214,10 +218,12 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
+        transaction.signature = await wallets.alice.signer.sign(
+            transactionComputer.computeBytesForSigning(transaction),
+        );
 
         assert.equal(
-            transaction.getSignature().toString("hex"),
+            Buffer.from(transaction.signature).toString("hex"),
             "b45f22e9f57a6df22670fcc3566723a0711a05ac2547456de59fd222a54940e4a1d99bd414897ccbf5c02a842ad86e638989b7f4d30edd26c99a8cd1eb092304",
         );
         assert.equal(
@@ -238,10 +244,12 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
+        transaction.signature = await wallets.alice.signer.sign(
+            transactionComputer.computeBytesForSigning(transaction),
+        );
 
         assert.equal(
-            transaction.getSignature().toString("hex"),
+            Buffer.from(transaction.signature).toString("hex"),
             "01f05aa8cb0614e12a94ab9dcbde5e78370a4e05d23ef25a1fb9d5fcf1cb3b1f33b919cd8dafb1704efb18fa233a8aa0d3344fb6ee9b613a7d7a403786ffbd0a",
         );
         assert.equal(
@@ -263,10 +271,12 @@ describe("test transaction", async () => {
             version: 1,
         });
 
-        transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
+        transaction.signature = await wallets.alice.signer.sign(
+            transactionComputer.computeBytesForSigning(transaction),
+        );
 
         assert.equal(
-            transaction.getSignature().toString("hex"),
+            Buffer.from(transaction.signature).toString("hex"),
             "dfa3e9f2fdec60dcb353bac3b3435b4a2ff251e7e98eaf8620f46c731fc70c8ba5615fd4e208b05e75fe0f7dc44b7a99567e29f94fcd91efac7e67b182cd2a04",
         );
         assert.equal(
@@ -286,10 +296,12 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
+        transaction.signature = await wallets.alice.signer.sign(
+            transactionComputer.computeBytesForSigning(transaction),
+        );
 
         assert.equal(
-            transaction.getSignature().toString("hex"),
+            Buffer.from(transaction.signature).toString("hex"),
             "3f08a1dd64fbb627d10b048e0b45b1390f29bb0e457762a2ccb710b029f299022a67a4b8e45cf62f4314afec2e56b5574c71e38df96cc41fae757b7ee5062503",
         );
         assert.equal(
@@ -297,7 +309,7 @@ describe("test transaction", async () => {
             "1359fb9d5b0b47ca9f3b4adce6e4a524fa74099dd4732743b9226774a4cb0ad8",
         );
 
-        const result = transaction.serializeForSigning();
+        const result = transactionComputer.computeBytesForSigning(transaction);
         assert.isFalse(result.toString().includes("options"));
     });
 
@@ -312,10 +324,12 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
+        transaction.signature = await wallets.alice.signer.sign(
+            transactionComputer.computeBytesForSigning(transaction),
+        );
 
         assert.equal(
-            transaction.getSignature().toString("hex"),
+            Buffer.from(transaction.signature).toString("hex"),
             "3f08a1dd64fbb627d10b048e0b45b1390f29bb0e457762a2ccb710b029f299022a67a4b8e45cf62f4314afec2e56b5574c71e38df96cc41fae757b7ee5062503",
         );
         assert.equal(
@@ -323,7 +337,7 @@ describe("test transaction", async () => {
             "1359fb9d5b0b47ca9f3b4adce6e4a524fa74099dd4732743b9226774a4cb0ad8",
         );
 
-        const result = transaction.serializeForSigning();
+        const result = transactionComputer.computeBytesForSigning(transaction);
         assert.isFalse(result.toString().includes("options"));
     });
 
@@ -331,18 +345,20 @@ describe("test transaction", async () => {
         const transaction = new Transaction({
             nonce: 204n,
             value: 1000000000000000000n,
-            sender: Address.fromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
-            receiver: Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+            sender: Address.newFromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
+            receiver: Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
             senderUsername: "carol",
             receiverUsername: "alice",
             gasLimit: 50000n,
             chainID: "T",
         });
 
-        transaction.applySignature(await wallets.carol.signer.sign(transaction.serializeForSigning()));
+        transaction.signature = await wallets.carol.signer.sign(
+            transactionComputer.computeBytesForSigning(transaction),
+        );
 
         assert.equal(
-            transaction.getSignature().toString("hex"),
+            Buffer.from(transaction.signature).toString("hex"),
             "51e6cd78fb3ab4b53ff7ad6864df27cb4a56d70603332869d47a5cf6ea977c30e696103e41e8dddf2582996ad335229fdf4acb726564dbc1a0bc9e705b511f06",
         );
         assert.equal(
@@ -393,7 +409,7 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        const fee = transaction.computeFee(networkConfig);
+        const fee = transactionComputer.computeTransactionFee(transaction, networkConfig);
         assert.equal(fee.toString(), "50000000000000");
     });
 
@@ -436,7 +452,7 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        let fee = transaction.computeFee(networkConfig);
+        let fee = transactionComputer.computeTransactionFee(transaction, networkConfig);
         assert.equal(fee.toString(), "62000100000000");
     });
 
@@ -470,7 +486,7 @@ describe("test transaction", async () => {
         });
 
         const plainObject = transaction.toPlainObject();
-        const restoredTransaction = Transaction.fromPlainObject(plainObject);
+        const restoredTransaction = Transaction.newFromPlainObject(plainObject);
         assert.deepEqual(restoredTransaction, transaction);
     });
 
@@ -482,7 +498,7 @@ describe("test transaction", async () => {
             gasLimit: 50000n,
             chainID: "local-testnet",
         });
-        assert.equal(tx1.getValue().toString(), "123456789000000000000000000000");
+        assert.equal(tx1.value.toString(), "123456789000000000000000000000");
 
         const tx2 = new Transaction({
             value: 123456789000000000000000000000n,
@@ -491,7 +507,7 @@ describe("test transaction", async () => {
             gasLimit: 50000n,
             chainID: "local-testnet",
         });
-        assert.equal(tx2.getValue().toString(), "123456789000000000000000000000");
+        assert.equal(tx2.value.toString(), "123456789000000000000000000000");
 
         const tx3 = new Transaction({
             value: BigInt("123456789000000000000000000000"),
@@ -500,7 +516,7 @@ describe("test transaction", async () => {
             gasLimit: 50000n,
             chainID: "local-testnet",
         });
-        assert.equal(tx3.getValue().toString(), "123456789000000000000000000000");
+        assert.equal(tx3.value.toString(), "123456789000000000000000000000");
     });
 
     it("checks correctly the version and options of the transaction", async () => {
@@ -588,8 +604,10 @@ describe("test transaction", async () => {
             version: 2,
             options: 2,
         });
-        transaction.applySignature(await wallets.alice.signer.sign(transaction.serializeForSigning()));
-        transaction.applyGuardianSignature(transaction.getSignature());
+        transaction.signature = await wallets.alice.signer.sign(
+            transactionComputer.computeBytesForSigning(transaction),
+        );
+        transaction.guardianSignature = transaction.signature;
         assert.isTrue(transaction.isGuardedTransaction());
     });
 
@@ -756,7 +774,7 @@ describe("test transaction", async () => {
         const restoredTransaction = Transaction.newFromPlainObject(plainObject);
 
         assert.deepEqual(plainObject, transaction.toPlainObject());
-        assert.deepEqual(restoredTransaction, Transaction.fromPlainObject(plainObject));
+        assert.deepEqual(restoredTransaction, Transaction.newFromPlainObject(plainObject));
         assert.deepEqual(restoredTransaction, transaction);
         assert.deepEqual(plainObject, {
             nonce: 90,

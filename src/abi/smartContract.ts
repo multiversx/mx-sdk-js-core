@@ -220,7 +220,7 @@ export class SmartContract implements ISmartContract {
             isPayableBySmartContract: metadataAsJson.payableBySc,
         });
 
-        transaction.setChainID(chainID);
+        transaction.chainID = chainID;
         transaction.value = value ?? 0n;
         transaction.gasPrice = gasPrice ?? BigInt(TRANSACTION_MIN_GAS_PRICE);
 
@@ -255,8 +255,8 @@ export class SmartContract implements ISmartContract {
             arguments: args,
         });
 
-        transaction.setChainID(chainID);
-        transaction.setValue(value);
+        transaction.chainID = chainID;
+        transaction.value = value;
         transaction.gasPrice = gasPrice ?? BigInt(TRANSACTION_MIN_GAS_PRICE);
 
         return transaction;

@@ -19,6 +19,7 @@ import { ManagedDecimalValue } from "./typesystem";
 describe("test smart contract interactor", function () {
     let provider = createLocalnetProvider();
     let alice: TestWallet;
+    const transactionComputer = new TransactionComputer();
 
     before(async function () {
         ({ alice } = await loadTestWallets());
@@ -46,7 +47,6 @@ describe("test smart contract interactor", function () {
         });
         deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
 
-        const transactionComputer = new TransactionComputer();
         deployTransaction.signature = await alice.signer.sign(
             Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
         );
@@ -283,7 +283,6 @@ describe("test smart contract interactor", function () {
         });
         deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
 
-        const transactionComputer = new TransactionComputer();
         deployTransaction.signature = await alice.signer.sign(
             Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
         );
@@ -385,7 +384,6 @@ describe("test smart contract interactor", function () {
         });
         deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
 
-        const transactionComputer = new TransactionComputer();
         deployTransaction.signature = await alice.signer.sign(
             Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
         );
@@ -483,8 +481,6 @@ describe("test smart contract interactor", function () {
         const transaction = options.transaction;
         const wallet = options.wallet;
 
-        const serialized = transaction.serializeForSigning();
-        const signature = await wallet.signer.sign(serialized);
-        transaction.applySignature(signature);
+        transaction.signature = await wallet.signer.sign(transactionComputer.computeBytesForSigning(transaction));
     }
 });

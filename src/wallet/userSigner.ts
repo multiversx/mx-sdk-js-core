@@ -36,7 +36,7 @@ export class UserSigner {
      * Gets the address of the signer.
      */
     getAddress(hrp?: string): Address {
-        const bech32 = this.secretKey.generatePublicKey().toAddress(hrp).bech32();
+        const bech32 = this.secretKey.generatePublicKey().toAddress(hrp).toBech32();
         return Address.newFromBech32(bech32);
     }
 }

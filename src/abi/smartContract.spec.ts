@@ -21,6 +21,7 @@ describe("test contract", () => {
     let provider = new MockNetworkProvider();
     let chainID = "test";
     let alice: TestWallet;
+    const computer = new TransactionComputer();
 
     before(async function () {
         ({ alice } = await loadTestWallets());
@@ -58,7 +59,7 @@ describe("test contract", () => {
         await alice.sync(provider);
         deployTransaction.nonce = alice.account.nonce;
 
-        assert.equal(deployTransaction.getData().valueOf().toString(), "01020304@0500@0100");
+        assert.equal(deployTransaction.data.toString(), "01020304@0500@0100");
         assert.equal(deployTransaction.gasLimit, 1000000n);
         assert.equal(deployTransaction.nonce, 42n);
 
@@ -70,11 +71,10 @@ describe("test contract", () => {
         );
 
         // Sign the transaction
-        deployTransaction.applySignature(await alice.signer.sign(deployTransaction.serializeForSigning()));
+        deployTransaction.signature = await alice.signer.sign(computer.computeBytesForSigning(deployTransaction));
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);
-        const computer = new TransactionComputer();
         const hashString = computer.computeTransactionHash(deployTransaction);
 
         await Promise.all([
@@ -125,15 +125,15 @@ describe("test contract", () => {
         callTransactionTwo.nonce = alice.account.nonce;
 
         assert.equal(callTransactionOne.nonce, 42n);
-        assert.equal(callTransactionOne.getData().valueOf().toString(), "helloEarth@05@0123");
+        assert.equal(callTransactionOne.data.toString(), "helloEarth@05@0123");
         assert.equal(callTransactionOne.gasLimit, 150000n);
         assert.equal(callTransactionTwo.nonce, 43n);
-        assert.equal(callTransactionTwo.getData().valueOf().toString(), "helloMars@05@0123");
+        assert.equal(callTransactionTwo.data.toString(), "helloMars@05@0123");
         assert.equal(callTransactionTwo.gasLimit, 1500000n);
 
         // Sign transactions, broadcast them
-        callTransactionOne.applySignature(await alice.signer.sign(callTransactionOne.serializeForSigning()));
-        callTransactionTwo.applySignature(await alice.signer.sign(callTransactionTwo.serializeForSigning()));
+        callTransactionOne.signature = await alice.signer.sign(computer.computeBytesForSigning(callTransactionOne));
+        callTransactionTwo.signature = await alice.signer.sign(computer.computeBytesForSigning(callTransactionTwo));
 
         let hashOne = await provider.sendTransaction(callTransactionOne);
         let hashTwo = await provider.sendTransaction(callTransactionTwo);
@@ -166,7 +166,7 @@ describe("test contract", () => {
         let watcher = new TransactionWatcher(provider);
 
         let contract = new SmartContract();
-        contract.setAddress(Address.fromBech32("erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q"));
+        contract.setAddress(Address.newFromBech32("erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q"));
 
         let deployTransaction = contract.upgrade({
             code: Code.fromBuffer(Buffer.from([1, 2, 3, 4])),
@@ -182,12 +182,12 @@ describe("test contract", () => {
         await alice.sync(provider);
         deployTransaction.nonce = alice.account.nonce;
 
-        assert.equal(deployTransaction.getData().valueOf().toString(), "upgradeContract@01020304@0100");
+        assert.equal(deployTransaction.data.toString(), "upgradeContract@01020304@0100");
         assert.equal(deployTransaction.gasLimit, 1000000n);
         assert.equal(deployTransaction.nonce, 42n);
 
         // Sign the transaction
-        deployTransaction.applySignature(await alice.signer.sign(deployTransaction.serializeForSigning()));
+        deployTransaction.signature = await alice.signer.sign(computer.computeBytesForSigning(deployTransaction));
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);
@@ -227,8 +227,8 @@ describe("test contract", () => {
             ],
         });
 
-        const callerAddress = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        const contractAddress = Address.fromBech32("erd1qqqqqqqqqqqqqpgqaxa53w6uk43n6dhyt2la6cd5lyv32qn4396qfsqlnk");
+        const callerAddress = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqaxa53w6uk43n6dhyt2la6cd5lyv32qn4396qfsqlnk");
 
         const contract = new SmartContract({
             abi,
@@ -296,8 +296,8 @@ describe("test contract", () => {
             ],
         });
 
-        const callerAddress = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
-        const contractAddress = Address.fromBech32("erd1qqqqqqqqqqqqqpgqaxa53w6uk43n6dhyt2la6cd5lyv32qn4396qfsqlnk");
+        const callerAddress = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqaxa53w6uk43n6dhyt2la6cd5lyv32qn4396qfsqlnk");
 
         const contract = new SmartContract({
             abi,

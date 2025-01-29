@@ -1,8 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
-import { IPlainTransactionObject } from "./interface";
-import { INetworkConfig } from "./interfaceOfNetwork";
+import { INetworkConfig, IPlainTransactionObject } from "./interface";
 import { interpretSignatureAsBuffer } from "./signature";
 import { TransactionComputer } from "./transactionComputer";
 

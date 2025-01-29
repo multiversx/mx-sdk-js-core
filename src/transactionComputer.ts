@@ -6,7 +6,7 @@ import {
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
 } from "./constants";
 import * as errors from "./errors";
-import { INetworkConfig } from "./interfaceOfNetwork";
+import { INetworkConfig } from "./interface";
 import { ProtoSerializer } from "./proto";
 import { Transaction } from "./transaction";
 

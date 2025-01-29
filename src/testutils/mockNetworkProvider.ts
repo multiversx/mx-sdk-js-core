@@ -2,7 +2,6 @@ import { Address } from "../address";
 import { AsyncTimer } from "../asyncTimer";
 import * as errors from "../errors";
 import { ErrMock } from "../errors";
-import { IAccountOnNetwork } from "../interfaceOfNetwork";
 import {
     AccountOnNetwork,
     DefinitionOfFungibleTokenOnNetwork,
@@ -123,7 +122,7 @@ export class MockNetworkProvider implements INetworkProvider {
         throw new Error("Method not implemented.");
     }
 
-    mockUpdateAccount(address: Address, mutate: (item: IAccountOnNetwork) => void) {
+    mockUpdateAccount(address: Address, mutate: (item: AccountOnNetwork) => void) {
         let account = this.accounts.get(address.toBech32());
         if (account) {
             mutate(account);

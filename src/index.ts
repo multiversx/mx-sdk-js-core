@@ -16,7 +16,6 @@ export * from "./delegation";
 export * from "./entrypoints";
 export * from "./errors";
 export * from "./interface";
-export * from "./interfaceOfNetwork";
 export * from "./logger";
 export * from "./message";
 export * from "./networkParams";

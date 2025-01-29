@@ -63,11 +63,11 @@ describe("test transaction", function () {
         await signTransaction({ transaction: transactionOne, wallet: alice });
         await signTransaction({ transaction: transactionTwo, wallet: alice });
 
-        await provider.sendTransaction(transactionOne);
-        await provider.sendTransaction(transactionTwo);
+        const hashOne = await provider.sendTransaction(transactionOne);
+        const hashTwo = await provider.sendTransaction(transactionTwo);
 
-        await watcher.awaitCompleted(transactionOne.getHash().hex());
-        await watcher.awaitCompleted(transactionTwo.getHash().hex());
+        await watcher.awaitCompleted(hashOne);
+        await watcher.awaitCompleted(hashTwo);
 
         await bob.sync(provider);
         let newBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
@@ -100,8 +100,8 @@ describe("test transaction", function () {
 
         transactionOne.setNonce(alice.account.nonce);
         await signTransaction({ transaction: transactionOne, wallet: alice });
-        await provider.sendTransaction(transactionOne);
-        await watcher.awaitCompleted(transactionOne.getHash().hex());
+        const hashOne = await provider.sendTransaction(transactionOne);
+        await watcher.awaitCompleted(hashOne);
 
         await bob.sync(provider);
         let newBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());

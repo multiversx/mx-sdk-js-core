@@ -191,8 +191,6 @@ describe("test contract", () => {
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);
-        const computer = new TransactionComputer();
-        const hashString = computer.computeTransactionHash(deployTransaction);
 
         await Promise.all([
             provider.mockTransactionTimeline(deployTransaction, [
@@ -202,7 +200,7 @@ describe("test contract", () => {
                 new TransactionStatus("executed"),
                 new MarkCompleted(),
             ]),
-            watcher.awaitCompleted(hashString),
+            watcher.awaitCompleted(hash),
         ]);
 
         assert.isTrue((await provider.getTransaction(hash)).status.isCompleted());

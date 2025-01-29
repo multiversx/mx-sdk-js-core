@@ -10,7 +10,7 @@ describe("behchmark sign and verify", () => {
         const secretKeys: UserSecretKey[] = [];
         const publicKeys: UserPublicKey[] = [];
         const messages: Buffer[] = [];
-        const goodSignatures: Buffer[] = [];
+        const goodSignatures: Uint8Array[] = [];
 
         for (let i = 0; i < n; i++) {
             const secretKey = new UserSecretKey(Buffer.from(utils.randomBytes(32)));
@@ -28,7 +28,7 @@ describe("behchmark sign and verify", () => {
 
         for (let i = 0; i < n; i++) {
             const signature = secretKeys[i].sign(messages[i]);
-            goodSignatures.push(Buffer.from(signature));
+            goodSignatures.push(signature);
         }
 
         console.timeEnd("sign");

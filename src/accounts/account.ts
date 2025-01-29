@@ -15,7 +15,7 @@ export class Account implements IAccount {
     /**
      * The address of the account.
      */
-    readonly address: Address = Address.empty();
+    readonly address: Address;
 
     /**
      * The nonce of the account (the account sequence number).
@@ -33,7 +33,7 @@ export class Account implements IAccount {
     readonly publicKey: UserPublicKey;
 
     /**
-     * Creates an account object from an address
+     * Creates an account object from a secret key
      */
     constructor(secretKey: UserSecretKey, hrp: string = LibraryConfig.DefaultAddressHrp) {
         this.secretKey = secretKey;
@@ -92,7 +92,7 @@ export class Account implements IAccount {
         };
     }
 
-    sign(data: Uint8Array): Uint8Array {
+    async sign(data: Uint8Array): Promise<Uint8Array> {
         return this.secretKey.sign(data);
     }
 

@@ -25,7 +25,7 @@ describe("test keypair", () => {
         assert.lengthOf(secretKey.valueOf(), 32);
     });
 
-    it("should sign and verify transaction", () => {
+    it("should sign and verify transaction", async () => {
         const transaction = new Transaction({
             nonce: 89n,
             value: 0n,
@@ -43,12 +43,11 @@ describe("test keypair", () => {
 
         const transactionComputer = new TransactionComputer();
         const serializedTx = transactionComputer.computeBytesForSigning(transaction);
-        transaction.signature = keypair.sign(serializedTx);
+        transaction.signature = await keypair.sign(serializedTx);
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
             "b56769014f2bdc5cf9fc4a05356807d71fcf8775c819b0f1b0964625b679c918ffa64862313bfef86f99b38cb84fcdb16fa33ad6eb565276616723405cd8f109",
         );
-        assert.isTrue(keypair.verify(serializedTx, transaction.signature));
-        assert.isTrue(keypair.verify(serializedTx, transaction.signature));
+        assert.isTrue(await keypair.verify(serializedTx, transaction.signature));
     });
 });

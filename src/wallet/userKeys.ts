@@ -38,8 +38,10 @@ export class UserSecretKey {
     }
 
     static generate(): UserSecretKey {
-        const keyPair = nacl.sign.keyPair(); // Generates a new signing keypair
-        const secretKey = keyPair.secretKey.subarray(0, 32); // Extract only the private key part
+        // Generates a new signing keypair
+        const keyPair = nacl.sign.keyPair();
+        // Extract only the private key part
+        const secretKey = keyPair.secretKey.subarray(0, USER_SEED_LENGTH);
         return new UserSecretKey(secretKey);
     }
 

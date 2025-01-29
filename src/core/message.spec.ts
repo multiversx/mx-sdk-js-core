@@ -1,8 +1,8 @@
-import { UserVerifier } from "./wallet";
 import { assert } from "chai";
+import { TestWallet, loadTestWallets } from "../testutils";
+import { UserVerifier } from "../wallet";
 import { DEFAULT_MESSAGE_VERSION, SDK_JS_SIGNER, UNKNOWN_SIGNER } from "./constants";
 import { Message, MessageComputer } from "./message";
-import { TestWallet, loadTestWallets } from "./testutils";
 
 describe("test message", () => {
     let alice: TestWallet;

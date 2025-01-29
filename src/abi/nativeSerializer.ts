@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import BigNumber from "bignumber.js";
-import { Address } from "../address";
-import { ErrInvalidArgument } from "../errors";
-import { numberToPaddedHex } from "../utils.codec";
+import { Address } from "../core/address";
+import { ErrInvalidArgument } from "../core/errors";
+import { numberToPaddedHex } from "../core/utils.codec";
 import { ArgumentErrorContext } from "./argumentErrorContext";
 import {
     AddressType,

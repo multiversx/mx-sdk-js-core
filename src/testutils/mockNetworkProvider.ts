@@ -1,7 +1,13 @@
-import { Address } from "../address";
-import { AsyncTimer } from "../asyncTimer";
-import * as errors from "../errors";
-import { ErrMock } from "../errors";
+import { Address } from "../core/address";
+import { AsyncTimer } from "../core/asyncTimer";
+import * as errors from "../core/errors";
+import { ErrMock } from "../core/errors";
+import { SmartContractQuery, SmartContractQueryResponse } from "../core/smartContractQuery";
+import { Token } from "../core/tokens";
+import { Transaction } from "../core/transaction";
+import { TransactionComputer } from "../core/transactionComputer";
+import { TransactionOnNetwork } from "../core/transactionOnNetwork";
+import { TransactionStatus } from "../core/transactionStatus";
 import {
     AccountOnNetwork,
     DefinitionOfFungibleTokenOnNetwork,
@@ -18,13 +24,7 @@ import {
     TokenAmountOnNetwork,
     TransactionCostResponse,
 } from "../networkProviders/resources";
-import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
-import { Token } from "../tokens";
-import { Transaction } from "../transaction";
-import { TransactionComputer } from "../transactionComputer";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
-import { TransactionStatus } from "../transactionStatus";
 import { createAccountBalance } from "./utils";
 
 export class MockNetworkProvider implements INetworkProvider {

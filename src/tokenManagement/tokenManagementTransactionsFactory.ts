@@ -1,10 +1,10 @@
 import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../abi";
-import { Address } from "../address";
-import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
-import { ErrBadUsage } from "../errors";
-import { Logger } from "../logger";
-import { Transaction } from "../transaction";
-import { TransactionBuilder } from "../transactionBuilder";
+import { Address } from "../core/address";
+import { ESDT_CONTRACT_ADDRESS_HEX } from "../core/constants";
+import { ErrBadUsage } from "../core/errors";
+import { Logger } from "../core/logger";
+import { Transaction } from "../core/transaction";
+import { TransactionBuilder } from "../core/transactionBuilder";
 import * as resources from "./resources";
 
 interface IConfig {

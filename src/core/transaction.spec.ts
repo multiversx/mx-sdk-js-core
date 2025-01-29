@@ -1,13 +1,13 @@
 import { Buffer } from "buffer";
 import { assert } from "chai";
+import { ProtoSerializer } from "../proto";
+import { TestWallet, loadTestWallets } from "../testutils";
+import { UserPublicKey, UserVerifier } from "../wallet";
 import { Address } from "./address";
 import { MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS, TRANSACTION_OPTIONS_DEFAULT } from "./constants";
 import { INetworkConfig } from "./interface";
-import { ProtoSerializer } from "./proto";
-import { TestWallet, loadTestWallets } from "./testutils";
 import { Transaction } from "./transaction";
 import { TransactionComputer } from "./transactionComputer";
-import { UserPublicKey, UserVerifier } from "./wallet";
 
 describe("test transaction", async () => {
     let wallets: Record<string, TestWallet>;

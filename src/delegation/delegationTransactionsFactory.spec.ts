@@ -1,7 +1,6 @@
 import { assert } from "chai";
-import { Address } from "../address";
-import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../constants";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
+import { Address, TransactionsFactoryConfig } from "../core";
+import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../core/constants";
 import { ValidatorPublicKey } from "../wallet";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
 

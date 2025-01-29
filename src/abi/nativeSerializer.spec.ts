@@ -1,7 +1,6 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
-import { Address } from "../address";
-import { ErrInvalidArgument } from "../errors";
+import { Address, ErrInvalidArgument } from "../core";
 import { NativeSerializer } from "./nativeSerializer";
 import {
     AbiRegistry,
@@ -10,6 +9,8 @@ import {
     BigUIntType,
     BooleanType,
     BooleanValue,
+    BytesType,
+    BytesValue,
     CompositeType,
     CompositeValue,
     EndpointDefinition,
@@ -34,7 +35,6 @@ import {
     VariadicType,
     VariadicValue,
 } from "./typesystem";
-import { BytesType, BytesValue } from "./typesystem/bytes";
 
 describe("test native serializer", () => {
     it("should perform type inference", async () => {

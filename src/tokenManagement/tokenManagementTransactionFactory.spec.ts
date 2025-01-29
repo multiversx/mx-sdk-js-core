@@ -1,8 +1,7 @@
 import { assert } from "chai";
-import { Address } from "../address";
-import { ESDT_CONTRACT_ADDRESS_HEX } from "../constants";
+import { Address, TransactionsFactoryConfig } from "../core";
+import { ESDT_CONTRACT_ADDRESS_HEX } from "../core/constants";
 import { loadTestWallets, TestWallet } from "../testutils";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { TokenManagementTransactionsFactory } from "./tokenManagementTransactionsFactory";
 
 describe("test token management transactions factory", () => {

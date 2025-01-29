@@ -1,5 +1,5 @@
 import { AbiRegistry, ArgSerializer } from "../abi";
-import { TransactionEvent } from "../transactionEvents";
+import { TransactionEvent } from "../core/transactionEvents";
 
 export class TransactionEventsParser {
     private readonly abi: AbiRegistry;

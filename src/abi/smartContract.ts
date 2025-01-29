@@ -1,10 +1,10 @@
-import { Address, AddressComputer } from "../address";
-import { Compatibility } from "../compatibility";
-import { TRANSACTION_MIN_GAS_PRICE } from "../constants";
-import { ErrContractHasNoAddress } from "../errors";
-import { Transaction } from "../transaction";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
-import { guardValueIsSet } from "../utils";
+import { Address, AddressComputer } from "../core/address";
+import { Compatibility } from "../core/compatibility";
+import { TRANSACTION_MIN_GAS_PRICE } from "../core/constants";
+import { ErrContractHasNoAddress } from "../core/errors";
+import { Transaction } from "../core/transaction";
+import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
+import { guardValueIsSet } from "../core/utils";
 import { SmartContractTransactionsFactory } from "./../smartContracts/smartContractTransactionsFactory";
 import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";

@@ -1,6 +1,6 @@
-import { guardValueIsSet } from "../../utils";
+import { guardValueIsSet } from "../../core/utils";
 import { CollectionOfTypedValues } from "./collections";
-import { Type, TypedValue, NullType, TypePlaceholder } from "./types";
+import { NullType, Type, TypedValue, TypePlaceholder } from "./types";
 
 // TODO: Move to a new file, "genericOption.ts"
 export class OptionType extends Type {

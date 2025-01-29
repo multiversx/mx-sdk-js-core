@@ -1,10 +1,10 @@
-import * as errors from "../../errors";
-import { assert } from "chai";
-import { U8Type, U8Value } from "./numerical";
-import { Field, FieldDefinition } from "./fields";
-import { EnumType, EnumValue, EnumVariantDefinition } from "./enum";
-import { StringType, StringValue } from "./string";
 import BigNumber from "bignumber.js";
+import { assert } from "chai";
+import * as errors from "../../core/errors";
+import { EnumType, EnumValue, EnumVariantDefinition } from "./enum";
+import { Field, FieldDefinition } from "./fields";
+import { U8Type, U8Value } from "./numerical";
+import { StringType, StringValue } from "./string";
 
 describe("test enums", () => {
     it("should get fields", () => {

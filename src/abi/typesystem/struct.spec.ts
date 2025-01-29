@@ -1,9 +1,9 @@
-import * as errors from "../../errors";
 import { assert } from "chai";
-import { BigUIntType, BigUIntValue, U32Type, U32Value } from "./numerical";
+import * as errors from "../../core/errors";
 import { BytesType, BytesValue } from "./bytes";
-import { Struct, StructType } from "./struct";
 import { Field, FieldDefinition } from "./fields";
+import { BigUIntType, BigUIntValue, U32Type, U32Value } from "./numerical";
+import { Struct, StructType } from "./struct";
 import { TokenIdentifierType, TokenIdentifierValue } from "./tokenIdentifier";
 
 describe("test structs", () => {

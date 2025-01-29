@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { numberToPaddedHex } from "../../utils.codec";
+import { numberToPaddedHex } from "../../core/utils.codec";
 
 /**
  * Returns whether the most significant bit of a given byte (within a buffer) is 1.

@@ -1,5 +1,5 @@
-import { ErrMissingFieldOnEnum } from "../../errors";
-import { guardTrue, guardValueIsSet } from "../../utils";
+import { ErrMissingFieldOnEnum } from "../../core/errors";
+import { guardTrue, guardValueIsSet } from "../../core/utils";
 import { Field, FieldDefinition, Fields } from "./fields";
 import { CustomType, TypedValue } from "./types";
 

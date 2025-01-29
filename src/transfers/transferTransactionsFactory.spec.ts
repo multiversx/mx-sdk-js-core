@@ -1,9 +1,7 @@
 import { assert } from "chai";
-import { Address } from "../address";
-import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
-import { ErrBadUsage } from "../errors";
-import { Token, TokenTransfer } from "../tokens";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
+import { Address, ErrBadUsage, Token, TokenTransfer } from "../core";
+import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../core/constants";
+import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 
 describe("test transfer transactions factory", function () {

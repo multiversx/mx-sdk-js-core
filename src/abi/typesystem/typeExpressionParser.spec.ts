@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { ErrTypingSystem } from "../../errors";
+import { ErrTypingSystem } from "../../core";
 import { TypeExpressionParser } from "./typeExpressionParser";
 import { Type } from "./types";
 

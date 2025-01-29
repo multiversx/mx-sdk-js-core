@@ -1,9 +1,9 @@
 import BigNumber from "bignumber.js";
 import { bigIntToBuffer } from "../abi/codec/utils";
-import { Address } from "../address";
-import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED } from "../constants";
-import * as errors from "../errors";
-import { Transaction } from "../transaction";
+import { Address } from "../core/address";
+import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED } from "../core/constants";
+import * as errors from "../core/errors";
+import { Transaction } from "../core/transaction";
 
 /**
  * Hides away the serialization complexity, for each type of object (e.g. transactions).

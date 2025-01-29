@@ -1,8 +1,8 @@
 import { PathLike, readFileSync, writeFileSync } from "fs";
 import path, { isAbsolute, join, resolve } from "path";
-import { LibraryConfig } from "../config";
-import { Err } from "../errors";
-import { Logger } from "../logger";
+import { LibraryConfig } from "../core/config";
+import { Err } from "../core/errors";
+import { Logger } from "../core/logger";
 import { CipherAlgorithm, Decryptor, EncryptedData, Encryptor, KeyDerivationFunction, Randomness } from "./crypto";
 import { ScryptKeyDerivationParams } from "./crypto/derivationParams";
 import { Mnemonic } from "./mnemonic";

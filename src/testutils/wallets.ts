@@ -1,9 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
 import { Account } from "../accounts";
-import { Address } from "../address";
+import { Address } from "../core/address";
+import { getAxios } from "../core/utils";
 import { AccountOnNetwork } from "../networkProviders";
-import { getAxios } from "../utils";
 import { UserSecretKey, UserSigner } from "./../wallet";
 import { readTestFile } from "./files";
 import { isOnBrowserTests } from "./utils";

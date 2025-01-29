@@ -1,4 +1,4 @@
-import { ErrInvariantFailed } from "../errors";
+import { ErrInvariantFailed } from "../core/errors";
 
 export function guardLength(withLength: { length?: number }, expectedLength: number) {
     let actualLength = withLength.length || 0;

@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { readFileSync } from "fs";
 import path from "path";
 import { Account } from "../accounts/account";
-import { Address } from "../address";
+import { Address, TransactionComputer } from "../core";
 import { loadAbiRegistry } from "../testutils";
 import { DevnetEntrypoint } from "./entrypoints";
 

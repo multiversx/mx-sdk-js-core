@@ -1,15 +1,15 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
+import { INetworkProvider } from "../networkProviders/interface";
+import { loadTestWallets, stringifyBigIntJSON, TestWallet } from "../testutils";
+import { createLocalnetProvider } from "../testutils/networkProviders";
+import { TransferTransactionsFactory } from "../transfers/transferTransactionsFactory";
 import { Logger } from "./logger";
-import { INetworkProvider } from "./networkProviders/interface";
-import { loadTestWallets, stringifyBigIntJSON, TestWallet } from "./testutils";
-import { createLocalnetProvider } from "./testutils/networkProviders";
 import { TokenTransfer } from "./tokens";
 import { Transaction } from "./transaction";
 import { TransactionComputer } from "./transactionComputer";
 import { TransactionsFactoryConfig } from "./transactionsFactoryConfig";
 import { TransactionWatcher } from "./transactionWatcher";
-import { TransferTransactionsFactory } from "./transfers/transferTransactionsFactory";
 
 describe("test transaction", function () {
     let alice: TestWallet, bob: TestWallet;

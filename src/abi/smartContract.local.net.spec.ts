@@ -1,6 +1,9 @@
 import { assert } from "chai";
 import { promises } from "fs";
-import { Logger } from "../logger";
+import { Logger } from "../core/logger";
+import { TransactionComputer } from "../core/transactionComputer";
+import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
+import { TransactionWatcher } from "../core/transactionWatcher";
 import {
     SmartContractController,
     SmartContractTransactionsFactory,
@@ -9,9 +12,6 @@ import {
 import { stringifyBigIntJSON } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
 import { loadTestWallets, TestWallet } from "../testutils/wallets";
-import { TransactionComputer } from "../transactionComputer";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
-import { TransactionWatcher } from "../transactionWatcher";
 import { decodeUnsignedNumber } from "./codec";
 import { SmartContract } from "./smartContract";
 import {

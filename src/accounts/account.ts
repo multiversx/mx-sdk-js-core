@@ -1,9 +1,9 @@
 import * as fs from "fs";
 import { PathLike } from "fs";
-import { Message, MessageComputer, TransactionComputer } from "..";
-import { Address } from "../address";
-import { LibraryConfig } from "../config";
-import { Transaction } from "../transaction";
+import { Message, MessageComputer, TransactionComputer } from "../core";
+import { Address } from "../core/address";
+import { LibraryConfig } from "../core/config";
+import { Transaction } from "../core/transaction";
 import { KeyPair, Mnemonic, UserPublicKey, UserSecretKey, UserSigner, UserWallet } from "../wallet";
 import { UserPem } from "../wallet/userPem";
 import { IAccount } from "./interfaces";

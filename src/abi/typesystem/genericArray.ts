@@ -1,4 +1,4 @@
-import { guardLength, guardTrue } from "../../utils";
+import { guardLength, guardTrue } from "../../core/utils";
 import { CollectionOfTypedValues } from "./collections";
 import { Type, TypedValue } from "./types";
 

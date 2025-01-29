@@ -1,4 +1,4 @@
-import { Address } from "../address";
+import { Address } from "../core/address";
 
 export class TransactionReceipt {
     value: string = "";

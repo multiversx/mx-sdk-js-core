@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { Err } from "../../errors";
+import { Err } from "../../core/errors";
 import { DigestAlgorithm } from "./constants";
 import { EncryptedData } from "./encryptedData";
 

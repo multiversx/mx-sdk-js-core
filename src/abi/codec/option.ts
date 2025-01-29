@@ -1,4 +1,4 @@
-import * as errors from "../../errors";
+import * as errors from "../../core/errors";
 import { OptionValue, Type } from "../typesystem";
 import { BinaryCodec } from "./binary";
 

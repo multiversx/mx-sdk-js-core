@@ -1,4 +1,4 @@
-import { ErrBadPEM } from "../errors";
+import { ErrBadPEM } from "../core/errors";
 import { USER_PUBKEY_LENGTH, USER_SEED_LENGTH, UserSecretKey } from "./userKeys";
 import { VALIDATOR_SECRETKEY_LENGTH, ValidatorSecretKey } from "./validatorKeys";
 

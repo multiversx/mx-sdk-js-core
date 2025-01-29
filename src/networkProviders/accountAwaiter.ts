@@ -1,5 +1,5 @@
-import { Address } from "../address";
-import { ExpectedAccountConditionNotReachedError } from "../errors";
+import { Address } from "../core/address";
+import { ExpectedAccountConditionNotReachedError } from "../core/errors";
 import { AccountOnNetwork } from "./accounts";
 import {
     DEFAULT_ACCOUNT_AWAITING_PATIENCE_IN_MILLISECONDS,

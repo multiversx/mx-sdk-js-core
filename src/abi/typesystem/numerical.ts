@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import * as errors from "../../errors";
+import * as errors from "../../core/errors";
 import { PrimitiveType, PrimitiveValue } from "./types";
 
 export class NumericalType extends PrimitiveType {

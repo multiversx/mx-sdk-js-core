@@ -1,9 +1,9 @@
 import { ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../abi";
-import { Address } from "../address";
-import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../constants";
-import { Err } from "../errors";
-import { Transaction } from "../transaction";
-import { TransactionBuilder } from "../transactionBuilder";
+import { Address } from "../core/address";
+import { DELEGATION_MANAGER_SC_ADDRESS_HEX } from "../core/constants";
+import { Err } from "../core/errors";
+import { Transaction } from "../core/transaction";
+import { TransactionBuilder } from "../core/transactionBuilder";
 import * as resources from "./resources";
 
 interface IConfig {

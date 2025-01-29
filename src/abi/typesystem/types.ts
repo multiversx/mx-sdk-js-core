@@ -1,5 +1,5 @@
-import { getJavascriptPrototypesInHierarchy } from "../../reflection";
-import { guardTrue, guardValueIsSet } from "../../utils";
+import { getJavascriptPrototypesInHierarchy } from "../../core/reflection";
+import { guardTrue, guardValueIsSet } from "../../core/utils";
 
 /**
  * An abstraction that represents a Type. Handles both generic and non-generic types.

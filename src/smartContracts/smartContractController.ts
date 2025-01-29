@@ -1,14 +1,14 @@
 import { AbiRegistry, ArgSerializer, isTyped, NativeSerializer } from "../abi";
 import { IAccount } from "../accounts/interfaces";
-import { Err, ErrSmartContractQuery } from "../errors";
+import { Err, ErrSmartContractQuery } from "../core/errors";
+import { SmartContractQuery, SmartContractQueryInput, SmartContractQueryResponse } from "../core/smartContractQuery";
+import { Transaction } from "../core/transaction";
+import { TransactionComputer } from "../core/transactionComputer";
+import { TransactionOnNetwork } from "../core/transactionOnNetwork";
+import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
+import { TransactionWatcher } from "../core/transactionWatcher";
 import { INetworkProvider } from "../networkProviders/interface";
-import { SmartContractQuery, SmartContractQueryInput, SmartContractQueryResponse } from "../smartContractQuery";
-import { Transaction } from "../transaction";
-import { TransactionComputer } from "../transactionComputer";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
-import { TransactionsFactoryConfig } from "../transactionsFactoryConfig";
 import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
-import { TransactionWatcher } from "../transactionWatcher";
 import * as resources from "./resources";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
 

@@ -1,4 +1,4 @@
-import { guardLength } from "../../utils";
+import { guardLength } from "../../core/utils";
 import { Type, TypeCardinality, TypedValue } from "./types";
 
 export class CompositeType extends Type {

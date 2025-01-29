@@ -1,8 +1,6 @@
 import { assert } from "chai";
-import { Address } from "../address";
+import { Address, TokenTransfer, Transaction } from "../core";
 import { loadTestWallets, TestWallet } from "../testutils";
-import { TokenTransfer } from "../tokens";
-import { Transaction } from "../transaction";
 import { ProtoSerializer } from "./serializer";
 
 describe("serialize transactions", () => {

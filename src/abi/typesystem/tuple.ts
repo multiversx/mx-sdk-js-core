@@ -1,4 +1,4 @@
-import * as errors from "../../errors";
+import * as errors from "../../core/errors";
 import { Field, FieldDefinition } from "./fields";
 import { Struct, StructType } from "./struct";
 import { Type, TypedValue } from "./types";

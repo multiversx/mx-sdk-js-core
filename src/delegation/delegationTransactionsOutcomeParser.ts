@@ -1,7 +1,7 @@
-import { Address } from "../address";
-import { ErrParseTransactionOutcome } from "../errors";
-import { TransactionEvent } from "../transactionEvents";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
+import { Address } from "../core/address";
+import { ErrParseTransactionOutcome } from "../core/errors";
+import { TransactionEvent } from "../core/transactionEvents";
+import { TransactionOnNetwork } from "../core/transactionOnNetwork";
 import { findEventsByIdentifier } from "../transactionsOutcomeParsers/resources";
 
 export class DelegationTransactionsOutcomeParser {

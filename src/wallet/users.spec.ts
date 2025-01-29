@@ -1,7 +1,6 @@
 import { assert } from "chai";
 import path from "path";
-import { Address, Message, Transaction } from "..";
-import { ErrBadMnemonicEntropy, ErrInvariantFailed } from "../errors";
+import { Address, ErrBadMnemonicEntropy, ErrInvariantFailed, Message, Transaction } from "../core";
 import {
     DummyMnemonicOf12Words,
     loadMnemonic,

@@ -1,7 +1,7 @@
 import { BytesValue } from "../abi";
-import { Address } from "../address";
-import { Token } from "../tokens";
-import { TransactionStatus } from "../transactionStatus";
+import { Address } from "../core/address";
+import { Token } from "../core/tokens";
+import { TransactionStatus } from "../core/transactionStatus";
 import {
     DEFAULT_ACCOUNT_AWAITING_PATIENCE_IN_MILLISECONDS,
     DEFAULT_ACCOUNT_AWAITING_POLLING_TIMEOUT_IN_MILLISECONDS,

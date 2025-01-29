@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { MarkCompleted, MockNetworkProvider, Wait } from "./testutils";
+import { MarkCompleted, MockNetworkProvider, Wait } from "../testutils";
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 import { TransactionStatus } from "./transactionStatus";
 import { TransactionWatcher } from "./transactionWatcher";

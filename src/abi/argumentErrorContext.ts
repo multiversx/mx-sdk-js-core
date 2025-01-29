@@ -1,4 +1,4 @@
-import { ErrInvalidArgument } from "../errors";
+import { ErrInvalidArgument } from "../core/errors";
 import { EndpointParameterDefinition, Type } from "./typesystem";
 
 export class ArgumentErrorContext {

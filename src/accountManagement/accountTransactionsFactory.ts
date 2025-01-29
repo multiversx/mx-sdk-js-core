@@ -1,6 +1,6 @@
-import { Address } from "../address";
-import { Transaction } from "../transaction";
-import { TransactionBuilder } from "../transactionBuilder";
+import { Address } from "../core/address";
+import { Transaction } from "../core/transaction";
+import { TransactionBuilder } from "../core/transactionBuilder";
 import { SaveKeyValueInput, SetGuardianInput } from "./resources";
 
 interface IConfig {

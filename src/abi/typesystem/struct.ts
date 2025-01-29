@@ -1,4 +1,4 @@
-import { ErrMissingFieldOnStruct } from "../../errors";
+import { ErrMissingFieldOnStruct } from "../../core/errors";
 import { Field, FieldDefinition, Fields } from "./fields";
 import { CustomType, TypedValue } from "./types";
 

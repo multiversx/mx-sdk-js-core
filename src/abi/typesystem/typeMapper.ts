@@ -1,4 +1,4 @@
-import * as errors from "../../errors";
+import * as errors from "../../core/errors";
 import { AddressType } from "./address";
 import { OptionalType } from "./algebraic";
 import { BooleanType } from "./boolean";

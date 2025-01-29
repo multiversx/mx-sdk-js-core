@@ -1,16 +1,16 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
-import * as errors from "../../errors";
+import * as errors from "../../core/errors";
 import { AddressType } from "./address";
 import { BooleanType } from "./boolean";
 import { BytesType, BytesValue } from "./bytes";
 import { OptionType } from "./generic";
+import { ManagedDecimalType } from "./managedDecimal";
+import { ManagedDecimalSignedType } from "./managedDecimalSigned";
 import { I64Type, NumericalValue, U16Type, U32Type, U32Value } from "./numerical";
 import { StringType } from "./string";
 import { TypeExpressionParser } from "./typeExpressionParser";
 import { NullType, PrimitiveType, Type } from "./types";
-import { ManagedDecimalType } from "./managedDecimal";
-import { ManagedDecimalSignedType } from "./managedDecimalSigned";
 
 describe("test types", () => {
     let parser = new TypeExpressionParser();

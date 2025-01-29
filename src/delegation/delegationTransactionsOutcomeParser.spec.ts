@@ -1,9 +1,6 @@
 import { assert } from "chai";
-import { Address } from "../address";
+import { Address, TransactionEvent, TransactionLogs, TransactionOnNetwork } from "../core";
 import { b64TopicsToBytes } from "../testutils";
-import { TransactionEvent } from "../transactionEvents";
-import { TransactionLogs } from "../transactionLogs";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { DelegationTransactionsOutcomeParser } from "./delegationTransactionsOutcomeParser";
 

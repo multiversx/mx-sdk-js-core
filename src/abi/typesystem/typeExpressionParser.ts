@@ -1,6 +1,6 @@
 import { TypeFormula } from "../../abi/typeFormula";
 import { TypeFormulaParser } from "../../abi/typeFormulaParser";
-import { ErrTypingSystem } from "../../errors";
+import { ErrTypingSystem } from "../../core/errors";
 import { Type } from "./types";
 
 export class TypeExpressionParser {

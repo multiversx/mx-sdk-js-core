@@ -1,12 +1,14 @@
 import { assert, expect } from "chai";
-import { Address } from "../address";
-import { SmartContractQuery } from "../smartContractQuery";
+import {
+    Address,
+    SmartContractQuery,
+    Token,
+    Transaction,
+    TransactionComputer,
+    TransactionOnNetwork,
+    TransactionStatus,
+} from "../core";
 import { loadTestWallet } from "../testutils/wallets";
-import { Token } from "../tokens";
-import { Transaction } from "../transaction";
-import { TransactionComputer } from "../transactionComputer";
-import { TransactionOnNetwork } from "../transactionOnNetwork";
-import { TransactionStatus } from "../transactionStatus";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 
 describe("ApiNetworkProvider Tests", function () {

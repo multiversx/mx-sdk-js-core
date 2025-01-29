@@ -1,10 +1,10 @@
-import { Address } from "../address";
-import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../constants";
-import { ErrBadUsage } from "../errors";
-import { TokenComputer, TokenTransfer } from "../tokens";
-import { TokenTransfersDataBuilder } from "../tokenTransfersDataBuilder";
-import { Transaction } from "../transaction";
-import { TransactionBuilder } from "../transactionBuilder";
+import { Address } from "../core/address";
+import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../core/constants";
+import { ErrBadUsage } from "../core/errors";
+import { TokenComputer, TokenTransfer } from "../core/tokens";
+import { TokenTransfersDataBuilder } from "../core/tokenTransfersDataBuilder";
+import { Transaction } from "../core/transaction";
+import { TransactionBuilder } from "../core/transactionBuilder";
 import * as resources from "./resources";
 
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;

@@ -1,5 +1,5 @@
-import { Address } from "../address";
-import { TokenTransfer } from "../tokens";
+import { Address } from "../core/address";
+import { TokenTransfer } from "../core/tokens";
 
 export type NativeTokenTransferInput = {
     receiver: Address;

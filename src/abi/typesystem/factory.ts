@@ -1,4 +1,4 @@
-import { Address } from "../../address";
+import { Address } from "../../core/address";
 import { AddressValue } from "./address";
 import { List } from "./generic";
 import { TokenIdentifierValue } from "./tokenIdentifier";

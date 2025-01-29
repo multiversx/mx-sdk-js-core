@@ -1,4 +1,4 @@
-import * as errors from "../../errors";
+import * as errors from "../../core/errors";
 import { AddressType, AddressValue } from "./address";
 import { BooleanType, BooleanValue } from "./boolean";
 import { BytesType, BytesValue } from "./bytes";

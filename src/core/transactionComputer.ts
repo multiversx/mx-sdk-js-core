@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { ProtoSerializer } from "../proto";
 import { Address } from "./address";
 import {
     MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS,
@@ -7,7 +8,6 @@ import {
 } from "./constants";
 import * as errors from "./errors";
 import { INetworkConfig } from "./interface";
-import { ProtoSerializer } from "./proto";
 import { Transaction } from "./transaction";
 
 const createTransactionHasher = require("blake2b");

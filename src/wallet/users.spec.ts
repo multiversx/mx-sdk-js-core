@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import path from "path";
-import { Address, ErrBadMnemonicEntropy, ErrInvariantFailed, Message, Randomness, Transaction } from "../core";
+import { Address, ErrBadMnemonicEntropy, ErrInvariantFailed, Message, Transaction } from "../core";
 import {
     DummyMnemonicOf12Words,
     loadMnemonic,
@@ -9,6 +9,7 @@ import {
     loadTestWallet,
     TestWallet,
 } from "./../testutils/wallets";
+import { Randomness } from "./crypto";
 import { Mnemonic } from "./mnemonic";
 import { UserSecretKey } from "./userKeys";
 import { UserSigner } from "./userSigner";

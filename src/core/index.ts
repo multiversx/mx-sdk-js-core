@@ -6,17 +6,6 @@
 
 require("./globals");
 
-export * from "../abi";
-export * from "../accountManagement";
-export * from "../accounts";
-export * from "../delegation";
-export * from "../entrypoints";
-export * from "../networkProviders";
-export * from "../relayed";
-export * from "../tokenManagement";
-export * from "../transactionsOutcomeParsers";
-export * from "../transfers";
-export * from "../wallet";
 export * from "./address";
 export * from "./asyncTimer";
 export * from "./config";

@@ -1,13 +1,7 @@
 import { assert } from "chai";
-import {
-    Address,
-    ErrParseTransactionOutcome,
-    SmartContractResult,
-    TransactionEvent,
-    TransactionLogs,
-    TransactionOnNetwork,
-} from "../core";
+import { Address, ErrParseTransactionOutcome, TransactionEvent, TransactionLogs, TransactionOnNetwork } from "../core";
 import { b64TopicsToBytes } from "../testutils";
+import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { TokenManagementTransactionsOutcomeParser } from "./tokenManagementTransactionsOutcomeParser";
 
 describe("test token management transactions outcome parser", () => {

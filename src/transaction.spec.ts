@@ -2,6 +2,7 @@ import { Buffer } from "buffer";
 import { assert } from "chai";
 import { Address } from "./address";
 import { MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS, TRANSACTION_OPTIONS_DEFAULT } from "./constants";
+import { NetworkConfig } from "./networkProviders";
 import { ProtoSerializer } from "./proto";
 import { TestWallet, loadTestWallets } from "./testutils";
 import { Transaction } from "./transaction";
@@ -15,12 +16,11 @@ describe("test transaction", async () => {
 
     const transactionComputer = new TransactionComputer();
 
-    const networkConfig = {
-        MinGasLimit: 50000,
-        GasPerDataByte: 1500,
-        GasPriceModifier: 0.01,
-        ChainID: "D",
-    };
+    const networkConfig = new NetworkConfig();
+    networkConfig.chainID = "D";
+    networkConfig.minGasLimit = 50000n;
+    networkConfig.gasPerDataByte = 1500n;
+    networkConfig.gasPriceModifier = 0.01;
 
     before(async function () {
         wallets = await loadTestWallets();
@@ -28,7 +28,7 @@ describe("test transaction", async () => {
 
     it("should serialize transaction for signing (without data)", async () => {
         const transaction = new Transaction({
-            chainID: networkConfig.ChainID,
+            chainID: networkConfig.chainID,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             gasLimit: 50000n,
@@ -48,7 +48,7 @@ describe("test transaction", async () => {
 
     it("should serialize transaction for signing (with data)", async () => {
         const transaction = new Transaction({
-            chainID: networkConfig.ChainID,
+            chainID: networkConfig.chainID,
             sender: wallets.alice.address,
             receiver: wallets.bob.address,
             gasLimit: 70000n,
@@ -143,7 +143,7 @@ describe("test transaction", async () => {
 
     it("should compute hash", async () => {
         const transaction = new Transaction({
-            chainID: networkConfig.ChainID,
+            chainID: networkConfig.chainID,
             sender: wallets.alice.address,
             receiver: wallets.alice.address,
             gasLimit: 100000n,
@@ -165,7 +165,7 @@ describe("test transaction", async () => {
 
     it("should compute hash (with usernames)", async () => {
         const transaction = new Transaction({
-            chainID: networkConfig.ChainID,
+            chainID: networkConfig.chainID,
             sender: wallets.alice.address,
             receiver: wallets.alice.address,
             gasLimit: 100000n,
@@ -428,7 +428,7 @@ describe("test transaction", async () => {
 
     it("computes fee, but should throw `NotEnoughGas` error", async () => {
         const transaction = new Transaction({
-            chainID: networkConfig.ChainID,
+            chainID: networkConfig.chainID,
             sender: wallets.alice.address,
             receiver: wallets.alice.address,
             gasLimit: 50000n,
@@ -458,7 +458,7 @@ describe("test transaction", async () => {
 
     it("computes fee (with data field)", async () => {
         const transaction = new Transaction({
-            chainID: networkConfig.ChainID,
+            chainID: networkConfig.chainID,
             sender: wallets.alice.address,
             receiver: wallets.alice.address,
             gasLimit: 50000n + 12010n,
@@ -798,7 +798,7 @@ describe("test transaction", async () => {
     });
     it("should serialize transaction with relayer", async () => {
         const transaction = new Transaction({
-            chainID: networkConfig.ChainID,
+            chainID: networkConfig.chainID,
             sender: wallets.alice.address,
             receiver: wallets.alice.address,
             relayer: wallets.bob.address,
@@ -819,7 +819,7 @@ describe("test transaction", async () => {
 
     it("should test relayed v3", async () => {
         const transaction = new Transaction({
-            chainID: networkConfig.ChainID,
+            chainID: networkConfig.chainID,
             sender: wallets.alice.address,
             receiver: wallets.alice.address,
             senderUsername: "alice",

@@ -2,6 +2,7 @@ import * as fs from "fs";
 import { PathLike } from "fs";
 import { AbiRegistry, Code, SmartContract, TypedValue } from "../abi";
 import { Transaction } from "../transaction";
+import { TransactionComputer } from "../transactionComputer";
 import { TransactionWatcher } from "../transactionWatcher";
 import { getAxios } from "../utils";
 import { TestWallet } from "./wallets";
@@ -25,12 +26,13 @@ export async function prepareDeployment(obj: {
         deployer: deployer.address,
     });
 
+    const computer = new TransactionComputer();
     let nonce = deployer.account.getNonceThenIncrement();
     let contractAddress = SmartContract.computeAddress(deployer.address, nonce);
-    transaction.setNonce(nonce);
-    transaction.setSender(deployer.address);
+    transaction.nonce = nonce;
+    transaction.sender = deployer.address;
     contract.setAddress(contractAddress);
-    transaction.applySignature(await deployer.signer.sign(transaction.serializeForSigning()));
+    transaction.signature = await deployer.signer.sign(computer.computeBytesForSigning(transaction));
 
     return transaction;
 }

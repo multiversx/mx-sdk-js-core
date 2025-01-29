@@ -14,7 +14,7 @@ describe("fetch transactions from local testnet", function () {
     let provider = createLocalnetProvider();
     let watcher: TransactionWatcher;
     let parser: SmartContractTransactionsOutcomeParser;
-
+    const transactionComputer = new TransactionComputer();
     before(async function () {
         ({ alice } = await loadTestWallets());
         watcher = new TransactionWatcher({
@@ -55,8 +55,10 @@ describe("fetch transactions from local testnet", function () {
             caller: alice.address,
         });
 
-        transactionIncrement.setNonce(alice.account.nonce);
-        transactionIncrement.applySignature(await alice.signer.sign(transactionIncrement.serializeForSigning()));
+        transactionIncrement.nonce = alice.account.nonce;
+        transactionIncrement.signature = await alice.signer.sign(
+            transactionComputer.computeBytesForSigning(transactionIncrement),
+        );
 
         alice.account.incrementNonce();
 

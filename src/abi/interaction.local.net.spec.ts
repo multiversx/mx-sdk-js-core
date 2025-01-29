@@ -483,8 +483,7 @@ describe("test smart contract interactor", function () {
         const transaction = options.transaction;
         const wallet = options.wallet;
 
-        const serialized = transaction.serializeForSigning();
-        const signature = await wallet.signer.sign(serialized);
-        transaction.applySignature(signature);
+        const transactionComputer = new TransactionComputer();
+        transaction.signature = await wallet.signer.sign(transactionComputer.computeBytesForSigning(transaction));
     }
 });

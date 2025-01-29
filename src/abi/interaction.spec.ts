@@ -12,6 +12,7 @@ import {
 } from "../testutils";
 import { Token, TokenTransfer } from "../tokens";
 import { Transaction } from "../transaction";
+import { TransactionComputer } from "../transactionComputer";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import { SmartContract } from "./smartContract";
@@ -251,20 +252,17 @@ describe("test smart contract interactor", function () {
         await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce().valueOf(), 0n);
         assert.equal(transaction.getData().toString(), "getUltimateAnswer");
-        assert.equal(
-            transaction.getHash().toString(),
-            "3579ad09099feb9755c860ddd225251170806d833342e912fccdfe2ed5c3a364",
-        );
+        const computer = new TransactionComputer();
+        let hashString = computer.computeTransactionHash(transaction);
+        assert.equal(hashString, "3579ad09099feb9755c860ddd225251170806d833342e912fccdfe2ed5c3a364");
 
         transaction = interaction.withNonce(1n).buildTransaction();
         transaction.setSender(alice.address);
         transaction.applySignature(await alice.signer.sign(transaction.serializeForSigning()));
         await provider.sendTransaction(transaction);
         assert.equal(transaction.getNonce(), 1n);
-        assert.equal(
-            transaction.getHash().toString(),
-            "ad513ce7c5d371d30e48f073326899766736eac1ac231d847d45bc3facbcb496",
-        );
+        hashString = computer.computeTransactionHash(transaction);
+        assert.equal(hashString, "ad513ce7c5d371d30e48f073326899766736eac1ac231d847d45bc3facbcb496");
 
         // Execute, and wait for execution
         transaction = interaction.withNonce(2n).buildTransaction();

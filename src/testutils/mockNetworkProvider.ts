@@ -21,7 +21,8 @@ import {
 } from "../networkProviders/resources";
 import { SmartContractQuery, SmartContractQueryResponse } from "../smartContractQuery";
 import { Token } from "../tokens";
-import { Transaction, TransactionHash } from "../transaction";
+import { Transaction } from "../transaction";
+import { TransactionComputer } from "../transactionComputer";
 import { TransactionOnNetwork } from "../transactionOnNetwork";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { TransactionStatus } from "../transactionStatus";
@@ -129,16 +130,16 @@ export class MockNetworkProvider implements INetworkProvider {
         }
     }
 
-    mockUpdateTransaction(hash: TransactionHash, mutate: (item: TransactionOnNetwork) => void) {
-        let transaction = this.transactions.get(hash.toString());
+    mockUpdateTransaction(hash: string, mutate: (item: TransactionOnNetwork) => void) {
+        let transaction = this.transactions.get(hash);
         if (transaction) {
             mutate(transaction);
         }
     }
 
-    mockPutTransaction(hash: TransactionHash, item: TransactionOnNetwork) {
+    mockPutTransaction(hash: string, item: TransactionOnNetwork) {
         item.status = TransactionStatus.createUnknown();
-        this.transactions.set(hash.toString(), item);
+        this.transactions.set(hash, item);
     }
 
     mockQueryContractOnFunction(functionName: string, response: SmartContractQueryResponse) {
@@ -181,14 +182,15 @@ export class MockNetworkProvider implements INetworkProvider {
     }
 
     async mockTransactionTimeline(transaction: Transaction, timelinePoints: any[]): Promise<void> {
-        return this.mockTransactionTimelineByHash(transaction.getHash(), timelinePoints);
+        const computer = new TransactionComputer();
+        return this.mockTransactionTimelineByHash(computer.computeTransactionHash(transaction), timelinePoints);
     }
 
     async mockNextTransactionTimeline(timelinePoints: any[]): Promise<void> {
         this.nextTransactionTimelinePoints = timelinePoints;
     }
 
-    async mockTransactionTimelineByHash(hash: TransactionHash, timelinePoints: any[]): Promise<void> {
+    async mockTransactionTimelineByHash(hash: string, timelinePoints: any[]): Promise<void> {
         let timeline = new AsyncTimer(`mock timeline of ${hash}`);
 
         await timeline.start(0);
@@ -222,8 +224,9 @@ export class MockNetworkProvider implements INetworkProvider {
     }
 
     async sendTransaction(transaction: Transaction): Promise<string> {
+        const computer = new TransactionComputer();
         this.mockPutTransaction(
-            transaction.getHash(),
+            computer.computeTransactionHash(transaction),
             new TransactionOnNetwork({
                 sender: transaction.getSender(),
                 receiver: transaction.getReceiver(),
@@ -233,7 +236,7 @@ export class MockNetworkProvider implements INetworkProvider {
         );
 
         this.mockTransactionTimeline(transaction, this.nextTransactionTimelinePoints);
-        return transaction.getHash().hex();
+        return computer.computeTransactionHash(transaction);
     }
 
     async simulateTransaction(_transaction: Transaction): Promise<any> {

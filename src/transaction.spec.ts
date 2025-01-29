@@ -85,7 +85,7 @@ describe("test transaction", async () => {
             "3f08a1dd64fbb627d10b048e0b45b1390f29bb0e457762a2ccb710b029f299022a67a4b8e45cf62f4314afec2e56b5574c71e38df96cc41fae757b7ee5062503",
         );
         assert.equal(
-            transaction.getHash().toString(),
+            transactionComputer.computeTransactionHash(transaction),
             "1359fb9d5b0b47ca9f3b4adce6e4a524fa74099dd4732743b9226774a4cb0ad8",
         );
     });
@@ -109,7 +109,7 @@ describe("test transaction", async () => {
             "f9e8c1caf7f36b99e7e76ee1118bf71b55cde11a2356e2b3adf15f4ad711d2e1982469cbba7eb0afbf74e8a8f78e549b9410cd86eeaa88fcba62611ac9f6e30e",
         );
         assert.equal(
-            transaction.getHash().toString(),
+            transactionComputer.computeTransactionHash(transaction),
             "10a2bd6f9c358d2c9645368081999efd2a4cc7f24bdfdd75e8f57485fd702001",
         );
     });
@@ -156,10 +156,7 @@ describe("test transaction", async () => {
 
         const hash = transactionComputer.computeTransactionHash(transaction);
 
-        assert.equal(
-            Buffer.from(hash).toString("hex"),
-            "169b76b752b220a76a93aeebc462a1192db1dc2ec9d17e6b4d7b0dcc91792f03",
-        );
+        assert.equal(hash, "169b76b752b220a76a93aeebc462a1192db1dc2ec9d17e6b4d7b0dcc91792f03");
     });
 
     it("should compute hash (with usernames)", async () => {
@@ -183,10 +180,7 @@ describe("test transaction", async () => {
 
         const hash = transactionComputer.computeTransactionHash(transaction);
 
-        assert.equal(
-            Buffer.from(hash).toString("hex"),
-            "41b5acf7ebaf4a9165a64206b6ebc02021b3adda55ffb2a2698aac2e7004dc29",
-        );
+        assert.equal(hash, "41b5acf7ebaf4a9165a64206b6ebc02021b3adda55ffb2a2698aac2e7004dc29");
     });
 
     it("should sign & compute hash (with data, with opaque, unused options) (legacy)", async () => {
@@ -227,7 +221,7 @@ describe("test transaction", async () => {
             "b45f22e9f57a6df22670fcc3566723a0711a05ac2547456de59fd222a54940e4a1d99bd414897ccbf5c02a842ad86e638989b7f4d30edd26c99a8cd1eb092304",
         );
         assert.equal(
-            transaction.getHash().toString(),
+            transactionComputer.computeTransactionHash(transaction).toString(),
             "84125d7154d81a723642100bdf74e6df99f7c069c016d1e6bbeb408fd4e961bf",
         );
     });
@@ -251,7 +245,7 @@ describe("test transaction", async () => {
             "01f05aa8cb0614e12a94ab9dcbde5e78370a4e05d23ef25a1fb9d5fcf1cb3b1f33b919cd8dafb1704efb18fa233a8aa0d3344fb6ee9b613a7d7a403786ffbd0a",
         );
         assert.equal(
-            transaction.getHash().toString(),
+            transactionComputer.computeTransactionHash(transaction),
             "321e1f1a0e3d06edade34fd0fdf3b4859e4328a73706a442c2439968a074113c",
         );
     });
@@ -276,7 +270,7 @@ describe("test transaction", async () => {
             "dfa3e9f2fdec60dcb353bac3b3435b4a2ff251e7e98eaf8620f46c731fc70c8ba5615fd4e208b05e75fe0f7dc44b7a99567e29f94fcd91efac7e67b182cd2a04",
         );
         assert.equal(
-            transaction.getHash().toString(),
+            transactionComputer.computeTransactionHash(transaction),
             "6ffa1a75f98aaf336bfb87ef13b9b5a477a017158285d34ee2a503668767e69e",
         );
     });
@@ -299,7 +293,7 @@ describe("test transaction", async () => {
             "3f08a1dd64fbb627d10b048e0b45b1390f29bb0e457762a2ccb710b029f299022a67a4b8e45cf62f4314afec2e56b5574c71e38df96cc41fae757b7ee5062503",
         );
         assert.equal(
-            transaction.getHash().toString(),
+            transactionComputer.computeTransactionHash(transaction),
             "1359fb9d5b0b47ca9f3b4adce6e4a524fa74099dd4732743b9226774a4cb0ad8",
         );
 
@@ -325,7 +319,7 @@ describe("test transaction", async () => {
             "3f08a1dd64fbb627d10b048e0b45b1390f29bb0e457762a2ccb710b029f299022a67a4b8e45cf62f4314afec2e56b5574c71e38df96cc41fae757b7ee5062503",
         );
         assert.equal(
-            transaction.getHash().toString(),
+            transactionComputer.computeTransactionHash(transaction),
             "1359fb9d5b0b47ca9f3b4adce6e4a524fa74099dd4732743b9226774a4cb0ad8",
         );
 
@@ -352,7 +346,7 @@ describe("test transaction", async () => {
             "51e6cd78fb3ab4b53ff7ad6864df27cb4a56d70603332869d47a5cf6ea977c30e696103e41e8dddf2582996ad335229fdf4acb726564dbc1a0bc9e705b511f06",
         );
         assert.equal(
-            transaction.getHash().toString(),
+            transactionComputer.computeTransactionHash(transaction),
             "edc84d776bfd655ddbd6fce24a83e379496ac47890d00be9c8bb2c6666fa3fd8",
         );
     });
@@ -371,7 +365,7 @@ describe("test transaction", async () => {
             options: 2,
             nonce: 92n,
             value: 123456789000000000000000000000n,
-            guardian: Address.fromBech32("erd1x23lzn8483xs2su4fak0r0dqx6w38enpmmqf2yrkylwq7mfnvyhsxqw57y"),
+            guardian: Address.newFromBech32("erd1x23lzn8483xs2su4fak0r0dqx6w38enpmmqf2yrkylwq7mfnvyhsxqw57y"),
         });
         transaction.guardianSignature = new Uint8Array(64);
         transaction.signature = await alice.signer.sign(transactionComputer.computeBytesForSigning(transaction));
@@ -385,10 +379,7 @@ describe("test transaction", async () => {
         );
 
         const txHash = transactionComputer.computeTransactionHash(transaction);
-        assert.equal(
-            Buffer.from(txHash).toString("hex"),
-            "242022e9dcfa0ee1d8199b0043314dbda8601619f70069ebc441b9f03349a35c",
-        );
+        assert.equal(txHash, "242022e9dcfa0ee1d8199b0043314dbda8601619f70069ebc441b9f03349a35c");
     });
 
     it("computes fee (legacy)", () => {

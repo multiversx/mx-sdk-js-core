@@ -69,12 +69,12 @@ export class TransactionComputer {
         return createKeccakHash("keccak256").update(signable).digest();
     }
 
-    computeTransactionHash(transaction: Transaction): Uint8Array {
+    computeTransactionHash(transaction: Transaction): string {
         const serializer = new ProtoSerializer();
         const buffer = serializer.serializeTransaction(transaction);
         const hash = createTransactionHasher(TRANSACTION_HASH_LENGTH).update(buffer).digest("hex");
 
-        return Buffer.from(hash, "hex");
+        return Buffer.from(hash, "hex").toString("hex");
     }
 
     hasOptionsSetForGuardedTransaction(transaction: Transaction): boolean {

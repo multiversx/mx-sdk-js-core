@@ -2,7 +2,7 @@ import { Buffer } from "buffer";
 import { assert } from "chai";
 import { Address } from "./address";
 import { MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS, TRANSACTION_OPTIONS_DEFAULT } from "./constants";
-import { NetworkConfig } from "./networkProviders";
+import { INetworkConfig } from "./interface";
 import { ProtoSerializer } from "./proto";
 import { TestWallet, loadTestWallets } from "./testutils";
 import { Transaction } from "./transaction";
@@ -16,11 +16,12 @@ describe("test transaction", async () => {
 
     const transactionComputer = new TransactionComputer();
 
-    const networkConfig = new NetworkConfig();
-    networkConfig.chainID = "D";
-    networkConfig.minGasLimit = 50000n;
-    networkConfig.gasPerDataByte = 1500n;
-    networkConfig.gasPriceModifier = 0.01;
+    const networkConfig: INetworkConfig = {
+        minGasLimit: 50000n,
+        gasPerDataByte: 1500n,
+        gasPriceModifier: 0.01,
+        chainID: "D",
+    };
 
     before(async function () {
         wallets = await loadTestWallets();

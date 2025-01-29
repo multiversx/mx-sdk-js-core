@@ -1,8 +1,7 @@
 import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
-import { IPlainTransactionObject } from "./interface";
-import { NetworkConfig } from "./networkProviders";
+import { INetworkConfig, IPlainTransactionObject } from "./interface";
 import { interpretSignatureAsBuffer } from "./signature";
 import { TransactionComputer } from "./transactionComputer";
 
@@ -445,7 +444,7 @@ export class Transaction {
      * Computes the current transaction fee based on the {@link NetworkConfig} and transaction properties
      * @param networkConfig {@link NetworkConfig}
      */
-    computeFee(networkConfig: NetworkConfig): BigNumber {
+    computeFee(networkConfig: INetworkConfig): BigNumber {
         const computer = new TransactionComputer();
         const fee = computer.computeTransactionFee(this, networkConfig);
         return new BigNumber(fee.toString());

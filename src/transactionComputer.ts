@@ -6,7 +6,7 @@ import {
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
 } from "./constants";
 import * as errors from "./errors";
-import { NetworkConfig } from "./networkProviders";
+import { INetworkConfig } from "./interface";
 import { ProtoSerializer } from "./proto";
 import { Transaction } from "./transaction";
 
@@ -22,7 +22,7 @@ export class TransactionComputer {
 
     computeTransactionFee(
         transaction: { gasPrice: bigint; gasLimit: bigint; data: Uint8Array },
-        networkConfig: NetworkConfig,
+        networkConfig: INetworkConfig,
     ): bigint {
         const moveBalanceGas = BigInt(
             networkConfig.minGasLimit + BigInt(transaction.data.length) * networkConfig.gasPerDataByte,

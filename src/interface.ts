@@ -26,3 +26,10 @@ export interface IPlainTransactionObject {
     guardianSignature?: string;
     relayerSignature?: string;
 }
+
+export interface INetworkConfig {
+    minGasLimit: bigint;
+    gasPerDataByte: bigint;
+    gasPriceModifier: number;
+    chainID: string;
+}

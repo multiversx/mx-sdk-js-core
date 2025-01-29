@@ -1,11 +1,3 @@
-/**
- * A library for interacting with the MultiversX blockchain (in general) and Smart Contracts (in particular).
- *
- * @packageDocumentation
- */
-
-require("./globals");
-
 export * from "./address";
 export * from "./asyncTimer";
 export * from "./config";

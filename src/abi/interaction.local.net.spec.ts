@@ -38,17 +38,17 @@ describe("test smart contract interactor", function () {
         });
 
         const bytecode = await promises.readFile("src/testdata/answer.wasm");
+        alice.nonce = (await provider.getAccount(alice.address)).nonce;
 
         const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 3000000n,
         });
-        deployTransaction.nonce = BigInt(alice.nonce.valueOf());
+        deployTransaction.nonce = alice.getNonceThenIncrement();
 
         deployTransaction.signature = alice.signTransaction(deployTransaction);
 
         const contractAddress = SmartContract.computeAddress(alice.address, alice.nonce);
-        alice.incrementNonce();
 
         const transactionCompletionAwaiter = new TransactionWatcher({
             getTransaction: async (hash: string) => {
@@ -85,10 +85,8 @@ describe("test smart contract interactor", function () {
             function: "getUltimateAnswer",
             gasLimit: 3000000n,
         });
-        transaction.nonce = BigInt(alice.nonce.valueOf());
+        transaction.nonce = alice.getNonceThenIncrement();
         transaction.signature = alice.signTransaction(transaction);
-
-        alice.incrementNonce();
 
         await provider.sendTransaction(transaction);
 
@@ -98,10 +96,8 @@ describe("test smart contract interactor", function () {
             function: "getUltimateAnswer",
             gasLimit: 3000000n,
         });
-        transaction.nonce = BigInt(alice.nonce.valueOf());
+        transaction.nonce = alice.getNonceThenIncrement();
         transaction.signature = alice.signTransaction(transaction);
-
-        alice.incrementNonce();
 
         const executeTxHash = await provider.sendTransaction(transaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(executeTxHash);
@@ -124,7 +120,7 @@ describe("test smart contract interactor", function () {
         });
 
         let network = await provider.getNetworkConfig();
-
+        alice.nonce = (await provider.getAccount(alice.address)).nonce;
         // Deploy the contract
         let deployTransaction = await prepareDeployment({
             contract: contract,
@@ -266,17 +262,17 @@ describe("test smart contract interactor", function () {
         const parser = new SmartContractTransactionsOutcomeParser({ abi: abiRegistry });
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
+        alice.nonce = (await provider.getAccount(alice.address)).nonce;
 
         const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 3000000n,
         });
-        deployTransaction.nonce = BigInt(alice.nonce.valueOf());
+        deployTransaction.nonce = alice.getNonceThenIncrement();
 
         deployTransaction.signature = alice.signTransaction(deployTransaction);
 
         const contractAddress = SmartContract.computeAddress(alice.address, alice.nonce);
-        alice.incrementNonce();
 
         const transactionCompletionAwaiter = new TransactionWatcher({
             getTransaction: async (hash: string) => {
@@ -300,11 +296,9 @@ describe("test smart contract interactor", function () {
             function: "increment",
             gasLimit: 3000000n,
         });
-        incrementTransaction.nonce = BigInt(alice.nonce.valueOf());
+        incrementTransaction.nonce = alice.getNonceThenIncrement();
 
         incrementTransaction.signature = alice.signTransaction(incrementTransaction);
-
-        alice.incrementNonce();
 
         // Query "get()"
         const query = queryController.createQuery({
@@ -327,10 +321,8 @@ describe("test smart contract interactor", function () {
             function: "decrement",
             gasLimit: 3000000n,
         });
-        decrementTransaction.nonce = alice.nonce;
+        decrementTransaction.nonce = alice.getNonceThenIncrement();
         decrementTransaction.signature = alice.signTransaction(decrementTransaction);
-
-        alice.incrementNonce();
 
         await provider.sendTransaction(decrementTransaction);
 
@@ -347,6 +339,7 @@ describe("test smart contract interactor", function () {
 
         let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
         let parser = new SmartContractTransactionsOutcomeParser({ abi: abiRegistry });
+        alice.nonce = (await provider.getAccount(alice.address)).nonce;
 
         let network = await provider.getNetworkConfig();
 
@@ -363,12 +356,11 @@ describe("test smart contract interactor", function () {
             bytecode: bytecode,
             gasLimit: 100000000n,
         });
-        deployTransaction.nonce = alice.nonce;
+        deployTransaction.nonce = alice.getNonceThenIncrement();
 
         deployTransaction.signature = alice.signTransaction(deployTransaction);
 
         const contractAddress = SmartContract.computeAddress(alice.address, alice.nonce);
-        alice.incrementNonce();
 
         const transactionCompletionAwaiter = new TransactionWatcher({
             getTransaction: async (hash: string) => {
@@ -388,10 +380,8 @@ describe("test smart contract interactor", function () {
             arguments: ["lucky", "EGLD", 1, null, null, 1, null, null],
             gasLimit: 30000000n,
         });
-        startTransaction.nonce = alice.nonce;
+        startTransaction.nonce = alice.getNonceThenIncrement();
         startTransaction.signature = alice.signTransaction(startTransaction);
-
-        alice.incrementNonce();
 
         const startTxHash = await provider.sendTransaction(startTransaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(startTxHash);
@@ -406,10 +396,8 @@ describe("test smart contract interactor", function () {
             arguments: ["lucky"],
             gasLimit: 5000000n,
         });
-        lotteryStatusTransaction.nonce = alice.nonce;
+        lotteryStatusTransaction.nonce = alice.getNonceThenIncrement();
         lotteryStatusTransaction.signature = alice.signTransaction(lotteryStatusTransaction);
-
-        alice.incrementNonce();
 
         const statusTxHash = await provider.sendTransaction(lotteryStatusTransaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(statusTxHash);
@@ -425,10 +413,8 @@ describe("test smart contract interactor", function () {
             arguments: ["lucky"],
             gasLimit: 5000000n,
         });
-        lotteryInfoTransaction.nonce = alice.nonce;
+        lotteryInfoTransaction.nonce = alice.getNonceThenIncrement();
         lotteryInfoTransaction.signature = alice.signTransaction(lotteryInfoTransaction);
-
-        alice.incrementNonce();
 
         const infoTxHash = await provider.sendTransaction(lotteryInfoTransaction);
         transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(infoTxHash);

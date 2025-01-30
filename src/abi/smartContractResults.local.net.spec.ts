@@ -33,6 +33,7 @@ describe("fetch transactions from local testnet", function () {
         TransactionWatcher.DefaultTimeout = 50000;
 
         let network = await provider.getNetworkConfig();
+        alice.nonce = (await provider.getAccount(alice.address)).nonce;
 
         // Deploy
         let contract = new SmartContract({});
@@ -54,10 +55,8 @@ describe("fetch transactions from local testnet", function () {
             caller: alice.address,
         });
 
-        transactionIncrement.nonce = alice.nonce;
+        transactionIncrement.nonce = alice.getNonceThenIncrement();
         transactionIncrement.signature = alice.signTransaction(transactionIncrement);
-
-        alice.incrementNonce();
 
         // Broadcast & execute
         const txHashDeploy = await provider.sendTransaction(transactionDeploy);
@@ -88,26 +87,24 @@ describe("fetch transactions from local testnet", function () {
         const factory = new SmartContractTransactionsFactory({ config: config });
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
+        alice.nonce = (await provider.getAccount(alice.address)).nonce;
 
         const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 3000000n,
         });
-        deployTransaction.nonce = alice.nonce;
+        deployTransaction.nonce = alice.getNonceThenIncrement();
         deployTransaction.signature = alice.signTransaction(deployTransaction);
 
         const contractAddress = SmartContract.computeAddress(alice.address, alice.nonce);
-        alice.incrementNonce();
 
         const smartContractCallTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "increment",
             gasLimit: 3000000n,
         });
-        smartContractCallTransaction.nonce = alice.nonce;
+        smartContractCallTransaction.nonce = alice.getNonceThenIncrement();
         smartContractCallTransaction.signature = alice.signTransaction(smartContractCallTransaction);
-
-        alice.incrementNonce();
 
         // Broadcast & execute
         const deployTxHash = await provider.sendTransaction(deployTransaction);

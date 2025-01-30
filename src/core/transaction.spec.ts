@@ -123,8 +123,8 @@ describe("test transaction", async () => {
     it("should sign transaction (with usernames)", async () => {
         const transaction = new Transaction({
             chainID: "T",
-            sender: alice.address,
-            receiver: bob.address,
+            sender: carol.address,
+            receiver: alice.address,
             gasLimit: 50000n,
             value: 1000000000000000000n,
             version: 2,
@@ -133,7 +133,7 @@ describe("test transaction", async () => {
             receiverUsername: "alice",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = carol.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -343,7 +343,7 @@ describe("test transaction", async () => {
             chainID: "T",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = carol.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -608,7 +608,7 @@ describe("test transaction", async () => {
             options: 1,
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.sign(transactionComputer.computeHashForSigning(transaction));
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -719,9 +719,9 @@ describe("test transaction", async () => {
 
         transactionComputer.applyOptionsForHashSigning(transaction);
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.sign(transactionComputer.computeHashForSigning(transaction));
 
-        const userVerifier = new UserVerifier(new UserPublicKey(alice.address.getPublicKey()));
+        const userVerifier = new UserVerifier(alice.publicKey);
         const isSignedByAlice = userVerifier.verify(
             transactionComputer.computeBytesForVerifying(transaction),
             transaction.signature,
@@ -732,7 +732,6 @@ describe("test transaction", async () => {
             transactionComputer.computeBytesForVerifying(transaction),
             transaction.signature,
         );
-
         assert.equal(isSignedByAlice, true);
         assert.equal(isSignedByBob, false);
     });

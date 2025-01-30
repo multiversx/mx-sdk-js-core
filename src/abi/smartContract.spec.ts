@@ -94,9 +94,7 @@ describe("test contract", () => {
             address: new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3"),
         });
 
-        provider.mockUpdateAccount(alice.address, (account) => {
-            account.nonce = 42n;
-        });
+        alice.nonce = 42n;
 
         let callTransactionOne = contract.call({
             func: new ContractFunction("helloEarth"),
@@ -169,10 +167,7 @@ describe("test contract", () => {
             caller: alice.address,
         });
 
-        provider.mockUpdateAccount(alice.address, (account) => {
-            account.nonce = 42n;
-        });
-
+        alice.nonce = 42n;
         deployTransaction.nonce = alice.nonce;
 
         assert.equal(deployTransaction.data.toString(), "upgradeContract@01020304@0100");

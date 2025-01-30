@@ -19,7 +19,7 @@ describe("test account methods", function () {
     });
 
     it("should create account from keystore", async function () {
-        const account = Account.newFromKeystore(`${testWallets}/withDummyMnemonic.json`, "password");
+        const account = Account.newFromKeystore(`${getTestWalletsPath()}/withDummyMnemonic.json`, "password");
 
         assert.equal(
             account.secretKey.valueOf().toString("hex"),

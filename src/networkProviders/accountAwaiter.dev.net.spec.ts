@@ -1,8 +1,8 @@
 import { assert } from "chai";
-import { Address, Transaction, TransactionComputer } from "../core";
+import { Account } from "../accounts";
+import { Address, Transaction } from "../core";
 import { MarkCompleted, MockNetworkProvider, Wait } from "../testutils/mockNetworkProvider";
-import { createAccountBalance } from "../testutils/utils";
-import { loadTestWallet } from "../testutils/wallets";
+import { createAccountBalance, getTestWalletsPath } from "../testutils/utils";
 import { AccountAwaiter } from "./accountAwaiter";
 import { AccountOnNetwork } from "./accounts";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
@@ -41,13 +41,12 @@ describe("AccountAwaiter Tests", () => {
 
     it("should await for account balance increase on the network", async function () {
         this.timeout(20000);
-        const alice = await loadTestWallet("alice");
-        const aliceAddress = alice.getAddress();
+        const alice = await Account.newFromPem(`${getTestWalletsPath()}/alice.pem`);
+        const aliceAddress = alice.address;
         const frank = Address.newFromBech32("erd1kdl46yctawygtwg2k462307dmz2v55c605737dp3zkxh04sct7asqylhyv");
 
         const api = new ApiNetworkProvider("https://devnet-api.multiversx.com");
         const watcher = new AccountAwaiter({ fetcher: api });
-        const txComputer = new TransactionComputer();
         const value = 100_000n;
 
         // Create and sign the transaction
@@ -59,7 +58,7 @@ describe("AccountAwaiter Tests", () => {
             value,
         });
         transaction.nonce = (await api.getAccount(aliceAddress)).nonce;
-        transaction.signature = await alice.signer.sign(txComputer.computeBytesForSigning(transaction));
+        transaction.signature = alice.signTransaction(transaction);
 
         const initialBalance = (await api.getAccount(frank)).balance;
 

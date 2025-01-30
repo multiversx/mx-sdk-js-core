@@ -1,19 +1,11 @@
 import { assert, expect } from "chai";
-import {
-    Address,
-    SmartContractQuery,
-    Token,
-    Transaction,
-    TransactionComputer,
-    TransactionOnNetwork,
-    TransactionStatus,
-} from "../core";
-import { loadTestWallet } from "../testutils/wallets";
+import { Account } from "../accounts";
+import { Address, SmartContractQuery, Token, Transaction, TransactionOnNetwork, TransactionStatus } from "../core";
+import { getTestWalletsPath } from "../testutils/utils";
 import { ProxyNetworkProvider } from "./proxyNetworkProvider";
 
 describe("ProxyNetworkProvider Tests", function () {
     const proxy = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
-    const transactionComputer = new TransactionComputer();
 
     it("should fetch network configuration", async () => {
         const result = await proxy.getNetworkConfig();
@@ -284,8 +276,7 @@ describe("ProxyNetworkProvider Tests", function () {
     });
 
     it("should simulate transaction", async () => {
-        const bob = await loadTestWallet("bob");
-
+        const bob = await Account.newFromPem(`${getTestWalletsPath()}/bob.pem`);
         let transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,
@@ -298,7 +289,7 @@ describe("ProxyNetworkProvider Tests", function () {
         let txOnNetwork = await proxy.simulateTransaction(transaction);
         assert.deepEqual(txOnNetwork.status, new TransactionStatus("success"));
 
-        transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
+        transaction.signature = bob.signTransaction(transaction);
         txOnNetwork = await proxy.simulateTransaction(transaction);
 
         transaction = new Transaction({
@@ -322,7 +313,7 @@ describe("ProxyNetworkProvider Tests", function () {
         assert.equal(txOnNetwork.smartContractResults[0].receiver.toBech32(), bob.address.toBech32());
         assert.equal(txOnNetwork.smartContractResults[0].data, "@6f6b");
 
-        transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
+        transaction.signature = bob.signTransaction(transaction);
         txOnNetwork = await proxy.simulateTransaction(transaction);
 
         assert.deepEqual(txOnNetwork.status, new TransactionStatus("success"));
@@ -336,7 +327,7 @@ describe("ProxyNetworkProvider Tests", function () {
     });
 
     it("should estimate transaction cost", async function () {
-        const bob = await loadTestWallet("bob");
+        const bob = await Account.newFromPem(`${getTestWalletsPath()}/bob.pem`);
         const transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,
@@ -345,14 +336,14 @@ describe("ProxyNetworkProvider Tests", function () {
             data: new Uint8Array(Buffer.from("test transaction")),
         });
         transaction.nonce = (await proxy.getAccount(bob.address)).nonce;
-        transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
+        transaction.signature = bob.signTransaction(transaction);
         const response = await proxy.estimateTransactionCost(transaction);
         assert.equal(response.gasLimit, 74000);
     });
 
     it("should send and await for completed transaction", async function () {
         this.timeout(50000);
-        const bob = await loadTestWallet("bob");
+        const bob = await Account.newFromPem(`${getTestWalletsPath()}/bob.pem`);
         let transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,
@@ -361,7 +352,7 @@ describe("ProxyNetworkProvider Tests", function () {
         });
         const nonce = (await proxy.getAccount(bob.address)).nonce;
         transaction.nonce = nonce;
-        transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
+        transaction.signature = bob.signTransaction(transaction);
         let hash = await proxy.sendTransaction(transaction);
         let transactionOnNetwork = await proxy.awaitTransactionCompleted(hash);
         assert.isTrue(transactionOnNetwork.status.isCompleted());
@@ -374,7 +365,7 @@ describe("ProxyNetworkProvider Tests", function () {
             data: new Uint8Array(Buffer.from("dummy@05")),
         });
         transaction.nonce = nonce + 1n;
-        transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
+        transaction.signature = bob.signTransaction(transaction);
         const condition = (txOnNetwork: TransactionOnNetwork) => !txOnNetwork.status.isSuccessful();
 
         hash = await proxy.sendTransaction(transaction);

@@ -1,14 +1,13 @@
 import { assert } from "chai";
-import { resolve } from "path";
 import { Address, Message, Transaction } from "../core";
+import { getTestWalletsPath } from "../testutils/utils";
 import { KeyPair, UserSecretKey } from "../wallet";
 import { Account } from "./account";
 
 describe("test account methods", function () {
-    const testWallets = resolve(__dirname, "..", "testdata", "testwallets");
     const DUMMY_MNEMONIC =
         "moral volcano peasant pass circle pen over picture flat shop clap goat never lyrics gather prepare woman film husband gravity behind test tiger improve";
-    const alice = `${testWallets}/alice.pem`;
+    const alice = `${getTestWalletsPath()}/alice.pem`;
     it("should create account from pem file", async function () {
         const account = await Account.newFromPem(alice);
 

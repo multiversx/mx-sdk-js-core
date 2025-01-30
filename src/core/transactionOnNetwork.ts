@@ -28,6 +28,11 @@ export function prepareTransactionForBroadcasting(transaction: Transaction): any
             transaction.guardianSignature.length === 0
                 ? undefined
                 : Buffer.from(transaction.guardianSignature).toString("hex"),
+        relayer: transaction.relayer.isEmpty() ? undefined : transaction.relayer.toBech32(),
+        relayerSignature:
+            transaction.relayerSignature.length === 0
+                ? undefined
+                : Buffer.from(transaction.relayerSignature).toString("hex"),
     };
 }
 

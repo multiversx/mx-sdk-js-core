@@ -66,6 +66,7 @@ describe("test mapper", () => {
     it("should map arrays", () => {
         testArrayMapping("array2<BigUint>", 2, new BigUIntType());
         testArrayMapping("array2<u32>", 2, new U32Type());
+        testArrayMapping("array6<u8>", 6, new U8Type());
         testArrayMapping("array8<BigUint>", 8, new BigUIntType());
         testArrayMapping("array48<u8>", 48, new U8Type());
         testArrayMapping("array256<BigUint>", 256, new BigUIntType());

@@ -95,10 +95,9 @@ describe("fetch transactions from local testnet", function () {
         });
         deployTransaction.nonce = alice.nonce;
         deployTransaction.signature = await alice.signTransaction(deployTransaction);
-        alice.incrementNonce();
 
         const contractAddress = SmartContract.computeAddress(alice.address, alice.nonce);
-
+        alice.incrementNonce();
         const smartContractCallTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "increment",

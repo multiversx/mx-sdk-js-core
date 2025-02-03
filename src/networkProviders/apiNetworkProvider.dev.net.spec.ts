@@ -1,19 +1,11 @@
 import { assert, expect } from "chai";
-import {
-    Address,
-    SmartContractQuery,
-    Token,
-    Transaction,
-    TransactionComputer,
-    TransactionOnNetwork,
-    TransactionStatus,
-} from "../core";
-import { loadTestWallet } from "../testutils/wallets";
+import { Account } from "../accounts";
+import { Address, SmartContractQuery, Token, Transaction, TransactionOnNetwork, TransactionStatus } from "../core";
+import { getTestWalletsPath } from "../testutils/utils";
 import { ApiNetworkProvider } from "./apiNetworkProvider";
 
 describe("ApiNetworkProvider Tests", function () {
     const apiProvider = new ApiNetworkProvider("https://devnet-api.multiversx.com");
-    const transactionComputer = new TransactionComputer();
 
     it("should fetch network configuration", async () => {
         const result = await apiProvider.getNetworkConfig();
@@ -284,7 +276,7 @@ describe("ApiNetworkProvider Tests", function () {
     });
 
     it("should simulate transaction", async () => {
-        const bob = await loadTestWallet("bob");
+        const bob = await Account.newFromPem(`${getTestWalletsPath()}/bob.pem`);
         let transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,
@@ -297,7 +289,7 @@ describe("ApiNetworkProvider Tests", function () {
         let txOnNetwork = await apiProvider.simulateTransaction(transaction);
         assert.deepEqual(txOnNetwork.status, new TransactionStatus("success"));
 
-        transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
+        transaction.signature = await bob.signTransaction(transaction);
         txOnNetwork = await apiProvider.simulateTransaction(transaction, true);
 
         transaction = new Transaction({
@@ -321,7 +313,7 @@ describe("ApiNetworkProvider Tests", function () {
         assert.equal(txOnNetwork.smartContractResults[0].receiver.toBech32(), bob.address.toBech32());
         assert.deepEqual(txOnNetwork.smartContractResults[0].data, "@6f6b");
 
-        transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
+        transaction.signature = await bob.signTransaction(transaction);
         txOnNetwork = await apiProvider.simulateTransaction(transaction, true);
 
         assert.deepEqual(txOnNetwork.status, new TransactionStatus("success"));
@@ -335,7 +327,7 @@ describe("ApiNetworkProvider Tests", function () {
     });
 
     it("should estimate transaction cost", async function () {
-        const bob = await loadTestWallet("bob");
+        const bob = await Account.newFromPem(`${getTestWalletsPath()}/bob.pem`);
         const transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,
@@ -344,14 +336,14 @@ describe("ApiNetworkProvider Tests", function () {
             data: new Uint8Array(Buffer.from("test transaction")),
         });
         transaction.nonce = (await apiProvider.getAccount(bob.address)).nonce;
-        transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
+        transaction.signature = await bob.signTransaction(transaction);
         const response = await apiProvider.estimateTransactionCost(transaction);
         assert.equal(response.gasLimit, 74000);
     });
 
     it("should send and await for completed transaction", async function () {
         this.timeout(30000);
-        const bob = await loadTestWallet("bob");
+        const bob = await Account.newFromPem(`${getTestWalletsPath()}/bob.pem`);
         let transaction = new Transaction({
             sender: bob.address,
             receiver: bob.address,
@@ -360,7 +352,7 @@ describe("ApiNetworkProvider Tests", function () {
         });
         const nonce = (await apiProvider.getAccount(bob.address)).nonce;
         transaction.nonce = nonce;
-        transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
+        transaction.signature = await bob.signTransaction(transaction);
         let hash = await apiProvider.sendTransaction(transaction);
         let transactionOnNetwork = await apiProvider.awaitTransactionCompleted(hash);
         assert.isTrue(transactionOnNetwork.status.isCompleted());
@@ -373,7 +365,7 @@ describe("ApiNetworkProvider Tests", function () {
             data: new Uint8Array(Buffer.from("dummy@05")),
         });
         transaction.nonce = nonce + 1n;
-        transaction.signature = await bob.signer.sign(transactionComputer.computeBytesForSigning(transaction));
+        transaction.signature = await bob.signTransaction(transaction);
         const condition = (txOnNetwork: TransactionOnNetwork) => !txOnNetwork.status.isSuccessful();
 
         hash = await apiProvider.sendTransaction(transaction);

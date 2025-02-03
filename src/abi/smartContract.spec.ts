@@ -1,14 +1,14 @@
 import { assert } from "chai";
+import { Account } from "../accounts";
 import { Address } from "../core/address";
 import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionStatus } from "../core/transactionStatus";
 import { TransactionWatcher } from "../core/transactionWatcher";
 import {
-    loadTestWallets,
+    getTestWalletsPath,
     MarkCompleted,
     MockNetworkProvider,
     setupUnitTestWatcherTimeouts,
-    TestWallet,
     Wait,
 } from "../testutils";
 import { Code } from "./code";
@@ -20,11 +20,11 @@ import { BytesValue } from "./typesystem/bytes";
 describe("test contract", () => {
     let provider = new MockNetworkProvider();
     let chainID = "test";
-    let alice: TestWallet;
+    let alice: Account;
     const computer = new TransactionComputer();
 
     before(async function () {
-        ({ alice } = await loadTestWallets());
+        alice = await Account.newFromPem(`${getTestWalletsPath()}/alice.pem`);
     });
 
     it("should compute contract address", async () => {
@@ -52,16 +52,11 @@ describe("test contract", () => {
             deployer: alice.address,
         });
 
-        provider.mockUpdateAccount(alice.address, (account) => {
-            account.nonce = 42n;
-        });
-
-        await alice.sync(provider);
-        deployTransaction.nonce = alice.account.nonce;
+        deployTransaction.nonce = alice.nonce;
 
         assert.equal(deployTransaction.data.toString(), "01020304@0500@0100");
         assert.equal(deployTransaction.gasLimit, 1000000n);
-        assert.equal(deployTransaction.nonce, 42n);
+        assert.equal(deployTransaction.nonce, alice.nonce);
 
         // Compute & set the contract address
         contract.setAddress(SmartContract.computeAddress(alice.address, 42n));
@@ -71,7 +66,7 @@ describe("test contract", () => {
         );
 
         // Sign the transaction
-        deployTransaction.signature = await alice.signer.sign(computer.computeBytesForSigning(deployTransaction));
+        deployTransaction.signature = await alice.signTransaction(deployTransaction);
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);
@@ -99,9 +94,7 @@ describe("test contract", () => {
             address: new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3"),
         });
 
-        provider.mockUpdateAccount(alice.address, (account) => {
-            account.nonce = 42n;
-        });
+        alice.nonce = 42n;
 
         let callTransactionOne = contract.call({
             func: new ContractFunction("helloEarth"),
@@ -119,10 +112,9 @@ describe("test contract", () => {
             caller: alice.address,
         });
 
-        await alice.sync(provider);
-        callTransactionOne.nonce = alice.account.nonce;
-        alice.account.incrementNonce();
-        callTransactionTwo.nonce = alice.account.nonce;
+        callTransactionOne.nonce = alice.nonce;
+        alice.incrementNonce();
+        callTransactionTwo.nonce = alice.nonce;
 
         assert.equal(callTransactionOne.nonce, 42n);
         assert.equal(callTransactionOne.data.toString(), "helloEarth@05@0123");
@@ -132,8 +124,8 @@ describe("test contract", () => {
         assert.equal(callTransactionTwo.gasLimit, 1500000n);
 
         // Sign transactions, broadcast them
-        callTransactionOne.signature = await alice.signer.sign(computer.computeBytesForSigning(callTransactionOne));
-        callTransactionTwo.signature = await alice.signer.sign(computer.computeBytesForSigning(callTransactionTwo));
+        callTransactionOne.signature = await alice.signTransaction(callTransactionOne);
+        callTransactionTwo.signature = await alice.signTransaction(callTransactionTwo);
 
         let hashOne = await provider.sendTransaction(callTransactionOne);
         let hashTwo = await provider.sendTransaction(callTransactionTwo);
@@ -175,19 +167,15 @@ describe("test contract", () => {
             caller: alice.address,
         });
 
-        provider.mockUpdateAccount(alice.address, (account) => {
-            account.nonce = 42n;
-        });
-
-        await alice.sync(provider);
-        deployTransaction.nonce = alice.account.nonce;
+        alice.nonce = 42n;
+        deployTransaction.nonce = alice.nonce;
 
         assert.equal(deployTransaction.data.toString(), "upgradeContract@01020304@0100");
         assert.equal(deployTransaction.gasLimit, 1000000n);
         assert.equal(deployTransaction.nonce, 42n);
 
         // Sign the transaction
-        deployTransaction.signature = await alice.signer.sign(computer.computeBytesForSigning(deployTransaction));
+        deployTransaction.signature = await alice.signTransaction(deployTransaction);
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);

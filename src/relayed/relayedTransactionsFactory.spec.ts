@@ -1,16 +1,20 @@
 import { assert } from "chai";
-import { Address, Transaction, TransactionComputer, TransactionsFactoryConfig } from "../core";
-import { TestWallet, loadTestWallets } from "../testutils";
+import { Account } from "../accounts";
+import { Address, Transaction, TransactionsFactoryConfig } from "../core";
+import { getTestWalletsPath } from "../testutils";
 import { RelayedTransactionsFactory } from "./relayedTransactionsFactory";
 
 describe("test relayed transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "T" });
     const factory = new RelayedTransactionsFactory({ config: config });
-    const transactionComputer = new TransactionComputer();
-    let alice: TestWallet, bob: TestWallet, carol: TestWallet, grace: TestWallet, frank: TestWallet;
+    let alice: Account, bob: Account, carol: Account, grace: Account, frank: Account;
 
     before(async function () {
-        ({ alice, bob, carol, grace, frank } = await loadTestWallets());
+        alice = await Account.newFromPem(`${getTestWalletsPath()}/alice.pem`);
+        bob = await Account.newFromPem(`${getTestWalletsPath()}/bob.pem`);
+        carol = await Account.newFromPem(`${getTestWalletsPath()}/carol.pem`);
+        grace = await Account.newFromPem(`${getTestWalletsPath()}/grace.pem`);
+        frank = await Account.newFromPem(`${getTestWalletsPath()}/frank.pem`);
     });
 
     it("should throw exception when creating relayed v1 transaction with invalid inner transaction", async function () {
@@ -46,16 +50,14 @@ describe("test relayed transactions factory", function () {
             nonce: 198n,
         });
 
-        const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
+        innerTransaction.signature = await bob.signTransaction(innerTransaction);
 
-        const relayedTransaction = factory.createRelayedV1Transaction(alice.getAddress(), {
+        const relayedTransaction = factory.createRelayedV1Transaction(alice.address, {
             innerTransaction: innerTransaction,
         });
         relayedTransaction.nonce = 2627n;
 
-        const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await alice.signer.sign(serializedRelayedTransaction);
+        relayedTransaction.signature = await alice.signTransaction(relayedTransaction);
 
         assert.equal(
             Buffer.from(relayedTransaction.data).toString(),
@@ -79,16 +81,14 @@ describe("test relayed transactions factory", function () {
             value: 1000000000000000000n,
         });
 
-        const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await carol.signer.sign(serializedInnerTransaction);
+        innerTransaction.signature = await carol.signTransaction(innerTransaction);
 
-        const relayedTransaction = factory.createRelayedV1Transaction(frank.getAddress(), {
+        const relayedTransaction = factory.createRelayedV1Transaction(frank.address, {
             innerTransaction: innerTransaction,
         });
         relayedTransaction.nonce = 715n;
 
-        const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await frank.signer.sign(serializedRelayedTransaction);
+        relayedTransaction.signature = await frank.signTransaction(relayedTransaction);
 
         assert.equal(
             Buffer.from(relayedTransaction.data).toString(),
@@ -112,16 +112,14 @@ describe("test relayed transactions factory", function () {
             value: 1999999000000000000000000n,
         });
 
-        const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await carol.signer.sign(serializedInnerTransaction);
+        innerTransaction.signature = await carol.signTransaction(innerTransaction);
 
-        const relayedTransaction = factory.createRelayedV1Transaction(frank.getAddress(), {
+        const relayedTransaction = factory.createRelayedV1Transaction(frank.address, {
             innerTransaction: innerTransaction,
         });
         relayedTransaction.nonce = 715n;
 
-        const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await frank.signer.sign(serializedRelayedTransaction);
+        relayedTransaction.signature = await frank.signTransaction(relayedTransaction);
 
         assert.equal(
             Buffer.from(relayedTransaction.data).toString(),
@@ -146,17 +144,15 @@ describe("test relayed transactions factory", function () {
             guardian: grace.address,
         });
 
-        const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
-        innerTransaction.guardianSignature = await grace.signer.sign(serializedInnerTransaction);
+        innerTransaction.signature = await bob.signTransaction(innerTransaction);
+        innerTransaction.guardianSignature = await grace.signTransaction(innerTransaction);
 
-        const relayedTransaction = factory.createRelayedV1Transaction(alice.getAddress(), {
+        const relayedTransaction = factory.createRelayedV1Transaction(alice.address, {
             innerTransaction: innerTransaction,
         });
         relayedTransaction.nonce = 2627n;
 
-        const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await alice.signer.sign(serializedRelayedTransaction);
+        relayedTransaction.signature = await alice.signTransaction(relayedTransaction);
 
         assert.equal(
             Buffer.from(relayedTransaction.data).toString(),
@@ -181,20 +177,18 @@ describe("test relayed transactions factory", function () {
             guardian: grace.address,
         });
 
-        const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
-        innerTransaction.guardianSignature = await grace.signer.sign(serializedInnerTransaction);
+        innerTransaction.signature = await bob.signTransaction(innerTransaction);
+        innerTransaction.guardianSignature = await grace.signTransaction(innerTransaction);
 
-        const relayedTransaction = factory.createRelayedV1Transaction(alice.getAddress(), {
+        const relayedTransaction = factory.createRelayedV1Transaction(alice.address, {
             innerTransaction: innerTransaction,
         });
         relayedTransaction.nonce = 2627n;
         relayedTransaction.options = 2;
         relayedTransaction.guardian = frank.address;
 
-        const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await alice.signer.sign(serializedRelayedTransaction);
-        relayedTransaction.guardianSignature = await frank.signer.sign(serializedRelayedTransaction);
+        relayedTransaction.signature = await alice.signTransaction(relayedTransaction);
+        relayedTransaction.guardianSignature = await frank.signTransaction(relayedTransaction);
 
         assert.equal(
             Buffer.from(relayedTransaction.data).toString(),
@@ -215,7 +209,7 @@ describe("test relayed transactions factory", function () {
         });
 
         assert.throws(() => {
-            factory.createRelayedV2Transaction(carol.getAddress(), {
+            factory.createRelayedV2Transaction(carol.address, {
                 innerTransaction: innerTransaction,
                 innerTransactionGasLimit: 50000n,
             }),
@@ -225,7 +219,7 @@ describe("test relayed transactions factory", function () {
         innerTransaction.gasLimit = 0n;
 
         assert.throws(() => {
-            factory.createRelayedV2Transaction(carol.getAddress(), {
+            factory.createRelayedV2Transaction(carol.address, {
                 innerTransaction: innerTransaction,
                 innerTransactionGasLimit: 50000n,
             }),
@@ -245,17 +239,15 @@ describe("test relayed transactions factory", function () {
             options: 0,
         });
 
-        const serializedInnerTransaction = transactionComputer.computeBytesForSigning(innerTransaction);
-        innerTransaction.signature = await bob.signer.sign(serializedInnerTransaction);
+        innerTransaction.signature = await bob.signTransaction(innerTransaction);
 
-        const relayedTransaction = factory.createRelayedV2Transaction(alice.getAddress(), {
+        const relayedTransaction = factory.createRelayedV2Transaction(alice.address, {
             innerTransaction: innerTransaction,
             innerTransactionGasLimit: 60000000n,
         });
         relayedTransaction.nonce = 37n;
 
-        const serializedRelayedTransaction = transactionComputer.computeBytesForSigning(relayedTransaction);
-        relayedTransaction.signature = await alice.signer.sign(serializedRelayedTransaction);
+        relayedTransaction.signature = await alice.signTransaction(relayedTransaction);
 
         assert.equal(relayedTransaction.version, 2);
         assert.equal(relayedTransaction.options, 0);

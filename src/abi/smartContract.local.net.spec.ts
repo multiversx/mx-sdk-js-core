@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { promises } from "fs";
+import { Account } from "../accounts";
 import { Logger } from "../core/logger";
-import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { TransactionWatcher } from "../core/transactionWatcher";
 import {
@@ -9,9 +9,8 @@ import {
     SmartContractTransactionsFactory,
     SmartContractTransactionsOutcomeParser,
 } from "../smartContracts";
-import { stringifyBigIntJSON } from "../testutils";
 import { createLocalnetProvider } from "../testutils/networkProviders";
-import { loadTestWallets, TestWallet } from "../testutils/wallets";
+import { getTestWalletsPath, stringifyBigIntJSON } from "../testutils/utils";
 import { decodeUnsignedNumber } from "./codec";
 import { SmartContract } from "./smartContract";
 import {
@@ -25,14 +24,15 @@ import {
 } from "./typesystem";
 
 describe("test on local testnet", function () {
-    let alice: TestWallet, bob: TestWallet, carol: TestWallet;
+    let alice: Account, bob: Account, carol: Account;
     let provider = createLocalnetProvider();
     let watcher: TransactionWatcher;
     let parser: SmartContractTransactionsOutcomeParser;
-    const transactionComputer = new TransactionComputer();
 
     before(async function () {
-        ({ alice, bob, carol } = await loadTestWallets());
+        alice = await Account.newFromPem(`${getTestWalletsPath()}/alice.pem`);
+        bob = await Account.newFromPem(`${getTestWalletsPath()}/bob.pem`);
+        carol = await Account.newFromPem(`${getTestWalletsPath()}/carol.pem`);
 
         watcher = new TransactionWatcher({
             getTransaction: async (hash: string) => {
@@ -49,63 +49,55 @@ describe("test on local testnet", function () {
         TransactionWatcher.DefaultTimeout = 50000;
 
         let network = await provider.getNetworkConfig();
-        await alice.sync(provider);
 
         const config = new TransactionsFactoryConfig({ chainID: network.chainID });
         const factory = new SmartContractTransactionsFactory({ config: config });
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
+        alice.nonce = (await provider.getAccount(alice.address)).nonce;
 
         const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 4000000n,
         });
-        deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
+        deployTransaction.nonce = alice.nonce;
 
-        deployTransaction.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
-        );
+        deployTransaction.signature = await alice.signTransaction(deployTransaction);
 
-        const contractAddress = SmartContract.computeAddress(alice.address, alice.account.nonce);
-        alice.account.incrementNonce();
+        const contractAddress = SmartContract.computeAddress(alice.address, alice.nonce);
 
         const smartContractCallTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "increment",
             gasLimit: 4000000n,
         });
-        smartContractCallTransaction.nonce = BigInt(alice.account.nonce.valueOf());
-        smartContractCallTransaction.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(smartContractCallTransaction)),
-        );
-
-        alice.account.incrementNonce();
+        alice.incrementNonce();
+        smartContractCallTransaction.nonce = alice.getNonceThenIncrement();
+        smartContractCallTransaction.signature = await alice.signTransaction(smartContractCallTransaction);
 
         const simulateOne = factory.createTransactionForExecute(alice.address, {
             function: "increment",
             contract: contractAddress,
             gasLimit: 200000n,
         });
-
-        simulateOne.nonce = BigInt(alice.account.nonce.valueOf());
-        simulateOne.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(simulateOne)),
-        );
-
-        alice.account.incrementNonce();
+        simulateOne.nonce = alice.getNonceThenIncrement();
+        simulateOne.signature = await alice.signTransaction(simulateOne);
 
         const simulateTwo = factory.createTransactionForExecute(alice.address, {
             function: "foobar",
             contract: contractAddress,
             gasLimit: 700000n,
         });
+        simulateTwo.nonce = alice.getNonceThenIncrement();
+        simulateTwo.signature = await alice.signTransaction(simulateTwo);
 
-        simulateTwo.nonce = BigInt(alice.account.nonce.valueOf());
-        simulateTwo.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(simulateTwo)),
-        );
-
-        alice.account.incrementNonce();
+        const simulateThree = factory.createTransactionForExecute(alice.address, {
+            function: "foobar",
+            contract: contractAddress,
+            gasLimit: 700000n,
+        });
+        simulateThree.nonce = alice.getNonceThenIncrement();
+        simulateThree.signature = await alice.signTransaction(simulateThree);
 
         // Broadcast & execute
         const deployTxHash = await provider.sendTransaction(deployTransaction);
@@ -133,49 +125,38 @@ describe("test on local testnet", function () {
         TransactionWatcher.DefaultTimeout = 50000;
 
         let network = await provider.getNetworkConfig();
-        await alice.sync(provider);
 
         const config = new TransactionsFactoryConfig({ chainID: network.chainID });
         const factory = new SmartContractTransactionsFactory({ config: config });
 
+        alice.nonce = (await provider.getAccount(alice.address)).nonce;
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
 
         const deployTransaction = factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 3000000n,
         });
-        deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
+        deployTransaction.nonce = alice.nonce;
 
-        deployTransaction.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
-        );
+        deployTransaction.signature = await alice.signTransaction(deployTransaction);
 
-        const contractAddress = SmartContract.computeAddress(alice.address, alice.account.nonce);
-        alice.account.incrementNonce();
-
+        const contractAddress = SmartContract.computeAddress(alice.address, alice.nonce);
+        alice.incrementNonce();
         const firstScCallTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "increment",
             gasLimit: 3000000n,
         });
-        firstScCallTransaction.nonce = BigInt(alice.account.nonce.valueOf());
-        firstScCallTransaction.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(firstScCallTransaction)),
-        );
-
-        alice.account.incrementNonce();
+        firstScCallTransaction.nonce = alice.getNonceThenIncrement();
+        firstScCallTransaction.signature = await alice.signTransaction(firstScCallTransaction);
 
         const secondScCallTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "increment",
             gasLimit: 3000000n,
         });
-        secondScCallTransaction.nonce = BigInt(alice.account.nonce.valueOf());
-        secondScCallTransaction.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(secondScCallTransaction)),
-        );
-
-        alice.account.incrementNonce();
+        secondScCallTransaction.nonce = alice.getNonceThenIncrement();
+        secondScCallTransaction.signature = await alice.signTransaction(secondScCallTransaction);
 
         // Broadcast & execute
         const deployTxHash = await provider.sendTransaction(deployTransaction);
@@ -210,11 +191,11 @@ describe("test on local testnet", function () {
         TransactionWatcher.DefaultTimeout = 50000;
 
         let network = await provider.getNetworkConfig();
-        await alice.sync(provider);
 
         const config = new TransactionsFactoryConfig({ chainID: network.chainID });
         const factory = new SmartContractTransactionsFactory({ config: config });
 
+        alice.nonce = (await provider.getAccount(alice.address)).nonce;
         const bytecode = await promises.readFile("src/testdata/erc20.wasm");
 
         const deployTransaction = factory.createTransactionForDeploy(alice.address, {
@@ -222,26 +203,19 @@ describe("test on local testnet", function () {
             gasLimit: 50000000n,
             arguments: [new U32Value(10000)],
         });
-        deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
-        deployTransaction.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
-        );
+        deployTransaction.nonce = alice.nonce;
+        deployTransaction.signature = await alice.signTransaction(deployTransaction);
 
-        const contractAddress = SmartContract.computeAddress(alice.address, alice.account.nonce);
-        alice.account.incrementNonce();
-
+        const contractAddress = SmartContract.computeAddress(alice.address, alice.nonce);
+        alice.incrementNonce();
         const transactionMintBob = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "transferToken",
             gasLimit: 9000000n,
             arguments: [new AddressValue(bob.address), new U32Value(1000)],
         });
-        transactionMintBob.nonce = BigInt(alice.account.nonce.valueOf());
-        transactionMintBob.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(transactionMintBob)),
-        );
-
-        alice.account.incrementNonce();
+        transactionMintBob.nonce = alice.getNonceThenIncrement();
+        transactionMintBob.signature = await alice.signTransaction(transactionMintBob);
 
         const transactionMintCarol = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
@@ -249,12 +223,8 @@ describe("test on local testnet", function () {
             gasLimit: 9000000n,
             arguments: [new AddressValue(carol.address), new U32Value(1500)],
         });
-        transactionMintCarol.nonce = BigInt(alice.account.nonce.valueOf());
-        transactionMintCarol.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(transactionMintCarol)),
-        );
-
-        alice.account.incrementNonce();
+        transactionMintCarol.nonce = alice.getNonceThenIncrement();
+        transactionMintCarol.signature = await alice.signTransaction(transactionMintCarol);
 
         // Broadcast & execute
         const deployTxHash = await provider.sendTransaction(deployTransaction);
@@ -312,7 +282,7 @@ describe("test on local testnet", function () {
         TransactionWatcher.DefaultTimeout = 50000;
 
         let network = await provider.getNetworkConfig();
-        await alice.sync(provider);
+        alice.nonce = (await provider.getAccount(alice.address)).nonce;
 
         const config = new TransactionsFactoryConfig({ chainID: network.chainID });
         const factory = new SmartContractTransactionsFactory({ config: config });
@@ -323,15 +293,12 @@ describe("test on local testnet", function () {
             bytecode: bytecode,
             gasLimit: 50000000n,
         });
-        deployTransaction.nonce = BigInt(alice.account.nonce.valueOf());
+        deployTransaction.nonce = alice.nonce;
 
-        deployTransaction.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(deployTransaction)),
-        );
+        deployTransaction.signature = await alice.signTransaction(deployTransaction);
 
-        const contractAddress = SmartContract.computeAddress(alice.address, alice.account.nonce);
-        alice.account.incrementNonce();
-
+        const contractAddress = SmartContract.computeAddress(alice.address, alice.nonce);
+        alice.incrementNonce();
         const startTransaction = factory.createTransactionForExecute(alice.address, {
             contract: contractAddress,
             function: "start",
@@ -348,12 +315,8 @@ describe("test on local testnet", function () {
                 OptionalValue.newMissing(),
             ],
         });
-        startTransaction.nonce = BigInt(alice.account.nonce.valueOf());
-        startTransaction.signature = await alice.signer.sign(
-            Buffer.from(transactionComputer.computeBytesForSigning(startTransaction)),
-        );
-
-        alice.account.incrementNonce();
+        startTransaction.nonce = alice.getNonceThenIncrement();
+        startTransaction.signature = await alice.signTransaction(startTransaction);
 
         // Broadcast & execute
         const deployTx = await provider.sendTransaction(deployTransaction);

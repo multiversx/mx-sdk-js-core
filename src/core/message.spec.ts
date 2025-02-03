@@ -1,15 +1,16 @@
 import { assert } from "chai";
-import { TestWallet, loadTestWallets } from "../testutils";
+import { Account } from "../accounts";
+import { getTestWalletsPath } from "../testutils/utils";
 import { UserVerifier } from "../wallet";
 import { DEFAULT_MESSAGE_VERSION, SDK_JS_SIGNER, UNKNOWN_SIGNER } from "./constants";
 import { Message, MessageComputer } from "./message";
 
 describe("test message", () => {
-    let alice: TestWallet;
+    let alice: Account;
     const messageComputer = new MessageComputer();
 
     before(async function () {
-        ({ alice } = await loadTestWallets());
+        alice = await Account.newFromPem(`${getTestWalletsPath()}/alice.pem`);
     });
 
     it("should test message compute bytes for signing", async () => {
@@ -32,10 +33,10 @@ describe("test message", () => {
 
         const message = new Message({
             data: data,
-            address: alice.getAddress(),
+            address: alice.address,
         });
 
-        message.signature = await alice.signer.sign(messageComputer.computeBytesForSigning(message));
+        message.signature = await alice.signMessage(message);
 
         assert.equal(
             Buffer.from(message.signature).toString("hex"),
@@ -53,13 +54,13 @@ describe("test message", () => {
         });
 
         const unpackedMessage = messageComputer.unpackMessage(packedMessage);
-        assert.deepEqual(unpackedMessage.address, alice.getAddress());
+        assert.deepEqual(unpackedMessage.address, alice.address);
         assert.deepEqual(unpackedMessage.data, message.data);
         assert.deepEqual(unpackedMessage.signature, message.signature);
         assert.deepEqual(unpackedMessage.version, message.version);
         assert.deepEqual(unpackedMessage.signer, message.signer);
 
-        const verifier = UserVerifier.fromAddress(alice.getAddress());
+        const verifier = UserVerifier.fromAddress(alice.address);
         const isValid = verifier.verify(
             Buffer.from(messageComputer.computeBytesForVerifying(unpackedMessage)),
             Buffer.from(unpackedMessage.signature!),
@@ -78,7 +79,7 @@ describe("test message", () => {
         };
 
         const message = messageComputer.unpackMessage(legacyMessage);
-        assert.deepEqual(message.address, alice.getAddress());
+        assert.deepEqual(message.address, alice.address);
         assert.deepEqual(Buffer.from(message.data).toString(), "this is a test message");
         assert.deepEqual(
             Buffer.from(message.signature!).toString("hex"),
@@ -97,7 +98,7 @@ describe("test message", () => {
         };
 
         const message = messageComputer.unpackMessage(packedMessage);
-        assert.deepEqual(message.address, alice.getAddress());
+        assert.deepEqual(message.address, alice.address);
         assert.deepEqual(Buffer.from(message.data).toString(), "this is a test message");
         assert.deepEqual(
             Buffer.from(message.signature!).toString("hex"),

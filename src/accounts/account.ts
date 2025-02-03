@@ -100,13 +100,13 @@ export class Account implements IAccount {
         return this.publicKey.verify(data, signature);
     }
 
-    signTransaction(transaction: Transaction): Uint8Array {
+    async signTransaction(transaction: Transaction): Promise<Uint8Array> {
         const transactionComputer = new TransactionComputer();
         const serializedTransaction = transactionComputer.computeBytesForSigning(transaction);
         return this.secretKey.sign(serializedTransaction);
     }
 
-    signMessage(message: Message): Uint8Array {
+    async signMessage(message: Message): Promise<Uint8Array> {
         const messageComputer = new MessageComputer();
         const serializedMessage = messageComputer.computeBytesForSigning(message);
         return this.secretKey.sign(serializedMessage);

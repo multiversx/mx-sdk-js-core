@@ -45,7 +45,7 @@ export class UserSecretKey {
         return new UserSecretKey(secretKey);
     }
 
-    sign(message: Buffer | Uint8Array): Uint8Array {
+    sign(message: Uint8Array): Uint8Array {
         const signature = ed.sync.sign(new Uint8Array(message), new Uint8Array(this.buffer));
         return signature;
     }

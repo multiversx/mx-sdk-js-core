@@ -1,14 +1,14 @@
 import * as fs from "fs";
 import { PathLike } from "fs";
+import { resolve } from "path";
 import { AbiRegistry, Code, SmartContract, TypedValue } from "../abi";
+import { Account } from "../accounts";
 import { Transaction } from "../core/transaction";
-import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionWatcher } from "../core/transactionWatcher";
 import { getAxios } from "../core/utils";
-import { TestWallet } from "./wallets";
 
 export async function prepareDeployment(obj: {
-    deployer: TestWallet;
+    deployer: Account;
     contract: SmartContract;
     codePath: string;
     initArguments: TypedValue[];
@@ -26,13 +26,12 @@ export async function prepareDeployment(obj: {
         deployer: deployer.address,
     });
 
-    const computer = new TransactionComputer();
-    let nonce = deployer.account.getNonceThenIncrement();
+    let nonce = deployer.getNonceThenIncrement();
     let contractAddress = SmartContract.computeAddress(deployer.address, nonce);
     transaction.nonce = nonce;
     transaction.sender = deployer.address;
     contract.setAddress(contractAddress);
-    transaction.signature = await deployer.signer.sign(computer.computeBytesForSigning(transaction));
+    transaction.signature = await deployer.signTransaction(transaction);
 
     return transaction;
 }
@@ -99,8 +98,8 @@ export function b64ToHex(value: string): string {
     return Buffer.from(value, "base64").toString("hex");
 }
 
-export function importJsonBig(value: string): string {
-    return Buffer.from(value, "base64").toString("hex");
+export function getTestWalletsPath(): string {
+    return resolve(__dirname, "..", "testdata", "testwallets");
 }
 
 export const stringifyBigIntJSON = (jsonString: any): any => {

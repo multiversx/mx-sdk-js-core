@@ -68,7 +68,7 @@ export class UserPublicKey {
         this.buffer = Buffer.from(buffer);
     }
 
-    verify(data: Buffer | Uint8Array, signature: Buffer | Uint8Array): boolean {
+    async verify(data: Buffer | Uint8Array, signature: Buffer | Uint8Array): Promise<boolean> {
         try {
             const ok = ed.sync.verify(new Uint8Array(signature), new Uint8Array(data), new Uint8Array(this.buffer));
             return ok;

@@ -4,9 +4,8 @@ import { Account } from "../accounts";
 import { IAccount } from "../accounts/interfaces";
 import { Address } from "../core/address";
 import { ErrInvalidNetworkProviderKind } from "../core/errors";
-import { Message, MessageComputer } from "../core/message";
+import { Message } from "../core/message";
 import { Transaction } from "../core/transaction";
-import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionOnNetwork } from "../core/transactionOnNetwork";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { TransactionWatcher } from "../core/transactionWatcher";
@@ -20,7 +19,7 @@ import { SmartContractController } from "../smartContracts/smartContractControll
 import { TokenManagementController, TokenManagementTransactionsFactory } from "../tokenManagement";
 import { TransferTransactionsFactory } from "../transfers";
 import { TransfersController } from "../transfers/transfersControllers";
-import { UserSecretKey, UserVerifier } from "../wallet";
+import { UserSecretKey } from "../wallet";
 import { DevnetEntrypointConfig, MainnetEntrypointConfig, TestnetEntrypointConfig } from "./config";
 
 class NetworkEntrypoint {
@@ -49,17 +48,14 @@ class NetworkEntrypoint {
     }
 
     async signTransaction(transaction: Transaction, account: IAccount): Promise<void> {
-        const txComputer = new TransactionComputer();
-        transaction.signature = await account.sign(txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await account.signTransaction(transaction);
     }
 
-    verifyTransactionSignature(transaction: Transaction): boolean {
-        const verifier = UserVerifier.fromAddress(transaction.sender);
-        const txComputer = new TransactionComputer();
-        return verifier.verify(txComputer.computeBytesForVerifying(transaction), transaction.signature);
+    async verifyTransactionSignature(transaction: Transaction, account: IAccount): Promise<boolean> {
+        return await account.verifyTransaction(transaction, transaction.signature);
     }
 
-    verifyMessageSignature(message: Message): boolean {
+    async verifyMessageSignature(message: Message, account: IAccount): Promise<boolean> {
         if (!message.address) {
             throw new Error("`address` property of Message is not set");
         }
@@ -68,9 +64,7 @@ class NetworkEntrypoint {
             throw new Error("`signature` property of Message is not set");
         }
 
-        const verifier = UserVerifier.fromAddress(message.address);
-        const messageComputer = new MessageComputer();
-        return verifier.verify(messageComputer.computeBytesForVerifying(message), message.signature);
+        return await account.verifyMessage(message, message.signature);
     }
 
     async recallAccountNonce(address: Address): Promise<bigint> {

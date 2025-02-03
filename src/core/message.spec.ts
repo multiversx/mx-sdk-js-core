@@ -1,7 +1,6 @@
 import { assert } from "chai";
 import { Account } from "../accounts";
 import { getTestWalletsPath } from "../testutils/utils";
-import { UserVerifier } from "../wallet";
 import { DEFAULT_MESSAGE_VERSION, SDK_JS_SIGNER, UNKNOWN_SIGNER } from "./constants";
 import { Message, MessageComputer } from "./message";
 
@@ -60,12 +59,8 @@ describe("test message", () => {
         assert.deepEqual(unpackedMessage.version, message.version);
         assert.deepEqual(unpackedMessage.signer, message.signer);
 
-        const verifier = UserVerifier.fromAddress(alice.address);
-        const isValid = verifier.verify(
-            Buffer.from(messageComputer.computeBytesForVerifying(unpackedMessage)),
-            Buffer.from(unpackedMessage.signature!),
-        );
-        assert.equal(isValid, true);
+        const isValid = await alice.verifyMessage(unpackedMessage, Buffer.from(unpackedMessage.signature!));
+        assert.isTrue(isValid);
     });
 
     it("should unpack legacy message", async () => {

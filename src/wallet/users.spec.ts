@@ -1,5 +1,6 @@
 import { assert } from "chai";
 import path from "path";
+import { Account } from "../accounts";
 import { Address, ErrBadMnemonicEntropy, ErrInvariantFailed, Message, Transaction } from "../core";
 import {
     DummyMnemonicOf12Words,
@@ -290,7 +291,7 @@ describe("test user wallets", () => {
     });
 
     it("should sign transactions", async () => {
-        let signer = new UserSigner(
+        let signer = new Account(
             UserSecretKey.fromString("1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf"),
         );
         let verifier = new UserVerifier(
@@ -323,7 +324,7 @@ describe("test user wallets", () => {
             Buffer.from(signature).toString("hex"),
             "a5db62c6186612d44094f83576aa6a664299315fb6e42d0c17a40e9cd33efa9a9df8b76943aeac7dceaff3d78a16a7414c914f03f7a88e786c2cf939eb111c06",
         );
-        assert.isTrue(verifier.verify(serialized, signature));
+        assert.isTrue(await verifier.verify(serialized, signature));
 
         // Without data field
         transaction = new Transaction({
@@ -393,7 +394,7 @@ describe("test user wallets", () => {
             Buffer.from(guardianSignature).toString("hex"),
             "5695fde5d9c77a94bb320438fbebe3bbd60b7cc4d633fb38e42bb65f83d253cbb82cc5ae40d701a7f0b839a5231320ca356018ced949885baae473e469ec770e",
         );
-        assert.isTrue(verifier.verify(serialized, signature));
+        assert.isTrue(await verifier.verify(serialized, signature));
 
         // Without data field
         transaction = new Transaction({
@@ -425,7 +426,7 @@ describe("test user wallets", () => {
             Buffer.from(guardianSignature).toString("hex"),
             "ea3b83adcc468b0c7d3613fca5f429a9764d5710137c34c27e15d06e625326724ccfa758968507acadb14345d19389ba6004a4f0a6c527799c01713e10cf650b",
         );
-        assert.isTrue(verifier.verify(serialized, signature));
+        assert.isTrue(await verifier.verify(serialized, signature));
     });
 
     it("should sign transactions using PEM files", async () => {
@@ -469,10 +470,10 @@ describe("test user wallets", () => {
         const signature = await signer.sign(message.data);
 
         assert.deepEqual(await signer.sign(message.data), await signer.sign(Uint8Array.from(message.data)));
-        assert.isTrue(verifier.verify(message.data, signature));
-        assert.isTrue(verifier.verify(Uint8Array.from(message.data), Uint8Array.from(signature)));
-        assert.isFalse(verifier.verify(Buffer.from("hello"), signature));
-        assert.isFalse(verifier.verify(new TextEncoder().encode("hello"), signature));
+        assert.isTrue(await verifier.verify(message.data, signature));
+        assert.isTrue(await verifier.verify(Uint8Array.from(message.data), Uint8Array.from(signature)));
+        assert.isFalse(await verifier.verify(Buffer.from("hello"), signature));
+        assert.isFalse(await verifier.verify(new TextEncoder().encode("hello"), signature));
     });
 
     it("should create UserSigner from wallet", async function () {

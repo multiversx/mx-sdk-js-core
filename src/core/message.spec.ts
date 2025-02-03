@@ -36,7 +36,7 @@ describe("test message", () => {
             address: alice.address,
         });
 
-        message.signature = alice.signMessage(message);
+        message.signature = await alice.signMessage(message);
 
         assert.equal(
             Buffer.from(message.signature).toString("hex"),

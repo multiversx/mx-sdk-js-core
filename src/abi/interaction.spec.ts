@@ -243,7 +243,7 @@ describe("test smart contract interactor", function () {
         // Execute, do not wait for execution
         let transaction = interaction.withSender(alice.address).withNonce(0n).buildTransaction();
         transaction.sender = alice.address;
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
         let hash = await provider.sendTransaction(transaction);
         assert.equal(transaction.nonce, 0n);
         assert.equal(transaction.data.toString(), "getUltimateAnswer");
@@ -251,7 +251,7 @@ describe("test smart contract interactor", function () {
 
         transaction = interaction.withNonce(1n).buildTransaction();
         transaction.sender = alice.address;
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
         hash = await provider.sendTransaction(transaction);
         assert.equal(transaction.nonce, 1n);
         assert.equal(hash, "ad513ce7c5d371d30e48f073326899766736eac1ac231d847d45bc3facbcb496");
@@ -259,7 +259,7 @@ describe("test smart contract interactor", function () {
         // Execute, and wait for execution
         transaction = interaction.withNonce(2n).buildTransaction();
         transaction.sender = alice.address;
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@2bs", "getUltimateAnswer");
         hash = await provider.sendTransaction(transaction);
         let responseExecute = await controller.awaitCompletedExecute(hash);
@@ -308,7 +308,7 @@ describe("test smart contract interactor", function () {
             .withChainID("mock")
             .buildTransaction();
 
-        incrementTransaction.signature = alice.signTransaction(incrementTransaction);
+        incrementTransaction.signature = await alice.signTransaction(incrementTransaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@08", "increment");
         let hash = await provider.sendTransaction(incrementTransaction);
         let responseExecute = await controller.awaitCompletedExecute(hash);
@@ -322,16 +322,16 @@ describe("test smart contract interactor", function () {
             .withChainID("mock")
             .buildTransaction();
 
-        decrementTransaction.signature = alice.signTransaction(decrementTransaction);
+        decrementTransaction.signature = await alice.signTransaction(decrementTransaction);
         await provider.sendTransaction(decrementTransaction);
         // Decrement #2
         decrementTransaction = decrementInteraction.withNonce(16n).buildTransaction();
-        decrementTransaction.signature = alice.signTransaction(decrementTransaction);
+        decrementTransaction.signature = await alice.signTransaction(decrementTransaction);
         await provider.sendTransaction(decrementTransaction);
         // Decrement #3
 
         decrementTransaction = decrementInteraction.withNonce(17n).buildTransaction();
-        decrementTransaction.signature = alice.signTransaction(decrementTransaction);
+        decrementTransaction.signature = await alice.signTransaction(decrementTransaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@05", "decrement");
         hash = await provider.sendTransaction(decrementTransaction);
         responseExecute = await controller.awaitCompletedExecute(hash);
@@ -372,7 +372,7 @@ describe("test smart contract interactor", function () {
             .withChainID("mock")
             .buildTransaction();
 
-        startTransaction.signature = alice.signTransaction(startTransaction);
+        startTransaction.signature = await alice.signTransaction(startTransaction);
 
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b", "start");
         let hash = await provider.sendTransaction(startTransaction);
@@ -389,7 +389,7 @@ describe("test smart contract interactor", function () {
             .withChainID("mock")
             .buildTransaction();
 
-        statusTransaction.signature = alice.signTransaction(statusTransaction);
+        statusTransaction.signature = await alice.signTransaction(statusTransaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult("@6f6b@01", "status");
 
         hash = await provider.sendTransaction(startTransaction);
@@ -407,7 +407,7 @@ describe("test smart contract interactor", function () {
             .withChainID("mock")
             .buildTransaction();
 
-        getLotteryInfoTransaction.signature = alice.signTransaction(getLotteryInfoTransaction);
+        getLotteryInfoTransaction.signature = await alice.signTransaction(getLotteryInfoTransaction);
         provider.mockGetTransactionWithAnyHashAsNotarizedWithOneResult(
             "@6f6b@0000000b6c75636b792d746f6b656e000000010100000000000000005fc2b9dbffffffff00000001640000000a140ec80fa7ee88000000",
             "getLotteryInfo",

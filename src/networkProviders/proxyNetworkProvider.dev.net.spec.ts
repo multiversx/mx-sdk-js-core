@@ -289,7 +289,7 @@ describe("ProxyNetworkProvider Tests", function () {
         let txOnNetwork = await proxy.simulateTransaction(transaction);
         assert.deepEqual(txOnNetwork.status, new TransactionStatus("success"));
 
-        transaction.signature = bob.signTransaction(transaction);
+        transaction.signature = await bob.signTransaction(transaction);
         txOnNetwork = await proxy.simulateTransaction(transaction);
 
         transaction = new Transaction({
@@ -313,7 +313,7 @@ describe("ProxyNetworkProvider Tests", function () {
         assert.equal(txOnNetwork.smartContractResults[0].receiver.toBech32(), bob.address.toBech32());
         assert.equal(txOnNetwork.smartContractResults[0].data, "@6f6b");
 
-        transaction.signature = bob.signTransaction(transaction);
+        transaction.signature = await bob.signTransaction(transaction);
         txOnNetwork = await proxy.simulateTransaction(transaction);
 
         assert.deepEqual(txOnNetwork.status, new TransactionStatus("success"));
@@ -336,7 +336,7 @@ describe("ProxyNetworkProvider Tests", function () {
             data: new Uint8Array(Buffer.from("test transaction")),
         });
         transaction.nonce = (await proxy.getAccount(bob.address)).nonce;
-        transaction.signature = bob.signTransaction(transaction);
+        transaction.signature = await bob.signTransaction(transaction);
         const response = await proxy.estimateTransactionCost(transaction);
         assert.equal(response.gasLimit, 74000);
     });
@@ -352,7 +352,7 @@ describe("ProxyNetworkProvider Tests", function () {
         });
         const nonce = (await proxy.getAccount(bob.address)).nonce;
         transaction.nonce = nonce;
-        transaction.signature = bob.signTransaction(transaction);
+        transaction.signature = await bob.signTransaction(transaction);
         let hash = await proxy.sendTransaction(transaction);
         let transactionOnNetwork = await proxy.awaitTransactionCompleted(hash);
         assert.isTrue(transactionOnNetwork.status.isCompleted());
@@ -365,7 +365,7 @@ describe("ProxyNetworkProvider Tests", function () {
             data: new Uint8Array(Buffer.from("dummy@05")),
         });
         transaction.nonce = nonce + 1n;
-        transaction.signature = bob.signTransaction(transaction);
+        transaction.signature = await bob.signTransaction(transaction);
         const condition = (txOnNetwork: TransactionOnNetwork) => !txOnNetwork.status.isSuccessful();
 
         hash = await proxy.sendTransaction(transaction);

@@ -70,7 +70,7 @@ describe("test account methods", function () {
         });
 
         const account = Account.newFromMnemonic(DUMMY_MNEMONIC);
-        transaction.signature = account.signTransaction(transaction);
+        transaction.signature = await account.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -84,7 +84,7 @@ describe("test account methods", function () {
         });
 
         const account = Account.newFromMnemonic(DUMMY_MNEMONIC);
-        message.signature = account.signMessage(message);
+        message.signature = await account.signMessage(message);
 
         assert.equal(
             Buffer.from(message.signature).toString("hex"),

@@ -58,7 +58,7 @@ describe("AccountAwaiter Tests", () => {
             value,
         });
         transaction.nonce = (await api.getAccount(aliceAddress)).nonce;
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         const initialBalance = (await api.getAccount(frank)).balance;
 

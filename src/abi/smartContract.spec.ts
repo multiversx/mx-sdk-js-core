@@ -66,7 +66,7 @@ describe("test contract", () => {
         );
 
         // Sign the transaction
-        deployTransaction.signature = alice.signTransaction(deployTransaction);
+        deployTransaction.signature = await alice.signTransaction(deployTransaction);
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);
@@ -124,8 +124,8 @@ describe("test contract", () => {
         assert.equal(callTransactionTwo.gasLimit, 1500000n);
 
         // Sign transactions, broadcast them
-        callTransactionOne.signature = alice.signTransaction(callTransactionOne);
-        callTransactionTwo.signature = alice.signTransaction(callTransactionTwo);
+        callTransactionOne.signature = await alice.signTransaction(callTransactionOne);
+        callTransactionTwo.signature = await alice.signTransaction(callTransactionTwo);
 
         let hashOne = await provider.sendTransaction(callTransactionOne);
         let hashTwo = await provider.sendTransaction(callTransactionTwo);
@@ -175,7 +175,7 @@ describe("test contract", () => {
         assert.equal(deployTransaction.nonce, 42n);
 
         // Sign the transaction
-        deployTransaction.signature = alice.signTransaction(deployTransaction);
+        deployTransaction.signature = await alice.signTransaction(deployTransaction);
 
         // Now let's broadcast the deploy transaction, and wait for its execution.
         let hash = await provider.sendTransaction(deployTransaction);

@@ -56,7 +56,7 @@ describe("fetch transactions from local testnet", function () {
         });
 
         transactionIncrement.nonce = alice.getNonceThenIncrement();
-        transactionIncrement.signature = alice.signTransaction(transactionIncrement);
+        transactionIncrement.signature = await alice.signTransaction(transactionIncrement);
 
         // Broadcast & execute
         const txHashDeploy = await provider.sendTransaction(transactionDeploy);
@@ -94,7 +94,7 @@ describe("fetch transactions from local testnet", function () {
             gasLimit: 3000000n,
         });
         deployTransaction.nonce = alice.getNonceThenIncrement();
-        deployTransaction.signature = alice.signTransaction(deployTransaction);
+        deployTransaction.signature = await alice.signTransaction(deployTransaction);
 
         const contractAddress = SmartContract.computeAddress(alice.address, alice.nonce);
 
@@ -104,7 +104,7 @@ describe("fetch transactions from local testnet", function () {
             gasLimit: 3000000n,
         });
         smartContractCallTransaction.nonce = alice.getNonceThenIncrement();
-        smartContractCallTransaction.signature = alice.signTransaction(smartContractCallTransaction);
+        smartContractCallTransaction.signature = await alice.signTransaction(smartContractCallTransaction);
 
         // Broadcast & execute
         const deployTxHash = await provider.sendTransaction(deployTransaction);

@@ -25,7 +25,7 @@ describe("serialize transactions", () => {
             chainID: "local-testnet",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         let buffer = serializer.serializeTransaction(transaction);
         assert.equal(
@@ -45,7 +45,7 @@ describe("serialize transactions", () => {
             chainID: "local-testnet",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         let buffer = serializer.serializeTransaction(transaction);
         assert.equal(
@@ -65,7 +65,7 @@ describe("serialize transactions", () => {
             chainID: "local-testnet",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         let buffer = serializer.serializeTransaction(transaction);
         assert.equal(
@@ -85,7 +85,7 @@ describe("serialize transactions", () => {
             chainID: "local-testnet",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         let buffer = serializer.serializeTransaction(transaction);
         assert.equal(
@@ -106,7 +106,7 @@ describe("serialize transactions", () => {
             version: 1,
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         let buffer = serializer.serializeTransaction(transaction);
         assert.equal(
@@ -127,7 +127,7 @@ describe("serialize transactions", () => {
             chainID: "T",
         });
 
-        transaction.signature = carol.signTransaction(transaction);
+        transaction.signature = await carol.signTransaction(transaction);
 
         const buffer = serializer.serializeTransaction(transaction);
         assert.equal(

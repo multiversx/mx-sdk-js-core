@@ -31,7 +31,7 @@ export async function prepareDeployment(obj: {
     transaction.nonce = nonce;
     transaction.sender = deployer.address;
     contract.setAddress(contractAddress);
-    transaction.signature = deployer.signTransaction(transaction);
+    transaction.signature = await deployer.signTransaction(transaction);
 
     return transaction;
 }

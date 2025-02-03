@@ -84,7 +84,7 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -108,7 +108,7 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -133,7 +133,7 @@ describe("test transaction", async () => {
             receiverUsername: "alice",
         });
 
-        transaction.signature = carol.signTransaction(transaction);
+        transaction.signature = await carol.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -218,7 +218,7 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -242,7 +242,7 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -267,7 +267,7 @@ describe("test transaction", async () => {
             version: 1,
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -290,7 +290,7 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -316,7 +316,7 @@ describe("test transaction", async () => {
             chainID: "local-testnet",
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -343,7 +343,7 @@ describe("test transaction", async () => {
             chainID: "T",
         });
 
-        transaction.signature = carol.signTransaction(transaction);
+        transaction.signature = await carol.signTransaction(transaction);
 
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
@@ -370,7 +370,7 @@ describe("test transaction", async () => {
             guardian: Address.newFromBech32("erd1x23lzn8483xs2su4fak0r0dqx6w38enpmmqf2yrkylwq7mfnvyhsxqw57y"),
         });
         transaction.guardianSignature = new Uint8Array(64);
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         const serializer = new ProtoSerializer();
         const buffer = serializer.serializeTransaction(transaction);
@@ -590,7 +590,7 @@ describe("test transaction", async () => {
             version: 2,
             options: 2,
         });
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
         transaction.guardianSignature = transaction.signature;
         assert.isTrue(transaction.isGuardedTransaction());
     });
@@ -690,7 +690,7 @@ describe("test transaction", async () => {
             nonce: 7n,
         });
 
-        transaction.signature = alice.signTransaction(transaction);
+        transaction.signature = await alice.signTransaction(transaction);
 
         const userVerifier = new UserVerifier(new UserPublicKey(alice.address.getPublicKey()));
         const isSignedByAlice = userVerifier.verify(

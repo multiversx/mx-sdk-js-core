@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { readFileSync } from "fs";
 import path from "path";
 import { Account } from "../accounts/account";
-import { Address, TransactionComputer } from "../core";
+import { Address } from "../core";
 import { loadAbiRegistry } from "../testutils";
 import { DevnetEntrypoint } from "./entrypoints";
 
@@ -98,7 +98,7 @@ describe("TestEntrypoint", () => {
         );
         const innerTransactionGasLimit = transaction.gasLimit;
         transaction.gasLimit = BigInt(0);
-        transaction.signature = sender.signTransaction(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         const relayedController = entrypoint.createRelayedController();
         const relayedTransaction = await relayedController.createRelayedV2Transaction(

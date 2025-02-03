@@ -93,8 +93,9 @@ describe("fetch transactions from local testnet", function () {
             bytecode: bytecode,
             gasLimit: 3000000n,
         });
-        deployTransaction.nonce = alice.getNonceThenIncrement();
+        deployTransaction.nonce = alice.nonce;
         deployTransaction.signature = await alice.signTransaction(deployTransaction);
+        alice.incrementNonce();
 
         const contractAddress = SmartContract.computeAddress(alice.address, alice.nonce);
 

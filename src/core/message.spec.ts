@@ -59,7 +59,7 @@ describe("test message", () => {
         assert.deepEqual(unpackedMessage.version, message.version);
         assert.deepEqual(unpackedMessage.signer, message.signer);
 
-        const isValid = await alice.verifyMessage(unpackedMessage, Buffer.from(unpackedMessage.signature!));
+        const isValid = await alice.verifyMessageSignature(unpackedMessage, Buffer.from(unpackedMessage.signature!));
         assert.isTrue(isValid);
     });
 

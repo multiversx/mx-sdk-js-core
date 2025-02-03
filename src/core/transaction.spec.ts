@@ -691,9 +691,9 @@ describe("test transaction", async () => {
 
         transaction.signature = await alice.signTransaction(transaction);
 
-        const isSignedByAlice = await alice.verifyTransaction(transaction, transaction.signature);
+        const isSignedByAlice = await alice.verifyTransactionSignature(transaction, transaction.signature);
 
-        const isSignedByBob = await bob.verifyTransaction(transaction, transaction.signature);
+        const isSignedByBob = await bob.verifyTransactionSignature(transaction, transaction.signature);
 
         assert.equal(isSignedByAlice, true);
         assert.equal(isSignedByBob, false);
@@ -712,9 +712,9 @@ describe("test transaction", async () => {
 
         transaction.signature = await alice.sign(transactionComputer.computeHashForSigning(transaction));
 
-        const isSignedByAlice = await alice.verifyTransaction(transaction, transaction.signature);
+        const isSignedByAlice = await alice.verifyTransactionSignature(transaction, transaction.signature);
 
-        const isSignedByBob = await bob.verifyTransaction(transaction, transaction.signature);
+        const isSignedByBob = await bob.verifyTransactionSignature(transaction, transaction.signature);
         assert.equal(isSignedByAlice, true);
         assert.equal(isSignedByBob, false);
     });

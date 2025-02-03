@@ -106,7 +106,7 @@ export class Account implements IAccount {
         return this.secretKey.sign(serializedTransaction);
     }
 
-    async verifyTransaction(transaction: Transaction, signature: Uint8Array): Promise<boolean> {
+    async verifyTransactionSignature(transaction: Transaction, signature: Uint8Array): Promise<boolean> {
         const transactionComputer = new TransactionComputer();
         const serializedTransaction = transactionComputer.computeBytesForVerifying(transaction);
         return this.publicKey.verify(serializedTransaction, signature);
@@ -118,7 +118,7 @@ export class Account implements IAccount {
         return this.secretKey.sign(serializedMessage);
     }
 
-    async verifyMessage(message: Message, signature: Uint8Array): Promise<boolean> {
+    async verifyMessageSignature(message: Message, signature: Uint8Array): Promise<boolean> {
         const messageComputer = new MessageComputer();
         const serializedMessage = messageComputer.computeBytesForVerifying(message);
         return this.publicKey.verify(serializedMessage, signature);

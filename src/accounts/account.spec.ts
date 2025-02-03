@@ -99,7 +99,7 @@ describe("test account methods", function () {
 
         const account = Account.newFromMnemonic(DUMMY_MNEMONIC);
         message.signature = await account.signMessage(message);
-        const isVerified = await account.verifyMessage(message, message.signature);
+        const isVerified = await account.verifyMessageSignature(message, message.signature);
 
         assert.isTrue(isVerified);
     });
@@ -126,7 +126,7 @@ describe("test account methods", function () {
             "b56769014f2bdc5cf9fc4a05356807d71fcf8775c819b0f1b0964625b679c918ffa64862313bfef86f99b38cb84fcdb16fa33ad6eb565276616723405cd8f109",
         );
 
-        const isVerified = await account.verifyTransaction(transaction, transaction.signature);
+        const isVerified = await account.verifyTransactionSignature(transaction, transaction.signature);
         assert.isTrue(isVerified);
     });
 });

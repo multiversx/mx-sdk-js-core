@@ -52,7 +52,7 @@ class NetworkEntrypoint {
     }
 
     async verifyTransactionSignature(transaction: Transaction, account: IAccount): Promise<boolean> {
-        return await account.verifyTransaction(transaction, transaction.signature);
+        return await account.verifyTransactionSignature(transaction, transaction.signature);
     }
 
     async verifyMessageSignature(message: Message, account: IAccount): Promise<boolean> {
@@ -64,7 +64,7 @@ class NetworkEntrypoint {
             throw new Error("`signature` property of Message is not set");
         }
 
-        return await account.verifyMessage(message, message.signature);
+        return await account.verifyMessageSignature(message, message.signature);
     }
 
     async recallAccountNonce(address: Address): Promise<bigint> {

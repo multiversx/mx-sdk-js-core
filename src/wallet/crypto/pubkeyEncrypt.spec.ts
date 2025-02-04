@@ -22,24 +22,39 @@ describe("test address", () => {
         );
     });
 
-    it("encrypts/decrypts", () => {
-        const decryptedData = PubkeyDecryptor.decrypt(encryptedDataOfAliceForBob, new UserSecretKey(bob.secretKey));
+    it("encrypts/decrypts", async function () {
+        const decryptedData = await PubkeyDecryptor.decrypt(
+            encryptedDataOfAliceForBob,
+            new UserSecretKey(bob.secretKey),
+        );
         assert.equal(sensitiveData.toString("hex"), decryptedData.toString("hex"));
     });
 
-    it("fails for different originator", () => {
-        encryptedDataOfAliceForBob.identities.originatorPubKey = carol.address.hex();
-        assert.throws(
-            () => PubkeyDecryptor.decrypt(encryptedDataOfAliceForBob, new UserSecretKey(bob.secretKey)),
-            "Invalid authentication for encrypted message originator",
-        );
+    it("fails for different originator", async function () {
+        encryptedDataOfAliceForBob.identities.originatorPubKey = carol.address.toHex();
+
+        try {
+            await PubkeyDecryptor.decrypt(encryptedDataOfAliceForBob, new UserSecretKey(bob.secretKey));
+            assert.fail("Invalid authentication for encrypted message originator");
+        } catch (error) {
+            assert(
+                error.message.includes("Invalid authentication for encrypted message originator"),
+                `Unexpected error message: ${error.message}`,
+            );
+        }
     });
 
-    it("fails for different DH public key", () => {
-        encryptedDataOfAliceForBob.identities.ephemeralPubKey = carol.address.hex();
-        assert.throws(
-            () => PubkeyDecryptor.decrypt(encryptedDataOfAliceForBob, new UserSecretKey(bob.secretKey)),
-            "Invalid authentication for encrypted message originator",
-        );
+    it("fails for different DH public key", async function () {
+        encryptedDataOfAliceForBob.identities.ephemeralPubKey = carol.address.toHex();
+
+        try {
+            await PubkeyDecryptor.decrypt(encryptedDataOfAliceForBob, new UserSecretKey(bob.secretKey));
+            assert.fail("Expected an error but none was thrown");
+        } catch (error) {
+            assert(
+                error.message.includes("Invalid authentication for encrypted message originator"),
+                `Unexpected error message: ${error.message}`,
+            );
+        }
     });
 });

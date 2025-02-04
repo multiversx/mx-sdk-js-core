@@ -3,7 +3,6 @@ import { assert } from "chai";
 import { Account } from "../accounts";
 import { ProtoSerializer } from "../proto";
 import { getTestWalletsPath } from "../testutils/utils";
-import { UserPublicKey, UserVerifier } from "../wallet";
 import { Address } from "./address";
 import { MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS, TRANSACTION_OPTIONS_DEFAULT } from "./constants";
 import { INetworkConfig } from "./interface";
@@ -692,17 +691,9 @@ describe("test transaction", async () => {
 
         transaction.signature = await alice.signTransaction(transaction);
 
-        const userVerifier = new UserVerifier(new UserPublicKey(alice.address.getPublicKey()));
-        const isSignedByAlice = userVerifier.verify(
-            transactionComputer.computeBytesForVerifying(transaction),
-            transaction.signature,
-        );
+        const isSignedByAlice = await alice.verifyTransactionSignature(transaction, transaction.signature);
 
-        const wrongVerifier = new UserVerifier(new UserPublicKey(bob.address.getPublicKey()));
-        const isSignedByBob = wrongVerifier.verify(
-            transactionComputer.computeBytesForVerifying(transaction),
-            transaction.signature,
-        );
+        const isSignedByBob = await bob.verifyTransactionSignature(transaction, transaction.signature);
 
         assert.equal(isSignedByAlice, true);
         assert.equal(isSignedByBob, false);
@@ -721,17 +712,9 @@ describe("test transaction", async () => {
 
         transaction.signature = await alice.sign(transactionComputer.computeHashForSigning(transaction));
 
-        const userVerifier = new UserVerifier(alice.publicKey);
-        const isSignedByAlice = userVerifier.verify(
-            transactionComputer.computeBytesForVerifying(transaction),
-            transaction.signature,
-        );
+        const isSignedByAlice = await alice.verifyTransactionSignature(transaction, transaction.signature);
 
-        const wrongVerifier = new UserVerifier(new UserPublicKey(bob.address.getPublicKey()));
-        const isSignedByBob = wrongVerifier.verify(
-            transactionComputer.computeBytesForVerifying(transaction),
-            transaction.signature,
-        );
+        const isSignedByBob = await bob.verifyTransactionSignature(transaction, transaction.signature);
         assert.equal(isSignedByAlice, true);
         assert.equal(isSignedByBob, false);
     });

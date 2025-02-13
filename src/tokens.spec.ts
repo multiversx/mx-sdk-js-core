@@ -46,6 +46,22 @@ describe("test tokens and token computer", async () => {
         const fungibleTokenIdentifier = "FNG-123456";
         identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(fungibleTokenIdentifier);
         assert.equal(identifier, "FNG-123456");
+
+        const numericTokenTicker = "2024-45a190";
+        identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(numericTokenTicker);
+        assert.equal(identifier, "2024-45a190");
+
+        const numericTokenTickerWithNonce = "2024-45a190-01";
+        identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(numericTokenTickerWithNonce);
+        assert.equal(identifier, "2024-45a190");
+
+        const numericTokenTickerWithPrefix = "t0-2024-45a190";
+        identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(numericTokenTickerWithPrefix);
+        assert.equal(identifier, "t0-2024-45a190");
+
+        const numericTokenTickerWithPrefixAndNonce = "t0-2024-45a190";
+        identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(numericTokenTickerWithPrefixAndNonce);
+        assert.equal(identifier, "t0-2024-45a190")
     });
 
     it("should fail if prefix longer than expected", async () => {

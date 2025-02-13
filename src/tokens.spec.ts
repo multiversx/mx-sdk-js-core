@@ -57,7 +57,7 @@ describe("test tokens and token computer", async () => {
 
         const numericTokenTickerWithPrefix = "t0-2065-65td7s";
         identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(numericTokenTickerWithPrefix);
-        assert.equal(identifier, "t0-2065-45a190");
+        assert.equal(identifier, "t0-2065-65td7s");
 
         const numericTokenTickerWithPrefixAndNonce = "t0-2065-65td7s";
         identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(numericTokenTickerWithPrefixAndNonce);

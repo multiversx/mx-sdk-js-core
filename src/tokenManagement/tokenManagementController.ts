@@ -30,7 +30,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.IssueFungibleInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingFungible(sender.address, options);
 
@@ -56,7 +56,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.IssueSemiFungibleInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingSemiFungible(sender.address, options);
 
@@ -82,7 +82,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.IssueNonFungibleInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingNonFungible(sender.address, options);
 
@@ -108,7 +108,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.RegisterMetaESDTInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringMetaESDT(sender.address, options);
 
@@ -134,7 +134,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.RegisterRolesInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringAndSettingRoles(sender.address, options);
 
@@ -160,7 +160,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.BurnRoleGloballyInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingBurnRoleGlobally(sender.address, options);
 
@@ -186,7 +186,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.BurnRoleGloballyInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingBurnRoleGlobally(sender.address, options);
 
@@ -212,7 +212,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.FungibleSpecialRoleInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingSpecialRoleOnFungibleToken(sender.address, options);
 
@@ -238,7 +238,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.SemiFungibleSpecialRoleInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken(
             sender.address,
@@ -267,7 +267,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.SpecialRoleInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingSpecialRoleOnNonFungibleToken(
             sender.address,
@@ -296,7 +296,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.MintInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForCreatingNFT(sender.address, options);
 
@@ -322,7 +322,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.PausingInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForPausing(sender.address, options);
 
@@ -348,7 +348,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.PausingInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnpausing(sender.address, options);
 
@@ -374,7 +374,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.ManagementInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForFreezing(sender.address, options);
 
@@ -400,7 +400,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.ManagementInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnfreezing(sender.address, options);
 
@@ -426,7 +426,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.ManagementInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForWiping(sender.address, options);
 
@@ -452,7 +452,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.LocalMintInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForLocalMint(sender.address, options);
 
@@ -478,7 +478,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.LocalBurnInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForLocalBurning(sender.address, options);
 
@@ -504,7 +504,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.UpdateAttributesInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUpdatingAttributes(sender.address, options);
 
@@ -530,7 +530,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.UpdateQuantityInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForAddingQuantity(sender.address, options);
 
@@ -556,7 +556,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.UpdateQuantityInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForBurningQuantity(sender.address, options);
 
@@ -582,7 +582,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.ModifyRoyaltiesInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingRoyalties(sender.address, options);
 
@@ -608,7 +608,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.SetNewUriInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingNewUris(sender.address, options);
 
@@ -634,7 +634,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.SetNewUriInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingCreator(sender.address, options);
 
@@ -660,7 +660,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.SetNewUriInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingCreator(sender.address, options);
 
@@ -686,7 +686,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.SetNewUriInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForMetadataRecreate(sender.address, options);
 
@@ -712,7 +712,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.SetNewUriInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForChangingTokenToDynamic(sender.address, options);
 
@@ -738,7 +738,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.UpdateTokenIDInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUpdatingTokenId(sender.address, options);
 
@@ -760,7 +760,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.RegisteringDynamicTokenInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringDynamicToken(sender.address, options);
 
@@ -786,7 +786,7 @@ export class TokenManagementController {
         nonce: bigint,
         options: resources.RegisteringDynamicTokenInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringDynamicAndSettingRoles(sender.address, options);
 

@@ -30,7 +30,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.NewDelegationContractInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForNewDelegationContract(sender.address, options);
 
@@ -56,7 +56,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.AddNodesInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForAddingNodes(sender.address, options);
 
@@ -73,7 +73,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ManageNodesInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRemovingNodes(sender.address, options);
 
@@ -90,7 +90,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ManageNodesInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForStakingNodes(sender.address, options);
 
@@ -107,7 +107,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ManageNodesInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnbondingNodes(sender.address, options);
 
@@ -124,7 +124,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ManageNodesInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnstakingNodes(sender.address, options);
 
@@ -141,7 +141,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.UnjailingNodesInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnjailingNodes(sender.address, options);
 
@@ -158,7 +158,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ChangeServiceFee,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForChangingServiceFee(sender.address, options);
 
@@ -175,7 +175,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ModifyDelegationCapInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingDelegationCap(sender.address, options);
 
@@ -192,7 +192,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingAutomaticActivation(sender.address, options);
 
@@ -209,7 +209,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingAutomaticActivation(sender.address, options);
 
@@ -226,7 +226,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingCapCheckOnRedelegateRewards(
             sender.address,
@@ -246,7 +246,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingCapCheckOnRedelegateRewards(
             sender.address,
@@ -266,7 +266,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.SetContractMetadataInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingMetadata(sender.address, options);
 
@@ -283,7 +283,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.DelegateActionsInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForDelegating(sender.address, options);
 
@@ -300,8 +300,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
-
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForClaimingRewards(sender.address, options);
 
@@ -318,7 +317,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRedelegatingRewards(sender.address, options);
 
@@ -335,7 +334,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.DelegateActionsInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUndelegating(sender.address, options);
 
@@ -352,7 +351,7 @@ export class DelegationController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForWithdrawing(sender.address, options);
 

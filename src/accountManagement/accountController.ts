@@ -22,7 +22,7 @@ export class AccountController {
         nonce: bigint,
         options: SaveKeyValueInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSavingKeyValue(sender.address, options);
 
@@ -39,7 +39,7 @@ export class AccountController {
         nonce: bigint,
         options: SetGuardianInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingGuardian(sender.address, options);
 
@@ -51,9 +51,12 @@ export class AccountController {
         return transaction;
     }
 
-    async createTransactionForGuardingAccount(sender: IAccount, nonce: bigint,
+    async createTransactionForGuardingAccount(
+        sender: IAccount,
+        nonce: bigint,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()): Promise<Transaction> {
+        relayer: Address = Address.empty(),
+    ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForGuardingAccount(sender.address);
 
         transaction.guardian = guardian;
@@ -64,9 +67,12 @@ export class AccountController {
         return transaction;
     }
 
-    async createTransactionForUnguardingAccount(sender: IAccount, nonce: bigint,
+    async createTransactionForUnguardingAccount(
+        sender: IAccount,
+        nonce: bigint,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()): Promise<Transaction> {
+        relayer: Address = Address.empty(),
+    ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnguardingAccount(sender.address);
 
         transaction.guardian = guardian;

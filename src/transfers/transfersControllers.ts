@@ -20,7 +20,7 @@ export class TransfersController {
         nonce: bigint,
         options: resources.NativeTokenTransferInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForNativeTokenTransfer(sender.address, options);
 
@@ -37,7 +37,7 @@ export class TransfersController {
         nonce: bigint,
         options: resources.CustomTokenTransferInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForESDTTokenTransfer(sender.address, options);
 
@@ -54,7 +54,7 @@ export class TransfersController {
         nonce: bigint,
         options: resources.CreateTransferTransactionInput,
         guardian: Address = Address.empty(),
-        relayer: Address = Address.empty()
+        relayer: Address = Address.empty(),
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForTransfer(sender.address, options);
 

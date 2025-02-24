@@ -9,7 +9,7 @@ import { DevnetEntrypoint } from "./entrypoints";
 describe("TestEntrypoint", () => {
     const entrypoint = new DevnetEntrypoint();
 
-    before(async function () { });
+    before(async function () {});
 
     it("native transfer", async () => {
         const controller = entrypoint.createTransfersController();
@@ -48,25 +48,13 @@ describe("TestEntrypoint", () => {
                 data: Buffer.from("hello"),
             },
             grace.address,
-            grace.address
-        );
-        assert.deepEqual(
-            transaction.guardian,
             grace.address,
         );
-        assert.deepEqual(
-            transaction.relayer,
-            grace.address,
-        );
-        assert.deepEqual(
-            transaction.guardianSignature,
-            new Uint8Array(),
-        );
+        assert.deepEqual(transaction.guardian, grace.address);
+        assert.deepEqual(transaction.relayer, grace.address);
+        assert.deepEqual(transaction.guardianSignature, new Uint8Array());
 
-        assert.deepEqual(
-            transaction.relayerSignature,
-            new Uint8Array(),
-        );
+        assert.deepEqual(transaction.relayerSignature, new Uint8Array());
     });
 
     it("contract flow", async function () {

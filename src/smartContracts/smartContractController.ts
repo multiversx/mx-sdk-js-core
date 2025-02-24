@@ -1,5 +1,6 @@
 import { AbiRegistry, ArgSerializer, isTyped, NativeSerializer } from "../abi";
 import { IAccount } from "../accounts/interfaces";
+import { Address } from "../core";
 import { Err, ErrSmartContractQuery } from "../core/errors";
 import { SmartContractQuery, SmartContractQueryInput, SmartContractQueryResponse } from "../core/smartContractQuery";
 import { Transaction } from "../core/transaction";
@@ -36,9 +37,13 @@ export class SmartContractController {
         sender: IAccount,
         nonce: bigint,
         options: resources.ContractDeployInput,
+        guardian: Address = Address.empty(),
+        relayer: Address = Address.empty()
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForDeploy(sender.address, options);
 
+        transaction.guardian = guardian;
+        transaction.relayer = relayer;
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -58,9 +63,13 @@ export class SmartContractController {
         sender: IAccount,
         nonce: bigint,
         options: resources.ContractUpgradeInput,
+        guardian: Address = Address.empty(),
+        relayer: Address = Address.empty()
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUpgrade(sender.address, options);
 
+        transaction.guardian = guardian;
+        transaction.relayer = relayer;
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -71,9 +80,13 @@ export class SmartContractController {
         sender: IAccount,
         nonce: bigint,
         options: resources.ContractExecuteInput,
+        guardian: Address = Address.empty(),
+        relayer: Address = Address.empty()
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForExecute(sender.address, options);
 
+        transaction.guardian = guardian;
+        transaction.relayer = relayer;
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 

@@ -9,7 +9,7 @@ import { DevnetEntrypoint } from "./entrypoints";
 describe("TestEntrypoint", () => {
     const entrypoint = new DevnetEntrypoint();
 
-    before(async function () {});
+    before(async function () { });
 
     it("native transfer", async () => {
         const controller = entrypoint.createTransfersController();
@@ -29,6 +29,43 @@ describe("TestEntrypoint", () => {
         assert.equal(
             Buffer.from(transaction.signature).toString("hex"),
             "69bc7d1777edd0a901e6cf94830475716205c5efdf2fd44d4be31badead59fc8418b34f0aa3b2c80ba14aed5edd30031757d826af58a1abb690a0bee89ba9309",
+        );
+    });
+
+    it("native transfer with guardian and relayer", async () => {
+        const controller = entrypoint.createTransfersController();
+        const filePath = path.join("src", "testdata", "testwallets");
+        const sender = await Account.newFromPem(path.join(filePath, "alice.pem"));
+        const grace = await Account.newFromPem(path.join(filePath, "grace.pem"));
+        sender.nonce = 77777n;
+
+        const transaction = await controller.createTransactionForTransfer(
+            sender,
+            BigInt(sender.getNonceThenIncrement().valueOf()),
+            {
+                receiver: sender.address,
+                nativeAmount: BigInt(0),
+                data: Buffer.from("hello"),
+            },
+            grace.address,
+            grace.address
+        );
+        assert.deepEqual(
+            transaction.guardian,
+            grace.address,
+        );
+        assert.deepEqual(
+            transaction.relayer,
+            grace.address,
+        );
+        assert.deepEqual(
+            transaction.guardianSignature,
+            new Uint8Array(),
+        );
+
+        assert.deepEqual(
+            transaction.relayerSignature,
+            new Uint8Array(),
         );
     });
 

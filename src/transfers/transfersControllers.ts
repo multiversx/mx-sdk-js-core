@@ -1,4 +1,5 @@
 import { IAccount } from "../accounts/interfaces";
+import { Address } from "../core";
 import { Transaction } from "../core/transaction";
 import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
@@ -18,9 +19,13 @@ export class TransfersController {
         sender: IAccount,
         nonce: bigint,
         options: resources.NativeTokenTransferInput,
+        guardian: Address = Address.empty(),
+        relayer: Address = Address.empty()
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForNativeTokenTransfer(sender.address, options);
 
+        transaction.guardian = guardian;
+        transaction.relayer = relayer;
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -31,9 +36,13 @@ export class TransfersController {
         sender: IAccount,
         nonce: bigint,
         options: resources.CustomTokenTransferInput,
+        guardian: Address = Address.empty(),
+        relayer: Address = Address.empty()
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForESDTTokenTransfer(sender.address, options);
 
+        transaction.guardian = guardian;
+        transaction.relayer = relayer;
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -44,9 +53,13 @@ export class TransfersController {
         sender: IAccount,
         nonce: bigint,
         options: resources.CreateTransferTransactionInput,
+        guardian: Address = Address.empty(),
+        relayer: Address = Address.empty()
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForTransfer(sender.address, options);
 
+        transaction.guardian = guardian;
+        transaction.relayer = relayer;
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 

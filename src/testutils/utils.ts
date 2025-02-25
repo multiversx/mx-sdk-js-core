@@ -4,7 +4,6 @@ import { resolve } from "path";
 import { AbiRegistry, Code, SmartContract, TypedValue } from "../abi";
 import { Account } from "../accounts";
 import { Transaction } from "../core/transaction";
-import { TransactionWatcher } from "../core/transactionWatcher";
 import { getAxios } from "../core/utils";
 
 export async function prepareDeployment(obj: {
@@ -79,11 +78,6 @@ export function isOnBrowserTests() {
 
     let isOnTests = window.location.href.includes(BROWSER_TESTS_URL);
     return isOnTests;
-}
-
-export function setupUnitTestWatcherTimeouts() {
-    TransactionWatcher.DefaultPollingInterval = 42;
-    TransactionWatcher.DefaultTimeout = 42 * 42;
 }
 
 export function createAccountBalance(egld: number): bigint {

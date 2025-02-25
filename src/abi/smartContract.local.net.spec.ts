@@ -34,19 +34,22 @@ describe("test on local testnet", function () {
         bob = await Account.newFromPem(`${getTestWalletsPath()}/bob.pem`);
         carol = await Account.newFromPem(`${getTestWalletsPath()}/carol.pem`);
 
-        watcher = new TransactionWatcher({
-            getTransaction: async (hash: string) => {
-                return await provider.getTransaction(hash);
+        watcher = new TransactionWatcher(
+            {
+                getTransaction: async (hash: string) => {
+                    return await provider.getTransaction(hash);
+                },
             },
-        });
+            {
+                pollingIntervalMilliseconds: 5000,
+                timeoutMilliseconds: 50000,
+            },
+        );
         parser = new SmartContractTransactionsOutcomeParser();
     });
 
     it("counter: should deploy, then simulate transactions using SmartContractTransactionsFactory", async function () {
         this.timeout(60000);
-
-        TransactionWatcher.DefaultPollingInterval = 5000;
-        TransactionWatcher.DefaultTimeout = 50000;
 
         let network = await provider.getNetworkConfig();
 
@@ -121,9 +124,6 @@ describe("test on local testnet", function () {
     it("counter: should deploy, call and query contract using SmartContractTransactionsFactory", async function () {
         this.timeout(80000);
 
-        TransactionWatcher.DefaultPollingInterval = 5000;
-        TransactionWatcher.DefaultTimeout = 50000;
-
         let network = await provider.getNetworkConfig();
 
         const config = new TransactionsFactoryConfig({ chainID: network.chainID });
@@ -186,9 +186,6 @@ describe("test on local testnet", function () {
 
     it("erc20: should deploy, call and query contract using SmartContractTransactionsFactory", async function () {
         this.timeout(60000);
-
-        TransactionWatcher.DefaultPollingInterval = 5000;
-        TransactionWatcher.DefaultTimeout = 50000;
 
         let network = await provider.getNetworkConfig();
 
@@ -277,10 +274,6 @@ describe("test on local testnet", function () {
 
     it("lottery: should deploy, call and query contract using SmartContractTransactionsFactory", async function () {
         this.timeout(60000);
-
-        TransactionWatcher.DefaultPollingInterval = 5000;
-        TransactionWatcher.DefaultTimeout = 50000;
-
         let network = await provider.getNetworkConfig();
         alice.nonce = (await provider.getAccount(alice.address)).nonce;
 

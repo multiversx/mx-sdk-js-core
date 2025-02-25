@@ -6,7 +6,7 @@ import { SmartContractQueryResponse } from "../core/smartContractQuery";
 import { Token, TokenTransfer } from "../core/tokens";
 import { Transaction } from "../core/transaction";
 import { SmartContractController } from "../smartContracts";
-import { loadAbiRegistry, MockNetworkProvider, setupUnitTestWatcherTimeouts } from "../testutils";
+import { loadAbiRegistry, MockNetworkProvider } from "../testutils";
 import { getTestWalletsPath } from "../testutils/utils";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
@@ -204,8 +204,7 @@ describe("test smart contract interactor", function () {
     });
 
     it("should interact with 'answer'", async function () {
-        setupUnitTestWatcherTimeouts();
-
+        this.timeout(30000);
         let abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
         let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new SmartContractController({ chainID: "D", networkProvider: provider, abi: abiRegistry });
@@ -270,8 +269,7 @@ describe("test smart contract interactor", function () {
     });
 
     it("should interact with 'counter'", async function () {
-        setupUnitTestWatcherTimeouts();
-
+        this.timeout(30000);
         let abi = await loadAbiRegistry("src/testdata/counter.abi.json");
         let contract = new SmartContract({ address: dummyAddress, abi: abi });
         let controller = new SmartContractController({ chainID: "D", networkProvider: provider, abi: abi });
@@ -339,8 +337,7 @@ describe("test smart contract interactor", function () {
     });
 
     it("should interact with 'lottery-esdt'", async function () {
-        setupUnitTestWatcherTimeouts();
-
+        this.timeout(30000);
         let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
         let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
         let controller = new SmartContractController({ chainID: "D", networkProvider: provider, abi: abiRegistry });

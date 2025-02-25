@@ -17,20 +17,23 @@ describe("fetch transactions from local testnet", function () {
 
     before(async function () {
         alice = await Account.newFromPem(`${getTestWalletsPath()}/alice.pem`);
-        watcher = new TransactionWatcher({
-            getTransaction: async (hash: string) => {
-                return await provider.getTransaction(hash);
+        watcher = new TransactionWatcher(
+            {
+                getTransaction: async (hash: string) => {
+                    return await provider.getTransaction(hash);
+                },
             },
-        });
+            {
+                pollingIntervalMilliseconds: 5000,
+                timeoutMilliseconds: 50000,
+            },
+        );
 
         parser = new SmartContractTransactionsOutcomeParser();
     });
 
     it("counter smart contract", async function () {
         this.timeout(60000);
-
-        TransactionWatcher.DefaultPollingInterval = 5000;
-        TransactionWatcher.DefaultTimeout = 50000;
 
         let network = await provider.getNetworkConfig();
         alice.nonce = (await provider.getAccount(alice.address)).nonce;
@@ -77,9 +80,6 @@ describe("fetch transactions from local testnet", function () {
 
     it("interact with counter smart contract using SmartContractTransactionsFactory", async function () {
         this.timeout(60000);
-
-        TransactionWatcher.DefaultPollingInterval = 5000;
-        TransactionWatcher.DefaultTimeout = 50000;
 
         let network = await provider.getNetworkConfig();
 

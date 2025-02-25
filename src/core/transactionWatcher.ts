@@ -17,9 +17,9 @@ export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
  * TransactionWatcher allows one to continuously watch (monitor), by means of polling, the status of a given transaction.
  */
 export class TransactionWatcher {
-    static DefaultPollingInterval: number = 6000;
-    static DefaultTimeout: number = TransactionWatcher.DefaultPollingInterval * 15;
-    static DefaultPatience: number = 0;
+    private static DefaultPollingInterval: number = 6000;
+    private static DefaultTimeout: number = TransactionWatcher.DefaultPollingInterval * 15;
+    private static DefaultPatience: number = 0;
 
     static NoopOnStatusReceived = (_: TransactionStatus) => {};
 

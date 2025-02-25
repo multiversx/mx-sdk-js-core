@@ -46,9 +46,9 @@ describe("TestEntrypoint", () => {
                 receiver: sender.address,
                 nativeAmount: BigInt(0),
                 data: Buffer.from("hello"),
+                guardian: grace.address,
+                relayer: grace.address,
             },
-            grace.address,
-            grace.address,
         );
         assert.deepEqual(transaction.guardian, grace.address);
         assert.deepEqual(transaction.relayer, grace.address);

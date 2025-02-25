@@ -28,14 +28,12 @@ export class DelegationController {
     async createTransactionForNewDelegationContract(
         sender: IAccount,
         nonce: bigint,
-        options: resources.NewDelegationContractInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.NewDelegationContractInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForNewDelegationContract(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -54,14 +52,12 @@ export class DelegationController {
     async createTransactionForAddingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.AddNodesInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.AddNodesInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForAddingNodes(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -71,14 +67,12 @@ export class DelegationController {
     async createTransactionForRemovingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageNodesInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ManageNodesInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRemovingNodes(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -88,14 +82,12 @@ export class DelegationController {
     async createTransactionForStakingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageNodesInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ManageNodesInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForStakingNodes(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -105,14 +97,12 @@ export class DelegationController {
     async createTransactionForUnbondingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageNodesInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ManageNodesInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnbondingNodes(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -122,14 +112,12 @@ export class DelegationController {
     async createTransactionForUnstakingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageNodesInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ManageNodesInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnstakingNodes(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -139,14 +127,12 @@ export class DelegationController {
     async createTransactionForUnjailingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UnjailingNodesInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.UnjailingNodesInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnjailingNodes(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -156,14 +142,12 @@ export class DelegationController {
     async createTransactionForChangingServiceFee(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ChangeServiceFee,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ChangeServiceFee & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForChangingServiceFee(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -173,14 +157,12 @@ export class DelegationController {
     async createTransactionForModifyingDelegationCap(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ModifyDelegationCapInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ModifyDelegationCapInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingDelegationCap(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -190,14 +172,12 @@ export class DelegationController {
     async createTransactionForSettingAutomaticActivation(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingAutomaticActivation(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -207,14 +187,12 @@ export class DelegationController {
     async createTransactionForUnsettingAutomaticActivation(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingAutomaticActivation(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -224,17 +202,15 @@ export class DelegationController {
     async createTransactionForSettingCapCheckOnRedelegateRewards(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingCapCheckOnRedelegateRewards(
             sender.address,
             options,
         );
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -244,17 +220,15 @@ export class DelegationController {
     async createTransactionForUnsettingCapCheckOnRedelegateRewards(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingCapCheckOnRedelegateRewards(
             sender.address,
             options,
         );
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -264,14 +238,12 @@ export class DelegationController {
     async createTransactionForSettingMetadata(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetContractMetadataInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.SetContractMetadataInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingMetadata(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -281,14 +253,12 @@ export class DelegationController {
     async createTransactionForDelegating(
         sender: IAccount,
         nonce: bigint,
-        options: resources.DelegateActionsInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.DelegateActionsInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForDelegating(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -298,14 +268,12 @@ export class DelegationController {
     async createTransactionForClaimingRewards(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForClaimingRewards(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -315,14 +283,12 @@ export class DelegationController {
     async createTransactionForRedelegatingRewards(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRedelegatingRewards(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -332,14 +298,12 @@ export class DelegationController {
     async createTransactionForUndelegating(
         sender: IAccount,
         nonce: bigint,
-        options: resources.DelegateActionsInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.DelegateActionsInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUndelegating(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -349,15 +313,13 @@ export class DelegationController {
     async createTransactionForWithdrawing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForWithdrawing(sender.address, options);
 
         transaction.nonce = nonce;
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
 
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 

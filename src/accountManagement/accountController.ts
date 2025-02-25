@@ -20,14 +20,12 @@ export class AccountController {
     async createTransactionForSavingKeyValue(
         sender: IAccount,
         nonce: bigint,
-        options: SaveKeyValueInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: SaveKeyValueInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSavingKeyValue(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -37,14 +35,12 @@ export class AccountController {
     async createTransactionForSettingGuardian(
         sender: IAccount,
         nonce: bigint,
-        options: SetGuardianInput,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: SetGuardianInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingGuardian(sender.address, options);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -54,13 +50,11 @@ export class AccountController {
     async createTransactionForGuardingAccount(
         sender: IAccount,
         nonce: bigint,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForGuardingAccount(sender.address);
-
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -70,13 +64,12 @@ export class AccountController {
     async createTransactionForUnguardingAccount(
         sender: IAccount,
         nonce: bigint,
-        guardian: Address = Address.empty(),
-        relayer: Address = Address.empty(),
+        options: { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnguardingAccount(sender.address);
 
-        transaction.guardian = guardian;
-        transaction.relayer = relayer;
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 

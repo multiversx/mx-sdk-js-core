@@ -1,5 +1,6 @@
 import { AbiRegistry, ArgSerializer, isTyped, NativeSerializer } from "../abi";
 import { IAccount } from "../accounts/interfaces";
+import { Address } from "../core";
 import { Err, ErrSmartContractQuery } from "../core/errors";
 import { SmartContractQuery, SmartContractQueryInput, SmartContractQueryResponse } from "../core/smartContractQuery";
 import { Transaction } from "../core/transaction";
@@ -35,10 +36,12 @@ export class SmartContractController {
     async createTransactionForDeploy(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ContractDeployInput,
+        options: resources.ContractDeployInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForDeploy(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -57,10 +60,12 @@ export class SmartContractController {
     async createTransactionForUpgrade(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ContractUpgradeInput,
+        options: resources.ContractUpgradeInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUpgrade(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -70,10 +75,12 @@ export class SmartContractController {
     async createTransactionForExecute(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ContractExecuteInput,
+        options: resources.ContractExecuteInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForExecute(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 

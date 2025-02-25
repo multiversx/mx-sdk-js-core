@@ -1,4 +1,5 @@
 import { IAccount } from "../accounts/interfaces";
+import { Address } from "../core";
 import { Transaction } from "../core/transaction";
 import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
@@ -17,10 +18,12 @@ export class TransfersController {
     async createTransactionForNativeTokenTransfer(
         sender: IAccount,
         nonce: bigint,
-        options: resources.NativeTokenTransferInput,
+        options: resources.NativeTokenTransferInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForNativeTokenTransfer(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -30,10 +33,12 @@ export class TransfersController {
     async createTransactionForEsdtTokenTransfer(
         sender: IAccount,
         nonce: bigint,
-        options: resources.CustomTokenTransferInput,
+        options: resources.CustomTokenTransferInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForESDTTokenTransfer(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -43,10 +48,12 @@ export class TransfersController {
     async createTransactionForTransfer(
         sender: IAccount,
         nonce: bigint,
-        options: resources.CreateTransferTransactionInput,
+        options: resources.CreateTransferTransactionInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForTransfer(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 

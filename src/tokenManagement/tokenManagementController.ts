@@ -1,4 +1,5 @@
 import { IAccount } from "../accounts/interfaces";
+import { Address } from "../core";
 import { Transaction } from "../core/transaction";
 import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionOnNetwork } from "../core/transactionOnNetwork";
@@ -27,10 +28,12 @@ export class TokenManagementController {
     async createTransactionForIssuingFungible(
         sender: IAccount,
         nonce: bigint,
-        options: resources.IssueFungibleInput,
+        options: resources.IssueFungibleInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingFungible(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -49,10 +52,12 @@ export class TokenManagementController {
     async createTransactionForIssuingSemiFungible(
         sender: IAccount,
         nonce: bigint,
-        options: resources.IssueSemiFungibleInput,
+        options: resources.IssueSemiFungibleInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingSemiFungible(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -71,10 +76,12 @@ export class TokenManagementController {
     async createTransactionForIssuingNonFungible(
         sender: IAccount,
         nonce: bigint,
-        options: resources.IssueNonFungibleInput,
+        options: resources.IssueNonFungibleInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingNonFungible(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -93,10 +100,12 @@ export class TokenManagementController {
     async createTransactionForRegisteringMetaEsdt(
         sender: IAccount,
         nonce: bigint,
-        options: resources.RegisterMetaESDTInput,
+        options: resources.RegisterMetaESDTInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringMetaESDT(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -115,10 +124,12 @@ export class TokenManagementController {
     async createTransactionForRegisteringAndSettingRoles(
         sender: IAccount,
         nonce: bigint,
-        options: resources.RegisterRolesInput,
+        options: resources.RegisterRolesInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringAndSettingRoles(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -137,10 +148,12 @@ export class TokenManagementController {
     async createTransactionForSetBurnRoleGlobally(
         sender: IAccount,
         nonce: bigint,
-        options: resources.BurnRoleGloballyInput,
+        options: resources.BurnRoleGloballyInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingBurnRoleGlobally(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -159,10 +172,12 @@ export class TokenManagementController {
     async createTransactionForUnsettingBurnRoleGlobally(
         sender: IAccount,
         nonce: bigint,
-        options: resources.BurnRoleGloballyInput,
+        options: resources.BurnRoleGloballyInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingBurnRoleGlobally(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -181,10 +196,12 @@ export class TokenManagementController {
     async createTransactionForSettingSpecialRoleOnFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.FungibleSpecialRoleInput,
+        options: resources.FungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingSpecialRoleOnFungibleToken(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -203,13 +220,15 @@ export class TokenManagementController {
     async createTransactionForSettingSpecialRoleOnSemiFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SemiFungibleSpecialRoleInput,
+        options: resources.SemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken(
             sender.address,
             options,
         );
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -228,13 +247,15 @@ export class TokenManagementController {
     async createTransactionForSettingSpecialRoleOnNonFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SpecialRoleInput,
+        options: resources.SpecialRoleInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingSpecialRoleOnNonFungibleToken(
             sender.address,
             options,
         );
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -253,10 +274,12 @@ export class TokenManagementController {
     async createTransactionForCreatingNft(
         sender: IAccount,
         nonce: bigint,
-        options: resources.MintInput,
+        options: resources.MintInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForCreatingNFT(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -275,10 +298,12 @@ export class TokenManagementController {
     async createTransactionForPausing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.PausingInput,
+        options: resources.PausingInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForPausing(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -297,10 +322,12 @@ export class TokenManagementController {
     async createTransactionForUnpausing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.PausingInput,
+        options: resources.PausingInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnpausing(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -319,10 +346,12 @@ export class TokenManagementController {
     async createTransactionForFreezing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManagementInput,
+        options: resources.ManagementInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForFreezing(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -341,10 +370,12 @@ export class TokenManagementController {
     async createTransactionForUnFreezing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManagementInput,
+        options: resources.ManagementInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnfreezing(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -363,10 +394,12 @@ export class TokenManagementController {
     async createTransactionForWiping(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManagementInput,
+        options: resources.ManagementInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForWiping(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -385,10 +418,12 @@ export class TokenManagementController {
     async createTransactionForLocaMinting(
         sender: IAccount,
         nonce: bigint,
-        options: resources.LocalMintInput,
+        options: resources.LocalMintInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForLocalMint(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -407,10 +442,12 @@ export class TokenManagementController {
     async createTransactionForLocalBurning(
         sender: IAccount,
         nonce: bigint,
-        options: resources.LocalBurnInput,
+        options: resources.LocalBurnInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForLocalBurning(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -429,10 +466,12 @@ export class TokenManagementController {
     async createTransactionForUpdatingAttributes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UpdateAttributesInput,
+        options: resources.UpdateAttributesInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUpdatingAttributes(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -451,10 +490,12 @@ export class TokenManagementController {
     async createTransactionForAddingQuantity(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UpdateQuantityInput,
+        options: resources.UpdateQuantityInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForAddingQuantity(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -473,10 +514,12 @@ export class TokenManagementController {
     async createTransactionForBurningQuantity(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UpdateQuantityInput,
+        options: resources.UpdateQuantityInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForBurningQuantity(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -495,10 +538,12 @@ export class TokenManagementController {
     async createTransactionForModifyingRoyalties(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ModifyRoyaltiesInput,
+        options: resources.ModifyRoyaltiesInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingRoyalties(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -517,10 +562,12 @@ export class TokenManagementController {
     async createTransactionForSettingNewUris(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetNewUriInput,
+        options: resources.SetNewUriInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingNewUris(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -539,10 +586,12 @@ export class TokenManagementController {
     async createTransactionForModifyingCreator(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetNewUriInput,
+        options: resources.SetNewUriInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingCreator(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -561,10 +610,12 @@ export class TokenManagementController {
     async createTransactionForUpdatingMetadata(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetNewUriInput,
+        options: resources.SetNewUriInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingCreator(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -583,10 +634,12 @@ export class TokenManagementController {
     async createTransactionForMetadataRecreate(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetNewUriInput,
+        options: resources.SetNewUriInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForMetadataRecreate(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -605,10 +658,12 @@ export class TokenManagementController {
     async createTransactionForChangingTokenToDynamic(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetNewUriInput,
+        options: resources.SetNewUriInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForChangingTokenToDynamic(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -627,10 +682,12 @@ export class TokenManagementController {
     async createTransactionForUpdatingTokenId(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UpdateTokenIDInput,
+        options: resources.UpdateTokenIDInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUpdatingTokenId(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -645,10 +702,12 @@ export class TokenManagementController {
     async createTransactionForRegisteringDynamicToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.RegisteringDynamicTokenInput,
+        options: resources.RegisteringDynamicTokenInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringDynamicToken(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
@@ -667,10 +726,12 @@ export class TokenManagementController {
     async createTransactionForRegisteringDynamicTokenAndSettingRoles(
         sender: IAccount,
         nonce: bigint,
-        options: resources.RegisteringDynamicTokenInput,
+        options: resources.RegisteringDynamicTokenInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringDynamicAndSettingRoles(sender.address, options);
 
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 

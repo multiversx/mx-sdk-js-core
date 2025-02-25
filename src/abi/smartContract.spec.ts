@@ -4,13 +4,7 @@ import { Address } from "../core/address";
 import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionStatus } from "../core/transactionStatus";
 import { TransactionWatcher } from "../core/transactionWatcher";
-import {
-    getTestWalletsPath,
-    MarkCompleted,
-    MockNetworkProvider,
-    setupUnitTestWatcherTimeouts,
-    Wait,
-} from "../testutils";
+import { getTestWalletsPath, MarkCompleted, MockNetworkProvider, Wait } from "../testutils";
 import { Code } from "./code";
 import { ContractFunction } from "./function";
 import { SmartContract } from "./smartContract";
@@ -41,8 +35,10 @@ describe("test contract", () => {
     });
 
     it("should deploy", async () => {
-        setupUnitTestWatcherTimeouts();
-        let watcher = new TransactionWatcher(provider);
+        let watcher = new TransactionWatcher(provider, {
+            pollingIntervalMilliseconds: 42,
+            timeoutMilliseconds: 42 * 42,
+        });
 
         let contract = new SmartContract();
         let deployTransaction = contract.deploy({
@@ -87,8 +83,10 @@ describe("test contract", () => {
     });
 
     it("should call", async () => {
-        setupUnitTestWatcherTimeouts();
-        let watcher = new TransactionWatcher(provider);
+        let watcher = new TransactionWatcher(provider, {
+            pollingIntervalMilliseconds: 42,
+            timeoutMilliseconds: 42 * 42,
+        });
 
         let contract = new SmartContract({
             address: new Address("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3"),
@@ -154,8 +152,10 @@ describe("test contract", () => {
     });
 
     it("should upgrade", async () => {
-        setupUnitTestWatcherTimeouts();
-        let watcher = new TransactionWatcher(provider);
+        let watcher = new TransactionWatcher(provider, {
+            pollingIntervalMilliseconds: 42,
+            timeoutMilliseconds: 42 * 42,
+        });
 
         let contract = new SmartContract();
         contract.setAddress(Address.newFromBech32("erd1qqqqqqqqqqqqqpgq3ytm9m8dpeud35v3us20vsafp77smqghd8ss4jtm0q"));

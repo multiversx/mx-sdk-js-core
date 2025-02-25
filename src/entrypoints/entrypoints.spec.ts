@@ -6,7 +6,7 @@ import { Address } from "../core";
 import { loadAbiRegistry } from "../testutils";
 import { DevnetEntrypoint } from "./entrypoints";
 
-describe("TestEntrypoint", () => {
+describe("TestEntrypoint", function () {
     const entrypoint = new DevnetEntrypoint();
 
     before(async function () {});
@@ -32,10 +32,35 @@ describe("TestEntrypoint", () => {
         );
     });
 
+    it("native transfer with guardian and relayer", async () => {
+        const controller = entrypoint.createTransfersController();
+        const filePath = path.join("src", "testdata", "testwallets");
+        const sender = await Account.newFromPem(path.join(filePath, "alice.pem"));
+        const grace = await Account.newFromPem(path.join(filePath, "grace.pem"));
+        sender.nonce = 77777n;
+
+        const transaction = await controller.createTransactionForTransfer(
+            sender,
+            BigInt(sender.getNonceThenIncrement().valueOf()),
+            {
+                receiver: sender.address,
+                nativeAmount: BigInt(0),
+                data: Buffer.from("hello"),
+                guardian: grace.address,
+                relayer: grace.address,
+            },
+        );
+        assert.deepEqual(transaction.guardian, grace.address);
+        assert.deepEqual(transaction.relayer, grace.address);
+        assert.deepEqual(transaction.guardianSignature, new Uint8Array());
+
+        assert.deepEqual(transaction.relayerSignature, new Uint8Array());
+    });
+
     it("contract flow", async function () {
         this.timeout(30000);
         const abi = await loadAbiRegistry("src/testdata/adder.abi.json");
-        const filePath = path.join("src", "testdata", "testwallets", "alice.pem");
+        const filePath = path.join("src", "testdata", "testwallets", "grace.pem");
         const sender = await Account.newFromPem(filePath);
         sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 

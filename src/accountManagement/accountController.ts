@@ -50,10 +50,9 @@ export class AccountController {
     async createTransactionForGuardingAccount(
         sender: IAccount,
         nonce: bigint,
-        options: { guardian?: Address; relayer?: Address },
+        options: { relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForGuardingAccount(sender.address);
-        transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
@@ -64,7 +63,7 @@ export class AccountController {
     async createTransactionForUnguardingAccount(
         sender: IAccount,
         nonce: bigint,
-        options: { guardian?: Address; relayer?: Address },
+        options: { guardian: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnguardingAccount(sender.address);
 

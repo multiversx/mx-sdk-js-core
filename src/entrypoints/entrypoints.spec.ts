@@ -60,7 +60,7 @@ describe("TestEntrypoint", function () {
     it("contract flow", async function () {
         this.timeout(30000);
         const abi = await loadAbiRegistry("src/testdata/adder.abi.json");
-        const filePath = path.join("src", "testdata", "testwallets", "alice.pem");
+        const filePath = path.join("src", "testdata", "testwallets", "grace.pem");
         const sender = await Account.newFromPem(filePath);
         sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 

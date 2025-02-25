@@ -6,7 +6,7 @@ import { Address } from "../core";
 import { loadAbiRegistry } from "../testutils";
 import { DevnetEntrypoint } from "./entrypoints";
 
-describe("TestEntrypoint", () => {
+describe("TestEntrypoint", function () {
     const entrypoint = new DevnetEntrypoint();
 
     before(async function () {});
@@ -58,7 +58,7 @@ describe("TestEntrypoint", () => {
     });
 
     it("contract flow", async function () {
-        this.timeout(40000);
+        this.timeout(30000);
         const abi = await loadAbiRegistry("src/testdata/adder.abi.json");
         const filePath = path.join("src", "testdata", "testwallets", "alice.pem");
         const sender = await Account.newFromPem(filePath);

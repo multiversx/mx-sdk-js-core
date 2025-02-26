@@ -11,7 +11,6 @@ export * from "./core";
 export * from "./delegation";
 export * from "./entrypoints";
 export * from "./networkProviders";
-export * from "./relayed";
 export * from "./tokenManagement";
 export * from "./transactionsOutcomeParsers";
 export * from "./transfers";

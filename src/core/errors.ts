@@ -300,33 +300,6 @@ export class ErrNotImplemented extends Err {
 }
 
 /**
- * Signals invalid arguments when using the relayed v1 builder
- */
-export class ErrInvalidRelayedV1BuilderArguments extends Err {
-    public constructor() {
-        super("invalid arguments for relayed v1 builder");
-    }
-}
-
-/**
- * Signals invalid arguments when using the relayed v2 builder
- */
-export class ErrInvalidRelayedV2BuilderArguments extends Err {
-    public constructor() {
-        super("invalid arguments for relayed v2 builder");
-    }
-}
-
-/**
- * Signals that Gas Limit isn't 0 for an inner tx when using relayed v2 builder
- */
-export class ErrGasLimitShouldBe0ForInnerTransaction extends Err {
-    public constructor() {
-        super("gas limit must be 0 for the inner transaction for relayed v2");
-    }
-}
-
-/**
  * Signals that the `isCompleted` property is missing on the transaction obect and is needed for the Transaction Watcher
  */
 export class ErrIsCompletedFieldIsMissingOnTransaction extends Err {

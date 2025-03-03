@@ -101,7 +101,7 @@ export class ErrAddressEmpty extends Err {
 }
 
 /**
- * Signals an invalid value for gasLimmit objects.
+ * Signals an invalid value for gasLimit objects.
  */
 export class ErrNotEnoughGas extends Err {
     public constructor(value: number) {
@@ -110,7 +110,7 @@ export class ErrNotEnoughGas extends Err {
 }
 
 /**
- * Signals an invalid value for nince objects.
+ * Signals an invalid value for nonce objects.
  */
 export class ErrNonceInvalid extends Err {
     public constructor(value: number) {

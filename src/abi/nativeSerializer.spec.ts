@@ -288,7 +288,7 @@ describe("test native serializer", () => {
         const compositeType = new CompositeType(new AddressType(), new U64Type());
         const optionalCompositeType = new OptionalType(compositeType);
         const addressBech32 = "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha";
-        const address = Address.fromBech32(addressBech32);
+        const address = Address.newFromBech32(addressBech32);
         const compositeValue = CompositeValue.fromItems(new AddressValue(address), new U64Value(42));
         const optionalCompositeValue = new OptionalValue(optionalCompositeType, compositeValue);
 

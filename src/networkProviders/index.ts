@@ -11,5 +11,6 @@ export { FungibleTokenOfAccountOnNetwork, NonFungibleTokenOfAccountOnNetwork } f
 
 export * from "./accounts";
 export { NetworkConfig } from "./networkConfig";
+export { NetworkProviderConfig } from "./networkProviderConfig";
 export { NetworkStatus } from "./networkStatus";
 export * from "./resources";

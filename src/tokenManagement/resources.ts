@@ -102,7 +102,7 @@ export type ManageMetadataInput = {
 
 export type RegisteringDynamicTokenInput = { tokenName: string; tokenTicker: string; tokenType: TokenType };
 
-type TokenType = "NFT" | "SFT" | "META" | "FNG";
+export type TokenType = "NFT" | "SFT" | "META" | "FNG";
 
 export type SpecialRoleOutput = {
     userAddress: Address;

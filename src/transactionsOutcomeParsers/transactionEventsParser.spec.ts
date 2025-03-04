@@ -65,7 +65,7 @@ describe("test transaction events parser", () => {
 
         assert.deepEqual(parsed, [
             {
-                dest_address: Address.fromBech32("erd1wfkv9495dhtt6a9yepxsyu2mlpw2ua333j4cr0qfulpxr4q5nfnshgyqun"),
+                dest_address: Address.newFromBech32("erd1wfkv9495dhtt6a9yepxsyu2mlpw2ua333j4cr0qfulpxr4q5nfnshgyqun"),
                 tokens: [
                     {
                         token_identifier: "WEGLD-01e49d",
@@ -119,7 +119,7 @@ describe("test transaction events parser", () => {
                         name: "SendTransferExecuteEgld",
                         fields: [
                             {
-                                to: Address.fromBech32(
+                                to: Address.newFromBech32(
                                     "erd1qqqqqqqqqqqqqpgq6qr0w0zzyysklfneh32eqp2cf383zc89d8sstnkl60",
                                 ),
                                 egld_amount: new BigNumber("0"),
@@ -129,7 +129,7 @@ describe("test transaction events parser", () => {
                             },
                         ],
                     },
-                    signers: [Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th")],
+                    signers: [Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th")],
                 },
             },
         ]);

@@ -7,7 +7,7 @@ describe("test account transactions factory", function () {
     const factory = new AccountTransactionsFactory({ config: config });
 
     it("should create 'Transaction' for saving key value", async function () {
-        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const keyValuePairs = new Map([[Buffer.from("key0"), Buffer.from("value0")]]);
 
         const transaction = factory.createTransactionForSavingKeyValue(sender, {
@@ -56,7 +56,7 @@ describe("test account transactions factory", function () {
     });
 
     it("should create 'Transaction' for guarding account", async function () {
-        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
         const transaction = factory.createTransactionForGuardingAccount(sender);
 
@@ -75,7 +75,7 @@ describe("test account transactions factory", function () {
     });
 
     it("should create 'Transaction' for unguarding account", async function () {
-        const sender = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
         const transaction = factory.createTransactionForUnguardingAccount(sender);
 

@@ -1,3 +1,4 @@
+import { TokenType } from "../core";
 import { Address } from "../core/address";
 
 export type IssueFungibleInput = IssueInput & { initialSupply: bigint; numDecimals: bigint };
@@ -101,8 +102,6 @@ export type ManageMetadataInput = {
 };
 
 export type RegisteringDynamicTokenInput = { tokenName: string; tokenTicker: string; tokenType: TokenType };
-
-type TokenType = "NFT" | "SFT" | "META" | "FNG";
 
 export type SpecialRoleOutput = {
     userAddress: Address;

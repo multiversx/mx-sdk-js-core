@@ -110,7 +110,7 @@ export class GuardianData {
     }
 }
 
-class Guardian {
+export class Guardian {
     activationEpoch: number = 0;
     address: Address = Address.empty();
     serviceUID: string = "";

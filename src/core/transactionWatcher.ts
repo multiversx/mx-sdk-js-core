@@ -68,15 +68,15 @@ export class TransactionWatcher {
 
     /**
      * Waits until the transaction is completely processed.
-     * @param txHash The hex-encoded transaction hash
+     * @param txHash The transaction hash
      */
-    public async awaitCompleted(txhash: string): Promise<TransactionOnNetwork> {
+    public async awaitCompleted(txHash: string): Promise<TransactionOnNetwork> {
         const isCompleted = (transactionOnNetwork: TransactionOnNetwork) => {
             return transactionOnNetwork.status.isCompleted();
         };
 
         const doFetch = async () => {
-            return await this.fetcher.getTransaction(txhash);
+            return await this.fetcher.getTransaction(txHash);
         };
         const errorProvider = () => new ErrExpectedTransactionStatusNotReached();
 

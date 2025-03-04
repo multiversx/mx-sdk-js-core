@@ -18,6 +18,8 @@ interface ILegacyTokenTransferOptions {
     numDecimals?: number;
 }
 
+export type TokenType = "NFT" | "SFT" | "META" | "FNG";
+
 export class Token {
     readonly identifier: string;
     readonly nonce: bigint;

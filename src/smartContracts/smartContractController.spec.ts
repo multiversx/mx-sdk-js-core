@@ -171,7 +171,7 @@ describe("test smart contract queries controller", () => {
             );
 
             const query = {
-                contract: Address.fromBech32("erd1qqqqqqqqqqqqqpgqvc7gdl0p4s97guh498wgz75k8sav6sjfjlwqh679jy"),
+                contract: Address.newFromBech32("erd1qqqqqqqqqqqqqpgqvc7gdl0p4s97guh498wgz75k8sav6sjfjlwqh679jy"),
                 function: "bar",
                 arguments: [],
             };

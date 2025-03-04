@@ -101,7 +101,7 @@ export class ErrAddressEmpty extends Err {
 }
 
 /**
- * Signals an invalid value for {@link GasLimit} objects.
+ * Signals an invalid value for gas limit.
  */
 export class ErrNotEnoughGas extends Err {
     public constructor(value: number) {
@@ -110,7 +110,7 @@ export class ErrNotEnoughGas extends Err {
 }
 
 /**
- * Signals an invalid value for {@link Nonce} objects.
+ * Signals an invalid value for nonce.
  */
 export class ErrNonceInvalid extends Err {
     public constructor(value: number) {
@@ -119,7 +119,7 @@ export class ErrNonceInvalid extends Err {
 }
 
 /**
- * Signals an invalid value for {@link TransactionVersion} objects.
+ * Signals an invalid value for transaction version.
  */
 export class ErrTransactionVersionInvalid extends Err {
     public constructor(value: number) {
@@ -128,7 +128,7 @@ export class ErrTransactionVersionInvalid extends Err {
 }
 
 /**
- * Signals an invalid value for {@link TransactionOptions} objects.
+ * Signals an invalid value for transaction options.
  */
 export class ErrTransactionOptionsInvalid extends Err {
     public constructor(value: number) {

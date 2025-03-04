@@ -73,19 +73,19 @@ describe("test address", () => {
 
     it("should check whether isSmartContract", () => {
         assert.isFalse(
-            Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th").isSmartContract(),
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th").isSmartContract(),
         );
         assert.isTrue(
-            Address.fromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l").isSmartContract(),
+            Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l").isSmartContract(),
         );
         assert.isTrue(
-            Address.fromBech32("erd1qqqqqqqqqqqqqpgqxwakt2g7u9atsnr03gqcgmhcv38pt7mkd94q6shuwt").isSmartContract(),
+            Address.newFromBech32("erd1qqqqqqqqqqqqqpgqxwakt2g7u9atsnr03gqcgmhcv38pt7mkd94q6shuwt").isSmartContract(),
         );
     });
 
     it("should contract address", () => {
         const addressComputer = new AddressComputer();
-        const deployer = Address.fromBech32("erd1j0hxzs7dcyxw08c4k2nv9tfcaxmqy8rj59meq505w92064x0h40qcxh3ap");
+        const deployer = Address.newFromBech32("erd1j0hxzs7dcyxw08c4k2nv9tfcaxmqy8rj59meq505w92064x0h40qcxh3ap");
 
         let contractAddress = addressComputer.computeContractAddress(deployer, 0n);
         assert.equal(contractAddress.toHex(), "00000000000000000500bb652200ed1f994200ab6699462cab4b1af7b11ebd5e");
@@ -99,15 +99,15 @@ describe("test address", () => {
     it("should get address shard", () => {
         const addressComputer = new AddressComputer();
 
-        let address = Address.fromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        let address = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         let shard = addressComputer.getShardOfAddress(address);
         assert.equal(shard, 1);
 
-        address = Address.fromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+        address = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         shard = addressComputer.getShardOfAddress(address);
         assert.equal(shard, 0);
 
-        address = Address.fromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
+        address = Address.newFromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
         shard = addressComputer.getShardOfAddress(address);
         assert.equal(shard, 2);
     });

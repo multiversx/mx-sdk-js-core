@@ -62,9 +62,9 @@ export class TransactionsFactoryConfig {
         this.gasLimitFreezing = 60000000n;
         this.gasLimitWiping = 60000000n;
         this.gasLimitEsdtNftCreate = 3000000n;
-        this.gasLimitEsdtNftUpdateAttributes = 1000000n;
-        this.gasLimitEsdtNftAddQuantity = 1000000n;
-        this.gasLimitEsdtNftBurn = 1000000n;
+        this.gasLimitEsdtNftUpdateAttributes = 500000n;
+        this.gasLimitEsdtNftAddQuantity = 500000n;
+        this.gasLimitEsdtNftBurn = 500000n;
         this.gasLimitStorePerByte = 10000n;
         this.issueCost = 50000000000000000n;
         this.gasLimitEsdtModifyRoyalties = 60000000n;

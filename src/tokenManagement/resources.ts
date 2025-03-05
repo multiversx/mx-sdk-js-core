@@ -25,7 +25,14 @@ export type FungibleSpecialRoleInput = {
     addRoleLocalBurn: boolean;
     addRoleESDTTransferRole: boolean;
 };
-export type SemiFungibleSpecialRoleInput = SpecialRoleInput & { addRoleNFTAddQuantity: boolean };
+export type SemiFungibleSpecialRoleInput = {
+    user: Address;
+    tokenIdentifier: string;
+    addRoleNFTCreate: boolean;
+    addRoleNFTBurn: boolean;
+    addRoleNFTAddQuantity: boolean;
+    addRoleESDTTransferRole: boolean;
+};
 
 export type SpecialRoleInput = {
     user: Address;

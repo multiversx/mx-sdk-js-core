@@ -36,8 +36,8 @@ describe("test smart contract transactions outcome parser", () => {
         assert.equal(parsed.returnMessage, "ok");
         assert.deepEqual(parsed.contracts, [
             {
-                address: contract.toBech32(),
-                ownerAddress: deployer.toBech32(),
+                address: contract,
+                ownerAddress: deployer,
                 codeHash: codeHash,
             },
         ]);

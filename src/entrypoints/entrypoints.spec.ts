@@ -2,7 +2,6 @@ import { assert } from "chai";
 import { readFileSync } from "fs";
 import path from "path";
 import { Account } from "../accounts/account";
-import { Address } from "../core";
 import { loadAbiRegistry } from "../testutils";
 import { DevnetEntrypoint } from "./entrypoints";
 
@@ -82,7 +81,7 @@ describe("TestEntrypoint", function () {
 
         assert.equal(outcome.contracts.length, 1);
 
-        const contractAddress = Address.newFromBech32(outcome.contracts[0].address);
+        const contractAddress = outcome.contracts[0].address;
 
         const executeTransaction = await controller.createTransactionForExecute(
             sender,

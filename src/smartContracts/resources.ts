@@ -34,18 +34,8 @@ export type ParsedSmartContractCallOutcome = {
     returnMessage: string;
 };
 
-export class DeployedSmartContract {
-    address: string;
-    ownerAddress: string;
+export type DeployedSmartContract = {
+    address: Address;
+    ownerAddress: Address;
     codeHash: Uint8Array;
-
-    constructor(address: string, ownerAddress: string, codeHash: Uint8Array) {
-        this.address = address;
-        this.ownerAddress = ownerAddress;
-        this.codeHash = codeHash;
-    }
-
-    toString(): string {
-        return `DeployedSmartContract(address=${this.address}, ownerAddress=${this.ownerAddress}, codeHash=${Buffer.from(this.codeHash).toString("hex")})`;
-    }
-}
+};

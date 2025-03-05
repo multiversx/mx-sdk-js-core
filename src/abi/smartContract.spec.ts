@@ -8,9 +8,10 @@ import { getTestWalletsPath, MarkCompleted, MockNetworkProvider, Wait } from "..
 import { Code } from "./code";
 import { ContractFunction } from "./function";
 import { SmartContract } from "./smartContract";
-import { AbiRegistry, OptionalValue, U32Value, U8Value, VariadicValue } from "./typesystem";
+import { Abi, OptionalValue, U32Value, U8Value, VariadicValue } from "./typesystem";
 import { BytesValue } from "./typesystem/bytes";
 
+// This will be deleted directly
 describe("test contract", () => {
     let provider = new MockNetworkProvider();
     let chainID = "test";
@@ -202,7 +203,7 @@ describe("test contract", () => {
         // These parameters are exotic and, generally speaking, can be avoided in contracts:
         // https://docs.multiversx.com/developers/data/multi-values/
 
-        const abi = AbiRegistry.create({
+        const abi = Abi.create({
             endpoints: [
                 {
                     name: "foo",
@@ -271,7 +272,7 @@ describe("test contract", () => {
     });
 
     it("v13 should be stricter than v12 on variadic<type> parameters (since NativeSerializer is used under the hood)", async () => {
-        const abi = AbiRegistry.create({
+        const abi = Abi.create({
             endpoints: [
                 {
                     name: "foo",

@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
-import { AbiRegistry, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "../abi";
+import { Abi, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "../abi";
 import { Address, SmartContractQueryResponse } from "../core";
 import { MockNetworkProvider, loadAbiRegistry } from "../testutils";
 import { bigIntToBuffer } from "../tokenOperations/codec";
@@ -94,7 +94,7 @@ describe("test smart contract queries controller", () => {
         });
 
         it("works with ABI, with mixed arguments", async function () {
-            const abi = AbiRegistry.create({
+            const abi = Abi.create({
                 endpoints: [
                     {
                         name: "bar",

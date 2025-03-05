@@ -1,4 +1,4 @@
-import { AbiRegistry, ArgSerializer } from "../abi";
+import { Abi, ArgSerializer } from "../abi";
 import { Address } from "../core/address";
 import { ARGUMENTS_SEPARATOR } from "../core/constants";
 import { Err } from "../core/errors";
@@ -14,9 +14,9 @@ enum Events {
 }
 
 export class SmartContractTransactionsOutcomeParser {
-    private readonly abi?: AbiRegistry;
+    private readonly abi?: Abi;
 
-    constructor(options?: { abi?: AbiRegistry }) {
+    constructor(options?: { abi?: Abi }) {
         this.abi = options?.abi;
     }
 

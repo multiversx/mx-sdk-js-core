@@ -205,9 +205,9 @@ describe("test smart contract interactor", function () {
 
     it("should interact with 'answer'", async function () {
         this.timeout(30000);
-        let abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
-        let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
-        let controller = new SmartContractController({ chainID: "D", networkProvider: provider, abi: abiRegistry });
+        let abi = await loadAbiRegistry("src/testdata/answer.abi.json");
+        let contract = new SmartContract({ address: dummyAddress, abi: abi });
+        let controller = new SmartContractController({ chainID: "D", networkProvider: provider, abi: abi });
 
         let interaction = <Interaction>contract.methods.getUltimateAnswer().withGasLimit(543210n).withChainID("T");
 
@@ -338,9 +338,9 @@ describe("test smart contract interactor", function () {
 
     it("should interact with 'lottery-esdt'", async function () {
         this.timeout(30000);
-        let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
-        let contract = new SmartContract({ address: dummyAddress, abi: abiRegistry });
-        let controller = new SmartContractController({ chainID: "D", networkProvider: provider, abi: abiRegistry });
+        let abi = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
+        let contract = new SmartContract({ address: dummyAddress, abi: abi });
+        let controller = new SmartContractController({ chainID: "D", networkProvider: provider, abi: abi });
 
         let startInteraction = <Interaction>(
             contract.methodsExplicit

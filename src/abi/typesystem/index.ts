@@ -3,7 +3,7 @@
  * @module typesystem
  */
 
-export * from "./abiRegistry";
+export * from "./abi";
 export * from "./address";
 export * from "./algebraic";
 export * from "./boolean";

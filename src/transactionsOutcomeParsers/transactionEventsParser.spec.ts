@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
-import { AbiRegistry } from "../abi";
+import { Abi } from "../abi";
 import { Address, TransactionEvent, TransactionLogs, TransactionOnNetwork } from "../core";
 import { b64TopicsToBytes, loadAbiRegistry } from "../testutils";
 import { findEventsByFirstTopic, SmartContractResult } from "./resources";
@@ -153,7 +153,7 @@ describe("test transaction events parser", () => {
     });
 
     it("parses event (with multi-values)", async function () {
-        const abi = AbiRegistry.create({
+        const abi = Abi.create({
             events: [
                 {
                     identifier: "doFoobar",

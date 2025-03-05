@@ -12,29 +12,29 @@ import { StructType } from "./struct";
 import { TokenIdentifierType } from "./tokenIdentifier";
 import { VariadicType } from "./variadic";
 
-describe("test abi registry", () => {
+describe("test abi", () => {
     it("load should also remap known to types", async () => {
         // Ultimate answer
-        let registry = await loadAbiRegistry("src/testdata/answer.abi.json");
-        let getUltimateAnswer = registry.getEndpoint("getUltimateAnswer");
+        let abi = await loadAbiRegistry("src/testdata/answer.abi.json");
+        let getUltimateAnswer = abi.getEndpoint("getUltimateAnswer");
         assert.instanceOf(getUltimateAnswer.output[0].type, I64Type);
 
         // Counter
-        registry = await loadAbiRegistry("src/testdata/counter.abi.json");
-        let getCounter = registry.getEndpoint("get");
+        abi = await loadAbiRegistry("src/testdata/counter.abi.json");
+        let getCounter = abi.getEndpoint("get");
         assert.instanceOf(getCounter.output[0].type, I64Type);
 
         // Lottery
-        registry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
-        let start = registry.getEndpoint("start");
-        let getStatus = registry.getEndpoint("status");
-        let getLotteryInfo = registry.getEndpoint("getLotteryInfo");
+        abi = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
+        let start = abi.getEndpoint("start");
+        let getStatus = abi.getEndpoint("status");
+        let getLotteryInfo = abi.getEndpoint("getLotteryInfo");
 
         // basic-features
-        registry = await loadAbiRegistry("src/testdata/basic-features.abi.json");
-        let returnManagedDecimal = registry.getEndpoint("returns_egld_decimal");
-        let returnsManagedDecimalSigned = registry.getEndpoint("managed_decimal_ln");
-        let returnsManagedDecimalVariable = registry.getEndpoint("managed_decimal_addition_var");
+        abi = await loadAbiRegistry("src/testdata/basic-features.abi.json");
+        let returnManagedDecimal = abi.getEndpoint("returns_egld_decimal");
+        let returnsManagedDecimalSigned = abi.getEndpoint("managed_decimal_ln");
+        let returnsManagedDecimalVariable = abi.getEndpoint("managed_decimal_addition_var");
 
         assert.isFalse(start.modifiers.isReadonly());
         assert.isTrue(getStatus.modifiers.isReadonly());
@@ -78,8 +78,8 @@ describe("test abi registry", () => {
             "hex",
         );
 
-        let registry = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
-        let performAction = registry.getEndpoint("getActionData");
+        let abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
+        let performAction = abi.getEndpoint("getActionData");
         assert.equal(performAction.output[0].type.getName(), "Action");
 
         let result = bc.decodeTopLevel(buff, performAction.output[0].type);
@@ -91,10 +91,10 @@ describe("test abi registry", () => {
     });
 
     it("should load ABI containing arrayN and nested structs", async () => {
-        let registry = await loadAbiRegistry("src/testdata/array-in-nested-structs.abi.json");
-        let dummyType = registry.getStruct("Dummy");
-        let fooType = registry.getStruct("Foo");
-        let barType = registry.getStruct("Bar");
+        let abi = await loadAbiRegistry("src/testdata/array-in-nested-structs.abi.json");
+        let dummyType = abi.getStruct("Dummy");
+        let fooType = abi.getStruct("Foo");
+        let barType = abi.getStruct("Bar");
         let fooTypeFromBarType = <StructType>barType.getFieldDefinition("foo")!.type;
         let dummyTypeFromFooTypeFromBarType = <StructType>fooTypeFromBarType.getFieldDefinition("dummy")!.type;
 
@@ -107,40 +107,40 @@ describe("test abi registry", () => {
     });
 
     it("should load ABI when custom types are out of order (a)", async () => {
-        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-a.abi.json");
+        const abi = await loadAbiRegistry("src/testdata/custom-types-out-of-order-a.abi.json");
 
-        assert.deepEqual(registry.getStruct("EsdtTokenTransfer").getNamesOfDependencies(), [
+        assert.deepEqual(abi.getStruct("EsdtTokenTransfer").getNamesOfDependencies(), [
             "EsdtTokenType",
             "TokenIdentifier",
             "u64",
             "BigUint",
         ]);
-        assert.deepEqual(registry.getEnum("EsdtTokenType").getNamesOfDependencies(), []);
-        assert.deepEqual(registry.getStruct("TypeA").getNamesOfDependencies(), ["TypeB", "TypeC", "u64"]);
-        assert.deepEqual(registry.getStruct("TypeB").getNamesOfDependencies(), ["TypeC", "u64"]);
-        assert.deepEqual(registry.getStruct("TypeC").getNamesOfDependencies(), ["u64"]);
+        assert.deepEqual(abi.getEnum("EsdtTokenType").getNamesOfDependencies(), []);
+        assert.deepEqual(abi.getStruct("TypeA").getNamesOfDependencies(), ["TypeB", "TypeC", "u64"]);
+        assert.deepEqual(abi.getStruct("TypeB").getNamesOfDependencies(), ["TypeC", "u64"]);
+        assert.deepEqual(abi.getStruct("TypeC").getNamesOfDependencies(), ["u64"]);
     });
 
     it("should load ABI when custom types are out of order (b)", async () => {
-        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-b.abi.json");
+        const abi = await loadAbiRegistry("src/testdata/custom-types-out-of-order-b.abi.json");
 
-        assert.deepEqual(registry.getStruct("EsdtTokenTransfer").getNamesOfDependencies(), [
+        assert.deepEqual(abi.getStruct("EsdtTokenTransfer").getNamesOfDependencies(), [
             "EsdtTokenType",
             "TokenIdentifier",
             "u64",
             "BigUint",
         ]);
-        assert.deepEqual(registry.getEnum("EsdtTokenType").getNamesOfDependencies(), []);
-        assert.deepEqual(registry.getStruct("TypeA").getNamesOfDependencies(), ["TypeB", "TypeC", "u64"]);
-        assert.deepEqual(registry.getStruct("TypeB").getNamesOfDependencies(), ["TypeC", "u64"]);
-        assert.deepEqual(registry.getStruct("TypeC").getNamesOfDependencies(), ["u64"]);
+        assert.deepEqual(abi.getEnum("EsdtTokenType").getNamesOfDependencies(), []);
+        assert.deepEqual(abi.getStruct("TypeA").getNamesOfDependencies(), ["TypeB", "TypeC", "u64"]);
+        assert.deepEqual(abi.getStruct("TypeB").getNamesOfDependencies(), ["TypeC", "u64"]);
+        assert.deepEqual(abi.getStruct("TypeC").getNamesOfDependencies(), ["u64"]);
     });
 
     it("should load ABI when custom types are out of order (community example: c)", async () => {
-        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-c.abi.json");
+        const abi = await loadAbiRegistry("src/testdata/custom-types-out-of-order-c.abi.json");
 
-        assert.lengthOf(registry.customTypes, 5);
-        assert.deepEqual(registry.getStruct("LoanCreateOptions").getNamesOfDependencies(), [
+        assert.lengthOf(abi.customTypes, 5);
+        assert.deepEqual(abi.getStruct("LoanCreateOptions").getNamesOfDependencies(), [
             "BigUint",
             "Address",
             "TokenIdentifier",
@@ -150,10 +150,10 @@ describe("test abi registry", () => {
     });
 
     it("should load ABI when custom types are out of order (community example: d)", async () => {
-        const registry = await loadAbiRegistry("src/testdata/custom-types-out-of-order-d.abi.json");
+        const abi = await loadAbiRegistry("src/testdata/custom-types-out-of-order-d.abi.json");
 
-        assert.lengthOf(registry.customTypes, 12);
-        assert.deepEqual(registry.getStruct("AuctionItem").getNamesOfDependencies(), [
+        assert.lengthOf(abi.customTypes, 12);
+        assert.deepEqual(abi.getStruct("AuctionItem").getNamesOfDependencies(), [
             "u64",
             "Address",
             "BigUint",
@@ -166,36 +166,36 @@ describe("test abi registry", () => {
     });
 
     it("should load ABI with counted-variadic", async () => {
-        const registry = await loadAbiRegistry("src/testdata/counted-variadic.abi.json");
-        const dummyType = registry.getStruct("Dummy");
+        const abi = await loadAbiRegistry("src/testdata/counted-variadic.abi.json");
+        const dummyType = abi.getStruct("Dummy");
 
-        assert.deepEqual(registry.getEndpoint("foo").input[0].type, new VariadicType(dummyType, true));
-        assert.deepEqual(registry.getEndpoint("bar").input[0].type, new VariadicType(new U32Type(), true));
-        assert.deepEqual(registry.getEndpoint("bar").input[1].type, new VariadicType(new BytesType(), true));
-        assert.deepEqual(registry.getEndpoint("bar").output[0].type, new VariadicType(new U32Type(), true));
-        assert.deepEqual(registry.getEndpoint("bar").output[1].type, new VariadicType(new BytesType(), true));
+        assert.deepEqual(abi.getEndpoint("foo").input[0].type, new VariadicType(dummyType, true));
+        assert.deepEqual(abi.getEndpoint("bar").input[0].type, new VariadicType(new U32Type(), true));
+        assert.deepEqual(abi.getEndpoint("bar").input[1].type, new VariadicType(new BytesType(), true));
+        assert.deepEqual(abi.getEndpoint("bar").output[0].type, new VariadicType(new U32Type(), true));
+        assert.deepEqual(abi.getEndpoint("bar").output[1].type, new VariadicType(new BytesType(), true));
     });
 
     it("should load ABI wih events", async () => {
-        const registry = await loadAbiRegistry("src/testdata/esdt-safe.abi.json");
+        const abi = await loadAbiRegistry("src/testdata/esdt-safe.abi.json");
 
-        assert.lengthOf(registry.events, 8);
+        assert.lengthOf(abi.events, 8);
 
-        const depositEvent = registry.getEvent("deposit");
+        const depositEvent = abi.getEvent("deposit");
         assert.deepEqual(depositEvent.inputs[0].type, new AddressType());
-        assert.deepEqual(depositEvent.inputs[1].type, new ListType(registry.getCustomType("EsdtTokenPayment")));
-        assert.deepEqual(depositEvent.inputs[2].type, registry.getCustomType("DepositEvent"));
+        assert.deepEqual(depositEvent.inputs[1].type, new ListType(abi.getCustomType("EsdtTokenPayment")));
+        assert.deepEqual(depositEvent.inputs[2].type, abi.getCustomType("DepositEvent"));
 
-        const setStatusEvent = registry.getEvent("setStatusEvent");
+        const setStatusEvent = abi.getEvent("setStatusEvent");
         assert.deepEqual(setStatusEvent.inputs[0].type, new U64Type());
         assert.deepEqual(setStatusEvent.inputs[1].type, new U64Type());
-        assert.deepEqual(setStatusEvent.inputs[2].type, registry.getCustomType("TransactionStatus"));
+        assert.deepEqual(setStatusEvent.inputs[2].type, abi.getCustomType("TransactionStatus"));
     });
 
     it("should load ABI explicit-enum", async () => {
-        const registry = await loadAbiRegistry("src/testdata/basic-features.abi.json");
+        const abi = await loadAbiRegistry("src/testdata/basic-features.abi.json");
 
-        const enumType = registry.getExplicitEnum("OperationCompletionStatus");
+        const enumType = abi.getExplicitEnum("OperationCompletionStatus");
 
         assert.deepEqual(enumType.variants[0].name, "completed");
 
@@ -203,9 +203,9 @@ describe("test abi registry", () => {
     });
 
     it("should load abi with title for endpoint", async () => {
-        const registry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
+        const abi = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
 
-        const endpoint = registry.getEndpoint("createLotteryPool");
+        const endpoint = abi.getEndpoint("createLotteryPool");
 
         assert.equal(endpoint.title, "Create lottery pool");
     });

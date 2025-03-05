@@ -1,4 +1,4 @@
-import { AbiRegistry, ArgSerializer, isTyped, NativeSerializer } from "../abi";
+import { Abi, ArgSerializer, isTyped, NativeSerializer } from "../abi";
 import { IAccount } from "../accounts/interfaces";
 import { Address } from "../core";
 import { Err, ErrSmartContractQuery } from "../core/errors";
@@ -19,9 +19,9 @@ export class SmartContractController {
     private transactionWatcher: TransactionWatcher;
     private txComputer: TransactionComputer;
     private networkProvider: INetworkProvider;
-    private abi?: AbiRegistry;
+    private abi?: Abi;
 
-    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: AbiRegistry }) {
+    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: Abi }) {
         this.factory = new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
             abi: options.abi,

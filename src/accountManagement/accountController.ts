@@ -1,16 +1,17 @@
 import { IAccount } from "../accounts/interfaces";
-import { Address } from "../core";
+import { Address, BaseController } from "../core";
 import { Transaction } from "../core/transaction";
 import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { AccountTransactionsFactory } from "./accountTransactionsFactory";
 import { SaveKeyValueInput, SetGuardianInput } from "./resources";
 
-export class AccountController {
+export class AccountController extends BaseController {
     private factory: AccountTransactionsFactory;
     private txComputer: TransactionComputer;
 
     constructor(options: { chainID: string }) {
+        super();
         this.factory = new AccountTransactionsFactory({
             config: new TransactionsFactoryConfig(options),
         });
@@ -27,6 +28,7 @@ export class AccountController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -42,6 +44,7 @@ export class AccountController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -55,6 +58,7 @@ export class AccountController {
         const transaction = this.factory.createTransactionForGuardingAccount(sender.address);
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -70,6 +74,7 @@ export class AccountController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;

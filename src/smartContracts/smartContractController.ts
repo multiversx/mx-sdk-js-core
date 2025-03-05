@@ -1,6 +1,6 @@
 import { Abi, ArgSerializer, isTyped, NativeSerializer } from "../abi";
 import { IAccount } from "../accounts/interfaces";
-import { Address } from "../core";
+import { Address, BaseController } from "../core";
 import { Err, ErrSmartContractQuery } from "../core/errors";
 import { SmartContractQuery, SmartContractQueryInput, SmartContractQueryResponse } from "../core/smartContractQuery";
 import { Transaction } from "../core/transaction";
@@ -13,7 +13,7 @@ import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomePa
 import * as resources from "./resources";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
 
-export class SmartContractController {
+export class SmartContractController extends BaseController {
     private factory: SmartContractTransactionsFactory;
     private parser: SmartContractTransactionsOutcomeParser;
     private transactionWatcher: TransactionWatcher;
@@ -22,6 +22,7 @@ export class SmartContractController {
     private abi?: Abi;
 
     constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: Abi }) {
+        super();
         this.factory = new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
             abi: options.abi,
@@ -43,6 +44,7 @@ export class SmartContractController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -67,6 +69,7 @@ export class SmartContractController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -82,6 +85,7 @@ export class SmartContractController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;

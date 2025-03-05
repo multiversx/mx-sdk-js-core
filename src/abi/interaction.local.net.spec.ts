@@ -27,14 +27,14 @@ describe("test smart contract interactor", function () {
     it("should interact with 'answer' (local testnet) using the SmartContractTransactionsFactory", async function () {
         this.timeout(80000);
 
-        let abiRegistry = await loadAbiRegistry("src/testdata/answer.abi.json");
+        let abi = await loadAbiRegistry("src/testdata/answer.abi.json");
 
         let network = await provider.getNetworkConfig();
 
         const config = new TransactionsFactoryConfig({ chainID: network.chainID });
         const factory = new SmartContractTransactionsFactory({
             config: config,
-            abi: abiRegistry,
+            abi: abi,
         });
 
         const bytecode = await promises.readFile("src/testdata/answer.wasm");
@@ -62,7 +62,7 @@ describe("test smart contract interactor", function () {
         const queryController = new SmartContractController({
             chainID: "localnet",
             networkProvider: provider,
-            abi: abiRegistry,
+            abi: abi,
         });
         let transactionOnNetwork = await transactionCompletionAwaiter.awaitCompleted(deployTxHash);
         let response = queryController.parseDeploy(transactionOnNetwork);
@@ -112,12 +112,12 @@ describe("test smart contract interactor", function () {
     it("should interact with 'basic-features' (local testnet)", async function () {
         this.timeout(140000);
 
-        let abiRegistry = await loadAbiRegistry("src/testdata/basic-features.abi.json");
-        let contract = new SmartContract({ abi: abiRegistry });
+        let abi = await loadAbiRegistry("src/testdata/basic-features.abi.json");
+        let contract = new SmartContract({ abi: abi });
         let controller = new SmartContractController({
             chainID: "localnet",
             networkProvider: provider,
-            abi: abiRegistry,
+            abi: abi,
         });
 
         let network = await provider.getNetworkConfig();
@@ -251,16 +251,16 @@ describe("test smart contract interactor", function () {
     it("should interact with 'counter' (local testnet) using the SmartContractTransactionsFactory", async function () {
         this.timeout(120000);
 
-        let abiRegistry = await loadAbiRegistry("src/testdata/counter.abi.json");
+        let abi = await loadAbiRegistry("src/testdata/counter.abi.json");
 
         let network = await provider.getNetworkConfig();
 
         const config = new TransactionsFactoryConfig({ chainID: network.chainID });
         const factory = new SmartContractTransactionsFactory({
             config: config,
-            abi: abiRegistry,
+            abi: abi,
         });
-        const parser = new SmartContractTransactionsOutcomeParser({ abi: abiRegistry });
+        const parser = new SmartContractTransactionsOutcomeParser({ abi: abi });
 
         const bytecode = await promises.readFile("src/testdata/counter.wasm");
         alice.nonce = (await provider.getAccount(alice.address)).nonce;
@@ -290,7 +290,7 @@ describe("test smart contract interactor", function () {
         const queryController = new SmartContractController({
             chainID: "localnet",
             networkProvider: provider,
-            abi: abiRegistry,
+            abi: abi,
         });
 
         let incrementTransaction = factory.createTransactionForExecute(alice.address, {
@@ -339,8 +339,8 @@ describe("test smart contract interactor", function () {
     it("should interact with 'lottery-esdt' (local testnet) using the SmartContractTransactionsFactory", async function () {
         this.timeout(140000);
 
-        let abiRegistry = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
-        let parser = new SmartContractTransactionsOutcomeParser({ abi: abiRegistry });
+        let abi = await loadAbiRegistry("src/testdata/lottery-esdt.abi.json");
+        let parser = new SmartContractTransactionsOutcomeParser({ abi: abi });
         alice.nonce = (await provider.getAccount(alice.address)).nonce;
 
         let network = await provider.getNetworkConfig();
@@ -348,7 +348,7 @@ describe("test smart contract interactor", function () {
         const config = new TransactionsFactoryConfig({ chainID: network.chainID });
         const factory = new SmartContractTransactionsFactory({
             config: config,
-            abi: abiRegistry,
+            abi: abi,
         });
 
         const bytecode = await promises.readFile("src/testdata/lottery-esdt.wasm");

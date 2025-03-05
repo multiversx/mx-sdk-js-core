@@ -1,4 +1,4 @@
-import { AbiRegistry } from "../abi";
+import { Abi } from "../abi";
 import { AccountController, AccountTransactionsFactory } from "../accountManagement";
 import { Account } from "../accounts";
 import { IAccount } from "../accounts/interfaces";
@@ -106,7 +106,7 @@ class NetworkEntrypoint {
         return new AccountTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: this.chainId }) });
     }
 
-    createSmartContractController(abi?: AbiRegistry): SmartContractController {
+    createSmartContractController(abi?: Abi): SmartContractController {
         return new SmartContractController({ chainID: this.chainId, networkProvider: this.networkProvider, abi });
     }
 

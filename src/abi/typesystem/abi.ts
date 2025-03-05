@@ -18,7 +18,7 @@ export class AbiRegistry {
     readonly customTypes: CustomType[] = [];
     readonly events: EventDefinition[] = [];
 
-    private constructor(options: {
+    protected constructor(options: {
         name: string;
         constructorDefinition: EndpointDefinition;
         upgradeConstructorDefinition?: EndpointDefinition;
@@ -239,4 +239,20 @@ function mapEvent(event: EventDefinition, mapper: TypeMapper): EventDefinition {
     );
 
     return new EventDefinition(event.identifier, newInputs);
+}
+
+export class Abi extends AbiRegistry {
+    /**
+     *
+     */
+    constructor(options: {
+        name: string;
+        constructorDefinition: EndpointDefinition;
+        upgradeConstructorDefinition?: EndpointDefinition;
+        endpoints: EndpointDefinition[];
+        customTypes: CustomType[];
+        events?: EventDefinition[];
+    }) {
+        super(options);
+    }
 }

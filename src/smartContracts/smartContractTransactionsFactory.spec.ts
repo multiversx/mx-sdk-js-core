@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { AbiRegistry, Code, U32Value } from "../abi";
+import { Abi, Code, U32Value } from "../abi";
 import { Address, Err, Token, TokenTransfer, TransactionsFactoryConfig } from "../core";
 import { loadAbiRegistry, loadContractCode } from "../testutils/utils";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
@@ -9,7 +9,7 @@ describe("test smart contract transactions factory", function () {
     let factory: SmartContractTransactionsFactory;
     let abiAwareFactory: SmartContractTransactionsFactory;
     let bytecode: Code;
-    let abi: AbiRegistry;
+    let abi: Abi;
 
     before(async function () {
         factory = new SmartContractTransactionsFactory({
@@ -427,7 +427,7 @@ describe("test smart contract transactions factory", function () {
     });
 
     it("should create 'Transaction' for upgrade, when ABI is available (with fallbacks)", async function () {
-        const abi = AbiRegistry.create({
+        const abi = Abi.create({
             upgradeConstructor: {
                 inputs: [
                     {

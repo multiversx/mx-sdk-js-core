@@ -11,7 +11,6 @@ import { SmartContract } from "./smartContract";
 import { Abi, OptionalValue, U32Value, U8Value, VariadicValue } from "./typesystem";
 import { BytesValue } from "./typesystem/bytes";
 
-// This will be deleted directly
 describe("test contract", () => {
     let provider = new MockNetworkProvider();
     let chainID = "test";

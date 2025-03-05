@@ -292,7 +292,6 @@ export class TokenManagementTransactionsFactory {
         options.addRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
         options.addRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
         options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
-        options.addRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -346,7 +345,7 @@ export class TokenManagementTransactionsFactory {
             "ESDTNFTCreate",
             ...this.argSerializer.valuesToStrings([
                 new StringValue(options.tokenIdentifier),
-                new BigUIntValue(options.initialQuantity),
+                new BigUIntValue(options.initialQuantity ?? 1n),
                 new StringValue(options.name),
                 new BigUIntValue(options.royalties),
                 new StringValue(options.hash),

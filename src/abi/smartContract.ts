@@ -29,6 +29,8 @@ interface IAbi {
 }
 
 /**
+ * * @deprecated component. Use "SmartContractTransactionsFactory" or "SmartContractController", instead.
+ *
  * An abstraction for deploying and interacting with Smart Contracts.
  */
 export class SmartContract implements ISmartContract {

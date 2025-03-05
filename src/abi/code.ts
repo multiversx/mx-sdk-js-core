@@ -2,6 +2,7 @@ const createHasher = require("blake2b");
 const CODE_HASH_LENGTH = 32;
 
 /**
+ * * @deprecated Use the bytecode directly
  * Bytecode of a Smart Contract, as an abstraction.
  */
 export class Code {

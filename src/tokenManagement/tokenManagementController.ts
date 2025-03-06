@@ -1,7 +1,6 @@
 import { IAccount } from "../accounts/interfaces";
 import { Address, BaseController } from "../core";
 import { Transaction } from "../core/transaction";
-import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionOnNetwork } from "../core/transactionOnNetwork";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { TransactionWatcher } from "../core/transactionWatcher";
@@ -13,7 +12,6 @@ import { TokenManagementTransactionsFactory } from "./tokenManagementTransaction
 export class TokenManagementController extends BaseController {
     private factory: TokenManagementTransactionsFactory;
     private transactionAwaiter: TransactionWatcher;
-    private txComputer: TransactionComputer;
     private parser: TokenManagementTransactionsOutcomeParser;
 
     constructor(options: { chainID: string; networkProvider: INetworkProvider }) {
@@ -22,7 +20,6 @@ export class TokenManagementController extends BaseController {
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
         });
         this.transactionAwaiter = new TransactionWatcher(options.networkProvider);
-        this.txComputer = new TransactionComputer();
         this.parser = new TokenManagementTransactionsOutcomeParser();
     }
 
@@ -37,7 +34,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -62,7 +59,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -87,7 +84,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -112,7 +109,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -137,7 +134,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -162,7 +159,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -187,7 +184,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -212,7 +209,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -240,7 +237,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -259,7 +256,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -287,7 +284,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -303,7 +300,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -328,7 +325,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -347,7 +344,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -375,7 +372,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -391,7 +388,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -416,7 +413,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -441,7 +438,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -466,7 +463,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -491,7 +488,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -516,7 +513,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -541,7 +538,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -566,7 +563,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -591,7 +588,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -616,7 +613,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -641,7 +638,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -666,7 +663,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -691,7 +688,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -716,7 +713,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -741,7 +738,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -766,7 +763,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -791,7 +788,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -816,7 +813,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -837,7 +834,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -862,7 +859,7 @@ export class TokenManagementController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.addExtraGasLimitIfRequired(transaction);
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }

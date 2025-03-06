@@ -137,9 +137,9 @@ describe("test token management transactions factory", () => {
             {
                 user: grace.address,
                 tokenIdentifier: "FRANK-11ce3e",
-                addRoleLocalMint: true,
-                addRoleLocalBurn: false,
-                addRoleESDTTransferRole: false,
+                localMintRole: true,
+                localBurnRole: false,
+                ESDTTransferRole: false,
             },
         );
 
@@ -154,15 +154,38 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.value, 0n);
     });
 
+    it("should create 'Transaction' for unsetting special role on fungible token", () => {
+        const transaction = tokenManagementFactory.createTransactionForUnsettingSpecialRoleOnFungibleToken(
+            frank.address,
+            {
+                user: grace.address,
+                tokenIdentifier: "FRANK-11ce3e",
+                localMintRole: true,
+                localBurnRole: false,
+                ESDTTransferRole: false,
+            },
+        );
+
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from(
+                "unSetSpecialRole@4652414e4b2d313163653365@1e8a8b6b49de5b7be10aaa158a5a6a4abb4b56cc08f524bb5e6cd5f211ad3e13@45534454526f6c654c6f63616c4d696e74",
+            ),
+        );
+        assert.deepEqual(transaction.sender, frank.address);
+        assert.deepEqual(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp));
+        assert.equal(transaction.value, 0n);
+    });
+
     it("should create 'Transaction' for setting all special roles on fungible token", () => {
         const transaction = tokenManagementFactory.createTransactionForSettingSpecialRoleOnFungibleToken(
             frank.address,
             {
                 user: grace.address,
                 tokenIdentifier: "FRANK-11ce3e",
-                addRoleLocalMint: true,
-                addRoleLocalBurn: true,
-                addRoleESDTTransferRole: true,
+                localMintRole: true,
+                localBurnRole: true,
+                ESDTTransferRole: true,
             },
         );
 
@@ -183,13 +206,13 @@ describe("test token management transactions factory", () => {
             {
                 user: grace.address,
                 tokenIdentifier: "FRANK-11ce3e",
-                addRoleNFTCreate: true,
-                addRoleNFTBurn: false,
-                addRoleNFTUpdateAttributes: true,
-                addRoleNFTAddURI: true,
-                addRoleESDTTransferRole: false,
-                addRoleESDTModifyCreator: true,
-                addRoleNFTRecreate: true,
+                NFTCreateRole: true,
+                NFTBurnRole: false,
+                NFTUpdateAttributesRole: true,
+                NFTAddURIRole: true,
+                ESDTTransferRole: false,
+                ESDTModifyCreatorRole: true,
+                NFTRecreateRole: true,
             },
         );
 
@@ -197,6 +220,33 @@ describe("test token management transactions factory", () => {
             transaction.data,
             Buffer.from(
                 "setSpecialRole@4652414e4b2d313163653365@1e8a8b6b49de5b7be10aaa158a5a6a4abb4b56cc08f524bb5e6cd5f211ad3e13@45534454526f6c654e4654437265617465@45534454526f6c654e465455706461746541747472696275746573@45534454526f6c654e4654416464555249@45534454526f6c654d6f6469667943726561746f72@45534454526f6c654e46545265637265617465",
+            ),
+        );
+        assert.deepEqual(transaction.sender, frank.address);
+        assert.deepEqual(transaction.receiver, Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, config.addressHrp));
+        assert.equal(transaction.value, 0n);
+    });
+
+    it("should create 'Transaction' for unsetting special role on non-fungible token", () => {
+        const transaction = tokenManagementFactory.createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
+            frank.address,
+            {
+                user: grace.address,
+                tokenIdentifier: "FRANK-11ce3e",
+                NFTCreateRole: true,
+                NFTBurnRole: false,
+                NFTUpdateAttributesRole: true,
+                NFTAddURIRole: true,
+                ESDTTransferRole: false,
+                ESDTModifyCreatorRole: true,
+                NFTRecreateRole: true,
+            },
+        );
+
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from(
+                "unSetSpecialRole@4652414e4b2d313163653365@1e8a8b6b49de5b7be10aaa158a5a6a4abb4b56cc08f524bb5e6cd5f211ad3e13@45534454526f6c654e4654437265617465@45534454526f6c654e465455706461746541747472696275746573@45534454526f6c654e4654416464555249@45534454526f6c654d6f6469667943726561746f72@45534454526f6c654e46545265637265617465",
             ),
         );
         assert.deepEqual(transaction.sender, frank.address);

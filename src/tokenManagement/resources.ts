@@ -21,31 +21,31 @@ export type IssueInput = {
 export type FungibleSpecialRoleInput = {
     user: Address;
     tokenIdentifier: string;
-    addRoleLocalMint: boolean;
-    addRoleLocalBurn: boolean;
-    addRoleESDTTransferRole: boolean;
+    localMintRole: boolean;
+    localBurnRole: boolean;
+    ESDTTransferRole: boolean;
 };
 export type SemiFungibleSpecialRoleInput = {
     user: Address;
     tokenIdentifier: string;
-    addRoleNFTCreate: boolean;
-    addRoleNFTBurn: boolean;
-    addRoleNFTAddQuantity: boolean;
-    addRoleESDTTransferRole: boolean;
+    NFTCreateRole: boolean;
+    NFTBurnRole: boolean;
+    NFTAddQuantityRole: boolean;
+    ESDTTransferRole: boolean;
 };
 
 export type SpecialRoleInput = {
     user: Address;
     tokenIdentifier: string;
-    addRoleNFTCreate: boolean;
-    addRoleNFTBurn: boolean;
-    addRoleNFTUpdateAttributes: boolean;
-    addRoleNFTAddURI: boolean;
-    addRoleESDTTransferRole: boolean;
-    addRoleESDTModifyCreator?: boolean;
-    addRoleNFTRecreate?: boolean;
-    addRoleESDTSetNewURI?: boolean;
-    addRoleESDTModifyRoyalties?: boolean;
+    NFTCreateRole: boolean;
+    NFTBurnRole: boolean;
+    NFTUpdateAttributesRole: boolean;
+    NFTAddURIRole: boolean;
+    ESDTTransferRole: boolean;
+    ESDTModifyCreatorRole?: boolean;
+    NFTRecreateRole?: boolean;
+    ESDTSetNewURIRole?: boolean;
+    ESDTModifyRoyaltiesRole?: boolean;
 };
 
 export type MintInput = {

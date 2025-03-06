@@ -1,16 +1,17 @@
 import { IAccount } from "../accounts/interfaces";
-import { Address } from "../core";
+import { Address, BaseController } from "../core";
 import { Transaction } from "../core/transaction";
 import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import * as resources from "./resources";
 import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 
-export class TransfersController {
+export class TransfersController extends BaseController {
     private factory: TransferTransactionsFactory;
     private txComputer: TransactionComputer;
 
     constructor(options: { chainID: string }) {
+        super();
         this.factory = new TransferTransactionsFactory({ config: new TransactionsFactoryConfig(options) });
         this.txComputer = new TransactionComputer();
     }
@@ -25,6 +26,7 @@ export class TransfersController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -40,6 +42,7 @@ export class TransfersController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;
@@ -55,6 +58,7 @@ export class TransfersController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
         transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
 
         return transaction;

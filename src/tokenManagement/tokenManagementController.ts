@@ -226,7 +226,7 @@ export class TokenManagementController extends BaseController {
         return this.parser.parseSetSpecialRole(transactionOnNetwork);
     }
 
-    async createTransactionForunsettingSpecialRoleOnFungibleToken(
+    async createTransactionForUnsettingSpecialRoleOnFungibleToken(
         sender: IAccount,
         nonce: bigint,
         options: resources.FungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },

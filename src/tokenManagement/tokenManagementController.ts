@@ -226,6 +226,25 @@ export class TokenManagementController extends BaseController {
         return this.parser.parseSetSpecialRole(transactionOnNetwork);
     }
 
+    async createTransactionForUnsettingSpecialRoleOnFungibleToken(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.UnsetFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnFungibleToken(
+            sender.address,
+            options,
+        );
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
     async createTransactionForSettingSpecialRoleOnSemiFungibleToken(
         sender: IAccount,
         nonce: bigint,
@@ -254,6 +273,66 @@ export class TokenManagementController extends BaseController {
         return this.parser.parseSetSpecialRole(transactionOnNetwork);
     }
 
+    async createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.UnsetSemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
+            sender.address,
+            options,
+        );
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async createTransactionForSettingSpecialRoleOnMetaESDT(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.SemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForSettingSpecialRoleOnMetaESDT(sender.address, options);
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
+    async awaitCompletedSetSpecialRoleOnMetaESDTToken(txHash: string): Promise<resources.SpecialRoleOutput[]> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.parseSetSpecialRoleOnSemiFungibleToken(transaction);
+    }
+
+    parseSetSpecialRoleOnMetaESDTToken(transactionOnNetwork: TransactionOnNetwork): resources.SpecialRoleOutput[] {
+        return this.parser.parseSetSpecialRole(transactionOnNetwork);
+    }
+
+    async createTransactionForUnsettingSpecialRoleOnMetaESDT(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.UnsetSemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnMetaESDT(sender.address, options);
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
+    }
+
     async createTransactionForSettingSpecialRoleOnNonFungibleToken(
         sender: IAccount,
         nonce: bigint,
@@ -280,6 +359,25 @@ export class TokenManagementController extends BaseController {
 
     parseSetSpecialRoleOnNonFungibleToken(transactionOnNetwork: TransactionOnNetwork): resources.SpecialRoleOutput[] {
         return this.parser.parseSetSpecialRole(transactionOnNetwork);
+    }
+
+    async createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.UnsetSpecialRoleInput & { guardian?: Address; relayer?: Address },
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
+            sender.address,
+            options,
+        );
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+
+        return transaction;
     }
 
     async createTransactionForCreatingNft(

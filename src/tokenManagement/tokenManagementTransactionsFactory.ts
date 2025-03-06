@@ -282,6 +282,28 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
+    createTransactionForUnsettingSpecialRoleOnFungibleToken(
+        sender: Address,
+        options: resources.UnsetFungibleSpecialRoleInput,
+    ): Transaction {
+        const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
+
+        options.removeRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
+        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
+        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+
+        const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: sender,
+            receiver: this.esdtContractAddress,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitSetSpecialRole,
+            addDataMovementGas: true,
+        }).build();
+    }
+
     createTransactionForSettingSpecialRoleOnSemiFungibleToken(
         sender: Address,
         options: resources.SemiFungibleSpecialRoleInput,
@@ -305,11 +327,40 @@ export class TokenManagementTransactionsFactory {
         }).build();
     }
 
+    createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
+        sender: Address,
+        options: resources.UnsetSemiFungibleSpecialRoleInput,
+    ): Transaction {
+        const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
+
+        options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
+        options.removeRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
+        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+
+        const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: sender,
+            receiver: this.esdtContractAddress,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitSetSpecialRole,
+            addDataMovementGas: true,
+        }).build();
+    }
+
     createTransactionForSettingSpecialRoleOnMetaESDT(
         sender: Address,
         options: resources.SemiFungibleSpecialRoleInput,
     ): Transaction {
         return this.createTransactionForSettingSpecialRoleOnSemiFungibleToken(sender, options);
+    }
+
+    createTransactionForUnsettingSpecialRoleOnMetaESDT(
+        sender: Address,
+        options: resources.UnsetSemiFungibleSpecialRoleInput,
+    ): Transaction {
+        return this.createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(sender, options);
     }
 
     createTransactionForSettingSpecialRoleOnNonFungibleToken(
@@ -329,6 +380,33 @@ export class TokenManagementTransactionsFactory {
         options.addRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: sender,
+            receiver: this.esdtContractAddress,
+            dataParts: dataParts,
+            gasLimit: this.config.gasLimitSetSpecialRole,
+            addDataMovementGas: true,
+        }).build();
+    }
+
+    createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
+        sender: Address,
+        options: resources.UnsetSpecialRoleInput,
+    ): Transaction {
+        const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
+
+        options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
+        options.removeRoleNFTUpdateAttributes ? args.push(new StringValue("ESDTRoleNFTUpdateAttributes")) : 0;
+        options.removeRoleNFTAddURI ? args.push(new StringValue("ESDTRoleNFTAddURI")) : 0;
+        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        options.removeRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
+        options.removeRoleNFTRecreate ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
+        options.removeRoleESDTSetNewURI ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
+        options.removeRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
+
+        const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
         return new TransactionBuilder({
             config: this.config,

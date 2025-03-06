@@ -48,6 +48,34 @@ export type SpecialRoleInput = {
     addRoleESDTModifyRoyalties?: boolean;
 };
 
+export type UnsetFungibleSpecialRoleInput = {
+    user: Address;
+    tokenIdentifier: string;
+    removeRoleLocalMint: boolean;
+    removeRoleLocalBurn: boolean;
+    removeRoleESDTTransferRole: boolean;
+};
+export type UnsetSemiFungibleSpecialRoleInput = {
+    user: Address;
+    tokenIdentifier: string;
+    removeRoleNFTBurn: boolean;
+    removeRoleNFTAddQuantity: boolean;
+    removeRoleESDTTransferRole: boolean;
+};
+
+export type UnsetSpecialRoleInput = {
+    user: Address;
+    tokenIdentifier: string;
+    removeRoleNFTBurn: boolean;
+    removeRoleNFTUpdateAttributes: boolean;
+    removeRoleNFTAddURI: boolean;
+    removeRoleESDTTransferRole: boolean;
+    removeRoleESDTModifyCreator?: boolean;
+    removeRoleNFTRecreate?: boolean;
+    removeRoleESDTSetNewURI?: boolean;
+    removeRoleESDTModifyRoyalties?: boolean;
+};
+
 export type MintInput = {
     tokenIdentifier: string;
     initialQuantity: bigint;

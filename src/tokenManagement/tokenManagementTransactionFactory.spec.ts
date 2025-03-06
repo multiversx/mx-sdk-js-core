@@ -137,9 +137,9 @@ describe("test token management transactions factory", () => {
             {
                 user: grace.address,
                 tokenIdentifier: "FRANK-11ce3e",
-                localMintRole: true,
-                localBurnRole: false,
-                ESDTTransferRole: false,
+                addRoleLocalMint: true,
+                addRoleLocalBurn: false,
+                addRoleESDTTransferRole: false,
             },
         );
 
@@ -160,9 +160,9 @@ describe("test token management transactions factory", () => {
             {
                 user: grace.address,
                 tokenIdentifier: "FRANK-11ce3e",
-                localMintRole: true,
-                localBurnRole: false,
-                ESDTTransferRole: false,
+                removeRoleLocalMint: true,
+                removeRoleLocalBurn: false,
+                removeRoleESDTTransferRole: false,
             },
         );
 
@@ -183,9 +183,9 @@ describe("test token management transactions factory", () => {
             {
                 user: grace.address,
                 tokenIdentifier: "FRANK-11ce3e",
-                localMintRole: true,
-                localBurnRole: true,
-                ESDTTransferRole: true,
+                addRoleLocalMint: true,
+                addRoleLocalBurn: true,
+                addRoleESDTTransferRole: true,
             },
         );
 
@@ -206,13 +206,13 @@ describe("test token management transactions factory", () => {
             {
                 user: grace.address,
                 tokenIdentifier: "FRANK-11ce3e",
-                NFTCreateRole: true,
-                NFTBurnRole: false,
-                NFTUpdateAttributesRole: true,
-                NFTAddURIRole: true,
-                ESDTTransferRole: false,
-                ESDTModifyCreatorRole: true,
-                NFTRecreateRole: true,
+                addRoleNFTCreate: true,
+                addRoleNFTBurn: false,
+                addRoleNFTUpdateAttributes: true,
+                addRoleNFTAddURI: true,
+                addRoleESDTTransferRole: false,
+                addRoleESDTModifyCreator: true,
+                addRoleNFTRecreate: true,
             },
         );
 
@@ -233,13 +233,13 @@ describe("test token management transactions factory", () => {
             {
                 user: grace.address,
                 tokenIdentifier: "FRANK-11ce3e",
-                NFTCreateRole: true,
-                NFTBurnRole: false,
-                NFTUpdateAttributesRole: true,
-                NFTAddURIRole: true,
-                ESDTTransferRole: false,
-                ESDTModifyCreatorRole: true,
-                NFTRecreateRole: true,
+                removeRoleNFTCreate: true,
+                removeRoleNFTBurn: false,
+                removeRoleNFTUpdateAttributes: true,
+                removeRoleNFTAddURI: true,
+                removeRoleESDTTransferRole: false,
+                removeRoleESDTModifyCreator: true,
+                removeRoleNFTRecreate: true,
             },
         );
 

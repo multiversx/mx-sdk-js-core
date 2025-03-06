@@ -229,7 +229,7 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUnsettingSpecialRoleOnFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.FungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.UnsetFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnFungibleToken(
             sender.address,
@@ -276,7 +276,7 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.UnsetSemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
             sender.address,
@@ -320,7 +320,7 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUnsettingSpecialRoleOnMetaESDT(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.UnsetSemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnMetaESDT(sender.address, options);
 
@@ -364,7 +364,7 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.UnsetSpecialRoleInput & { guardian?: Address; relayer?: Address },
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
             sender.address,

@@ -21,31 +21,61 @@ export type IssueInput = {
 export type FungibleSpecialRoleInput = {
     user: Address;
     tokenIdentifier: string;
-    localMintRole: boolean;
-    localBurnRole: boolean;
-    ESDTTransferRole: boolean;
+    addRoleLocalMint: boolean;
+    addRoleLocalBurn: boolean;
+    addRoleESDTTransferRole: boolean;
 };
 export type SemiFungibleSpecialRoleInput = {
     user: Address;
     tokenIdentifier: string;
-    NFTCreateRole: boolean;
-    NFTBurnRole: boolean;
-    NFTAddQuantityRole: boolean;
-    ESDTTransferRole: boolean;
+    addRoleNFTCreate: boolean;
+    addRoleNFTBurn: boolean;
+    addRoleNFTAddQuantity: boolean;
+    addRoleESDTTransferRole: boolean;
 };
 
 export type SpecialRoleInput = {
     user: Address;
     tokenIdentifier: string;
-    NFTCreateRole: boolean;
-    NFTBurnRole: boolean;
-    NFTUpdateAttributesRole: boolean;
-    NFTAddURIRole: boolean;
-    ESDTTransferRole: boolean;
-    ESDTModifyCreatorRole?: boolean;
-    NFTRecreateRole?: boolean;
-    ESDTSetNewURIRole?: boolean;
-    ESDTModifyRoyaltiesRole?: boolean;
+    addRoleNFTCreate: boolean;
+    addRoleNFTBurn: boolean;
+    addRoleNFTUpdateAttributes: boolean;
+    addRoleNFTAddURI: boolean;
+    addRoleESDTTransferRole: boolean;
+    addRoleESDTModifyCreator?: boolean;
+    addRoleNFTRecreate?: boolean;
+    addRoleESDTSetNewURI?: boolean;
+    addRoleESDTModifyRoyalties?: boolean;
+};
+
+export type UnsetFungibleSpecialRoleInput = {
+    user: Address;
+    tokenIdentifier: string;
+    removeRoleLocalMint: boolean;
+    removeRoleLocalBurn: boolean;
+    removeRoleESDTTransferRole: boolean;
+};
+export type UnsetSemiFungibleSpecialRoleInput = {
+    user: Address;
+    tokenIdentifier: string;
+    removeRoleNFTCreate: boolean;
+    removeRoleNFTBurn: boolean;
+    removeRoleNFTAddQuantity: boolean;
+    removeRoleESDTTransferRole: boolean;
+};
+
+export type UnsetSpecialRoleInput = {
+    user: Address;
+    tokenIdentifier: string;
+    removeRoleNFTCreate: boolean;
+    removeRoleNFTBurn: boolean;
+    removeRoleNFTUpdateAttributes: boolean;
+    removeRoleNFTAddURI: boolean;
+    removeRoleESDTTransferRole: boolean;
+    removeRoleESDTModifyCreator?: boolean;
+    removeRoleNFTRecreate?: boolean;
+    removeRoleESDTSetNewURI?: boolean;
+    removeRoleESDTModifyRoyalties?: boolean;
 };
 
 export type MintInput = {

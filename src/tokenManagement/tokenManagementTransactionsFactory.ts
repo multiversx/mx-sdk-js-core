@@ -266,9 +266,9 @@ export class TokenManagementTransactionsFactory {
     ): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.localMintRole ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
-        options.localBurnRole ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
-        options.ESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        options.addRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
+        options.addRoleLocalBurn ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
+        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -284,13 +284,13 @@ export class TokenManagementTransactionsFactory {
 
     createTransactionForUnsettingSpecialRoleOnFungibleToken(
         sender: Address,
-        options: resources.FungibleSpecialRoleInput,
+        options: resources.UnsetFungibleSpecialRoleInput,
     ): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.localMintRole ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
-        options.localBurnRole ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
-        options.ESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        options.removeRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
+        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
+        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
 
         const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -310,10 +310,10 @@ export class TokenManagementTransactionsFactory {
     ): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.NFTCreateRole ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
-        options.NFTBurnRole ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
-        options.NFTAddQuantityRole ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
-        options.ESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        options.addRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
+        options.addRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
+        options.addRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
+        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -329,14 +329,14 @@ export class TokenManagementTransactionsFactory {
 
     createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
         sender: Address,
-        options: resources.SemiFungibleSpecialRoleInput,
+        options: resources.UnsetSemiFungibleSpecialRoleInput,
     ): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.NFTCreateRole ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
-        options.NFTBurnRole ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
-        options.NFTAddQuantityRole ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
-        options.ESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        options.removeRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
+        options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
+        options.removeRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
+        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
 
         const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -359,7 +359,7 @@ export class TokenManagementTransactionsFactory {
 
     createTransactionForUnsettingSpecialRoleOnMetaESDT(
         sender: Address,
-        options: resources.SemiFungibleSpecialRoleInput,
+        options: resources.UnsetSemiFungibleSpecialRoleInput,
     ): Transaction {
         return this.createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(sender, options);
     }
@@ -370,15 +370,15 @@ export class TokenManagementTransactionsFactory {
     ): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.NFTCreateRole ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
-        options.NFTBurnRole ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
-        options.NFTUpdateAttributesRole ? args.push(new StringValue("ESDTRoleNFTUpdateAttributes")) : 0;
-        options.NFTAddURIRole ? args.push(new StringValue("ESDTRoleNFTAddURI")) : 0;
-        options.ESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
-        options.ESDTModifyCreatorRole ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
-        options.NFTRecreateRole ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
-        options.ESDTSetNewURIRole ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
-        options.ESDTModifyRoyaltiesRole ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
+        options.addRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
+        options.addRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
+        options.addRoleNFTUpdateAttributes ? args.push(new StringValue("ESDTRoleNFTUpdateAttributes")) : 0;
+        options.addRoleNFTAddURI ? args.push(new StringValue("ESDTRoleNFTAddURI")) : 0;
+        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        options.addRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
+        options.addRoleNFTRecreate ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
+        options.addRoleESDTSetNewURI ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
+        options.addRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -394,19 +394,19 @@ export class TokenManagementTransactionsFactory {
 
     createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
         sender: Address,
-        options: resources.SpecialRoleInput,
+        options: resources.UnsetSpecialRoleInput,
     ): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.NFTCreateRole ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
-        options.NFTBurnRole ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
-        options.NFTUpdateAttributesRole ? args.push(new StringValue("ESDTRoleNFTUpdateAttributes")) : 0;
-        options.NFTAddURIRole ? args.push(new StringValue("ESDTRoleNFTAddURI")) : 0;
-        options.ESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
-        options.ESDTModifyCreatorRole ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
-        options.NFTRecreateRole ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
-        options.ESDTSetNewURIRole ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
-        options.ESDTModifyRoyaltiesRole ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
+        options.removeRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
+        options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
+        options.removeRoleNFTUpdateAttributes ? args.push(new StringValue("ESDTRoleNFTUpdateAttributes")) : 0;
+        options.removeRoleNFTAddURI ? args.push(new StringValue("ESDTRoleNFTAddURI")) : 0;
+        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        options.removeRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
+        options.removeRoleNFTRecreate ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
+        options.removeRoleESDTSetNewURI ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
+        options.removeRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
 
         const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 

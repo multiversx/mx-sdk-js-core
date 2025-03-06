@@ -333,7 +333,6 @@ export class TokenManagementTransactionsFactory {
     ): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.removeRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
         options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
         options.removeRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
         options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
@@ -398,7 +397,6 @@ export class TokenManagementTransactionsFactory {
     ): Transaction {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.removeRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
         options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
         options.removeRoleNFTUpdateAttributes ? args.push(new StringValue("ESDTRoleNFTUpdateAttributes")) : 0;
         options.removeRoleNFTAddURI ? args.push(new StringValue("ESDTRoleNFTAddURI")) : 0;

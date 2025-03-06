@@ -58,7 +58,6 @@ export type UnsetFungibleSpecialRoleInput = {
 export type UnsetSemiFungibleSpecialRoleInput = {
     user: Address;
     tokenIdentifier: string;
-    removeRoleNFTCreate: boolean;
     removeRoleNFTBurn: boolean;
     removeRoleNFTAddQuantity: boolean;
     removeRoleESDTTransferRole: boolean;
@@ -67,7 +66,6 @@ export type UnsetSemiFungibleSpecialRoleInput = {
 export type UnsetSpecialRoleInput = {
     user: Address;
     tokenIdentifier: string;
-    removeRoleNFTCreate: boolean;
     removeRoleNFTBurn: boolean;
     removeRoleNFTUpdateAttributes: boolean;
     removeRoleNFTAddURI: boolean;

@@ -233,7 +233,6 @@ describe("test token management transactions factory", () => {
             {
                 user: grace.address,
                 tokenIdentifier: "FRANK-11ce3e",
-                removeRoleNFTCreate: true,
                 removeRoleNFTBurn: false,
                 removeRoleNFTUpdateAttributes: true,
                 removeRoleNFTAddURI: true,
@@ -246,7 +245,7 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(
             transaction.data,
             Buffer.from(
-                "unSetSpecialRole@4652414e4b2d313163653365@1e8a8b6b49de5b7be10aaa158a5a6a4abb4b56cc08f524bb5e6cd5f211ad3e13@45534454526f6c654e4654437265617465@45534454526f6c654e465455706461746541747472696275746573@45534454526f6c654e4654416464555249@45534454526f6c654d6f6469667943726561746f72@45534454526f6c654e46545265637265617465",
+                "unSetSpecialRole@4652414e4b2d313163653365@1e8a8b6b49de5b7be10aaa158a5a6a4abb4b56cc08f524bb5e6cd5f211ad3e13@45534454526f6c654e465455706461746541747472696275746573@45534454526f6c654e4654416464555249@45534454526f6c654d6f6469667943726561746f72@45534454526f6c654e46545265637265617465",
             ),
         );
         assert.deepEqual(transaction.sender, frank.address);

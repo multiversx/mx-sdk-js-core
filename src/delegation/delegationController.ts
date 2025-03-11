@@ -1,7 +1,6 @@
 import { IAccount } from "../accounts/interfaces";
-import { Address } from "../core";
+import { Address, BaseController } from "../core";
 import { Transaction } from "../core/transaction";
-import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionOnNetwork } from "../core/transactionOnNetwork";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { TransactionWatcher } from "../core/transactionWatcher";
@@ -10,19 +9,18 @@ import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
 import { DelegationTransactionsOutcomeParser } from "./delegationTransactionsOutcomeParser";
 import * as resources from "./resources";
 
-export class DelegationController {
+export class DelegationController extends BaseController {
     private transactionAwaiter: TransactionWatcher;
     private factory: DelegationTransactionsFactory;
     private parser: DelegationTransactionsOutcomeParser;
-    private txComputer: TransactionComputer;
 
     constructor(options: { chainID: string; networkProvider: INetworkProvider }) {
+        super();
         this.transactionAwaiter = new TransactionWatcher(options.networkProvider);
         this.factory = new DelegationTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
         });
         this.parser = new DelegationTransactionsOutcomeParser();
-        this.txComputer = new TransactionComputer();
     }
 
     async createTransactionForNewDelegationContract(
@@ -35,7 +33,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -59,7 +58,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -74,7 +74,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -89,7 +90,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -104,7 +106,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -119,7 +122,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -134,7 +138,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -149,7 +154,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -164,7 +170,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -179,7 +186,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -194,7 +202,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -212,7 +221,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -230,7 +240,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -245,7 +256,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -260,7 +272,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -275,7 +288,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -290,7 +304,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -305,7 +320,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -321,7 +337,8 @@ export class DelegationController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
 
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }

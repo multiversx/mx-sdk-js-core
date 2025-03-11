@@ -1,4 +1,4 @@
-import { AbiRegistry } from "../abi";
+import { Abi } from "../abi";
 import { AccountController, AccountTransactionsFactory } from "../accountManagement";
 import { Account } from "../accounts";
 import { IAccount } from "../accounts/interfaces";
@@ -12,8 +12,6 @@ import { TransactionWatcher } from "../core/transactionWatcher";
 import { DelegationController, DelegationTransactionsFactory } from "../delegation";
 import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
 import { INetworkProvider } from "../networkProviders/interface";
-import { RelayedTransactionsFactory } from "../relayed";
-import { RelayedController } from "../relayed/relayedController";
 import { SmartContractTransactionsFactory } from "../smartContracts";
 import { SmartContractController } from "../smartContracts/smartContractController";
 import { TokenManagementController, TokenManagementTransactionsFactory } from "../tokenManagement";
@@ -108,15 +106,7 @@ class NetworkEntrypoint {
         return new AccountTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: this.chainId }) });
     }
 
-    createRelayedController(): RelayedController {
-        return new RelayedController({ chainID: this.chainId });
-    }
-
-    createRelayedTransactionsFactory(): RelayedTransactionsFactory {
-        return new RelayedTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: this.chainId }) });
-    }
-
-    createSmartContractController(abi?: AbiRegistry): SmartContractController {
+    createSmartContractController(abi?: Abi): SmartContractController {
         return new SmartContractController({ chainID: this.chainId, networkProvider: this.networkProvider, abi });
     }
 

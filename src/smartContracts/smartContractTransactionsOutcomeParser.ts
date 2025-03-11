@@ -1,4 +1,4 @@
-import { AbiRegistry, ArgSerializer } from "../abi";
+import { Abi, ArgSerializer } from "../abi";
 import { Address } from "../core/address";
 import { ARGUMENTS_SEPARATOR } from "../core/constants";
 import { Err } from "../core/errors";
@@ -14,33 +14,19 @@ enum Events {
 }
 
 export class SmartContractTransactionsOutcomeParser {
-    private readonly abi?: AbiRegistry;
+    private readonly abi?: Abi;
 
-    constructor(options?: { abi?: AbiRegistry }) {
+    constructor(options?: { abi?: Abi }) {
         this.abi = options?.abi;
     }
 
-    parseDeploy(options: { transactionOnNetwork: TransactionOnNetwork }): {
-        returnCode: string;
-        returnMessage: string;
-        contracts: {
-            address: string;
-            ownerAddress: string;
-            codeHash: Uint8Array;
-        }[];
-    } {
+    parseDeploy(options: { transactionOnNetwork: TransactionOnNetwork }): resources.SmartContractDeployOutcome {
         return this.parseDeployGivenTransactionOnNetwork(options.transactionOnNetwork);
     }
 
-    protected parseDeployGivenTransactionOnNetwork(transactionOnNetwork: TransactionOnNetwork): {
-        returnCode: string;
-        returnMessage: string;
-        contracts: {
-            address: string;
-            ownerAddress: string;
-            codeHash: Uint8Array;
-        }[];
-    } {
+    protected parseDeployGivenTransactionOnNetwork(
+        transactionOnNetwork: TransactionOnNetwork,
+    ): resources.SmartContractDeployOutcome {
         const directCallOutcome = this.findDirectSmartContractCallOutcome(transactionOnNetwork);
 
         const events = transactionOnNetwork.logs.events
@@ -61,15 +47,15 @@ export class SmartContractTransactionsOutcomeParser {
     }
 
     private parseScDeployEvent(event: { topics: Uint8Array[] }): {
-        address: string;
-        ownerAddress: string;
+        address: Address;
+        ownerAddress: Address;
         codeHash: Uint8Array;
     } {
         const topicForAddress = Buffer.from(event.topics[0]).toString("hex");
         const topicForOwnerAddress = Buffer.from(event.topics[1]).toString("hex");
         const topicForCodeHash = Buffer.from(event.topics[2]);
-        const address = topicForAddress?.length ? new Address(topicForAddress).toBech32() : "";
-        const ownerAddress = topicForOwnerAddress?.length ? new Address(topicForOwnerAddress).toBech32() : "";
+        const address = topicForAddress?.length ? new Address(topicForAddress) : Address.empty();
+        const ownerAddress = topicForOwnerAddress?.length ? new Address(topicForOwnerAddress) : Address.empty();
         const codeHash = topicForCodeHash;
 
         return {

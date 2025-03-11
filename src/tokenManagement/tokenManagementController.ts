@@ -1,7 +1,6 @@
 import { IAccount } from "../accounts/interfaces";
-import { Address } from "../core";
+import { Address, BaseController } from "../core";
 import { Transaction } from "../core/transaction";
-import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionOnNetwork } from "../core/transactionOnNetwork";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { TransactionWatcher } from "../core/transactionWatcher";
@@ -10,18 +9,17 @@ import { TokenManagementTransactionsOutcomeParser } from "../transactionsOutcome
 import * as resources from "./resources";
 import { TokenManagementTransactionsFactory } from "./tokenManagementTransactionsFactory";
 
-export class TokenManagementController {
+export class TokenManagementController extends BaseController {
     private factory: TokenManagementTransactionsFactory;
     private transactionAwaiter: TransactionWatcher;
-    private txComputer: TransactionComputer;
     private parser: TokenManagementTransactionsOutcomeParser;
 
     constructor(options: { chainID: string; networkProvider: INetworkProvider }) {
+        super();
         this.factory = new TokenManagementTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
         });
         this.transactionAwaiter = new TransactionWatcher(options.networkProvider);
-        this.txComputer = new TransactionComputer();
         this.parser = new TokenManagementTransactionsOutcomeParser();
     }
 
@@ -35,7 +33,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -59,7 +58,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -83,7 +83,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -107,7 +108,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -131,7 +133,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -155,7 +158,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -179,7 +183,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -203,7 +208,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -215,6 +221,25 @@ export class TokenManagementController {
 
     parseSetSpecialRoleOnFungible(transactionOnNetwork: TransactionOnNetwork): resources.SpecialRoleOutput[] {
         return this.parser.parseSetSpecialRole(transactionOnNetwork);
+    }
+
+    async createTransactionForUnsettingSpecialRoleOnFungibleToken(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.UnsetFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnFungibleToken(
+            sender.address,
+            options,
+        );
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
+
+        return transaction;
     }
 
     async createTransactionForSettingSpecialRoleOnSemiFungibleToken(
@@ -230,7 +255,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -242,6 +268,66 @@ export class TokenManagementController {
 
     parseSetSpecialRoleOnSemiFungibleToken(transactionOnNetwork: TransactionOnNetwork): resources.SpecialRoleOutput[] {
         return this.parser.parseSetSpecialRole(transactionOnNetwork);
+    }
+
+    async createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.UnsetSemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
+            sender.address,
+            options,
+        );
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
+
+        return transaction;
+    }
+
+    async createTransactionForSettingSpecialRoleOnMetaESDT(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.SemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForSettingSpecialRoleOnMetaESDT(sender.address, options);
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
+
+        return transaction;
+    }
+
+    async awaitCompletedSetSpecialRoleOnMetaESDTToken(txHash: string): Promise<resources.SpecialRoleOutput[]> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.parseSetSpecialRoleOnSemiFungibleToken(transaction);
+    }
+
+    parseSetSpecialRoleOnMetaESDTToken(transactionOnNetwork: TransactionOnNetwork): resources.SpecialRoleOutput[] {
+        return this.parser.parseSetSpecialRole(transactionOnNetwork);
+    }
+
+    async createTransactionForUnsettingSpecialRoleOnMetaESDT(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.UnsetSemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnMetaESDT(sender.address, options);
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
+
+        return transaction;
     }
 
     async createTransactionForSettingSpecialRoleOnNonFungibleToken(
@@ -257,7 +343,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -271,6 +358,25 @@ export class TokenManagementController {
         return this.parser.parseSetSpecialRole(transactionOnNetwork);
     }
 
+    async createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.UnsetSpecialRoleInput & { guardian?: Address; relayer?: Address },
+    ): Promise<Transaction> {
+        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
+            sender.address,
+            options,
+        );
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
+
+        return transaction;
+    }
+
     async createTransactionForCreatingNft(
         sender: IAccount,
         nonce: bigint,
@@ -281,7 +387,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -305,7 +412,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -329,7 +437,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -353,7 +462,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -377,7 +487,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -401,7 +512,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -425,7 +537,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -449,7 +562,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -473,7 +587,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -497,7 +612,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -521,7 +637,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -545,7 +662,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -569,7 +687,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -593,7 +712,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -617,7 +737,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -641,7 +762,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -665,7 +787,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -689,7 +812,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -709,7 +833,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -733,7 +858,8 @@ export class TokenManagementController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }

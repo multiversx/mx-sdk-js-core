@@ -1,3 +1,4 @@
+import { TokenType } from "../core";
 import { Address } from "../core/address";
 
 export type IssueFungibleInput = IssueInput & { initialSupply: bigint; numDecimals: bigint };
@@ -24,7 +25,14 @@ export type FungibleSpecialRoleInput = {
     addRoleLocalBurn: boolean;
     addRoleESDTTransferRole: boolean;
 };
-export type SemiFungibleSpecialRoleInput = SpecialRoleInput & { addRoleNFTAddQuantity: boolean };
+export type SemiFungibleSpecialRoleInput = {
+    user: Address;
+    tokenIdentifier: string;
+    addRoleNFTCreate: boolean;
+    addRoleNFTBurn: boolean;
+    addRoleNFTAddQuantity: boolean;
+    addRoleESDTTransferRole: boolean;
+};
 
 export type SpecialRoleInput = {
     user: Address;
@@ -38,6 +46,34 @@ export type SpecialRoleInput = {
     addRoleNFTRecreate?: boolean;
     addRoleESDTSetNewURI?: boolean;
     addRoleESDTModifyRoyalties?: boolean;
+};
+
+export type UnsetFungibleSpecialRoleInput = {
+    user: Address;
+    tokenIdentifier: string;
+    removeRoleLocalMint: boolean;
+    removeRoleLocalBurn: boolean;
+    removeRoleESDTTransferRole: boolean;
+};
+export type UnsetSemiFungibleSpecialRoleInput = {
+    user: Address;
+    tokenIdentifier: string;
+    removeRoleNFTBurn: boolean;
+    removeRoleNFTAddQuantity: boolean;
+    removeRoleESDTTransferRole: boolean;
+};
+
+export type UnsetSpecialRoleInput = {
+    user: Address;
+    tokenIdentifier: string;
+    removeRoleNFTBurn: boolean;
+    removeRoleNFTUpdateAttributes: boolean;
+    removeRoleNFTAddURI: boolean;
+    removeRoleESDTTransferRole: boolean;
+    removeRoleESDTModifyCreator?: boolean;
+    removeRoleNFTRecreate?: boolean;
+    removeRoleESDTSetNewURI?: boolean;
+    removeRoleESDTModifyRoyalties?: boolean;
 };
 
 export type MintInput = {
@@ -101,8 +137,6 @@ export type ManageMetadataInput = {
 };
 
 export type RegisteringDynamicTokenInput = { tokenName: string; tokenTicker: string; tokenType: TokenType };
-
-type TokenType = "NFT" | "SFT" | "META" | "FNG";
 
 export type SpecialRoleOutput = {
     userAddress: Address;

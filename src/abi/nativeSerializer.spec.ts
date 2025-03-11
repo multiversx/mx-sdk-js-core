@@ -3,7 +3,7 @@ import { assert } from "chai";
 import { Address, ErrInvalidArgument } from "../core";
 import { NativeSerializer } from "./nativeSerializer";
 import {
-    AbiRegistry,
+    Abi,
     AddressType,
     AddressValue,
     BigUIntType,
@@ -172,7 +172,7 @@ describe("test native serializer", () => {
     });
 
     it("should handle optionals in a strict manner (but it does not)", async () => {
-        const endpoint = AbiRegistry.create({
+        const endpoint = Abi.create({
             endpoints: [
                 {
                     name: "foo",
@@ -222,7 +222,7 @@ describe("test native serializer", () => {
     });
 
     it("should accept a mix between typed values and regular JavaScript objects (variadic, optionals)", async () => {
-        const endpoint = AbiRegistry.create({
+        const endpoint = Abi.create({
             endpoints: [
                 {
                     name: "foo",
@@ -271,7 +271,7 @@ describe("test native serializer", () => {
     });
 
     it("should accept a mix between typed values and regular JavaScript objects (composite, optionals)", async () => {
-        const endpoint = AbiRegistry.create({
+        const endpoint = Abi.create({
             endpoints: [
                 {
                     name: "foo",
@@ -288,7 +288,7 @@ describe("test native serializer", () => {
         const compositeType = new CompositeType(new AddressType(), new U64Type());
         const optionalCompositeType = new OptionalType(compositeType);
         const addressBech32 = "erd1dc3yzxxeq69wvf583gw0h67td226gu2ahpk3k50qdgzzym8npltq7ndgha";
-        const address = Address.fromBech32(addressBech32);
+        const address = Address.newFromBech32(addressBech32);
         const compositeValue = CompositeValue.fromItems(new AddressValue(address), new U64Value(42));
         const optionalCompositeValue = new OptionalValue(optionalCompositeType, compositeValue);
 
@@ -331,7 +331,7 @@ describe("test native serializer", () => {
     });
 
     it("should accept a mix between typed values and regular JavaScript objects (tuples)", async () => {
-        const endpoint = AbiRegistry.create({
+        const endpoint = Abi.create({
             endpoints: [
                 {
                     name: "foo",
@@ -404,7 +404,7 @@ describe("test native serializer", () => {
     });
 
     it("should accept managed decimals with constants and variable decimals", async () => {
-        const endpoint = AbiRegistry.create({
+        const endpoint = Abi.create({
             endpoints: [
                 {
                     name: "foo",
@@ -445,7 +445,7 @@ describe("test native serializer", () => {
     });
 
     it("should accept no value for variadic types", async () => {
-        const endpoint = AbiRegistry.create({
+        const endpoint = Abi.create({
             endpoints: [
                 {
                     name: "foo",
@@ -474,7 +474,7 @@ describe("test native serializer", () => {
     });
 
     it("should accept null or undefined for option types and optionals", async () => {
-        const endpoint = AbiRegistry.create({
+        const endpoint = Abi.create({
             endpoints: [
                 {
                     name: "foo",
@@ -502,7 +502,7 @@ describe("test native serializer", () => {
     });
 
     it("should perform type inference (enums)", async () => {
-        const abiRegistry = AbiRegistry.create({
+        const abi = Abi.create({
             endpoints: [
                 {
                     name: "foo",
@@ -573,8 +573,8 @@ describe("test native serializer", () => {
             },
         });
 
-        const endpoint = abiRegistry.getEndpoint("foo");
-        const enumType = abiRegistry.getEnum("MyEnum");
+        const endpoint = abi.getEndpoint("foo");
+        const enumType = abi.getEnum("MyEnum");
 
         // Simple enum by discriminant
         const p0 = 0;
@@ -604,7 +604,7 @@ describe("test native serializer", () => {
     });
 
     it("should perform type inference (explicit-enums)", async () => {
-        const abiRegistry = AbiRegistry.create({
+        const abi = Abi.create({
             endpoints: [
                 {
                     name: "foo",
@@ -633,8 +633,8 @@ describe("test native serializer", () => {
             },
         });
 
-        const endpoint = abiRegistry.getEndpoint("foo");
-        const enumType = abiRegistry.getExplicitEnum("OperationCompletionStatus");
+        const endpoint = abi.getEndpoint("foo");
+        const enumType = abi.getExplicitEnum("OperationCompletionStatus");
         const enumString = "completed";
 
         const typedValues = NativeSerializer.nativeToTypedValues([enumString], endpoint);
@@ -644,7 +644,7 @@ describe("test native serializer", () => {
     });
 
     it("should getArgumentsCardinality", async () => {
-        const abi = AbiRegistry.create({
+        const abi = Abi.create({
             endpoints: [
                 {
                     name: "a",
@@ -708,7 +708,7 @@ describe("test native serializer", () => {
     });
 
     it("should accept a mixed of values for boolen type", async () => {
-        const endpoint = AbiRegistry.create({
+        const endpoint = Abi.create({
             endpoints: [
                 {
                     name: "foo",

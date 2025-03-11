@@ -18,6 +18,8 @@ interface ILegacyTokenTransferOptions {
     numDecimals?: number;
 }
 
+export type TokenType = "NFT" | "SFT" | "META" | "FNG";
+
 export class Token {
     readonly identifier: string;
     readonly nonce: bigint;
@@ -292,7 +294,7 @@ export class TokenComputer {
     }
 
     private splitIdentifierIntoComponents(parts: string[]): { prefix: any; ticker: any; randomSequence: any } {
-        if (this.isLowercaseAlphanumeric(parts[0])) {
+        if (parts.length >= 3 && parts[2].length === this.TOKEN_RANDOM_SEQUENCE_LENGTH) {
             return { prefix: parts[0], ticker: parts[1], randomSequence: parts[2] };
         }
 
@@ -347,10 +349,6 @@ export class TokenComputer {
 
         if (!ticker.match(/^[a-zA-Z0-9]+$/)) {
             throw new ErrInvalidTokenIdentifier("The token ticker should only contain alphanumeric characters");
-        }
-
-        if (!(ticker == ticker.toUpperCase())) {
-            throw new ErrInvalidTokenIdentifier("The token ticker should be upper case");
         }
     }
 }

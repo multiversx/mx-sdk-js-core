@@ -101,7 +101,7 @@ export class ErrAddressEmpty extends Err {
 }
 
 /**
- * Signals an invalid value for {@link GasLimit} objects.
+ * Signals an invalid value for gas limit.
  */
 export class ErrNotEnoughGas extends Err {
     public constructor(value: number) {
@@ -110,7 +110,7 @@ export class ErrNotEnoughGas extends Err {
 }
 
 /**
- * Signals an invalid value for {@link Nonce} objects.
+ * Signals an invalid value for nonce.
  */
 export class ErrNonceInvalid extends Err {
     public constructor(value: number) {
@@ -119,7 +119,7 @@ export class ErrNonceInvalid extends Err {
 }
 
 /**
- * Signals an invalid value for {@link TransactionVersion} objects.
+ * Signals an invalid value for transaction version.
  */
 export class ErrTransactionVersionInvalid extends Err {
     public constructor(value: number) {
@@ -128,7 +128,7 @@ export class ErrTransactionVersionInvalid extends Err {
 }
 
 /**
- * Signals an invalid value for {@link TransactionOptions} objects.
+ * Signals an invalid value for transaction options.
  */
 export class ErrTransactionOptionsInvalid extends Err {
     public constructor(value: number) {
@@ -296,33 +296,6 @@ export class ErrContractInteraction extends Err {
 export class ErrNotImplemented extends Err {
     public constructor() {
         super("Method not yet implemented");
-    }
-}
-
-/**
- * Signals invalid arguments when using the relayed v1 builder
- */
-export class ErrInvalidRelayedV1BuilderArguments extends Err {
-    public constructor() {
-        super("invalid arguments for relayed v1 builder");
-    }
-}
-
-/**
- * Signals invalid arguments when using the relayed v2 builder
- */
-export class ErrInvalidRelayedV2BuilderArguments extends Err {
-    public constructor() {
-        super("invalid arguments for relayed v2 builder");
-    }
-}
-
-/**
- * Signals that Gas Limit isn't 0 for an inner tx when using relayed v2 builder
- */
-export class ErrGasLimitShouldBe0ForInnerTransaction extends Err {
-    public constructor() {
-        super("gas limit must be 0 for the inner transaction for relayed v2");
     }
 }
 

@@ -1,10 +1,9 @@
-import { AbiRegistry, ArgSerializer, isTyped, NativeSerializer } from "../abi";
+import { Abi, ArgSerializer, isTyped, NativeSerializer } from "../abi";
 import { IAccount } from "../accounts/interfaces";
-import { Address } from "../core";
+import { Address, BaseController } from "../core";
 import { Err, ErrSmartContractQuery } from "../core/errors";
 import { SmartContractQuery, SmartContractQueryInput, SmartContractQueryResponse } from "../core/smartContractQuery";
 import { Transaction } from "../core/transaction";
-import { TransactionComputer } from "../core/transactionComputer";
 import { TransactionOnNetwork } from "../core/transactionOnNetwork";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { TransactionWatcher } from "../core/transactionWatcher";
@@ -13,22 +12,21 @@ import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomePa
 import * as resources from "./resources";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
 
-export class SmartContractController {
+export class SmartContractController extends BaseController {
     private factory: SmartContractTransactionsFactory;
     private parser: SmartContractTransactionsOutcomeParser;
     private transactionWatcher: TransactionWatcher;
-    private txComputer: TransactionComputer;
     private networkProvider: INetworkProvider;
-    private abi?: AbiRegistry;
+    private abi?: Abi;
 
-    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: AbiRegistry }) {
+    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: Abi }) {
+        super();
         this.factory = new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
             abi: options.abi,
         });
         this.parser = new SmartContractTransactionsOutcomeParser(options);
         this.transactionWatcher = new TransactionWatcher(options.networkProvider);
-        this.txComputer = new TransactionComputer();
         this.networkProvider = options.networkProvider;
         this.abi = options.abi;
     }
@@ -43,7 +41,8 @@ export class SmartContractController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -67,7 +66,8 @@ export class SmartContractController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }
@@ -82,7 +82,8 @@ export class SmartContractController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        transaction.signature = await sender.sign(this.txComputer.computeBytesForSigning(transaction));
+        this.addExtraGasLimitIfRequired(transaction);
+        transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
     }

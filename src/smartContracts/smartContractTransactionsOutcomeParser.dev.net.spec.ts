@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import { Address } from "../core";
 import { createDevnetProvider } from "../testutils/networkProviders";
 import { SmartContractTransactionsOutcomeParser } from "./smartContractTransactionsOutcomeParser";
 
@@ -14,8 +15,8 @@ describe("test smart contract transactions outcome parser on devnet", () => {
         assert.equal(parsedGivenTransactionOnNetwork.returnCode, "ok");
         assert.deepEqual(parsedGivenTransactionOnNetwork.contracts, [
             {
-                address: "erd1qqqqqqqqqqqqqpgqpayq2es08gq8798xhnpr0kzgn7495qt5q6uqd7lpwf",
-                ownerAddress: "erd1tn62hjp72rznp8vq0lplva5csav6rccpqqdungpxtqz0g2hcq6uq9k4cc6",
+                address: Address.newFromBech32("erd1qqqqqqqqqqqqqpgqpayq2es08gq8798xhnpr0kzgn7495qt5q6uqd7lpwf"),
+                ownerAddress: Address.newFromBech32("erd1tn62hjp72rznp8vq0lplva5csav6rccpqqdungpxtqz0g2hcq6uq9k4cc6"),
                 codeHash: Buffer.from("c876625ec34a04445cfd99067777ebe488afdbc6899cd958f4c1d36107ca02d9", "hex"),
             },
         ]);

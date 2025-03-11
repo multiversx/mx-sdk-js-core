@@ -386,25 +386,29 @@ export class Transaction {
      *
      * @param plainObjectTransaction Raw data of a transaction, usually obtained by calling toPlainObject()
      */
-    static newFromPlainObject(object: IPlainTransactionObject): Transaction {
+    static newFromPlainObject(plainObjectTransaction: IPlainTransactionObject): Transaction {
         const transaction = new Transaction({
-            nonce: BigInt(object.nonce),
-            value: BigInt(object.value || ""),
-            receiver: Address.newFromBech32(object.receiver),
-            receiverUsername: Buffer.from(object.receiverUsername || "", "base64").toString(),
-            sender: Address.newFromBech32(object.sender),
-            senderUsername: Buffer.from(object.senderUsername || "", "base64").toString(),
-            guardian: object.guardian ? Address.newFromBech32(object.guardian) : Address.empty(),
-            relayer: object.relayer ? Address.newFromBech32(object.relayer) : Address.empty(),
-            gasPrice: BigInt(object.gasPrice),
-            gasLimit: BigInt(object.gasLimit),
-            data: Buffer.from(object.data || "", "base64"),
-            chainID: String(object.chainID),
-            version: Number(object.version),
-            options: object.options ? Number(object.options) : undefined,
-            signature: Buffer.from(object.signature || "", "hex"),
-            guardianSignature: Buffer.from(object.guardianSignature || "", "hex"),
-            relayerSignature: Buffer.from(object.relayerSignature || "", "hex"),
+            nonce: BigInt(plainObjectTransaction.nonce),
+            value: BigInt(plainObjectTransaction.value || ""),
+            receiver: Address.newFromBech32(plainObjectTransaction.receiver),
+            receiverUsername: Buffer.from(plainObjectTransaction.receiverUsername || "", "base64").toString(),
+            sender: Address.newFromBech32(plainObjectTransaction.sender),
+            senderUsername: Buffer.from(plainObjectTransaction.senderUsername || "", "base64").toString(),
+            guardian: plainObjectTransaction.guardian
+                ? Address.newFromBech32(plainObjectTransaction.guardian)
+                : Address.empty(),
+            relayer: plainObjectTransaction.relayer
+                ? Address.newFromBech32(plainObjectTransaction.relayer)
+                : Address.empty(),
+            gasPrice: BigInt(plainObjectTransaction.gasPrice),
+            gasLimit: BigInt(plainObjectTransaction.gasLimit),
+            data: Buffer.from(plainObjectTransaction.data || "", "base64"),
+            chainID: String(plainObjectTransaction.chainID),
+            version: Number(plainObjectTransaction.version),
+            options: plainObjectTransaction.options ? Number(plainObjectTransaction.options) : undefined,
+            signature: Buffer.from(plainObjectTransaction.signature || "", "hex"),
+            guardianSignature: Buffer.from(plainObjectTransaction.guardianSignature || "", "hex"),
+            relayerSignature: Buffer.from(plainObjectTransaction.relayerSignature || "", "hex"),
         });
 
         return transaction;

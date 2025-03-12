@@ -1,5 +1,5 @@
 import { IAccount } from "../accounts/interfaces";
-import { Address, BaseController } from "../core";
+import { Address, BaseController, BaseControllerInput } from "../core";
 import { Transaction } from "../core/transaction";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import * as resources from "./resources";
@@ -16,14 +16,14 @@ export class TransfersController extends BaseController {
     async createTransactionForNativeTokenTransfer(
         sender: IAccount,
         nonce: bigint,
-        options: resources.NativeTokenTransferInput & { guardian?: Address; relayer?: Address },
+        options: resources.NativeTokenTransferInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForNativeTokenTransfer(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -32,14 +32,14 @@ export class TransfersController extends BaseController {
     async createTransactionForEsdtTokenTransfer(
         sender: IAccount,
         nonce: bigint,
-        options: resources.CustomTokenTransferInput & { guardian?: Address; relayer?: Address },
+        options: resources.CustomTokenTransferInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForESDTTokenTransfer(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -48,14 +48,14 @@ export class TransfersController extends BaseController {
     async createTransactionForTransfer(
         sender: IAccount,
         nonce: bigint,
-        options: resources.CreateTransferTransactionInput & { guardian?: Address; relayer?: Address },
+        options: resources.CreateTransferTransactionInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForTransfer(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;

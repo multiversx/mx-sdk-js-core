@@ -1,5 +1,5 @@
 import { IAccount } from "../accounts/interfaces";
-import { Address, BaseController } from "../core";
+import { Address, BaseController, BaseControllerInput } from "../core";
 import { Transaction } from "../core/transaction";
 import { TransactionOnNetwork } from "../core/transactionOnNetwork";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
@@ -26,14 +26,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForIssuingFungible(
         sender: IAccount,
         nonce: bigint,
-        options: resources.IssueFungibleInput & { guardian?: Address; relayer?: Address },
+        options: resources.IssueFungibleInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingFungible(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -51,14 +51,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForIssuingSemiFungible(
         sender: IAccount,
         nonce: bigint,
-        options: resources.IssueSemiFungibleInput & { guardian?: Address; relayer?: Address },
+        options: resources.IssueSemiFungibleInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingSemiFungible(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -76,14 +76,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForIssuingNonFungible(
         sender: IAccount,
         nonce: bigint,
-        options: resources.IssueNonFungibleInput & { guardian?: Address; relayer?: Address },
+        options: resources.IssueNonFungibleInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForIssuingNonFungible(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -101,14 +101,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForRegisteringMetaEsdt(
         sender: IAccount,
         nonce: bigint,
-        options: resources.RegisterMetaESDTInput & { guardian?: Address; relayer?: Address },
+        options: resources.RegisterMetaESDTInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringMetaESDT(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -126,14 +126,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForRegisteringAndSettingRoles(
         sender: IAccount,
         nonce: bigint,
-        options: resources.RegisterRolesInput & { guardian?: Address; relayer?: Address },
+        options: resources.RegisterRolesInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringAndSettingRoles(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -151,14 +151,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForSetBurnRoleGlobally(
         sender: IAccount,
         nonce: bigint,
-        options: resources.BurnRoleGloballyInput & { guardian?: Address; relayer?: Address },
+        options: resources.BurnRoleGloballyInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingBurnRoleGlobally(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -176,14 +176,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUnsettingBurnRoleGlobally(
         sender: IAccount,
         nonce: bigint,
-        options: resources.BurnRoleGloballyInput & { guardian?: Address; relayer?: Address },
+        options: resources.BurnRoleGloballyInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingBurnRoleGlobally(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -201,14 +201,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForSettingSpecialRoleOnFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.FungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.FungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingSpecialRoleOnFungibleToken(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -226,7 +226,7 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUnsettingSpecialRoleOnFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UnsetFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.UnsetFungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnFungibleToken(
             sender.address,
@@ -236,7 +236,7 @@ export class TokenManagementController extends BaseController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -245,7 +245,7 @@ export class TokenManagementController extends BaseController {
     async createTransactionForSettingSpecialRoleOnSemiFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.SemiFungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken(
             sender.address,
@@ -255,7 +255,7 @@ export class TokenManagementController extends BaseController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -273,7 +273,7 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UnsetSemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.UnsetSemiFungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
             sender.address,
@@ -283,7 +283,7 @@ export class TokenManagementController extends BaseController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -292,14 +292,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForSettingSpecialRoleOnMetaESDT(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.SemiFungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingSpecialRoleOnMetaESDT(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -317,14 +317,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUnsettingSpecialRoleOnMetaESDT(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UnsetSemiFungibleSpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.UnsetSemiFungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnMetaESDT(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -333,7 +333,7 @@ export class TokenManagementController extends BaseController {
     async createTransactionForSettingSpecialRoleOnNonFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.SpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingSpecialRoleOnNonFungibleToken(
             sender.address,
@@ -343,7 +343,7 @@ export class TokenManagementController extends BaseController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -361,7 +361,7 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UnsetSpecialRoleInput & { guardian?: Address; relayer?: Address },
+        options: resources.UnsetSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
             sender.address,
@@ -371,7 +371,7 @@ export class TokenManagementController extends BaseController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -380,14 +380,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForCreatingNft(
         sender: IAccount,
         nonce: bigint,
-        options: resources.MintInput & { guardian?: Address; relayer?: Address },
+        options: resources.MintInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForCreatingNFT(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -405,14 +405,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForPausing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.PausingInput & { guardian?: Address; relayer?: Address },
+        options: resources.PausingInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForPausing(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -430,14 +430,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUnpausing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.PausingInput & { guardian?: Address; relayer?: Address },
+        options: resources.PausingInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnpausing(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -455,14 +455,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForFreezing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManagementInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManagementInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForFreezing(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -480,14 +480,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUnFreezing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManagementInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManagementInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnfreezing(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -505,14 +505,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForWiping(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManagementInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManagementInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForWiping(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -530,14 +530,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForLocaMinting(
         sender: IAccount,
         nonce: bigint,
-        options: resources.LocalMintInput & { guardian?: Address; relayer?: Address },
+        options: resources.LocalMintInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForLocalMint(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -555,14 +555,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForLocalBurning(
         sender: IAccount,
         nonce: bigint,
-        options: resources.LocalBurnInput & { guardian?: Address; relayer?: Address },
+        options: resources.LocalBurnInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForLocalBurning(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -580,14 +580,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUpdatingAttributes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UpdateAttributesInput & { guardian?: Address; relayer?: Address },
+        options: resources.UpdateAttributesInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUpdatingAttributes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -605,14 +605,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForAddingQuantity(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UpdateQuantityInput & { guardian?: Address; relayer?: Address },
+        options: resources.UpdateQuantityInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForAddingQuantity(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -630,14 +630,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForBurningQuantity(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UpdateQuantityInput & { guardian?: Address; relayer?: Address },
+        options: resources.UpdateQuantityInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForBurningQuantity(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -655,14 +655,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForModifyingRoyalties(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ModifyRoyaltiesInput & { guardian?: Address; relayer?: Address },
+        options: resources.ModifyRoyaltiesInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingRoyalties(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -680,14 +680,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForSettingNewUris(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetNewUriInput & { guardian?: Address; relayer?: Address },
+        options: resources.SetNewUriInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingNewUris(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -705,14 +705,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForModifyingCreator(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetNewUriInput & { guardian?: Address; relayer?: Address },
+        options: resources.SetNewUriInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingCreator(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -730,14 +730,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUpdatingMetadata(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetNewUriInput & { guardian?: Address; relayer?: Address },
+        options: resources.SetNewUriInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingCreator(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -755,14 +755,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForMetadataRecreate(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetNewUriInput & { guardian?: Address; relayer?: Address },
+        options: resources.SetNewUriInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForMetadataRecreate(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -780,14 +780,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForChangingTokenToDynamic(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetNewUriInput & { guardian?: Address; relayer?: Address },
+        options: resources.SetNewUriInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForChangingTokenToDynamic(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -805,14 +805,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForUpdatingTokenId(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UpdateTokenIDInput & { guardian?: Address; relayer?: Address },
+        options: resources.UpdateTokenIDInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUpdatingTokenId(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -826,14 +826,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForRegisteringDynamicToken(
         sender: IAccount,
         nonce: bigint,
-        options: resources.RegisteringDynamicTokenInput & { guardian?: Address; relayer?: Address },
+        options: resources.RegisteringDynamicTokenInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringDynamicToken(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -851,14 +851,14 @@ export class TokenManagementController extends BaseController {
     async createTransactionForRegisteringDynamicTokenAndSettingRoles(
         sender: IAccount,
         nonce: bigint,
-        options: resources.RegisteringDynamicTokenInput & { guardian?: Address; relayer?: Address },
+        options: resources.RegisteringDynamicTokenInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRegisteringDynamicAndSettingRoles(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;

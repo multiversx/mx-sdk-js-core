@@ -31,6 +31,31 @@ describe("TestEntrypoint", function () {
         );
     });
 
+    it("native transfer with gas options", async () => {
+        const controller = entrypoint.createTransfersController();
+        const filePath = path.join("src", "testdata", "testwallets", "alice.pem");
+        const sender = await Account.newFromPem(filePath);
+        sender.nonce = 77777n;
+
+        const gasLimit = BigInt(50000);
+        const gasPrice = BigInt(1000);
+
+        const transaction = await controller.createTransactionForTransfer(
+            sender,
+            BigInt(sender.getNonceThenIncrement().valueOf()),
+            {
+                receiver: sender.address,
+                nativeAmount: BigInt(0),
+                data: Buffer.from("hello"),
+                gasLimit: gasLimit,
+                gasPrice: gasPrice,
+            },
+        );
+
+        assert.equal(transaction.gasLimit, gasLimit, "Gas limit should be set correctly");
+        assert.equal(transaction.gasPrice, gasPrice, "Gas price should be set correctly");
+    });
+
     it("native transfer with guardian and relayer", async () => {
         const controller = entrypoint.createTransfersController();
         const filePath = path.join("src", "testdata", "testwallets");

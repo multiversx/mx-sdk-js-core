@@ -1,5 +1,5 @@
 import { IAccount } from "../accounts/interfaces";
-import { Address, BaseController } from "../core";
+import { Address, BaseController, BaseControllerInput } from "../core";
 import { Transaction } from "../core/transaction";
 import { TransactionOnNetwork } from "../core/transactionOnNetwork";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
@@ -26,14 +26,14 @@ export class DelegationController extends BaseController {
     async createTransactionForNewDelegationContract(
         sender: IAccount,
         nonce: bigint,
-        options: resources.NewDelegationContractInput & { guardian?: Address; relayer?: Address },
+        options: resources.NewDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForNewDelegationContract(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -51,14 +51,14 @@ export class DelegationController extends BaseController {
     async createTransactionForAddingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.AddNodesInput & { guardian?: Address; relayer?: Address },
+        options: resources.AddNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForAddingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -67,14 +67,14 @@ export class DelegationController extends BaseController {
     async createTransactionForRemovingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageNodesInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManageNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRemovingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -83,14 +83,14 @@ export class DelegationController extends BaseController {
     async createTransactionForStakingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageNodesInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManageNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForStakingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -99,14 +99,14 @@ export class DelegationController extends BaseController {
     async createTransactionForUnbondingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageNodesInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManageNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnbondingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -115,14 +115,14 @@ export class DelegationController extends BaseController {
     async createTransactionForUnstakingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageNodesInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManageNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnstakingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -131,14 +131,14 @@ export class DelegationController extends BaseController {
     async createTransactionForUnjailingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UnjailingNodesInput & { guardian?: Address; relayer?: Address },
+        options: resources.UnjailingNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnjailingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -147,14 +147,14 @@ export class DelegationController extends BaseController {
     async createTransactionForChangingServiceFee(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ChangeServiceFee & { guardian?: Address; relayer?: Address },
+        options: resources.ChangeServiceFee & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForChangingServiceFee(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -163,14 +163,14 @@ export class DelegationController extends BaseController {
     async createTransactionForModifyingDelegationCap(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ModifyDelegationCapInput & { guardian?: Address; relayer?: Address },
+        options: resources.ModifyDelegationCapInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForModifyingDelegationCap(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -179,14 +179,14 @@ export class DelegationController extends BaseController {
     async createTransactionForSettingAutomaticActivation(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingAutomaticActivation(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -195,14 +195,14 @@ export class DelegationController extends BaseController {
     async createTransactionForUnsettingAutomaticActivation(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingAutomaticActivation(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -211,7 +211,7 @@ export class DelegationController extends BaseController {
     async createTransactionForSettingCapCheckOnRedelegateRewards(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingCapCheckOnRedelegateRewards(
             sender.address,
@@ -221,7 +221,7 @@ export class DelegationController extends BaseController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -230,7 +230,7 @@ export class DelegationController extends BaseController {
     async createTransactionForUnsettingCapCheckOnRedelegateRewards(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUnsettingCapCheckOnRedelegateRewards(
             sender.address,
@@ -240,7 +240,7 @@ export class DelegationController extends BaseController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -249,14 +249,14 @@ export class DelegationController extends BaseController {
     async createTransactionForSettingMetadata(
         sender: IAccount,
         nonce: bigint,
-        options: resources.SetContractMetadataInput & { guardian?: Address; relayer?: Address },
+        options: resources.SetContractMetadataInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForSettingMetadata(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -265,14 +265,14 @@ export class DelegationController extends BaseController {
     async createTransactionForDelegating(
         sender: IAccount,
         nonce: bigint,
-        options: resources.DelegateActionsInput & { guardian?: Address; relayer?: Address },
+        options: resources.DelegateActionsInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForDelegating(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -281,14 +281,14 @@ export class DelegationController extends BaseController {
     async createTransactionForClaimingRewards(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForClaimingRewards(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -297,14 +297,14 @@ export class DelegationController extends BaseController {
     async createTransactionForRedelegatingRewards(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForRedelegatingRewards(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -313,14 +313,14 @@ export class DelegationController extends BaseController {
     async createTransactionForUndelegating(
         sender: IAccount,
         nonce: bigint,
-        options: resources.DelegateActionsInput & { guardian?: Address; relayer?: Address },
+        options: resources.DelegateActionsInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForUndelegating(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -329,7 +329,7 @@ export class DelegationController extends BaseController {
     async createTransactionForWithdrawing(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ManageDelegationContractInput & { guardian?: Address; relayer?: Address },
+        options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = this.factory.createTransactionForWithdrawing(sender.address, options);
 
@@ -337,7 +337,7 @@ export class DelegationController extends BaseController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
 
-        this.addExtraGasLimitIfRequired(transaction);
+        this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;

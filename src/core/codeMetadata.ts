@@ -44,7 +44,7 @@ export class CodeMetadata {
     /**
      * Named constructor
      * Creates a metadata object from a buffer.
-     * Should check that data has correct length (2 bytes)
+     * Also checks that data has correct length (2 bytes)
      */
     static newFromBytes(bytes: Uint8Array): CodeMetadata {
         if (bytes.length != CodeMetadataLength) {
@@ -67,19 +67,7 @@ export class CodeMetadata {
      * Creates a metadata object from a buffer.
      */
     static newFromBuffer(buffer: Buffer): CodeMetadata {
-        if (buffer.length != CodeMetadataLength) {
-            throw new Error(`code metadata buffer has length ${buffer.length}, expected ${CodeMetadataLength}`);
-        }
-
-        const byteZero = buffer[0];
-        const byteOne = buffer[1];
-
-        const upgradeable = (byteZero & CodeMetadata.ByteZero.Upgradeable) !== 0;
-        const readable = (byteZero & CodeMetadata.ByteZero.Readable) !== 0;
-        const payable = (byteOne & CodeMetadata.ByteOne.Payable) !== 0;
-        const payableBySc = (byteOne & CodeMetadata.ByteOne.PayableBySc) !== 0;
-
-        return new CodeMetadata(upgradeable, readable, payable, payableBySc);
+        return this.newFromBytes(buffer);
     }
 
     /**

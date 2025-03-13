@@ -60,7 +60,7 @@ export class Account implements IAccount {
     /**
      * Named constructor
      * Loads a secret key from an encrypted keystore file. Handles both keystores that hold a mnemonic and ones that hold a secret key (legacy).
-     * For keystores that hold an encrypted mnemonic, the optional "address_index" parameter is used to derive the desired secret key.
+     * For keystores that hold an encrypted mnemonic, the optional "addressIndex" parameter is used to derive the desired secret key.
      * Returns an Account object, initialized with the secret key.
      */
     static newFromKeystore(
@@ -75,7 +75,7 @@ export class Account implements IAccount {
 
     /**
      * Named constructor
-     * Loads (derives) a secret key from a mnemonic. The optional "address_index" parameter is used to guide the derivation.
+     * Loads (derives) a secret key from a mnemonic. The optional "addressIndex" parameter is used to guide the derivation.
      * Returns an Account object, initialized with the secret key.
      */
     static newFromMnemonic(

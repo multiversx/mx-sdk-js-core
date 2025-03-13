@@ -85,6 +85,7 @@ export class Address {
     }
 
     /**
+     * Named constructor
      * Creates an address object from a bech32-encoded string
      */
     static newFromBech32(value: string): Address {
@@ -102,6 +103,7 @@ export class Address {
     }
 
     /**
+     * Named constructor
      * Creates an address object from a hex-encoded string
      */
     static newFromHex(value: string, hrp?: string): Address {
@@ -121,29 +123,6 @@ export class Address {
 
     private static isValidHex(value: string) {
         return Buffer.from(value, "hex").length == PUBKEY_LENGTH;
-    }
-
-    /**
-     * Creates an empty address object.
-     * Generally speaking, this should not be used by client code (internal use only).
-     */
-    static empty(): Address {
-        return new Address("");
-    }
-
-    /**
-     * Performs address validation without throwing errors
-     */
-    static isValid(value: string): boolean {
-        const decoded = bech32.decodeUnsafe(value);
-        const prefix = decoded?.prefix;
-        const pubkey = decoded ? Buffer.from(bech32.fromWords(decoded.words)) : undefined;
-
-        if (prefix !== LibraryConfig.DefaultAddressHrp || pubkey?.length !== PUBKEY_LENGTH) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -192,7 +171,7 @@ export class Address {
     }
 
     /**
-     * Returns the pubkey as raw bytes (buffer)
+     * Returns the underlying public key.
      */
     getPublicKey(): Buffer {
         return this.publicKey;
@@ -203,6 +182,29 @@ export class Address {
      */
     getHrp(): string {
         return this.hrp;
+    }
+
+    /**
+     * Creates an empty address object.
+     * Generally speaking, this should not be used by client code (internal use only).
+     */
+    static empty(): Address {
+        return new Address("");
+    }
+
+    /**
+     * Performs address validation without throwing errors
+     */
+    static isValid(value: string): boolean {
+        const decoded = bech32.decodeUnsafe(value);
+        const prefix = decoded?.prefix;
+        const pubkey = decoded ? Buffer.from(bech32.fromWords(decoded.words)) : undefined;
+
+        if (prefix !== LibraryConfig.DefaultAddressHrp || pubkey?.length !== PUBKEY_LENGTH) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -269,7 +271,9 @@ export class AddressComputer {
     constructor(numberOfShardsWithoutMeta?: number) {
         this.numberOfShardsWithoutMeta = numberOfShardsWithoutMeta || CURRENT_NUMBER_OF_SHARDS_WITHOUT_META;
     }
-
+    /**
+     * Note that the first input parameter is received as an interface, but the return value is a concrete type (see guidelines).
+     */
     computeContractAddress(deployer: Address, deploymentNonce: bigint): Address {
         const initialPadding = Buffer.alloc(8, 0);
         const ownerPubkey = deployer.getPublicKey();
@@ -288,6 +292,9 @@ export class AddressComputer {
         return new Address(addressBytes);
     }
 
+    /**
+     * The number of shards (necessary for computing the shard ID) would be received as a constructor parameter - constructor is not captured by specs.
+     */
     getShardOfAddress(address: Address): number {
         return this.getShardOfPubkey(address.getPublicKey(), this.numberOfShardsWithoutMeta);
     }

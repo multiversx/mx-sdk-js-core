@@ -5,7 +5,7 @@ import {
     ErrExpectedTransactionStatusNotReached,
     ErrIsCompletedFieldIsMissingOnTransaction,
 } from "./errors";
-import { ITransactionFetcher } from "./interface";
+import { ITransactionFetcher } from "./interfaces";
 import { Logger } from "./logger";
 import { TransactionEvent } from "./transactionEvents";
 import { TransactionOnNetwork } from "./transactionOnNetwork";

@@ -20,6 +20,10 @@ export class SmartContractTransactionsOutcomeParser {
         this.abi = options?.abi;
     }
 
+    /**
+     * Parses the transaction and recovers basic information about the contract(s) deployed by the transaction.
+     * @param options
+     */
     parseDeploy(options: { transactionOnNetwork: TransactionOnNetwork }): resources.SmartContractDeployOutcome {
         return this.parseDeployGivenTransactionOnNetwork(options.transactionOnNetwork);
     }

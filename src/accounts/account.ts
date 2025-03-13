@@ -1,12 +1,7 @@
 import * as fs from "fs";
 import { PathLike } from "fs";
-import { Message, MessageComputer, TransactionComputer } from "../core";
-import { Address } from "../core/address";
-import { LibraryConfig } from "../core/config";
-import { Transaction } from "../core/transaction";
-import { KeyPair, Mnemonic, UserPublicKey, UserSecretKey, UserSigner, UserWallet } from "../wallet";
-import { UserPem } from "../wallet/userPem";
-import { IAccount } from "./interfaces";
+import { Address, IAccount, LibraryConfig, Message, MessageComputer, Transaction, TransactionComputer } from "../core";
+import { KeyPair, Mnemonic, UserPem, UserPublicKey, UserSecretKey, UserSigner, UserWallet } from "../wallet";
 
 /**
  * An abstraction representing an account (user or Smart Contract) on the Network.

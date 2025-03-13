@@ -21,6 +21,9 @@ interface ILegacyTokenTransferOptions {
 export type TokenType = "NFT" | "SFT" | "META" | "FNG";
 
 export class Token {
+    /**
+     * E.g. "FOO-abcdef", "EGLD".
+     */
     readonly identifier: string;
     readonly nonce: bigint;
 
@@ -88,6 +91,10 @@ export class TokenTransfer {
         }
     }
 
+    /**     *
+     * @param amount
+     * @returns @TokenTransfer from native token
+     */
     static newFromNativeAmount(amount: bigint): TokenTransfer {
         const token = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
         return new TokenTransfer({ token, amount });
@@ -98,7 +105,7 @@ export class TokenTransfer {
     }
 
     /**
-     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
+     * @deprecated Use {@link newFromNativeAmount} instead.
      */
     static egldFromAmount(amount: BigNumber.Value) {
         const amountAsBigInteger = new BigNumber(amount).shiftedBy(EGLDNumDecimals).decimalPlaces(0);
@@ -106,7 +113,7 @@ export class TokenTransfer {
     }
 
     /**
-     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
+     * @deprecated Use {@link newFromNativeAmount} instead.
      */
     static egldFromBigInteger(amountAsBigInteger: BigNumber.Value) {
         return new TokenTransfer({
@@ -232,10 +239,16 @@ export class TokenComputer {
     TOKEN_RANDOM_SEQUENCE_LENGTH = 6;
     constructor() {}
 
+    /**
+     * Returns token.nonce == 0
+     */
     isFungible(token: Token): boolean {
         return token.nonce === 0n;
     }
 
+    /**
+     * Given "FOO-abcdef-0a" returns 10.
+     */
     extractNonceFromExtendedIdentifier(identifier: string): number {
         const parts = identifier.split("-");
 
@@ -252,6 +265,9 @@ export class TokenComputer {
         return decodeUnsignedNumber(Buffer.from(hexNonce, "hex"));
     }
 
+    /**
+     * Given "FOO-abcdef-0a" returns FOO-abcdef.
+     */
     extractIdentifierFromExtendedIdentifier(identifier: string): string {
         const parts = identifier.split("-");
         const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(parts);
@@ -262,6 +278,22 @@ export class TokenComputer {
             return prefix + "-" + ticker + "-" + randomSequence;
         }
         return ticker + "-" + randomSequence;
+    }
+
+    /**
+     * Given "FOO-abcdef-0a" returns FOO.
+     * Given "FOO-abcdef" returns FOO.
+     */
+    extractTickerFromExtendedIdentifier(identifier: string): string {
+        const parts = identifier.split("-");
+        const { prefix, ticker, randomSequence } = this.splitIdentifierIntoComponents(parts);
+
+        this.validateExtendedIdentifier(prefix, ticker, randomSequence, parts);
+        if (prefix) {
+            this.checkLengthOfPrefix(prefix);
+            return prefix + "-" + ticker + "-" + randomSequence;
+        }
+        return ticker;
     }
 
     computeExtendedIdentifier(token: Token): string {
@@ -313,10 +345,6 @@ export class TokenComputer {
         ) {
             throw new ErrInvalidTokenIdentifier("Invalid extended token identifier provided");
         }
-    }
-
-    private isLowercaseAlphanumeric(str: string): boolean {
-        return /^[a-z0-9]+$/.test(str);
     }
 
     private checkLengthOfRandomSequence(randomSequence: string): void {

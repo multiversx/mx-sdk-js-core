@@ -1,12 +1,19 @@
 import { Abi, ArgSerializer, isTyped, NativeSerializer } from "../abi";
-import { IAccount } from "../accounts/interfaces";
-import { Address, BaseController, BaseControllerInput } from "../core";
-import { Err, ErrSmartContractQuery } from "../core/errors";
-import { SmartContractQuery, SmartContractQueryInput, SmartContractQueryResponse } from "../core/smartContractQuery";
-import { Transaction } from "../core/transaction";
-import { TransactionOnNetwork } from "../core/transactionOnNetwork";
-import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
-import { TransactionWatcher } from "../core/transactionWatcher";
+import {
+    Address,
+    BaseController,
+    BaseControllerInput,
+    Err,
+    ErrSmartContractQuery,
+    IAccount,
+    SmartContractQuery,
+    SmartContractQueryInput,
+    SmartContractQueryResponse,
+    Transaction,
+    TransactionOnNetwork,
+    TransactionsFactoryConfig,
+    TransactionWatcher,
+} from "../core";
 import { INetworkProvider } from "../networkProviders/interface";
 import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 import * as resources from "./resources";

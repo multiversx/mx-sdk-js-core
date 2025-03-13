@@ -51,6 +51,9 @@ export class MessageComputer {
         return createKeccakHash("keccak256").update(bytesToHash).digest();
     }
 
+    /**
+     * returns the result of `compute_bytes_for_signing()
+     */
     computeBytesForVerifying(message: Message): Uint8Array {
         return this.computeBytesForSigning(message);
     }
@@ -71,6 +74,10 @@ export class MessageComputer {
         };
     }
 
+    /**
+     * packed_message should be the one obtained from calling `pack_message()`
+     * should treat both 'legacy message' and current message
+     */
     unpackMessage(packedMessage: {
         message: string;
         signature?: string;

@@ -1,3 +1,16 @@
+import { Message, Transaction } from ".";
+import { Address } from "./address";
+
+export interface IAccount {
+    readonly address: Address;
+
+    sign(data: Uint8Array): Promise<Uint8Array>;
+    signTransaction(transaction: Transaction): Promise<Uint8Array>;
+    verifyTransactionSignature(transaction: Transaction, signature: Uint8Array): Promise<boolean>;
+    signMessage(message: Message): Promise<Uint8Array>;
+    verifyMessageSignature(message: Message, signature: Uint8Array): Promise<boolean>;
+}
+
 import { TransactionOnNetwork } from "./transactionOnNetwork";
 
 export interface ITransactionFetcher {

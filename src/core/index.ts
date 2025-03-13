@@ -6,7 +6,7 @@ export * from "./baseController";
 export * from "./codeMetadata";
 export * from "./config";
 export * from "./errors";
-export * from "./interface";
+export * from "./interfaces";
 export * from "./logger";
 export * from "./message";
 export * from "./networkParams";

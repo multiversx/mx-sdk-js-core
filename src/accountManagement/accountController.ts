@@ -1,5 +1,5 @@
-import { IAccount } from "../accounts/interfaces";
 import { Address, BaseController, BaseControllerInput } from "../core";
+import { IAccount } from "../core/interfaces";
 import { Transaction } from "../core/transaction";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { AccountTransactionsFactory } from "./accountTransactionsFactory";

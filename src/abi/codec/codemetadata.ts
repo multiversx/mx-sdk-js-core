@@ -8,7 +8,7 @@ export class CodeMetadataCodec {
     }
 
     decodeTopLevel(buffer: Buffer): CodeMetadataValue {
-        const codeMetadata = CodeMetadata.newFromBytes(new Uint8Array(buffer));
+        const codeMetadata = CodeMetadata.newFromBytes(buffer);
         return new CodeMetadataValue(codeMetadata);
     }
 

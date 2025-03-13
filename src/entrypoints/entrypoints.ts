@@ -91,7 +91,7 @@ class NetworkEntrypoint {
     }
 
     /**
-     * Function of the network provider, promoted to the facade.
+     * Function of the network provider, promoted to the entrypoint.
      * @param transactions
      */
     sendTransactions(transactions: Transaction[]): Promise<[number, string[]]> {
@@ -99,7 +99,7 @@ class NetworkEntrypoint {
     }
 
     /**
-     * Function of the network provider, promoted to the facade.
+     * Function of the network provider, promoted to the entrypoint.
      * @param transaction
      */
     sendTransaction(transaction: Transaction): Promise<string> {

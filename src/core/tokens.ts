@@ -22,7 +22,7 @@ export type TokenType = "NFT" | "SFT" | "META" | "FNG";
 
 export class Token {
     /**
-     * E.g. "FOO-abcdef", "EGLD".
+     * E.g. "FOO-abcdef", "EGLD-000000".
      */
     readonly identifier: string;
     readonly nonce: bigint;

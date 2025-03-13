@@ -52,7 +52,7 @@ export class MessageComputer {
     }
 
     /**
-     * returns the result of `compute_bytes_for_signing()
+     * returns the result of `computeBytesForSigning`
      */
     computeBytesForVerifying(message: Message): Uint8Array {
         return this.computeBytesForSigning(message);
@@ -75,7 +75,7 @@ export class MessageComputer {
     }
 
     /**
-     * packed_message should be the one obtained from calling `pack_message()`
+     * packedMessage should be the one obtained from calling `packMessage()`
      * should treat both 'legacy message' and current message
      */
     unpackMessage(packedMessage: {

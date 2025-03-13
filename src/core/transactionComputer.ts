@@ -7,7 +7,7 @@ import {
     TRANSACTION_OPTIONS_TX_HASH_SIGN,
 } from "./constants";
 import * as errors from "./errors";
-import { INetworkConfig } from "./interface";
+import { INetworkConfig } from "./interfaces";
 import { Transaction } from "./transaction";
 
 const createTransactionHasher = require("blake2b");
@@ -46,6 +46,9 @@ export class TransactionComputer {
         return feeForMove + processingFee;
     }
 
+    /**
+     * Compute bytes for signing the transaction
+     */
     computeBytesForSigning(transaction: Transaction): Uint8Array {
         this.ensureValidTransactionFields(transaction);
 
@@ -54,6 +57,9 @@ export class TransactionComputer {
         return new Uint8Array(Buffer.from(serialized));
     }
 
+    /**
+     * Compute bytes for verifying the transaction signature
+     */
     computeBytesForVerifying(transaction: Transaction): Uint8Array {
         const isTxSignedByHash = this.hasOptionsSetForHashSigning(transaction);
 
@@ -63,6 +69,9 @@ export class TransactionComputer {
         return this.computeBytesForSigning(transaction);
     }
 
+    /**
+     * Serializes the transaction then computes the hash; used for hash signing transactions.
+     */
     computeHashForSigning(transaction: Transaction): Uint8Array {
         const plainTransaction = this.toPlainObject(transaction);
         const signable = Buffer.from(JSON.stringify(plainTransaction));
@@ -77,14 +86,23 @@ export class TransactionComputer {
         return Buffer.from(hash, "hex").toString("hex");
     }
 
+    /**
+     * Returns true if the second least significant bit is set; returns false otherwise
+     */
     hasOptionsSetForGuardedTransaction(transaction: Transaction): boolean {
         return (transaction.options & TRANSACTION_OPTIONS_TX_GUARDED) == TRANSACTION_OPTIONS_TX_GUARDED;
     }
 
+    /**
+     * Returns true if the least significant bit is set; returns false otherwise; should also have transaction.version >= 2
+     */
     hasOptionsSetForHashSigning(transaction: Transaction): boolean {
         return (transaction.options & TRANSACTION_OPTIONS_TX_HASH_SIGN) == TRANSACTION_OPTIONS_TX_HASH_SIGN;
     }
 
+    /**
+     * Sets guardian address, transaction.version = 2, sets transaction.options second least significant bit
+     */
     applyGuardian(transaction: Transaction, guardian: Address) {
         if (transaction.version < MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS) {
             transaction.version = MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS;
@@ -94,10 +112,16 @@ export class TransactionComputer {
         transaction.guardian = guardian;
     }
 
+    /**
+     * Returns true if transaction.relayer is set; returns false otherwise;
+     */
     isRelayedV3Transaction(transaction: Transaction) {
         return !transaction.relayer.isEmpty();
     }
 
+    /**
+     * Sets the least significant bit of the `options` field; also ensures that `version` >= 2
+     */
     applyOptionsForHashSigning(transaction: Transaction) {
         if (transaction.version < MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS) {
             transaction.version = MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS;

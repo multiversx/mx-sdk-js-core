@@ -1,22 +1,23 @@
 import { Abi } from "../abi";
 import { AccountController, AccountTransactionsFactory } from "../accountManagement";
 import { Account } from "../accounts";
-import { IAccount } from "../accounts/interfaces";
-import { Address } from "../core/address";
-import { ErrInvalidNetworkProviderKind } from "../core/errors";
-import { Message } from "../core/message";
-import { Transaction } from "../core/transaction";
-import { TransactionOnNetwork } from "../core/transactionOnNetwork";
-import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
-import { TransactionWatcher } from "../core/transactionWatcher";
+import {
+    Address,
+    ErrInvalidNetworkProviderKind,
+    IAccount,
+    Message,
+    Transaction,
+    TransactionOnNetwork,
+    TransactionsFactoryConfig,
+    TransactionWatcher,
+} from "../core";
 import { DelegationController, DelegationTransactionsFactory } from "../delegation";
 import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
 import { INetworkProvider } from "../networkProviders/interface";
 import { SmartContractTransactionsFactory } from "../smartContracts";
 import { SmartContractController } from "../smartContracts/smartContractController";
 import { TokenManagementController, TokenManagementTransactionsFactory } from "../tokenManagement";
-import { TransferTransactionsFactory } from "../transfers";
-import { TransfersController } from "../transfers/transfersControllers";
+import { TransfersController, TransferTransactionsFactory } from "../transfers";
 import { UserSecretKey } from "../wallet";
 import { DevnetEntrypointConfig, MainnetEntrypointConfig, TestnetEntrypointConfig } from "./config";
 
@@ -36,11 +37,17 @@ class NetworkEntrypoint {
         this.chainId = options.chainId;
     }
 
+    /**
+     * Creates a new Account by generating a new secret key and instantiating an UserSigner
+     */
     async createAccount(): Promise<Account> {
         const secretKey = UserSecretKey.generate();
         return new Account(secretKey);
     }
 
+    /**
+     * Calls a faucet
+     */
     async getAirdrop(_address: Address): Promise<void> {
         throw new Error("Not implemented");
     }
@@ -49,10 +56,20 @@ class NetworkEntrypoint {
         transaction.signature = await account.signTransaction(transaction);
     }
 
+    /**
+     * Verifies if the signature field is valid
+     * @param transaction
+     * @param account
+     */
     async verifyTransactionSignature(transaction: Transaction, account: IAccount): Promise<boolean> {
         return await account.verifyTransactionSignature(transaction, transaction.signature);
     }
 
+    /**
+     * Verifies if message signature is valid
+     * @param message
+     * @param account
+     */
     async verifyMessageSignature(message: Message, account: IAccount): Promise<boolean> {
         if (!message.address) {
             throw new Error("`address` property of Message is not set");
@@ -65,18 +82,34 @@ class NetworkEntrypoint {
         return await account.verifyMessageSignature(message, message.signature);
     }
 
+    /**
+     * Fetches the account nonce from the network.
+     * @param address
+     */
     async recallAccountNonce(address: Address): Promise<bigint> {
         return (await this.networkProvider.getAccount(address)).nonce;
     }
 
+    /**
+     * Function of the network provider, promoted to the entrypoint.
+     * @param transactions
+     */
     sendTransactions(transactions: Transaction[]): Promise<[number, string[]]> {
         return this.networkProvider.sendTransactions(transactions);
     }
 
+    /**
+     * Function of the network provider, promoted to the entrypoint.
+     * @param transaction
+     */
     sendTransaction(transaction: Transaction): Promise<string> {
         return this.networkProvider.sendTransaction(transaction);
     }
 
+    /**
+     * Generic function to await a transaction on the network.
+     * @param txHash
+     */
     async awaitCompletedTransaction(txHash: string): Promise<TransactionOnNetwork> {
         const transactionAwaiter = new TransactionWatcher(this.networkProvider);
         return transactionAwaiter.awaitCompleted(txHash);
@@ -86,6 +119,9 @@ class NetworkEntrypoint {
         return this.networkProvider.getTransaction(txHash);
     }
 
+    /**
+     * Access to the underlying network provider.
+     */
     createNetworkProvider(): INetworkProvider {
         return this.networkProvider;
     }

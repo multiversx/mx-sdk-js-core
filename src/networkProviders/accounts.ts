@@ -1,4 +1,6 @@
+import { BytesValue } from "../abi";
 import { Address, CodeMetadata } from "../core";
+import { BlockCoordinates } from "./blocks";
 
 /**
  * A plain view of an account, as queried from the Network.
@@ -120,6 +122,62 @@ export class Guardian {
         result.activationEpoch = Number(responsePart["activationEpoch"] || 0);
         result.address = new Address(responsePart["address"] || "");
         result.serviceUID = responsePart["serviceUID"] || "";
+
+        return result;
+    }
+}
+export class AccountStorageEntry {
+    raw: Record<string, any> = {};
+    address: Address = Address.empty();
+    key: string = "";
+    value: string = "";
+
+    constructor(init?: Partial<AccountStorageEntry>) {
+        Object.assign(this, init);
+    }
+
+    static fromHttpResponse(payload: any, key: string): AccountStorageEntry {
+        const result = new AccountStorageEntry();
+        const value = payload["value"] || "";
+
+        result.raw = payload;
+        result.key = key;
+        result.value = BytesValue.fromHex(value).toString();
+
+        return result;
+    }
+}
+
+/**
+ * A plain view of an account storage.
+ */
+
+export class AccountStorage {
+    raw: Record<string, any> = {};
+    blockCoordinates!: BlockCoordinates;
+    entries: AccountStorageEntry[] = [];
+    constructor(init?: Partial<AccountStorage>) {
+        Object.assign(this, init);
+    }
+
+    static fromHttpResponse(payload: any): AccountStorage {
+        let result = new AccountStorage();
+
+        const pairs = payload["pairs"] || {};
+        const entries: AccountStorageEntry[] = Object.entries(pairs).map(([key, value]) => {
+            const decodedKey = Buffer.from(key, "hex").toString("utf8");
+            const val: string = value ? (value as string).toString() : "";
+            const decodedValue = Buffer.from(val).toString();
+
+            return new AccountStorageEntry({
+                raw: { [key]: value },
+                key: decodedKey,
+                value: decodedValue,
+            });
+        });
+        result.raw = payload;
+        result.entries = entries;
+        result.blockCoordinates = BlockCoordinates.fromHttpResponse(payload);
 
         return result;
     }

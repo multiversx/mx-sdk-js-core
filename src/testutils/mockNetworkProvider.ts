@@ -10,20 +10,17 @@ import { TransactionOnNetwork } from "../core/transactionOnNetwork";
 import { TransactionStatus } from "../core/transactionStatus";
 import {
     AccountOnNetwork,
+    AccountStorage,
+    AccountStorageEntry,
     DefinitionOfFungibleTokenOnNetwork,
     DefinitionOfTokenCollectionOnNetwork,
     NetworkConfig,
     NetworkStatus,
 } from "../networkProviders";
+import { BlockOnNetwork } from "../networkProviders/blocks";
 import { INetworkProvider, IPagination } from "../networkProviders/interface";
-import {
-    AccountStorage,
-    AccountStorageEntry,
-    AwaitingOptions,
-    BlockOnNetwork,
-    TokenAmountOnNetwork,
-    TransactionCostResponse,
-} from "../networkProviders/resources";
+import { AwaitingOptions, TransactionCostResponse } from "../networkProviders/resources";
+import { TokenAmountOnNetwork } from "../networkProviders/tokens";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
 import { createAccountBalance } from "./utils";
 

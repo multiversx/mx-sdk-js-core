@@ -1,20 +1,18 @@
-import { Address } from "../core/address";
-import { SmartContractQuery, SmartContractQueryResponse } from "../core/smartContractQuery";
-import { Token } from "../core/tokens";
-import { Transaction } from "../core/transaction";
-import { TransactionOnNetwork } from "../core/transactionOnNetwork";
-import { TransactionStatus } from "../core/transactionStatus";
-import { AccountOnNetwork } from "./accounts";
+import {
+    Address,
+    SmartContractQuery,
+    SmartContractQueryResponse,
+    Token,
+    Transaction,
+    TransactionOnNetwork,
+    TransactionStatus,
+} from "../core";
+import { AccountOnNetwork, AccountStorage, AccountStorageEntry } from "./accounts";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkStatus } from "./networkStatus";
-import {
-    AccountStorage,
-    AccountStorageEntry,
-    AwaitingOptions,
-    TokenAmountOnNetwork,
-    TransactionCostResponse,
-} from "./resources";
+import { AwaitingOptions, TransactionCostResponse } from "./resources";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
+import { TokenAmountOnNetwork } from "./tokens";
 
 /**
  * An interface that defines the endpoints of an HTTP API Provider.
@@ -62,14 +60,11 @@ export interface INetworkProvider {
     sendTransaction(tx: Transaction): Promise<string>;
 
     /**
-     * Simulates the processing of an already-signed transaction.
-     *
+     * Simulates the processing of an already-signed transaction.     *
      */
     simulateTransaction(tx: Transaction): Promise<TransactionOnNetwork>;
-
     /**
-     * Estimates the cost of a transaction.
-     *
+     * Estimates the cost of a transaction.     *
      */
     estimateTransactionCost(tx: Transaction): Promise<TransactionCostResponse>;
 

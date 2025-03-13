@@ -5,7 +5,7 @@ import { ProtoSerializer } from "../proto";
 import { getTestWalletsPath } from "../testutils/utils";
 import { Address } from "./address";
 import { MIN_TRANSACTION_VERSION_THAT_SUPPORTS_OPTIONS, TRANSACTION_OPTIONS_DEFAULT } from "./constants";
-import { INetworkConfig } from "./interface";
+import { INetworkConfig } from "./interfaces";
 import { Transaction } from "./transaction";
 import { TransactionComputer } from "./transactionComputer";
 

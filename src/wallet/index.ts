@@ -3,6 +3,7 @@ export * from "./keypair";
 export * from "./mnemonic";
 export * from "./pem";
 export * from "./userKeys";
+export * from "./userPem";
 export * from "./userSigner";
 export * from "./userVerifier";
 export * from "./userWallet";

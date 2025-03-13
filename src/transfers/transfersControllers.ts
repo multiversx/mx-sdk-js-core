@@ -1,7 +1,11 @@
-import { IAccount } from "../accounts/interfaces";
-import { Address, BaseController, BaseControllerInput } from "../core";
-import { Transaction } from "../core/transaction";
-import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
+import {
+    Address,
+    BaseController,
+    BaseControllerInput,
+    IAccount,
+    Transaction,
+    TransactionsFactoryConfig,
+} from "../core";
 import * as resources from "./resources";
 import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 

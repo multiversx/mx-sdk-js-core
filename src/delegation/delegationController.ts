@@ -1,9 +1,13 @@
-import { IAccount } from "../accounts/interfaces";
-import { Address, BaseController, BaseControllerInput } from "../core";
-import { Transaction } from "../core/transaction";
-import { TransactionOnNetwork } from "../core/transactionOnNetwork";
-import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
-import { TransactionWatcher } from "../core/transactionWatcher";
+import {
+    Address,
+    BaseController,
+    BaseControllerInput,
+    IAccount,
+    Transaction,
+    TransactionOnNetwork,
+    TransactionsFactoryConfig,
+    TransactionWatcher,
+} from "../core";
 import { INetworkProvider } from "../networkProviders/interface";
 import { DelegationTransactionsFactory } from "./delegationTransactionsFactory";
 import { DelegationTransactionsOutcomeParser } from "./delegationTransactionsOutcomeParser";

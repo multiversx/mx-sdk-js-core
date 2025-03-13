@@ -1,15 +1,21 @@
-import { Address } from "../core/address";
+import {
+    Address,
+    ErrContractQuery,
+    ErrNetworkProvider,
+    getAxios,
+    prepareTransactionForBroadcasting,
+    SmartContractQuery,
+    SmartContractQueryResponse,
+    Token,
+    Transaction,
+    TransactionOnNetwork,
+    TransactionStatus,
+    TransactionWatcher,
+} from "../core";
 import { ESDT_CONTRACT_ADDRESS_HEX, METACHAIN_ID } from "../core/constants";
-import { ErrContractQuery, ErrNetworkProvider } from "../core/errors";
-import { SmartContractQuery, SmartContractQueryResponse } from "../core/smartContractQuery";
-import { Token } from "../core/tokens";
-import { Transaction } from "../core/transaction";
-import { prepareTransactionForBroadcasting, TransactionOnNetwork } from "../core/transactionOnNetwork";
-import { TransactionStatus } from "../core/transactionStatus";
-import { TransactionWatcher } from "../core/transactionWatcher";
-import { getAxios } from "../core/utils";
 import { AccountAwaiter } from "./accountAwaiter";
-import { AccountOnNetwork, GuardianData } from "./accounts";
+import { AccountOnNetwork, AccountStorage, AccountStorageEntry, GuardianData } from "./accounts";
+import { BlockOnNetwork } from "./blocks";
 import { defaultAxiosConfig } from "./config";
 import { BaseUserAgent } from "./constants";
 import { ContractQueryRequest } from "./contractQueryRequest";
@@ -17,15 +23,9 @@ import { INetworkProvider } from "./interface";
 import { NetworkConfig } from "./networkConfig";
 import { NetworkProviderConfig } from "./networkProviderConfig";
 import { NetworkStatus } from "./networkStatus";
-import {
-    AccountStorage,
-    AccountStorageEntry,
-    AwaitingOptions,
-    BlockOnNetwork,
-    TokenAmountOnNetwork,
-    TransactionCostResponse,
-} from "./resources";
+import { AwaitingOptions, TransactionCostResponse } from "./resources";
 import { DefinitionOfFungibleTokenOnNetwork, DefinitionOfTokenCollectionOnNetwork } from "./tokenDefinitions";
+import { TokenAmountOnNetwork } from "./tokens";
 import { extendUserAgentIfBackend } from "./userAgent";
 
 // TODO: Find & remove duplicate code between "ProxyNetworkProvider" and "ApiNetworkProvider".

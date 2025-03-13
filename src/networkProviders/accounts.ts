@@ -1,5 +1,4 @@
-import { CodeMetadata } from "../abi";
-import { Address } from "../core/address";
+import { Address, CodeMetadata } from "../core";
 
 /**
  * A plain view of an account, as queried from the Network.

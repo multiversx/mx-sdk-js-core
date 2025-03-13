@@ -3,6 +3,7 @@ require("./globals");
 export * from "./address";
 export * from "./asyncTimer";
 export * from "./baseController";
+export * from "./codeMetadata";
 export * from "./config";
 export * from "./errors";
 export * from "./interface";

@@ -1,22 +1,22 @@
-import { CodeMetadata, CodeMetadataLength } from "../codeMetadata";
+import { CodeMetadata, CodeMetadataLength } from "../../core/codeMetadata";
 import { CodeMetadataValue } from "../typesystem/codeMetadata";
 
 export class CodeMetadataCodec {
     decodeNested(buffer: Buffer): [CodeMetadataValue, number] {
-        const codeMetadata = CodeMetadata.newFromBuffer(buffer.slice(0, CodeMetadataLength));
+        const codeMetadata = CodeMetadata.newFromBytes(buffer.slice(0, CodeMetadataLength));
         return [new CodeMetadataValue(codeMetadata), CodeMetadataLength];
     }
 
     decodeTopLevel(buffer: Buffer): CodeMetadataValue {
-        const codeMetadata = CodeMetadata.newFromBuffer(buffer);
+        const codeMetadata = CodeMetadata.newFromBytes(new Uint8Array(buffer));
         return new CodeMetadataValue(codeMetadata);
     }
 
     encodeNested(codeMetadata: CodeMetadataValue): Buffer {
-        return codeMetadata.valueOf().toBuffer();
+        return Buffer.from(codeMetadata.valueOf().toBytes());
     }
 
     encodeTopLevel(codeMetadata: CodeMetadataValue): Buffer {
-        return codeMetadata.valueOf().toBuffer();
+        return Buffer.from(codeMetadata.valueOf().toBytes());
     }
 }

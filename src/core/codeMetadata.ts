@@ -41,20 +41,18 @@ export class CodeMetadata {
         this.payableBySc = payableBySc;
     }
 
-    static newFromBytes(bytes: Uint8Array): CodeMetadata {
-        return CodeMetadata.newFromBuffer(Buffer.from(bytes));
-    }
-
     /**
+     * Named constructor
      * Creates a metadata object from a buffer.
+     * Also checks that data has correct length (2 bytes)
      */
-    static newFromBuffer(buffer: Buffer): CodeMetadata {
-        if (buffer.length != CodeMetadataLength) {
-            throw new Error(`code metadata buffer has length ${buffer.length}, expected ${CodeMetadataLength}`);
+    static newFromBytes(bytes: Uint8Array): CodeMetadata {
+        if (bytes.length != CodeMetadataLength) {
+            throw new Error(`code metadata buffer has length ${bytes.length}, expected ${CodeMetadataLength}`);
         }
 
-        const byteZero = buffer[0];
-        const byteOne = buffer[1];
+        const byteZero = bytes[0];
+        const byteOne = bytes[1];
 
         const upgradeable = (byteZero & CodeMetadata.ByteZero.Upgradeable) !== 0;
         const readable = (byteZero & CodeMetadata.ByteZero.Readable) !== 0;
@@ -62,6 +60,67 @@ export class CodeMetadata {
         const payableBySc = (byteOne & CodeMetadata.ByteOne.PayableBySc) !== 0;
 
         return new CodeMetadata(upgradeable, readable, payable, payableBySc);
+    }
+
+    /**
+     * @deprecated Use {@link newFromBytes} instead.
+     * Creates a metadata object from a buffer.
+     */
+    static newFromBuffer(buffer: Buffer): CodeMetadata {
+        return this.newFromBytes(buffer);
+    }
+
+    /**
+     * Converts the metadata to the protocol-friendly representation.
+     */
+    toBytes(): Uint8Array {
+        let byteZero = 0;
+        let byteOne = 0;
+
+        if (this.upgradeable) {
+            byteZero |= CodeMetadata.ByteZero.Upgradeable;
+        }
+        if (this.readable) {
+            byteZero |= CodeMetadata.ByteZero.Readable;
+        }
+        if (this.payable) {
+            byteOne |= CodeMetadata.ByteOne.Payable;
+        }
+        if (this.payableBySc) {
+            byteOne |= CodeMetadata.ByteOne.PayableBySc;
+        }
+
+        return new Uint8Array(Buffer.from([byteZero, byteOne]));
+    }
+
+    /**
+     * @deprecated Use {@link toBytes} instead.
+     */
+    toBuffer(): Buffer {
+        let byteZero = 0;
+        let byteOne = 0;
+
+        if (this.upgradeable) {
+            byteZero |= CodeMetadata.ByteZero.Upgradeable;
+        }
+        if (this.readable) {
+            byteZero |= CodeMetadata.ByteZero.Readable;
+        }
+        if (this.payable) {
+            byteOne |= CodeMetadata.ByteOne.Payable;
+        }
+        if (this.payableBySc) {
+            byteOne |= CodeMetadata.ByteOne.PayableBySc;
+        }
+
+        return Buffer.from([byteZero, byteOne]);
+    }
+
+    /**
+     * Converts the metadata to a hex-encoded string.
+     */
+    toString() {
+        return Buffer.from(this.toBytes()).toString("hex");
     }
 
     /**
@@ -90,36 +149,6 @@ export class CodeMetadata {
      */
     togglePayableBySc(value: boolean) {
         this.payableBySc = value;
-    }
-
-    /**
-     * Converts the metadata to the protocol-friendly representation.
-     */
-    toBuffer(): Buffer {
-        let byteZero = 0;
-        let byteOne = 0;
-
-        if (this.upgradeable) {
-            byteZero |= CodeMetadata.ByteZero.Upgradeable;
-        }
-        if (this.readable) {
-            byteZero |= CodeMetadata.ByteZero.Readable;
-        }
-        if (this.payable) {
-            byteOne |= CodeMetadata.ByteOne.Payable;
-        }
-        if (this.payableBySc) {
-            byteOne |= CodeMetadata.ByteOne.PayableBySc;
-        }
-
-        return Buffer.from([byteZero, byteOne]);
-    }
-
-    /**
-     * Converts the metadata to a hex-encoded string.
-     */
-    toString() {
-        return this.toBuffer().toString("hex");
     }
 
     /**

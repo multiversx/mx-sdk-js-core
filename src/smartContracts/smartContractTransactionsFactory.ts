@@ -1,7 +1,5 @@
-import { ArgSerializer, CodeMetadata, ContractFunction, EndpointDefinition } from "../abi";
-import { NativeSerializer } from "../abi/nativeSerializer";
-import { isTyped } from "../abi/typesystem";
-import { Address } from "../core/address";
+import { ArgSerializer, ContractFunction, EndpointDefinition, isTyped, NativeSerializer } from "../abi";
+import { Address, CodeMetadata } from "../core";
 import { CONTRACT_DEPLOY_ADDRESS_HEX, VM_TYPE_WASM_VM } from "../core/constants";
 import { Err } from "../core/errors";
 import { Logger } from "../core/logger";

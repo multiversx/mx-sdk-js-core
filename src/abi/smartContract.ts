@@ -1,4 +1,5 @@
 import { Address, AddressComputer } from "../core/address";
+import { CodeMetadata } from "../core/codeMetadata";
 import { Compatibility } from "../core/compatibility";
 import { TRANSACTION_MIN_GAS_PRICE } from "../core/constants";
 import { ErrContractHasNoAddress } from "../core/errors";
@@ -6,7 +7,6 @@ import { Transaction } from "../core/transaction";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { guardValueIsSet } from "../core/utils";
 import { SmartContractTransactionsFactory } from "./../smartContracts/smartContractTransactionsFactory";
-import { CodeMetadata } from "./codeMetadata";
 import { ContractFunction } from "./function";
 import { Interaction } from "./interaction";
 import {

@@ -25,7 +25,7 @@ describe("CodeMetadata Class Tests", function () {
 
     it("should convert to buffer correctly", function () {
         const metadata = new CodeMetadata(true, true, true, true);
-        const buffer = metadata.toBuffer();
+        const buffer = metadata.toBytes();
 
         assert.equal(buffer.length, 2);
         assert.equal(buffer[0], CodeMetadata.ByteZero.Upgradeable | CodeMetadata.ByteZero.Readable);
@@ -37,7 +37,7 @@ describe("CodeMetadata Class Tests", function () {
             CodeMetadata.ByteZero.Upgradeable | CodeMetadata.ByteZero.Readable,
             CodeMetadata.ByteOne.Payable | CodeMetadata.ByteOne.PayableBySc,
         ]);
-        const metadata = CodeMetadata.newFromBuffer(buffer);
+        const metadata = CodeMetadata.newFromBytes(buffer);
 
         assert.isTrue(metadata.upgradeable);
         assert.isTrue(metadata.readable);
@@ -47,7 +47,7 @@ describe("CodeMetadata Class Tests", function () {
 
     it("should create from buffer correctly when some flags are set", function () {
         const buffer = Buffer.from([CodeMetadata.ByteZero.Upgradeable, CodeMetadata.ByteOne.PayableBySc]);
-        const metadata = CodeMetadata.newFromBuffer(buffer);
+        const metadata = CodeMetadata.newFromBytes(buffer);
 
         assert.isTrue(metadata.upgradeable);
         assert.isFalse(metadata.readable);
@@ -60,7 +60,7 @@ describe("CodeMetadata Class Tests", function () {
 
         assert.throws(
             () => {
-                CodeMetadata.newFromBuffer(buffer);
+                CodeMetadata.newFromBytes(buffer);
             },
             Error,
             "code metadata buffer has length 1, expected 2",

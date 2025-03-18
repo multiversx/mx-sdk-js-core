@@ -1,21 +1,20 @@
-import { IContractQuery } from "./interface";
+import { SmartContractQuery } from "../core/smartContractQuery";
 
 export class ContractQueryRequest {
-    private readonly query: IContractQuery;
+    private readonly query: SmartContractQuery;
 
-    constructor(query: IContractQuery) {
+    constructor(query: SmartContractQuery) {
         this.query = query;
     }
 
     toHttpRequest() {
         let request: any = {};
         let query = this.query;
-        request.scAddress = query.address.bech32();
-        request.caller = query.caller?.bech32() ? query.caller.bech32() : undefined;
-        request.funcName = query.func.toString();
+        request.scAddress = query.contract.toBech32();
+        request.caller = query.caller?.toBech32() ? query.caller.toBech32() : undefined;
+        request.funcName = query.function;
         request.value = query.value ? query.value.toString() : undefined;
-        request.args = query.getEncodedArguments();
-        
+        request.args = query.arguments?.map((x) => Buffer.from(x).toString("hex"));
         return request;
     }
 }

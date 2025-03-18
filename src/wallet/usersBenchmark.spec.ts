@@ -10,7 +10,7 @@ describe("behchmark sign and verify", () => {
         const secretKeys: UserSecretKey[] = [];
         const publicKeys: UserPublicKey[] = [];
         const messages: Buffer[] = [];
-        const goodSignatures: Buffer[] = [];
+        const goodSignatures: Uint8Array[] = [];
 
         for (let i = 0; i < n; i++) {
             const secretKey = new UserSecretKey(Buffer.from(utils.randomBytes(32)));
@@ -36,7 +36,7 @@ describe("behchmark sign and verify", () => {
         console.time("verify (good)");
 
         for (let i = 0; i < n; i++) {
-            const ok = publicKeys[i].verify(messages[i], goodSignatures[i]);
+            const ok = await publicKeys[i].verify(messages[i], goodSignatures[i]);
             assert.isTrue(ok);
         }
 
@@ -45,7 +45,7 @@ describe("behchmark sign and verify", () => {
         console.time("verify (bad)");
 
         for (let i = 0; i < n; i++) {
-            const ok = publicKeys[i].verify(messages[messages.length - i - 1], goodSignatures[i]);
+            const ok = await publicKeys[i].verify(messages[messages.length - i - 1], goodSignatures[i]);
             assert.isFalse(ok);
         }
 

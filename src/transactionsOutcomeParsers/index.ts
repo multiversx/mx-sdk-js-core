@@ -1,5 +1,4 @@
-export * from "./delegationTransactionsOutcomeParser";
+export * from "../smartContracts/smartContractTransactionsOutcomeParser";
+export * from "../tokenManagement/tokenManagementTransactionsOutcomeParser";
 export * from "./resources";
-export * from "./smartContractTransactionsOutcomeParser";
-export * from "./tokenManagementTransactionsOutcomeParser";
 export * from "./transactionEventsParser";

@@ -4,34 +4,15 @@
  * @packageDocumentation
  */
 
-require("./globals");
-
-export * from "./account";
-export * from "./adapters";
-export * from "./address";
-export * from "./asyncTimer";
-export * from "./config";
-export * from "./converters";
-export * from "./errors";
-export * from "./gasEstimator";
-export * from "./interface";
-export * from "./interfaceOfNetwork";
-export * from "./logger";
-export * from "./message";
-export * from "./networkParams";
-export * from "./relayedTransactionV1Builder";
-export * from "./relayedTransactionV2Builder";
-export * from "./signableMessage";
-export * from "./smartContractQueriesController";
-export * from "./smartcontracts";
-export * from "./tokenOperations";
-export * from "./tokens";
-export * from "./transaction";
-export * from "./transactionComputer";
-export * from "./transactionPayload";
-export * from "./transactionWatcher";
-export * from "./transactionsFactories";
-export * from "./transactionsOutcomeParsers";
-export * from "./utils";
+export * from "./abi";
+export * from "./accountManagement";
+export * from "./accounts";
+export * from "./core";
+export * from "./delegation";
+export * from "./entrypoints";
 export * from "./networkProviders";
+export * from "./smartContracts";
+export * from "./tokenManagement";
+export * from "./transactionsOutcomeParsers";
+export * from "./transfers";
 export * from "./wallet";

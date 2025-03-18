@@ -1,25 +1,26 @@
 import crypto from "crypto";
-import nacl from "tweetnacl";
 import ed2curve from "ed2curve";
-import { X25519EncryptedData } from "./x25519EncryptedData";
+import nacl from "tweetnacl";
 import { UserPublicKey, UserSecretKey } from "../userKeys";
+import { X25519EncryptedData } from "./x25519EncryptedData";
 
 export class PubkeyDecryptor {
-    static decrypt(data: X25519EncryptedData, decryptorSecretKey: UserSecretKey): Buffer {
-        const ciphertext = Buffer.from(data.ciphertext, 'hex');
-        const edhPubKey = Buffer.from(data.identities.ephemeralPubKey, 'hex');
-        const originatorPubKeyBuffer = Buffer.from(data.identities.originatorPubKey, 'hex');
+    static async decrypt(data: X25519EncryptedData, decryptorSecretKey: UserSecretKey): Promise<Buffer> {
+        const ciphertext = Buffer.from(data.ciphertext, "hex");
+        const edhPubKey = Buffer.from(data.identities.ephemeralPubKey, "hex");
+        const originatorPubKeyBuffer = Buffer.from(data.identities.originatorPubKey, "hex");
         const originatorPubKey = new UserPublicKey(originatorPubKeyBuffer);
 
-        const authMessage = crypto.createHash('sha256').update(
-            Buffer.concat([ciphertext, edhPubKey])
-        ).digest();
+        const authMessage = crypto
+            .createHash("sha256")
+            .update(Buffer.concat([ciphertext, edhPubKey]))
+            .digest();
 
-        if (!originatorPubKey.verify(authMessage, Buffer.from(data.mac, 'hex'))) {
+        if (!(await originatorPubKey.verify(authMessage, Buffer.from(data.mac, "hex")))) {
             throw new Error("Invalid authentication for encrypted message originator");
         }
 
-        const nonce = Buffer.from(data.nonce, 'hex');
+        const nonce = Buffer.from(data.nonce, "hex");
         const x25519Secret = ed2curve.convertSecretKey(decryptorSecretKey.valueOf());
         const x25519EdhPubKey = ed2curve.convertPublicKey(edhPubKey);
         if (x25519EdhPubKey === null) {

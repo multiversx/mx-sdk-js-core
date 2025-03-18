@@ -1,12 +1,11 @@
 import BigNumber from "bignumber.js";
-import { Address } from "../address";
-import { IAddress } from "./interface";
+import { Address } from "../core/address";
 
 export class DefinitionOfFungibleTokenOnNetwork {
     identifier: string = "";
     name: string = "";
     ticker: string = "";
-    owner: IAddress = Address.empty();
+    owner: Address = Address.empty();
     decimals: number = 0;
     supply: BigNumber = new BigNumber(0);
     isPaused: boolean = false;
@@ -21,7 +20,7 @@ export class DefinitionOfFungibleTokenOnNetwork {
     assets: Record<string, any> = {};
 
     static fromApiHttpResponse(payload: any): DefinitionOfFungibleTokenOnNetwork {
-        let result = new DefinitionOfFungibleTokenOnNetwork();
+        const result = new DefinitionOfFungibleTokenOnNetwork();
 
         result.identifier = payload.identifier || "";
         result.name = payload.name || "";
@@ -76,7 +75,7 @@ export class DefinitionOfTokenCollectionOnNetwork {
     type: string = "";
     name: string = "";
     ticker: string = "";
-    owner: IAddress = Address.empty();
+    owner: Address = Address.empty();
     decimals: number = 0;
     canPause: boolean = false;
     canFreeze: boolean = false;
@@ -88,7 +87,7 @@ export class DefinitionOfTokenCollectionOnNetwork {
     canCreateMultiShard: boolean = false;
 
     static fromApiHttpResponse(payload: any): DefinitionOfTokenCollectionOnNetwork {
-        let result = new DefinitionOfTokenCollectionOnNetwork();
+        const result = new DefinitionOfTokenCollectionOnNetwork();
 
         result.collection = payload.collection || "";
         result.type = payload.type || "";

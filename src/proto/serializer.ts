@@ -1,10 +1,9 @@
 import BigNumber from "bignumber.js";
-import { Address } from "../address";
-import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED } from "../constants";
-import * as errors from "../errors";
-import { ITransaction, ITransactionValue } from "../interface";
-import { bigIntToBuffer } from "../smartcontracts/codec/utils";
-import { Transaction } from "../transaction";
+import { bigIntToBuffer } from "../abi/codec/utils";
+import { Address } from "../core/address";
+import { TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_OPTIONS_TX_GUARDED } from "../core/constants";
+import * as errors from "../core/errors";
+import { Transaction } from "../core/transaction";
 
 /**
  * Hides away the serialization complexity, for each type of object (e.g. transactions).
@@ -25,11 +24,11 @@ export class ProtoSerializer {
         return buffer;
     }
 
-    private convertToProtoMessage(transaction: ITransaction) {
+    private convertToProtoMessage(transaction: Transaction) {
         const proto = require("./compiled").proto;
 
-        const receiverPubkey = new Address(transaction.receiver).getPublicKey();
-        const senderPubkey = new Address(transaction.sender).getPublicKey();
+        const receiverPubkey = transaction.receiver.getPublicKey();
+        const senderPubkey = transaction.sender.getPublicKey();
 
         let protoTransaction = new proto.Transaction({
             // mx-chain-go's serializer handles nonce == 0 differently, thus we treat 0 as "undefined".
@@ -68,14 +67,14 @@ export class ProtoSerializer {
         return protoTransaction;
     }
 
-    private isRelayedTransaction(transaction: ITransaction) {
+    private isRelayedTransaction(transaction: Transaction) {
         return !transaction.relayer.isEmpty();
     }
 
     /**
      * Custom serialization, compatible with mx-chain-go.
      */
-    private serializeTransactionValue(transactionValue: ITransactionValue): Buffer {
+    private serializeTransactionValue(transactionValue: bigint): Buffer {
         let value = new BigNumber(transactionValue.toString());
         if (value.isZero()) {
             return Buffer.from([0, 0]);
@@ -88,13 +87,13 @@ export class ProtoSerializer {
         return buffer;
     }
 
-    private isGuardedTransaction(transaction: ITransaction): boolean {
-        const hasGuardian = transaction.guardian.length > 0;
+    private isGuardedTransaction(transaction: Transaction): boolean {
+        const hasGuardian = !transaction.guardian.isEmpty();
         const hasGuardianSignature = transaction.guardianSignature.length > 0;
         return this.isWithGuardian(transaction) && hasGuardian && hasGuardianSignature;
     }
 
-    private isWithGuardian(transaction: ITransaction): boolean {
+    private isWithGuardian(transaction: Transaction): boolean {
         return (transaction.options & TRANSACTION_OPTIONS_TX_GUARDED) == TRANSACTION_OPTIONS_TX_GUARDED;
     }
 

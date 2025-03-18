@@ -8,9 +8,8 @@ describe("test JSON serialization", function () {
     });
 
     it("should deserialize", async function () {
-        const JSONbig = require("json-bigint")({ constructorAction: 'ignore' });
+        const JSONbig = require("json-bigint")({ constructorAction: "ignore" });
         const data = `{"Costum":{"foo_constructor":1}}`;
         JSONbig.parse(data);
     });
 });
-

@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
-import * as contractsCodecUtils from "../smartcontracts/codec/utils";
-import * as codecUtils from "../utils.codec";
+import * as contractsCodecUtils from "../abi/codec/utils";
+import * as codecUtils from "../core/utils.codec";
 
 export function stringToBuffer(value: string): Buffer {
     return Buffer.from(value);
@@ -22,7 +22,7 @@ export function bigIntToBuffer(value: BigNumber.Value): Buffer {
     return contractsCodecUtils.bigIntToBuffer(value);
 }
 
-export { utf8ToHex, bigIntToHex, addressToHex } from "../utils.codec";
+export { bigIntToHex, utf8ToHex } from "../core/utils.codec";
 
 export function bufferToHex(value: Buffer) {
     const hex = value.toString("hex");

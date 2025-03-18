@@ -1,24 +1,15 @@
-import { Address } from "../address";
-import { ErrSignerCannotSign } from "../errors";
+import { Address } from "../core/address";
+import { ErrSignerCannotSign } from "../core/errors";
 import { UserSecretKey } from "./userKeys";
 import { UserWallet } from "./userWallet";
-
-interface IUserSecretKey {
-    sign(message: Buffer | Uint8Array): Buffer;
-    generatePublicKey(): IUserPublicKey;
-}
-
-interface IUserPublicKey {
-    toAddress(hrp?: string): { bech32(): string };
-}
 
 /**
  * ed25519 signer
  */
 export class UserSigner {
-    protected readonly secretKey: IUserSecretKey;
+    readonly secretKey: UserSecretKey;
 
-    constructor(secretKey: IUserSecretKey) {
+    constructor(secretKey: UserSecretKey) {
         this.secretKey = secretKey;
     }
 
@@ -32,7 +23,7 @@ export class UserSigner {
         return new UserSigner(secretKey);
     }
 
-    async sign(data: Buffer | Uint8Array): Promise<Buffer> {
+    async sign(data: Uint8Array): Promise<Uint8Array> {
         try {
             const signature = this.secretKey.sign(data);
             return signature;
@@ -45,7 +36,7 @@ export class UserSigner {
      * Gets the address of the signer.
      */
     getAddress(hrp?: string): Address {
-        const bech32 = this.secretKey.generatePublicKey().toAddress(hrp).bech32();
+        const bech32 = this.secretKey.generatePublicKey().toAddress(hrp).toBech32();
         return Address.newFromBech32(bech32);
     }
 }

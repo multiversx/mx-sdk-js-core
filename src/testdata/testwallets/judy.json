@@ -1,5 +1,6 @@
 {
     "version": 4,
+    "kind": "secretKey",
     "id": "a3108434-5d2c-4dca-9f94-29e822697e20",
     "address": "4a101a0f8f95f1218683900801cd971c6028b1597a771b2ed367d1ede09d9d2a",
     "bech32": "erd1fggp5ru0jhcjrp5rjqyqrnvhr3sz3v2e0fm3ktknvlg7mcyan54qzccnan",

@@ -1,6 +1,7 @@
 import * as ed from "@noble/ed25519";
 import { sha512 } from "@noble/hashes/sha512";
-import { Address } from "../address";
+import nacl from "tweetnacl";
+import { Address } from "../core/address";
 import { guardLength } from "./assertions";
 import { parseUserKey } from "./pem";
 
@@ -36,9 +37,17 @@ export class UserSecretKey {
         return new UserPublicKey(buffer);
     }
 
-    sign(message: Buffer | Uint8Array): Buffer {
+    static generate(): UserSecretKey {
+        // Generates a new signing keypair
+        const keyPair = nacl.sign.keyPair();
+        // Extract only the private key part
+        const secretKey = keyPair.secretKey.subarray(0, USER_SEED_LENGTH);
+        return new UserSecretKey(secretKey);
+    }
+
+    sign(message: Uint8Array): Uint8Array {
         const signature = ed.sync.sign(new Uint8Array(message), new Uint8Array(this.buffer));
-        return Buffer.from(signature);
+        return signature;
     }
 
     hex(): string {
@@ -59,7 +68,7 @@ export class UserPublicKey {
         this.buffer = Buffer.from(buffer);
     }
 
-    verify(data: Buffer | Uint8Array, signature: Buffer | Uint8Array): boolean {
+    async verify(data: Buffer | Uint8Array, signature: Buffer | Uint8Array): Promise<boolean> {
         try {
             const ok = ed.sync.verify(new Uint8Array(signature), new Uint8Array(data), new Uint8Array(this.buffer));
             return ok;

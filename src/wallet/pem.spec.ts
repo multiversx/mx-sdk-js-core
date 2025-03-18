@@ -1,6 +1,6 @@
 import { Buffer } from "buffer";
 import { assert } from "chai";
-import { ErrBadPEM } from "../errors";
+import { ErrBadPEM } from "../core/errors";
 import { loadTestWallet, TestWallet } from "./../testutils/wallets";
 import { parse, parseUserKey, parseValidatorKey } from "./pem";
 import { BLS } from "./validatorKeys";
@@ -18,7 +18,7 @@ describe("test PEMs", () => {
         let aliceKey = parseUserKey(alice.pemFileText);
 
         assert.equal(aliceKey.hex(), alice.secretKeyHex);
-        assert.equal(aliceKey.generatePublicKey().toAddress().bech32(), alice.address.bech32());
+        assert.equal(aliceKey.generatePublicKey().toAddress().toBech32(), alice.address.toBech32());
     });
 
     it("should parseValidatorKey", async () => {

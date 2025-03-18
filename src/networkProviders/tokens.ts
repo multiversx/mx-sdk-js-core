@@ -1,7 +1,7 @@
 import { BigNumber } from "bignumber.js";
-import { Address } from "../address";
-import { numberToPaddedHex } from "../utils.codec";
-import { IAddress } from "./interface";
+import { Address, Token } from "../core";
+import { numberToPaddedHex } from "../core/utils.codec";
+import { BlockCoordinates } from "./blocks";
 
 export class FungibleTokenOfAccountOnNetwork {
     identifier: string = "";
@@ -27,7 +27,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
     nonce: number = 0;
     type: string = "";
     name: string = "";
-    creator: IAddress = Address.empty();
+    creator: Address = Address.empty();
     supply: BigNumber = new BigNumber(0);
     decimals: number = 0;
     royalties: BigNumber = new BigNumber(0);
@@ -39,7 +39,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
     }
 
     static fromProxyHttpResponse(payload: any): NonFungibleTokenOfAccountOnNetwork {
-        let result = NonFungibleTokenOfAccountOnNetwork.fromHttpResponse(payload);
+        const result = NonFungibleTokenOfAccountOnNetwork.fromHttpResponse(payload);
 
         result.identifier = payload.tokenIdentifier || "";
         result.collection = NonFungibleTokenOfAccountOnNetwork.parseCollectionFromIdentifier(result.identifier);
@@ -49,7 +49,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
     }
 
     static fromProxyHttpResponseByNonce(payload: any): NonFungibleTokenOfAccountOnNetwork {
-        let result = NonFungibleTokenOfAccountOnNetwork.fromHttpResponse(payload);
+        const result = NonFungibleTokenOfAccountOnNetwork.fromHttpResponse(payload);
         let nonceAsHex = numberToPaddedHex(result.nonce);
 
         result.identifier = `${payload.tokenIdentifier}-${nonceAsHex}`;
@@ -60,7 +60,7 @@ export class NonFungibleTokenOfAccountOnNetwork {
     }
 
     static fromApiHttpResponse(payload: any): NonFungibleTokenOfAccountOnNetwork {
-        let result = NonFungibleTokenOfAccountOnNetwork.fromHttpResponse(payload);
+        const result = NonFungibleTokenOfAccountOnNetwork.fromHttpResponse(payload);
 
         result.identifier = payload.identifier || "";
         result.collection = payload.collection || "";
@@ -91,5 +91,36 @@ export class NonFungibleTokenOfAccountOnNetwork {
         let parts = identifier.split("-");
         let collection = parts.slice(0, 2).join("-");
         return collection;
+    }
+}
+
+export class TokenAmountOnNetwork {
+    raw: Record<string, any> = {};
+    token: Token = new Token({ identifier: "" });
+    amount: bigint = 0n;
+    block_coordinates?: BlockCoordinates;
+
+    constructor(init?: Partial<TokenAmountOnNetwork>) {
+        Object.assign(this, init);
+    }
+
+    static fromProxyResponse(payload: any): TokenAmountOnNetwork {
+        const result = new TokenAmountOnNetwork();
+
+        result.raw = payload;
+        result.amount = BigInt(payload["balance"] ?? 0);
+        result.token = new Token({ identifier: payload["tokenIdentifier"] ?? "", nonce: payload["nonce"] ?? 0 });
+
+        return result;
+    }
+
+    static fromApiResponse(payload: any): TokenAmountOnNetwork {
+        const result = new TokenAmountOnNetwork();
+
+        result.raw = payload;
+        result.amount = BigInt(payload["balance"] ?? 0);
+        result.token = new Token({ identifier: payload["identifier"] ?? "", nonce: payload["nonce"] ?? 0 });
+
+        return result;
     }
 }

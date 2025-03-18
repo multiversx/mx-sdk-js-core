@@ -1,10 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Account } from "../account";
-import { Address } from "../address";
-import { IAddress } from "../interface";
-import { IAccountOnNetwork } from "../interfaceOfNetwork";
-import { getAxios } from "../utils";
+import { Account } from "../accounts";
+import { Address } from "../core/address";
+import { getAxios } from "../core/utils";
+import { AccountOnNetwork } from "../networkProviders";
 import { UserSecretKey, UserSigner } from "./../wallet";
 import { readTestFile } from "./files";
 import { isOnBrowserTests } from "./utils";
@@ -12,7 +11,7 @@ import { isOnBrowserTests } from "./utils";
 export const DummyMnemonicOf12Words = "matter trumpet twenty parade fame north lift sail valve salon foster cinnamon";
 
 interface IAccountFetcher {
-    getAccount(address: IAddress): Promise<IAccountOnNetwork>;
+    getAccount(address: Address): Promise<AccountOnNetwork>;
 }
 
 export async function loadAndSyncTestWallets(provider: IAccountFetcher): Promise<Record<string, TestWallet>> {
@@ -104,7 +103,7 @@ export class TestWallet {
         this.signer = new UserSigner(UserSecretKey.fromString(secretKeyHex));
         this.keyFileObject = keyFileObject;
         this.pemFileText = pemFileText;
-        this.account = new Account(this.address);
+        this.account = new Account(new UserSecretKey(this.secretKey));
     }
 
     getAddress(): Address {
@@ -113,7 +112,12 @@ export class TestWallet {
 
     async sync(provider: IAccountFetcher) {
         let accountOnNetwork = await provider.getAccount(this.address);
-        this.account.update(accountOnNetwork);
+        this.account.nonce = accountOnNetwork.nonce;
         return this;
+    }
+
+    async getBalance(provider: IAccountFetcher) {
+        let accountOnNetwork = await provider.getAccount(this.address);
+        return accountOnNetwork.balance;
     }
 }

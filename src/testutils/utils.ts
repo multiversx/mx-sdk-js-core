@@ -1,22 +1,18 @@
-import BigNumber from "bignumber.js";
 import * as fs from "fs";
 import { PathLike } from "fs";
-import { IChainID, IGasLimit } from "../interface";
-import { Code } from "../smartcontracts/code";
-import { SmartContract } from "../smartcontracts/smartContract";
-import { AbiRegistry, TypedValue } from "../smartcontracts/typesystem";
-import { Transaction } from "../transaction";
-import { TransactionWatcher } from "../transactionWatcher";
-import { getAxios } from "../utils";
-import { TestWallet } from "./wallets";
+import { resolve } from "path";
+import { Abi, Code, SmartContract, TypedValue } from "../abi";
+import { Account } from "../accounts";
+import { Transaction } from "../core/transaction";
+import { getAxios } from "../core/utils";
 
 export async function prepareDeployment(obj: {
-    deployer: TestWallet;
+    deployer: Account;
     contract: SmartContract;
     codePath: string;
     initArguments: TypedValue[];
-    gasLimit: IGasLimit;
-    chainID: IChainID;
+    gasLimit: bigint;
+    chainID: string;
 }): Promise<Transaction> {
     let contract = obj.contract;
     let deployer = obj.deployer;
@@ -29,12 +25,12 @@ export async function prepareDeployment(obj: {
         deployer: deployer.address,
     });
 
-    let nonce = deployer.account.getNonceThenIncrement();
+    let nonce = deployer.getNonceThenIncrement();
     let contractAddress = SmartContract.computeAddress(deployer.address, nonce);
-    transaction.setNonce(nonce);
-    transaction.setSender(deployer.address);
+    transaction.nonce = nonce;
+    transaction.sender = deployer.address;
     contract.setAddress(contractAddress);
-    transaction.applySignature(await deployer.signer.sign(transaction.serializeForSigning()));
+    transaction.signature = await deployer.signTransaction(transaction);
 
     return transaction;
 }
@@ -59,17 +55,17 @@ export async function loadContractCode(path: PathLike): Promise<Code> {
     return Code.fromBuffer(buffer);
 }
 
-export async function loadAbiRegistry(path: PathLike): Promise<AbiRegistry> {
+export async function loadAbiRegistry(path: PathLike): Promise<Abi> {
     if (isOnBrowserTests()) {
         const axios = await getAxios();
         let response: any = await axios.default.get(path.toString());
-        return AbiRegistry.create(response.data);
+        return Abi.create(response.data);
     }
 
     // Load from files
     let jsonContent: string = await fs.promises.readFile(path, { encoding: "utf8" });
     let json = JSON.parse(jsonContent);
-    return AbiRegistry.create(json);
+    return Abi.create(json);
 }
 
 export function isOnBrowserTests() {
@@ -84,15 +80,27 @@ export function isOnBrowserTests() {
     return isOnTests;
 }
 
-export function setupUnitTestWatcherTimeouts() {
-    TransactionWatcher.DefaultPollingInterval = 42;
-    TransactionWatcher.DefaultTimeout = 42 * 42;
-}
-
-export function createAccountBalance(egld: number): BigNumber {
-    return new BigNumber(egld.toString() + "0".repeat(18));
+export function createAccountBalance(egld: number): bigint {
+    return BigInt(egld.toString() + "0".repeat(18));
 }
 
 export function b64TopicsToBytes(topics: string[]): Uint8Array[] {
     return topics.map((topic) => Buffer.from(topic, "base64"));
 }
+
+export function b64ToHex(value: string): string {
+    return Buffer.from(value, "base64").toString("hex");
+}
+
+export function getTestWalletsPath(): string {
+    return resolve(__dirname, "..", "testdata", "testwallets");
+}
+
+export const stringifyBigIntJSON = (jsonString: any): any => {
+    const JSONBig = require("json-bigint")({ constructorAction: "ignore" });
+    try {
+        return JSONBig.stringify(jsonString);
+    } catch (error) {
+        throw new Error(`Failed to parse JSON: ${error.message}`);
+    }
+};

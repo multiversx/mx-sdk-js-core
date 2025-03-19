@@ -17,7 +17,6 @@ export * from "./transactionComputer";
 export * from "./transactionEvents";
 export * from "./transactionLogs";
 export * from "./transactionOnNetwork";
-export * from "./transactionPayload";
 export * from "./transactionsFactoryConfig";
 export * from "./transactionStatus";
 export * from "./transactionWatcher";

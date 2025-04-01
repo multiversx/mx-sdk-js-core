@@ -21,7 +21,7 @@ import { TransfersController, TransferTransactionsFactory } from "../transfers";
 import { UserSecretKey } from "../wallet";
 import { DevnetEntrypointConfig, MainnetEntrypointConfig, TestnetEntrypointConfig } from "./config";
 
-class NetworkEntrypoint {
+export class NetworkEntrypoint {
     private networkProvider: INetworkProvider;
     private chainId: string;
 

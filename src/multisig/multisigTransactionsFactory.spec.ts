@@ -170,19 +170,19 @@ describe("test multisig transactions factory", function () {
     it("should create transaction for propose transfer execute", function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const destinationContract = Address.newFromBech32(
-            "erd1qqqqqqqqqqqqqpgq7qq4j96cdffea6lhvkt9m29vk94d4gv2w8esymux73",
+            "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms",
         );
-
         const multisigContractAddress = Address.newFromBech32(
-            "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
+            "erd1qqqqqqqqqqqqqpgq6kurkz43xq8t35kx9p8rvyz5kpxe9g7qd8ssefqjw8",
         );
         const amount = 1000000000000000000n; // 1 EGLD
         const transaction = factory.createTransactionForProposeTransferExecute(senderAddress, {
             multisigContract: multisigContractAddress,
-            to: destinationContract,
             egldAmount: amount,
-            functionName: "setVaultActiveState",
-            arguments: ["erd1qqqqqqqqqqqqqpgqfec7wc6mll3p5m5rp3tcrsetmws4tmenw8esw7pck7"],
+            to: destinationContract,
+            functionName: "add",
+            functionArguments: [7],
+            abi: adderAbi,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -192,7 +192,7 @@ describe("test multisig transactions factory", function () {
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
-            "proposeTransferExecute@00000000000000000500f0015917586a539eebf765965da8acb16adaa18a71f3@@7365745661756c744163746976655374617465@000000000000000005004e71e7635bffe21a6e830c5781c32bdba155ef3371f3",
+            "proposeTransferExecute@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@0de0b6b3a7640000@010000000003938700@616464@07",
         );
     });
 
@@ -214,8 +214,8 @@ describe("test multisig transactions factory", function () {
             multisigContract: multisigContractAddress,
             to: destinationContract,
             tokens: [tokenTransfer],
-            functionName: "myEsdtFunction",
-            arguments: ["arg1", "arg2"],
+            functionName: "distribute",
+            functionArguments: [],
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -239,10 +239,10 @@ describe("test multisig transactions factory", function () {
         );
         const transaction = factory.createTransactionForProposeAsyncCall(senderAddress, {
             multisigContract: multisigContractAddress,
+            nativeTransferAmount: 0n,
             to: destinationContract,
             functionName: "add",
             functionArguments: [7],
-            nativeTransferAmount: 0n,
             tokenTransfers: [],
             abi: adderAbi,
         });
@@ -256,6 +256,58 @@ describe("test multisig transactions factory", function () {
             transaction.data.toString(),
             "proposeAsyncCall@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@@@616464@07",
         );
+    });
+
+    it("should create transaction for deposit the expected amount of egld", function () {
+        const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+
+        const multisigContractAddress = Address.newFromBech32(
+            "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
+        );
+        const token = new Token({
+            identifier: "TEST-abcdef",
+        });
+        const tokenTransfer = new TokenTransfer({ token: token, amount: 1000000000000000000n });
+
+        const transaction = factory.createTransactionForDeposit(senderAddress, {
+            multisigContract: multisigContractAddress,
+            egldAmount: 1n,
+            tokenTransfers: [],
+        });
+
+        assert.instanceOf(transaction, Transaction);
+        assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
+        assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
+        assert.isAbove(transaction.data.length, 0);
+        assert.equal(transaction.chainID, config.chainID);
+        assert.equal(transaction.value, 1n);
+        assert.deepEqual(transaction.data.toString(), "deposit");
+    });
+
+    it("should create transaction for deposit esdt token", function () {
+        const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+
+        const multisigContractAddress = Address.newFromBech32(
+            "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
+        );
+        const token = new Token({
+            identifier: "ALICE-5627f1",
+        });
+        const tokenTransfer = new TokenTransfer({ token: token, amount: 100n });
+
+        const transaction = factory.createTransactionForDeposit(senderAddress, {
+            multisigContract: multisigContractAddress,
+            egldAmount: 0n,
+            tokenTransfers: [tokenTransfer],
+        });
+
+        assert.instanceOf(transaction, Transaction);
+        assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
+        assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
+        assert.isAbove(transaction.data.length, 0);
+        assert.equal(transaction.chainID, config.chainID);
+        assert.equal(transaction.value, 0n);
+        assert.deepEqual(transaction.data.toString(), "ESDTTransfer@414c4943452d353632376631@64@6465706f736974");
     });
 
     it("should create transaction for propose SC deploy from source", function () {

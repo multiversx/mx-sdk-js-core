@@ -49,7 +49,14 @@ export type ProposeTransferExecuteInput = MultisigContractInput & {
     egldAmount: bigint;
     gasLimit?: bigint;
     functionName: string;
-    arguments: any[];
+    functionArguments: any[];
+    abi?: Abi;
+};
+
+export type DepositExecuteInput = MultisigContractInput & {
+    egldAmount: bigint;
+    gasLimit?: bigint;
+    tokenTransfers: TokenTransfer[];
 };
 
 export class ProposeTransferExecuteEsdtInput {
@@ -58,7 +65,8 @@ export class ProposeTransferExecuteEsdtInput {
     tokens: any[];
     gasLimit?: bigint;
     functionName: string;
-    arguments: any[];
+    functionArguments: any[];
+    abi?: Abi;
 
     constructor(options: ProposeTransferExecuteEsdtInput) {
         this.multisigContract = options.multisigContract;
@@ -343,7 +351,7 @@ export type CallActionData = {
 
 export type EsdtTokenPayment = {
     token_identifier: string;
-    token_nonce: number;
+    token_nonce: BigInt;
     amount: BigInt;
 };
 

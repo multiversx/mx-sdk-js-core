@@ -168,13 +168,21 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         options: resources.ProposeTransferExecuteInput,
     ): Transaction {
         const gasOption = new U64Value(options.gasLimit ?? this.config.gasLimitCreateMultisig);
-
+        const input = resources.ProposeTransferExecutInput.newFromTransferExecuteInput({
+            multisig: options.multisigContract,
+            to: options.to,
+            nativeTransferAmount: options.egldAmount,
+            tokenTransfers: [],
+            functionName: options.functionName,
+            arguments: options.functionArguments,
+            abi: options.abi,
+        });
         const dataParts = [
             "proposeTransferExecute",
             this.argSerializer.valuesToStrings([new AddressValue(options.to)])[0],
             this.argSerializer.valuesToStrings([new BigUIntValue(options.egldAmount)])[0],
             this.argSerializer.valuesToStrings([new OptionValue(new OptionType(new U64Type()), gasOption)])[0],
-            ...options.functionName,
+            ...input.functionCall,
         ];
 
         const gasLimit = this.config.gasLimitProposeAction + this.config.additionalGasLimitForMultisigOperations;
@@ -187,6 +195,21 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             gasLimit: gasLimit,
             addDataMovementGas: true,
         }).build();
+    }
+
+    /**
+     * Proposes a transaction that will transfer EGLD and/or execute a function
+     */
+    createTransactionForDeposit(sender: Address, options: resources.DepositExecuteInput): Transaction {
+        console.log(111, options.tokenTransfers.length, { t: options.tokenTransfers });
+        return this.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "deposit",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [],
+            nativeTransferAmount: options.egldAmount,
+            tokenTransfers: options.tokenTransfers,
+        });
     }
 
     /**

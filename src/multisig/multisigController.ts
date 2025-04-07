@@ -501,6 +501,26 @@ export class MultisigController extends SmartContractController {
     }
 
     /**
+     * Creates a transaction for deposit native token or tokens
+     */
+    async createTransactionForDeposit(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.DepositExecuteInput & BaseControllerInput,
+    ): Promise<Transaction> {
+        const transaction = this.multisigFactory.createTransactionForDeposit(sender.address, options);
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.setTransactionGasOptions(transaction, options);
+        transaction.signature = await sender.signTransaction(transaction);
+
+        return transaction;
+    }
+
+
+    /**
      * Creates a transaction for proposing to transfer EGLD and execute a smart contract call
      */
     async createTransactionForProposeTransferExecute(

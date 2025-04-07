@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { PathLike } from "fs";
 import { resolve } from "path";
-import { Abi, Code, SmartContract, TypedValue } from "../abi";
+import { Abi, SmartContract, TypedValue } from "../abi";
 import { Account } from "../accounts";
 import { Transaction } from "../core/transaction";
 import { getAxios } from "../core/utils";
@@ -35,7 +35,7 @@ export async function prepareDeployment(obj: {
     return transaction;
 }
 
-export async function loadContractCode(path: PathLike): Promise<Code> {
+export async function loadContractCode(path: PathLike): Promise<Uint8Array> {
     if (isOnBrowserTests()) {
         const axios = await getAxios();
         let response: any = await axios.default.get(path.toString(), {
@@ -46,13 +46,11 @@ export async function loadContractCode(path: PathLike): Promise<Code> {
             },
         });
 
-        let buffer = Buffer.from(response.data);
-        return Code.fromBuffer(buffer);
+        return Buffer.from(response.data);
     }
 
     // Load from file.
-    let buffer: Buffer = await fs.promises.readFile(path);
-    return Code.fromBuffer(buffer);
+    return await fs.promises.readFile(path);
 }
 
 export async function loadAbiRegistry(path: PathLike): Promise<Abi> {

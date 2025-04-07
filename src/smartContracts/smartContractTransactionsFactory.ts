@@ -1,5 +1,5 @@
 import { ArgSerializer, ContractFunction, EndpointDefinition, isTyped, NativeSerializer } from "../abi";
-import { Address, CodeMetadata } from "../core";
+import { Address, CodeMetadata, TransactionsFactoryConfig } from "../core";
 import { CONTRACT_DEPLOY_ADDRESS_HEX, VM_TYPE_WASM_VM } from "../core/constants";
 import { Err } from "../core/errors";
 import { Logger } from "../core/logger";
@@ -9,15 +9,6 @@ import { Transaction } from "../core/transaction";
 import { TransactionBuilder } from "../core/transactionBuilder";
 import { byteArrayToHex, utf8ToHex } from "../core/utils.codec";
 import * as resources from "./resources";
-
-interface IConfig {
-    chainID: string;
-    addressHrp: string;
-    minGasLimit: bigint;
-    gasLimitPerByte: bigint;
-    gasLimitClaimDeveloperRewards: bigint;
-    gasLimitChangeOwnerAddress: bigint;
-}
 
 interface IAbi {
     constructorDefinition: EndpointDefinition;
@@ -30,13 +21,13 @@ interface IAbi {
  * Use this class to create transactions to deploy, call or upgrade a smart contract.
  */
 export class SmartContractTransactionsFactory {
-    private readonly config: IConfig;
+    protected readonly config: TransactionsFactoryConfig;
     private readonly abi?: IAbi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
     private readonly contractDeployAddress: Address;
 
-    constructor(options: { config: IConfig; abi?: IAbi }) {
+    constructor(options: { config: TransactionsFactoryConfig; abi?: IAbi }) {
         this.config = options.config;
         this.abi = options.abi;
         this.tokenComputer = new TokenComputer();
@@ -102,7 +93,10 @@ export class SmartContractTransactionsFactory {
 
         const endpoint = this.abi?.getEndpoint(options.function);
 
+        console.log({ args });
         const preparedArgs = this.argsToDataParts(args, endpoint);
+        console.log({ preparedArgs });
+
         dataParts.push(...preparedArgs);
 
         return new TransactionBuilder({

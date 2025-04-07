@@ -20,11 +20,11 @@ import * as resources from "./resources";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
 
 export class SmartContractController extends BaseController {
-    private factory: SmartContractTransactionsFactory;
+    protected factory: SmartContractTransactionsFactory;
     private parser: SmartContractTransactionsOutcomeParser;
     private transactionWatcher: TransactionWatcher;
     private networkProvider: INetworkProvider;
-    private abi?: Abi;
+    protected abi?: Abi;
 
     constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: Abi }) {
         super();
@@ -113,6 +113,7 @@ export class SmartContractController extends BaseController {
 
     async runQuery(query: SmartContractQuery): Promise<SmartContractQueryResponse> {
         const queryResponse = await this.networkProvider.queryContract(query);
+        console.log({ queryResponse });
         return queryResponse;
     }
 
@@ -146,7 +147,6 @@ export class SmartContractController extends BaseController {
         const parts = response.returnDataParts.map((part) => Buffer.from(part));
 
         let values = argsSerializer.buffersToValues(parts, endpoint.output);
-
         return values.map((value) => value.valueOf());
     }
 

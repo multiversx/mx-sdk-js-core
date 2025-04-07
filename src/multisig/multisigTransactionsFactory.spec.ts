@@ -252,9 +252,9 @@ describe("test multisig transactions factory", function () {
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
         assert.isAbove(transaction.data.length, 0);
         assert.equal(transaction.chainID, config.chainID);
-        assert.deepEqual(
+        assert.equal(
             transaction.data.toString(),
-            "proposeAsyncCall@0000000000000000050049bff963bdfa3ea02713362095df32e3d708eaccfc57@0000000c53555045522d313963356335000000000000000000000008f9ccd8a1c5080000@@64697374726962757465",
+            "proposeAsyncCall@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@@@616464@07",
         );
     });
 

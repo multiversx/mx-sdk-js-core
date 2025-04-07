@@ -225,23 +225,35 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
      * Proposes an async call to another contract
      */
     createTransactionForProposeAsyncCall(sender: Address, options: resources.ProposeAsyncCallInput): Transaction {
-        const gasOption = new U64Value(options.optGasLimit ?? this.config.gasLimitCreateMultisig);
         const input = resources.ProposeTransferExecutInput.newFromTransferExecuteInput({
             multisig: options.multisigContract,
             to: options.to,
-            nativeTransferAmount: 0n,
-            tokenTransfers: [],
-            functionName: "add",
-            arguments: [7],
+            nativeTransferAmount: options.nativeTransferAmount,
+            tokenTransfers: options.tokenTransfers,
+            functionName: options.functionName,
+            arguments: options.functionArguments,
             abi: options.abi,
         });
         const gasLimit = this.config.gasLimitProposeAction + this.config.additionalGasLimitForMultisigOperations;
-        return this.createTransactionForExecute(sender, {
-            contract: options.multisigContract,
-            function: "proposeAsyncCall",
+
+        let receiver = options.multisigContract;
+        const dataParts = [
+            "proposeAsyncCall",
+            this.argSerializer.valuesToStrings([new AddressValue(options.to)])[0],
+            this.argSerializer.valuesToStrings([new BigUIntValue(options.nativeTransferAmount)])[0],
+            this.argSerializer.valuesToStrings([new BigUIntValue(options.optGasLimit ?? 0n)])[0],
+            ...input.functionCall,
+        ];
+
+        return new TransactionBuilder({
+            config: this.config,
+            sender: sender,
+            receiver: receiver,
+            dataParts: dataParts,
             gasLimit: gasLimit,
-            arguments: [input.to, 0n, input.gasLimit, VariadicValue.fromItems(...input.functionCall)],
-        });
+            addDataMovementGas: false,
+            amount: 0n,
+        }).build();
     }
 
     /**

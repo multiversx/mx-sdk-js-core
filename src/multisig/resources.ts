@@ -105,16 +105,14 @@ export class ProposeTransferExecutInput {
             nativeTransferAmount: 0n,
             tokenTransfers: options.tokenTransfers,
         });
-        console.log({ ter: transaction.data.toString() });
         const functionCallParts = Buffer.from(transaction.data).toString().split(ARGUMENTS_SEPARATOR);
         const functionName = functionCallParts[0];
         const functionArguments = [];
         for (let index = 1; index < functionCallParts.length; index++) {
             const element = functionCallParts[index];
-            functionArguments.push(element);
+            functionArguments.push(element.valueOf());
         }
-        const functionCall = [new BytesValue(Buffer.from(functionName)), ...functionArguments];
-        console.log({ functionCall });
+        const functionCall = [new BytesValue(Buffer.from(utf8ToHex(functionName))), ...functionArguments];
         return new ProposeTransferExecutInput({
             multisigContract: options.multisig,
             to: options.to,

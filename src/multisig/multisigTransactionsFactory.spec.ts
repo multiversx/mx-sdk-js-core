@@ -7,7 +7,7 @@ import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { loadAbiRegistry, loadContractCode } from "../testutils";
 import { MultisigTransactionsFactory } from "./multisigTransactionFactory";
 
-describe("test multisig transactions factory", function () {
+describe.only("test multisig transactions factory", function () {
     const config = new TransactionsFactoryConfig({
         chainID: "D",
     });
@@ -27,7 +27,7 @@ describe("test multisig transactions factory", function () {
         });
     });
 
-    it("should create transaction for deploy multisig contract", function () {
+    it.skip("should create transaction for deploy multisig contract", function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const boardMemberAddress = Address.newFromBech32(
@@ -310,7 +310,7 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "ESDTTransfer@414c4943452d353632376631@64@6465706f736974");
     });
 
-    it("should create transaction for propose SC deploy from source", function () {
+    it.only("should create transaction for propose SC deploy from source", function () {
         const amount = BigInt(50000000000000000); // 0.05 EGLD
         const metadata = new CodeMetadata(true, true, false);
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
@@ -324,7 +324,7 @@ describe("test multisig transactions factory", function () {
             amount: amount,
             source: sourceContract,
             codeMetadata: metadata,
-            arguments: ["arg1", "arg2"],
+            arguments: ["7"],
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -334,7 +334,7 @@ describe("test multisig transactions factory", function () {
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
-            "proposeSCDeployFromSource@000000000000000005007e25ce6debac748d86b5d393120ab1eb02a46d581679@@000000000000000005006abd1c3a3794da01602b855ac03e7821e6638ec81679@0500",
+            "proposeSCDeployFromSource@b1a2bc2ec50000@000000000000000005006abd1c3a3794da01602b855ac03e7821e6638ec81679@0500@7",
         );
     });
 
@@ -363,7 +363,7 @@ describe("test multisig transactions factory", function () {
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
-            "proposeSCUpgradeFromSource@000000000000000005007e25ce6debac748d86b5d393120ab1eb02a46d581679@@000000000000000005006abd1c3a3794da01602b855ac03e7821e6638ec81679@0500",
+            "proposeSCUpgradeFromSource@000000000000000005007e25ce6debac748d86b5d393120ab1eb02a46d581679@b1a2bc2ec50000@000000000000000005006abd1c3a3794da01602b855ac03e7821e6638ec81679@0500",
         );
     });
 

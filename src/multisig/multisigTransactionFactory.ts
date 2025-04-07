@@ -290,7 +290,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             "proposeSCDeployFromSource",
             this.argSerializer.valuesToStrings([new BigUIntValue(options.amount)])[0],
             this.argSerializer.valuesToStrings([new AddressValue(options.source)])[0],
-            this.serializeCodeMetadata(options.codeMetadata),
+            options.codeMetadata.toString(),
             ...options.arguments,
         ];
 
@@ -318,7 +318,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             this.argSerializer.valuesToStrings([new AddressValue(options.scAddress)])[0],
             this.argSerializer.valuesToStrings([new BigUIntValue(options.amount)])[0],
             this.argSerializer.valuesToStrings([new AddressValue(options.source)])[0],
-            this.serializeCodeMetadata(options.codeMetadata),
+            options.codeMetadata.toString(),
             ...options.arguments,
         ];
 

@@ -22,7 +22,7 @@ interface IAbi {
  */
 export class SmartContractTransactionsFactory {
     protected readonly config: TransactionsFactoryConfig;
-    private readonly abi?: IAbi;
+    protected readonly abi?: IAbi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
     private readonly contractDeployAddress: Address;
@@ -62,7 +62,7 @@ export class SmartContractTransactionsFactory {
 
     createTransactionForExecute(sender: Address, options: resources.ContractExecuteInput): Transaction {
         const args = options.arguments || [];
-        let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
+        let tokenTransfers = options.tokenTransfers ?? [];
         let nativeTransferAmount = options.nativeTransferAmount ?? 0n;
         let numberOfTokens = tokenTransfers.length;
 
@@ -93,9 +93,7 @@ export class SmartContractTransactionsFactory {
 
         const endpoint = this.abi?.getEndpoint(options.function);
 
-        console.log({ args });
         const preparedArgs = this.argsToDataParts(args, endpoint);
-        console.log({ preparedArgs });
 
         dataParts.push(...preparedArgs);
 
@@ -189,7 +187,7 @@ export class SmartContractTransactionsFactory {
         }).build();
     }
 
-    private argsToDataParts(args: any[], endpoint?: EndpointDefinition): string[] {
+    protected argsToDataParts(args: any[], endpoint?: EndpointDefinition): string[] {
         if (endpoint) {
             const typedArgs = NativeSerializer.nativeToTypedValues(args, endpoint);
             return new ArgSerializer().valuesToStrings(typedArgs);

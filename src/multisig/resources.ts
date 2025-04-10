@@ -3,6 +3,7 @@ import { Token, TokenTransfer, TransactionsFactoryConfig } from "../core";
 import { Address } from "../core/address";
 import { CodeMetadata } from "../core/codeMetadata";
 import { ARGUMENTS_SEPARATOR } from "../core/constants";
+import { utf8ToHex } from "../core/utils.codec";
 import { SmartContractTransactionsFactory } from "../smartContracts";
 
 export type DeployMultisigContractInput = {
@@ -14,6 +15,7 @@ export type DeployMultisigContractInput = {
     isReadable?: boolean;
     isPayable?: boolean;
     isPayableBySmartContract?: boolean;
+    gasLimit: bigint;
 };
 
 export type UpgradeMultisigContractInput = {
@@ -23,9 +25,11 @@ export type UpgradeMultisigContractInput = {
     isPayable?: boolean;
     isPayableBySmartContract?: boolean;
     multisigContract: Address;
+    gasLimit: bigint;
 };
 export type MultisigContractInput = {
     multisigContract: Address;
+    gasLimit: bigint;
 };
 
 export type ProposeAddBoardMemberInput = MultisigContractInput & {
@@ -63,7 +67,7 @@ export class ProposeTransferExecuteEsdtInput {
     multisigContract: Address;
     to: Address;
     tokens: any[];
-    gasLimit?: bigint;
+    gasLimit: bigint;
     functionName: string;
     functionArguments: any[];
     abi?: Abi;
@@ -74,7 +78,74 @@ export class ProposeTransferExecuteEsdtInput {
         this.tokens = options.tokens;
         this.gasLimit = options.gasLimit;
         this.functionName = options.functionName;
-        this.arguments = options.arguments;
+        this.functionArguments = options.functionArguments;
+        this.abi = options.abi;
+    }
+}
+
+export class ProposeTransferExecuteEsdtInputForContract {
+    multisigContract: Address;
+    to: Address;
+    gasLimit?: bigint;
+    functionCall: any[];
+    tokens: EsdtTokenPayment[];
+
+    constructor(options: {
+        multisigContract: Address;
+        to: Address;
+        gasLimit?: bigint;
+        functionCall: any[];
+        tokens: EsdtTokenPayment[];
+    }) {
+        this.multisigContract = options.multisigContract;
+        this.to = options.to;
+        this.gasLimit = options.gasLimit;
+        this.functionCall = options.functionCall;
+        this.tokens = options.tokens;
+    }
+
+    static newFromTransferExecuteInput(options: {
+        multisig: Address;
+        to: Address;
+        nativeTransferAmount: bigint;
+        tokenTransfers: TokenTransfer[];
+        functionName: string;
+        arguments: any[];
+        optGasLimit?: bigint;
+        abi?: Abi;
+    }): ProposeTransferExecuteEsdtInputForContract {
+        const transactionsFactory = new SmartContractTransactionsFactory({
+            config: new TransactionsFactoryConfig({ chainID: "" }),
+            abi: options.abi,
+        });
+        const transaction = transactionsFactory.createTransactionForExecute(Address.empty(), {
+            contract: Address.empty(),
+            function: options.functionName,
+            gasLimit: 0n,
+            arguments: options.arguments,
+            nativeTransferAmount: 0n,
+            tokenTransfers: options.tokenTransfers,
+        });
+
+        const tokens: EsdtTokenPayment[] = options.tokenTransfers.map((token) => {
+            return { token_identifier: token.token.identifier, token_nonce: token.token.nonce, amount: token.amount };
+        });
+
+        const functionCallParts = Buffer.from(transaction.data).toString().split(ARGUMENTS_SEPARATOR);
+        const functionName = functionCallParts[0];
+        const functionArguments = [];
+        for (let index = 1; index < functionCallParts.length; index++) {
+            const element = functionCallParts[index];
+            functionArguments.push(element.valueOf());
+        }
+        const functionCall = [new BytesValue(Buffer.from(utf8ToHex(functionName))), ...functionArguments];
+        return new ProposeTransferExecuteEsdtInputForContract({
+            multisigContract: options.multisig,
+            to: options.to,
+            functionCall: functionCall,
+            gasLimit: options.optGasLimit,
+            tokens: tokens,
+        });
     }
 }
 
@@ -94,7 +165,6 @@ export class ProposeTransferExecutInput {
     static newFromTransferExecuteInput(options: {
         multisig: Address;
         to: Address;
-        nativeTransferAmount: bigint;
         tokenTransfers: TokenTransfer[];
         functionName: string;
         arguments: any[];
@@ -137,7 +207,7 @@ export class ProposeAsyncCallInput {
     tokenTransfers: TokenTransfer[];
     functionName: string;
     functionArguments: any[];
-    optGasLimit?: bigint;
+    gasLimit: bigint;
     abi?: Abi;
     /**
      *
@@ -149,7 +219,7 @@ export class ProposeAsyncCallInput {
         tokenTransfers: TokenTransfer[];
         functionName: string;
         functionArguments: any[];
-        optGasLimit?: bigint;
+        gasLimit: bigint;
         abi?: Abi;
     }) {
         this.multisigContract = options.multisigContract;
@@ -158,7 +228,7 @@ export class ProposeAsyncCallInput {
         this.tokenTransfers = options.tokenTransfers;
         this.functionName = options.functionName;
         this.functionArguments = options.functionArguments;
-        this.optGasLimit = options.optGasLimit;
+        this.gasLimit = options.gasLimit;
         this.abi = options.abi;
     }
 }
@@ -265,7 +335,6 @@ export class SendTransferExecuteEgld extends MultisigAction {
         this.optionalGasLimit = data.opt_gas_limit;
         this.funcionName = data.endpoint_name.toString();
         this.arguments = data.arguments;
-        console.log(this.receiver, data.to);
     }
 }
 export class SendTransferExecuteEsdt extends MultisigAction {
@@ -286,7 +355,8 @@ export class SendTransferExecuteEsdt extends MultisigAction {
                 }),
         );
         this.optionalGasLimit = data.opt_gas_limit;
-        this.funcionName = data.endpoint_name.toString();
+
+        this.funcionName = Buffer.from(data.endpoint_name.toString(), "hex").toString();
         this.arguments = data.arguments;
     }
 }
@@ -298,7 +368,6 @@ export class SendAsyncCall extends MultisigAction {
     funcionName: string;
     arguments: Uint8Array[];
     constructor(data: any) {
-        console.log({ data });
         super();
         this.type = MultisigActionEnum.SendAsyncCall;
         this.receiver = data.to;
@@ -317,10 +386,10 @@ export class SCDeployFromSource extends MultisigAction {
     constructor(data: any) {
         super();
         this.type = MultisigActionEnum.SCDeployFromSource;
-        this.sourceContractAddress = data.source;
-        this.amount = data.amount;
-        this.codeMetadata = data.code_metadata;
-        this.arguments = data.arguments;
+        this.sourceContractAddress = data[1];
+        this.amount = data[0];
+        this.codeMetadata = data[2];
+        this.arguments = data[3];
     }
 }
 
@@ -333,11 +402,11 @@ export class SCUpgradeFromSource extends MultisigAction {
     constructor(data: any) {
         super();
         this.type = MultisigActionEnum.SCUpgradeFromSource;
-        this.sourceContractAddress = data.source;
-        this.scAddress = data.sc_address;
-        this.amount = data.amount;
-        this.codeMetadata = data.code_metadata;
-        this.arguments = data.arguments;
+        this.scAddress = data[0];
+        this.amount = data[1];
+        this.sourceContractAddress = data[2];
+        this.codeMetadata = data[3];
+        this.arguments = data[4];
     }
 }
 
@@ -350,9 +419,9 @@ export type CallActionData = {
 };
 
 export type EsdtTokenPayment = {
-    token_identifier: string;
-    token_nonce: BigInt;
-    amount: BigInt;
+    token_identifier: any;
+    token_nonce: any;
+    amount: any;
 };
 
 export type EsdtTransferExecuteData = {

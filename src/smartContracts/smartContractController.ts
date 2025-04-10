@@ -113,7 +113,6 @@ export class SmartContractController extends BaseController {
 
     async runQuery(query: SmartContractQuery): Promise<SmartContractQueryResponse> {
         const queryResponse = await this.networkProvider.queryContract(query);
-        console.log({ queryResponse });
         return queryResponse;
     }
 

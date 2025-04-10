@@ -221,7 +221,6 @@ export class MultisigController extends SmartContractController {
             function: "userRole",
             arguments: [Address.newFromBech32(options.userAddress)],
         });
-        console.log(1111, response);
         const userRole = response[0].valueOf().name as keyof typeof resources.UserRoleEnum;
         return resources.UserRoleEnum[userRole];
     }
@@ -236,10 +235,7 @@ export class MultisigController extends SmartContractController {
             function: "getActionData",
             arguments: [options.actionId],
         });
-
-        console.log({ res: JSON.stringify(response[0].valueOf()) });
         const result = this.mapResponseToAction(response[0].valueOf());
-
         return result;
     }
 
@@ -519,6 +515,13 @@ export class MultisigController extends SmartContractController {
         return transaction;
     }
 
+    /**
+     * Awaits the completion of a propose transfer execute action
+     */
+    async awaitCompletedDepositExecute(txHash: string): Promise<number> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.multisigParser.parseActionProposal(transaction);
+    }
 
     /**
      * Creates a transaction for proposing to transfer EGLD and execute a smart contract call
@@ -842,7 +845,6 @@ export class MultisigController extends SmartContractController {
 
     private mapResponseToAction = (responseData: any): resources.MultisigAction => {
         const { name, fields } = responseData;
-        console.log({ name });
         switch (name) {
             case resources.MultisigActionEnum.Nothing:
                 return new resources.MultisigAction();
@@ -861,9 +863,9 @@ export class MultisigController extends SmartContractController {
             case resources.MultisigActionEnum.SendAsyncCall:
                 return new resources.SendAsyncCall(fields[0]);
             case resources.MultisigActionEnum.SCDeployFromSource:
-                return new resources.SCDeployFromSource(fields[0]);
+                return new resources.SCDeployFromSource(fields);
             case resources.MultisigActionEnum.SCUpgradeFromSource:
-                return new resources.SCUpgradeFromSource(fields[0]);
+                return new resources.SCUpgradeFromSource(fields);
             default:
                 throw new Error(`Unknown action type: ${name}`);
         }

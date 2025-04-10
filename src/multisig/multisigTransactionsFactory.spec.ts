@@ -7,7 +7,7 @@ import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { loadAbiRegistry, loadContractCode } from "../testutils";
 import { MultisigTransactionsFactory } from "./multisigTransactionFactory";
 
-describe.only("test multisig transactions factory", function () {
+describe("test multisig transactions factory", function () {
     const config = new TransactionsFactoryConfig({
         chainID: "D",
     });
@@ -27,7 +27,7 @@ describe.only("test multisig transactions factory", function () {
         });
     });
 
-    it.skip("should create transaction for deploy multisig contract", function () {
+    it("should create transaction for deploy multisig contract", function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const boardMemberAddress = Address.newFromBech32(
@@ -39,13 +39,13 @@ describe.only("test multisig transactions factory", function () {
         const amount = 1000000000000000000n; // 1 EGLD
 
         const transaction = factory.createTransactionForMultisigDeploy(senderAddress, {
-            bytecode: bytecode.valueOf(),
+            bytecode: bytecode,
+            gasLimit: 5000000n,
             quorum: 2,
             board,
             amount,
         });
         const res = Buffer.from(transaction.data).toString().split("@");
-        console.log(11111, res[1], res[2], res[3], res[4], res[5], res.length);
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu");
@@ -69,9 +69,8 @@ describe.only("test multisig transactions factory", function () {
         const transaction = factory.createTransactionForMultisigUpgrade(senderAddress, {
             bytecode: bytecode,
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
         });
-        const res = Buffer.from(transaction.data).toString().split("@");
-        console.log(11111, res[1], res[2], res[3], res[4], res[5], res.length);
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
@@ -91,6 +90,7 @@ describe.only("test multisig transactions factory", function () {
         );
         const transaction = factory.createTransactionForProposeAddBoardMember(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             boardMemberAddress: boardMemberAddress,
         });
 
@@ -114,6 +114,7 @@ describe.only("test multisig transactions factory", function () {
         );
         const transaction = factory.createTransactionForProposeAddProposer(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             proposerAddress: proposerAddress,
         });
 
@@ -136,6 +137,7 @@ describe.only("test multisig transactions factory", function () {
         );
         const transaction = factory.createTransactionForProposeRemoveUser(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             userAddress: userAddress,
         });
 
@@ -157,6 +159,7 @@ describe.only("test multisig transactions factory", function () {
         );
         const transaction = factory.createTransactionForProposeChangeQuorum(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             newQuorum: 3,
         });
 
@@ -178,6 +181,7 @@ describe.only("test multisig transactions factory", function () {
         const amount = 1000000000000000000n; // 1 EGLD
         const transaction = factory.createTransactionForProposeTransferExecute(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             egldAmount: amount,
             to: destinationContract,
             functionName: "add",
@@ -192,7 +196,7 @@ describe.only("test multisig transactions factory", function () {
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
-            "proposeTransferExecute@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@0de0b6b3a7640000@010000000003938700@616464@07",
+            "proposeTransferExecute@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@0de0b6b3a7640000@0100000000004c4b40@616464@07",
         );
     });
 
@@ -206,12 +210,13 @@ describe.only("test multisig transactions factory", function () {
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
         const token = new Token({
-            identifier: "TEST-abcdef",
+            identifier: "ALICE-5627f1",
         });
-        const tokenTransfer = new TokenTransfer({ token: token, amount: 1000000000000000000n });
+        const tokenTransfer = new TokenTransfer({ token: token, amount: 10n });
 
         const transaction = factory.createTransactionForProposeTransferExecuteEsdt(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             to: destinationContract,
             tokens: [tokenTransfer],
             functionName: "distribute",
@@ -225,7 +230,7 @@ describe.only("test multisig transactions factory", function () {
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
-            "proposeTransferExecuteEsdt@0000000000000000050049bff963bdfa3ea02713362095df32e3d708eaccfc57@0000000c53555045522d313963356335000000000000000000000008f9ccd8a1c5080000@@64697374726962757465",
+            "proposeTransferExecuteEsdt@0000000000000000050049bff963bdfa3ea02713362095df32e3d708eaccfc57@0000000c414c4943452d3536323766310000000000000000000000010a@0100000000004c4b40@3634363937333734373236393632373537343635",
         );
     });
 
@@ -239,6 +244,7 @@ describe.only("test multisig transactions factory", function () {
         );
         const transaction = factory.createTransactionForProposeAsyncCall(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             nativeTransferAmount: 0n,
             to: destinationContract,
             functionName: "add",
@@ -254,7 +260,7 @@ describe.only("test multisig transactions factory", function () {
         assert.equal(transaction.chainID, config.chainID);
         assert.equal(
             transaction.data.toString(),
-            "proposeAsyncCall@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@@@616464@07",
+            "proposeAsyncCall@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@@4c4b40@616464@07",
         );
     });
 
@@ -264,13 +270,10 @@ describe.only("test multisig transactions factory", function () {
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const token = new Token({
-            identifier: "TEST-abcdef",
-        });
-        const tokenTransfer = new TokenTransfer({ token: token, amount: 1000000000000000000n });
 
         const transaction = factory.createTransactionForDeposit(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             egldAmount: 1n,
             tokenTransfers: [],
         });
@@ -297,6 +300,7 @@ describe.only("test multisig transactions factory", function () {
 
         const transaction = factory.createTransactionForDeposit(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             egldAmount: 0n,
             tokenTransfers: [tokenTransfer],
         });
@@ -310,17 +314,18 @@ describe.only("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "ESDTTransfer@414c4943452d353632376631@64@6465706f736974");
     });
 
-    it.only("should create transaction for propose SC deploy from source", function () {
+    it("should create transaction for propose SC deploy from source", function () {
         const amount = BigInt(50000000000000000); // 0.05 EGLD
         const metadata = new CodeMetadata(true, true, false);
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
-        const sourceContract = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqd273cw3hjndqzcpts4dvq0ncy8nx8rkgzeusnefvaq");
+        const sourceContract = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqsuxsgykwm6r3s5apct2g5a2rcpe7kw0ed8ssf6h9f6");
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqpgq0cjuum0t436gmp446wf3yz43avp2gm2czeus8mctaf",
         );
 
         const transaction = factory.createTransactionForProposeSCDeployFromSource(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             amount: amount,
             source: sourceContract,
             codeMetadata: metadata,
@@ -334,7 +339,7 @@ describe.only("test multisig transactions factory", function () {
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
-            "proposeSCDeployFromSource@b1a2bc2ec50000@000000000000000005006abd1c3a3794da01602b855ac03e7821e6638ec81679@0500@7",
+            "proposeSCDeployFromSource@b1a2bc2ec50000@00000000000000000500870d0412cede871853a1c2d48a7543c073eb39f969e1@0500@7",
         );
     });
 
@@ -349,6 +354,7 @@ describe.only("test multisig transactions factory", function () {
 
         const transaction = factory.createTransactionForProposeSCUpgradeFromSource(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             scAddress: multisigContractAddress,
             amount: amount,
             source: sourceContract,
@@ -376,6 +382,7 @@ describe.only("test multisig transactions factory", function () {
         const transaction = factory.createTransactionForSignAction(senderAddress, {
             multisigContract: multisigContractAddress,
             actionId: 42,
+            gasLimit: 5000000n,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -396,6 +403,7 @@ describe.only("test multisig transactions factory", function () {
         const transaction = factory.createTransactionForSignBatch(senderAddress, {
             multisigContract: multisigContractAddress,
             groupId: 5,
+            gasLimit: 5000000n,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -415,6 +423,7 @@ describe.only("test multisig transactions factory", function () {
         const transaction = factory.createTransactionForSignAndPerform(senderAddress, {
             multisigContract: multisigContractAddress,
             actionId: 42,
+            gasLimit: 5000000n,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -435,6 +444,7 @@ describe.only("test multisig transactions factory", function () {
         const transaction = factory.createTransactionForUnsign(senderAddress, {
             multisigContract: multisigContractAddress,
             actionId: 42,
+            gasLimit: 5000000n,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -453,6 +463,7 @@ describe.only("test multisig transactions factory", function () {
             multisigContract: multisigContractAddress,
             actionId: 42,
             outdatedBoardMembers: [1, 3, 5],
+            gasLimit: 5000000n,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -470,6 +481,7 @@ describe.only("test multisig transactions factory", function () {
         const transaction = factory.createTransactionForPerformAction(senderAddress, {
             multisigContract: multisigContractAddress,
             actionId: 42,
+            gasLimit: 5000000n,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -487,6 +499,7 @@ describe.only("test multisig transactions factory", function () {
         const transaction = factory.createTransactionForPerformBatch(senderAddress, {
             multisigContract: multisigContractAddress,
             groupId: 5,
+            gasLimit: 5000000n,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -505,6 +518,7 @@ describe.only("test multisig transactions factory", function () {
         const transaction = factory.createTransactionForDiscardAction(senderAddress, {
             multisigContract: multisigContractAddress,
             actionId: 322,
+            gasLimit: 5000000n,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -523,6 +537,7 @@ describe.only("test multisig transactions factory", function () {
         );
         const transaction = factory.createTransactionForDiscardBatch(senderAddress, {
             multisigContract: multisigContractAddress,
+            gasLimit: 5000000n,
             actionIds: [24, 25],
         });
 

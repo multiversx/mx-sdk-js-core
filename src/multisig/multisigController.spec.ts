@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { Address, SmartContractQueryResponse } from "../core";
+import { Address, CodeMetadata, SmartContractQueryResponse } from "../core";
 import { MockNetworkProvider } from "../testutils";
 import { MultisigController } from "./multisigController";
 import * as resources from "./resources";
@@ -283,7 +283,7 @@ describe("test multisig controller query methods", () => {
         assert.equal(result[1], mockProposerAddress);
     });
 
-    it("getActionData returns the action data as address array", async function () {
+    it("getActionData returns the action data as SendTransferExecuteEgld", async function () {
         networkProvider.mockQueryContractOnFunction(
             "getActionData",
             new SmartContractQueryResponse({
@@ -310,7 +310,7 @@ describe("test multisig controller query methods", () => {
         assert.equal(mappedRes.amount, 42n);
     });
 
-    it("getActionData returns the action data as address array", async function () {
+    it("getActionData returns the action data as SendAsyncCall", async function () {
         networkProvider.mockQueryContractOnFunction(
             "getActionData",
             new SmartContractQueryResponse({
@@ -331,11 +331,178 @@ describe("test multisig controller query methods", () => {
             actionId: 42,
         });
 
-        console.log(result);
         const mappedRes = result as resources.SendAsyncCall;
         assert.equal(mappedRes.receiver.toBech32(), "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms");
         assert.equal(mappedRes.funcionName, "add");
         assert.equal(mappedRes.amount, 0n);
+    });
+
+    it("getActionData returns the action data as SendTransferExecuteEsdt", async function () {
+        networkProvider.mockQueryContractOnFunction(
+            "getActionData",
+            new SmartContractQueryResponse({
+                function: "getActionData",
+                returnDataParts: [
+                    Buffer.from(
+                        "BgAAAAAAAAAABQBJv/ljvfo+oCcTNiCV3zLj1wjqzPxXAAAAAQAAAAxBTElDRS01NjI3ZjEAAAAAAAAAAAAAAAEKAQAAAAAATEtAAAAAFDY0Njk3Mzc0NzI2OTYyNzU3NDY1AAAAAA==",
+                        "base64",
+                    ),
+                ],
+                returnCode: "ok",
+                returnMessage: "ok",
+            }),
+        );
+
+        const result = await controller.getActionData({
+            mutisigAddress: mockMultisigAddress,
+            actionId: 42,
+        });
+
+        const mappedRes = result as resources.SendTransferExecuteEsdt;
+
+        assert.equal(mappedRes.receiver.toBech32(), "erd1qqqqqqqqqqqqqpgqfxlljcaalgl2qfcnxcsftheju0ts36kvl3ts3qkewe");
+        assert.equal(mappedRes.funcionName, "distribute");
+    });
+
+    it("getActionData returns the action data as AddBoardMember", async function () {
+        networkProvider.mockQueryContractOnFunction(
+            "getActionData",
+            new SmartContractQueryResponse({
+                function: "getActionData",
+                returnDataParts: [Buffer.from("AYBJ1jnlppgNHNI5KrzOQQKc2nShVjUjogLwlkHMJhj4", "base64")],
+                returnCode: "ok",
+                returnMessage: "ok",
+            }),
+        );
+
+        const result = await controller.getActionData({
+            mutisigAddress: mockMultisigAddress,
+            actionId: 42,
+        });
+
+        const mappedRes = result as resources.AddBoardMember;
+
+        assert.equal(mappedRes.address.toBech32(), "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+    });
+
+    it("getActionData returns the action data as AddProposer", async function () {
+        networkProvider.mockQueryContractOnFunction(
+            "getActionData",
+            new SmartContractQueryResponse({
+                function: "getActionData",
+                returnDataParts: [Buffer.from("AYBJ1jnlppgNHNI5KrzOQQKc2nShVjUjogLwlkHMJhj4", "base64")],
+                returnCode: "ok",
+                returnMessage: "ok",
+            }),
+        );
+
+        const result = await controller.getActionData({
+            mutisigAddress: mockMultisigAddress,
+            actionId: 42,
+        });
+
+        const mappedRes = result as resources.AddProposer;
+
+        assert.equal(mappedRes.address.toBech32(), "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+    });
+
+    it("getActionData returns the action data as SCDeployFromSource", async function () {
+        networkProvider.mockQueryContractOnFunction(
+            "getActionData",
+            new SmartContractQueryResponse({
+                function: "getActionData",
+                returnDataParts: [
+                    Buffer.from(
+                        "CAAAAAexorwuxQAAAAAAAAAAAAAFAIcNBBLO3ocYU6HC1Ip1Q8Bz6zn5aeEFAAAAAAEAAAABBw==",
+                        "base64",
+                    ),
+                ],
+                returnCode: "ok",
+                returnMessage: "ok",
+            }),
+        );
+
+        const result = await controller.getActionData({
+            mutisigAddress: mockMultisigAddress,
+            actionId: 42,
+        });
+
+        const mappedRes = result as resources.SCDeployFromSource;
+
+        assert.equal(
+            mappedRes.sourceContractAddress.toBech32(),
+            "erd1qqqqqqqqqqqqqpgqsuxsgykwm6r3s5apct2g5a2rcpe7kw0ed8ssf6h9f6",
+        );
+        assert.equal(mappedRes.amount.toString(), "50000000000000000");
+        assert.deepEqual(mappedRes.codeMetadata, new CodeMetadata(true, true, false));
+    });
+
+    it("getActionData returns the action data as SCUpgradeFromSource", async function () {
+        networkProvider.mockQueryContractOnFunction(
+            "getActionData",
+            new SmartContractQueryResponse({
+                function: "getActionData",
+                returnDataParts: [
+                    Buffer.from(
+                        "CQAAAAAAAAAABQB+Jc5t66x0jYa105MSCrHrAqRtWBZ5AAAAB7GivC7FAAAAAAAAAAAAAAUAar0cOjeU2gFgK4VawD54IeZjjsgWeQUAAAAAAA==",
+                        "base64",
+                    ),
+                ],
+                returnCode: "ok",
+                returnMessage: "ok",
+            }),
+        );
+        const amount = BigInt(50000000000000000); // 0.05 EGLD
+        const metadata = new CodeMetadata(true, true, false);
+        const sourceContract = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqd273cw3hjndqzcpts4dvq0ncy8nx8rkgzeusnefvaq");
+
+        const result = await controller.getActionData({
+            mutisigAddress: mockMultisigAddress,
+            actionId: 42,
+        });
+        const mappedRes = result as resources.SCUpgradeFromSource;
+
+        assert.equal(mappedRes.sourceContractAddress.toBech32(), sourceContract.toBech32());
+        assert.equal(mappedRes.amount, amount);
+        assert.deepEqual(mappedRes.codeMetadata, metadata);
+    });
+
+    it("getActionData returns the action data as ChangeQuorum", async function () {
+        networkProvider.mockQueryContractOnFunction(
+            "getActionData",
+            new SmartContractQueryResponse({
+                function: "getActionData",
+                returnDataParts: [Buffer.from("BAAAAAI=", "base64")],
+                returnCode: "ok",
+                returnMessage: "ok",
+            }),
+        );
+        const result = await controller.getActionData({
+            mutisigAddress: mockMultisigAddress,
+            actionId: 42,
+        });
+        const mappedRes = result as resources.ChangeQuorum;
+
+        assert.equal(mappedRes.quorum, 2);
+    });
+
+    it("getActionData returns the action data as RemoveUser", async function () {
+        networkProvider.mockQueryContractOnFunction(
+            "getActionData",
+            new SmartContractQueryResponse({
+                function: "getActionData",
+                returnDataParts: [Buffer.from("A4BJ1jnlppgNHNI5KrzOQQKc2nShVjUjogLwlkHMJhj4", "base64")],
+                returnCode: "ok",
+                returnMessage: "ok",
+            }),
+        );
+        const result = await controller.getActionData({
+            mutisigAddress: mockMultisigAddress,
+            actionId: 42,
+        });
+        const mappedRes = result as resources.RemoveUser;
+
+        assert.equal(mappedRes.address.toBech32(), "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
     });
 
     it("getActionSigners returns the action signers as address array", async function () {

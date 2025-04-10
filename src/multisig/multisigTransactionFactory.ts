@@ -4,16 +4,18 @@ import {
     BigUIntValue,
     ContractFunction,
     EndpointDefinition,
+    EndpointModifiers,
+    NativeSerializer,
     OptionType,
     OptionValue,
+    TokenIdentifierValue,
     U32Value,
     U64Type,
     U64Value,
     VariadicValue,
 } from "../abi";
-import { TransactionsFactoryConfig } from "../core";
+import { TokenComputer, TransactionsFactoryConfig } from "../core";
 import { Address } from "../core/address";
-import { CodeMetadata } from "../core/codeMetadata";
 import { Transaction } from "../core/transaction";
 import { TransactionBuilder } from "../core/transactionBuilder";
 import { SmartContractTransactionsFactory } from "../smartContracts";
@@ -47,7 +49,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
 
         return this.createTransactionForDeploy(sender, {
             bytecode: options.bytecode,
-            gasLimit: this.config.gasLimitCreateMultisig,
+            gasLimit: options.gasLimit,
             nativeTransferAmount,
             isUpgradeable: options.isUpgradeable,
             isReadable: options.isReadable,
@@ -63,7 +65,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     createTransactionForMultisigUpgrade(sender: Address, options: resources.UpgradeMultisigContractInput): Transaction {
         return this.createTransactionForUpgrade(sender, {
             bytecode: options.bytecode,
-            gasLimit: this.config.gasLimitCreateMultisig,
+            gasLimit: options.gasLimit,
             isUpgradeable: options.isUpgradeable,
             isReadable: options.isReadable,
             isPayable: options.isPayable,
@@ -85,14 +87,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             this.argSerializer.valuesToStrings([new AddressValue(options.boardMemberAddress)])[0],
         ];
 
-        const gasLimit = this.config.gasLimitProposeAction + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -106,14 +106,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             this.argSerializer.valuesToStrings([new AddressValue(options.proposerAddress)])[0],
         ];
 
-        const gasLimit = this.config.gasLimitProposeAction + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -127,14 +125,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             this.argSerializer.valuesToStrings([new AddressValue(options.userAddress)])[0],
         ];
 
-        const gasLimit = this.config.gasLimitProposeAction + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -148,14 +144,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             this.argSerializer.valuesToStrings([new U32Value(options.newQuorum)])[0],
         ];
 
-        const gasLimit = this.config.gasLimitProposeAction + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -167,11 +161,10 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         sender: Address,
         options: resources.ProposeTransferExecuteInput,
     ): Transaction {
-        const gasOption = new U64Value(options.gasLimit ?? this.config.gasLimitCreateMultisig);
+        const gasOption = new U64Value(options.gasLimit);
         const input = resources.ProposeTransferExecutInput.newFromTransferExecuteInput({
             multisig: options.multisigContract,
             to: options.to,
-            nativeTransferAmount: options.egldAmount,
             tokenTransfers: [],
             functionName: options.functionName,
             arguments: options.functionArguments,
@@ -185,14 +178,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             ...input.functionCall,
         ];
 
-        const gasLimit = this.config.gasLimitProposeAction + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -201,7 +192,6 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
      * Proposes a transaction that will transfer EGLD and/or execute a function
      */
     createTransactionForDeposit(sender: Address, options: resources.DepositExecuteInput): Transaction {
-        console.log(111, options.tokenTransfers.length, { t: options.tokenTransfers });
         return this.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "deposit",
@@ -219,27 +209,42 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         sender: Address,
         options: resources.ProposeTransferExecuteEsdtInput,
     ): Transaction {
-        const gasOption = new U64Value(options.gasLimit ?? this.config.gasLimitCreateMultisig);
-
-        // Tokens serialization would need a dedicated helper or converter
-        const tokensSerialized = this.serializeEsdtTokenPayments(options.tokens);
-
+        const input = resources.ProposeTransferExecutInput.newFromTransferExecuteInput({
+            multisig: options.multisigContract,
+            to: options.to,
+            tokenTransfers: [],
+            functionName: options.functionName,
+            arguments: options.functionArguments,
+            abi: options.abi,
+        });
+        const tokenComputer = new TokenComputer();
+        const argsTyped = [];
+        for (const token of options.tokens) {
+            const identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(token.token.identifier);
+            argsTyped.push({
+                token_identifier: new TokenIdentifierValue(
+                    tokenComputer.extractIdentifierFromExtendedIdentifier(token.token.identifier),
+                ),
+                token_nonce: new U64Value(token.token.nonce),
+                amount: new BigUIntValue(token.amount),
+            });
+        }
         const dataParts = [
             "proposeTransferExecuteEsdt",
-            this.argSerializer.valuesToStrings([new AddressValue(options.to)])[0],
-            tokensSerialized,
-            this.argSerializer.valuesToStrings([new OptionValue(new OptionType(new U64Type()), gasOption)])[0],
-            ...options.functionName,
+            ...this.argSerializer.valuesToStrings(
+                NativeSerializer.nativeToTypedValues(
+                    [options.to, argsTyped, options.gasLimit, VariadicValue.fromItems(...input.functionCall)],
+                    this.abi?.getEndpoint("proposeTransferExecuteEsdt") ??
+                        new EndpointDefinition("proposeTransferExecuteEsdt", [], [], new EndpointModifiers("", [])),
+                ),
+            ),
         ];
-
-        const gasLimit = this.config.gasLimitProposeAction + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -251,20 +256,17 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         const input = resources.ProposeTransferExecutInput.newFromTransferExecuteInput({
             multisig: options.multisigContract,
             to: options.to,
-            nativeTransferAmount: options.nativeTransferAmount,
             tokenTransfers: options.tokenTransfers,
             functionName: options.functionName,
             arguments: options.functionArguments,
             abi: options.abi,
         });
-        const gasLimit = this.config.gasLimitProposeAction + this.config.additionalGasLimitForMultisigOperations;
-
         let receiver = options.multisigContract;
         const dataParts = [
             "proposeAsyncCall",
             this.argSerializer.valuesToStrings([new AddressValue(options.to)])[0],
             this.argSerializer.valuesToStrings([new BigUIntValue(options.nativeTransferAmount)])[0],
-            this.argSerializer.valuesToStrings([new BigUIntValue(options.optGasLimit ?? 0n)])[0],
+            this.argSerializer.valuesToStrings([new BigUIntValue(options.gasLimit ?? 0n)])[0],
             ...input.functionCall,
         ];
 
@@ -273,7 +275,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             sender: sender,
             receiver: receiver,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: false,
             amount: 0n,
         }).build();
@@ -294,14 +296,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             ...options.arguments,
         ];
 
-        const gasLimit = this.config.gasLimitProposeAction + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -322,14 +322,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             ...options.arguments,
         ];
 
-        const gasLimit = this.config.gasLimitProposeAction + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -340,14 +338,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     createTransactionForSignAction(sender: Address, options: resources.ActionInput): Transaction {
         const dataParts = ["sign", this.argSerializer.valuesToStrings([new U32Value(options.actionId)])[0]];
 
-        const gasLimit = this.config.gasLimitSignAction + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -358,17 +354,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     createTransactionForSignBatch(sender: Address, options: resources.GroupInput): Transaction {
         const dataParts = ["signBatch", this.argSerializer.valuesToStrings([new U32Value(options.groupId)])[0]];
 
-        const gasLimit =
-            this.config.gasLimitSignAction +
-            this.config.gasLimitPerBatchAction +
-            this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -379,17 +370,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     createTransactionForSignAndPerform(sender: Address, options: resources.ActionInput): Transaction {
         const dataParts = ["signAndPerform", this.argSerializer.valuesToStrings([new U32Value(options.actionId)])[0]];
 
-        const gasLimit =
-            this.config.gasLimitSignAction +
-            this.config.gasLimitPerformAction +
-            this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -403,18 +389,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             this.argSerializer.valuesToStrings([new U32Value(options.groupId)])[0],
         ];
 
-        const gasLimit =
-            this.config.gasLimitSignAction +
-            this.config.gasLimitPerformAction +
-            this.config.gasLimitPerBatchAction +
-            this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -425,14 +405,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     createTransactionForUnsign(sender: Address, options: resources.ActionInput): Transaction {
         const dataParts = ["unsign", this.argSerializer.valuesToStrings([new U32Value(options.actionId)])[0]];
 
-        const gasLimit = this.config.gasLimitMultisigOperations + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -443,17 +421,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     createTransactionForUnsignBatch(sender: Address, options: resources.GroupInput): Transaction {
         const dataParts = ["unsignBatch", this.argSerializer.valuesToStrings([new U32Value(options.groupId)])[0]];
 
-        const gasLimit =
-            this.config.gasLimitMultisigOperations +
-            this.config.gasLimitPerBatchAction +
-            this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -475,14 +448,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             ...outdatedMembersArgs,
         ];
 
-        const gasLimit = this.config.gasLimitMultisigOperations + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -493,14 +464,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     createTransactionForPerformAction(sender: Address, options: resources.ActionInput): Transaction {
         const dataParts = ["performAction", this.argSerializer.valuesToStrings([new U32Value(options.actionId)])[0]];
 
-        const gasLimit = this.config.gasLimitPerformAction + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -511,17 +480,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     createTransactionForPerformBatch(sender: Address, options: resources.GroupInput): Transaction {
         const dataParts = ["performBatch", this.argSerializer.valuesToStrings([new U32Value(options.groupId)])[0]];
 
-        const gasLimit =
-            this.config.gasLimitPerformAction +
-            this.config.gasLimitPerBatchAction +
-            this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -532,14 +496,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     createTransactionForDiscardAction(sender: Address, options: resources.ActionInput): Transaction {
         const dataParts = ["discardAction", this.argSerializer.valuesToStrings([new U32Value(options.actionId)])[0]];
 
-        const gasLimit = this.config.gasLimitMultisigOperations + this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
     }
@@ -552,36 +514,13 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
 
         const dataParts = ["discardBatch", ...actionIdsArgs];
 
-        const gasLimit =
-            this.config.gasLimitMultisigOperations +
-            this.config.gasLimitPerBatchAction +
-            this.config.additionalGasLimitForMultisigOperations;
-
         return new TransactionBuilder({
             config: this.config,
             sender: sender,
             receiver: options.multisigContract,
             dataParts: dataParts,
-            gasLimit: gasLimit,
+            gasLimit: options.gasLimit,
             addDataMovementGas: true,
         }).build();
-    }
-
-    /**
-     * Helper method to serialize ESDT token payments
-     */
-    private serializeEsdtTokenPayments(_tokens: any[]): string {
-        // This is a placeholder - the actual implementation would depend on your SDK's
-        // serialization format for lists of EsdtTokenPayment objects
-        return "serialized_tokens";
-    }
-
-    /**
-     * Helper method to serialize CodeMetadata
-     */
-    private serializeCodeMetadata(_metadata: CodeMetadata): string {
-        // This is a placeholder - the actual implementation would depend on your SDK's
-        // serialization format for CodeMetadata
-        return "serialized_metadata";
     }
 }

@@ -60,22 +60,6 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     }
 
     /**
-     * Creates a transaction to upgrade a new multisig contract
-     */
-    createTransactionForMultisigUpgrade(sender: Address, options: resources.UpgradeMultisigContractInput): Transaction {
-        return this.createTransactionForUpgrade(sender, {
-            bytecode: options.bytecode,
-            gasLimit: options.gasLimit,
-            isUpgradeable: options.isUpgradeable,
-            isReadable: options.isReadable,
-            isPayable: options.isPayable,
-            isPayableBySmartContract: options.isPayableBySmartContract,
-            contract: options.multisigContract,
-            arguments: [],
-        });
-    }
-
-    /**
      * Proposes adding a new board member
      */
     createTransactionForProposeAddBoardMember(

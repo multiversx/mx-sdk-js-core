@@ -180,7 +180,7 @@ describe("test multisig controller query methods", () => {
         });
     });
 
-    it("quorumReached returnsfalse when quorum reached", async function () {
+    it("quorumReached returns false when quorum reached", async function () {
         networkProvider.mockQueryContractOnFunction(
             "quorumReached",
             new SmartContractQueryResponse({

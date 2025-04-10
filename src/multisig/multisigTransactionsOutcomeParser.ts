@@ -20,7 +20,7 @@ export class MultisigTransactionsOutcomeParser {
      * @param transactionOnNetwork The completed transaction
      * @returns An array of objects containing the new contract addresses
      */
-    parseCreateNewMultisigContract(transactionOnNetwork: TransactionOnNetwork): { contractAddress: Address }[] {
+    parseDeployMultisigContract(transactionOnNetwork: TransactionOnNetwork): { contractAddress: Address }[] {
         const directCallOutcome = this.findDirectMultisigDeployOutcome(transactionOnNetwork);
 
         if (!directCallOutcome || directCallOutcome.returnCode !== "ok") {

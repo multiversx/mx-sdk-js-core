@@ -59,26 +59,6 @@ describe("test multisig transactions factory", function () {
         );
     });
 
-    it("should create transaction for upgrade multisig contract", function () {
-        const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
-
-        const multisigContractAddress = Address.newFromBech32(
-            "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
-        );
-
-        const transaction = factory.createTransactionForMultisigUpgrade(senderAddress, {
-            bytecode: bytecode,
-            multisigContract: multisigContractAddress,
-            gasLimit: 5000000n,
-        });
-        assert.instanceOf(transaction, Transaction);
-        assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
-        assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-
-        assert.equal(transaction.chainID, config.chainID);
-        assert.deepEqual(transaction.data!, Buffer.from(`upgradeContract@${bytecode}`));
-    });
-
     it("should create transaction for propose add board member", function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 

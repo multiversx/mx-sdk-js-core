@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { Abi, U32Value } from "../abi";
+import { Abi, Code, U32Value } from "../abi";
 import { Address, Err, Token, TokenTransfer, TransactionsFactoryConfig } from "../core";
 import { loadAbiRegistry, loadContractCode } from "../testutils/utils";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
@@ -8,7 +8,7 @@ describe("test smart contract transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });
     let factory: SmartContractTransactionsFactory;
     let abiAwareFactory: SmartContractTransactionsFactory;
-    let bytecode: Uint8Array;
+    let bytecode: Code;
     let abi: Abi;
 
     before(async function () {

@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { Abi } from "../abi";
+import { Abi, Code } from "../abi";
 import { CodeMetadata, Token, TokenTransfer } from "../core";
 import { Address } from "../core/address";
 import { Transaction } from "../core/transaction";
@@ -12,7 +12,7 @@ describe("test multisig transactions factory", function () {
         chainID: "D",
     });
 
-    let bytecode: Uint8Array;
+    let bytecode: Code;
     let abi: Abi;
     let adderAbi: Abi;
     let factory: MultisigTransactionsFactory;
@@ -39,7 +39,7 @@ describe("test multisig transactions factory", function () {
         const amount = 1000000000000000000n; // 1 EGLD
 
         const transaction = factory.createTransactionForMultisigDeploy(senderAddress, {
-            bytecode: bytecode,
+            bytecode: bytecode.valueOf(),
             gasLimit: 5000000n,
             quorum: 2,
             board,

@@ -412,7 +412,7 @@ export class SCUpgradeFromSource extends MultisigAction {
 
 export type CallActionData = {
     receiver: Address;
-    amount: BigInt;
+    amount: bigint;
     optionalGasLimit?: number | null;
     functionName: Uint8Array;
     arguments: Uint8Array[];

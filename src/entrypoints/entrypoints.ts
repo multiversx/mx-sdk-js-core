@@ -21,15 +21,24 @@ import { TransfersController, TransferTransactionsFactory } from "../transfers";
 import { UserSecretKey } from "../wallet";
 import { DevnetEntrypointConfig, MainnetEntrypointConfig, TestnetEntrypointConfig } from "./config";
 
-class NetworkEntrypoint {
+export class NetworkEntrypoint {
     private networkProvider: INetworkProvider;
     private chainId: string;
 
-    constructor(options: { networkProviderUrl: string; networkProviderKind: string; chainId: string }) {
+    constructor(options: {
+        networkProviderUrl: string;
+        networkProviderKind: string;
+        chainId: string;
+        clientName?: string;
+    }) {
         if (options.networkProviderKind === "proxy") {
-            this.networkProvider = new ProxyNetworkProvider(options.networkProviderUrl);
+            this.networkProvider = new ProxyNetworkProvider(options.networkProviderUrl, {
+                clientName: options.clientName,
+            });
         } else if (options.networkProviderKind === "api") {
-            this.networkProvider = new ApiNetworkProvider(options.networkProviderUrl);
+            this.networkProvider = new ApiNetworkProvider(options.networkProviderUrl, {
+                clientName: options.clientName,
+            });
         } else {
             throw new ErrInvalidNetworkProviderKind();
         }
@@ -174,34 +183,37 @@ class NetworkEntrypoint {
 }
 
 export class TestnetEntrypoint extends NetworkEntrypoint {
-    constructor(url?: string, kind?: string) {
+    constructor(url?: string, kind?: string, clientName?: string) {
         const entrypointConfig = new TestnetEntrypointConfig();
         super({
             networkProviderUrl: url || entrypointConfig.networkProviderUrl,
             networkProviderKind: kind || entrypointConfig.networkProviderKind,
             chainId: entrypointConfig.chainId,
+            clientName: clientName,
         });
     }
 }
 
 export class DevnetEntrypoint extends NetworkEntrypoint {
-    constructor(url?: string, kind?: string) {
+    constructor(url?: string, kind?: string, clientName?: string) {
         const entrypointConfig = new DevnetEntrypointConfig();
         super({
             networkProviderUrl: url || entrypointConfig.networkProviderUrl,
             networkProviderKind: kind || entrypointConfig.networkProviderKind,
             chainId: entrypointConfig.chainId,
+            clientName: clientName,
         });
     }
 }
 
 export class MainnetEntrypoint extends NetworkEntrypoint {
-    constructor(url?: string, kind?: string) {
+    constructor(url?: string, kind?: string, clientName?: string) {
         const entrypointConfig = new MainnetEntrypointConfig();
         super({
             networkProviderUrl: url || entrypointConfig.networkProviderUrl,
             networkProviderKind: kind || entrypointConfig.networkProviderKind,
             chainId: entrypointConfig.chainId,
+            clientName: clientName,
         });
     }
 }

@@ -30,8 +30,8 @@ interface IAbi {
  * Use this class to create transactions to deploy, call or upgrade a smart contract.
  */
 export class SmartContractTransactionsFactory {
-    private readonly config: IConfig;
-    private readonly abi?: IAbi;
+    protected readonly config: IConfig;
+    protected readonly abi?: IAbi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
     private readonly contractDeployAddress: Address;
@@ -195,7 +195,7 @@ export class SmartContractTransactionsFactory {
         }).build();
     }
 
-    private argsToDataParts(args: any[], endpoint?: EndpointDefinition): string[] {
+    protected argsToDataParts(args: any[], endpoint?: EndpointDefinition): string[] {
         if (endpoint) {
             const typedArgs = NativeSerializer.nativeToTypedValues(args, endpoint);
             return new ArgSerializer().valuesToStrings(typedArgs);

@@ -30,12 +30,10 @@ describe("test multisig transactions factory", function () {
     it("should create transaction for deploy multisig contract", function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
-        const boardMemberAddress = Address.newFromBech32(
-            "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
-        );
-        const proposerAddress = Address.newFromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
+        const boardMemberOne = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+        const boardMemberTwo = Address.newFromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
 
-        const board = [boardMemberAddress, proposerAddress];
+        const board = [boardMemberOne, boardMemberTwo];
         const amount = 1000000000000000000n; // 1 EGLD
 
         const transaction = factory.createTransactionForMultisigDeploy(senderAddress, {
@@ -61,16 +59,14 @@ describe("test multisig transactions factory", function () {
     it("should create transaction for propose add board member", function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
-        const boardMemberAddress = Address.newFromBech32(
-            "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx",
-        );
+        const boardMember = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
         const transaction = factory.createTransactionForProposeAddBoardMember(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
-            boardMemberAddress: boardMemberAddress,
+            boardMember: boardMember,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -87,14 +83,14 @@ describe("test multisig transactions factory", function () {
     it("should create transaction for propose add proposer", function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
-        const proposerAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+        const proposer = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
         const transaction = factory.createTransactionForProposeAddProposer(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
-            proposerAddress: proposerAddress,
+            proposer: proposer,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -161,7 +157,7 @@ describe("test multisig transactions factory", function () {
         const transaction = factory.createTransactionForProposeTransferExecute(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
-            egldAmount: amount,
+            nativeTokenAmount: amount,
             to: destinationContract,
             functionName: "add",
             functionArguments: [7],
@@ -253,7 +249,7 @@ describe("test multisig transactions factory", function () {
         const transaction = factory.createTransactionForDeposit(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
-            egldAmount: 1n,
+            nativeTokenAmount: 1n,
             tokenTransfers: [],
         });
 
@@ -280,7 +276,7 @@ describe("test multisig transactions factory", function () {
         const transaction = factory.createTransactionForDeposit(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
-            egldAmount: 0n,
+            nativeTokenAmount: 0n,
             tokenTransfers: [tokenTransfer],
         });
 

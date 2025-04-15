@@ -2,7 +2,6 @@ import {
     AddressValue,
     ArgSerializer,
     BigUIntValue,
-    ContractFunction,
     EndpointDefinition,
     EndpointModifiers,
     NativeSerializer,
@@ -19,13 +18,14 @@ import { Address } from "../core/address";
 import { Transaction } from "../core/transaction";
 import { TransactionBuilder } from "../core/transactionBuilder";
 import { SmartContractTransactionsFactory } from "../smartContracts";
+import { ProposeTransferExecuteContractInput } from "./proposeTransferExecuteContract";
 import * as resources from "./resources";
 
 interface IAbi {
     constructorDefinition: EndpointDefinition;
     upgradeConstructorDefinition?: EndpointDefinition;
 
-    getEndpoint(name: string | ContractFunction): EndpointDefinition;
+    getEndpoint(name: string): EndpointDefinition;
 }
 /**
  * Use this class to create multisig related transactions like creating a new multisig contract,
@@ -68,7 +68,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     ): Transaction {
         const dataParts = [
             "proposeAddBoardMember",
-            this.argSerializer.valuesToStrings([new AddressValue(options.boardMemberAddress)])[0],
+            this.argSerializer.valuesToStrings([new AddressValue(options.boardMember)])[0],
         ];
 
         return new TransactionBuilder({
@@ -77,7 +77,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -87,7 +87,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     createTransactionForProposeAddProposer(sender: Address, options: resources.ProposeAddProposerInput): Transaction {
         const dataParts = [
             "proposeAddProposer",
-            this.argSerializer.valuesToStrings([new AddressValue(options.proposerAddress)])[0],
+            this.argSerializer.valuesToStrings([new AddressValue(options.proposer)])[0],
         ];
 
         return new TransactionBuilder({
@@ -96,7 +96,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -115,7 +115,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -134,7 +134,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -146,19 +146,20 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         options: resources.ProposeTransferExecuteInput,
     ): Transaction {
         const gasOption = new U64Value(options.gasLimit);
-        const input = resources.ProposeTransferExecutInput.newFromTransferExecuteInput({
+        const input = ProposeTransferExecuteContractInput.newFromTransferExecuteInput({
             multisig: options.multisigContract,
             to: options.to,
-            tokenTransfers: [],
             functionName: options.functionName,
             arguments: options.functionArguments,
             abi: options.abi,
         });
         const dataParts = [
             "proposeTransferExecute",
-            this.argSerializer.valuesToStrings([new AddressValue(options.to)])[0],
-            this.argSerializer.valuesToStrings([new BigUIntValue(options.egldAmount)])[0],
-            this.argSerializer.valuesToStrings([new OptionValue(new OptionType(new U64Type()), gasOption)])[0],
+            ...this.argSerializer.valuesToStrings([
+                new AddressValue(options.to),
+                new BigUIntValue(options.nativeTokenAmount),
+                new OptionValue(new OptionType(new U64Type()), gasOption),
+            ]),
             ...input.functionCall,
         ];
 
@@ -168,7 +169,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -181,7 +182,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             function: "deposit",
             gasLimit: options.gasLimit ?? 0n,
             arguments: [],
-            nativeTransferAmount: options.egldAmount,
+            nativeTransferAmount: options.nativeTokenAmount,
             tokenTransfers: options.tokenTransfers,
         });
     }
@@ -193,10 +194,9 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         sender: Address,
         options: resources.ProposeTransferExecuteEsdtInput,
     ): Transaction {
-        const input = resources.ProposeTransferExecutInput.newFromTransferExecuteInput({
+        const input = ProposeTransferExecuteContractInput.newFromTransferExecuteInput({
             multisig: options.multisigContract,
             to: options.to,
-            tokenTransfers: [],
             functionName: options.functionName,
             arguments: options.functionArguments,
             abi: options.abi,
@@ -228,7 +228,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -236,7 +236,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
      * Proposes an async call to another contract
      */
     createTransactionForProposeAsyncCall(sender: Address, options: resources.ProposeAsyncCallInput): Transaction {
-        const input = resources.ProposeTransferExecutInput.newFromTransferExecuteInput({
+        const input = ProposeTransferExecuteContractInput.newFromProposeAsyncCallInput({
             multisig: options.multisigContract,
             to: options.to,
             tokenTransfers: options.tokenTransfers,
@@ -247,9 +247,11 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         let receiver = options.multisigContract;
         const dataParts = [
             "proposeAsyncCall",
-            this.argSerializer.valuesToStrings([new AddressValue(options.to)])[0],
-            this.argSerializer.valuesToStrings([new BigUIntValue(options.nativeTransferAmount)])[0],
-            this.argSerializer.valuesToStrings([new BigUIntValue(options.gasLimit ?? 0n)])[0],
+            ...this.argSerializer.valuesToStrings([
+                new AddressValue(options.to),
+                new BigUIntValue(options.nativeTransferAmount),
+                new BigUIntValue(options.gasLimit ?? 0n),
+            ]),
             ...input.functionCall,
         ];
 
@@ -273,8 +275,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     ): Transaction {
         const dataParts = [
             "proposeSCDeployFromSource",
-            this.argSerializer.valuesToStrings([new BigUIntValue(options.amount)])[0],
-            this.argSerializer.valuesToStrings([new AddressValue(options.source)])[0],
+            ...this.argSerializer.valuesToStrings([new BigUIntValue(options.amount), new AddressValue(options.source)]),
             options.codeMetadata.toString(),
             ...options.arguments,
         ];
@@ -285,7 +286,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -298,9 +299,11 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     ): Transaction {
         const dataParts = [
             "proposeSCUpgradeFromSource",
-            this.argSerializer.valuesToStrings([new AddressValue(options.scAddress)])[0],
-            this.argSerializer.valuesToStrings([new BigUIntValue(options.amount)])[0],
-            this.argSerializer.valuesToStrings([new AddressValue(options.source)])[0],
+            ...this.argSerializer.valuesToStrings([
+                new AddressValue(options.scAddress),
+                new BigUIntValue(options.amount),
+                new AddressValue(options.source),
+            ]),
             options.codeMetadata.toString(),
             ...options.arguments,
         ];
@@ -311,7 +314,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -327,7 +330,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -343,7 +346,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -359,7 +362,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -378,7 +381,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -394,7 +397,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -410,7 +413,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -437,7 +440,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -453,7 +456,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -469,7 +472,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -485,7 +488,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 
@@ -503,7 +506,7 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             receiver: options.multisigContract,
             dataParts: dataParts,
             gasLimit: options.gasLimit,
-            addDataMovementGas: true,
+            addDataMovementGas: false,
         }).build();
     }
 }

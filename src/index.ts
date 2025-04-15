@@ -10,6 +10,7 @@ export * from "./accounts";
 export * from "./core";
 export * from "./delegation";
 export * from "./entrypoints";
+export * from "./multisig";
 export * from "./networkProviders";
 export * from "./smartContracts";
 export * from "./tokenManagement";

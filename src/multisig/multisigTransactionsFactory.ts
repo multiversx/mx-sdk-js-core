@@ -204,7 +204,6 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         const tokenComputer = new TokenComputer();
         const argsTyped = [];
         for (const token of options.tokens) {
-            const identifier = tokenComputer.extractIdentifierFromExtendedIdentifier(token.token.identifier);
             argsTyped.push({
                 token_identifier: new TokenIdentifierValue(
                     tokenComputer.extractIdentifierFromExtendedIdentifier(token.token.identifier),

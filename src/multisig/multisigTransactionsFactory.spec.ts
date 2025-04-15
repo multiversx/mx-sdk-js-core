@@ -45,7 +45,6 @@ describe("test multisig transactions factory", function () {
             board,
             amount,
         });
-        const res = Buffer.from(transaction.data).toString().split("@");
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu");

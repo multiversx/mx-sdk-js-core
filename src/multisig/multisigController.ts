@@ -499,9 +499,8 @@ export class MultisigController extends SmartContractController {
     /**
      * Awaits the completion of a propose transfer execute action
      */
-    async awaitCompletedDepositExecute(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseActionProposal(transaction);
+    async awaitCompletedDepositExecute(txHash: string): Promise<void> {
+        await this.transactionAwaiter.awaitCompleted(txHash);
     }
 
     /**

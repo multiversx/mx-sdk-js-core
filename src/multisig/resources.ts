@@ -209,9 +209,6 @@ export class ProposeAsyncCallInput {
     functionArguments: any[];
     gasLimit: bigint;
     abi?: Abi;
-    /**
-     *
-     */
     constructor(options: {
         multisigContract: Address;
         to: Address;

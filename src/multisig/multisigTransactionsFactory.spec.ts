@@ -34,19 +34,17 @@ describe("test multisig transactions factory", function () {
         const boardMemberTwo = Address.newFromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
 
         const board = [boardMemberOne, boardMemberTwo];
-        const amount = 1000000000000000000n; // 1 EGLD
 
         const transaction = factory.createTransactionForMultisigDeploy(senderAddress, {
             bytecode: bytecode.valueOf(),
             gasLimit: 5000000n,
             quorum: 2,
             board,
-            amount,
         });
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu");
-        assert.equal(transaction.value, amount);
+        assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             Buffer.from(transaction.data),

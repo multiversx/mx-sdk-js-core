@@ -12,6 +12,8 @@ import {
     TransactionWatcher,
 } from "../core";
 import { DelegationController, DelegationTransactionsFactory } from "../delegation";
+import { MultisigTransactionsFactory } from "../multisig";
+import { MultisigController } from "../multisig/multisigController";
 import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
 import { INetworkProvider } from "../networkProviders/interface";
 import { SmartContractTransactionsFactory } from "../smartContracts";
@@ -179,6 +181,14 @@ export class NetworkEntrypoint {
         return new TransferTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
         });
+    }
+
+    createMultisigController(): MultisigController {
+        return new MultisigController({ chainID: this.chainId, networkProvider: this.networkProvider });
+    }
+
+    createMultisigTransactionsFactory(): MultisigTransactionsFactory {
+        return new MultisigTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: this.chainId }) });
     }
 }
 

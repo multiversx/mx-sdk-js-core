@@ -29,6 +29,7 @@
         "out-browser",
         "out-browser-tests",
         "**/*.spec.ts",
-        "src/testutils"
+        "src/testutils",
+        "cookbook"
     ]
 }

@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@multiversx/sdk-core": "14.0.0",
+    "@multiversx/sdk-dapp": "2.40.11",
+    "axios": "1.7.7",
+    "chai": "5.1.0"
+  }
+}

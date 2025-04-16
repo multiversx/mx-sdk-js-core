@@ -43,14 +43,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
      * Creates a transaction to deploy a new multisig contract
      */
     createTransactionForMultisigDeploy(sender: Address, options: resources.DeployMultisigContractInput): Transaction {
-        const nativeTransferAmount = options.amount ?? 0n;
         const boardAddresses: AddressValue[] = options.board.map((addr) => new AddressValue(addr));
         const args = [new U32Value(options.quorum), VariadicValue.fromItems(...boardAddresses)];
 
         return this.createTransactionForDeploy(sender, {
             bytecode: options.bytecode,
             gasLimit: options.gasLimit,
-            nativeTransferAmount,
             isUpgradeable: options.isUpgradeable,
             isReadable: options.isReadable,
             isPayable: options.isPayable,

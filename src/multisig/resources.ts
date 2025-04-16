@@ -6,7 +6,6 @@ import { CodeMetadata } from "../core/codeMetadata";
 export type DeployMultisigContractInput = {
     quorum: number;
     board: Address[];
-    amount?: bigint;
     bytecode: Uint8Array;
     isUpgradeable?: boolean;
     isReadable?: boolean;

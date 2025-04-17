@@ -224,6 +224,31 @@ export class MultisigController extends SmartContractController {
     }
 
     /**
+     * Gets all pending actions.
+     */
+    async getPendingActionFullInfo(options: { mutisigAddress: string }): Promise<resources.FullMultisigAction[]> {
+        const response = await this.query({
+            contract: Address.newFromBech32(options.mutisigAddress),
+            function: "getPendingActionFullInfo",
+            arguments: [],
+        });
+
+        const result: resources.FullMultisigAction[] = [];
+        const actions = response[0];
+        for (let action = 0; action < actions.length; action++) {
+            const element = actions[action];
+            console.log({ element }, element.action_id, this.mapResponseToAction(element.action_data.valueOf()));
+            result.push({
+                actionId: Number(element.action_id.toString()),
+                groupId: Number(element.group_id.toString()),
+                actionData: this.mapResponseToAction(element.action_data.valueOf()),
+                signers: element.signers.map((address: Address) => new Address(address).toBech32()),
+            });
+        }
+        return result;
+    }
+
+    /**
      * Gets addresses of all users who signed an action.
      * Does not check if those users are still board members or not, so the result may contain invalid signers.
      */
@@ -802,6 +827,7 @@ export class MultisigController extends SmartContractController {
             case resources.MultisigActionEnum.SCUpgradeFromSource:
                 return new resources.SCUpgradeFromSource(fields);
             default:
+                console;
                 throw new Error(`Unknown action type: ${name}`);
         }
     };

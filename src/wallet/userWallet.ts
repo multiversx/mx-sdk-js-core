@@ -50,7 +50,9 @@ export class UserWallet {
         randomness = randomness || new Randomness();
 
         const publicKey = secretKey.generatePublicKey();
+        console.log({ secretKey, v: secretKey.valueOf() });
         const data = Buffer.concat([secretKey.valueOf(), publicKey.valueOf()]);
+        console.log({ data });
         const encryptedData = Encryptor.encrypt(data, password, randomness);
 
         return new UserWallet({
@@ -250,6 +252,7 @@ export class UserWallet {
             : resolve(join(process.cwd(), path.toString()));
 
         const jsonContent = this.toJSON(addressHrp);
+        console.log({ path });
         writeFileSync(resolvedPath, jsonContent, { encoding: "utf-8" });
     }
 }

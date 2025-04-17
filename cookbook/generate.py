@@ -5,20 +5,20 @@ from typing import Dict, List
 current_dir = Path(__file__).parent.absolute()
 
 input_files = [
-    current_dir / "entrypoints.js",
-    current_dir / "account.js",
-    current_dir / "networkProviders.js",
-    current_dir / "transactions.js",
-    current_dir / "smartContracts.js",
-    current_dir / "tokens.js",
-    current_dir / "accountManagement.js",
-    current_dir / "delegation.js",
-    current_dir / "relayed.js",
-    current_dir / "guarded.js",
-    current_dir / "addresses.js",
-    current_dir / "wallets.js",
-    current_dir / "signingObjects.js",
-    current_dir / "verifySignatures.js"
+    current_dir / "entrypoints.ts",
+    current_dir / "account.ts",
+    current_dir / "networkProviders.ts",
+    current_dir / "transactions.ts",
+    current_dir / "smartContracts.ts",
+    current_dir / "tokens.ts",
+    current_dir / "accountManagement.ts",
+    current_dir / "delegation.ts",
+    current_dir / "relayed.ts",
+    current_dir / "guarded.ts",
+    current_dir / "addresses.ts",
+    current_dir / "wallets.ts",
+    current_dir / "signingObjects.ts",
+    current_dir / "verifySignatures.ts"
 ]
 
 MARKER_INSERT = "md-insert:"
@@ -33,16 +33,6 @@ API_DEFAIULT_VERSION = "v13"
 DOCS_URL = "https://docs.multiversx.com"
 
 notes: Dict[str, str] = {
-    "transactionLegacyVsNext": """:::note
-Since `sdk-core v13`, the `class:Transaction` class exhibits its state as public read-write properties. For example, you can access and set the `nonce` property, instead of using `getNonce` and `setNonce`.
-:::""",
-
-    "forSimplicityWeUseUserSigner": f""":::important
-For the sake of simplicity, in this section we'll use a `UserSigner` object to sign the transaction.
-In real-world dApps, transactions are signed by end-users using their wallet, through a [signing provider]({DOCS_URL}/sdk-and-tools/sdk-js/sdk-js-signing-providers).
-:::
-""",
-
     "mixedTypedValuesAndNativeValues": """:::tip
 When creating transactions using `class:SmartContractController` or `class:SmartContractTransactionsFactory`, even if the ABI is available and provided,
 you can still use `class:TypedValue` objects as arguments for deployments and interactions.

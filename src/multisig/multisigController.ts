@@ -237,7 +237,6 @@ export class MultisigController extends SmartContractController {
         const actions = response[0];
         for (let action = 0; action < actions.length; action++) {
             const element = actions[action];
-            console.log({ element }, element.action_id, this.mapResponseToAction(element.action_data.valueOf()));
             result.push({
                 actionId: Number(element.action_id.toString()),
                 groupId: Number(element.group_id.toString()),

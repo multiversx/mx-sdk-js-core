@@ -250,6 +250,6 @@ export class UserWallet {
             : resolve(join(process.cwd(), path.toString()));
 
         const jsonContent = this.toJSON(addressHrp);
-        writeFileSync(resolvedPath, jsonContent, { encoding: "utf-8" });
+        writeFileSync(resolvedPath, JSON.stringify(jsonContent, null, 4), { encoding: "utf-8" });
     }
 }

@@ -1,5 +1,6 @@
 import path from "path"; // md-ignore
 import { Account, DevnetEntrypoint, KeyPair, Mnemonic, UserSecretKey } from "../src"; // md-ignore
+// md-start
 (async () => {
     // ## Creating Accounts
 

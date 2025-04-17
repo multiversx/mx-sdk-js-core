@@ -1,4 +1,5 @@
 import { DevnetEntrypoint } from "../src"; // md-ignore
+// md-start
 (async () => {
     // ## Overview
 

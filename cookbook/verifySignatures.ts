@@ -9,6 +9,7 @@ import {
     UserPublicKey,
     UserVerifier,
 } from "../src"; // md-ignore
+// md-start
 (async () => {
     // ## Verifying signatures
 

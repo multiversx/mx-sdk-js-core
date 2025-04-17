@@ -21,6 +21,7 @@ import {
     U64Value,
 } from "../src"; // md-ignore
 import { loadAbiRegistry } from "../src/testutils";
+// md-start
 (async () => {
     // ### Smart Contracts
 

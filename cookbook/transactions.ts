@@ -9,6 +9,7 @@ import {
     TransfersController,
     TransferTransactionsFactory,
 } from "../src"; // md-ignore
+// md-start
 (async () => {
     // ## Creating transactions
 

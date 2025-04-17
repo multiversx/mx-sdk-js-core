@@ -1,4 +1,5 @@
 import { Address, AddressComputer, LibraryConfig } from "../src"; // md-ignore
+// md-start
 (async () => {
     // ## Addresses
 

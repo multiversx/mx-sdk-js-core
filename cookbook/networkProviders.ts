@@ -7,6 +7,7 @@ import {
     Token,
     Transaction,
 } from "../src"; // md-ignore
+// md-start
 (async () => {
     // ## Calling the Faucet
 

@@ -1,5 +1,6 @@
 import path from "path"; // md-ignore
 import { KeyPair, Mnemonic, UserPem, UserWallet } from "../src"; // md-ignore
+// md-start
 (async () => {
     // ## Wallets
 

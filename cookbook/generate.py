@@ -21,31 +21,20 @@ input_files = [
     current_dir / "verifySignatures.ts"
 ]
 
-MARKER_INSERT = "md-insert:"
 DIRECTIVE_PREFIX = "// md-"
+DIRECTIVE_START = "// md-start"
 DIRECTIVE_IGNORE = "// md-ignore"
 DIRECTIVE_UNINDENT = "// md-unindent"
 DIRECTIVE_AS_COMMENT = "// md-as-comment"
-DIRECTIVE_INSERT = f"// {MARKER_INSERT}"
+TO_REMOVE = [
+    """(async () => {""", 
+    """})().catch((e) => {
+    console.log({ e });
+});"""]
 
 API_URL = "https://multiversx.github.io/mx-sdk-js-core"
 API_DEFAIULT_VERSION = "v13"
 DOCS_URL = "https://docs.multiversx.com"
-
-notes: Dict[str, str] = {
-    "mixedTypedValuesAndNativeValues": """:::tip
-When creating transactions using `class:SmartContractController` or `class:SmartContractTransactionsFactory`, even if the ABI is available and provided,
-you can still use `class:TypedValue` objects as arguments for deployments and interactions.
-
-Even further, you can use a mix of `class:TypedValue` objects and plain JavaScript values and objects. For example:
-
-```js
-let args = [new U32Value(42), "hello", { foo: "bar" }, new TokenIdentifierValue("TEST-abcdef")];
-```
-
-:::""",
-}
-
 
 def main():
     output_file = current_dir / "cookbook.md"
@@ -64,15 +53,18 @@ def main():
 
 def render_file(input_file: Path) -> List[str]:
     input_text = input_file.read_text()
+    for item in TO_REMOVE: 
+        input_text = input_text.replace(item, "")
     input_lines = input_text.splitlines()
+    start = input_lines.index(DIRECTIVE_START)
+    input_lines = input_lines[start:]
     output_lines: List[str] = []
 
     for line in input_lines:
         should_ignore = DIRECTIVE_IGNORE in line
         should_unindent = DIRECTIVE_UNINDENT in line
-        is_comment = line.startswith("//")
+        is_comment = line.startswith("//") or line.startswith("    //")
         should_keep_as_comment = DIRECTIVE_AS_COMMENT in line
-        should_insert = DIRECTIVE_INSERT in line
 
         if should_ignore:
             continue
@@ -81,15 +73,10 @@ def render_file(input_file: Path) -> List[str]:
             line = line.lstrip()
 
         if is_comment and not should_keep_as_comment:
-            line = line[2:].strip()
+            line = line.strip().strip("/").strip()
 
         line = line.replace(DIRECTIVE_UNINDENT, "")
         line = line.replace(DIRECTIVE_AS_COMMENT, "")
-
-        if should_insert:
-            box_name = line.replace(MARKER_INSERT, "").strip()
-            box_content = notes[box_name]
-            line = box_content
 
         line = line.rstrip()
         output_lines.append(line)

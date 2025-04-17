@@ -1,99 +1,98 @@
-(async () => {
-    // ## Overview
+md-start
 
-    // This guide walks you through handling common tasks using the MultiversX Javascript SDK (v14, latest stable version).
+## Overview
 
-    // ## Creating an Entrypoint
+This guide walks you through handling common tasks using the MultiversX Javascript SDK (v14, latest stable version).
 
-    // An Entrypoint represents a network client that simplifies access to the most common operations.
-    // There is a dedicated entrypoint for each network: `MainnetEntrypoint`,  `DevnetEntrypoint`, `TestnetEntrypoint`, `LocalnetEntrypoint`.
+## Creating an Entrypoint
 
-    // For example, to create a Devnet entrypoint you have the following command:
+An Entrypoint represents a network client that simplifies access to the most common operations.
+There is a dedicated entrypoint for each network: `MainnetEntrypoint`,  `DevnetEntrypoint`, `TestnetEntrypoint`, `LocalnetEntrypoint`.
 
-    // ```js
+For example, to create a Devnet entrypoint you have the following command:
+
+```js
     const entrypoint = new DevnetEntrypoint();
-    // ```
+```
 
-    // #### Using a Custom API
-    // If you'd like to connect to a third-party API, you can specify the url parameter:
+#### Using a Custom API
+If you'd like to connect to a third-party API, you can specify the url parameter:
 
-    // ```js
+```js
     const apiEntrypoint = new DevnetEntrypoint("https://custom-multiversx-devnet-api.com");
-    // ```
+```
 
-    // #### Using a Proxy
+#### Using a Proxy
 
-    // By default, the DevnetEntrypoint uses the standard API. However, you can create a custom entrypoint that interacts with a proxy by specifying the kind parameter:
+By default, the DevnetEntrypoint uses the standard API. However, you can create a custom entrypoint that interacts with a proxy by specifying the kind parameter:
 
-    // ```js
+```js
     const customEntrypoint = new DevnetEntrypoint("https://devnet-gateway.multiversx.com", "proxy");
-    // ```
-})().catch((e) => {
-    console.log({ e });
-});
+```
 
-(async () => {
-    // ## Creating Accounts
+md-start
 
-    // You can initialize an account directly from the entrypoint. Keep in mind that the account is network agnostic, meaning it doesn't matter which entrypoint is used.
-    // Accounts are used for signing transactions and messages and managing the account's nonce. They can also be saved to a PEM or keystore file for future use.
+## Creating Accounts
 
-    // ```js
+You can initialize an account directly from the entrypoint. Keep in mind that the account is network agnostic, meaning it doesn't matter which entrypoint is used.
+Accounts are used for signing transactions and messages and managing the account's nonce. They can also be saved to a PEM or keystore file for future use.
+
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const account = entrypoint.createAccount();
     }
-    // ```
+```
 
-    // ### Other Ways to Instantiate an Account
+### Other Ways to Instantiate an Account
 
-    // #### From a Secret Key
-    // ```js
+#### From a Secret Key
+```js
     {
         const secretKeyHex = "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9";
         const secretKey = new UserSecretKey(Buffer.from(secretKeyHex, "hex"));
 
         const accountFromSecretKey = new Account(secretKey);
     }
-    // ```
+```
 
-    // #### From a PEM file
-    // ```js
+#### From a PEM file
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const accountFromPem = Account.newFromPem(filePath);
     }
-    // ```
+```
 
-    // #### From a Keystore File
-    // ```js
+#### From a Keystore File
+```js
     {
         const keystorePath = path.join("../src", "testdata", "testwallets", "alice.json");
         const accountFromKeystore = Account.newFromKeystore(keystorePath, "password");
     }
-    // ```
+```
 
-    // #### From a Mnemonic
-    // ```js
+#### From a Mnemonic
+```js
 
     const mnemonic = Mnemonic.generate();
     const accountFromMnemonic = Account.newFromMnemonic(mnemonic.toString());
-    // ```
+```
 
-    // #### From a KeyPair
+#### From a KeyPair
 
-    // ```js
+```js
     const keypair = KeyPair.generate();
     const accountFromKeyPairs = Account.newFromKeypair(keypair);
-    // ```
+```
 
-    // ### Managing the Account Nonce
+### Managing the Account Nonce
 
-    // An account has a `nonce` property that the user is responsible for managing.
-    // You can fetch the nonce from the network and increment it after each transaction.
-    // Each transaction must have the correct nonce, otherwise it will fail to execute.
+An account has a `nonce` property that the user is responsible for managing.
+You can fetch the nonce from the network and increment it after each transaction.
+Each transaction must have the correct nonce, otherwise it will fail to execute.
 
-    // ```js
+```js
     {
         const secretKeyHex = "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9";
         const key = new UserSecretKey(Buffer.from(secretKeyHex, "hex"));
@@ -109,18 +108,18 @@
         // Increment nonce after each transaction
         const nonce = accountWithNonce.getNonceThenIncrement();
     }
-    // ```
+```
 
-    // For more details, see the [Creating Transactions](#creating-transactions) section.
+For more details, see the [Creating Transactions](#creating-transactions) section.
 
-    // #### Saving the Account to a File
+#### Saving the Account to a File
 
-    // Accounts can be saved to either a PEM file or a keystore file.
-    // While PEM wallets are less secure for storing secret keys, they are convenient for testing purposes.
-    // Keystore files offer a higher level of security.
+Accounts can be saved to either a PEM file or a keystore file.
+While PEM wallets are less secure for storing secret keys, they are convenient for testing purposes.
+Keystore files offer a higher level of security.
 
-    // #### Saving the Account to a PEM File
-    // ```js
+#### Saving the Account to a PEM File
+```js
     {
         const secretKeyHex = "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9";
         const secretKey = new UserSecretKey(Buffer.from(secretKeyHex, "hex"));
@@ -128,10 +127,10 @@
         const account = new Account(secretKey);
         account.saveToPem(path.resolve("wallet.pem"));
     }
-    // ```
+```
 
-    // #### Saving the Account to a Keystore File
-    // ```js
+#### Saving the Account to a Keystore File
+```js
     {
         const secretKeyHex = "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9";
         const secretKey = new UserSecretKey(Buffer.from(secretKeyHex, "hex"));
@@ -140,73 +139,63 @@
         account.saveToKeystore(path.resolve("keystoreWallet.json"), "password");
     }
 
-    // ```
+```
 
-    // ### Using a Ledger Device
+### Using a Ledger Device
 
-    // You can manage your account with a Ledger device, allowing you to sign both transactions and messages while keeping your keys secure.
+You can manage your account with a Ledger device, allowing you to sign both transactions and messages while keeping your keys secure.
 
-    // Note: **The multiversx-sdk package does not include Ledger support by default. To enable it, install the package with Ledger dependencies**:
+Note: **The multiversx-sdk package does not include Ledger support by default. To enable it, install the package with Ledger dependencies**:
 ```bash
 npm install @multiversx/sdk-hw-provider
 ```
 
-    // #### Creating a Ledger Account
-    // This can be done using the dedicated library. You can find more information [here](/sdk-and-tools/sdk-js/sdk-js-signing-providers/#the-hardware-wallet-provider).
+#### Creating a Ledger Account
+This can be done using the dedicated library. You can find more information [here](/sdk-and-tools/sdk-js/sdk-js-signing-providers/#the-hardware-wallet-provider).
 
-    // When signing transactions or messages, the Ledger device will prompt you to confirm the details before proceeding.
+When signing transactions or messages, the Ledger device will prompt you to confirm the details before proceeding.
 
-    // ### Compatibility with IAccount Interface
+### Compatibility with IAccount Interface
 
-    // The `Account` implements the `IAccount` interface, making it compatible with transaction controllers and any other component that expects this interface.
-})().catch((e) => {
-    console.log({ e });
-});
+The `Account` implements the `IAccount` interface, making it compatible with transaction controllers and any other component that expects this interface.
 
-import {
-    Address,
-    ApiNetworkProvider,
-    DevnetEntrypoint,
-    ProxyNetworkProvider,
-    SmartContractQuery,
-    Token,
-    Transaction,
-(async () => {
-    // ## Calling the Faucet
+md-start
 
-    // This functionality is not yet available through the entrypoint, but we recommend using the faucet available within the Web Wallet. For more details about the faucet [see this](/wallet/web-wallet/#testnet-and-devnet-faucet).
+## Calling the Faucet
 
-    // - [Testnet Wallet](https://testnet-wallet.multiversx.com/).
-    // - [Devnet Wallet](https://devnet-wallet.multiversx.com/).
+This functionality is not yet available through the entrypoint, but we recommend using the faucet available within the Web Wallet. For more details about the faucet [see this](/wallet/web-wallet/#testnet-and-devnet-faucet).
 
-    // ### Interacting with the network
+- [Testnet Wallet](https://testnet-wallet.multiversx.com/).
+- [Devnet Wallet](https://devnet-wallet.multiversx.com/).
 
-    // The entrypoint exposes a few ways to directly interact with the network, such as:
+### Interacting with the network
 
-    // - `recallAccountNonce(address: Address): Promise<bigint>;`
-    // - `sendTransactions(transactions: Transaction[]): Promise<[number, string[]]>;`
-    // - `sendTransaction(transaction: Transaction): Promise<string>;`
-    // - `getTransaction(txHash: string): Promise<TransactionOnNetwork>;`
-    // - `awaitCompletedTransaction(txHash: string): Promise<TransactionOnNetwork>;`
+The entrypoint exposes a few ways to directly interact with the network, such as:
 
-    // Some other methods are exposed through a so called **network provider**.
+- `recallAccountNonce(address: Address): Promise<bigint>;`
+- `sendTransactions(transactions: Transaction[]): Promise<[number, string[]]>;`
+- `sendTransaction(transaction: Transaction): Promise<string>;`
+- `getTransaction(txHash: string): Promise<TransactionOnNetwork>;`
+- `awaitCompletedTransaction(txHash: string): Promise<TransactionOnNetwork>;`
 
-    // - **ApiNetworkProvider**: Interacts with the API, which is a layer over the proxy. It fetches data from the network and `Elastic Search`.
-    // - **ProxyNetworkProvider**: Interacts directly with the proxy of an observing squad.
+Some other methods are exposed through a so called **network provider**.
 
-    // To get the underlying network provider from our entrypoint, we can do as follows:
+- **ApiNetworkProvider**: Interacts with the API, which is a layer over the proxy. It fetches data from the network and `Elastic Search`.
+- **ProxyNetworkProvider**: Interacts directly with the proxy of an observing squad.
 
-    // ```js
+To get the underlying network provider from our entrypoint, we can do as follows:
+
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const networkProvider = entrypoint.createNetworkProvider();
     }
-    // ```
+```
 
-    // ### Creating a network provider
-    // When manually instantiating a network provider, you can provide a configuration to specify the client name and set custom request options.
+### Creating a network provider
+When manually instantiating a network provider, you can provide a configuration to specify the client name and set custom request options.
 
-    // ```js
+```js
     {
         // Create a configuration object
         const config = {
@@ -223,30 +212,30 @@ import {
         // Instantiate the network provider with the config
         const api = new ApiNetworkProvider("https://devnet-api.multiversx.com", config);
     }
-    // ```
+```
 
-    // A full list of available methods for `ApiNetworkProvider` can be found [here](https://multiversx.github.io/mx-sdk-js-core/v14/classes/ApiNetworkProvider.html).
+A full list of available methods for `ApiNetworkProvider` can be found [here](https://multiversx.github.io/mx-sdk-js-core/v14/classes/ApiNetworkProvider.html).
 
-    // Both `ApiNetworkProvider` and `ProxyNetworkProvider` implement a common interface, which can be found [here](https://multiversx.github.io/mx-sdk-js-core/v14/interfaces/INetworkProvider.html). This allows them to be used interchangeably.
+Both `ApiNetworkProvider` and `ProxyNetworkProvider` implement a common interface, which can be found [here](https://multiversx.github.io/mx-sdk-js-core/v14/interfaces/INetworkProvider.html). This allows them to be used interchangeably.
 
-    // The classes returned by the API expose the most commonly used fields directly for convenience. However, each object also contains a `raw` field that stores the original API response, allowing access to additional fields if needed.
+The classes returned by the API expose the most commonly used fields directly for convenience. However, each object also contains a `raw` field that stores the original API response, allowing access to additional fields if needed.
 
-    // ## Fetching data from the network
+## Fetching data from the network
 
-    // ### Fetching the network config
+### Fetching the network config
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const networkProvider = entrypoint.createNetworkProvider();
 
         const networkConfig = networkProvider.getNetworkConfig();
     }
-    // ```
+```
 
-    // ### Fetching the network status
+### Fetching the network status
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const networkProvider = entrypoint.createNetworkProvider();
@@ -254,96 +243,96 @@ import {
         const metaNetworkStatus = networkProvider.getNetworkStatus(); // fetches status from metachain
         const networkStatus = networkProvider.getNetworkStatus(); // fetches status from shard one
     }
-    // ```
+```
 
-    // ### Fetching a Block from the Network
-    // To fetch a block, we first instantiate the required arguments and use its hash. The API only supports fetching blocks by hash, whereas the **PROXY** allows fetching blocks by either hash or nonce.
+### Fetching a Block from the Network
+To fetch a block, we first instantiate the required arguments and use its hash. The API only supports fetching blocks by hash, whereas the **PROXY** allows fetching blocks by either hash or nonce.
 
-    // When using the **PROXY**, keep in mind that the shard must also be specified in the arguments.
+When using the **PROXY**, keep in mind that the shard must also be specified in the arguments.
 
-    // #### Fetching a block using the **API**
-    // ```js
+#### Fetching a block using the **API**
+```js
     {
         const api = new ApiNetworkProvider("https://devnet-api.multiversx.com");
         const blockHash = "1147e111ce8dd860ae43a0f0d403da193a940bfd30b7d7f600701dd5e02f347a";
         const block = await api.getBlock(blockHash);
     }
-    // ```
+```
 
-    // Additionally, we can fetch the latest block from the network:
+Additionally, we can fetch the latest block from the network:
 
-    // ```js
+```js
     {
         const api = new ApiNetworkProvider("https://devnet-api.multiversx.com");
         const latestBlock = await api.getLatestBlock();
     }
-    // ```
+```
 
-    // #### Fetching a block using the **PROXY**
+#### Fetching a block using the **PROXY**
 
-    // When using the proxy, we have to provide the shard, as well.
-    // ```js
+When using the proxy, we have to provide the shard, as well.
+```js
     {
         const proxy = new ProxyNetworkProvider("https://devnet-api.multiversx.com");
         const blockHash = "1147e111ce8dd860ae43a0f0d403da193a940bfd30b7d7f600701dd5e02f347a";
         const block = proxy.getBlock({ blockHash, shard: 1 });
     }
-    // ```
+```
 
-    // We can also fetch the latest block from the network.
-    // By default, the shard will be the metachain, but we can specify a different shard if needed.
+We can also fetch the latest block from the network.
+By default, the shard will be the metachain, but we can specify a different shard if needed.
 
-    // ```js
+```js
     {
         const proxy = new ProxyNetworkProvider("https://devnet-api.multiversx.com");
         const latestBlock = proxy.getLatestBlock();
     }
-    // ```
+```
 
-    // ### Fetching an Account
-    // To fetch an account, we need its address. Once we have the address, we create an `Address` object and pass it as an argument to the method.
+### Fetching an Account
+To fetch an account, we need its address. Once we have the address, we create an `Address` object and pass it as an argument to the method.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
         const alice = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const account = await api.getAccount(alice);
     }
-    // ```
+```
 
-    // ### Fetching an Account's Storage
-    // We can also fetch an account's storage, allowing us to retrieve all key-value pairs saved for that account.
+### Fetching an Account's Storage
+We can also fetch an account's storage, allowing us to retrieve all key-value pairs saved for that account.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
         const alice = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const account = await api.getAccountStorage(alice);
     }
-    // ```
+```
 
-    // If we only want to fetch a specific key, we can do so as follows:
+If we only want to fetch a specific key, we can do so as follows:
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
         const alice = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const account = await api.getAccountStorageEntry(alice, "testKey");
     }
-    // ```
+```
 
-    // ### Waiting for an Account to Meet a Condition
-    // There are times when we need to wait for a specific condition to be met before proceeding with an action.
-    // For example, let's say we want to send 7 EGLD from Alice to Bob, but this can only happen once Alice's balance reaches at least 7 EGLD.
-    // This approach is useful in scenarios where you're waiting for external funds to be sent to Alice, enabling her to transfer the required amount to another recipient.
+### Waiting for an Account to Meet a Condition
+There are times when we need to wait for a specific condition to be met before proceeding with an action.
+For example, let's say we want to send 7 EGLD from Alice to Bob, but this can only happen once Alice's balance reaches at least 7 EGLD.
+This approach is useful in scenarios where you're waiting for external funds to be sent to Alice, enabling her to transfer the required amount to another recipient.
 
-    // To implement this, we need to define the condition to check each time the account is fetched from the network. We create a function that takes an `AccountOnNetwork` object as an argument and returns a `bool`.
-    // Keep in mind that this method has a default timeout, which can be adjusted using the `AwaitingOptions` class.
+To implement this, we need to define the condition to check each time the account is fetched from the network. We create a function that takes an `AccountOnNetwork` object as an argument and returns a `bool`.
+Keep in mind that this method has a default timeout, which can be adjusted using the `AwaitingOptions` class.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -354,14 +343,14 @@ import {
         const alice = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const account = await api.awaitAccountOnCondition(alice, condition);
     }
-    // ```
+```
 
-    // ### Sending and Simulating Transactions
-    // To execute transactions, we use the network providers to broadcast them to the network. Keep in mind that for transactions to be processed, they must be signed.
+### Sending and Simulating Transactions
+To execute transactions, we use the network providers to broadcast them to the network. Keep in mind that for transactions to be processed, they must be signed.
 
-    // #### Sending a Transaction
+#### Sending a Transaction
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -380,10 +369,10 @@ import {
 
         const transactionHash = await api.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Sending multiple transactions
-    // ```js
+#### Sending multiple transactions
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -424,12 +413,12 @@ import {
             thirdTransaction,
         ]);
     }
-    // ```
+```
 
-    // #### Simulating transactions
-    // A transaction can be simulated before being sent for processing by the network. This is primarily used for smart contract calls, allowing you to preview the results produced by the smart contract.
+#### Simulating transactions
+A transaction can be simulated before being sent for processing by the network. This is primarily used for smart contract calls, allowing you to preview the results produced by the smart contract.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -447,12 +436,12 @@ import {
 
         const transactionOnNetwork = await api.simulateTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Estimating the gas cost of a transaction
-    // Before sending a transaction to the network for processing, you can retrieve the estimated gas limit required for the transaction to be executed.
+#### Estimating the gas cost of a transaction
+Before sending a transaction to the network for processing, you can retrieve the estimated gas limit required for the transaction to be executed.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -473,12 +462,12 @@ import {
 
         const transactionCostResponse = await api.estimateTransactionCost(transaction);
     }
-    // ```
+```
 
-    // ### Waiting for transaction completion
-    // After sending a transaction, you may want to wait until it is processed before proceeding with another action. Keep in mind that this method has a default timeout, which can be adjusted using the `AwaitingOptions` class.
+### Waiting for transaction completion
+After sending a transaction, you may want to wait until it is processed before proceeding with another action. Keep in mind that this method has a default timeout, which can be adjusted using the `AwaitingOptions` class.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -486,12 +475,12 @@ import {
         const txHash = "exampletransactionhash";
         const transactionOnNetwork = await api.awaitTransactionCompleted(txHash);
     }
-    // ```
+```
 
-    // ### Waiting for a Transaction to Satisfy a Condition
-    // Similar to accounts, we can wait until a transaction meets a specific condition.
+### Waiting for a Transaction to Satisfy a Condition
+Similar to accounts, we can wait until a transaction meets a specific condition.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -501,12 +490,12 @@ import {
         const txHash = "exampletransactionhash";
         const transactionOnNetwork = await api.awaitTransactionOnCondition(txHash, condition);
     }
-    // ```
+```
 
-    // ### Waiting for transaction completion
-    // After sending a transaction, you may want to wait until it is processed before proceeding with another action. Keep in mind that this method has a default timeout, which can be adjusted using the `AwaitingOptions` class.
+### Waiting for transaction completion
+After sending a transaction, you may want to wait until it is processed before proceeding with another action. Keep in mind that this method has a default timeout, which can be adjusted using the `AwaitingOptions` class.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -514,12 +503,12 @@ import {
         const txHash = "exampletransactionhash";
         const transactionOnNetwork = await api.awaitTransactionCompleted(txHash);
     }
-    // ```
+```
 
-    // ### Fetching Transactions from the Network
-    // After sending a transaction, we can fetch it from the network using the transaction hash, which we receive after broadcasting the transaction.
+### Fetching Transactions from the Network
+After sending a transaction, we can fetch it from the network using the transaction hash, which we receive after broadcasting the transaction.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -527,12 +516,12 @@ import {
         const txHash = "exampletransactionhash";
         const transactionOnNetwork = await api.getTransaction(txHash);
     }
-    // ```
+```
 
-    // ### Fetching a token from an account
-    // We can fetch a specific token (ESDT, MetaESDT, SFT, NFT) from an account by providing the account's address and the token identifier.
+### Fetching a token from an account
+We can fetch a specific token (ESDT, MetaESDT, SFT, NFT) from an account by providing the account's address and the token identifier.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -544,12 +533,12 @@ import {
         token = new Token({ identifier: "NFT-987654", nonce: 11n }); // NFT
         tokenOnNetwork = await api.getTokenOfAccount(alice, token);
     }
-    // ```
+```
 
-    // ### Fetching all fungible tokens of an account
-    // Fetches all fungible tokens held by an account. Note that this method does not handle pagination, but it can be achieved using `doGetGeneric`.
+### Fetching all fungible tokens of an account
+Fetches all fungible tokens held by an account. Note that this method does not handle pagination, but it can be achieved using `doGetGeneric`.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -557,12 +546,12 @@ import {
         const alice = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const fungibleTokens = await api.getFungibleTokensOfAccount(alice);
     }
-    // ```
+```
 
-    // ### Fetching all non-fungible tokens of an account
-    // Fetches all non-fungible tokens held by an account. Note that this method does not handle pagination, but it can be achieved using `doGetGeneric`.
+### Fetching all non-fungible tokens of an account
+Fetches all non-fungible tokens held by an account. Note that this method does not handle pagination, but it can be achieved using `doGetGeneric`.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -570,12 +559,12 @@ import {
         const alice = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const nfts = await api.getNonFungibleTokensOfAccount(alice);
     }
-    // ```
+```
 
-    // ### Fetching token metadata
-    // If we want to fetch the metadata of a token (e.g., owner, decimals, etc.), we can use the following methods:
+### Fetching token metadata
+If we want to fetch the metadata of a token (e.g., owner, decimals, etc.), we can use the following methods:
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -586,12 +575,12 @@ import {
         // used for METAESDT, SFT, NFT
         const nonFungibleTokenDefinition = await api.getDefinitionOfTokenCollection("NFTEST-ec88b8");
     }
-    // ```
+```
 
-    // ### Querying Smart Contracts
-    // Smart contract queries, or view functions, are endpoints that only read data from the contract. To send a query to the observer nodes, we can proceed as follows:
+### Querying Smart Contracts
+Smart contract queries, or view functions, are endpoints that only read data from the contract. To send a query to the observer nodes, we can proceed as follows:
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -603,13 +592,13 @@ import {
         });
         const response = await api.queryContract(query);
     }
-    // ```
+```
 
-    // ### Custom Api/Proxy calls
-    // The methods exposed by the `ApiNetworkProvider` or `ProxyNetworkProvider` are the most common and widely used. However, there may be times when custom API calls are needed. For these cases, we’ve created generic methods for both GET and POST requests.
-    // Let’s assume we want to retrieve all the transactions sent by Alice in which the `delegate` function was called.
+### Custom Api/Proxy calls
+The methods exposed by the `ApiNetworkProvider` or `ProxyNetworkProvider` are the most common and widely used. However, there may be times when custom API calls are needed. For these cases, we’ve created generic methods for both GET and POST requests.
+Let’s assume we want to retrieve all the transactions sent by Alice in which the `delegate` function was called.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const api = entrypoint.createNetworkProvider();
@@ -619,36 +608,25 @@ import {
 
         const response = await api.doGetGeneric(url);
     }
-    // ```
-})().catch((e) => {
-    console.log({ e });
-});
+```
 
-import {
-    Account,
-    Address,
-    DevnetEntrypoint,
-    Token,
-    TokenTransfer,
-    TransactionsFactoryConfig,
-    TransfersController,
-    TransferTransactionsFactory,
-(async () => {
-    // ## Creating transactions
+md-start
 
-    // In this section, we’ll explore how to create different types of transactions. To create transactions, we can use either controllers or factories.
-    // Controllers are ideal for quick scripts or network interactions, while factories provide a more granular and lower-level approach, typically required for DApps.
+## Creating transactions
 
-    // Controllers typically use the same parameters as factories, but they also require an Account object and the sender’s nonce.
-    // Controllers also include extra functionality, such as waiting for transaction completion and parsing transactions.
-    // The same functionality can be achieved for transactions built using factories, and we’ll see how in the sections below. In the next section, we’ll learn how to create transactions using both methods.
+In this section, we’ll explore how to create different types of transactions. To create transactions, we can use either controllers or factories.
+Controllers are ideal for quick scripts or network interactions, while factories provide a more granular and lower-level approach, typically required for DApps.
 
-    // ### Instantiating Controllers and Factories
-    // There are two ways to create controllers and factories:
-    // 1. Get them from the entrypoint.
-    // 2. Manually instantiate them.
+Controllers typically use the same parameters as factories, but they also require an Account object and the sender’s nonce.
+Controllers also include extra functionality, such as waiting for transaction completion and parsing transactions.
+The same functionality can be achieved for transactions built using factories, and we’ll see how in the sections below. In the next section, we’ll learn how to create transactions using both methods.
 
-    // ```js
+### Instantiating Controllers and Factories
+There are two ways to create controllers and factories:
+1. Get them from the entrypoint.
+2. Manually instantiate them.
+
+```js
     {
         const entrypoint = new DevnetEntrypoint();
 
@@ -662,14 +640,14 @@ import {
         const config = new TransactionsFactoryConfig({ chainID: "D" });
         const factory = new TransferTransactionsFactory({ config });
     }
-    // ```
+```
 
-    // ### Token transfers
-    // We can send both native tokens (EGLD) and ESDT tokens using either the controller or the factory.
-    // #### Native Token Transfers Using the Controller
-    // When using the controller, the transaction will be signed because we’ll be working with an Account.
+### Token transfers
+We can send both native tokens (EGLD) and ESDT tokens using either the controller or the factory.
+#### Native Token Transfers Using the Controller
+When using the controller, the transaction will be signed because we’ll be working with an Account.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
 
@@ -692,15 +670,15 @@ import {
 
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // If you know you’ll only be sending native tokens, you can create the transaction using the `createTransactionForNativeTokenTransfer` method.
+If you know you’ll only be sending native tokens, you can create the transaction using the `createTransactionForNativeTokenTransfer` method.
 
-    // #### Native Token Transfers Using the Factory
-    // When using the factory, only the sender's address is required. As a result, the transaction won’t be signed, and the nonce field won’t be set correctly.
-    // You will need to handle these aspects after the transaction is created.
+#### Native Token Transfers Using the Factory
+When using the factory, only the sender's address is required. As a result, the transaction won’t be signed, and the nonce field won’t be set correctly.
+You will need to handle these aspects after the transaction is created.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const factory = entrypoint.createTransfersTransactionsFactory();
@@ -726,13 +704,13 @@ import {
 
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // If you know you’ll only be sending native tokens, you can create the transaction using the `createTransactionForNativeTokenTransfer` method.
+If you know you’ll only be sending native tokens, you can create the transaction using the `createTransactionForNativeTokenTransfer` method.
 
-    // #### Custom token transfers using the controller
+#### Custom token transfers using the controller
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
 
@@ -764,14 +742,14 @@ import {
 
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // If you know you'll only send ESDT tokens, the same transaction can be created using createTransactionForEsdtTokenTransfer.
+If you know you'll only send ESDT tokens, the same transaction can be created using createTransactionForEsdtTokenTransfer.
 
-    // #### Custom token transfers using the factory
-    // When using the factory, only the sender's address is required. As a result, the transaction won’t be signed, and the nonce field won’t be set correctly. These aspects should be handled after the transaction is created.
+#### Custom token transfers using the factory
+When using the factory, only the sender's address is required. As a result, the transaction won’t be signed, and the nonce field won’t be set correctly. These aspects should be handled after the transaction is created.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const factory = entrypoint.createTransfersTransactionsFactory();
@@ -805,15 +783,15 @@ import {
 
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // If you know you'll only send ESDT tokens, the same transaction can be created using createTransactionForEsdtTokenTransfer.
+If you know you'll only send ESDT tokens, the same transaction can be created using createTransactionForEsdtTokenTransfer.
 
-    // #### Sending native and custom tokens
-    // Both native and custom tokens can now be sent. If a `nativeAmount` is provided along with `tokenTransfers`, the native token will be included in the `MultiESDTNFTTransfer` built-in function call.
-    // We can send both types of tokens using either the `controller` or the `factory`, but for simplicity, we’ll use the controller in this example.
+#### Sending native and custom tokens
+Both native and custom tokens can now be sent. If a `nativeAmount` is provided along with `tokenTransfers`, the native token will be included in the `MultiESDTNFTTransfer` built-in function call.
+We can send both types of tokens using either the `controller` or the `factory`, but for simplicity, we’ll use the controller in this example.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
 
@@ -843,63 +821,42 @@ import {
 
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
-})().catch((e) => {
-    console.log({ e });
-});
+```
 
-import {
-    Abi,
-    Account,
-    Address,
-    AddressComputer,
-    BigUIntValue,
-    BinaryCodec,
-    DevnetEntrypoint,
-    Field,
-    gatherAllEvents,
-    SmartContractTransactionsOutcomeParser,
-    Struct,
-    Token,
-    TokenIdentifierValue,
-    TokenTransfer,
-    TransactionEventsParser,
-    U32Value,
-    U64Value,
-import { loadAbiRegistry } from "../src/testutils";
-(async () => {
-    // ### Smart Contracts
+md-start
 
-    // #### Contract ABIs
+### Smart Contracts
 
-    // A contract's ABI (Application Binary Interface) describes the endpoints, data structures, and events that the contract exposes.
-    // While interactions with the contract are possible without the ABI, they are much easier to implement when the definitions are available.
+#### Contract ABIs
 
-    // #### Loading the ABI from a file
-    // ```js
+A contract's ABI (Application Binary Interface) describes the endpoints, data structures, and events that the contract exposes.
+While interactions with the contract are possible without the ABI, they are much easier to implement when the definitions are available.
+
+#### Loading the ABI from a file
+```js
     {
         let abiJson = await promises.readFile("../src/testData/adder.abi.json", { encoding: "utf8" });
         let abiObj = JSON.parse(abiJson);
         let abi = Abi.create(abiObj);
     }
-    // ```
+```
 
-    // #### Loading the ABI from an URL
+#### Loading the ABI from an URL
 
-    // ```js
+```js
     {
         const response = await axios.get(
             "https://github.com/multiversx/mx-sdk-js-core/raw/main/src/testdata/adder.abi.json",
         );
         let abi = Abi.create(response.data);
     }
-    // ```
+```
 
-    // #### Manually construct the ABI
+#### Manually construct the ABI
 
-    // If an ABI file isn’t available, but you know the contract’s endpoints and data types, you can manually construct the ABI.
+If an ABI file isn’t available, but you know the contract’s endpoints and data types, you can manually construct the ABI.
 
-    // ```js
+```js
     {
         let abi = Abi.create({
             endpoints: [
@@ -911,9 +868,9 @@ import { loadAbiRegistry } from "../src/testutils";
             ],
         });
     }
-    // ```
+```
 
-    // ```js
+```js
     {
         let abi = Abi.create({
             endpoints: [
@@ -930,16 +887,16 @@ import { loadAbiRegistry } from "../src/testutils";
             ],
         });
     }
-    // ```
+```
 
-    // ### Smart Contract deployments
-    // For creating smart contract deployment transactions, we have two options: a controller and a factory. Both function similarly to the ones used for token transfers.
-    // When creating transactions that interact with smart contracts, it's recommended to provide the ABI file to the controller or factory if possible.
-    // This allows arguments to be passed as native Javascript values. If the ABI is not available, but we know the expected data types, we can pass arguments as typed values (e.g., `BigUIntValue`, `ListValue`, `StructValue`, etc.) or as raw bytes.
+### Smart Contract deployments
+For creating smart contract deployment transactions, we have two options: a controller and a factory. Both function similarly to the ones used for token transfers.
+When creating transactions that interact with smart contracts, it's recommended to provide the ABI file to the controller or factory if possible.
+This allows arguments to be passed as native Javascript values. If the ABI is not available, but we know the expected data types, we can pass arguments as typed values (e.g., `BigUIntValue`, `ListValue`, `StructValue`, etc.) or as raw bytes.
 
-    // #### Deploying a Smart Contract Using the Controller
+#### Deploying a Smart Contract Using the Controller
 
-    // ```js
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const sender = await Account.newFromPem(filePath);
@@ -969,22 +926,22 @@ import { loadAbiRegistry } from "../src/testutils";
         // broadcasting the transaction
         const txHash = await entrypoint.sendTransaction(deployTransaction);
     }
-    // ```
+```
 
-    // :::tip
-    // When creating transactions using [`SmartContractController`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/SmartContractController.html) or [`SmartContractTransactionsFactory`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/SmartContractTransactionsFactory.html), even if the ABI is available and provided,
-    // you can still use [`TypedValue`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/TypedValue.html) objects as arguments for deployments and interactions.
+:::tip
+When creating transactions using [`SmartContractController`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/SmartContractController.html) or [`SmartContractTransactionsFactory`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/SmartContractTransactionsFactory.html), even if the ABI is available and provided,
+you can still use [`TypedValue`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/TypedValue.html) objects as arguments for deployments and interactions.
 
-    //  Even further, you can use a mix of [`TypedValue`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/TypedValue.html) objects and plain JavaScript values and objects. For example:
+Even further, you can use a mix of [`TypedValue`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/TypedValue.html) objects and plain JavaScript values and objects. For example:
 
-    // ```js
-    // let args = [new U32Value(42), "hello", { foo: "bar" }, new TokenIdentifierValue("TEST-abcdef")];
-    // ```
-    // :::
+```js
+let args = [new U32Value(42), "hello", { foo: "bar" }, new TokenIdentifierValue("TEST-abcdef")];
+```
+:::
 
-    // #### Parsing contract deployment transactions
+#### Parsing contract deployment transactions
 
-    // ```js
+```js
     {
         // We use the transaction hash we got when broadcasting the transaction
 
@@ -994,11 +951,11 @@ import { loadAbiRegistry } from "../src/testutils";
         const outcome = await controller.awaitCompletedDeploy("txHash"); // waits for transaction completion and parses the result
         const contractAddress = outcome.contracts[0].address;
     }
-    // ```
+```
 
-    // If we want to wait for transaction completion and parse the result in two different steps, we can do as follows:
+If we want to wait for transaction completion and parse the result in two different steps, we can do as follows:
 
-    // ```js
+```js
     {
         // We use the transaction hash we got when broadcasting the transaction
         // If we want to wait for transaction completion and parse the result in two different steps, we can do as follows:
@@ -1011,13 +968,13 @@ import { loadAbiRegistry } from "../src/testutils";
         // parsing the transaction
         const outcome = await controller.parseDeploy(transactionOnNetwork);
     }
-    // ```
+```
 
-    // #### Computing the contract address
+#### Computing the contract address
 
-    // Even before broadcasting, at the moment you know the sender's address and the nonce for your deployment transaction, you can (deterministically) compute the (upcoming) address of the smart contract:
+Even before broadcasting, at the moment you know the sender's address and the nonce for your deployment transaction, you can (deterministically) compute the (upcoming) address of the smart contract:
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const factory = entrypoint.createSmartContractTransactionsFactory();
@@ -1043,12 +1000,12 @@ import { loadAbiRegistry } from "../src/testutils";
 
         console.log("Contract address:", contractAddress.toBech32());
     }
-    // ```
+```
 
-    // #### Deploying a Smart Contract using the factory
-    // After the transaction is created the nonce needs to be properly set and the transaction should be signed before broadcasting it.
+#### Deploying a Smart Contract using the factory
+After the transaction is created the nonce needs to be properly set and the transaction should be signed before broadcasting it.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const factory = entrypoint.createSmartContractTransactionsFactory();
@@ -1092,15 +1049,15 @@ import { loadAbiRegistry } from "../src/testutils";
 
         console.log(contractAddress.toBech32());
     }
-    // ```
+```
 
-    // ### Smart Contract calls
+### Smart Contract calls
 
-    // In this section we'll see how we can call an endpoint of our previously deployed smart contract using both approaches with the `controller` and the `factory`.
+In this section we'll see how we can call an endpoint of our previously deployed smart contract using both approaches with the `controller` and the `factory`.
 
-    // #### Calling a smart contract using the controller
+#### Calling a smart contract using the controller
 
-    // ```js
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const sender = await Account.newFromPem(filePath);
@@ -1132,12 +1089,12 @@ import { loadAbiRegistry } from "../src/testutils";
 
         console.log(txHash);
     }
-    // ```
+```
 
-    // #### Parsing smart contract call transactions
-    // In our case, calling the add endpoint does not return anything, but similar to the example above, we could parse this transaction to get the output values of a smart contract call.
+#### Parsing smart contract call transactions
+In our case, calling the add endpoint does not return anything, but similar to the example above, we could parse this transaction to get the output values of a smart contract call.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const controller = entrypoint.createSmartContractController();
@@ -1146,13 +1103,13 @@ import { loadAbiRegistry } from "../src/testutils";
         const parsedOutcome = await controller.awaitCompletedExecute(txHash);
         const values = parsedOutcome.values;
     }
-    // ```
+```
 
-    // #### Calling a smart contract and sending tokens (transfer & execute)
-    // Additionally, if an endpoint requires a payment when called, we can send tokens to the contract while creating a smart contract call transaction.
-    // Both EGLD and ESDT tokens or a combination of both can be sent. This functionality is supported by both the controller and the factory.
+#### Calling a smart contract and sending tokens (transfer & execute)
+Additionally, if an endpoint requires a payment when called, we can send tokens to the contract while creating a smart contract call transaction.
+Both EGLD and ESDT tokens or a combination of both can be sent. This functionality is supported by both the controller and the factory.
 
-    // ```js
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const sender = await Account.newFromPem(filePath);
@@ -1195,12 +1152,12 @@ import { loadAbiRegistry } from "../src/testutils";
 
         console.log(txHash);
     }
-    // ```
+```
 
-    // #### Calling a smart contract using the factory
-    // Let's create the same smart contract call transaction, but using the `factory`.
+#### Calling a smart contract using the factory
+Let's create the same smart contract call transaction, but using the `factory`.
 
-    // ```js
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const alice = await Account.newFromPem(filePath);
@@ -1243,12 +1200,12 @@ import { loadAbiRegistry } from "../src/testutils";
 
         console.log(txHash);
     }
-    // ```
+```
 
-    // #### Parsing transaction outcome
-    // As said before, the `add` endpoint we called does not return anything, but we could parse the outcome of smart contract call transactions, as follows:
+#### Parsing transaction outcome
+As said before, the `add` endpoint we called does not return anything, but we could parse the outcome of smart contract call transactions, as follows:
 
-    // ```js
+```js
     {
         // load the abi file
         const entrypoint = new DevnetEntrypoint();
@@ -1258,16 +1215,16 @@ import { loadAbiRegistry } from "../src/testutils";
         const transactionOnNetwork = await entrypoint.getTransaction(txHash);
         const outcome = parser.parseExecute({ transactionOnNetwork });
     }
-    // ```
+```
 
-    // #### Decoding transaction events
-    // You might be interested into decoding events emitted by a contract. You can do so by using the `TransactionEventsParser`.
+#### Decoding transaction events
+You might be interested into decoding events emitted by a contract. You can do so by using the `TransactionEventsParser`.
 
-    // Suppose we'd like to decode a `startPerformAction` event emitted by the [multisig](https://github.com/multiversx/mx-contracts-rs/tree/main/contracts/multisig) contract.
+Suppose we'd like to decode a `startPerformAction` event emitted by the [multisig](https://github.com/multiversx/mx-contracts-rs/tree/main/contracts/multisig) contract.
 
-    // First, we load the abi file, then we fetch the transaction, we extract the event from the transaction and then we parse it.
+First, we load the abi file, then we fetch the transaction, we extract the event from the transaction and then we parse it.
 
-    // ```js
+```js
     {
         // load the abi files
         const entrypoint = new DevnetEntrypoint();
@@ -1278,13 +1235,13 @@ import { loadAbiRegistry } from "../src/testutils";
         const events = gatherAllEvents(transactionOnNetwork);
         const outcome = parser.parseEvents({ events });
     }
-    // ```
+```
 
-    // #### Decoding transaction events
-    // Whenever needed, the contract ABI can be used for manually encoding or decoding custom types.
+#### Decoding transaction events
+Whenever needed, the contract ABI can be used for manually encoding or decoding custom types.
 
-    // Let's encode a struct called EsdtTokenPayment (of [multisig](https://github.com/multiversx/mx-contracts-rs/tree/main/contracts/multisig) contract) into binary data.
-    // ```js
+Let's encode a struct called EsdtTokenPayment (of [multisig](https://github.com/multiversx/mx-contracts-rs/tree/main/contracts/multisig) contract) into binary data.
+```js
     {
         const abi = await loadAbiRegistry("../src/testdata/multisig-full.abi.json");
         const paymentType = abi.getStruct("EsdtTokenPayment");
@@ -1300,10 +1257,10 @@ import { loadAbiRegistry } from "../src/testutils";
 
         console.log(encoded.toString("hex"));
     }
-    // ```
+```
 
-    // Now let's decode a struct using the ABI.
-    // ```js
+Now let's decode a struct using the ABI.
+```js
     {
         const abi = await loadAbiRegistry("../src/testdata/multisig-full.abi.json");
         const actionStructType = abi.getEnum("Action");
@@ -1317,14 +1274,14 @@ import { loadAbiRegistry } from "../src/testutils";
         const decodedValue = decoded.valueOf();
         console.log(JSON.stringify(decodedValue, null, 4));
     }
-    // ```
+```
 
-    // ### Smart Contract queries
-    // When querying a smart contract, a **view function** is called. A view function does not modify the state of the contract, so we do not need to send a transaction.
-    // To perform this query, we use the **SmartContractController**. While we can use the contract's ABI file to encode the query arguments, we can also use it to parse the result.
-    // In this example, we will query the **adder smart contract** by calling its `getSum` endpoint.
+### Smart Contract queries
+When querying a smart contract, a **view function** is called. A view function does not modify the state of the contract, so we do not need to send a transaction.
+To perform this query, we use the **SmartContractController**. While we can use the contract's ABI file to encode the query arguments, we can also use it to parse the result.
+In this example, we will query the **adder smart contract** by calling its `getSum` endpoint.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq7cmfueefdqkjsnnjnwydw902v8pwjqy3d8ssd4meug");
@@ -1336,12 +1293,12 @@ import { loadAbiRegistry } from "../src/testutils";
         // creates the query, runs the query, parses the result
         const response = await controller.query({ contract: contractAddress, function: "getSum", arguments: [] });
     }
-    // ```
+```
 
-    // If we need more granular control, we can split the process into three steps: **create the query, run the query, and parse the query response**.
-    // This approach achieves the same result as the previous example.
+If we need more granular control, we can split the process into three steps: **create the query, run the query, and parse the query response**.
+This approach achieves the same result as the previous example.
 
-    // ```js
+```js
     {
         const entrypoint = new DevnetEntrypoint();
 
@@ -1362,14 +1319,14 @@ import { loadAbiRegistry } from "../src/testutils";
         // parse the result
         const parsedResponse = controller.parseQueryResponse(response);
     }
-    // ```
+```
 
-    // ### Upgrading a smart contract
-    // Contract upgrade transactions are similar to deployment transactions (see above) because they also require contract bytecode.
-    // However, in this case, the contract address is already known. Like deploying a smart contract, we can upgrade a smart contract using either the **controller** or the **factory**.
+### Upgrading a smart contract
+Contract upgrade transactions are similar to deployment transactions (see above) because they also require contract bytecode.
+However, in this case, the contract address is already known. Like deploying a smart contract, we can upgrade a smart contract using either the **controller** or the **factory**.
 
-    // #### Uprgrading a smart contract using the controller
-    // ```js
+#### Uprgrading a smart contract using the controller
+```js
     {
         // prepare the account
         const entrypoint = new DevnetEntrypoint();
@@ -1410,24 +1367,22 @@ import { loadAbiRegistry } from "../src/testutils";
 
         console.log({ txHash });
     }
-    // ```
-})().catch((e) => {
-    console.log({ e });
-});
+```
 
-(async () => {
-    // ### Token management
+md-start
 
-    // In this section, we're going to create transactions to issue fungible tokens, issue semi-fungible tokens, create NFTs, set token roles, but also parse these transactions to extract their outcome (e.g. get the token identifier of the newly issued token).
+### Token management
 
-    // These methods are available through the `TokenManagementController` and the `TokenManagementTransactionsFactory`.
-    // The controller also includes built-in methods for awaiting the completion of transactions and parsing their outcomes.
-    // For the factory, the same functionality can be achieved using the `TokenManagementTransactionsOutcomeParser`.
+In this section, we're going to create transactions to issue fungible tokens, issue semi-fungible tokens, create NFTs, set token roles, but also parse these transactions to extract their outcome (e.g. get the token identifier of the newly issued token).
 
-    // For scripts or quick network interactions, we recommend using the controller. However, for a more granular approach (e.g., DApps), the factory is the better choice.
+These methods are available through the `TokenManagementController` and the `TokenManagementTransactionsFactory`.
+The controller also includes built-in methods for awaiting the completion of transactions and parsing their outcomes.
+For the factory, the same functionality can be achieved using the `TokenManagementTransactionsOutcomeParser`.
 
-    // #### Issuing fungible tokens using the controller
-    // ```js
+For scripts or quick network interactions, we recommend using the controller. However, for a more granular approach (e.g., DApps), the factory is the better choice.
+
+#### Issuing fungible tokens using the controller
+```js
     {
         // create the entrypoint and the token management controller
         const entrypoint = new DevnetEntrypoint();
@@ -1461,10 +1416,10 @@ import { loadAbiRegistry } from "../src/testutils";
 
         const tokenIdentifier = outcome[0].tokenIdentifier;
     }
-    // ```
+```
 
-    // #### Issuing fungible tokens using the factory
-    // ```js
+#### Issuing fungible tokens using the factory
+```js
     {
         // create the entrypoint and the token management transactions factory
         const entrypoint = new DevnetEntrypoint();
@@ -1505,10 +1460,10 @@ import { loadAbiRegistry } from "../src/testutils";
         const outcome = parser.parseIssueFungible(transactionOnNetwork);
         const tokenIdentifier = outcome[0].tokenIdentifier;
     }
-    // ```
+```
 
-    // #### Setting special roles for fungible tokens using the controller
-    // ```js
+#### Setting special roles for fungible tokens using the controller
+```js
     {
         // create the entrypoint and the token management controller
         const entrypoint = new DevnetEntrypoint();
@@ -1544,10 +1499,10 @@ import { loadAbiRegistry } from "../src/testutils";
         const roles = outcome[0].roles;
         const user = outcome[0].userAddress;
     }
-    // ```
+```
 
-    // #### Setting special roles for fungible tokens using the factory
-    // ```js
+#### Setting special roles for fungible tokens using the factory
+```js
     {
         // create the entrypoint and the token management controller
         const entrypoint = new DevnetEntrypoint();
@@ -1589,10 +1544,10 @@ import { loadAbiRegistry } from "../src/testutils";
         const roles = outcome[0].roles;
         const user = outcome[0].userAddress;
     }
-    // ```
+```
 
-    // #### Issuing semi-fungible tokens using the controller
-    // ```js
+#### Issuing semi-fungible tokens using the controller
+```js
     {
         // create the entrypoint and the token management controller
         const entrypoint = new DevnetEntrypoint();
@@ -1629,10 +1584,10 @@ import { loadAbiRegistry } from "../src/testutils";
 
         const tokenIdentifier = outcome[0].tokenIdentifier;
     }
-    // ```
+```
 
-    // #### Issuing semi-fungible tokens using the factory
-    // ```js
+#### Issuing semi-fungible tokens using the factory
+```js
     {
         // create the entrypoint and the token management controller
         const entrypoint = new DevnetEntrypoint();
@@ -1672,11 +1627,11 @@ import { loadAbiRegistry } from "../src/testutils";
 
         const tokenIdentifier = outcome[0].tokenIdentifier;
     }
-    // ```
+```
 
-    // #### Issuing NFT collection & creating NFTs using the controller
+#### Issuing NFT collection & creating NFTs using the controller
 
-    // ```js
+```js
     {
         // create the entrypoint and the token management controller
         const entrypoint = new DevnetEntrypoint();
@@ -1734,10 +1689,10 @@ import { loadAbiRegistry } from "../src/testutils";
         const nonce = outcomeNft[0].nonce;
         const initialQuantity = outcomeNft[0].initialQuantity;
     }
-    // ```
+```
 
-    // #### Issuing NFT collection & creating NFTs using the factory
-    // ```js
+#### Issuing NFT collection & creating NFTs using the factory
+```js
     {
         // create the entrypoint and the token management transdactions factory
         const entrypoint = new DevnetEntrypoint();
@@ -1802,28 +1757,26 @@ import { loadAbiRegistry } from "../src/testutils";
 
         const identifier = outcome[0].tokenIdentifier;
     }
-    // ```
+```
 
-    // These are just a few examples of what you can do using the token management controller or factory. For a complete list of supported methods, please refer to the autogenerated documentation:
+These are just a few examples of what you can do using the token management controller or factory. For a complete list of supported methods, please refer to the autogenerated documentation:
 
-    // - [TokenManagementController](https://multiversx.github.io/mx-sdk-js-core/v14/classes/TokenManagementController.html)
-    // - [TokenManagementTransactionsFactory](https://multiversx.github.io/mx-sdk-js-core/v14/classes/TokenManagementTransactionsFactory.html)
-})().catch((e) => {
-    console.log({ e });
-});
+- [TokenManagementController](https://multiversx.github.io/mx-sdk-js-core/v14/classes/TokenManagementController.html)
+- [TokenManagementTransactionsFactory](https://multiversx.github.io/mx-sdk-js-core/v14/classes/TokenManagementTransactionsFactory.html)
 
-(async () => {
-    // ### Account management
+md-start
 
-    // The account management controller and factory allow us to create transactions for managing accounts, such as:
-    // - Guarding and unguarding accounts
-    // - Saving key-value pairs in the account storage, on the blockchain.
+### Account management
 
-    // To learn more about Guardians, please refer to the [official documentation](/developers/built-in-functions/#setguardian).
-    // A guardian can also be set using the WebWallet, which leverages our hosted `Trusted Co-Signer Service`. Follow [this guide](/wallet/web-wallet/#guardian) for step-by-step instructions on guarding an account using the wallet.
+The account management controller and factory allow us to create transactions for managing accounts, such as:
+- Guarding and unguarding accounts
+- Saving key-value pairs in the account storage, on the blockchain.
 
-    // #### Guarding an account using the controller
-    // ```js
+To learn more about Guardians, please refer to the [official documentation](/developers/built-in-functions/#setguardian).
+A guardian can also be set using the WebWallet, which leverages our hosted `Trusted Co-Signer Service`. Follow [this guide](/wallet/web-wallet/#guardian) for step-by-step instructions on guarding an account using the wallet.
+
+#### Guarding an account using the controller
+```js
     {
         // create the entrypoint and the account controller
         const entrypoint = new DevnetEntrypoint();
@@ -1847,10 +1800,10 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Guarding an account using the factory
-    // ```js
+#### Guarding an account using the factory
+```js
     {
         // create the entrypoint and the account management factory
         const entrypoint = new DevnetEntrypoint();
@@ -1879,12 +1832,12 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    //  Once a guardian is set, we must wait **20 epochs** before it can be activated. After activation, all transactions sent from the account must also be signed by the guardian.
+Once a guardian is set, we must wait **20 epochs** before it can be activated. After activation, all transactions sent from the account must also be signed by the guardian.
 
-    // #### Activating the guardian using the controller
-    // ```js
+#### Activating the guardian using the controller
+```js
     {
         // create the entrypoint and the account controller
         const entrypoint = new DevnetEntrypoint();
@@ -1906,10 +1859,10 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Activating the guardian using the factory
-    // ```js
+#### Activating the guardian using the factory
+```js
     {
         // create the entrypoint and the account factory
         const entrypoint = new DevnetEntrypoint();
@@ -1933,10 +1886,10 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Unguarding the account using the controller
-    // ```js
+#### Unguarding the account using the controller
+```js
     {
         // create the entrypoint and the account controller
         const entrypoint = new DevnetEntrypoint();
@@ -1958,10 +1911,10 @@ import { loadAbiRegistry } from "../src/testutils";
         // the transaction should also be signed by the guardian before being sent otherwise it won't be executed
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Unguarding the guardian using the factory
-    // ```js
+#### Unguarding the guardian using the factory
+```js
     {
         // create the entrypoint and the account factory
         const entrypoint = new DevnetEntrypoint();
@@ -1985,12 +1938,12 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Saving a key-value pair to an account using the controller
-    // You can find more information [here](/developers/account-storage) regarding the account storage.
+#### Saving a key-value pair to an account using the controller
+You can find more information [here](/developers/account-storage) regarding the account storage.
 
-    // ```js
+```js
     {
         // create the entrypoint and the account controller
         const entrypoint = new DevnetEntrypoint();
@@ -2012,10 +1965,10 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Saving a key-value pair to an account using the factory
-    // ```js
+#### Saving a key-value pair to an account using the factory
+```js
     {
         // create the entrypoint and the account factory
         const entrypoint = new DevnetEntrypoint();
@@ -2044,29 +1997,27 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
-})().catch((e) => {
-    console.log({ e });
-});
+```
 
-(async () => {
-    // ### Delegation management
+md-start
 
-    // To learn more about staking providers and delegation, please refer to the official [documentation](/validators/delegation-manager/#introducing-staking-providers).
-    // In this section, we'll cover how to:
-    // - Create a new delegation contract
-    // - Retrieve the contract address
-    // - Delegate funds to the contract
-    // - Redelegate rewards
-    // - Claim rewards
-    // - Undelegate and withdraw funds
+### Delegation management
 
-    // These operations can be performed using both the controller and the **factory**. For a complete list of supported methods, please refer to the autogenerated documentation:
-    // - [DelegationController](https://multiversx.github.io/mx-sdk-js-core/v14/classes/DelegationController.html)
-    // - [DelegationTransactionsFactory](https://multiversx.github.io/mx-sdk-js-core/v14/classes/DelegationTransactionsFactory.html)
+To learn more about staking providers and delegation, please refer to the official [documentation](/validators/delegation-manager/#introducing-staking-providers).
+In this section, we'll cover how to:
+- Create a new delegation contract
+- Retrieve the contract address
+- Delegate funds to the contract
+- Redelegate rewards
+- Claim rewards
+- Undelegate and withdraw funds
 
-    // #### Creating a New Delegation Contract Using the Controller
-    // ```js
+These operations can be performed using both the controller and the **factory**. For a complete list of supported methods, please refer to the autogenerated documentation:
+- [DelegationController](https://multiversx.github.io/mx-sdk-js-core/v14/classes/DelegationController.html)
+- [DelegationTransactionsFactory](https://multiversx.github.io/mx-sdk-js-core/v14/classes/DelegationTransactionsFactory.html)
+
+#### Creating a New Delegation Contract Using the Controller
+```js
     {
         // create the entrypoint and the delegation controller
         const entrypoint = new DevnetEntrypoint();
@@ -2096,10 +2047,10 @@ import { loadAbiRegistry } from "../src/testutils";
 
         const contractAddress = outcome[0].contractAddress;
     }
-    // ```
+```
 
-    // #### Creating a new delegation contract using the factory
-    // ```js
+#### Creating a new delegation contract using the factory
+```js
     {
         // create the entrypoint and the delegation factory
         const entrypoint = new DevnetEntrypoint();
@@ -2133,12 +2084,12 @@ import { loadAbiRegistry } from "../src/testutils";
         const outcome = parser.parseIssueFungible(transactionOnNetwork);
         const tokenIdentifier = outcome[0].tokenIdentifier;
     }
-    // ```
+```
 
-    // #### Delegating funds to the contract using the Controller
-    // We can send funds to a delegation contract to earn rewards.
+#### Delegating funds to the contract using the Controller
+We can send funds to a delegation contract to earn rewards.
 
-    // ```js
+```js
     {
         // create the entrypoint and the delegation controller
         const entrypoint = new DevnetEntrypoint();
@@ -2160,10 +2111,10 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Delegating funds to the contract using the factory
-    // ```js
+#### Delegating funds to the contract using the factory
+```js
     {
         // create the entrypoint and the delegation factory
         const entrypoint = new DevnetEntrypoint();
@@ -2190,12 +2141,12 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Redelegating rewards using the Controller
-    // Over time, as rewards accumulate, we may choose to redelegate them to the contract to maximize earnings.
+#### Redelegating rewards using the Controller
+Over time, as rewards accumulate, we may choose to redelegate them to the contract to maximize earnings.
 
-    // ```js
+```js
     {
         // create the entrypoint and the delegation controller
         const entrypoint = new DevnetEntrypoint();
@@ -2219,10 +2170,10 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Redelegating rewards using the factory
-    // ```js
+#### Redelegating rewards using the factory
+```js
     {
         // create the entrypoint and the delegation factory
         const entrypoint = new DevnetEntrypoint();
@@ -2248,12 +2199,12 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Claiming rewards using the Controller
-    // We can also claim our rewards when needed.
+#### Claiming rewards using the Controller
+We can also claim our rewards when needed.
 
-    // ```js
+```js
     {
         // create the entrypoint and the delegation controller
         const entrypoint = new DevnetEntrypoint();
@@ -2273,10 +2224,10 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Claiming rewards using the factory
-    // ```js
+#### Claiming rewards using the factory
+```js
     {
         // create the entrypoint and the delegation factory
         const entrypoint = new DevnetEntrypoint();
@@ -2302,12 +2253,12 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Undelegating funds using the Controller
-    // By **undelegating**, we signal the contract that we want to retrieve our staked funds. This process requires a **10-epoch unbonding period** before the funds become available.
+#### Undelegating funds using the Controller
+By **undelegating**, we signal the contract that we want to retrieve our staked funds. This process requires a **10-epoch unbonding period** before the funds become available.
 
-    // ```js
+```js
     {
         // create the entrypoint and the delegation controller
         const entrypoint = new DevnetEntrypoint();
@@ -2328,10 +2279,10 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Undelegating funds using the factory
-    // ```js
+#### Undelegating funds using the factory
+```js
     {
         // create the entrypoint and the delegation factory
         const entrypoint = new DevnetEntrypoint();
@@ -2358,12 +2309,12 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Withdrawing funds using the Controller
-    // After the `10-epoch unbonding period` is complete, we can proceed with withdrawing our staked funds using the controller. This final step allows us to regain access to the previously delegated funds.
+#### Withdrawing funds using the Controller
+After the `10-epoch unbonding period` is complete, we can proceed with withdrawing our staked funds using the controller. This final step allows us to regain access to the previously delegated funds.
 
-    // ```js
+```js
     {
         // create the entrypoint and the delegation controller
         const entrypoint = new DevnetEntrypoint();
@@ -2384,10 +2335,10 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Withdrawing funds using the factory
-    // ```js
+#### Withdrawing funds using the factory
+```js
     {
         // create the entrypoint and the delegation factory
         const entrypoint = new DevnetEntrypoint();
@@ -2413,28 +2364,26 @@ import { loadAbiRegistry } from "../src/testutils";
         // sending the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
-})().catch((e) => {
-    console.log({ e });
-});
+```
 
-(async () => {
-    // ### Relayed transactions
-    // We are currently on the `third iteration (V3)` of relayed transactions. V1 and V2 will soon be deactivated, so we will focus on V3.
+md-start
 
-    // For V3, two new fields have been added to transactions:
-    // - relayer
-    // - relayerSignature
+### Relayed transactions
+We are currently on the `third iteration (V3)` of relayed transactions. V1 and V2 will soon be deactivated, so we will focus on V3.
 
-    // Signing Process:
-    // 1. The relayer must be set before the sender signs the transaction.
-    // 2. Once the sender has signed, the relayer can also sign the transaction and broadcast it.
+For V3, two new fields have been added to transactions:
+- relayer
+- relayerSignature
 
-    // **Important Consideration**:
-    // Relayed V3 transactions require an additional `50,000` gas.
-    // Let’s see how to create a relayed transaction:
+Signing Process:
+1. The relayer must be set before the sender signs the transaction.
+2. Once the sender has signed, the relayer can also sign the transaction and broadcast it.
 
-    // ```js
+**Important Consideration**:
+Relayed V3 transactions require an additional `50,000` gas.
+Let’s see how to create a relayed transaction:
+
+```js
     {
         const entrypoint = new DevnetEntrypoint();
         const walletsPath = path.join("../src", "testdata", "testwallets");
@@ -2464,15 +2413,15 @@ import { loadAbiRegistry } from "../src/testutils";
         // broadcast the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Creating relayed transactions using controllers
-    // We can create relayed transactions using any of the available controllers.
-    // Each controller includes a relayer argument, which must be set if we want to create a relayed transaction.
+#### Creating relayed transactions using controllers
+We can create relayed transactions using any of the available controllers.
+Each controller includes a relayer argument, which must be set if we want to create a relayed transaction.
 
-    // Let’s issue a fungible token using a relayed transaction:
+Let’s issue a fungible token using a relayed transaction:
 
-    // ```js
+```js
     {
         // create the entrypoint and the token management controller
         const entrypoint = new DevnetEntrypoint();
@@ -2508,15 +2457,15 @@ import { loadAbiRegistry } from "../src/testutils";
         // broadcast the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Creating relayed transactions using factories
-    // Unlike controllers, `transaction factories` do not have a `relayer` argument. Instead, the **relayer must be set after creating the transaction**.
-    // This approach is beneficial because the **transaction is not signed by the sender at the time of creation**, allowing flexibility in setting the relayer before signing.
+#### Creating relayed transactions using factories
+Unlike controllers, `transaction factories` do not have a `relayer` argument. Instead, the **relayer must be set after creating the transaction**.
+This approach is beneficial because the **transaction is not signed by the sender at the time of creation**, allowing flexibility in setting the relayer before signing.
 
-    // Let’s issue a fungible token using the `TokenManagementTransactionsFactory`:
+Let’s issue a fungible token using the `TokenManagementTransactionsFactory`:
 
-    // ```js
+```js
     {
         // create the entrypoint and the token management factory
         const entrypoint = new DevnetEntrypoint();
@@ -2558,31 +2507,29 @@ import { loadAbiRegistry } from "../src/testutils";
         // broadcast the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
-})().catch((e) => {
-    console.log({ e });
-});
+```
 
-(async () => {
-    // ### Guarded transactions
-    // Similar to relayers, transactions also have two additional fields:
+md-start
 
-    // - guardian
-    // - guardianSignature
+### Guarded transactions
+Similar to relayers, transactions also have two additional fields:
 
-    // Each controller includes an argument for the guardian. The transaction can either:
-    // 1. Be sent to a service that signs it using the guardian’s account, or
-    // 2. Be signed by another account acting as a guardian.
+- guardian
+- guardianSignature
 
-    // Let’s issue a token using a guarded account:
+Each controller includes an argument for the guardian. The transaction can either:
+1. Be sent to a service that signs it using the guardian’s account, or
+2. Be signed by another account acting as a guardian.
 
-    // #### Creating guarded transactions using controllers
-    // We can create guarded transactions using any of the available controllers.
+Let’s issue a token using a guarded account:
 
-    // Each controller method includes a guardian argument, which must be set if we want to create a guarded transaction.
-    // Let’s issue a fungible token using a relayed transaction:
+#### Creating guarded transactions using controllers
+We can create guarded transactions using any of the available controllers.
 
-    // ```js
+Each controller method includes a guardian argument, which must be set if we want to create a guarded transaction.
+Let’s issue a fungible token using a relayed transaction:
+
+```js
     {
         // create the entrypoint and the token management controller
         const entrypoint = new DevnetEntrypoint();
@@ -2618,15 +2565,15 @@ import { loadAbiRegistry } from "../src/testutils";
         // broadcast the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // #### Creating guarded transactions using factories
-    // Unlike controllers, `transaction factories` do not have a `guardian` argument. Instead, the **guardian must be set after creating the transaction**.
-    // This approach is beneficial because the transaction is **not signed by the sender at the time of creation**, allowing flexibility in setting the guardian before signing.
+#### Creating guarded transactions using factories
+Unlike controllers, `transaction factories` do not have a `guardian` argument. Instead, the **guardian must be set after creating the transaction**.
+This approach is beneficial because the transaction is **not signed by the sender at the time of creation**, allowing flexibility in setting the guardian before signing.
 
-    // Let’s issue a fungible token using the `TokenManagementTransactionsFactory`:
+Let’s issue a fungible token using the `TokenManagementTransactionsFactory`:
 
-    // ```js
+```js
     {
         // create the entrypoint and the token management factory
         const entrypoint = new DevnetEntrypoint();
@@ -2668,33 +2615,31 @@ import { loadAbiRegistry } from "../src/testutils";
         // broadcast the transaction
         const txHash = await entrypoint.sendTransaction(transaction);
     }
-    // ```
+```
 
-    // We can create guarded relayed transactions just like we did before. However, keep in mind:
+We can create guarded relayed transactions just like we did before. However, keep in mind:
 
-    // Only the sender can be guarded, the relayer cannot be guarded.
+Only the sender can be guarded, the relayer cannot be guarded.
 
-    // Flow for Creating Guarded Relayed Transactions:
-    // - Using Controllers:
-    //    1. Set both guardian and relayer fields.
-    //    2. The transaction must be signed by both the guardian and the relayer.
-    // - Using Factories:
+Flow for Creating Guarded Relayed Transactions:
+- Using Controllers:
+1. Set both guardian and relayer fields.
+2. The transaction must be signed by both the guardian and the relayer.
+- Using Factories:
 
-    //    1. Create the transaction.
-    //    2. Set both guardian and relayer fields.
-    //    3. First, the sender signs the transaction.
-    //    4. Then, the guardian signs.
-    //    5. Finally, the relayer signs before broadcasting.
-})().catch((e) => {
-    console.log({ e });
-});
+1. Create the transaction.
+2. Set both guardian and relayer fields.
+3. First, the sender signs the transaction.
+4. Then, the guardian signs.
+5. Finally, the relayer signs before broadcasting.
 
-(async () => {
-    // ## Addresses
+md-start
 
-    // Create an `Address` object from a bech32-encoded string:
+## Addresses
 
-    // ``` js
+Create an `Address` object from a bech32-encoded string:
+
+``` js
     {
         // Create an Address object from a bech32-encoded string
         const address = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
@@ -2704,12 +2649,12 @@ import { loadAbiRegistry } from "../src/testutils";
         console.log("Public key (hex-encoded):", Buffer.from(address.getPublicKey()).toString("hex"));
     }
 
-    // ```
+```
 
-    // Here’s how you can create an address from a hex-encoded string using the MultiversX JavaScript SDK:
-    // If the HRP (human-readable part) is not provided, the SDK will use the default one ("erd").
+Here’s how you can create an address from a hex-encoded string using the MultiversX JavaScript SDK:
+If the HRP (human-readable part) is not provided, the SDK will use the default one ("erd").
 
-    // ``` js
+``` js
     {
         // Create an address from a hex-encoded string with a specified HRP
         const address = Address.newFromHex("0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1", "erd");
@@ -2717,36 +2662,36 @@ import { loadAbiRegistry } from "../src/testutils";
         console.log("Address (bech32-encoded):", address.toBech32());
         console.log("Public key (hex-encoded):", address.toHex());
     }
-    // ```
+```
 
-    // #### Create an address from a raw public key
+#### Create an address from a raw public key
 
-    // ``` js
+``` js
     {
         const pubkey = Buffer.from("0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1", "hex");
         const addressFromPubkey = new Address(pubkey, "erd");
     }
-    // ```
+```
 
-    // #### Getting the shard of an address
-    // ``` js
+#### Getting the shard of an address
+``` js
 
     const addressComputer = new AddressComputer();
     const address = Address.newFromHex("0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1");
     console.log("Shard:", addressComputer.getShardOfAddress(address));
-    // ```
+```
 
-    // Checking if an address is a smart contract
-    // ``` js
+Checking if an address is a smart contract
+``` js
 
     const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgquzmh78klkqwt0p4rjys0qtp3la07gz4d396qn50nnm");
     console.log("Is contract address:", contractAddress.isSmartContract());
-    // ```
+```
 
-    // ### Changing the default hrp
-    // The **LibraryConfig** class manages the default **HRP** (human-readable part) for addresses, which is set to `"erd"` by default.
-    // You can change the HRP when creating an address or modify it globally in **LibraryConfig**, affecting all newly created addresses.
-    // ``` js
+### Changing the default hrp
+The **LibraryConfig** class manages the default **HRP** (human-readable part) for addresses, which is set to `"erd"` by default.
+You can change the HRP when creating an address or modify it globally in **LibraryConfig**, affecting all newly created addresses.
+``` js
 
     console.log(LibraryConfig.DefaultAddressHrp);
     const defaultAddress = Address.newFromHex("0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1");
@@ -2758,28 +2703,26 @@ import { loadAbiRegistry } from "../src/testutils";
 
     // Reset HRP back to "erd" to avoid affecting other parts of the application.
     LibraryConfig.DefaultAddressHrp = "erd";
-    // ```
-})().catch((e) => {
-    console.log({ e });
-});
+```
 
-(async () => {
-    // ## Wallets
+md-start
 
-    // #### Generating a mnemonic
-    // Mnemonic generation is based on [bip39](https://www.npmjs.com/package/bip39) and can be achieved as follows:
+## Wallets
 
-    // ``` js
+#### Generating a mnemonic
+Mnemonic generation is based on [bip39](https://www.npmjs.com/package/bip39) and can be achieved as follows:
+
+``` js
 
     const mnemonic = Mnemonic.generate();
     const words = mnemonic.getWords();
     console.log({ words });
-    // ```
+```
 
-    // #### Saving the mnemonic to a keystore file
-    // The mnemonic can be saved to a keystore file:
+#### Saving the mnemonic to a keystore file
+The mnemonic can be saved to a keystore file:
 
-    // ``` js
+``` js
     {
         const mnemonic = Mnemonic.generate();
 
@@ -2790,12 +2733,12 @@ import { loadAbiRegistry } from "../src/testutils";
         console.log({ filePath });
         wallet.save(filePath);
     }
-    // ```
+```
 
-    // #### Deriving secret keys from a mnemonic
-    // Given a mnemonic, we can derive keypairs:
+#### Deriving secret keys from a mnemonic
+Given a mnemonic, we can derive keypairs:
 
-    // ``` js
+``` js
     {
         const mnemonic = Mnemonic.generate();
 
@@ -2805,12 +2748,12 @@ import { loadAbiRegistry } from "../src/testutils";
         console.log("Secret key: ", secretKey.hex());
         console.log("Public key: ", publicKey.hex());
     }
-    // ```
+```
 
-    // #### Saving a secret key to a keystore file
-    // The secret key can also be saved to a keystore file:
+#### Saving a secret key to a keystore file
+The secret key can also be saved to a keystore file:
 
-    // ``` js
+``` js
     {
         const mnemonic = Mnemonic.generate();
         const secretKey = mnemonic.deriveKey();
@@ -2820,12 +2763,12 @@ import { loadAbiRegistry } from "../src/testutils";
         const filePath = path.join("../src", "testdata", "testwallets", "walletWithSecretKey.json");
         wallet.save(filePath);
     }
-    // ```
+```
 
-    // #### Saving a secret key to a PEM file
-    // We can save a secret key to a pem file. *This is not recommended as it is not secure, but it's very convenient for testing purposes.*
+#### Saving a secret key to a PEM file
+We can save a secret key to a pem file. *This is not recommended as it is not secure, but it's very convenient for testing purposes.*
 
-    // ``` js
+``` js
     {
         const mnemonic = Mnemonic.generate();
 
@@ -2839,12 +2782,12 @@ import { loadAbiRegistry } from "../src/testutils";
         const filePath = path.join("../src", "testdata", "testwallets", "wallet.pem");
         pem.save(filePath);
     }
-    // ```
+```
 
-    // #### Generating a KeyPair
-    // A `KeyPair` is a wrapper over a secret key and a public key. We can create a keypair and use it for signing or verifying.
+#### Generating a KeyPair
+A `KeyPair` is a wrapper over a secret key and a public key. We can create a keypair and use it for signing or verifying.
 
-    // ``` js
+``` js
     {
         const keypair = KeyPair.generate();
 
@@ -2852,12 +2795,12 @@ import { loadAbiRegistry } from "../src/testutils";
         const secretKey = keypair.getSecretKey();
         const publicKey = keypair.getPublicKey();
     }
-    // ```
+```
 
-    // #### Loading a wallet from keystore mnemonic file
-    // Load a keystore that holds an encrypted mnemonic (and perform wallet derivation at the same time):
+#### Loading a wallet from keystore mnemonic file
+Load a keystore that holds an encrypted mnemonic (and perform wallet derivation at the same time):
 
-    // ``` js
+``` js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "walletWithMnemonic.json");
 
@@ -2875,11 +2818,11 @@ import { loadAbiRegistry } from "../src/testutils";
         console.log("Secret key: ", secretKey.hex());
         console.log("Address: ", address.toBech32());
     }
-    // ```
+```
 
-    // #### Loading a wallet from a keystore secret key file
+#### Loading a wallet from a keystore secret key file
 
-    // ``` js
+``` js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "walletWithSecretKey.json");
 
@@ -2889,11 +2832,11 @@ import { loadAbiRegistry } from "../src/testutils";
         console.log("Secret key: ", secretKey.hex());
         console.log("Address: ", address.toBech32());
     }
-    // ```
+```
 
-    // #### Loading a wallet from a PEM file
+#### Loading a wallet from a PEM file
 
-    // ``` js
+``` js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "wallet.pem");
 
@@ -2902,20 +2845,18 @@ import { loadAbiRegistry } from "../src/testutils";
         console.log("Secret key: ", pem.secretKey.hex());
         console.log("Public key: ", pem.publicKey.hex());
     }
-    // ```
-})().catch((e) => {
-    console.log({ e });
-});
+```
 
-(async () => {
-    // ## Signing objects
+md-start
 
-    // Signing is done using an account's secret key. To simplify this process, we provide wrappers like [Account](#creating-accounts), which streamline signing operations.
-    // First, we'll explore how to sign using an Account, followed by signing directly with a secret key.
+## Signing objects
 
-    // #### Signing a Transaction using an Account
-    // We are going to assume we have an account at this point. If you don't, feel free to check out the [creating an account](#creating-accounts) section.
-    // ```js
+Signing is done using an account's secret key. To simplify this process, we provide wrappers like [Account](#creating-accounts), which streamline signing operations.
+First, we'll explore how to sign using an Account, followed by signing directly with a secret key.
+
+#### Signing a Transaction using an Account
+We are going to assume we have an account at this point. If you don't, feel free to check out the [creating an account](#creating-accounts) section.
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const alice = await Account.newFromPem(filePath);
@@ -2931,10 +2872,10 @@ import { loadAbiRegistry } from "../src/testutils";
         transaction.signature = await alice.signTransaction(transaction);
         console.log(transaction.toPlainObject());
     }
-    // ```
+```
 
-    // #### Signing a Transaction using a SecretKey
-    // ```js
+#### Signing a Transaction using a SecretKey
+```js
     {
         const secretKeyHex = "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9";
         const secretKey = UserSecretKey.fromString(secretKeyHex);
@@ -2958,10 +2899,10 @@ import { loadAbiRegistry } from "../src/testutils";
 
         console.log(transaction.toPlainObject());
     }
-    // ```
+```
 
-    // #### Signing a Transaction by hash
-    // ```js
+#### Signing a Transaction by hash
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const alice = await Account.newFromPem(filePath);
@@ -2988,10 +2929,10 @@ import { loadAbiRegistry } from "../src/testutils";
 
         console.log(transaction.toPlainObject());
     }
-    // ```
+```
 
-    // #### Signing a Message using an Account:
-    // ```js
+#### Signing a Message using an Account:
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const alice = await Account.newFromPem(filePath);
@@ -3003,10 +2944,10 @@ import { loadAbiRegistry } from "../src/testutils";
 
         message.signature = await alice.signMessage(message);
     }
-    // ```
+```
 
-    // #### Signing a Message using an SecretKey:
-    // ```js
+#### Signing a Message using an SecretKey:
+```js
     {
         const secretKeyHex = "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9";
         const secretKey = UserSecretKey.fromString(secretKeyHex);
@@ -3022,28 +2963,17 @@ import { loadAbiRegistry } from "../src/testutils";
 
         message.signature = await secretKey.sign(serialized);
     }
-    // ```
-})().catch((e) => {
-    console.log({ e });
-});
+```
 
-import {
-    Account,
-    Address,
-    Message,
-    MessageComputer,
-    Transaction,
-    TransactionComputer,
-    UserPublicKey,
-    UserVerifier,
-(async () => {
-    // ## Verifying signatures
+md-start
 
-    // Signature verification is performed using an account’s public key.
-    // To simplify this process, we provide wrappers over public keys that make verification easier and more convenient.
+## Verifying signatures
 
-    // #### Verifying Transaction signature using a UserVerifier
-    // ```js
+Signature verification is performed using an account’s public key.
+To simplify this process, we provide wrappers over public keys that make verification easier and more convenient.
+
+#### Verifying Transaction signature using a UserVerifier
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const account = await Account.newFromPem(filePath);
@@ -3073,11 +3003,11 @@ import {
 
         console.log("Transaction is signed by Alice: ", isSignedByAlice);
     }
-    // ```
+```
 
-    // #### Verifying Message signature using a UserVerifier
+#### Verifying Message signature using a UserVerifier
 
-    // ```ts
+```ts
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const account = await Account.newFromPem(filePath);
@@ -3103,10 +3033,10 @@ import {
 
         console.log("Message is signed by Alice: ", isSignedByAlice);
     }
-    // ```
+```
 
-    // #### Verifying a signature using a public key
-    // ```js
+#### Verifying a signature using a public key
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const account = await Account.newFromPem(filePath);
@@ -3135,13 +3065,13 @@ import {
         const isSignedByAlice = await publicKey.verify(serializedTransaction, transaction.signature);
         console.log("Transaction is signed by Alice: ", isSignedByAlice);
     }
-    // ```
+```
 
-    // #### Sending messages over boundaries
-    // Signed Message objects are typically sent to a remote party (e.g., a service), which can then verify the signature.
-    // To prepare a message for transmission, you can use the `MessageComputer.packMessage()` utility method.
+#### Sending messages over boundaries
+Signed Message objects are typically sent to a remote party (e.g., a service), which can then verify the signature.
+To prepare a message for transmission, you can use the `MessageComputer.packMessage()` utility method.
 
-    // ```js
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const account = await Account.newFromPem(filePath);
@@ -3159,11 +3089,11 @@ import {
 
         console.log("Packed message", packedMessage);
     }
-    // ```
+```
 
-    // Then, on the receiving side, you can use [`MessageComputer.unpackMessage()`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/MessageComputer.html#unpackMessage) to reconstruct the message, prior verification:
+Then, on the receiving side, you can use [`MessageComputer.unpackMessage()`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/MessageComputer.html#unpackMessage) to reconstruct the message, prior verification:
 
-    // ```js
+```js
     {
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const alice = await Account.newFromPem(filePath);
@@ -3186,7 +3116,4 @@ import {
 
         console.log("Transaction is signed by Alice: ", isSignedByAlice);
     }
-    // ```
-})().catch((e) => {
-    console.log({ e });
-});
+```

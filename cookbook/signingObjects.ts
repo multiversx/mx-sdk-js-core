@@ -1,5 +1,6 @@
 import path from "path"; // md-ignore
 import { Account, Address, Message, MessageComputer, Transaction, TransactionComputer, UserSecretKey } from "../src"; // md-ignore
+// md-start
 (async () => {
     // ## Signing objects
 

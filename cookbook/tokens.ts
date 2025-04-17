@@ -1,5 +1,6 @@
 import path from "path"; // md-ignore
 import { Account, Address, DevnetEntrypoint, TokenManagementTransactionsOutcomeParser } from "../src"; // md-ignore
+// md-start
 (async () => {
     // ### Token management
 

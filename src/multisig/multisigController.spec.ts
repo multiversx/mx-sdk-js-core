@@ -311,6 +311,58 @@ describe("test multisig controller query methods", () => {
         assert.equal(mappedRes.amount, 42n);
     });
 
+    it("getPendingActionFullInfo returns all the actions pending", async function () {
+        networkProvider.mockQueryContractOnFunction(
+            "getPendingActionFullInfo",
+            new SmartContractQueryResponse({
+                function: "getPendingActionFullInfo",
+                returnDataParts: [
+                    Buffer.from(
+                        "AAAAAQAAAAAFgEnWOeWmmA0c0jkqvM5BApzadKFWNSOiAvCWQcwmGPgAAAAIDeC2s6dkAAABAAAAAAF9eEAAAAAAAAAAAAAAAAEBOUcu/2iGdxqYLzCD2l1CHyTCkYHmOIgijcgcpg1p4Q==",
+                        "base64",
+                    ),
+                    Buffer.from(
+                        "AAAAAgAAAAAHAAAAAAAAAAAFAHjSljKssVmYAD9hXQpRJhNT2AQdPhMAAAAIDeC2s6dkAAABAAAAAAOThwAAAAABCgAAAAIAAAABDQAAAAENAAAAAQE5Ry7/aIZ3GpgvMIPaXUIfJMKRgeY4iCKNyBymDWnh",
+                        "base64",
+                    ),
+                    Buffer.from(
+                        "AAAAAwAAAAAGAAAAAAAAAAAFAEm/+WO9+j6gJxM2IJXfMuPXCOrM/FcAAAABAAAADEFMSUNFLTU2MjdmMQAAAAAAAAAAAAAAAAEAAAAAAExLQAAAABQ2NDY5NzM3NDcyNjk2Mjc1NzQ2NQAAAAAAAAABATlHLv9ohncamC8wg9pdQh8kwpGB5jiIIo3IHKYNaeE=",
+                        "base64",
+                    ),
+                    Buffer.from(
+                        "AAAABAAAAAAGAAAAAAAAAAAFAEm/+WO9+j6gJxM2IJXfMuPXCOrM/FcAAAABAAAADEFMSUNFLTU2MjdmMQAAAAAAAAAAAAAAAQoBAAAAAABMS0AAAAAUNjQ2OTczNzQ3MjY5NjI3NTc0NjUAAAAAAAAAAQE5Ry7/aIZ3GpgvMIPaXUIfJMKRgeY4iCKNyBymDWnh",
+                        "base64",
+                    ),
+                    Buffer.from(
+                        "AAAABgAAAAACgEnWOeWmmA0c0jkqvM5BApzadKFWNSOiAvCWQcwmGPgAAAABATlHLv9ohncamC8wg9pdQh8kwpGB5jiIIo3IHKYNaeE=",
+                        "base64",
+                    ),
+                    Buffer.from(
+                        "AAAABwAAAAAIAAAAB7GivC7FAAAAAAAAAAAAAAUAhw0EEs7ehxhTocLUinVDwHPrOflp4QUAAAAAAQAAAAEHAAAAAQE5Ry7/aIZ3GpgvMIPaXUIfJMKRgeY4iCKNyBymDWnh",
+                        "base64",
+                    ),
+                    Buffer.from(
+                        "AAAACAAAAAAJAAAAAAAAAAAFAH4lzm3rrHSNhrXTkxIKsesCpG1YFnkAAAAHsaK8LsUAAAAAAAAAAAAABQBqvRw6N5TaAWArhVrAPngh5mOOyBZ5BQAAAAAAAAAAAQE5Ry7/aIZ3GpgvMIPaXUIfJMKRgeY4iCKNyBymDWnh",
+                        "base64",
+                    ),
+                    Buffer.from("AAAACQAAAAAEAAAAAgAAAAEBOUcu/2iGdxqYLzCD2l1CHyTCkYHmOIgijcgcpg1p4Q==", "base64"),
+                    Buffer.from(
+                        "AAAACgAAAAADgEnWOeWmmA0c0jkqvM5BApzadKFWNSOiAvCWQcwmGPgAAAABATlHLv9ohncamC8wg9pdQh8kwpGB5jiIIo3IHKYNaeE=",
+                        "base64",
+                    ),
+                ],
+                returnCode: "ok",
+                returnMessage: "ok",
+            }),
+        );
+
+        const result = await controller.getPendingActionFullInfo({
+            mutisigAddress: mockMultisigAddress,
+        });
+
+        assert.equal(result.length, 9);
+    });
+
     // TODO: I'll do this on a future branch
     it.skip("getActionData returns the action data as SendAsyncCall", async function () {
         networkProvider.mockQueryContractOnFunction(

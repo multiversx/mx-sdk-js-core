@@ -123,6 +123,14 @@ export enum MultisigActionEnum {
 export class MultisigAction {
     public type: MultisigActionEnum = MultisigActionEnum.Nothing;
 }
+
+export type FullMultisigAction = {
+    actionId: number;
+    groupId: number;
+    signers: Address[];
+    actionData: MultisigAction;
+};
+
 export class AddBoardMember extends MultisigAction {
     public address: Address;
     constructor(address: Address) {

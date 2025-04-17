@@ -26,6 +26,7 @@ DIRECTIVE_START = "// md-start"
 DIRECTIVE_IGNORE = "// md-ignore"
 DIRECTIVE_UNINDENT = "// md-unindent"
 DIRECTIVE_AS_COMMENT = "// md-as-comment"
+TO_UNINDENT_SPACE = "    "
 TO_REMOVE = [
     """(async () => {""", 
     """})().catch((e) => {
@@ -72,11 +73,17 @@ def render_file(input_file: Path) -> List[str]:
         if should_unindent:
             line = line.lstrip()
 
+        line = line.replace(DIRECTIVE_UNINDENT, "")
+        line = line.replace(DIRECTIVE_START, "")
+        line = line.replace(DIRECTIVE_AS_COMMENT, "")
+
         if is_comment and not should_keep_as_comment:
             line = line.strip().strip("/").strip()
+        else: 
+            if line.startswith(TO_UNINDENT_SPACE):
+                line = line[len(TO_UNINDENT_SPACE):] 
 
-        line = line.replace(DIRECTIVE_UNINDENT, "")
-        line = line.replace(DIRECTIVE_AS_COMMENT, "")
+
 
         line = line.rstrip()
         output_lines.append(line)

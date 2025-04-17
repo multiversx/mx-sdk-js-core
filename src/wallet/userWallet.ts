@@ -50,9 +50,7 @@ export class UserWallet {
         randomness = randomness || new Randomness();
 
         const publicKey = secretKey.generatePublicKey();
-        console.log({ secretKey, v: secretKey.valueOf() });
         const data = Buffer.concat([secretKey.valueOf(), publicKey.valueOf()]);
-        console.log({ data });
         const encryptedData = Encryptor.encrypt(data, password, randomness);
 
         return new UserWallet({

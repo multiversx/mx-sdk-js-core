@@ -11,7 +11,6 @@ import { KeyPair, Mnemonic, UserPem, UserWallet } from "../src"; // md-ignore
 
     const mnemonic = Mnemonic.generate();
     const words = mnemonic.getWords();
-    console.log({ words });
     // ```
 
     // #### Saving the mnemonic to a keystore file
@@ -25,7 +24,6 @@ import { KeyPair, Mnemonic, UserPem, UserWallet } from "../src"; // md-ignore
         const wallet = UserWallet.fromMnemonic({ mnemonic: mnemonic.toString(), password: "password" });
 
         const filePath = path.join("../src", "testdata", "testwallets", "walletWithMnemonic.json");
-        console.log({ filePath });
         wallet.save(filePath);
     }
     // ```

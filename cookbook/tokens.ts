@@ -294,7 +294,7 @@ import { Account, Address, DevnetEntrypoint, TokenManagementTransactionsOutcomeP
         let txHash = await entrypoint.sendTransaction(transaction);
 
         // wait for transaction to execute, extract the token identifier // md-as-comment
-        let outcome = await controller.awaitCompletedIssueNonFungible(txHash);
+        const outcome = await controller.awaitCompletedIssueNonFungible(txHash);
 
         const collectionIdentifier = outcome[0].tokenIdentifier;
 
@@ -313,9 +313,11 @@ import { Account, Address, DevnetEntrypoint, TokenManagementTransactionsOutcomeP
         txHash = await entrypoint.sendTransaction(transaction);
 
         // wait for transaction to execute, extract the token identifier // md-as-comment
-        outcome = await controller.awaitCompletedCreateNft(txHash);
+        const outcomeNft = await controller.awaitCompletedCreateNft(txHash);
 
-        const identifier = outcome[0].tokenIdentifier;
+        const identifier = outcomeNft[0].tokenIdentifier;
+        const nonce = outcomeNft[0].nonce;
+        const initialQuantity = outcomeNft[0].initialQuantity;
     }
     // ```
 

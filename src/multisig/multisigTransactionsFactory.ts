@@ -7,7 +7,7 @@ import {
     EndpointModifiers,
     NativeSerializer,
     OptionType,
-    OptionValue,ßß
+    OptionValue,
     TokenIdentifierValue,
     U32Value,
     U64Type,

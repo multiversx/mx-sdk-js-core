@@ -194,17 +194,8 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             arguments: options.functionArguments,
             abi: options.abi,
         });
-        const tokenComputer = new TokenComputer();
-        const argsTyped = [];
-        for (const token of options.tokens) {
-            argsTyped.push({
-                token_identifier: new TokenIdentifierValue(
-                    tokenComputer.extractIdentifierFromExtendedIdentifier(token.token.identifier),
-                ),
-                token_nonce: new U64Value(token.token.nonce),
-                amount: new BigUIntValue(token.amount),
-            });
-        }
+
+        const argsTyped = this.mapTokenPayment(options);
         const dataParts = [
             "proposeTransferExecuteEsdt",
             ...this.argSerializer.valuesToStrings(
@@ -223,6 +214,21 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             gasLimit: options.gasLimit,
             addDataMovementGas: false,
         }).build();
+    }
+
+    private mapTokenPayment(options: resources.ProposeTransferExecuteEsdtInput) {
+        const tokenComputer = new TokenComputer();
+        const argsTyped = [];
+        for (const token of options.tokens) {
+            argsTyped.push({
+                token_identifier: new TokenIdentifierValue(
+                    tokenComputer.extractIdentifierFromExtendedIdentifier(token.token.identifier),
+                ),
+                token_nonce: new U64Value(token.token.nonce),
+                amount: new BigUIntValue(token.amount),
+            });
+        }
+        return argsTyped;
     }
 
     /**

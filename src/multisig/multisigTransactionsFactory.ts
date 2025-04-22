@@ -7,7 +7,7 @@ import {
     EndpointModifiers,
     NativeSerializer,
     OptionType,
-    OptionValue,
+    OptionValue,ßß
     TokenIdentifierValue,
     U32Value,
     U64Type,
@@ -19,7 +19,7 @@ import { Address } from "../core/address";
 import { Transaction } from "../core/transaction";
 import { TransactionBuilder } from "../core/transactionBuilder";
 import { SmartContractTransactionsFactory } from "../smartContracts";
-import { ProposeTransferExecuteContractInput } from "./ProposeTransferExecuteContractInput";
+import { ProposeTransferExecuteContractInput } from "./proposeTransferExecuteContractInput";
 import * as resources from "./resources";
 
 /**

@@ -1,4 +1,5 @@
 import {
+    Abi,
     AddressValue,
     ArgSerializer,
     BigUIntValue,
@@ -18,15 +19,9 @@ import { Address } from "../core/address";
 import { Transaction } from "../core/transaction";
 import { TransactionBuilder } from "../core/transactionBuilder";
 import { SmartContractTransactionsFactory } from "../smartContracts";
-import { ProposeTransferExecuteContractInput } from "./proposeTransferExecuteContract";
+import { ProposeTransferExecuteContractInput } from "./ProposeTransferExecuteContractInput";
 import * as resources from "./resources";
 
-interface IAbi {
-    constructorDefinition: EndpointDefinition;
-    upgradeConstructorDefinition?: EndpointDefinition;
-
-    getEndpoint(name: string): EndpointDefinition;
-}
 /**
  * Use this class to create multisig related transactions like creating a new multisig contract,
  * proposing actions, signing actions, and performing actions.
@@ -34,7 +29,7 @@ interface IAbi {
 export class MultisigTransactionsFactory extends SmartContractTransactionsFactory {
     private readonly argSerializer: ArgSerializer;
 
-    constructor(options: { config: TransactionsFactoryConfig; abi?: IAbi }) {
+    constructor(options: { config: TransactionsFactoryConfig; abi?: Abi }) {
         super(options);
         this.argSerializer = new ArgSerializer();
     }

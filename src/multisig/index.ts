@@ -1,3 +1,3 @@
 export * from "./multisigTransactionsFactory";
-export * from "./proposeTransferExecuteContract";
+export * from "./ProposeTransferExecuteContractInput";
 export * from "./resources";

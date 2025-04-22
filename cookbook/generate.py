@@ -27,6 +27,8 @@ DIRECTIVE_IGNORE = "// md-ignore"
 DIRECTIVE_UNINDENT = "// md-unindent"
 DIRECTIVE_AS_COMMENT = "// md-as-comment"
 TO_UNINDENT_SPACE = "    "
+
+# we don't want this ceremonial piece of code to show up in the rendered cookbook
 TO_REMOVE = [
     """(async () => {""", 
     """})().catch((e) => {
@@ -54,10 +56,13 @@ def main():
 
 def render_file(input_file: Path) -> List[str]:
     input_text = input_file.read_text()
+
     for item in TO_REMOVE: 
         input_text = input_text.replace(item, "")
+
     input_lines = input_text.splitlines()
     start = input_lines.index(DIRECTIVE_START)
+    
     input_lines = input_lines[start:]
     output_lines: List[str] = []
 

@@ -239,14 +239,14 @@ describe("test multisig controller query methods", () => {
     });
 
     it("getAllBoardMembers returns all board members as address array", async function () {
-        // Prepare addresses for the mock response
-        const address1 = Buffer.from(Address.newFromBech32(mockBoardMemberAddress).toHex(), "hex");
-        const address2 = Buffer.from(Address.newFromBech32(mockProposerAddress).toHex(), "hex");
         networkProvider.mockQueryContractOnFunction(
             "getAllBoardMembers",
             new SmartContractQueryResponse({
                 function: "getAllBoardMembers",
-                returnDataParts: [address1, address2],
+                returnDataParts: [
+                    Buffer.from("ATlHLv9ohncamC8wg9pdQh8kwpGB5jiIIo3IHKYNaeE=", "base64"),
+                    Buffer.from("gEnWOeWmmA0c0jkqvM5BApzadKFWNSOiAvCWQcwmGPg=", "base64"),
+                ],
                 returnCode: "ok",
                 returnMessage: "ok",
             }),
@@ -257,8 +257,8 @@ describe("test multisig controller query methods", () => {
         });
 
         assert.equal(result.length, 2);
-        assert.equal(result[0], mockBoardMemberAddress);
-        assert.equal(result[1], mockProposerAddress);
+        assert.equal(result[0], "erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        assert.equal(result[1], "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
     });
 
     it("getAllProposers returns all proposers as address array", async function () {
@@ -484,7 +484,7 @@ describe("test multisig controller query methods", () => {
         const mappedRes = result as resources.SCDeployFromSource;
 
         assert.equal(
-            mappedRes.sourceContractAddress.toBech32(),
+            mappedRes.sourceContract.toBech32(),
             "erd1qqqqqqqqqqqqqpgqsuxsgykwm6r3s5apct2g5a2rcpe7kw0ed8ssf6h9f6",
         );
         assert.equal(mappedRes.amount.toString(), "50000000000000000");
@@ -516,7 +516,7 @@ describe("test multisig controller query methods", () => {
         });
         const mappedRes = result as resources.SCUpgradeFromSource;
 
-        assert.equal(mappedRes.sourceContractAddress.toBech32(), sourceContract.toBech32());
+        assert.equal(mappedRes.sourceContract.toBech32(), sourceContract.toBech32());
         assert.equal(mappedRes.amount, amount);
         assert.deepEqual(mappedRes.codeMetadata, metadata);
     });

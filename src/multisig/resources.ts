@@ -141,6 +141,7 @@ export class AddBoardMember extends MultisigAction {
 }
 export class AddProposer extends MultisigAction {
     public address: Address;
+
     constructor(address: Address) {
         super();
         this.type = MultisigActionEnum.AddProposer;
@@ -150,6 +151,7 @@ export class AddProposer extends MultisigAction {
 export class RemoveUser extends MultisigAction {
     public type: MultisigActionEnum = MultisigActionEnum.RemoveUser;
     public address: Address;
+
     constructor(address: Address) {
         super();
         this.type = MultisigActionEnum.RemoveUser;
@@ -159,6 +161,7 @@ export class RemoveUser extends MultisigAction {
 
 export class ChangeQuorum extends MultisigAction {
     public quorum: number;
+
     constructor(quorum: number) {
         super();
         this.type = MultisigActionEnum.ChangeQuorum;
@@ -172,6 +175,7 @@ export class SendTransferExecuteEgld extends MultisigAction {
     optionalGasLimit?: number;
     funcionName: string;
     arguments: Uint8Array[];
+
     constructor(data: any) {
         super();
         this.type = MultisigActionEnum.SendTransferExecuteEgld;
@@ -188,6 +192,7 @@ export class SendTransferExecuteEsdt extends MultisigAction {
     optionalGasLimit?: number;
     funcionName: string;
     arguments: Uint8Array[];
+
     constructor(data: any) {
         super();
         this.type = MultisigActionEnum.SendTransferExecuteEsdt;
@@ -212,6 +217,7 @@ export class SendAsyncCall extends MultisigAction {
     optionalGasLimit?: number;
     funcionName: string;
     arguments: Uint8Array[];
+
     constructor(data: any) {
         super();
         this.type = MultisigActionEnum.SendAsyncCall;
@@ -224,14 +230,15 @@ export class SendAsyncCall extends MultisigAction {
 }
 
 export class SCDeployFromSource extends MultisigAction {
-    sourceContractAddress: Address;
+    sourceContract: Address;
     amount: bigint;
     codeMetadata: CodeMetadata;
     arguments: Uint8Array[];
+
     constructor(data: any) {
         super();
         this.type = MultisigActionEnum.SCDeployFromSource;
-        this.sourceContractAddress = data[1];
+        this.sourceContract = data[1];
         this.amount = data[0];
         this.codeMetadata = data[2];
         this.arguments = data[3];
@@ -239,17 +246,18 @@ export class SCDeployFromSource extends MultisigAction {
 }
 
 export class SCUpgradeFromSource extends MultisigAction {
-    sourceContractAddress: Address;
-    scAddress: Address;
+    sourceContract: Address;
+    destinationContract: Address;
     amount: bigint;
     codeMetadata: CodeMetadata;
     arguments: Uint8Array[];
+
     constructor(data: any) {
         super();
         this.type = MultisigActionEnum.SCUpgradeFromSource;
-        this.scAddress = data[0];
+        this.destinationContract = data[0];
         this.amount = data[1];
-        this.sourceContractAddress = data[2];
+        this.sourceContract = data[2];
         this.codeMetadata = data[3];
         this.arguments = data[4];
     }

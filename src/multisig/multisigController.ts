@@ -83,7 +83,7 @@ export class MultisigController extends SmartContractController {
             arguments: [],
         });
 
-        return Number(Buffer.from(response[0]).toString());
+        return Number(response[0].toString());
     }
 
     /**
@@ -96,7 +96,7 @@ export class MultisigController extends SmartContractController {
             arguments: [],
         });
 
-        return Number(Buffer.from(response[0]).toString());
+        return Number(response[0].toString());
     }
 
     /**
@@ -179,7 +179,7 @@ export class MultisigController extends SmartContractController {
             arguments: [],
         });
 
-        return response[0].map((address: Address) => address.toBech32());
+        return response[0].map((address: Address) => address?.toBech32());
     }
 
     /**
@@ -192,7 +192,7 @@ export class MultisigController extends SmartContractController {
             arguments: [],
         });
 
-        return response[0].map((address: Address) => new Address(address).toBech32());
+        return response[0].map((address: Address) => address?.toBech32());
     }
     /**
      *  "Indicates user rights.",
@@ -237,7 +237,6 @@ export class MultisigController extends SmartContractController {
         const actions = response[0];
         for (let action = 0; action < actions.length; action++) {
             const element = actions[action];
-            console.log({ element }, element.action_id, this.mapResponseToAction(element.action_data.valueOf()));
             result.push({
                 actionId: Number(element.action_id.toString()),
                 groupId: Number(element.group_id.toString()),
@@ -287,7 +286,7 @@ export class MultisigController extends SmartContractController {
             arguments: [options.actionId],
         });
 
-        return Number(Buffer.from(response[0]).toString());
+        return Number(response[0].toString());
     }
 
     /**
@@ -827,7 +826,6 @@ export class MultisigController extends SmartContractController {
             case resources.MultisigActionEnum.SCUpgradeFromSource:
                 return new resources.SCUpgradeFromSource(fields);
             default:
-                console;
                 throw new Error(`Unknown action type: ${name}`);
         }
     };

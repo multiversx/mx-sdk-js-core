@@ -919,10 +919,10 @@ This allows arguments to be passed as native Javascript values. If the ABI is no
 ```
 
 :::tip
-When creating transactions using [`SmartContractController`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/SmartContractController.html) or [`SmartContractTransactionsFactory`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/SmartContractTransactionsFactory.html), even if the ABI is available and provided,
-you can still use [`TypedValue`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/TypedValue.html) objects as arguments for deployments and interactions.
+When creating transactions using [`SmartContractController`](https://multiversx.github.io/mx-sdk-js-core/v14/classes/SmartContractController.html) or [`SmartContractTransactionsFactory`](https://multiversx.github.io/mx-sdk-js-core/v14/classes/SmartContractTransactionsFactory.html), even if the ABI is available and provided,
+you can still use [`TypedValue`](https://multiversx.github.io/mx-sdk-js-core/v14/classes/TypedValue.html) objects as arguments for deployments and interactions.
 
-Even further, you can use a mix of [`TypedValue`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/TypedValue.html) objects and plain JavaScript values and objects. For example:
+Even further, you can use a mix of [`TypedValue`](https://multiversx.github.io/mx-sdk-js-core/v14/classes/TypedValue.html) objects and plain JavaScript values and objects. For example:
 
 ```js
 let args = [new U32Value(42), "hello", { foo: "bar" }, new TokenIdentifierValue("TEST-abcdef")];
@@ -3061,7 +3061,7 @@ To prepare a message for transmission, you can use the `MessageComputer.packMess
 }
 ```
 
-Then, on the receiving side, you can use [`MessageComputer.unpackMessage()`](https://multiversx.github.io/mx-sdk-js-core/v13/classes/MessageComputer.html#unpackMessage) to reconstruct the message, prior verification:
+Then, on the receiving side, you can use [`MessageComputer.unpackMessage()`](https://multiversx.github.io/mx-sdk-js-core/v14/classes/MessageComputer.html#unpackMessage) to reconstruct the message, prior verification:
 
 ```js
 {

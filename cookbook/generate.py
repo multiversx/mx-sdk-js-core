@@ -36,7 +36,7 @@ TO_REMOVE = [
 });"""]
 
 API_URL = "https://multiversx.github.io/mx-sdk-js-core"
-API_DEFAIULT_VERSION = "v13"
+API_DEFAIULT_VERSION = "v14"
 DOCS_URL = "https://docs.multiversx.com"
 
 def main():

@@ -1,4 +1,5 @@
 import {
+    Abi,
     AddressValue,
     ArgSerializer,
     BigUIntValue,
@@ -7,7 +8,6 @@ import {
     NativeSerializer,
     OptionType,
     OptionValue,
-    TokenIdentifierValue,
     U32Value,
     U64Type,
     U64Value,
@@ -18,15 +18,9 @@ import { Address } from "../core/address";
 import { Transaction } from "../core/transaction";
 import { TransactionBuilder } from "../core/transactionBuilder";
 import { SmartContractTransactionsFactory } from "../smartContracts";
-import { ProposeTransferExecuteContractInput } from "./proposeTransferExecuteContract";
+import { ProposeTransferExecuteContractInput } from "./proposeTransferExecuteContractInput";
 import * as resources from "./resources";
 
-interface IAbi {
-    constructorDefinition: EndpointDefinition;
-    upgradeConstructorDefinition?: EndpointDefinition;
-
-    getEndpoint(name: string): EndpointDefinition;
-}
 /**
  * Use this class to create multisig related transactions like creating a new multisig contract,
  * proposing actions, signing actions, and performing actions.
@@ -34,7 +28,7 @@ interface IAbi {
 export class MultisigTransactionsFactory extends SmartContractTransactionsFactory {
     private readonly argSerializer: ArgSerializer;
 
-    constructor(options: { config: TransactionsFactoryConfig; abi?: IAbi }) {
+    constructor(options: { config: TransactionsFactoryConfig; abi?: Abi }) {
         super(options);
         this.argSerializer = new ArgSerializer();
     }
@@ -199,22 +193,13 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             arguments: options.functionArguments,
             abi: options.abi,
         });
-        const tokenComputer = new TokenComputer();
-        const argsTyped = [];
-        for (const token of options.tokens) {
-            argsTyped.push({
-                token_identifier: new TokenIdentifierValue(
-                    tokenComputer.extractIdentifierFromExtendedIdentifier(token.token.identifier),
-                ),
-                token_nonce: new U64Value(token.token.nonce),
-                amount: new BigUIntValue(token.amount),
-            });
-        }
+
+        const tokenPayments: resources.EsdtTokenPayment[] = this.mapTokenPayments(options);
         const dataParts = [
             "proposeTransferExecuteEsdt",
             ...this.argSerializer.valuesToStrings(
                 NativeSerializer.nativeToTypedValues(
-                    [options.to, argsTyped, options.gasLimit, VariadicValue.fromItems(...input.functionCall)],
+                    [options.to, tokenPayments, options.gasLimit, VariadicValue.fromItems(...input.functionCall)],
                     this.abi?.getEndpoint("proposeTransferExecuteEsdt") ??
                         new EndpointDefinition("proposeTransferExecuteEsdt", [], [], new EndpointModifiers("", [])),
                 ),
@@ -228,6 +213,19 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             gasLimit: options.gasLimit,
             addDataMovementGas: false,
         }).build();
+    }
+
+    private mapTokenPayments(options: resources.ProposeTransferExecuteEsdtInput): resources.EsdtTokenPayment[] {
+        const tokenComputer = new TokenComputer();
+        const tokens = [];
+        for (const token of options.tokens) {
+            tokens.push({
+                token_identifier: tokenComputer.extractIdentifierFromExtendedIdentifier(token.token.identifier),
+                token_nonce: token.token.nonce,
+                amount: token.amount,
+            });
+        }
+        return tokens;
     }
 
     /**

@@ -8,7 +8,6 @@ import {
     NativeSerializer,
     OptionType,
     OptionValue,
-    TokenIdentifierValue,
     U32Value,
     U64Type,
     U64Value,
@@ -195,12 +194,12 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             abi: options.abi,
         });
 
-        const argsTyped = this.mapTokenPayment(options);
+        const tokenPayments: resources.EsdtTokenPayment[] = this.mapTokenPayments(options);
         const dataParts = [
             "proposeTransferExecuteEsdt",
             ...this.argSerializer.valuesToStrings(
                 NativeSerializer.nativeToTypedValues(
-                    [options.to, argsTyped, options.gasLimit, VariadicValue.fromItems(...input.functionCall)],
+                    [options.to, tokenPayments, options.gasLimit, VariadicValue.fromItems(...input.functionCall)],
                     this.abi?.getEndpoint("proposeTransferExecuteEsdt") ??
                         new EndpointDefinition("proposeTransferExecuteEsdt", [], [], new EndpointModifiers("", [])),
                 ),
@@ -216,19 +215,17 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         }).build();
     }
 
-    private mapTokenPayment(options: resources.ProposeTransferExecuteEsdtInput) {
+    private mapTokenPayments(options: resources.ProposeTransferExecuteEsdtInput): resources.EsdtTokenPayment[] {
         const tokenComputer = new TokenComputer();
-        const argsTyped = [];
+        const tokens = [];
         for (const token of options.tokens) {
-            argsTyped.push({
-                token_identifier: new TokenIdentifierValue(
-                    tokenComputer.extractIdentifierFromExtendedIdentifier(token.token.identifier),
-                ),
-                token_nonce: new U64Value(token.token.nonce),
-                amount: new BigUIntValue(token.amount),
+            tokens.push({
+                token_identifier: tokenComputer.extractIdentifierFromExtendedIdentifier(token.token.identifier),
+                token_nonce: token.token.nonce,
+                amount: token.amount,
             });
         }
-        return argsTyped;
+        return tokens;
     }
 
     /**

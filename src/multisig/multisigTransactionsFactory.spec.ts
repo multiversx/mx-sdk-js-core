@@ -70,7 +70,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
@@ -165,7 +164,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
@@ -199,7 +197,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
@@ -229,7 +226,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.equal(transaction.chainID, config.chainID);
         assert.equal(
             transaction.data.toString(),
@@ -254,7 +250,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.equal(transaction.chainID, config.chainID);
         assert.equal(transaction.value, 1n);
         assert.deepEqual(transaction.data.toString(), "deposit");
@@ -281,7 +276,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.equal(transaction.chainID, config.chainID);
         assert.equal(transaction.value, 0n);
         assert.deepEqual(transaction.data.toString(), "ESDTTransfer@414c4943452d353632376631@64@6465706f736974");
@@ -308,7 +302,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
@@ -338,7 +331,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
@@ -361,8 +353,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
-
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(transaction.data.toString(), "sign@2a");
     });
@@ -382,7 +372,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(transaction.data.toString(), "signBatch@05");
     });
@@ -402,8 +391,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
-
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(transaction.data.toString(), "signAndPerform@2a");
     });
@@ -423,7 +410,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.deepEqual(transaction.data.toString(), "unsign@2a");
     });
 
@@ -442,7 +428,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.deepEqual(transaction.data.toString(), "unsignForOutdatedBoardMembers@2a@01@03@05");
     });
 
@@ -460,7 +445,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.deepEqual(transaction.data.toString(), "performAction@2a");
     });
 
@@ -478,7 +462,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.deepEqual(transaction.data.toString(), "performBatch@05");
     });
 
@@ -497,7 +480,6 @@ describe("test multisig transactions factory", function () {
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
-        assert.isAbove(transaction.data.length, 0);
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(transaction.data.toString(), "discardAction@0142");
     });

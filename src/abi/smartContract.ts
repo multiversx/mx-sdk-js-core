@@ -19,14 +19,7 @@ import {
 } from "./interface";
 import { NativeSerializer } from "./nativeSerializer";
 import { Query } from "./query";
-import { EndpointDefinition, TypedValue } from "./typesystem";
-
-interface IAbi {
-    constructorDefinition: EndpointDefinition;
-
-    getEndpoints(): EndpointDefinition[];
-    getEndpoint(name: string | ContractFunction): EndpointDefinition;
-}
+import { Abi, EndpointDefinition, TypedValue } from "./typesystem";
 
 /**
  * * @deprecated component. Use "SmartContractTransactionsFactory" or "SmartContractController", instead.
@@ -35,7 +28,7 @@ interface IAbi {
  */
 export class SmartContract implements ISmartContract {
     private address: Address = Address.empty();
-    private abi?: IAbi;
+    private abi?: Abi;
 
     /**
      * This object contains a function for each endpoint defined by the contract.
@@ -55,7 +48,7 @@ export class SmartContract implements ISmartContract {
     /**
      * Create a SmartContract object by providing its address on the Network.
      */
-    constructor(options: { address?: Address; abi?: IAbi } = {}) {
+    constructor(options: { address?: Address; abi?: Abi } = {}) {
         this.address = options.address || Address.empty();
         this.abi = options.abi;
 
@@ -105,13 +98,16 @@ export class SmartContract implements ISmartContract {
         return this.address;
     }
 
-    private getAbi(): IAbi {
+    private getAbi(): Abi {
         guardValueIsSet("abi", this.abi);
         return this.abi!;
     }
 
     getEndpoint(name: string | ContractFunction): EndpointDefinition {
-        return this.getAbi().getEndpoint(name);
+        if (typeof name === "string") {
+            return this.getAbi().getEndpoint(name);
+        }
+        return this.getAbi().getEndpoint(name.name);
     }
 
     /**

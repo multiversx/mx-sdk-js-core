@@ -36,7 +36,7 @@ TO_REMOVE = [
 });"""]
 
 API_URL = "https://multiversx.github.io/mx-sdk-js-core"
-API_DEFAIULT_VERSION = "v14"
+API_DEFAULT_VERSION = "v14"
 DOCS_URL = "https://docs.multiversx.com"
 
 def main():
@@ -102,10 +102,10 @@ def render_api_links(input: str) -> str:
 
     for match in matches_func:
         [class_name, method] = match.split(".")
-        input = input.replace(f"`func:{match}()`", f"[`{match}()`]({API_URL}/{API_DEFAIULT_VERSION}/classes/{class_name}.html#{method})")
+        input = input.replace(f"`func:{match}()`", f"[`{match}()`]({API_URL}/{API_DEFAULT_VERSION}/classes/{class_name}.html#{method})")
 
     for match in matches_class:
-        input = input.replace(f"`class:{match}`", f"[`{match}`]({API_URL}/{API_DEFAIULT_VERSION}/classes/{match}.html)")
+        input = input.replace(f"`class:{match}`", f"[`{match}`]({API_URL}/{API_DEFAULT_VERSION}/classes/{match}.html)")
 
     return input
 

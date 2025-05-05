@@ -1,5 +1,5 @@
 import { Abi, BytesValue } from "../abi";
-import { Address, TokenTransfer, TransactionsFactoryConfig } from "../core";
+import { Address, TokenTransfer, Transaction, TransactionsFactoryConfig } from "../core";
 import { ARGUMENTS_SEPARATOR } from "../core/constants";
 import { utf8ToHex } from "../core/utils.codec";
 import { SmartContractTransactionsFactory } from "../smartContracts";
@@ -36,14 +36,9 @@ export class ProposeTransferExecuteContractInput {
             arguments: options.arguments,
             nativeTransferAmount: 0n,
         });
-        const functionCallParts = Buffer.from(transaction.data).toString().split(ARGUMENTS_SEPARATOR);
-        const functionName = functionCallParts[0];
-        const functionArguments = [];
-        for (let index = 1; index < functionCallParts.length; index++) {
-            const element = functionCallParts[index];
-            functionArguments.push(element.valueOf());
-        }
-        const functionCall = [new BytesValue(Buffer.from(utf8ToHex(functionName))), ...functionArguments];
+
+        const functionCall = ProposeTransferExecuteContractInput.getFunctionCall(transaction);
+
         return new ProposeTransferExecuteContractInput({
             multisigContract: options.multisig,
             to: options.to,
@@ -72,19 +67,22 @@ export class ProposeTransferExecuteContractInput {
             arguments: options.arguments,
             nativeTransferAmount: 0n,
         });
-        const functionCallParts = Buffer.from(transaction.data).toString().split(ARGUMENTS_SEPARATOR);
-        const functionName = functionCallParts[0];
-        const functionArguments = [];
-        for (let index = 1; index < functionCallParts.length; index++) {
-            const element = functionCallParts[index];
-            functionArguments.push(element.valueOf());
-        }
-        const functionCall = [new BytesValue(Buffer.from(utf8ToHex(functionName))), ...functionArguments];
+
+        const functionCall = ProposeTransferExecuteContractInput.getFunctionCall(transaction);
+
         return new ProposeTransferExecuteContractInput({
             multisigContract: options.multisig,
             to: options.to,
             functionCall: functionCall,
             gasLimit: options.optGasLimit,
         });
+    }
+
+    private static getFunctionCall(transaction: Transaction) {
+        const functionCallParts = Buffer.from(transaction.data).toString().split(ARGUMENTS_SEPARATOR);
+        const functionName = functionCallParts[0];
+        const functionArguments = functionCallParts.slice(1).map((part) => part.valueOf());
+        const functionCall = [new BytesValue(Buffer.from(utf8ToHex(functionName))), ...functionArguments];
+        return functionCall;
     }
 }

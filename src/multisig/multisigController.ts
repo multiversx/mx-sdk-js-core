@@ -13,6 +13,7 @@ import { SmartContractController } from "../smartContracts";
 import { MultisigTransactionsFactory } from "./multisigTransactionsFactory";
 import { MultisigTransactionsOutcomeParser } from "./multisigTransactionsOutcomeParser";
 import * as resources from "./resources";
+
 export class MultisigController extends SmartContractController {
     private transactionAwaiter: TransactionWatcher;
     private multisigFactory: MultisigTransactionsFactory;
@@ -26,7 +27,7 @@ export class MultisigController extends SmartContractController {
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
             abi: options.abi,
         });
-        this.multisigParser = new MultisigTransactionsOutcomeParser();
+        this.multisigParser = new MultisigTransactionsOutcomeParser({ abi: options.abi });
     }
 
     /**

@@ -183,12 +183,15 @@ export class NetworkEntrypoint {
         });
     }
 
-    createMultisigController(): MultisigController {
-        return new MultisigController({ chainID: this.chainId, networkProvider: this.networkProvider });
+    createMultisigController(abi?: Abi): MultisigController {
+        return new MultisigController({ chainID: this.chainId, networkProvider: this.networkProvider, abi: abi });
     }
 
-    createMultisigTransactionsFactory(): MultisigTransactionsFactory {
-        return new MultisigTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: this.chainId }) });
+    createMultisigTransactionsFactory(abi?: Abi): MultisigTransactionsFactory {
+        return new MultisigTransactionsFactory({
+            config: new TransactionsFactoryConfig({ chainID: this.chainId }),
+            abi: abi,
+        });
     }
 }
 

@@ -142,7 +142,7 @@ export class SmartContractTransactionsOutcomeParser {
         const eligibleResults: SmartContractResult[] = [];
 
         for (const result of transactionOnNetwork.smartContractResults) {
-            const matchesCriteriaOnData = result.data.toString().startsWith(ARGUMENTS_SEPARATOR);
+            const matchesCriteriaOnData = Buffer.from(result.data).toString("utf-8").startsWith(ARGUMENTS_SEPARATOR);
             const matchesCriteriaOnReceiver = result.receiver.toBech32() === transactionOnNetwork.sender.toBech32();
             const matchesCriteriaOnPreviousHash = result;
 

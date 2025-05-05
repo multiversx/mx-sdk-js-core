@@ -93,7 +93,7 @@ describe("test smart contract transactions outcome parser", () => {
         const transactionOnNetwork = new TransactionOnNetwork({
             nonce: 7n,
             function: "getUltimateAnswer",
-            smartContractResults: [new SmartContractResult({ data: Buffer.from("@6f6b@2a") })],
+            smartContractResults: [new SmartContractResult({ data: Buffer.from("QDZmNmJAMmE=", "base64") })],
         });
 
         const parsed = parser.parseExecute({ transactionOnNetwork });

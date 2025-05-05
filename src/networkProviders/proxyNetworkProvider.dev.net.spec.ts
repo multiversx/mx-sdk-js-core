@@ -388,4 +388,14 @@ describe("ProxyNetworkProvider Tests", function () {
         const result = await proxy.queryContract(query);
         assert.equal(result.returnDataParts.length, 1);
     });
+
+    it("should query contract when undefined returnData", async () => {
+        const query = new SmartContractQuery({
+            contract: Address.newFromBech32("erd1qqqqqqqqqqqqqpgqf738mcf8f08kuwhn8dvtka5veyad2fqwu00sqnjgln"),
+            function: "getAllProposers",
+            arguments: [],
+        });
+        const result = await proxy.queryContract(query);
+        assert.equal(result.returnDataParts.length, 0);
+    });
 });

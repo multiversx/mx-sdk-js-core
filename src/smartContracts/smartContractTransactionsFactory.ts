@@ -1,4 +1,4 @@
-import { ArgSerializer, ContractFunction, EndpointDefinition, isTyped, NativeSerializer } from "../abi";
+import { Abi, ArgSerializer, EndpointDefinition, isTyped, NativeSerializer } from "../abi";
 import { Address, CodeMetadata } from "../core";
 import { CONTRACT_DEPLOY_ADDRESS_HEX, VM_TYPE_WASM_VM } from "../core/constants";
 import { Err } from "../core/errors";
@@ -19,24 +19,17 @@ interface IConfig {
     gasLimitChangeOwnerAddress: bigint;
 }
 
-interface IAbi {
-    constructorDefinition: EndpointDefinition;
-    upgradeConstructorDefinition?: EndpointDefinition;
-
-    getEndpoint(name: string | ContractFunction): EndpointDefinition;
-}
-
 /**
  * Use this class to create transactions to deploy, call or upgrade a smart contract.
  */
 export class SmartContractTransactionsFactory {
-    private readonly config: IConfig;
-    private readonly abi?: IAbi;
+    protected readonly config: IConfig;
+    protected readonly abi?: Abi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
     private readonly contractDeployAddress: Address;
 
-    constructor(options: { config: IConfig; abi?: IAbi }) {
+    constructor(options: { config: IConfig; abi?: Abi }) {
         this.config = options.config;
         this.abi = options.abi;
         this.tokenComputer = new TokenComputer();
@@ -195,7 +188,7 @@ export class SmartContractTransactionsFactory {
         }).build();
     }
 
-    private argsToDataParts(args: any[], endpoint?: EndpointDefinition): string[] {
+    protected argsToDataParts(args: any[], endpoint?: EndpointDefinition): string[] {
         if (endpoint) {
             const typedArgs = NativeSerializer.nativeToTypedValues(args, endpoint);
             return new ArgSerializer().valuesToStrings(typedArgs);

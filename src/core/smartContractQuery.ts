@@ -49,7 +49,7 @@ export class SmartContractQueryResponse {
         let returnMessage = payload["returnMessage"] || payload["ReturnMessage"];
 
         return new SmartContractQueryResponse({
-            returnDataParts: returnData?.map((item) => Buffer.from(item || "", "base64")),
+            returnDataParts: returnData?.map((item) => Buffer.from(item || "", "base64")) ?? [],
             returnCode: returnCode,
             returnMessage: returnMessage,
             function: functionName,

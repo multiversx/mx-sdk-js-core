@@ -162,7 +162,7 @@ describe("ApiNetworkProvider Tests", function () {
         assert.isTrue(transaction.status.isCompleted());
     });
 
-    it("should fetch smart contract invoking transaction", async () => {
+    it("should fetch smart contract invoking transaction with expected data", async () => {
         const transaction = await apiProvider.getTransaction(
             "6fe05e4ca01d42c96ae5182978a77fe49f26bcc14aac95ad4f19618173f86ddb",
         );
@@ -174,6 +174,10 @@ describe("ApiNetworkProvider Tests", function () {
             Buffer.from(
                 "issue@54455354546f6b656e@54455354@016345785d8a0000@06@63616e4368616e67654f776e6572@74727565@63616e55706772616465@74727565@63616e4164645370656369616c526f6c6573@74727565",
             ),
+        );
+        assert.deepEqual(
+            transaction.smartContractResults[0].data,
+            Buffer.from("ESDTSetBurnRoleForAll@544553542d666631353565"),
         );
         assert.equal(Buffer.from(transaction.logs.events[0].topics[0]).toString("hex"), "544553542d666631353565");
         assert.equal(Buffer.from(transaction.logs.events[0].topics[1]).toString("hex"), "");
@@ -381,5 +385,15 @@ describe("ApiNetworkProvider Tests", function () {
         });
         const result = await apiProvider.queryContract(query);
         assert.equal(result.returnDataParts.length, 1);
+    });
+
+    it("should query contract when undefined returnData", async () => {
+        const query = new SmartContractQuery({
+            contract: Address.newFromBech32("erd1qqqqqqqqqqqqqpgqf738mcf8f08kuwhn8dvtka5veyad2fqwu00sqnjgln"),
+            function: "getAllProposers",
+            arguments: [],
+        });
+        const result = await apiProvider.queryContract(query);
+        assert.equal(result.returnDataParts.length, 0);
     });
 });

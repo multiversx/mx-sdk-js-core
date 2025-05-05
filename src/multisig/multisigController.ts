@@ -19,7 +19,7 @@ export class MultisigController extends SmartContractController {
     private multisigFactory: MultisigTransactionsFactory;
     private multisigParser: MultisigTransactionsOutcomeParser;
 
-    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: Abi }) {
+    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi: Abi }) {
         super(options);
         this.abi = options.abi;
         this.transactionAwaiter = new TransactionWatcher(options.networkProvider);

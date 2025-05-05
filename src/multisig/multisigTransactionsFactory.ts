@@ -28,7 +28,7 @@ import * as resources from "./resources";
 export class MultisigTransactionsFactory extends SmartContractTransactionsFactory {
     private readonly argSerializer: ArgSerializer;
 
-    constructor(options: { config: TransactionsFactoryConfig; abi?: Abi }) {
+    constructor(options: { config: TransactionsFactoryConfig; abi: Abi }) {
         super(options);
         this.argSerializer = new ArgSerializer();
     }

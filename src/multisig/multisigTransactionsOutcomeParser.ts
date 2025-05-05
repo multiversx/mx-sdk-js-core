@@ -10,9 +10,9 @@ import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomePa
  */
 export class MultisigTransactionsOutcomeParser {
     private parser: SmartContractTransactionsOutcomeParser;
-    private readonly abi?: Abi;
+    private readonly abi: Abi;
 
-    constructor(options?: { abi?: Abi }) {
+    constructor(options: { abi: Abi }) {
         this.abi = options?.abi;
         this.parser = new SmartContractTransactionsOutcomeParser({ abi: this.abi });
     }
@@ -70,7 +70,7 @@ export class MultisigTransactionsOutcomeParser {
 
         return queryResponse.map((item) => {
             const buffer = Buffer.from(item, "base64");
-            return Address.newFromHex(buffer.toString("hex"));
+            return new Address(buffer);
         });
     }
 

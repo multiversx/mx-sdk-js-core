@@ -76,11 +76,12 @@ export class TransactionOnNetwork {
         const result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.smartContractResults =
             response.smartContractResults?.map(
-                (result: Partial<SmartContractResult>) =>
+                (result: any) =>
                     new SmartContractResult({
                         ...result,
                         receiver: result.receiver ? new Address(result.receiver) : undefined,
                         sender: result.sender ? new Address(result.sender) : undefined,
+                        data: Buffer.from(result.data ?? "", "utf-8"),
                         raw: result,
                     }),
             ) ?? [];
@@ -142,11 +143,12 @@ export class TransactionOnNetwork {
         const result = TransactionOnNetwork.fromHttpResponse(txHash, response);
         result.smartContractResults =
             response.results?.map(
-                (result: Partial<SmartContractResult>) =>
+                (result: any) =>
                     new SmartContractResult({
                         ...result,
                         receiver: result.receiver ? new Address(result.receiver) : undefined,
                         sender: result.sender ? new Address(result.sender) : undefined,
+                        data: Buffer.from(result.data ?? "", "base64"),
                         raw: result,
                     }),
             ) ?? [];
@@ -167,7 +169,6 @@ export class TransactionOnNetwork {
         result.gasPrice = BigInt(response.gasPrice) || 0n;
         result.gasLimit = BigInt(response.gasLimit) || 0n;
         result.function = response.function || "";
-        result.data = Buffer.from(response.data || "", "base64");
         result.version = response.version || 1;
         result.options = response.options || 0;
         result.data = Buffer.from(response.data || "", "base64");

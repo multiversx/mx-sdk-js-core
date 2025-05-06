@@ -35,7 +35,7 @@ describe("test multisig transactions factory", function () {
 
         const board = [boardMemberOne, boardMemberTwo];
 
-        const transaction = factory.createTransactionForMultisigDeploy(senderAddress, {
+        const transaction = factory.createTransactionForDeploy(senderAddress, {
             bytecode: bytecode.valueOf(),
             gasLimit: 5000000n,
             quorum: 2,
@@ -305,7 +305,7 @@ describe("test multisig transactions factory", function () {
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
-            "proposeSCDeployFromSource@b1a2bc2ec50000@00000000000000000500870d0412cede871853a1c2d48a7543c073eb39f969e1@0500@7",
+            "proposeSCDeployFromSource@b1a2bc2ec50000@000000000000000005007e25ce6debac748d86b5d393120ab1eb02a46d581679@0500@37",
         );
     });
 

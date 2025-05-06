@@ -3,6 +3,8 @@ import {
     AddressValue,
     ArgSerializer,
     BigUIntValue,
+    BytesValue,
+    CodeMetadataValue,
     EndpointDefinition,
     EndpointModifiers,
     NativeSerializer,
@@ -21,26 +23,38 @@ import { SmartContractTransactionsFactory } from "../smartContracts";
 import { ProposeTransferExecuteContractInput } from "./proposeTransferExecuteContractInput";
 import * as resources from "./resources";
 
+interface IConfig {
+    chainID: string;
+    addressHrp: string;
+    minGasLimit: bigint;
+    gasLimitPerByte: bigint;
+}
+
 /**
  * Use this class to create multisig related transactions like creating a new multisig contract,
  * proposing actions, signing actions, and performing actions.
  */
-export class MultisigTransactionsFactory extends SmartContractTransactionsFactory {
+export class MultisigTransactionsFactory {
     private readonly argSerializer: ArgSerializer;
+    private readonly smartContractFactory: SmartContractTransactionsFactory;
+    private readonly config: IConfig;
+    private readonly abi: Abi;
 
     constructor(options: { config: TransactionsFactoryConfig; abi: Abi }) {
-        super(options);
+        this.config = options.config;
+        this.abi = options.abi;
         this.argSerializer = new ArgSerializer();
+        this.smartContractFactory = new SmartContractTransactionsFactory(options);
     }
 
     /**
      * Creates a transaction to deploy a new multisig contract
      */
-    createTransactionForMultisigDeploy(sender: Address, options: resources.DeployMultisigContractInput): Transaction {
+    createTransactionForDeploy(sender: Address, options: resources.DeployMultisigContractInput): Transaction {
         const boardAddresses: AddressValue[] = options.board.map((addr) => new AddressValue(addr));
         const args = [new U32Value(options.quorum), VariadicValue.fromItems(...boardAddresses)];
 
-        return this.createTransactionForDeploy(sender, {
+        return this.smartContractFactory.createTransactionForDeploy(sender, {
             bytecode: options.bytecode,
             gasLimit: options.gasLimit,
             isUpgradeable: options.isUpgradeable,
@@ -58,76 +72,48 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         sender: Address,
         options: resources.ProposeAddBoardMemberInput,
     ): Transaction {
-        const dataParts = [
-            "proposeAddBoardMember",
-            this.argSerializer.valuesToStrings([new AddressValue(options.boardMember)])[0],
-        ];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "proposeAddBoardMember",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new AddressValue(options.boardMember)],
+        });
     }
 
     /**
      * Proposes adding a new proposer
      */
     createTransactionForProposeAddProposer(sender: Address, options: resources.ProposeAddProposerInput): Transaction {
-        const dataParts = [
-            "proposeAddProposer",
-            this.argSerializer.valuesToStrings([new AddressValue(options.proposer)])[0],
-        ];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "proposeAddProposer",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new AddressValue(options.proposer)],
+        });
     }
 
     /**
      * Proposes removing a user (board member or proposer)
      */
     createTransactionForProposeRemoveUser(sender: Address, options: resources.ProposeRemoveUserInput): Transaction {
-        const dataParts = [
-            "proposeRemoveUser",
-            this.argSerializer.valuesToStrings([new AddressValue(options.userAddress)])[0],
-        ];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "proposeRemoveUser",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new AddressValue(options.userAddress)],
+        });
     }
 
     /**
      * Proposes changing the quorum (minimum signatures required)
      */
     createTransactionForProposeChangeQuorum(sender: Address, options: resources.ProposeChangeQuorumInput): Transaction {
-        const dataParts = [
-            "proposeChangeQuorum",
-            this.argSerializer.valuesToStrings([new U32Value(options.newQuorum)])[0],
-        ];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "proposeChangeQuorum",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new U32Value(options.newQuorum)],
+        });
     }
 
     /**
@@ -145,31 +131,25 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             arguments: options.functionArguments,
             abi: options.abi,
         });
-        const dataParts = [
-            "proposeTransferExecute",
-            ...this.argSerializer.valuesToStrings([
+
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "proposeTransferExecute",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [
                 new AddressValue(options.to),
                 new BigUIntValue(options.nativeTokenAmount),
                 new OptionValue(new OptionType(new U64Type()), gasOption),
-            ]),
-            ...input.functionCall,
-        ];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+                VariadicValue.fromItems(...input.functionCall.map((value) => new BytesValue(value))),
+            ],
+        });
     }
 
     /**
      * Proposes a transaction that will transfer EGLD and/or execute a function
      */
     createTransactionForDeposit(sender: Address, options: resources.DepositExecuteInput): Transaction {
-        return this.createTransactionForExecute(sender, {
+        return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "deposit",
             gasLimit: options.gasLimit ?? 0n,
@@ -240,26 +220,18 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
             arguments: options.functionArguments,
             abi: options.abi,
         });
-        let receiver = options.multisigContract;
-        const dataParts = [
-            "proposeAsyncCall",
-            ...this.argSerializer.valuesToStrings([
+
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "proposeAsyncCall",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [
                 new AddressValue(options.to),
                 new BigUIntValue(options.nativeTransferAmount),
                 new BigUIntValue(options.gasLimit ?? 0n),
-            ]),
-            ...input.functionCall,
-        ];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: receiver,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-            amount: 0n,
-        }).build();
+                VariadicValue.fromItems(...input.functionCall.map((value) => new BytesValue(value))),
+            ],
+        });
     }
 
     /**
@@ -269,21 +241,17 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         sender: Address,
         options: resources.ProposeContractDeployFromSourceInput,
     ): Transaction {
-        const dataParts = [
-            "proposeSCDeployFromSource",
-            ...this.argSerializer.valuesToStrings([new BigUIntValue(options.amount), new AddressValue(options.source)]),
-            options.codeMetadata.toString(),
-            ...options.arguments,
-        ];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "proposeSCDeployFromSource",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [
+                new BigUIntValue(options.amount),
+                new AddressValue(options.multisigContract),
+                new CodeMetadataValue(options.codeMetadata),
+                VariadicValue.fromItems(...options.arguments.map((value) => new BytesValue(Buffer.from(value)))),
+            ],
+        });
     }
 
     /**
@@ -293,124 +261,90 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         sender: Address,
         options: resources.ProposeContractUpgradeFromSourceInput,
     ): Transaction {
-        const dataParts = [
-            "proposeSCUpgradeFromSource",
-            ...this.argSerializer.valuesToStrings([
-                new AddressValue(options.scAddress),
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "proposeSCUpgradeFromSource",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [
+                new AddressValue(options.multisigContract),
                 new BigUIntValue(options.amount),
                 new AddressValue(options.source),
-            ]),
-            options.codeMetadata.toString(),
-            ...options.arguments,
-        ];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+                new CodeMetadataValue(options.codeMetadata),
+                VariadicValue.fromItems(...options.arguments.map((value) => new BytesValue(Buffer.from(value)))),
+            ],
+        });
     }
 
     /**
      * Signs an action (by a board member)
      */
     createTransactionForSignAction(sender: Address, options: resources.ActionInput): Transaction {
-        const dataParts = ["sign", this.argSerializer.valuesToStrings([new U32Value(options.actionId)])[0]];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "sign",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new U32Value(options.actionId)],
+        });
     }
 
     /**
      * Signs all actions in a batch
      */
     createTransactionForSignBatch(sender: Address, options: resources.GroupInput): Transaction {
-        const dataParts = ["signBatch", this.argSerializer.valuesToStrings([new U32Value(options.groupId)])[0]];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "signBatch",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new U32Value(options.groupId)],
+        });
     }
 
     /**
      * Signs and performs an action in one transaction
      */
     createTransactionForSignAndPerform(sender: Address, options: resources.ActionInput): Transaction {
-        const dataParts = ["signAndPerform", this.argSerializer.valuesToStrings([new U32Value(options.actionId)])[0]];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "signAndPerform",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new U32Value(options.actionId)],
+        });
     }
 
     /**
      * Signs and performs all actions in a batch
      */
     createTransactionForSignBatchAndPerform(sender: Address, options: resources.GroupInput): Transaction {
-        const dataParts = [
-            "signBatchAndPerform",
-            this.argSerializer.valuesToStrings([new U32Value(options.groupId)])[0],
-        ];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "signBatchAndPerform",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new U32Value(options.groupId)],
+        });
     }
 
     /**
      * Withdraws signature from an action
      */
     createTransactionForUnsign(sender: Address, options: resources.ActionInput): Transaction {
-        const dataParts = ["unsign", this.argSerializer.valuesToStrings([new U32Value(options.actionId)])[0]];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "unsign",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new U32Value(options.actionId)],
+        });
     }
 
     /**
      * Withdraws signatures from all actions in a batch
      */
     createTransactionForUnsignBatch(sender: Address, options: resources.GroupInput): Transaction {
-        const dataParts = ["unsignBatch", this.argSerializer.valuesToStrings([new U32Value(options.groupId)])[0]];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "unsignBatch",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new U32Value(options.groupId)],
+        });
     }
 
     /**
@@ -420,89 +354,61 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
         sender: Address,
         options: resources.UnsignForOutdatedBoardMembersInput,
     ): Transaction {
-        const outdatedMembersArgs = options.outdatedBoardMembers.map(
-            (id) => this.argSerializer.valuesToStrings([new U32Value(id)])[0],
-        );
-
-        const dataParts = [
-            "unsignForOutdatedBoardMembers",
-            this.argSerializer.valuesToStrings([new U32Value(options.actionId)])[0],
-            ...outdatedMembersArgs,
-        ];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        const outdatedBoardMembers: U32Value[] = options.outdatedBoardMembers.map((id) => new U32Value(id));
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "unsignForOutdatedBoardMembers",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new U32Value(options.actionId), VariadicValue.fromItems(...outdatedBoardMembers)],
+        });
     }
 
     /**
      * Performs an action that has reached quorum
      */
     createTransactionForPerformAction(sender: Address, options: resources.ActionInput): Transaction {
-        const dataParts = ["performAction", this.argSerializer.valuesToStrings([new U32Value(options.actionId)])[0]];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "performAction",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new U32Value(options.actionId)],
+        });
     }
 
     /**
      * Performs all actions in a batch that have reached quorum
      */
     createTransactionForPerformBatch(sender: Address, options: resources.GroupInput): Transaction {
-        const dataParts = ["performBatch", this.argSerializer.valuesToStrings([new U32Value(options.groupId)])[0]];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "performBatch",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new U32Value(options.groupId)],
+        });
     }
 
     /**
      * Discards an action that is no longer needed
      */
     createTransactionForDiscardAction(sender: Address, options: resources.ActionInput): Transaction {
-        const dataParts = ["discardAction", this.argSerializer.valuesToStrings([new U32Value(options.actionId)])[0]];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "discardAction",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [new U32Value(options.actionId)],
+        });
     }
 
     /**
      * Discards all actions in the provided list
      */
     createTransactionForDiscardBatch(sender: Address, options: resources.DiscardBatchInput): Transaction {
-        const actionIdsArgs = options.actionIds.map((id) => this.argSerializer.valuesToStrings([new U32Value(id)])[0]);
-
-        const dataParts = ["discardBatch", ...actionIdsArgs];
-
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+        const actionIdsArgs = options.actionIds.map((id) => new U32Value(id));
+        return this.smartContractFactory.createTransactionForExecute(sender, {
+            contract: options.multisigContract,
+            function: "discardBatch",
+            gasLimit: options.gasLimit ?? 0n,
+            arguments: [VariadicValue.fromItems(...actionIdsArgs)],
+        });
     }
 }

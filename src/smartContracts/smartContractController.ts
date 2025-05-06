@@ -20,11 +20,11 @@ import * as resources from "./resources";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
 
 export class SmartContractController extends BaseController {
-    private factory: SmartContractTransactionsFactory;
+    protected factory: SmartContractTransactionsFactory;
     private parser: SmartContractTransactionsOutcomeParser;
     private transactionWatcher: TransactionWatcher;
     private networkProvider: INetworkProvider;
-    private abi?: Abi;
+    protected abi?: Abi;
 
     constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: Abi }) {
         super();

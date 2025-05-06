@@ -1,5 +1,5 @@
 import { Abi } from "../abi";
-import { TokenTransfer } from "../core";
+import { Token, TokenTransfer } from "../core";
 import { Address } from "../core/address";
 import { CodeMetadata } from "../core/codeMetadata";
 
@@ -70,14 +70,14 @@ export type ProposeAsyncCallInput = MultisigContractInput & {
     abi?: Abi;
 };
 
-export type ProposeSCDeployFromSourceInput = MultisigContractInput & {
+export type ProposeContractDeployFromSourceInput = MultisigContractInput & {
     amount: bigint;
     source: Address;
     codeMetadata: CodeMetadata;
     arguments: string[];
 };
 
-export type ProposeSCUpgradeFromSourceInput = MultisigContractInput & {
+export type ProposeContractUpgradeFromSourceInput = MultisigContractInput & {
     scAddress: Address;
     amount: bigint;
     source: Address;
@@ -100,6 +100,168 @@ export type UnsignForOutdatedBoardMembersInput = ActionInput & {
 export type DiscardBatchInput = MultisigContractInput & {
     actionIds: number[];
 };
+
+export enum UserRoleEnum {
+    None = "None",
+    Proposer = "Proposer",
+    BoardMember = "BoardMember",
+}
+
+export enum MultisigActionEnum {
+    Nothing = "Nothing",
+    AddBoardMember = "AddBoardMember",
+    AddProposer = "AddProposer",
+    RemoveUser = "RemoveUser",
+    ChangeQuorum = "ChangeQuorum",
+    SendTransferExecuteEgld = "SendTransferExecuteEgld",
+    SendTransferExecuteEsdt = "SendTransferExecuteEsdt",
+    SendAsyncCall = "SendAsyncCall",
+    SCDeployFromSource = "SCDeployFromSource",
+    SCUpgradeFromSource = "SCUpgradeFromSource",
+}
+
+export class MultisigAction {
+    public type: MultisigActionEnum = MultisigActionEnum.Nothing;
+}
+
+export type FullMultisigAction = {
+    actionId: number;
+    groupId: number;
+    signers: Address[];
+    actionData: MultisigAction;
+};
+
+export class AddBoardMember extends MultisigAction {
+    public address: Address;
+    constructor(address: Address) {
+        super();
+        this.type = MultisigActionEnum.AddBoardMember;
+        this.address = address;
+    }
+}
+export class AddProposer extends MultisigAction {
+    public address: Address;
+
+    constructor(address: Address) {
+        super();
+        this.type = MultisigActionEnum.AddProposer;
+        this.address = address;
+    }
+}
+export class RemoveUser extends MultisigAction {
+    public type: MultisigActionEnum = MultisigActionEnum.RemoveUser;
+    public address: Address;
+
+    constructor(address: Address) {
+        super();
+        this.type = MultisigActionEnum.RemoveUser;
+        this.address = address;
+    }
+}
+
+export class ChangeQuorum extends MultisigAction {
+    public quorum: number;
+
+    constructor(quorum: number) {
+        super();
+        this.type = MultisigActionEnum.ChangeQuorum;
+        this.quorum = quorum;
+    }
+}
+
+export class SendTransferExecuteEgld extends MultisigAction {
+    receiver: Address;
+    amount: bigint;
+    optionalGasLimit?: number;
+    funcionName: string;
+    arguments: Uint8Array[];
+
+    constructor(data: any) {
+        super();
+        this.type = MultisigActionEnum.SendTransferExecuteEgld;
+        this.receiver = data.to;
+        this.amount = data.egld_amount;
+        this.optionalGasLimit = data.opt_gas_limit;
+        this.funcionName = data.endpoint_name.toString();
+        this.arguments = data.arguments;
+    }
+}
+export class SendTransferExecuteEsdt extends MultisigAction {
+    receiver: Address;
+    tokens: TokenTransfer[];
+    optionalGasLimit?: number;
+    funcionName: string;
+    arguments: Uint8Array[];
+
+    constructor(data: any) {
+        super();
+        this.type = MultisigActionEnum.SendTransferExecuteEsdt;
+        this.receiver = data.to;
+        this.tokens = data.tokens.map(
+            (token: { token_identifier: string; nonce: bigint; amount: bigint }) =>
+                new TokenTransfer({
+                    token: new Token({ identifier: token.token_identifier, nonce: token.nonce }),
+                    amount: token.amount,
+                }),
+        );
+        this.optionalGasLimit = data.opt_gas_limit;
+
+        this.funcionName = Buffer.from(data.endpoint_name.toString(), "hex").toString();
+        this.arguments = data.arguments;
+    }
+}
+
+export class SendAsyncCall extends MultisigAction {
+    receiver: Address;
+    amount: bigint;
+    optionalGasLimit?: number;
+    funcionName: string;
+    arguments: Uint8Array[];
+
+    constructor(data: any) {
+        super();
+        this.type = MultisigActionEnum.SendAsyncCall;
+        this.receiver = data.to;
+        this.amount = data.egld_amount;
+        this.optionalGasLimit = data.opt_gas_limit;
+        this.funcionName = data.endpoint_name.toString();
+        this.arguments = data.arguments;
+    }
+}
+
+export class SCDeployFromSource extends MultisigAction {
+    sourceContract: Address;
+    amount: bigint;
+    codeMetadata: CodeMetadata;
+    arguments: Uint8Array[];
+
+    constructor(data: any) {
+        super();
+        this.type = MultisigActionEnum.SCDeployFromSource;
+        this.sourceContract = data[1];
+        this.amount = data[0];
+        this.codeMetadata = data[2];
+        this.arguments = data[3];
+    }
+}
+
+export class SCUpgradeFromSource extends MultisigAction {
+    sourceContract: Address;
+    destinationContract: Address;
+    amount: bigint;
+    codeMetadata: CodeMetadata;
+    arguments: Uint8Array[];
+
+    constructor(data: any) {
+        super();
+        this.type = MultisigActionEnum.SCUpgradeFromSource;
+        this.destinationContract = data[0];
+        this.amount = data[1];
+        this.sourceContract = data[2];
+        this.codeMetadata = data[3];
+        this.arguments = data[4];
+    }
+}
 
 export type CallActionData = {
     receiver: Address;

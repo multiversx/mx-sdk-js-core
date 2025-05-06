@@ -1,7 +1,5 @@
 import { Abi } from "../abi";
-import { TransactionOnNetwork } from "../core";
-import { Address } from "../core/address";
-import { Err } from "../core/errors";
+import { Address, TransactionOnNetwork } from "../core";
 import { SmartContractDeployOutcome } from "../smartContracts/resources";
 import { SmartContractTransactionsOutcomeParser } from "../transactionsOutcomeParsers";
 
@@ -22,7 +20,7 @@ export class MultisigTransactionsOutcomeParser {
      * @param transactionOnNetwork The completed transaction
      * @returns An array of objects containing the new contract addresses
      */
-    parseDeployMultisigContract(transactionOnNetwork: TransactionOnNetwork): SmartContractDeployOutcome {
+    parseDeploy(transactionOnNetwork: TransactionOnNetwork): SmartContractDeployOutcome {
         return this.parser.parseDeploy({ transactionOnNetwork });
     }
 
@@ -31,60 +29,20 @@ export class MultisigTransactionsOutcomeParser {
      * @param transactionOnNetwork The completed transaction
      * @returns The action ID that was created
      */
-    parseActionProposal(transactionOnNetwork: TransactionOnNetwork): number {
+    parseProposeAction(transactionOnNetwork: TransactionOnNetwork): number {
         const result = this.parser.parseExecute({ transactionOnNetwork });
 
         return result.values[0];
     }
 
     /**
-     * Parses the outcome of a query to get the multisig contract's pending actions
-     * @param queryResponse The query response
-     * @returns The list of pending action IDs
+     * Parses the outcome of a multisig action proposal
+     * @param transactionOnNetwork The completed transaction
+     * @returns In case of scDeploy returns address else undefined
      */
-    parsePendingActionIds(queryResponse: string[]): number[] {
-        try {
-            if (!queryResponse || queryResponse.length === 0) {
-                return [];
-            }
+    parsePerformAction(transactionOnNetwork: TransactionOnNetwork): Address | undefined {
+        const result = this.parser.parseExecute({ transactionOnNetwork });
 
-            // Assuming each element in the response is a base64 encoded action ID
-            return queryResponse.map((item) => {
-                const buffer = Buffer.from(item, "base64");
-                return parseInt(buffer.toString("hex"), 16);
-            });
-        } catch (error) {
-            throw new Error(`Error parsing pending action IDs: ${error}`);
-        }
-    }
-
-    /**
-     * Parses the outcome of a query to get the multisig contract's board members
-     * @param queryResponse The query response
-     * @returns The list of board member addresses
-     */
-    parseBoardMembers(queryResponse: string[]): Address[] {
-        if (!queryResponse || queryResponse.length === 0) {
-            return [];
-        }
-
-        return queryResponse.map((item) => {
-            const buffer = Buffer.from(item, "base64");
-            return new Address(buffer);
-        });
-    }
-
-    /**
-     * Parses the outcome of a query to get the multisig contract's quorum
-     * @param queryResponse The query response
-     * @returns The quorum value
-     */
-    parseQuorum(queryResponse: string[]): number {
-        if (!queryResponse || queryResponse.length === 0) {
-            throw new Err("No return data available");
-        }
-
-        const buffer = Buffer.from(queryResponse[0], "base64");
-        return parseInt(buffer.toString("hex"), 16);
+        return result.values[0];
     }
 }

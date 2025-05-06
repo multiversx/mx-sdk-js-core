@@ -221,7 +221,7 @@ describe("test multisig controller query methods", () => {
             "userRole",
             new SmartContractQueryResponse({
                 function: "userRole",
-                returnDataParts: [Buffer.from("01", "hex")], // 1 = BOARD_MEMBER, for example
+                returnDataParts: [Buffer.from("01", "hex")], // 1 = PROPOSER, for example
                 returnCode: "ok",
                 returnMessage: "ok",
             }),
@@ -232,7 +232,7 @@ describe("test multisig controller query methods", () => {
             userAddress: mockBoardMemberAddress,
         });
 
-        assert.equal(result, "Proposer"); // 1 could be board member role
+        assert.equal(result, "Proposer"); // 1 could be proposer member role
     });
 
     it("getAllBoardMembers returns all board members as address array", async function () {

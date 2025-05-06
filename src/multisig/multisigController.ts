@@ -617,39 +617,12 @@ export class MultisigController extends SmartContractController {
     /**
      * Creates a transaction for proposing to deploy a smart contract from source
      */
-    async createTransactionForProposeSCDeployFromSource(
+    async createTransactionForProposeContractDeployFromSource(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ProposeSCDeployFromSourceInput & BaseControllerInput,
+        options: resources.ProposeContractDeployFromSourceInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeSCDeployFromSource(sender.address, options);
-
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        transaction.signature = await sender.signTransaction(transaction);
-
-        return transaction;
-    }
-
-    /**
-     * Awaits the completion of a propose SC deploy from source action
-     */
-    async awaitCompletedProposeSCDeployFromSource(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseProposeAction(transaction);
-    }
-
-    /**
-     * Creates a transaction for proposing to upgrade a smart contract from source
-     */
-    async createTransactionForProposeSCUpgradeFromSource(
-        sender: IAccount,
-        nonce: bigint,
-        options: resources.ProposeSCUpgradeFromSourceInput & BaseControllerInput,
-    ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeSCUpgradeFromSource(
+        const transaction = this.multisigFactory.createTransactionForProposeContractDeployFromSource(
             sender.address,
             options,
         );
@@ -664,9 +637,39 @@ export class MultisigController extends SmartContractController {
     }
 
     /**
-     * Awaits the completion of a propose SC upgrade from source action
+     * Awaits the completion of a propose Contract deploy from source action
      */
-    async awaitCompletedProposeSCUpgradeFromSource(txHash: string): Promise<number> {
+    async awaitCompletedProposeContractDeployFromSource(txHash: string): Promise<number> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.multisigParser.parseProposeAction(transaction);
+    }
+
+    /**
+     * Creates a transaction for proposing to upgrade a smart contract from source
+     */
+    async createTransactionForProposeContractUpgradeFromSource(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.ProposeContractUpgradeFromSourceInput & BaseControllerInput,
+    ): Promise<Transaction> {
+        const transaction = this.multisigFactory.createTransactionForProposeContractUpgradeFromSource(
+            sender.address,
+            options,
+        );
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.setTransactionGasOptions(transaction, options);
+        transaction.signature = await sender.signTransaction(transaction);
+
+        return transaction;
+    }
+
+    /**
+     * Awaits the completion of a propose Contract upgrade from source action
+     */
+    async awaitCompletedProposeContractUpgradeFromSource(txHash: string): Promise<number> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.multisigParser.parseProposeAction(transaction);
     }

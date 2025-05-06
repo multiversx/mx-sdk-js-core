@@ -70,14 +70,14 @@ export type ProposeAsyncCallInput = MultisigContractInput & {
     abi?: Abi;
 };
 
-export type ProposeSCDeployFromSourceInput = MultisigContractInput & {
+export type ProposeContractDeployFromSourceInput = MultisigContractInput & {
     amount: bigint;
     source: Address;
     codeMetadata: CodeMetadata;
     arguments: string[];
 };
 
-export type ProposeSCUpgradeFromSourceInput = MultisigContractInput & {
+export type ProposeContractUpgradeFromSourceInput = MultisigContractInput & {
     scAddress: Address;
     amount: bigint;
     source: Address;

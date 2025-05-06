@@ -28,7 +28,7 @@ import * as resources from "./resources";
 export class MultisigTransactionsFactory extends SmartContractTransactionsFactory {
     private readonly argSerializer: ArgSerializer;
 
-    constructor(options: { config: TransactionsFactoryConfig; abi?: Abi }) {
+    constructor(options: { config: TransactionsFactoryConfig; abi: Abi }) {
         super(options);
         this.argSerializer = new ArgSerializer();
     }
@@ -265,9 +265,9 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     /**
      * Proposes deploying a smart contract from source
      */
-    createTransactionForProposeSCDeployFromSource(
+    createTransactionForProposeContractDeployFromSource(
         sender: Address,
-        options: resources.ProposeSCDeployFromSourceInput,
+        options: resources.ProposeContractDeployFromSourceInput,
     ): Transaction {
         const dataParts = [
             "proposeSCDeployFromSource",
@@ -289,9 +289,9 @@ export class MultisigTransactionsFactory extends SmartContractTransactionsFactor
     /**
      * Proposes upgrading a smart contract from source
      */
-    createTransactionForProposeSCUpgradeFromSource(
+    createTransactionForProposeContractUpgradeFromSource(
         sender: Address,
-        options: resources.ProposeSCUpgradeFromSourceInput,
+        options: resources.ProposeContractUpgradeFromSourceInput,
     ): Transaction {
         const dataParts = [
             "proposeSCUpgradeFromSource",

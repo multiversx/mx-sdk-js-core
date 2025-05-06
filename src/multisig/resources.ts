@@ -70,14 +70,14 @@ export type ProposeAsyncCallInput = MultisigContractInput & {
     abi?: Abi;
 };
 
-export type ProposeSCDeployFromSourceInput = MultisigContractInput & {
+export type ProposeContractDeployFromSourceInput = MultisigContractInput & {
     amount: bigint;
     source: Address;
     codeMetadata: CodeMetadata;
     arguments: string[];
 };
 
-export type ProposeSCUpgradeFromSourceInput = MultisigContractInput & {
+export type ProposeContractUpgradeFromSourceInput = MultisigContractInput & {
     scAddress: Address;
     amount: bigint;
     source: Address;
@@ -198,7 +198,7 @@ export class SendTransferExecuteEsdt extends MultisigAction {
         this.type = MultisigActionEnum.SendTransferExecuteEsdt;
         this.receiver = data.to;
         this.tokens = data.tokens.map(
-            (token: { token_identifier: any; nonce: any; amount: any }) =>
+            (token: { token_identifier: string; nonce: bigint; amount: bigint }) =>
                 new TokenTransfer({
                     token: new Token({ identifier: token.token_identifier, nonce: token.nonce }),
                     amount: token.amount,

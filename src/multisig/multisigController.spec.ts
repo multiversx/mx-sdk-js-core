@@ -9,10 +9,7 @@ describe("test multisig controller query methods", () => {
     const mockBoardMemberAddress = "erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx";
     const mockProposerAddress = "erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8";
     let networkProvider = new MockNetworkProvider();
-    let controller = new MultisigController({
-        chainID: "D",
-        networkProvider: networkProvider,
-    });
+    let controller: MultisigController;
 
     beforeEach(async function () {
         networkProvider = new MockNetworkProvider();
@@ -224,7 +221,7 @@ describe("test multisig controller query methods", () => {
             "userRole",
             new SmartContractQueryResponse({
                 function: "userRole",
-                returnDataParts: [Buffer.from("01", "hex")], // 1 = BOARD_MEMBER, for example
+                returnDataParts: [Buffer.from("01", "hex")], // 1 = PROPOSER, for example
                 returnCode: "ok",
                 returnMessage: "ok",
             }),
@@ -235,7 +232,7 @@ describe("test multisig controller query methods", () => {
             userAddress: mockBoardMemberAddress,
         });
 
-        assert.equal(result, "Proposer"); // 1 could be board member role
+        assert.equal(result, "Proposer"); // 1 could be proposer member role
     });
 
     it("getAllBoardMembers returns all board members as address array", async function () {

@@ -19,7 +19,7 @@ export class MultisigController extends SmartContractController {
     private multisigFactory: MultisigTransactionsFactory;
     private multisigParser: MultisigTransactionsOutcomeParser;
 
-    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: Abi }) {
+    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi: Abi }) {
         super(options);
         this.abi = options.abi;
         this.transactionAwaiter = new TransactionWatcher(options.networkProvider);
@@ -314,7 +314,7 @@ export class MultisigController extends SmartContractController {
      */
     async awaitCompletedProposeAddBoardMember(txHash: string): Promise<number> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseActionProposal(transaction);
+        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**
@@ -341,7 +341,7 @@ export class MultisigController extends SmartContractController {
      */
     async awaitCompletedProposeAddProposer(txHash: string): Promise<number> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseActionProposal(transaction);
+        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**
@@ -368,7 +368,7 @@ export class MultisigController extends SmartContractController {
      */
     async awaitCompletedProposeRemoveUser(txHash: string): Promise<number> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseActionProposal(transaction);
+        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**
@@ -395,7 +395,7 @@ export class MultisigController extends SmartContractController {
      */
     async awaitCompletedProposeChangeQuorum(txHash: string): Promise<number> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseActionProposal(transaction);
+        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**
@@ -446,8 +446,9 @@ export class MultisigController extends SmartContractController {
     /**
      * Awaits the completion of a perform action
      */
-    async awaitCompletedPerformAction(txHash: string): Promise<void> {
-        await this.transactionAwaiter.awaitCompleted(txHash);
+    async awaitCompletedPerformAction(txHash: string): Promise<Address | undefined> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.multisigParser.parsePerformAction(transaction);
     }
 
     /**
@@ -526,7 +527,7 @@ export class MultisigController extends SmartContractController {
      */
     async awaitCompletedDepositExecute(txHash: string): Promise<number> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseActionProposal(transaction);
+        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**
@@ -553,7 +554,7 @@ export class MultisigController extends SmartContractController {
      */
     async awaitCompletedProposeTransferExecute(txHash: string): Promise<number> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseActionProposal(transaction);
+        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**
@@ -583,7 +584,7 @@ export class MultisigController extends SmartContractController {
      */
     async awaitCompletedProposeTransferExecuteEsdt(txHash: string): Promise<number> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseActionProposal(transaction);
+        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**
@@ -610,45 +611,18 @@ export class MultisigController extends SmartContractController {
      */
     async awaitCompletedProposeAsyncCall(txHash: string): Promise<number> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseActionProposal(transaction);
+        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**
      * Creates a transaction for proposing to deploy a smart contract from source
      */
-    async createTransactionForProposeSCDeployFromSource(
+    async createTransactionForProposeContractDeployFromSource(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ProposeSCDeployFromSourceInput & BaseControllerInput,
+        options: resources.ProposeContractDeployFromSourceInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeSCDeployFromSource(sender.address, options);
-
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        transaction.signature = await sender.signTransaction(transaction);
-
-        return transaction;
-    }
-
-    /**
-     * Awaits the completion of a propose SC deploy from source action
-     */
-    async awaitCompletedProposeSCDeployFromSource(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseActionProposal(transaction);
-    }
-
-    /**
-     * Creates a transaction for proposing to upgrade a smart contract from source
-     */
-    async createTransactionForProposeSCUpgradeFromSource(
-        sender: IAccount,
-        nonce: bigint,
-        options: resources.ProposeSCUpgradeFromSourceInput & BaseControllerInput,
-    ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeSCUpgradeFromSource(
+        const transaction = this.multisigFactory.createTransactionForProposeContractDeployFromSource(
             sender.address,
             options,
         );
@@ -663,11 +637,41 @@ export class MultisigController extends SmartContractController {
     }
 
     /**
-     * Awaits the completion of a propose SC upgrade from source action
+     * Awaits the completion of a propose Contract deploy from source action
      */
-    async awaitCompletedProposeSCUpgradeFromSource(txHash: string): Promise<number> {
+    async awaitCompletedProposeContractDeployFromSource(txHash: string): Promise<number> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseActionProposal(transaction);
+        return this.multisigParser.parseProposeAction(transaction);
+    }
+
+    /**
+     * Creates a transaction for proposing to upgrade a smart contract from source
+     */
+    async createTransactionForProposeContractUpgradeFromSource(
+        sender: IAccount,
+        nonce: bigint,
+        options: resources.ProposeContractUpgradeFromSourceInput & BaseControllerInput,
+    ): Promise<Transaction> {
+        const transaction = this.multisigFactory.createTransactionForProposeContractUpgradeFromSource(
+            sender.address,
+            options,
+        );
+
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.setTransactionGasOptions(transaction, options);
+        transaction.signature = await sender.signTransaction(transaction);
+
+        return transaction;
+    }
+
+    /**
+     * Awaits the completion of a propose Contract upgrade from source action
+     */
+    async awaitCompletedProposeContractUpgradeFromSource(txHash: string): Promise<number> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**

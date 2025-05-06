@@ -290,7 +290,7 @@ describe("test multisig transactions factory", function () {
             "erd1qqqqqqqqqqqqqpgq0cjuum0t436gmp446wf3yz43avp2gm2czeus8mctaf",
         );
 
-        const transaction = factory.createTransactionForProposeSCDeployFromSource(senderAddress, {
+        const transaction = factory.createTransactionForProposeContractDeployFromSource(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             amount: amount,
@@ -318,7 +318,7 @@ describe("test multisig transactions factory", function () {
             "erd1qqqqqqqqqqqqqpgq0cjuum0t436gmp446wf3yz43avp2gm2czeus8mctaf",
         );
 
-        const transaction = factory.createTransactionForProposeSCUpgradeFromSource(senderAddress, {
+        const transaction = factory.createTransactionForProposeContractUpgradeFromSource(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             scAddress: multisigContractAddress,

@@ -23,8 +23,8 @@ interface IConfig {
  * Use this class to create transactions to deploy, call or upgrade a smart contract.
  */
 export class SmartContractTransactionsFactory {
-    protected readonly config: IConfig;
-    protected readonly abi?: Abi;
+    private readonly config: IConfig;
+    private readonly abi?: Abi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
     private readonly contractDeployAddress: Address;

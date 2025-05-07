@@ -160,6 +160,7 @@ describe("test multisig transactions factory", function () {
             to: destinationContract,
             functionName: "add",
             functionArguments: [7],
+            optGasLimit: 5000000n,
             abi: adderAbi,
         });
 
@@ -194,6 +195,7 @@ describe("test multisig transactions factory", function () {
             tokens: [tokenTransfer],
             functionName: "distribute",
             functionArguments: [],
+            optGasLimit: 5000000n,
         });
 
         assert.instanceOf(transaction, Transaction);
@@ -223,6 +225,7 @@ describe("test multisig transactions factory", function () {
             functionArguments: [7],
             tokenTransfers: [],
             abi: adderAbi,
+            optGasLimit: 5000000n,
         });
 
         assert.instanceOf(transaction, Transaction);

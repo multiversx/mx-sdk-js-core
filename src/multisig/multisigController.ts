@@ -6,11 +6,12 @@ import {
     BaseControllerInput,
     IAccount,
     Transaction,
+    TransactionOnNetwork,
     TransactionsFactoryConfig,
     TransactionWatcher,
 } from "../core";
 import { INetworkProvider } from "../networkProviders/interface";
-import { SmartContractController } from "../smartContracts";
+import { SmartContractController, SmartContractDeployOutcome } from "../smartContracts";
 import { MultisigTransactionsFactory } from "./multisigTransactionsFactory";
 import { MultisigTransactionsOutcomeParser } from "./multisigTransactionsOutcomeParser";
 import * as resources from "./resources";
@@ -53,6 +54,15 @@ export class MultisigController extends BaseController {
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
+    }
+
+    parseDeploy(transactionOnNetwork: TransactionOnNetwork): SmartContractDeployOutcome {
+        return this.multisigParser.parseDeploy(transactionOnNetwork);
+    }
+
+    async awaitCompletedDeploy(txHash: string): Promise<SmartContractDeployOutcome> {
+        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
+        return this.parseDeploy(transaction);
     }
 
     /**
@@ -314,14 +324,6 @@ export class MultisigController extends BaseController {
     }
 
     /**
-     * Awaits the completion of a propose add board member action
-     */
-    async awaitCompletedProposeAddBoardMember(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseProposeAction(transaction);
-    }
-
-    /**
      * Creates a transaction for proposing to add a proposer
      */
     async createTransactionForProposeAddProposer(
@@ -338,14 +340,6 @@ export class MultisigController extends BaseController {
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
-    }
-
-    /**
-     * Awaits the completion of a propose add proposer action
-     */
-    async awaitCompletedProposeAddProposer(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**
@@ -368,14 +362,6 @@ export class MultisigController extends BaseController {
     }
 
     /**
-     * Awaits the completion of a propose remove user action
-     */
-    async awaitCompletedProposeRemoveUser(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseProposeAction(transaction);
-    }
-
-    /**
      * Creates a transaction for proposing to change quorum
      */
     async createTransactionForProposeChangeQuorum(
@@ -394,10 +380,11 @@ export class MultisigController extends BaseController {
         return transaction;
     }
 
-    /**
-     * Awaits the completion of a propose change quorum action
-     */
-    async awaitCompletedProposeChangeQuorum(txHash: string): Promise<number> {
+    parseProposeAction(transaction: TransactionOnNetwork): number {
+        return this.multisigParser.parseProposeAction(transaction);
+    }
+
+    async awaitCompletedProposeAction(txHash: string): Promise<number> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.multisigParser.parseProposeAction(transaction);
     }
@@ -422,13 +409,6 @@ export class MultisigController extends BaseController {
     }
 
     /**
-     * Awaits the completion of a sign action
-     */
-    async awaitCompletedSignAction(txHash: string): Promise<void> {
-        await this.transactionAwaiter.awaitCompleted(txHash);
-    }
-
-    /**
      * Creates a transaction for performing an action
      */
     async createTransactionForPerformAction(
@@ -447,9 +427,10 @@ export class MultisigController extends BaseController {
         return transaction;
     }
 
-    /**
-     * Awaits the completion of a perform action
-     */
+    parsePerformAction(transaction: TransactionOnNetwork): Address | undefined {
+        return this.multisigParser.parsePerformAction(transaction);
+    }
+
     async awaitCompletedPerformAction(txHash: string): Promise<Address | undefined> {
         const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
         return this.multisigParser.parsePerformAction(transaction);
@@ -475,13 +456,6 @@ export class MultisigController extends BaseController {
     }
 
     /**
-     * Awaits the completion of an unsign action
-     */
-    async awaitCompletedUnsignAction(txHash: string): Promise<void> {
-        await this.transactionAwaiter.awaitCompleted(txHash);
-    }
-
-    /**
      * Creates a transaction for discarding an action
      */
     async createTransactionForDiscardAction(
@@ -498,13 +472,6 @@ export class MultisigController extends BaseController {
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
-    }
-
-    /**
-     * Awaits the completion of a discard action
-     */
-    async awaitCompletedDiscardAction(txHash: string): Promise<void> {
-        await this.transactionAwaiter.awaitCompleted(txHash);
     }
 
     /**
@@ -527,14 +494,6 @@ export class MultisigController extends BaseController {
     }
 
     /**
-     * Awaits the completion of a propose transfer execute action
-     */
-    async awaitCompletedDepositExecute(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseProposeAction(transaction);
-    }
-
-    /**
      * Creates a transaction for proposing to transfer EGLD and execute a smart contract call
      */
     async createTransactionForProposeTransferExecute(
@@ -551,14 +510,6 @@ export class MultisigController extends BaseController {
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
-    }
-
-    /**
-     * Awaits the completion of a propose transfer execute action
-     */
-    async awaitCompletedProposeTransferExecute(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**
@@ -584,14 +535,6 @@ export class MultisigController extends BaseController {
     }
 
     /**
-     * Awaits the completion of a propose transfer execute ESDT action
-     */
-    async awaitCompletedProposeTransferExecuteEsdt(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseProposeAction(transaction);
-    }
-
-    /**
      * Creates a transaction for proposing an async call to another contract
      */
     async createTransactionForProposeAsyncCall(
@@ -608,14 +551,6 @@ export class MultisigController extends BaseController {
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
-    }
-
-    /**
-     * Awaits the completion of a propose async call action
-     */
-    async awaitCompletedProposeAsyncCall(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseProposeAction(transaction);
     }
 
     /**
@@ -641,14 +576,6 @@ export class MultisigController extends BaseController {
     }
 
     /**
-     * Awaits the completion of a propose Contract deploy from source action
-     */
-    async awaitCompletedProposeContractDeployFromSource(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseProposeAction(transaction);
-    }
-
-    /**
      * Creates a transaction for proposing to upgrade a smart contract from source
      */
     async createTransactionForProposeContractUpgradeFromSource(
@@ -671,14 +598,6 @@ export class MultisigController extends BaseController {
     }
 
     /**
-     * Awaits the completion of a propose Contract upgrade from source action
-     */
-    async awaitCompletedProposeContractUpgradeFromSource(txHash: string): Promise<number> {
-        const transaction = await this.transactionAwaiter.awaitCompleted(txHash);
-        return this.multisigParser.parseProposeAction(transaction);
-    }
-
-    /**
      * Creates a transaction for signing a batch of actions
      */
     async createTransactionForSignBatch(
@@ -698,13 +617,6 @@ export class MultisigController extends BaseController {
     }
 
     /**
-     * Awaits the completion of a sign batch action
-     */
-    async awaitCompletedSignBatch(txHash: string): Promise<void> {
-        await this.transactionAwaiter.awaitCompleted(txHash);
-    }
-
-    /**
      * Creates a transaction for signing and performing an action in one step
      */
     async createTransactionForSignAndPerform(
@@ -721,13 +633,6 @@ export class MultisigController extends BaseController {
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
-    }
-
-    /**
-     * Awaits the completion of a sign and perform action
-     */
-    async awaitCompletedSignAndPerform(txHash: string): Promise<void> {
-        await this.transactionAwaiter.awaitCompleted(txHash);
     }
 
     /**
@@ -753,13 +658,6 @@ export class MultisigController extends BaseController {
     }
 
     /**
-     * Awaits the completion of an unsign for outdated board members action
-     */
-    async awaitCompletedUnsignForOutdatedBoardMembers(txHash: string): Promise<void> {
-        await this.transactionAwaiter.awaitCompleted(txHash);
-    }
-
-    /**
      * Creates a transaction for performing a batch of actions
      */
     async createTransactionForPerformBatch(
@@ -779,13 +677,6 @@ export class MultisigController extends BaseController {
     }
 
     /**
-     * Awaits the completion of a perform action batch
-     */
-    async awaitCompletedPerformActionBatch(txHash: string): Promise<void> {
-        await this.transactionAwaiter.awaitCompleted(txHash);
-    }
-
-    /**
      * Creates a transaction for discarding a batch of actions
      */
     async createTransactionForDiscardBatch(
@@ -802,13 +693,6 @@ export class MultisigController extends BaseController {
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
-    }
-
-    /**
-     * Awaits the completion of a discard batch action
-     */
-    async awaitCompletedDiscardBatch(txHash: string): Promise<void> {
-        await this.transactionAwaiter.awaitCompleted(txHash);
     }
 
     private mapResponseToAction = (responseData: any): resources.MultisigAction => {

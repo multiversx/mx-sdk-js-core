@@ -6,7 +6,6 @@ import {
     BytesValue,
     CodeMetadataValue,
     EndpointDefinition,
-    EndpointModifiers,
     isTyped,
     NativeSerializer,
     OptionType,
@@ -77,8 +76,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeAddBoardMember",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new AddressValue(options.boardMember)],
+            gasLimit: options.gasLimit,
+            arguments: [options.boardMember],
         });
     }
 
@@ -89,8 +88,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeAddProposer",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new AddressValue(options.proposer)],
+            gasLimit: options.gasLimit,
+            arguments: [options.proposer],
         });
     }
 
@@ -101,8 +100,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeRemoveUser",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new AddressValue(options.userAddress)],
+            gasLimit: options.gasLimit,
+            arguments: [options.userAddress],
         });
     }
 
@@ -113,8 +112,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeChangeQuorum",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new U32Value(options.newQuorum)],
+            gasLimit: options.gasLimit,
+            arguments: [options.newQuorum],
         });
     }
 
@@ -125,7 +124,7 @@ export class MultisigTransactionsFactory {
         sender: Address,
         options: resources.ProposeTransferExecuteInput,
     ): Transaction {
-        const gasOption = new U64Value(options.gasLimit);
+        const gasOption = new U64Value(options.optGasLimit ?? 0n);
         const input = ProposeTransferExecuteContractInput.newFromTransferExecuteInput({
             multisig: options.multisigContract,
             to: options.to,
@@ -137,7 +136,7 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeTransferExecute",
-            gasLimit: options.gasLimit ?? 0n,
+            gasLimit: options.gasLimit,
             arguments: [
                 new AddressValue(options.to),
                 new BigUIntValue(options.nativeTokenAmount),
@@ -154,7 +153,7 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "deposit",
-            gasLimit: options.gasLimit ?? 0n,
+            gasLimit: options.gasLimit,
             arguments: [],
             nativeTransferAmount: options.nativeTokenAmount,
             tokenTransfers: options.tokenTransfers,
@@ -181,9 +180,8 @@ export class MultisigTransactionsFactory {
             "proposeTransferExecuteEsdt",
             ...this.argSerializer.valuesToStrings(
                 NativeSerializer.nativeToTypedValues(
-                    [options.to, tokenPayments, options.gasLimit, VariadicValue.fromItems(...input.functionCall)],
-                    this.abi?.getEndpoint("proposeTransferExecuteEsdt") ??
-                        new EndpointDefinition("proposeTransferExecuteEsdt", [], [], new EndpointModifiers("", [])),
+                    [options.to, tokenPayments, options.optGasLimit, VariadicValue.fromItems(...input.functionCall)],
+                    this.abi.getEndpoint("proposeTransferExecuteEsdt"),
                 ),
             ),
         ];
@@ -226,11 +224,11 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeAsyncCall",
-            gasLimit: options.gasLimit ?? 0n,
+            gasLimit: options.gasLimit,
             arguments: [
                 new AddressValue(options.to),
                 new BigUIntValue(options.nativeTransferAmount),
-                new BigUIntValue(options.gasLimit ?? 0n),
+                new BigUIntValue(options.optGasLimit ?? 0n),
                 VariadicValue.fromItems(...input.functionCall.map((value) => new BytesValue(value))),
             ],
         });
@@ -247,7 +245,7 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeSCDeployFromSource",
-            gasLimit: options.gasLimit ?? 0n,
+            gasLimit: options.gasLimit,
             arguments: [
                 new BigUIntValue(options.amount),
                 new AddressValue(options.multisigContract),
@@ -268,7 +266,7 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeSCUpgradeFromSource",
-            gasLimit: options.gasLimit ?? 0n,
+            gasLimit: options.gasLimit,
             arguments: [
                 new AddressValue(options.multisigContract),
                 new BigUIntValue(options.amount),
@@ -286,8 +284,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "sign",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new U32Value(options.actionId)],
+            gasLimit: options.gasLimit,
+            arguments: [options.actionId],
         });
     }
 
@@ -298,8 +296,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "signBatch",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new U32Value(options.groupId)],
+            gasLimit: options.gasLimit,
+            arguments: [options.groupId],
         });
     }
 
@@ -310,8 +308,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "signAndPerform",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new U32Value(options.actionId)],
+            gasLimit: options.gasLimit,
+            arguments: [options.actionId],
         });
     }
 
@@ -322,8 +320,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "signBatchAndPerform",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new U32Value(options.groupId)],
+            gasLimit: options.gasLimit,
+            arguments: [options.groupId],
         });
     }
 
@@ -334,8 +332,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "unsign",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new U32Value(options.actionId)],
+            gasLimit: options.gasLimit,
+            arguments: [options.actionId],
         });
     }
 
@@ -346,8 +344,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "unsignBatch",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new U32Value(options.groupId)],
+            gasLimit: options.gasLimit,
+            arguments: [options.groupId],
         });
     }
 
@@ -362,7 +360,7 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "unsignForOutdatedBoardMembers",
-            gasLimit: options.gasLimit ?? 0n,
+            gasLimit: options.gasLimit,
             arguments: [new U32Value(options.actionId), VariadicValue.fromItems(...outdatedBoardMembers)],
         });
     }
@@ -374,8 +372,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "performAction",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new U32Value(options.actionId)],
+            gasLimit: options.gasLimit,
+            arguments: [options.actionId],
         });
     }
 
@@ -386,8 +384,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "performBatch",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new U32Value(options.groupId)],
+            gasLimit: options.gasLimit,
+            arguments: [options.groupId],
         });
     }
 
@@ -398,8 +396,8 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "discardAction",
-            gasLimit: options.gasLimit ?? 0n,
-            arguments: [new U32Value(options.actionId)],
+            gasLimit: options.gasLimit,
+            arguments: [options.actionId],
         });
     }
 
@@ -411,7 +409,7 @@ export class MultisigTransactionsFactory {
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "discardBatch",
-            gasLimit: options.gasLimit ?? 0n,
+            gasLimit: options.gasLimit,
             arguments: [VariadicValue.fromItems(...actionIdsArgs)],
         });
     }

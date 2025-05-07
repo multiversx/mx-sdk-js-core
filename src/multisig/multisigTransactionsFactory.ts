@@ -125,7 +125,7 @@ export class MultisigTransactionsFactory {
         sender: Address,
         options: resources.ProposeTransferExecuteInput,
     ): Transaction {
-        const gasOption = new U64Value(options.gasLimit);
+        const gasOption = new U64Value(options.optGasLimit ?? 0n);
         const input = ProposeTransferExecuteContractInput.newFromTransferExecuteInput({
             multisig: options.multisigContract,
             to: options.to,
@@ -181,7 +181,7 @@ export class MultisigTransactionsFactory {
             "proposeTransferExecuteEsdt",
             ...this.argSerializer.valuesToStrings(
                 NativeSerializer.nativeToTypedValues(
-                    [options.to, tokenPayments, options.gasLimit, VariadicValue.fromItems(...input.functionCall)],
+                    [options.to, tokenPayments, options.optGasLimit, VariadicValue.fromItems(...input.functionCall)],
                     this.abi?.getEndpoint("proposeTransferExecuteEsdt") ??
                         new EndpointDefinition("proposeTransferExecuteEsdt", [], [], new EndpointModifiers("", [])),
                 ),
@@ -230,7 +230,7 @@ export class MultisigTransactionsFactory {
             arguments: [
                 new AddressValue(options.to),
                 new BigUIntValue(options.nativeTransferAmount),
-                new BigUIntValue(options.gasLimit ?? 0n),
+                new BigUIntValue(options.optGasLimit ?? 0n),
                 VariadicValue.fromItems(...input.functionCall.map((value) => new BytesValue(value))),
             ],
         });

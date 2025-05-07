@@ -66,7 +66,7 @@ export type ProposeAsyncCallInput = MultisigContractInput & {
     tokenTransfers: TokenTransfer[];
     functionName: string;
     functionArguments: any[];
-    gasLimit: bigint;
+    optGasLimit?: bigint;
     abi?: Abi;
 };
 

@@ -256,7 +256,7 @@ export class MultisigController extends BaseController {
                 actionId: Number(element.action_id.toString()),
                 groupId: Number(element.group_id.toString()),
                 actionData: this.mapResponseToAction(element.action_data.valueOf()),
-                signers: element.signers.map((address: Address) => new Address(address).toBech32()),
+                signers: element.signers.map((address: Address) => new Address(address)),
             });
         }
         return result;

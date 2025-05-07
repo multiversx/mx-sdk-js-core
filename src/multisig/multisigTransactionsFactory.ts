@@ -7,15 +7,17 @@ import {
     CodeMetadataValue,
     EndpointDefinition,
     EndpointModifiers,
+    isTyped,
     NativeSerializer,
     OptionType,
     OptionValue,
+    TypedValue,
     U32Value,
     U64Type,
     U64Value,
     VariadicValue,
 } from "../abi";
-import { TokenComputer, TransactionsFactoryConfig } from "../core";
+import { Err, TokenComputer, TransactionsFactoryConfig } from "../core";
 import { Address } from "../core/address";
 import { Transaction } from "../core/transaction";
 import { TransactionBuilder } from "../core/transactionBuilder";
@@ -241,6 +243,7 @@ export class MultisigTransactionsFactory {
         sender: Address,
         options: resources.ProposeContractDeployFromSourceInput,
     ): Transaction {
+        let args: TypedValue[] = this.argsToTypedValues(options.arguments, options.abi?.constructorDefinition);
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeSCDeployFromSource",
@@ -249,7 +252,7 @@ export class MultisigTransactionsFactory {
                 new BigUIntValue(options.amount),
                 new AddressValue(options.multisigContract),
                 new CodeMetadataValue(options.codeMetadata),
-                VariadicValue.fromItems(...options.arguments.map((value) => new BytesValue(Buffer.from(value)))),
+                VariadicValue.fromItems(...args),
             ],
         });
     }
@@ -261,6 +264,7 @@ export class MultisigTransactionsFactory {
         sender: Address,
         options: resources.ProposeContractUpgradeFromSourceInput,
     ): Transaction {
+        let args: TypedValue[] = this.argsToTypedValues(options.arguments, options.abi?.constructorDefinition);
         return this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeSCUpgradeFromSource",
@@ -270,7 +274,7 @@ export class MultisigTransactionsFactory {
                 new BigUIntValue(options.amount),
                 new AddressValue(options.source),
                 new CodeMetadataValue(options.codeMetadata),
-                VariadicValue.fromItems(...options.arguments.map((value) => new BytesValue(Buffer.from(value)))),
+                VariadicValue.fromItems(...args),
             ],
         });
     }
@@ -410,5 +414,22 @@ export class MultisigTransactionsFactory {
             gasLimit: options.gasLimit ?? 0n,
             arguments: [VariadicValue.fromItems(...actionIdsArgs)],
         });
+    }
+
+    protected argsToTypedValues(args: any[], endpoint?: EndpointDefinition): TypedValue[] {
+        if (endpoint) {
+            const typedArgs = NativeSerializer.nativeToTypedValues(args, endpoint);
+            return typedArgs;
+        }
+
+        if (this.areArgsOfTypedValue(args)) {
+            return args;
+        }
+
+        throw new Err("Can't convert args to TypedValues");
+    }
+
+    private areArgsOfTypedValue(args: any[]): boolean {
+        return args.every((arg) => isTyped(arg));
     }
 }

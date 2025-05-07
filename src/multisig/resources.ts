@@ -74,7 +74,8 @@ export type ProposeContractDeployFromSourceInput = MultisigContractInput & {
     amount: bigint;
     source: Address;
     codeMetadata: CodeMetadata;
-    arguments: string[];
+    arguments: any[];
+    abi?: Abi;
 };
 
 export type ProposeContractUpgradeFromSourceInput = MultisigContractInput & {
@@ -82,7 +83,8 @@ export type ProposeContractUpgradeFromSourceInput = MultisigContractInput & {
     amount: bigint;
     source: Address;
     codeMetadata: CodeMetadata;
-    arguments: string[];
+    arguments: any[];
+    abi?: Abi;
 };
 
 export type ActionInput = MultisigContractInput & {

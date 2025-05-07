@@ -370,7 +370,7 @@ describe("test multisig transactions factory", function () {
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
-            "proposeSCUpgradeFromSource@000000000000000005007e25ce6debac748d86b5d393120ab1eb02a46d581679@b1a2bc2ec50000@000000000000000005006abd1c3a3794da01602b855ac03e7821e6638ec81679@0500",
+            "proposeSCUpgradeFromSource@000000000000000005007e25ce6debac748d86b5d393120ab1eb02a46d581679@b1a2bc2ec50000@000000000000000005006abd1c3a3794da01602b855ac03e7821e6638ec81679@0500@02@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@00000000000000000500870d0412cede871853a1c2d48a7543c073eb39f969e1",
         );
     });
 
@@ -409,7 +409,7 @@ describe("test multisig transactions factory", function () {
         assert.equal(transaction.chainID, config.chainID);
         assert.deepEqual(
             transaction.data.toString(),
-            "proposeSCUpgradeFromSource@000000000000000005007e25ce6debac748d86b5d393120ab1eb02a46d581679@b1a2bc2ec50000@000000000000000005006abd1c3a3794da01602b855ac03e7821e6638ec81679@0500",
+            "proposeSCUpgradeFromSource@000000000000000005007e25ce6debac748d86b5d393120ab1eb02a46d581679@b1a2bc2ec50000@000000000000000005006abd1c3a3794da01602b855ac03e7821e6638ec81679@0500@02@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@00000000000000000500870d0412cede871853a1c2d48a7543c073eb39f969e1",
         );
     });
 

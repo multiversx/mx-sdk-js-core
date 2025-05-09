@@ -26,6 +26,7 @@ export class AccountController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.setTransactionGasOptions(transaction, options);
+        this.setVersionAndOptionsForGuardian(transaction);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -42,6 +43,7 @@ export class AccountController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.setTransactionGasOptions(transaction, options);
+        this.setVersionAndOptionsForGuardian(transaction);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -72,6 +74,7 @@ export class AccountController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.setTransactionGasOptions(transaction, options);
+        this.setVersionAndOptionsForGuardian(transaction);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;

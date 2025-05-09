@@ -396,4 +396,11 @@ describe("ApiNetworkProvider Tests", function () {
         const result = await apiProvider.queryContract(query);
         assert.equal(result.returnDataParts.length, 0);
     });
+
+    it("should fetch transactions for an account", async () => {
+        const transactions = await apiProvider.getTransactions(
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.isTrue(transactions.length > 0);
+    });
 });

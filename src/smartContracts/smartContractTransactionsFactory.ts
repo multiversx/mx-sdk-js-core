@@ -1,6 +1,10 @@
 import { ArgSerializer, ContractFunction, EndpointDefinition, isTyped, NativeSerializer } from "../abi";
 import { Address, CodeMetadata } from "../core";
-import { CONTRACT_DEPLOY_ADDRESS_HEX, VM_TYPE_WASM_VM } from "../core/constants";
+import {
+    CONTRACT_DEPLOY_ADDRESS_HEX,
+    EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER,
+    VM_TYPE_WASM_VM,
+} from "../core/constants";
 import { Err } from "../core/errors";
 import { Logger } from "../core/logger";
 import { TokenComputer, TokenTransfer } from "../core/tokens";
@@ -87,7 +91,10 @@ export class SmartContractTransactionsFactory {
         if (numberOfTokens === 1) {
             const transfer = tokenTransfers[0];
 
-            if (this.tokenComputer.isFungible(transfer.token)) {
+            if (transfer.token.identifier === EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER) {
+                dataParts = this.dataArgsBuilder.buildDataPartsForMultiESDTNFTTransfer(receiver, tokenTransfers);
+                receiver = sender;
+            } else if (this.tokenComputer.isFungible(transfer.token)) {
                 dataParts = this.dataArgsBuilder.buildDataPartsForESDTTransfer(transfer);
             } else {
                 dataParts = this.dataArgsBuilder.buildDataPartsForSingleESDTNFTTransfer(transfer, receiver);

@@ -44,6 +44,12 @@ export class TransactionsFactoryConfig {
     gasLimitNftChangeToDynamic: bigint;
     gasLimitUpdateTokenId: bigint;
     gasLimitRegisterDynamic: bigint;
+    gasLimitForProposal: bigint;
+    gasLimitForVote: bigint;
+    gasLimitForClosingProposal: bigint;
+    gasLimitForClearProposals: bigint;
+    gasLimitForChangeConfig: bigint;
+    gasLimitForClaimAccumulatedFees: bigint;
 
     constructor(options: { chainID: string }) {
         // General-purpose configuration
@@ -100,5 +106,13 @@ export class TransactionsFactoryConfig {
         // Configuration for smart contract operations
         this.gasLimitClaimDeveloperRewards = 6000000n;
         this.gasLimitChangeOwnerAddress = 6000000n;
+
+        // Configuration for governance operations
+        this.gasLimitForProposal = 50_000_000n;
+        this.gasLimitForVote = 5_000_000n;
+        this.gasLimitForClosingProposal = 50_000_000n;
+        this.gasLimitForClearProposals = 50_000_000n;
+        this.gasLimitForChangeConfig = 50_000_000n;
+        this.gasLimitForClaimAccumulatedFees = 1_000_000n;
     }
 }

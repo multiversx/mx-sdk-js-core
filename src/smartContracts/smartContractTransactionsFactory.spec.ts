@@ -188,6 +188,51 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(transaction, transactionAbiAware);
     });
 
+    it("should create 'Transaction' for execute and transfer with EGLD as single token tranfer", async function () {
+        const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const contract = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
+        const func = "add";
+        const gasLimit = 6000000n;
+        const args = [new U32Value(7)];
+        const token = new Token({ identifier: "EGLD-000000", nonce: 0n });
+        const transfer = new TokenTransfer({ token, amount: 10n });
+
+        const transaction = factory.createTransactionForExecute(sender, {
+            contract: contract,
+            function: func,
+            gasLimit: gasLimit,
+            arguments: args,
+            tokenTransfers: [transfer],
+        });
+
+        const transactionAbiAware = abiAwareFactory.createTransactionForExecute(sender, {
+            contract: contract,
+            function: func,
+            gasLimit: gasLimit,
+            arguments: args,
+            tokenTransfers: [transfer],
+        });
+
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.data,
+            Buffer.from(
+                "MultiESDTNFTTransfer@00000000000000000500b9353fe8407f87310c87e12fa1ac807f0485da39d152@01@45474c442d303030303030@@0a@616464@07",
+            ),
+        );
+        assert.equal(transaction.gasLimit, gasLimit);
+        assert.equal(transaction.value, 0n);
+
+        assert.deepEqual(transaction, transactionAbiAware);
+    });
+
     it("should create 'Transaction' for execute and transfer multiple esdts", async function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqak8zt22wl2ph4tswtyc39namqx6ysa2sd8ss4xmlj3");

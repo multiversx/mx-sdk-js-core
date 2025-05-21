@@ -34,3 +34,10 @@ export type ChangeConfigInput = {
     minVetoThreshold: number;
     minPassThreshold: number;
 };
+
+export type ProposeProposalOutcome = {
+    proposalNonce: number;
+    commitHash: string;
+    startVoteEpoch: number;
+    endVoteEpoch: number;
+};

@@ -28,8 +28,8 @@ export type ClearEndedProposalsInput = {
 };
 
 export type ChangeConfigInput = {
-    proposalFee: string;
-    lastProposalFee: string;
+    proposalFee: bigint;
+    lastProposalFee: bigint;
     minQuorum: number;
     minVetoThreshold: number;
     minPassThreshold: number;

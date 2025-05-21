@@ -113,11 +113,11 @@ export class GovernanceTransactionsFactory {
 
     createTransactionForChangingConfig(sender: Address, options: ChangeConfigInput): Transaction {
         const args = [
-            new StringValue(options.proposalFee),
-            new StringValue(options.lastProposalFee),
-            new BigUIntValue(options.minQuorum),
-            new BigUIntValue(options.minVetoThreshold),
-            new BigUIntValue(options.minPassThreshold),
+            new StringValue(options.proposalFee.toString()),
+            new StringValue(options.lastProposalFee.toString()),
+            new StringValue(options.minQuorum.toString()),
+            new StringValue(options.minVetoThreshold.toString()),
+            new StringValue(options.minPassThreshold.toString()),
         ];
         const dataParts = ["changeConfig", ...this.argSerializer.valuesToStrings(args)];
 

@@ -4,7 +4,7 @@ import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { GovernanceTransactionsFactory } from "./governanceTransactionsFactory";
 import { Vote } from "./resources";
 
-describe.only("test multisig transactions factory", function () {
+describe("test multisig transactions factory", function () {
     const config = new TransactionsFactoryConfig({
         chainID: "D",
     });
@@ -15,6 +15,8 @@ describe.only("test multisig transactions factory", function () {
     const governanceAddress = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrlllsrujgla";
 
     it("should create transaction for creating new proposal", function () {
+        const expectedData = `proposal@${Buffer.from(commitHash).toString("hex")}@0a@0f`;
+
         const transaction = factory.createTransactionForNewProposal(alice, {
             commitHash: commitHash,
             startVoteEpoch: 10,
@@ -27,7 +29,7 @@ describe.only("test multisig transactions factory", function () {
         assert.equal(transaction.value, 1000_000000000000000000n);
         assert.equal(transaction.chainID, config.chainID);
         assert.equal(transaction.gasLimit, 50_192_500n);
-        assert.equal(transaction.data.toString(), `proposal@${Buffer.from(commitHash).toString("hex")}@0a@0f`);
+        assert.equal(transaction.data.toString(), expectedData);
     });
 
     it("should create transaction for voting", function () {
@@ -58,6 +60,9 @@ describe.only("test multisig transactions factory", function () {
     });
 
     it("should create transaction for clearing ended proposals", function () {
+        const expectedData =
+            "clearEndedProposals@0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8";
+
         const transaction = factory.createTransactionForClearingEndedProposals(alice, {
             proposers: [alice, Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx")],
         });
@@ -67,10 +72,7 @@ describe.only("test multisig transactions factory", function () {
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
         assert.equal(transaction.gasLimit, 150_273_500n);
-        assert.equal(
-            transaction.data.toString(),
-            "clearEndedProposals@0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8",
-        );
+        assert.equal(transaction.data.toString(), expectedData);
     });
 
     it("should create transaction for claiming accumulated fees", function () {
@@ -85,9 +87,12 @@ describe.only("test multisig transactions factory", function () {
     });
 
     it("should create transaction for changing config", function () {
+        const expectedData =
+            "changeConfig@31303030303030303030303030303030303030303030@3130303030303030303030303030303030303030@35303030@33303030@36303030";
+
         const transaction = factory.createTransactionForChangingConfig(alice, {
-            proposalFee: "1000000000000000000000",
-            lastProposalFee: "10000000000000000000",
+            proposalFee: 1000000000000000000000n,
+            lastProposalFee: 10000000000000000000n,
             minQuorum: 5000,
             minVetoThreshold: 3000,
             minPassThreshold: 6000,
@@ -97,10 +102,7 @@ describe.only("test multisig transactions factory", function () {
         assert.equal(transaction.receiver.toBech32(), governanceAddress);
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
-        assert.equal(transaction.gasLimit, 50_219_500n);
-        assert.equal(
-            transaction.data.toString(),
-            "changeConfig@31303030303030303030303030303030303030303030@3130303030303030303030303030303030303030@1388@0bb8@1770",
-        );
+        assert.equal(transaction.gasLimit, 50_237_500n);
+        assert.equal(transaction.data.toString(), expectedData);
     });
 });

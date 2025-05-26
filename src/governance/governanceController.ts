@@ -30,13 +30,13 @@ import {
 } from "./resources";
 
 export class GovernanceController extends BaseController {
-    private governanceFactory: GovernanceTransactionsFactory;
-    private parser: GovernanceTransactionsOutcomeParser;
-    private smartContractController: SmartContractController;
+    private readonly governanceFactory: GovernanceTransactionsFactory;
+    private readonly parser: GovernanceTransactionsOutcomeParser;
+    private readonly smartContractController: SmartContractController;
     private readonly governanceContract: Address;
-    private transactionAwaiter: TransactionWatcher;
-    private addressHrp: string;
-    private serializer: ArgSerializer;
+    private readonly transactionAwaiter: TransactionWatcher;
+    private readonly addressHrp: string;
+    private readonly serializer: ArgSerializer;
 
     constructor(options: { chainID: string; networkProvider: INetworkProvider; addressHrp?: string }) {
         super();

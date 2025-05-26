@@ -22,7 +22,7 @@ export class GovernanceTransactionsOutcomeParser {
         const startVoteEpoch = { type: new BigUIntType() };
         const endVoteEpoch = { type: new BigUIntType() };
 
-        let outcome: NewProposalOutcome[] = [];
+        const outcome: NewProposalOutcome[] = [];
         for (const event of events) {
             const data = this.serializer.buffersToValues(
                 event.topics.map((topic) => Buffer.from(topic)),
@@ -50,7 +50,7 @@ export class GovernanceTransactionsOutcomeParser {
         const totalStake = { type: new BigUIntType() };
         const votingPower = { type: new BigUIntType() };
 
-        let outcome: VoteOutcome[] = [];
+        const outcome: VoteOutcome[] = [];
         for (const event of events) {
             const data = this.serializer.buffersToValues(
                 event.topics.map((topic) => Buffer.from(topic)),
@@ -79,7 +79,7 @@ export class GovernanceTransactionsOutcomeParser {
         const userStake = { type: new BigUIntType() };
         const votingPower = { type: new BigUIntType() };
 
-        let outcome: DelegateVoteOutcome[] = [];
+        const outcome: DelegateVoteOutcome[] = [];
         for (const event of events) {
             const data = this.serializer.buffersToValues(
                 event.topics.map((topic) => Buffer.from(topic)),
@@ -103,7 +103,7 @@ export class GovernanceTransactionsOutcomeParser {
 
         const events = findEventsByIdentifier(transactionOnNetwork, "closeProposal");
 
-        let outcome: CloseProposalOutcome[] = [];
+        const outcome: CloseProposalOutcome[] = [];
         for (const event of events) {
             const commitHash = Buffer.from(event.topics[0]).toString();
             const passed = Buffer.from(event.topics[1]).toString() === "true";

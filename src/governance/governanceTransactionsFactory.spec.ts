@@ -4,7 +4,7 @@ import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { GovernanceTransactionsFactory } from "./governanceTransactionsFactory";
 import { Vote } from "./resources";
 
-describe("test multisig transactions factory", function () {
+describe("test governance transactions factory", function () {
     const config = new TransactionsFactoryConfig({
         chainID: "D",
     });

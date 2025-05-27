@@ -304,7 +304,7 @@ describe("test multisig controller query methods", () => {
 
         const mappedRes = result as resources.SendTransferExecuteEgld;
         assert.equal(mappedRes.receiver.toBech32(), "erd1qqqqqqqqqqqqqpgq6qr0w0zzyysklfneh32eqp2cf383zc89d8sstnkl60");
-        assert.equal(mappedRes.funcionName, "add");
+        assert.equal(mappedRes.functionName, "add");
         assert.equal(mappedRes.amount, 42n);
     });
 

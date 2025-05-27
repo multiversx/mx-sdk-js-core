@@ -175,16 +175,16 @@ export class SendTransferExecuteEgld extends MultisigAction {
     receiver: Address;
     amount: bigint;
     optionalGasLimit?: bigint;
-    funcionName: string;
+    functionName: string;
     arguments: Uint8Array[];
 
     constructor(data: any) {
         super();
         this.type = MultisigActionEnum.SendTransferExecuteEgld;
         this.receiver = data.to;
-        this.amount = BigInt(data.egld_amount?.toString() ?? 0);
-        this.optionalGasLimit = BigInt(data.opt_gas_limit?.toString() ?? 0);
-        this.funcionName = data.endpoint_name.toString();
+        this.amount = BigInt(data.egld_amount?.toFixed() ?? 0);
+        this.optionalGasLimit = BigInt(data.opt_gas_limit?.toFixed() ?? 0);
+        this.functionName = data.endpoint_name.toString();
         this.arguments = data.arguments;
     }
 }
@@ -206,7 +206,7 @@ export class SendTransferExecuteEsdt extends MultisigAction {
                     amount: token.amount,
                 }),
         );
-        this.optionalGasLimit = BigInt(data.opt_gas_limit.toString());
+        this.optionalGasLimit = BigInt(data.opt_gas_limit.toFixed());
 
         this.funcionName = Buffer.from(data.endpoint_name.toString(), "hex").toString();
         this.arguments = data.arguments;
@@ -224,8 +224,8 @@ export class SendAsyncCall extends MultisigAction {
         super();
         this.type = MultisigActionEnum.SendAsyncCall;
         this.receiver = data.to;
-        this.amount = BigInt(data.egld_amount?.toString() ?? 0);
-        this.optionalGasLimit = BigInt(data.opt_gas_limit?.toString() ?? 0);
+        this.amount = BigInt(data.egld_amount?.toFixed() ?? 0);
+        this.optionalGasLimit = BigInt(data.opt_gas_limit?.toFixed() ?? 0);
         this.funcionName = data.endpoint_name.toString();
         this.arguments = data.arguments;
     }

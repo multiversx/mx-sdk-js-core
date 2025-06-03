@@ -341,7 +341,6 @@ export class TokenManagementTransactionsFactory {
         options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
         options.removeRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
         options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
-        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
         options.removeRoleNFTUpdate ? args.push(new StringValue("ESDTRoleNFTUpdate")) : 0;
         options.removeRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
         options.removeRoleESDTSetNewUri ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;

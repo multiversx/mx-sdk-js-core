@@ -314,6 +314,11 @@ export class TokenManagementTransactionsFactory {
         options.addRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
         options.addRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
         options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        options.addRoleNFTUpdate ? args.push(new StringValue("ESDTRoleNFTUpdate")) : 0;
+        options.addRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
+        options.addRoleESDTSetNewUri ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
+        options.addRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
+        options.addRoleNFTRecreate ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -336,6 +341,11 @@ export class TokenManagementTransactionsFactory {
         options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
         options.removeRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
         options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        options.removeRoleNFTUpdate ? args.push(new StringValue("ESDTRoleNFTUpdate")) : 0;
+        options.removeRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
+        options.removeRoleESDTSetNewUri ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
+        options.removeRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
+        options.removeRoleNFTRecreate ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
 
         const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 

@@ -2,9 +2,6 @@ export { ApiNetworkProvider } from "./apiNetworkProvider";
 export * from "./interface";
 export { ProxyNetworkProvider } from "./proxyNetworkProvider";
 
-export { ContractQueryResponse } from "./contractQueryResponse";
-export { ContractResultItem, ContractResults } from "./contractResults";
-
 export * from "./accounts";
 export * from "./blocks";
 export { NetworkConfig } from "./networkConfig";

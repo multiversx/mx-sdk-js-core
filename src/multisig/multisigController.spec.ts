@@ -31,7 +31,7 @@ describe("test multisig controller query methods", () => {
             }),
         );
 
-        const result = await controller.getQuorum({ mutisigAddress: mockMultisigAddress });
+        const result = await controller.getQuorum({ multisigAddress: mockMultisigAddress });
 
         assert.equal(result, 3);
     });
@@ -46,7 +46,7 @@ describe("test multisig controller query methods", () => {
                 returnMessage: "ok",
             }),
         );
-        const result = await controller.getNumBoardMembers({ mutisigAddress: mockMultisigAddress });
+        const result = await controller.getNumBoardMembers({ multisigAddress: mockMultisigAddress });
 
         assert.equal(result, 2);
     });
@@ -62,7 +62,7 @@ describe("test multisig controller query methods", () => {
             }),
         );
 
-        const result = await controller.getNumGroups({ mutisigAddress: mockMultisigAddress });
+        const result = await controller.getNumGroups({ multisigAddress: mockMultisigAddress });
 
         assert.equal(result, 5);
     });
@@ -78,7 +78,7 @@ describe("test multisig controller query methods", () => {
             }),
         );
 
-        const result = await controller.getNumProposers({ mutisigAddress: mockMultisigAddress });
+        const result = await controller.getNumProposers({ multisigAddress: mockMultisigAddress });
 
         assert.equal(result, 4);
     });
@@ -95,7 +95,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getActionGroup({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             groupId: 5,
         });
         assert.equal(result.length, 1);
@@ -114,7 +114,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getLastGroupActionId({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
         });
 
         assert.equal(result, 7);
@@ -132,7 +132,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getActionLastIndex({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
         });
 
         assert.equal(result, 0x42);
@@ -150,7 +150,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.hasSignedAction({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             userAddress: mockBoardMemberAddress,
             actionId: 42,
         });
@@ -169,7 +169,7 @@ describe("test multisig controller query methods", () => {
             );
 
             const result = await controller.hasSignedAction({
-                mutisigAddress: mockMultisigAddress,
+                multisigAddress: mockMultisigAddress,
                 userAddress: mockProposerAddress,
                 actionId: 42,
             });
@@ -190,7 +190,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.quorumReached({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
 
@@ -208,7 +208,7 @@ describe("test multisig controller query methods", () => {
             );
 
             const result = await controller.quorumReached({
-                mutisigAddress: mockMultisigAddress,
+                multisigAddress: mockMultisigAddress,
                 actionId: 42,
             });
 
@@ -228,7 +228,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getUserRole({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             userAddress: mockBoardMemberAddress,
         });
 
@@ -250,7 +250,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getAllBoardMembers({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
         });
 
         assert.equal(result.length, 2);
@@ -273,7 +273,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getAllProposers({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
         });
 
         assert.equal(result.length, 2);
@@ -298,7 +298,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getActionData({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
 
@@ -354,7 +354,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getPendingActionFullInfo({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
         });
 
         assert.equal(result.length, 9);
@@ -378,7 +378,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getActionData({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
 
@@ -405,7 +405,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getActionData({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
 
@@ -427,7 +427,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getActionData({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
 
@@ -448,7 +448,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getActionData({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
 
@@ -474,7 +474,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getActionData({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
 
@@ -508,7 +508,7 @@ describe("test multisig controller query methods", () => {
         const sourceContract = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqd273cw3hjndqzcpts4dvq0ncy8nx8rkgzeusnefvaq");
 
         const result = await controller.getActionData({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
         const mappedRes = result as resources.SCUpgradeFromSource;
@@ -529,7 +529,7 @@ describe("test multisig controller query methods", () => {
             }),
         );
         const result = await controller.getActionData({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
         const mappedRes = result as resources.ChangeQuorum;
@@ -548,7 +548,7 @@ describe("test multisig controller query methods", () => {
             }),
         );
         const result = await controller.getActionData({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
         const mappedRes = result as resources.RemoveUser;
@@ -573,7 +573,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getActionSigners({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
 
@@ -593,7 +593,7 @@ describe("test multisig controller query methods", () => {
             }),
         );
 
-        const result = await controller.getActionSignerCount({ mutisigAddress: mockMultisigAddress, actionId: 42 });
+        const result = await controller.getActionSignerCount({ multisigAddress: mockMultisigAddress, actionId: 42 });
 
         assert.equal(result, 4);
     });
@@ -610,7 +610,7 @@ describe("test multisig controller query methods", () => {
         );
 
         const result = await controller.getActionValidSignerCount({
-            mutisigAddress: mockMultisigAddress,
+            multisigAddress: mockMultisigAddress,
             actionId: 42,
         });
 

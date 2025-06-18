@@ -8,12 +8,12 @@ export class ValidatorSigner {
     /**
      * Signs a message.
      */
-    async signUsingPem(pemText: string, pemIndex: number = 0, signable: Buffer | Uint8Array): Promise<void> {
+    async signUsingPem(pemText: string, pemIndex: number = 0, signable: Buffer | Uint8Array): Promise<Uint8Array> {
         await BLS.initIfNecessary();
 
         try {
             let secretKey = ValidatorSecretKey.fromPem(pemText, pemIndex);
-            secretKey.sign(signable);
+            return secretKey.sign(signable);
         } catch (err: any) {
             throw new ErrSignerCannotSign(err);
         }

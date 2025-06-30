@@ -52,7 +52,7 @@ export class AccountOnNetwork {
     static fromProxyHttpResponse(payload: any): AccountOnNetwork {
         const result = new AccountOnNetwork();
 
-        result.address = payload["address"] ? Address.newf(payload["address"]) : Address.empty();
+        result.address = payload["address"] ? Address.newFromBech32(payload["address"]) : Address.empty();
         result.nonce = BigInt(payload["nonce"] || 0);
         result.balance = BigInt(payload["balance"] || 0);
         result.userName = payload["username"] || undefined;

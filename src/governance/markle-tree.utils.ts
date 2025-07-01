@@ -64,7 +64,7 @@ export class MerkleTreeUtils {
         for (const leaf of this.leaves) {
             totalBalance = totalBalance.plus(leaf.balance);
         }
-        return totalBalance.toString();
+        return totalBalance.toFixed();
     }
 
     getDepth(): number {

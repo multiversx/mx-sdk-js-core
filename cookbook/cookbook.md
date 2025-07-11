@@ -1227,7 +1227,7 @@ First, we load the abi file, then we fetch the transaction, we extract the event
 }
 ```
 
-#### Decoding transaction events
+#### Encoding / decoding custom types
 Whenever needed, the contract ABI can be used for manually encoding or decoding custom types.
 
 Let's encode a struct called EsdtTokenPayment (of [multisig](https://github.com/multiversx/mx-contracts-rs/tree/main/contracts/multisig) contract) into binary data.

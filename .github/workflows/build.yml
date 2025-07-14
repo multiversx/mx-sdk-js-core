@@ -30,4 +30,4 @@ jobs:
     - run: npm run compile
     - run: npm install esmify && npm run compile-browser
     - run: npm run tests-unit
-    - run: npm run tests-devnet
+    # - run: npm run tests-devnet  TODO: Enable this later

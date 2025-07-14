@@ -203,16 +203,18 @@ export class GovernanceController extends BaseController {
         });
 
         const proposalFee = BigInt(Buffer.from(result[0]).toString());
-        const minQuorum = Number(Buffer.from(result[1]).toString());
-        const minPassThreshold = Number(Buffer.from(result[2]).toString());
+        const lostProposalFee = BigInt(Buffer.from(result[1]).toString());
+        const minQuorum = Number(Buffer.from(result[2]).toString());
         const minVetoThreshold = Number(Buffer.from(result[3]).toString());
-        const lastProposalNonce = Number(Buffer.from(result[4]).toString());
+        const minPassThreshold = Number(Buffer.from(result[4]).toString());
+        const lastProposalNonce = Number(Buffer.from(result[5]).toString());
 
         return {
             proposalFee,
+            lostProposalFee,
             minQuorum,
-            minPassThreshold,
             minVetoThreshold,
+            minPassThreshold,
             lastProposalNonce,
         };
     }

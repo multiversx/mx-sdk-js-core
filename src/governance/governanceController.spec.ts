@@ -159,9 +159,10 @@ describe("test governance controller", function () {
             new SmartContractQueryResponse({
                 returnDataParts: [
                     Buffer.from("1000000000000000000000"),
+                    Buffer.from("10000000000000000000"),
                     Buffer.from("0.2000"),
-                    Buffer.from("0.5000"),
                     Buffer.from("0.3300"),
+                    Buffer.from("0.5000"),
                     Buffer.from("1"),
                 ],
                 returnCode: "ok",

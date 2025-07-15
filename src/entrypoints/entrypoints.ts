@@ -158,9 +158,10 @@ export class NetworkEntrypoint {
         return new SmartContractController({ chainID: this.chainId, networkProvider: this.networkProvider, abi });
     }
 
-    createSmartContractTransactionsFactory(): SmartContractTransactionsFactory {
+    createSmartContractTransactionsFactory(abi?: Abi): SmartContractTransactionsFactory {
         return new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
+            abi: abi,
         });
     }
 

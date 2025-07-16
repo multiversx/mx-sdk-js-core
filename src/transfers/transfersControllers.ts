@@ -3,6 +3,7 @@ import {
     BaseController,
     BaseControllerInput,
     IAccount,
+    IGasLimitEstimator,
     Transaction,
     TransactionsFactoryConfig,
 } from "../core";
@@ -12,9 +13,12 @@ import { TransferTransactionsFactory } from "./transferTransactionsFactory";
 export class TransfersController extends BaseController {
     private factory: TransferTransactionsFactory;
 
-    constructor(options: { chainID: string }) {
+    constructor(options: { chainID: string; gasLimitEstimator?: IGasLimitEstimator }) {
         super();
-        this.factory = new TransferTransactionsFactory({ config: new TransactionsFactoryConfig(options) });
+        this.factory = new TransferTransactionsFactory({
+            config: new TransactionsFactoryConfig(options),
+            gasLimitEstimator: options.gasLimitEstimator,
+        });
     }
 
     async createTransactionForNativeTokenTransfer(

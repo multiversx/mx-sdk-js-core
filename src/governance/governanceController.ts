@@ -4,6 +4,7 @@ import {
     BaseController,
     BaseControllerInput,
     IAccount,
+    IGasLimitEstimator,
     LibraryConfig,
     Transaction,
     TransactionOnNetwork,
@@ -38,10 +39,16 @@ export class GovernanceController extends BaseController {
     private readonly addressHrp: string;
     private readonly serializer: ArgSerializer;
 
-    constructor(options: { chainID: string; networkProvider: INetworkProvider; addressHrp?: string }) {
+    constructor(options: {
+        chainID: string;
+        networkProvider: INetworkProvider;
+        addressHrp?: string;
+        gasLimitEstimator?: IGasLimitEstimator;
+    }) {
         super();
         this.governanceFactory = new GovernanceTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
+            gasLimitEstimator: options.gasLimitEstimator,
         });
         this.smartContractController = new SmartContractController({
             chainID: options.chainID,

@@ -3,7 +3,7 @@ import { TokenTransfer } from "../core/tokens";
 
 export type ContractDeployInput = {
     bytecode: Uint8Array;
-    gasLimit: bigint;
+    gasLimit?: bigint;
     arguments?: any[];
     nativeTransferAmount?: bigint;
     isUpgradeable?: boolean;
@@ -14,7 +14,7 @@ export type ContractDeployInput = {
 
 export type ContractExecuteInput = {
     contract: Address;
-    gasLimit: bigint;
+    gasLimit?: bigint;
     function: string;
     arguments?: any[];
     nativeTransferAmount?: bigint;

@@ -35,6 +35,8 @@ export class MockNetworkProvider implements INetworkProvider {
     private readonly queryContractResponders: QueryContractResponder[] = [];
     private readonly getTransactionResponders: GetTransactionResponder[] = [];
 
+    mockTransactionCostResponse: TransactionCostResponse;
+
     constructor() {
         this.transactions = new Map<string, TransactionOnNetwork>();
         this.accounts = new Map<string, AccountOnNetwork>();
@@ -57,6 +59,8 @@ export class MockNetworkProvider implements INetworkProvider {
                 balance: createAccountBalance(300),
             }),
         );
+
+        this.mockTransactionCostResponse = new TransactionCostResponse();
     }
     getBlock(): Promise<BlockOnNetwork> {
         throw new Error("Method not implemented.");
@@ -77,9 +81,11 @@ export class MockNetworkProvider implements INetworkProvider {
     ): Promise<AccountOnNetwork> {
         throw new Error("Method not implemented.");
     }
-    estimateTransactionCost(_tx: Transaction): Promise<TransactionCostResponse> {
-        throw new Error("Method not implemented.");
+
+    async estimateTransactionCost(_tx: Transaction): Promise<TransactionCostResponse> {
+        return this.mockTransactionCostResponse;
     }
+
     awaitTransactionOnCondition(
         _transactionHash: string,
         _condition: (account: TransactionOnNetwork) => boolean,

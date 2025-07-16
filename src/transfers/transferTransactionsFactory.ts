@@ -1,4 +1,6 @@
+import { IGasLimitEstimator } from "../core";
 import { Address } from "../core/address";
+import { BaseFactory } from "../core/baseFactory";
 import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "../core/constants";
 import { ErrBadUsage } from "../core/errors";
 import { TokenComputer, TokenTransfer } from "../core/tokens";
@@ -22,12 +24,13 @@ interface IConfig {
 /**
  * Use this class to create transactions for native token transfers (EGLD) or custom tokens transfers (ESDT/NTF/MetaESDT).
  */
-export class TransferTransactionsFactory {
-    private readonly config?: IConfig;
-    private readonly tokenTransfersDataBuilder?: TokenTransfersDataBuilder;
-    private readonly tokenComputer?: TokenComputer;
+export class TransferTransactionsFactory extends BaseFactory {
+    private readonly config: IConfig;
+    private readonly tokenTransfersDataBuilder: TokenTransfersDataBuilder;
+    private readonly tokenComputer: TokenComputer;
 
-    constructor(options: { config: IConfig }) {
+    constructor(options: { config: IConfig; gasLimitEstimator?: IGasLimitEstimator }) {
+        super({ config: options.config, gasLimitEstimator: options.gasLimitEstimator });
         this.config = options.config;
         this.tokenComputer = new TokenComputer();
         this.tokenTransfersDataBuilder = new TokenTransfersDataBuilder();
@@ -36,14 +39,18 @@ export class TransferTransactionsFactory {
     createTransactionForNativeTokenTransfer(sender: Address, options: resources.NativeTokenTransferInput): Transaction {
         const data = options.data || new Uint8Array();
 
-        return new Transaction({
+        const transaction = new Transaction({
             sender: sender,
             receiver: options.receiver,
-            chainID: this.config!.chainID,
-            gasLimit: this.computeGasForMoveBalance(this.config!, data),
+            chainID: this.config.chainID,
+            gasLimit: 0n,
             data: data,
             value: options.nativeAmount ?? BigInt(0),
         });
+
+        this.setGasLimit(transaction, undefined, 0n); // check
+
+        return transaction;
     }
 
     createTransactionForESDTTokenTransfer(sender: Address, options: resources.CustomTokenTransferInput): Transaction {
@@ -62,14 +69,17 @@ export class TransferTransactionsFactory {
             options.receiver,
         );
 
-        return new TransactionBuilder({
-            config: this.config!,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: extraGasForTransfer,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, undefined, extraGasForTransfer);
+
+        return transaction;
     }
 
     createTransactionForTransfer(sender: Address, options: resources.CreateTransferTransactionInput): Transaction {

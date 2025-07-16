@@ -3,6 +3,7 @@ import {
     BaseController,
     BaseControllerInput,
     IAccount,
+    IGasLimitEstimator,
     Transaction,
     TransactionOnNetwork,
     TransactionsFactoryConfig,
@@ -18,10 +19,15 @@ export class TokenManagementController extends BaseController {
     private transactionAwaiter: TransactionWatcher;
     private parser: TokenManagementTransactionsOutcomeParser;
 
-    constructor(options: { chainID: string; networkProvider: INetworkProvider }) {
+    constructor(options: {
+        chainID: string;
+        networkProvider: INetworkProvider;
+        gasLimitEstimator?: IGasLimitEstimator;
+    }) {
         super();
         this.factory = new TokenManagementTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
+            gasLimitEstimator: options.gasLimitEstimator,
         });
         this.transactionAwaiter = new TransactionWatcher(options.networkProvider);
         this.parser = new TokenManagementTransactionsOutcomeParser();

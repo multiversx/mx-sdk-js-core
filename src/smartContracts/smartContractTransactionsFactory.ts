@@ -1,5 +1,6 @@
 import { Abi, ArgSerializer, EndpointDefinition, isTyped, NativeSerializer } from "../abi";
-import { Address, CodeMetadata } from "../core";
+import { Address, CodeMetadata, IGasLimitEstimator } from "../core";
+import { BaseFactory } from "../core/baseFactory";
 import {
     CONTRACT_DEPLOY_ADDRESS_HEX,
     EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER,
@@ -10,7 +11,6 @@ import { Logger } from "../core/logger";
 import { TokenComputer, TokenTransfer } from "../core/tokens";
 import { TokenTransfersDataBuilder } from "../core/tokenTransfersDataBuilder";
 import { Transaction } from "../core/transaction";
-import { TransactionBuilder } from "../core/transactionBuilder";
 import { byteArrayToHex, utf8ToHex } from "../core/utils.codec";
 import * as resources from "./resources";
 
@@ -26,14 +26,15 @@ interface IConfig {
 /**
  * Use this class to create transactions to deploy, call or upgrade a smart contract.
  */
-export class SmartContractTransactionsFactory {
+export class SmartContractTransactionsFactory extends BaseFactory {
     private readonly config: IConfig;
     private readonly abi?: Abi;
     private readonly tokenComputer: TokenComputer;
     private readonly dataArgsBuilder: TokenTransfersDataBuilder;
     private readonly contractDeployAddress: Address;
 
-    constructor(options: { config: IConfig; abi?: Abi }) {
+    constructor(options: { config: IConfig; abi?: Abi; gasLimitEstimator?: IGasLimitEstimator }) {
+        super({ config: options.config, gasLimitEstimator: options.gasLimitEstimator });
         this.config = options.config;
         this.abi = options.abi;
         this.tokenComputer = new TokenComputer();
@@ -55,15 +56,18 @@ export class SmartContractTransactionsFactory {
         const preparedArgs = this.argsToDataParts(args, endpoint);
         dataParts.push(...preparedArgs);
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: this.contractDeployAddress,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-            amount: nativeTransferAmount,
-        }).build();
+            value: nativeTransferAmount,
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, options.gasLimit);
+
+        return transaction;
     }
 
     createTransactionForExecute(sender: Address, options: resources.ContractExecuteInput): Transaction {
@@ -105,15 +109,18 @@ export class SmartContractTransactionsFactory {
         const preparedArgs = this.argsToDataParts(args, endpoint);
         dataParts.push(...preparedArgs);
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
-            receiver: receiver,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-            amount: nativeTransferAmount,
-        }).build();
+        const transaction = new Transaction({
+            sender,
+            receiver,
+            value: nativeTransferAmount,
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, options.gasLimit);
+
+        return transaction;
     }
 
     createTransactionForUpgrade(sender: Address, options: resources.ContractUpgradeInput): Transaction {
@@ -132,15 +139,18 @@ export class SmartContractTransactionsFactory {
         const preparedArgs = this.argsToDataParts(args, endpoint);
         dataParts.push(...preparedArgs);
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: options.contract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-            amount: nativeTransferAmount,
-        }).build();
+            value: nativeTransferAmount,
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, options.gasLimit);
+
+        return transaction;
     }
 
     private getEndpointForUpgrade(): EndpointDefinition | undefined {
@@ -168,14 +178,17 @@ export class SmartContractTransactionsFactory {
     createTransactionForClaimingDeveloperRewards(options: { sender: Address; contract: Address }): Transaction {
         const dataParts = ["ClaimDeveloperRewards"];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: options.sender,
             receiver: options.contract,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitClaimDeveloperRewards,
-            addDataMovementGas: false,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, this.config.gasLimitClaimDeveloperRewards);
+
+        return transaction;
     }
 
     createTransactionForChangingOwnerAddress(options: {
@@ -185,14 +198,17 @@ export class SmartContractTransactionsFactory {
     }): Transaction {
         const dataParts = ["ChangeOwnerAddress", options.newOwner.toHex()];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: options.sender,
             receiver: options.contract,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitChangeOwnerAddress,
-            addDataMovementGas: false,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, this.config.gasLimitChangeOwnerAddress);
+
+        return transaction;
     }
 
     protected argsToDataParts(args: any[], endpoint?: EndpointDefinition): string[] {

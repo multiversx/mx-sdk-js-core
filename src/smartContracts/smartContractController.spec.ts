@@ -3,7 +3,7 @@ import { assert } from "chai";
 import { Abi, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "../abi";
 import { Account } from "../accounts";
 import { Address, SmartContractQueryResponse } from "../core";
-import { GasLimitEstimator } from "../gasEstimator/GasLimitEstimator";
+import { GasLimitEstimator } from "../gasEstimator";
 import { MockNetworkProvider, getTestWalletsPath, loadAbiRegistry } from "../testutils";
 import { bigIntToBuffer } from "../tokenOperations/codec";
 import { SmartContractController } from "./smartContractController";

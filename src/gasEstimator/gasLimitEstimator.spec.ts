@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { Address, TransactionStatus } from "../core";
 import { Transaction } from "../core/transaction";
 import { MockNetworkProvider } from "../testutils";
-import { GasLimitEstimator } from "./GasLimitEstimator";
+import { GasLimitEstimator } from "./gasLimitEstimator";
 
 describe("GasLimitEstimator tests", () => {
     it("should estimate gas limit with default multiplier", async () => {

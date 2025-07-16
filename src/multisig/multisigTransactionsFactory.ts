@@ -16,10 +16,10 @@ import {
     U64Value,
     VariadicValue,
 } from "../abi";
-import { Err, TokenComputer, TransactionsFactoryConfig } from "../core";
+import { Err, IGasLimitEstimator, TokenComputer, TransactionsFactoryConfig } from "../core";
 import { Address } from "../core/address";
+import { BaseFactory } from "../core/baseFactory";
 import { Transaction } from "../core/transaction";
-import { TransactionBuilder } from "../core/transactionBuilder";
 import { SmartContractTransactionsFactory } from "../smartContracts";
 import { ProposeTransferExecuteContractInput } from "./proposeTransferExecuteContractInput";
 import * as resources from "./resources";
@@ -35,13 +35,14 @@ interface IConfig {
  * Use this class to create multisig related transactions like creating a new multisig contract,
  * proposing actions, signing actions, and performing actions.
  */
-export class MultisigTransactionsFactory {
+export class MultisigTransactionsFactory extends BaseFactory {
     private readonly argSerializer: ArgSerializer;
     private readonly smartContractFactory: SmartContractTransactionsFactory;
     private readonly config: IConfig;
     private readonly abi: Abi;
 
-    constructor(options: { config: TransactionsFactoryConfig; abi: Abi }) {
+    constructor(options: { config: TransactionsFactoryConfig; abi: Abi; gasLimitEstimator?: IGasLimitEstimator }) {
+        super({ config: options.config, gasLimitEstimator: options.gasLimitEstimator });
         this.config = options.config;
         this.abi = options.abi;
         this.argSerializer = new ArgSerializer();
@@ -185,14 +186,18 @@ export class MultisigTransactionsFactory {
                 ),
             ),
         ];
-        return new TransactionBuilder({
-            config: this.config,
+
+        const transaction = new Transaction({
             sender: sender,
             receiver: options.multisigContract,
-            dataParts: dataParts,
-            gasLimit: options.gasLimit,
-            addDataMovementGas: false,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, undefined, options.gasLimit);
+
+        return transaction;
     }
 
     private mapTokenPayments(options: resources.ProposeTransferExecuteEsdtInput): resources.EsdtTokenPayment[] {

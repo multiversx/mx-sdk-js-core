@@ -5,6 +5,7 @@ import {
     BaseController,
     BaseControllerInput,
     IAccount,
+    IGasLimitEstimator,
     Transaction,
     TransactionOnNetwork,
     TransactionsFactoryConfig,
@@ -22,12 +23,18 @@ export class MultisigController extends BaseController {
     private multisigParser: MultisigTransactionsOutcomeParser;
     private smartContractController: SmartContractController;
 
-    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi: Abi }) {
+    constructor(options: {
+        chainID: string;
+        networkProvider: INetworkProvider;
+        abi: Abi;
+        gasLimitEstimator?: IGasLimitEstimator;
+    }) {
         super();
         this.transactionAwaiter = new TransactionWatcher(options.networkProvider);
         this.multisigFactory = new MultisigTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
             abi: options.abi,
+            gasLimitEstimator: options.gasLimitEstimator,
         });
         this.multisigParser = new MultisigTransactionsOutcomeParser({ abi: options.abi });
         this.smartContractController = new SmartContractController({

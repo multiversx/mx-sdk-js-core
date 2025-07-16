@@ -6,7 +6,6 @@ import { ErrBadUsage } from "../core/errors";
 import { TokenComputer, TokenTransfer } from "../core/tokens";
 import { TokenTransfersDataBuilder } from "../core/tokenTransfersDataBuilder";
 import { Transaction } from "../core/transaction";
-import { TransactionBuilder } from "../core/transactionBuilder";
 import * as resources from "./resources";
 
 const ADDITIONAL_GAS_FOR_ESDT_TRANSFER = 100000;
@@ -123,14 +122,17 @@ export class TransferTransactionsFactory extends BaseFactory {
             receiver: options.receiver,
         });
 
-        return new TransactionBuilder({
-            config: this.config!,
+        const transaction = new Transaction({
             sender: sender,
             receiver: receiver,
-            dataParts: dataParts,
-            gasLimit: extraGasForTransfer,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, undefined, extraGasForTransfer);
+
+        return transaction;
     }
 
     private buildTransferData(transfer: TokenTransfer, options: { sender: Address; receiver: Address }) {

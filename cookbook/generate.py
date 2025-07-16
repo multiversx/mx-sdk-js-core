@@ -15,6 +15,7 @@ input_files = [
     current_dir / "delegation.ts",
     current_dir / "relayed.ts",
     current_dir / "guarded.ts",
+    current_dir / "governance.ts",
     current_dir / "addresses.ts",
     current_dir / "wallets.ts",
     current_dir / "signingObjects.ts",

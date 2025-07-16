@@ -62,7 +62,7 @@ import {
     }
     // ```
 
-    // A full list of available methods for `ApiNetworkProvider` can be found [here](https://multiversx.github.io/mx-sdk-js-core/v14/classes/ApiNetworkProvider.html).
+    // Here you can find a full list of available methods for `class:ApiNetworkProvider`.
 
     // Both `ApiNetworkProvider` and `ProxyNetworkProvider` implement a common interface, which can be found [here](https://multiversx.github.io/mx-sdk-js-core/v14/interfaces/INetworkProvider.html). This allows them to be used interchangeably.
 

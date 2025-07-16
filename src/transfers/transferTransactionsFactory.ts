@@ -47,7 +47,7 @@ export class TransferTransactionsFactory extends BaseFactory {
             value: options.nativeAmount ?? BigInt(0),
         });
 
-        this.setGasLimit(transaction, undefined, 0n); // check
+        this.setGasLimit(transaction, undefined, 0n);
 
         return transaction;
     }

@@ -1,6 +1,7 @@
 import { IGasLimitEstimator } from "../core";
 import { Address } from "../core/address";
 import { BaseFactory } from "../core/baseFactory";
+import { TRANSACTION_OPTIONS_TX_GUARDED } from "../core/constants";
 import { Transaction } from "../core/transaction";
 import { SaveKeyValueInput, SetGuardianInput } from "./resources";
 
@@ -101,7 +102,7 @@ export class AccountTransactionsFactory extends BaseFactory {
         return transaction;
     }
 
-    createTransactionForUnguardingAccount(sender: Address): Transaction {
+    createTransactionForUnguardingAccount(sender: Address, options: { guardian?: Address }): Transaction {
         const dataParts = ["UnGuardAccount"];
 
         const transaction = new Transaction({
@@ -109,6 +110,8 @@ export class AccountTransactionsFactory extends BaseFactory {
             receiver: sender,
             chainID: this.config.chainID,
             gasLimit: 0n,
+            options: TRANSACTION_OPTIONS_TX_GUARDED,
+            guardian: options.guardian,
         });
 
         this.setTransactionPayload(transaction, dataParts);

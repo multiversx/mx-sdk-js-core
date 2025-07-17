@@ -69,7 +69,9 @@ export class AccountController extends BaseController {
         nonce: bigint,
         options: BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnguardingAccount(sender.address);
+        const transaction = this.factory.createTransactionForUnguardingAccount(sender.address, {
+            guardian: options.guardian,
+        });
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();

@@ -1,5 +1,6 @@
 import { assert } from "chai";
 import { Address, TransactionsFactoryConfig } from "../core";
+import { TRANSACTION_OPTIONS_TX_GUARDED } from "../core/constants";
 import { AccountTransactionsFactory } from "./accountTransactionsFactory";
 
 describe("test account transactions factory", function () {
@@ -76,8 +77,9 @@ describe("test account transactions factory", function () {
 
     it("should create 'Transaction' for unguarding account", async function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const guardian = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
-        const transaction = factory.createTransactionForUnguardingAccount(sender);
+        const transaction = factory.createTransactionForUnguardingAccount(sender, { guardian });
 
         assert.deepEqual(
             transaction.sender,
@@ -91,5 +93,10 @@ describe("test account transactions factory", function () {
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
         assert.equal(transaction.gasLimit, 321000n);
+        assert.equal(transaction.options, TRANSACTION_OPTIONS_TX_GUARDED);
+        assert.deepEqual(
+            transaction.guardian,
+            Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"),
+        );
     });
 });

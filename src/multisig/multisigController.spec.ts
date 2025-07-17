@@ -384,7 +384,7 @@ describe("test multisig controller query methods", () => {
 
         const mappedRes = result as resources.SendAsyncCall;
         assert.equal(mappedRes.receiver.toBech32(), "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms");
-        assert.equal(mappedRes.funcionName, "add");
+        assert.equal(mappedRes.functionName, "add");
         assert.equal(mappedRes.amount, 0n);
     });
 
@@ -412,7 +412,7 @@ describe("test multisig controller query methods", () => {
         const mappedRes = result as resources.SendTransferExecuteEsdt;
 
         assert.equal(mappedRes.receiver.toBech32(), "erd1qqqqqqqqqqqqqpgqfxlljcaalgl2qfcnxcsftheju0ts36kvl3ts3qkewe");
-        assert.equal(mappedRes.funcionName, "distribute");
+        assert.equal(mappedRes.functionName, "distribute");
     });
 
     it("getActionData returns the action data as AddBoardMember", async function () {

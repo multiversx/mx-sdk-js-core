@@ -175,7 +175,11 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         }
     }
 
-    createTransactionForClaimingDeveloperRewards(options: { sender: Address; contract: Address }): Transaction {
+    createTransactionForClaimingDeveloperRewards(options: {
+        sender: Address;
+        contract: Address;
+        gasLimit?: bigint;
+    }): Transaction {
         const dataParts = ["ClaimDeveloperRewards"];
 
         const transaction = new Transaction({
@@ -186,7 +190,7 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, this.config.gasLimitClaimDeveloperRewards);
+        this.setGasLimit(transaction, options.gasLimit, this.config.gasLimitClaimDeveloperRewards);
 
         return transaction;
     }
@@ -195,6 +199,7 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         sender: Address;
         contract: Address;
         newOwner: Address;
+        gasLimit?: bigint;
     }): Transaction {
         const dataParts = ["ChangeOwnerAddress", options.newOwner.toHex()];
 
@@ -206,7 +211,7 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, this.config.gasLimitChangeOwnerAddress);
+        this.setGasLimit(transaction, options.gasLimit, this.config.gasLimitChangeOwnerAddress);
 
         return transaction;
     }

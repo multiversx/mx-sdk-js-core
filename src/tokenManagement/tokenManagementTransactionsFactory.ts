@@ -275,7 +275,6 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
             receiver: this.esdtContractAddress,
             chainID: this.config.chainID,
             gasLimit: 0n,
-            value: this.config.issueCost,
         });
 
         this.setTransactionPayload(transaction, dataParts);

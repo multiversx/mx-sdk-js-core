@@ -32,14 +32,21 @@ export class BaseFactory {
     protected async setGasLimit(transaction: Transaction, gasLimit?: bigint, configGasLimit?: bigint): Promise<void> {
         if (gasLimit) {
             transaction.gasLimit = gasLimit;
-        } else if (this.gasLimitEstimator) {
-            transaction.gasLimit = await this.gasLimitEstimator.estimateGasLimit(transaction);
-        } else if (configGasLimit !== undefined) {
+            return;
+        }
+
+        if (this.gasLimitEstimator) {
+            transaction.gasLimit = await this.gasLimitEstimator.estimateGasLimit({ transaction });
+            return;
+        }
+
+        if (configGasLimit !== undefined) {
             const dataMovementGas =
                 this.gasConfig.minGasLimit + this.gasConfig.gasLimitPerByte * BigInt(transaction.data.length);
             transaction.gasLimit = dataMovementGas + configGasLimit;
-        } else {
-            throw new Error("Gas limit must be provided or a gas limit estimator must be set.");
+            return;
         }
+
+        throw new Error("Gas limit must be provided or a gas limit estimator must be set.");
     }
 }

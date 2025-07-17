@@ -14,7 +14,7 @@ describe("GasLimitEstimator tests", () => {
         };
         networkProvider.mockTransactionCostResponse = mockTxCostResponse;
 
-        const estimator = new GasLimitEstimator(networkProvider);
+        const estimator = new GasLimitEstimator({ networkProvider });
         const tx = new Transaction({
             sender: Address.empty(),
             receiver: Address.empty(),
@@ -23,7 +23,7 @@ describe("GasLimitEstimator tests", () => {
             value: 10000000n,
         });
 
-        const estimatedGas = await estimator.estimateGasLimit(tx);
+        const estimatedGas = await estimator.estimateGasLimit({ transaction: tx });
         assert.equal(estimatedGas, 50000n);
     });
 
@@ -36,7 +36,7 @@ describe("GasLimitEstimator tests", () => {
         };
         networkProvider.mockTransactionCostResponse = mockTxCostResponse;
 
-        const estimator = new GasLimitEstimator(networkProvider, 1.5);
+        const estimator = new GasLimitEstimator({ networkProvider: networkProvider, gasMultiplier: 1.5 });
         const tx = new Transaction({
             sender: Address.empty(),
             receiver: Address.empty(),
@@ -45,7 +45,29 @@ describe("GasLimitEstimator tests", () => {
             value: 10000000n,
         });
 
-        const estimatedGas = await estimator.estimateGasLimit(tx);
+        const estimatedGas = await estimator.estimateGasLimit({ transaction: tx });
         assert.equal(estimatedGas, 75000n);
+    });
+
+    it("should round down estimated gas limit with multiplier", async () => {
+        const networkProvider = new MockNetworkProvider();
+        const mockTxCostResponse = {
+            raw: {},
+            gasLimit: 50000,
+            status: TransactionStatus.createUnknown(),
+        };
+        networkProvider.mockTransactionCostResponse = mockTxCostResponse;
+
+        const estimator = new GasLimitEstimator({ networkProvider: networkProvider, gasMultiplier: 1.98765 });
+        const tx = new Transaction({
+            sender: Address.empty(),
+            receiver: Address.empty(),
+            chainID: "D",
+            gasLimit: 0n,
+            value: 10000000n,
+        });
+
+        const estimatedGas = await estimator.estimateGasLimit({ transaction: tx });
+        assert.equal(estimatedGas, 99382n);
     });
 });

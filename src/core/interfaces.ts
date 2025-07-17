@@ -45,5 +45,5 @@ export interface INetworkConfig {
 }
 
 export interface IGasLimitEstimator {
-    estimateGasLimit(transaction: Transaction): Promise<bigint>;
+    estimateGasLimit(options: { transaction: Transaction }): Promise<bigint>;
 }

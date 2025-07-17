@@ -256,11 +256,11 @@ describe("test smart contract queries controller", () => {
             assert.equal(transaction.gasLimit, 123456789n);
         });
 
-        it("should set the specified gasLimit when gasLimitEstimator is provided", async function () {
+        it("should set the specified gasLimit even when gasLimitEstimator is provided", async function () {
             const alice = await Account.newFromPem(`${getTestWalletsPath()}/alice.pem`);
             const networkProvider = new MockNetworkProvider();
 
-            const gasLimitEstimator = new GasLimitEstimator(networkProvider, 1.5);
+            const gasLimitEstimator = new GasLimitEstimator({ networkProvider: networkProvider, gasMultiplier: 1.5 });
             const controller = new SmartContractController({
                 chainID: "D",
                 networkProvider: networkProvider,

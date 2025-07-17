@@ -12,13 +12,18 @@ export class GasLimitEstimator {
     private networkProvider: INetworkProvider;
     private gasMultiplier: number;
 
-    constructor(networkProvider: INetworkProvider, gasMultiplier?: number) {
-        this.networkProvider = networkProvider;
-        this.gasMultiplier = gasMultiplier || 1;
+    constructor(options: { networkProvider: INetworkProvider; gasMultiplier?: number }) {
+        this.networkProvider = options.networkProvider;
+        this.gasMultiplier = options.gasMultiplier || 1.0;
     }
 
-    async estimateGasLimit(transaction: Transaction): Promise<bigint> {
-        const gasLimit = (await this.networkProvider.estimateTransactionCost(transaction)).gasLimit;
-        return BigInt(gasLimit * this.gasMultiplier);
+    async estimateGasLimit(options: { transaction: Transaction }): Promise<bigint> {
+        try {
+            const gasLimit = (await this.networkProvider.estimateTransactionCost(options.transaction)).gasLimit;
+            const multipliedEstimatedGas = Math.floor(gasLimit * this.gasMultiplier);
+            return BigInt(multipliedEstimatedGas);
+        } catch (error) {
+            throw new Error(`Failed to estimate gas limit: ${error instanceof Error ? error.message : String(error)}`);
+        }
     }
 }

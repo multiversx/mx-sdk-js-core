@@ -11,12 +11,12 @@ export type DeployMultisigContractInput = {
     isReadable?: boolean;
     isPayable?: boolean;
     isPayableBySmartContract?: boolean;
-    gasLimit: bigint;
+    gasLimit?: bigint;
 };
 
 export type MultisigContractInput = {
     multisigContract: Address;
-    gasLimit: bigint;
+    gasLimit?: bigint;
 };
 
 export type ProposeAddBoardMemberInput = MultisigContractInput & {

@@ -195,7 +195,7 @@ export class MultisigTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, undefined, options.gasLimit);
+        this.setGasLimit(transaction, options.gasLimit);
 
         return transaction;
     }

@@ -1,4 +1,4 @@
-import { Transaction } from "../core";
+import { ErrGasLimitCannotBeEstimated, Transaction } from "../core";
 
 interface ITransactionCostResponse {
     gasLimit: number;
@@ -22,8 +22,8 @@ export class GasLimitEstimator {
             const gasLimit = (await this.networkProvider.estimateTransactionCost(options.transaction)).gasLimit;
             const multipliedEstimatedGas = Math.floor(gasLimit * this.gasMultiplier);
             return BigInt(multipliedEstimatedGas);
-        } catch (error) {
-            throw new Error(`Failed to estimate gas limit: ${error instanceof Error ? error.message : String(error)}`);
+        } catch (error: any) {
+            throw new ErrGasLimitCannotBeEstimated(error);
         }
     }
 }

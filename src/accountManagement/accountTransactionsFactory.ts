@@ -110,9 +110,12 @@ export class AccountTransactionsFactory extends BaseFactory {
             receiver: sender,
             chainID: this.config.chainID,
             gasLimit: 0n,
-            options: TRANSACTION_OPTIONS_TX_GUARDED,
-            guardian: options.guardian,
         });
+
+        if (options.guardian) {
+            transaction.guardian = options.guardian;
+            transaction.options = TRANSACTION_OPTIONS_TX_GUARDED;
+        }
 
         this.setTransactionPayload(transaction, dataParts);
         this.setGasLimit(transaction, undefined, this.config.gasLimitUnguardAccount);

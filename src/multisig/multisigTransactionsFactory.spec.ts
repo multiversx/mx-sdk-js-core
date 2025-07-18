@@ -202,6 +202,7 @@ describe("test multisig transactions factory", function () {
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
         assert.equal(transaction.chainID, config.chainID);
+        assert.equal(transaction.gasLimit, 5000000n);
         assert.deepEqual(
             transaction.data.toString(),
             "proposeTransferExecuteEsdt@0000000000000000050049bff963bdfa3ea02713362095df32e3d708eaccfc57@0000000c414c4943452d3536323766310000000000000000000000010a@0100000000004c4b40@3634363937333734373236393632373537343635",

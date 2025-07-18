@@ -1,7 +1,7 @@
 import { ArgSerializer, BigUIntValue, StringValue } from "../abi";
-import { Address, Transaction, TransactionsFactoryConfig } from "../core";
+import { Address, IGasLimitEstimator, Transaction, TransactionsFactoryConfig } from "../core";
+import { BaseFactory } from "../core/baseFactory";
 import { GOVERNANCE_CONTRACT_ADDRESS_HEX } from "../core/constants";
-import { TransactionBuilder } from "../core/transactionBuilder";
 import {
     ChangeConfigInput,
     ClearEndedProposalsInput,
@@ -25,12 +25,13 @@ interface IConfig {
 
 const EXTRA_GAS_LIMIT_FOR_VOTING = 100_000n;
 
-export class GovernanceTransactionsFactory {
+export class GovernanceTransactionsFactory extends BaseFactory {
     private readonly config: IConfig;
     private readonly argSerializer: ArgSerializer;
     private readonly governanceContract: Address;
 
-    constructor(options: { config: TransactionsFactoryConfig }) {
+    constructor(options: { config: TransactionsFactoryConfig; gasLimitEstimator?: IGasLimitEstimator }) {
+        super({ config: options.config, gasLimitEstimator: options.gasLimitEstimator });
         this.config = options.config;
         this.argSerializer = new ArgSerializer();
         this.governanceContract = Address.newFromHex(GOVERNANCE_CONTRACT_ADDRESS_HEX, this.config.addressHrp);
@@ -44,71 +45,88 @@ export class GovernanceTransactionsFactory {
         ];
         const dataParts = ["proposal", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: this.governanceContract,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitForProposal,
-            addDataMovementGas: true,
-            amount: options.nativeTokenAmount,
-        }).build();
+            value: options.nativeTokenAmount,
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, undefined, this.config.gasLimitForProposal);
+
+        return transaction;
     }
 
     createTransactionForVoting(sender: Address, options: VoteProposalInput): Transaction {
         const args = [new BigUIntValue(options.proposalNonce), new StringValue(options.vote.valueOf())];
         const dataParts = ["vote", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: this.governanceContract,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitForVote + EXTRA_GAS_LIMIT_FOR_VOTING,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, undefined, this.config.gasLimitForVote + EXTRA_GAS_LIMIT_FOR_VOTING);
+
+        return transaction;
     }
 
     createTransactionForClosingProposal(sender: Address, options: CloseProposalInput): Transaction {
         const args = [new BigUIntValue(options.proposalNonce)];
         const dataParts = ["closeProposal", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: this.governanceContract,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitForClosingProposal,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, undefined, this.config.gasLimitForClosingProposal);
+
+        return transaction;
     }
 
     createTransactionForClearingEndedProposals(sender: Address, options: ClearEndedProposalsInput): Transaction {
         const dataParts = ["clearEndedProposals", ...options.proposers.map((address) => address.toHex())];
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: this.governanceContract,
-            dataParts: dataParts,
-            gasLimit:
-                this.config.gasLimitForClearProposals +
-                BigInt(options.proposers.length) * this.config.gasLimitForClearProposals,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+
+        const gasLimit =
+            this.config.gasLimitForClearProposals +
+            BigInt(options.proposers.length) * this.config.gasLimitForClearProposals;
+        this.setGasLimit(transaction, undefined, gasLimit);
+
+        return transaction;
     }
 
     createTransactionForClaimingAccumulatedFees(sender: Address): Transaction {
         const dataParts = ["claimAccumulatedFees"];
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: this.governanceContract,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitForClaimAccumulatedFees,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, undefined, this.config.gasLimitForClaimAccumulatedFees);
+
+        return transaction;
     }
 
     createTransactionForChangingConfig(sender: Address, options: ChangeConfigInput): Transaction {
@@ -121,13 +139,16 @@ export class GovernanceTransactionsFactory {
         ];
         const dataParts = ["changeConfig", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: this.governanceContract,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitForChangeConfig,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        this.setGasLimit(transaction, undefined, this.config.gasLimitForChangeConfig);
+
+        return transaction;
     }
 }

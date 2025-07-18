@@ -1,5 +1,5 @@
 import { Address, BaseController, BaseControllerInput } from "../core";
-import { IAccount } from "../core/interfaces";
+import { IAccount, IGasLimitEstimator } from "../core/interfaces";
 import { Transaction } from "../core/transaction";
 import { TransactionsFactoryConfig } from "../core/transactionsFactoryConfig";
 import { AccountTransactionsFactory } from "./accountTransactionsFactory";
@@ -8,10 +8,11 @@ import { SaveKeyValueInput, SetGuardianInput } from "./resources";
 export class AccountController extends BaseController {
     private factory: AccountTransactionsFactory;
 
-    constructor(options: { chainID: string }) {
+    constructor(options: { chainID: string; gasLimitEstimator?: IGasLimitEstimator }) {
         super();
         this.factory = new AccountTransactionsFactory({
             config: new TransactionsFactoryConfig(options),
+            gasLimitEstimator: options.gasLimitEstimator,
         });
     }
 
@@ -68,7 +69,9 @@ export class AccountController extends BaseController {
         nonce: bigint,
         options: BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnguardingAccount(sender.address);
+        const transaction = this.factory.createTransactionForUnguardingAccount(sender.address, {
+            guardian: options.guardian,
+        });
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();

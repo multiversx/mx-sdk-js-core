@@ -585,7 +585,7 @@ describe("test smart contract transactions factory", function () {
             Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4"),
         );
         assert.equal(Buffer.from(transaction.data).toString(), "ClaimDeveloperRewards");
-        assert.equal(transaction.gasLimit, 6000000n);
+        assert.equal(transaction.gasLimit, 6081500n);
         assert.equal(transaction.value, 0n);
     });
 
@@ -612,7 +612,7 @@ describe("test smart contract transactions factory", function () {
             Buffer.from(transaction.data).toString(),
             "ChangeOwnerAddress@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8",
         );
-        assert.equal(transaction.gasLimit, 6000000n);
+        assert.equal(transaction.gasLimit, 6174500n);
         assert.equal(transaction.value, 0n);
     });
 });

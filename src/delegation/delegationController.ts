@@ -3,6 +3,7 @@ import {
     BaseController,
     BaseControllerInput,
     IAccount,
+    IGasLimitEstimator,
     Transaction,
     TransactionOnNetwork,
     TransactionsFactoryConfig,
@@ -18,11 +19,16 @@ export class DelegationController extends BaseController {
     private factory: DelegationTransactionsFactory;
     private parser: DelegationTransactionsOutcomeParser;
 
-    constructor(options: { chainID: string; networkProvider: INetworkProvider }) {
+    constructor(options: {
+        chainID: string;
+        networkProvider: INetworkProvider;
+        gasLimitEstimator?: IGasLimitEstimator;
+    }) {
         super();
         this.transactionAwaiter = new TransactionWatcher(options.networkProvider);
         this.factory = new DelegationTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
+            gasLimitEstimator: options.gasLimitEstimator,
         });
         this.parser = new DelegationTransactionsOutcomeParser();
     }

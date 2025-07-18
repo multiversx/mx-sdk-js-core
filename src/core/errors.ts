@@ -213,7 +213,7 @@ export class ErrContractHasNoAddress extends ErrContract {
     public constructor() {
         super(`
 The smart contract has no address set. Make sure you provide the address in the constructor, or call setAddress() appropriately.
-If you need to recompute the address of the contract, make use of SmartContract.computeAddress() (static method). 
+If you need to recompute the address of the contract, make use of SmartContract.computeAddress() (static method).
 `);
     }
 }
@@ -437,5 +437,14 @@ export class ErrInvalidNetworkProviderKind extends Err {
 export class ExpectedAccountConditionNotReachedError extends Err {
     public constructor() {
         super("The expected account condition was not reached.");
+    }
+}
+
+/**
+ * Signals that the gasLimit could not be estimated.
+ */
+export class ErrGasLimitCannotBeEstimated extends Err {
+    public constructor(error: Error) {
+        super(`Failed to estimate gas limit: ${error}`, error);
     }
 }

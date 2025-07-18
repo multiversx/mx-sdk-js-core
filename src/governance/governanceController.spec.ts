@@ -173,6 +173,7 @@ describe("test governance controller", function () {
 
         const config = await controller.getConfig();
         assert.equal(config.proposalFee, 1000_000000000000000000n);
+        assert.equal(config.lostProposalFee, 10_000000000000000000n);
         assert.equal(config.minQuorum, 0.2);
         assert.equal(config.minPassThreshold, 0.5);
         assert.equal(config.minVetoThreshold, 0.33);

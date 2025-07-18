@@ -6,6 +6,7 @@ import {
     Err,
     ErrSmartContractQuery,
     IAccount,
+    IGasLimitEstimator,
     SmartContractQuery,
     SmartContractQueryInput,
     SmartContractQueryResponse,
@@ -26,11 +27,17 @@ export class SmartContractController extends BaseController {
     private networkProvider: INetworkProvider;
     protected abi?: Abi;
 
-    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: Abi }) {
+    constructor(options: {
+        chainID: string;
+        networkProvider: INetworkProvider;
+        abi?: Abi;
+        gasLimitEstimator?: IGasLimitEstimator;
+    }) {
         super();
         this.factory = new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
             abi: options.abi,
+            gasLimitEstimator: options.gasLimitEstimator,
         });
         this.parser = new SmartContractTransactionsOutcomeParser(options);
         this.transactionWatcher = new TransactionWatcher(options.networkProvider);

@@ -11,7 +11,7 @@ describe("test account transactions factory", function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const keyValuePairs = new Map([[Buffer.from("key0"), Buffer.from("value0")]]);
 
-        const transaction = factory.createTransactionForSavingKeyValue(sender, {
+        const transaction = await factory.createTransactionForSavingKeyValue(sender, {
             keyValuePairs: keyValuePairs,
         });
 
@@ -34,7 +34,7 @@ describe("test account transactions factory", function () {
         const guardian = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const serviceID = "MultiversXTCSService";
 
-        const transaction = factory.createTransactionForSettingGuardian(sender, {
+        const transaction = await factory.createTransactionForSettingGuardian(sender, {
             guardianAddress: guardian,
             serviceID: serviceID,
         });
@@ -59,7 +59,7 @@ describe("test account transactions factory", function () {
     it("should create 'Transaction' for guarding account", async function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
-        const transaction = factory.createTransactionForGuardingAccount(sender);
+        const transaction = await factory.createTransactionForGuardingAccount(sender);
 
         assert.deepEqual(
             transaction.sender,
@@ -79,7 +79,7 @@ describe("test account transactions factory", function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const guardian = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
-        const transaction = factory.createTransactionForUnguardingAccount(sender, { guardian });
+        const transaction = await factory.createTransactionForUnguardingAccount(sender, { guardian });
 
         assert.deepEqual(
             transaction.sender,

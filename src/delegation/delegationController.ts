@@ -38,7 +38,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.NewDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForNewDelegationContract(sender.address, options);
+        const transaction = await this.factory.createTransactionForNewDelegationContract(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -64,7 +64,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.AddNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForAddingNodes(sender.address, options);
+        const transaction = await this.factory.createTransactionForAddingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -81,7 +81,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ManageNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForRemovingNodes(sender.address, options);
+        const transaction = await this.factory.createTransactionForRemovingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -98,7 +98,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ManageNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForStakingNodes(sender.address, options);
+        const transaction = await this.factory.createTransactionForStakingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -115,7 +115,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ManageNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnbondingNodes(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnbondingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -132,7 +132,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ManageNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnstakingNodes(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnstakingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -149,7 +149,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.UnjailingNodesInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnjailingNodes(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnjailingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -166,7 +166,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ChangeServiceFee & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForChangingServiceFee(sender.address, options);
+        const transaction = await this.factory.createTransactionForChangingServiceFee(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -183,7 +183,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ModifyDelegationCapInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForModifyingDelegationCap(sender.address, options);
+        const transaction = await this.factory.createTransactionForModifyingDelegationCap(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -200,7 +200,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingAutomaticActivation(sender.address, options);
+        const transaction = await this.factory.createTransactionForSettingAutomaticActivation(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -217,7 +217,10 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnsettingAutomaticActivation(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnsettingAutomaticActivation(
+            sender.address,
+            options,
+        );
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -234,7 +237,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingCapCheckOnRedelegateRewards(
+        const transaction = await this.factory.createTransactionForSettingCapCheckOnRedelegateRewards(
             sender.address,
             options,
         );
@@ -254,7 +257,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnsettingCapCheckOnRedelegateRewards(
+        const transaction = await this.factory.createTransactionForUnsettingCapCheckOnRedelegateRewards(
             sender.address,
             options,
         );
@@ -274,7 +277,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.SetContractMetadataInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingMetadata(sender.address, options);
+        const transaction = await this.factory.createTransactionForSettingMetadata(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -291,7 +294,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.DelegateActionsInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForDelegating(sender.address, options);
+        const transaction = await this.factory.createTransactionForDelegating(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -308,7 +311,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForClaimingRewards(sender.address, options);
+        const transaction = await this.factory.createTransactionForClaimingRewards(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -325,7 +328,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForRedelegatingRewards(sender.address, options);
+        const transaction = await this.factory.createTransactionForRedelegatingRewards(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -342,7 +345,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.DelegateActionsInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUndelegating(sender.address, options);
+        const transaction = await this.factory.createTransactionForUndelegating(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -359,7 +362,7 @@ export class DelegationController extends BaseController {
         nonce: bigint,
         options: resources.ManageDelegationContractInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForWithdrawing(sender.address, options);
+        const transaction = await this.factory.createTransactionForWithdrawing(sender.address, options);
 
         transaction.nonce = nonce;
         transaction.guardian = options.guardian ?? Address.empty();

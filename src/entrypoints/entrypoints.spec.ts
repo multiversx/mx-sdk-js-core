@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 import path from "path";
 import { Account } from "../accounts/account";
 import { loadAbiRegistry } from "../testutils";
-import { DevnetEntrypoint } from "./entrypoints";
+import { DevnetEntrypoint, NetworkEntrypoint } from "./entrypoints";
 
 describe("TestEntrypoint", function () {
     const entrypoint = new DevnetEntrypoint();
@@ -133,5 +133,28 @@ describe("TestEntrypoint", function () {
         assert.isNotNull(account.address);
         assert.equal(account.secretKey.valueOf().length, 32);
         assert.equal(account.publicKey.valueOf().length, 32);
+    });
+
+    it("should estimate gas limit", async () => {
+        const entrypoint = new NetworkEntrypoint({
+            networkProviderUrl: "https://devnet-api.multiversx.com",
+            networkProviderKind: "api",
+            chainId: "D",
+            gasLimitMultiplier: 1.5,
+        });
+        const controller = entrypoint.createTransfersController();
+        const filePath = path.join("src", "testdata", "testwallets", "alice.pem");
+        const sender = await Account.newFromPem(filePath);
+        sender.nonce = await entrypoint.recallAccountNonce(sender.address);
+
+        const transaction = await controller.createTransactionForTransfer(
+            sender,
+            BigInt(sender.getNonceThenIncrement().valueOf()),
+            {
+                receiver: sender.address,
+                nativeAmount: BigInt(10000000),
+            },
+        );
+        assert.equal(transaction.gasLimit, 75000n);
     });
 });

@@ -30,7 +30,7 @@ export class BaseFactory {
      * @param configGasLimit - Optional gas limit from the configuration. This is computed internally based on some config values.
      */
     protected async setGasLimit(transaction: Transaction, gasLimit?: bigint, configGasLimit?: bigint): Promise<void> {
-        if (gasLimit) {
+        if (gasLimit !== undefined) {
             transaction.gasLimit = gasLimit;
             return;
         }

@@ -38,7 +38,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.IssueFungibleInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForIssuingFungible(sender.address, options);
+        const transaction = await this.factory.createTransactionForIssuingFungible(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -64,7 +64,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.IssueSemiFungibleInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForIssuingSemiFungible(sender.address, options);
+        const transaction = await this.factory.createTransactionForIssuingSemiFungible(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -90,7 +90,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.IssueNonFungibleInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForIssuingNonFungible(sender.address, options);
+        const transaction = await this.factory.createTransactionForIssuingNonFungible(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -116,7 +116,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.RegisterMetaESDTInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForRegisteringMetaESDT(sender.address, options);
+        const transaction = await this.factory.createTransactionForRegisteringMetaESDT(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -142,7 +142,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.RegisterRolesInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForRegisteringAndSettingRoles(sender.address, options);
+        const transaction = await this.factory.createTransactionForRegisteringAndSettingRoles(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -168,7 +168,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.BurnRoleGloballyInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingBurnRoleGlobally(sender.address, options);
+        const transaction = await this.factory.createTransactionForSettingBurnRoleGlobally(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -194,7 +194,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.BurnRoleGloballyInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnsettingBurnRoleGlobally(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnsettingBurnRoleGlobally(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -220,7 +220,10 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.FungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingSpecialRoleOnFungibleToken(sender.address, options);
+        const transaction = await this.factory.createTransactionForSettingSpecialRoleOnFungibleToken(
+            sender.address,
+            options,
+        );
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -246,7 +249,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.UnsetFungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnFungibleToken(
+        const transaction = await this.factory.createTransactionForUnsettingSpecialRoleOnFungibleToken(
             sender.address,
             options,
         );
@@ -266,7 +269,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.SemiFungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken(
+        const transaction = await this.factory.createTransactionForSettingSpecialRoleOnSemiFungibleToken(
             sender.address,
             options,
         );
@@ -295,7 +298,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.UnsetSemiFungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
+        const transaction = await this.factory.createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
             sender.address,
             options,
         );
@@ -315,7 +318,10 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.SemiFungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingSpecialRoleOnMetaESDT(sender.address, options);
+        const transaction = await this.factory.createTransactionForSettingSpecialRoleOnMetaESDT(
+            sender.address,
+            options,
+        );
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -341,7 +347,10 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.UnsetSemiFungibleSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnMetaESDT(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnsettingSpecialRoleOnMetaESDT(
+            sender.address,
+            options,
+        );
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -358,7 +367,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.SpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingSpecialRoleOnNonFungibleToken(
+        const transaction = await this.factory.createTransactionForSettingSpecialRoleOnNonFungibleToken(
             sender.address,
             options,
         );
@@ -387,7 +396,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.UnsetSpecialRoleInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
+        const transaction = await this.factory.createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
             sender.address,
             options,
         );
@@ -407,7 +416,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.MintInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForCreatingNFT(sender.address, options);
+        const transaction = await this.factory.createTransactionForCreatingNFT(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -433,7 +442,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.PausingInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForPausing(sender.address, options);
+        const transaction = await this.factory.createTransactionForPausing(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -459,7 +468,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.PausingInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnpausing(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnpausing(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -485,7 +494,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.ManagementInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForFreezing(sender.address, options);
+        const transaction = await this.factory.createTransactionForFreezing(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -511,7 +520,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.ManagementInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUnfreezing(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnfreezing(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -537,7 +546,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.ManagementInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForWiping(sender.address, options);
+        const transaction = await this.factory.createTransactionForWiping(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -563,7 +572,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.LocalMintInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForLocalMint(sender.address, options);
+        const transaction = await this.factory.createTransactionForLocalMint(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -589,7 +598,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.LocalBurnInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForLocalBurning(sender.address, options);
+        const transaction = await this.factory.createTransactionForLocalBurning(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -615,7 +624,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.UpdateAttributesInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUpdatingAttributes(sender.address, options);
+        const transaction = await this.factory.createTransactionForUpdatingAttributes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -641,7 +650,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.UpdateQuantityInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForAddingQuantity(sender.address, options);
+        const transaction = await this.factory.createTransactionForAddingQuantity(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -667,7 +676,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.UpdateQuantityInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForBurningQuantity(sender.address, options);
+        const transaction = await this.factory.createTransactionForBurningQuantity(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -693,7 +702,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.ModifyRoyaltiesInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForModifyingRoyalties(sender.address, options);
+        const transaction = await this.factory.createTransactionForModifyingRoyalties(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -719,7 +728,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.SetNewUriInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForSettingNewUris(sender.address, options);
+        const transaction = await this.factory.createTransactionForSettingNewUris(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -745,7 +754,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.SetNewUriInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForModifyingCreator(sender.address, options);
+        const transaction = await this.factory.createTransactionForModifyingCreator(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -771,7 +780,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.SetNewUriInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForModifyingCreator(sender.address, options);
+        const transaction = await this.factory.createTransactionForModifyingCreator(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -797,7 +806,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.SetNewUriInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForMetadataRecreate(sender.address, options);
+        const transaction = await this.factory.createTransactionForMetadataRecreate(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -823,7 +832,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.SetNewUriInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForChangingTokenToDynamic(sender.address, options);
+        const transaction = await this.factory.createTransactionForChangingTokenToDynamic(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -849,7 +858,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.UpdateTokenIDInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUpdatingTokenId(sender.address, options);
+        const transaction = await this.factory.createTransactionForUpdatingTokenId(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -871,7 +880,7 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.RegisteringDynamicTokenInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForRegisteringDynamicToken(sender.address, options);
+        const transaction = await this.factory.createTransactionForRegisteringDynamicToken(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -897,7 +906,10 @@ export class TokenManagementController extends BaseController {
         nonce: bigint,
         options: resources.RegisteringDynamicTokenInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForRegisteringDynamicAndSettingRoles(sender.address, options);
+        const transaction = await this.factory.createTransactionForRegisteringDynamicAndSettingRoles(
+            sender.address,
+            options,
+        );
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();

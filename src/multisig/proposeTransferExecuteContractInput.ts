@@ -17,19 +17,19 @@ export class ProposeTransferExecuteContractInput {
         this.functionCall = options.functionCall;
     }
 
-    static newFromTransferExecuteInput(options: {
+    static async newFromTransferExecuteInput(options: {
         multisig: Address;
         to: Address;
         functionName: string;
         arguments: any[];
         optGasLimit?: bigint;
         abi?: Abi;
-    }): ProposeTransferExecuteContractInput {
+    }): Promise<ProposeTransferExecuteContractInput> {
         const transactionsFactory = new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: "" }),
             abi: options.abi,
         });
-        const transaction = transactionsFactory.createTransactionForExecute(Address.empty(), {
+        const transaction = await transactionsFactory.createTransactionForExecute(Address.empty(), {
             contract: Address.empty(),
             function: options.functionName,
             gasLimit: 0n,
@@ -47,7 +47,7 @@ export class ProposeTransferExecuteContractInput {
         });
     }
 
-    static newFromProposeAsyncCallInput(options: {
+    static async newFromProposeAsyncCallInput(options: {
         multisig: Address;
         to: Address;
         tokenTransfers: TokenTransfer[];
@@ -55,12 +55,12 @@ export class ProposeTransferExecuteContractInput {
         arguments: any[];
         optGasLimit?: bigint;
         abi?: Abi;
-    }): ProposeTransferExecuteContractInput {
+    }): Promise<ProposeTransferExecuteContractInput> {
         const transactionsFactory = new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: "" }),
             abi: options.abi,
         });
-        const transaction = transactionsFactory.createTransactionForExecute(Address.empty(), {
+        const transaction = await transactionsFactory.createTransactionForExecute(Address.empty(), {
             contract: Address.empty(),
             function: options.functionName,
             gasLimit: 0n,

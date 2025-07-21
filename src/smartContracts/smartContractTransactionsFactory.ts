@@ -42,7 +42,7 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         this.contractDeployAddress = Address.newFromHex(CONTRACT_DEPLOY_ADDRESS_HEX, this.config.addressHrp);
     }
 
-    createTransactionForDeploy(sender: Address, options: resources.ContractDeployInput): Transaction {
+    async createTransactionForDeploy(sender: Address, options: resources.ContractDeployInput): Promise<Transaction> {
         const nativeTransferAmount = options.nativeTransferAmount ?? 0n;
         const isUpgradeable = options.isUpgradeable ?? true;
         const isReadable = options.isReadable ?? true;
@@ -65,12 +65,12 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, options.gasLimit);
+        await this.setGasLimit(transaction, options.gasLimit);
 
         return transaction;
     }
 
-    createTransactionForExecute(sender: Address, options: resources.ContractExecuteInput): Transaction {
+    async createTransactionForExecute(sender: Address, options: resources.ContractExecuteInput): Promise<Transaction> {
         const args = options.arguments || [];
         let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
         let nativeTransferAmount = options.nativeTransferAmount ?? 0n;
@@ -118,12 +118,12 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, options.gasLimit);
+        await this.setGasLimit(transaction, options.gasLimit);
 
         return transaction;
     }
 
-    createTransactionForUpgrade(sender: Address, options: resources.ContractUpgradeInput): Transaction {
+    async createTransactionForUpgrade(sender: Address, options: resources.ContractUpgradeInput): Promise<Transaction> {
         const nativeTransferAmount = options.nativeTransferAmount ?? 0n;
 
         const isUpgradeable = options.isUpgradeable ?? true;
@@ -148,7 +148,7 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, options.gasLimit);
+        await this.setGasLimit(transaction, options.gasLimit);
 
         return transaction;
     }
@@ -175,11 +175,11 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         }
     }
 
-    createTransactionForClaimingDeveloperRewards(options: {
+    async createTransactionForClaimingDeveloperRewards(options: {
         sender: Address;
         contract: Address;
         gasLimit?: bigint;
-    }): Transaction {
+    }): Promise<Transaction> {
         const dataParts = ["ClaimDeveloperRewards"];
 
         const transaction = new Transaction({
@@ -190,17 +190,17 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, options.gasLimit, this.config.gasLimitClaimDeveloperRewards);
+        await this.setGasLimit(transaction, options.gasLimit, this.config.gasLimitClaimDeveloperRewards);
 
         return transaction;
     }
 
-    createTransactionForChangingOwnerAddress(options: {
+    async createTransactionForChangingOwnerAddress(options: {
         sender: Address;
         contract: Address;
         newOwner: Address;
         gasLimit?: bigint;
-    }): Transaction {
+    }): Promise<Transaction> {
         const dataParts = ["ChangeOwnerAddress", options.newOwner.toHex()];
 
         const transaction = new Transaction({
@@ -211,7 +211,7 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, options.gasLimit, this.config.gasLimitChangeOwnerAddress);
+        await this.setGasLimit(transaction, options.gasLimit, this.config.gasLimitChangeOwnerAddress);
 
         return transaction;
     }

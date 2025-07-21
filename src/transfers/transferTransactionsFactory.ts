@@ -35,7 +35,10 @@ export class TransferTransactionsFactory extends BaseFactory {
         this.tokenTransfersDataBuilder = new TokenTransfersDataBuilder();
     }
 
-    createTransactionForNativeTokenTransfer(sender: Address, options: resources.NativeTokenTransferInput): Transaction {
+    async createTransactionForNativeTokenTransfer(
+        sender: Address,
+        options: resources.NativeTokenTransferInput,
+    ): Promise<Transaction> {
         const data = options.data || new Uint8Array();
 
         const transaction = new Transaction({
@@ -47,12 +50,15 @@ export class TransferTransactionsFactory extends BaseFactory {
             value: options.nativeAmount ?? BigInt(0),
         });
 
-        this.setGasLimit(transaction, undefined, 0n);
+        await this.setGasLimit(transaction, undefined, 0n);
 
         return transaction;
     }
 
-    createTransactionForESDTTokenTransfer(sender: Address, options: resources.CustomTokenTransferInput): Transaction {
+    async createTransactionForESDTTokenTransfer(
+        sender: Address,
+        options: resources.CustomTokenTransferInput,
+    ): Promise<Transaction> {
         const numberOfTransfers = options.tokenTransfers.length;
 
         if (numberOfTransfers === 0) {
@@ -60,7 +66,7 @@ export class TransferTransactionsFactory extends BaseFactory {
         }
 
         if (numberOfTransfers === 1) {
-            return this.createSingleESDTTransferTransaction(sender, options);
+            return await this.createSingleESDTTransferTransaction(sender, options);
         }
 
         const { dataParts, extraGasForTransfer } = this.buildMultiESDTNFTTransferData(
@@ -76,12 +82,15 @@ export class TransferTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, undefined, extraGasForTransfer);
+        await this.setGasLimit(transaction, undefined, extraGasForTransfer);
 
         return transaction;
     }
 
-    createTransactionForTransfer(sender: Address, options: resources.CreateTransferTransactionInput): Transaction {
+    async createTransactionForTransfer(
+        sender: Address,
+        options: resources.CreateTransferTransactionInput,
+    ): Promise<Transaction> {
         const nativeAmount = options.nativeAmount ?? 0n;
         let tokenTransfers = options.tokenTransfers ? [...options.tokenTransfers] : [];
         const numberOfTokens = tokenTransfers.length;
@@ -91,7 +100,7 @@ export class TransferTransactionsFactory extends BaseFactory {
         }
 
         if ((nativeAmount && numberOfTokens === 0) || options.data) {
-            return this.createTransactionForNativeTokenTransfer(sender, {
+            return await this.createTransactionForNativeTokenTransfer(sender, {
                 receiver: options.receiver,
                 nativeAmount: nativeAmount,
                 data: options.data,
@@ -103,19 +112,19 @@ export class TransferTransactionsFactory extends BaseFactory {
             tokenTransfers.push(nativeTransfer);
         }
 
-        return this.createTransactionForESDTTokenTransfer(sender, {
+        return await this.createTransactionForESDTTokenTransfer(sender, {
             receiver: options.receiver,
             tokenTransfers: tokenTransfers,
         });
     }
 
-    private createSingleESDTTransferTransaction(
+    private async createSingleESDTTransferTransaction(
         sender: Address,
         options: {
             receiver: Address;
             tokenTransfers: TokenTransfer[];
         },
-    ): Transaction {
+    ): Promise<Transaction> {
         const transfer = options.tokenTransfers[0];
         const { dataParts, extraGasForTransfer, receiver } = this.buildTransferData(transfer, {
             sender,
@@ -130,7 +139,7 @@ export class TransferTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, undefined, extraGasForTransfer);
+        await this.setGasLimit(transaction, undefined, extraGasForTransfer);
 
         return transaction;
     }
@@ -175,9 +184,5 @@ export class TransferTransactionsFactory extends BaseFactory {
             dataParts: this.tokenTransfersDataBuilder!.buildDataPartsForSingleESDTNFTTransfer(transfer, receiver),
             extraGasForTransfer: this.config!.gasLimitESDTNFTTransfer + BigInt(ADDITIONAL_GAS_FOR_ESDT_NFT_TRANSFER),
         };
-    }
-
-    private computeGasForMoveBalance(config: IConfig, data: Uint8Array): bigint {
-        return config.minGasLimit + config.gasLimitPerByte * BigInt(data.length);
     }
 }

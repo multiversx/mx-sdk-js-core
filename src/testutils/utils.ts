@@ -1,39 +1,8 @@
 import * as fs from "fs";
 import { PathLike } from "fs";
 import { resolve } from "path";
-import { Abi, Code, SmartContract, TypedValue } from "../abi";
-import { Account } from "../accounts";
-import { Transaction } from "../core/transaction";
+import { Abi, Code } from "../abi";
 import { getAxios } from "../core/utils";
-
-export async function prepareDeployment(obj: {
-    deployer: Account;
-    contract: SmartContract;
-    codePath: string;
-    initArguments: TypedValue[];
-    gasLimit: bigint;
-    chainID: string;
-}): Promise<Transaction> {
-    let contract = obj.contract;
-    let deployer = obj.deployer;
-
-    let transaction = obj.contract.deploy({
-        code: await loadContractCode(obj.codePath),
-        gasLimit: obj.gasLimit,
-        initArguments: obj.initArguments,
-        chainID: obj.chainID,
-        deployer: deployer.address,
-    });
-
-    let nonce = deployer.getNonceThenIncrement();
-    let contractAddress = SmartContract.computeAddress(deployer.address, nonce);
-    transaction.nonce = nonce;
-    transaction.sender = deployer.address;
-    contract.setAddress(contractAddress);
-    transaction.signature = await deployer.signTransaction(transaction);
-
-    return transaction;
-}
 
 export async function loadContractCode(path: PathLike): Promise<Code> {
     if (isOnBrowserTests()) {

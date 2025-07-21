@@ -52,7 +52,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.DeployMultisigContractInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForDeploy(sender.address, options);
+        const transaction = await await this.multisigFactory.createTransactionForDeploy(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -319,7 +319,10 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeAddBoardMemberInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeAddBoardMember(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForProposeAddBoardMember(
+            sender.address,
+            options,
+        );
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -338,7 +341,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeAddProposerInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeAddProposer(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForProposeAddProposer(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -357,7 +360,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeRemoveUserInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeRemoveUser(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForProposeRemoveUser(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -376,7 +379,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeChangeQuorumInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeChangeQuorum(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForProposeChangeQuorum(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -404,7 +407,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ActionInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForSignAction(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForSignAction(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -423,7 +426,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ActionInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForPerformAction(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForPerformAction(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -451,7 +454,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ActionInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForUnsign(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForUnsign(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -470,7 +473,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ActionInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForDiscardAction(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForDiscardAction(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -489,7 +492,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.DepositExecuteInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForDeposit(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForDeposit(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -508,7 +511,10 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeTransferExecuteInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeTransferExecute(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForProposeTransferExecute(
+            sender.address,
+            options,
+        );
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -527,7 +533,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeTransferExecuteEsdtInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeTransferExecuteEsdt(
+        const transaction = await this.multisigFactory.createTransactionForProposeTransferExecuteEsdt(
             sender.address,
             options,
         );
@@ -549,7 +555,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeAsyncCallInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeAsyncCall(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForProposeAsyncCall(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -568,7 +574,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeContractDeployFromSourceInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeContractDeployFromSource(
+        const transaction = await this.multisigFactory.createTransactionForProposeContractDeployFromSource(
             sender.address,
             options,
         );
@@ -590,7 +596,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeContractUpgradeFromSourceInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForProposeContractUpgradeFromSource(
+        const transaction = await this.multisigFactory.createTransactionForProposeContractUpgradeFromSource(
             sender.address,
             options,
         );
@@ -612,7 +618,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.GroupInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForSignBatch(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForSignBatch(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -631,7 +637,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ActionInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForSignAndPerform(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForSignAndPerform(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -650,7 +656,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.UnsignForOutdatedBoardMembersInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForUnsignForOutdatedBoardMembers(
+        const transaction = await this.multisigFactory.createTransactionForUnsignForOutdatedBoardMembers(
             sender.address,
             options,
         );
@@ -672,7 +678,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.GroupInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForPerformBatch(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForPerformBatch(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -691,7 +697,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.DiscardBatchInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.multisigFactory.createTransactionForDiscardBatch(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForDiscardBatch(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();

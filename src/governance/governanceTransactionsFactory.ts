@@ -37,7 +37,7 @@ export class GovernanceTransactionsFactory extends BaseFactory {
         this.governanceContract = Address.newFromHex(GOVERNANCE_CONTRACT_ADDRESS_HEX, this.config.addressHrp);
     }
 
-    createTransactionForNewProposal(sender: Address, options: NewProposalInput): Transaction {
+    async createTransactionForNewProposal(sender: Address, options: NewProposalInput): Promise<Transaction> {
         const args = [
             new StringValue(options.commitHash),
             new BigUIntValue(options.startVoteEpoch),
@@ -54,12 +54,12 @@ export class GovernanceTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, undefined, this.config.gasLimitForProposal);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitForProposal);
 
         return transaction;
     }
 
-    createTransactionForVoting(sender: Address, options: VoteProposalInput): Transaction {
+    async createTransactionForVoting(sender: Address, options: VoteProposalInput): Promise<Transaction> {
         const args = [new BigUIntValue(options.proposalNonce), new StringValue(options.vote.valueOf())];
         const dataParts = ["vote", ...this.argSerializer.valuesToStrings(args)];
 
@@ -71,12 +71,12 @@ export class GovernanceTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, undefined, this.config.gasLimitForVote + EXTRA_GAS_LIMIT_FOR_VOTING);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitForVote + EXTRA_GAS_LIMIT_FOR_VOTING);
 
         return transaction;
     }
 
-    createTransactionForClosingProposal(sender: Address, options: CloseProposalInput): Transaction {
+    async createTransactionForClosingProposal(sender: Address, options: CloseProposalInput): Promise<Transaction> {
         const args = [new BigUIntValue(options.proposalNonce)];
         const dataParts = ["closeProposal", ...this.argSerializer.valuesToStrings(args)];
 
@@ -88,12 +88,15 @@ export class GovernanceTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, undefined, this.config.gasLimitForClosingProposal);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitForClosingProposal);
 
         return transaction;
     }
 
-    createTransactionForClearingEndedProposals(sender: Address, options: ClearEndedProposalsInput): Transaction {
+    async createTransactionForClearingEndedProposals(
+        sender: Address,
+        options: ClearEndedProposalsInput,
+    ): Promise<Transaction> {
         const dataParts = ["clearEndedProposals", ...options.proposers.map((address) => address.toHex())];
 
         const transaction = new Transaction({
@@ -108,12 +111,12 @@ export class GovernanceTransactionsFactory extends BaseFactory {
         const gasLimit =
             this.config.gasLimitForClearProposals +
             BigInt(options.proposers.length) * this.config.gasLimitForClearProposals;
-        this.setGasLimit(transaction, undefined, gasLimit);
+        await this.setGasLimit(transaction, undefined, gasLimit);
 
         return transaction;
     }
 
-    createTransactionForClaimingAccumulatedFees(sender: Address): Transaction {
+    async createTransactionForClaimingAccumulatedFees(sender: Address): Promise<Transaction> {
         const dataParts = ["claimAccumulatedFees"];
 
         const transaction = new Transaction({
@@ -124,12 +127,12 @@ export class GovernanceTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, undefined, this.config.gasLimitForClaimAccumulatedFees);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitForClaimAccumulatedFees);
 
         return transaction;
     }
 
-    createTransactionForChangingConfig(sender: Address, options: ChangeConfigInput): Transaction {
+    async createTransactionForChangingConfig(sender: Address, options: ChangeConfigInput): Promise<Transaction> {
         const args = [
             new StringValue(options.proposalFee.toString()),
             new StringValue(options.lastProposalFee.toString()),
@@ -147,7 +150,7 @@ export class GovernanceTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, undefined, this.config.gasLimitForChangeConfig);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitForChangeConfig);
 
         return transaction;
     }

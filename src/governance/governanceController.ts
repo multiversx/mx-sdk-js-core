@@ -66,7 +66,7 @@ export class GovernanceController extends BaseController {
         nonce: bigint,
         options: NewProposalInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.governanceFactory.createTransactionForNewProposal(sender.address, options);
+        const transaction = await this.governanceFactory.createTransactionForNewProposal(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -92,7 +92,7 @@ export class GovernanceController extends BaseController {
         nonce: bigint,
         options: VoteProposalInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.governanceFactory.createTransactionForVoting(sender.address, options);
+        const transaction = await this.governanceFactory.createTransactionForVoting(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -118,7 +118,7 @@ export class GovernanceController extends BaseController {
         nonce: bigint,
         options: CloseProposalInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.governanceFactory.createTransactionForClosingProposal(sender.address, options);
+        const transaction = await this.governanceFactory.createTransactionForClosingProposal(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -144,7 +144,10 @@ export class GovernanceController extends BaseController {
         nonce: bigint,
         options: ClearEndedProposalsInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.governanceFactory.createTransactionForClearingEndedProposals(sender.address, options);
+        const transaction = await this.governanceFactory.createTransactionForClearingEndedProposals(
+            sender.address,
+            options,
+        );
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -161,7 +164,7 @@ export class GovernanceController extends BaseController {
         nonce: bigint,
         options: BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.governanceFactory.createTransactionForClaimingAccumulatedFees(sender.address);
+        const transaction = await this.governanceFactory.createTransactionForClaimingAccumulatedFees(sender.address);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -178,7 +181,7 @@ export class GovernanceController extends BaseController {
         nonce: bigint,
         options: ChangeConfigInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.governanceFactory.createTransactionForChangingConfig(sender.address, options);
+        const transaction = await this.governanceFactory.createTransactionForChangingConfig(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();

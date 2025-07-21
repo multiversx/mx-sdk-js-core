@@ -52,11 +52,14 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Creates a transaction to deploy a new multisig contract
      */
-    createTransactionForDeploy(sender: Address, options: resources.DeployMultisigContractInput): Transaction {
+    async createTransactionForDeploy(
+        sender: Address,
+        options: resources.DeployMultisigContractInput,
+    ): Promise<Transaction> {
         const boardAddresses: AddressValue[] = options.board.map((addr) => new AddressValue(addr));
         const args = [new U32Value(options.quorum), VariadicValue.fromItems(...boardAddresses)];
 
-        return this.smartContractFactory.createTransactionForDeploy(sender, {
+        return await this.smartContractFactory.createTransactionForDeploy(sender, {
             bytecode: options.bytecode,
             gasLimit: options.gasLimit,
             isUpgradeable: options.isUpgradeable,
@@ -70,11 +73,11 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Proposes adding a new board member
      */
-    createTransactionForProposeAddBoardMember(
+    async createTransactionForProposeAddBoardMember(
         sender: Address,
         options: resources.ProposeAddBoardMemberInput,
-    ): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    ): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeAddBoardMember",
             gasLimit: options.gasLimit,
@@ -85,8 +88,11 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Proposes adding a new proposer
      */
-    createTransactionForProposeAddProposer(sender: Address, options: resources.ProposeAddProposerInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForProposeAddProposer(
+        sender: Address,
+        options: resources.ProposeAddProposerInput,
+    ): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeAddProposer",
             gasLimit: options.gasLimit,
@@ -97,8 +103,11 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Proposes removing a user (board member or proposer)
      */
-    createTransactionForProposeRemoveUser(sender: Address, options: resources.ProposeRemoveUserInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForProposeRemoveUser(
+        sender: Address,
+        options: resources.ProposeRemoveUserInput,
+    ): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeRemoveUser",
             gasLimit: options.gasLimit,
@@ -109,8 +118,11 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Proposes changing the quorum (minimum signatures required)
      */
-    createTransactionForProposeChangeQuorum(sender: Address, options: resources.ProposeChangeQuorumInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForProposeChangeQuorum(
+        sender: Address,
+        options: resources.ProposeChangeQuorumInput,
+    ): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeChangeQuorum",
             gasLimit: options.gasLimit,
@@ -121,12 +133,12 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Proposes a transaction that will transfer EGLD and/or execute a function
      */
-    createTransactionForProposeTransferExecute(
+    async createTransactionForProposeTransferExecute(
         sender: Address,
         options: resources.ProposeTransferExecuteInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const gasOption = new U64Value(options.optGasLimit ?? 0n);
-        const input = ProposeTransferExecuteContractInput.newFromTransferExecuteInput({
+        const input = await ProposeTransferExecuteContractInput.newFromTransferExecuteInput({
             multisig: options.multisigContract,
             to: options.to,
             functionName: options.functionName,
@@ -134,7 +146,7 @@ export class MultisigTransactionsFactory extends BaseFactory {
             abi: options.abi,
         });
 
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeTransferExecute",
             gasLimit: options.gasLimit,
@@ -150,8 +162,8 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Proposes a transaction that will transfer EGLD and/or execute a function
      */
-    createTransactionForDeposit(sender: Address, options: resources.DepositExecuteInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForDeposit(sender: Address, options: resources.DepositExecuteInput): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "deposit",
             gasLimit: options.gasLimit,
@@ -164,11 +176,11 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Proposes a transaction that will transfer ESDT tokens and/or execute a function
      */
-    createTransactionForProposeTransferExecuteEsdt(
+    async createTransactionForProposeTransferExecuteEsdt(
         sender: Address,
         options: resources.ProposeTransferExecuteEsdtInput,
-    ): Transaction {
-        const input = ProposeTransferExecuteContractInput.newFromTransferExecuteInput({
+    ): Promise<Transaction> {
+        const input = await ProposeTransferExecuteContractInput.newFromTransferExecuteInput({
             multisig: options.multisigContract,
             to: options.to,
             functionName: options.functionName,
@@ -195,7 +207,7 @@ export class MultisigTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        this.setGasLimit(transaction, options.gasLimit);
+        await this.setGasLimit(transaction, options.gasLimit);
 
         return transaction;
     }
@@ -216,8 +228,11 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Proposes an async call to another contract
      */
-    createTransactionForProposeAsyncCall(sender: Address, options: resources.ProposeAsyncCallInput): Transaction {
-        const input = ProposeTransferExecuteContractInput.newFromProposeAsyncCallInput({
+    async createTransactionForProposeAsyncCall(
+        sender: Address,
+        options: resources.ProposeAsyncCallInput,
+    ): Promise<Transaction> {
+        const input = await ProposeTransferExecuteContractInput.newFromProposeAsyncCallInput({
             multisig: options.multisigContract,
             to: options.to,
             tokenTransfers: options.tokenTransfers,
@@ -226,7 +241,7 @@ export class MultisigTransactionsFactory extends BaseFactory {
             abi: options.abi,
         });
 
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeAsyncCall",
             gasLimit: options.gasLimit,
@@ -242,12 +257,12 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Proposes deploying a smart contract from source
      */
-    createTransactionForProposeContractDeployFromSource(
+    async createTransactionForProposeContractDeployFromSource(
         sender: Address,
         options: resources.ProposeContractDeployFromSourceInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         let args: TypedValue[] = this.argsToTypedValues(options.arguments, options.abi?.constructorDefinition);
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeSCDeployFromSource",
             gasLimit: options.gasLimit,
@@ -263,12 +278,12 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Proposes upgrading a smart contract from source
      */
-    createTransactionForProposeContractUpgradeFromSource(
+    async createTransactionForProposeContractUpgradeFromSource(
         sender: Address,
         options: resources.ProposeContractUpgradeFromSourceInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         let args: TypedValue[] = this.argsToTypedValues(options.arguments, options.abi?.constructorDefinition);
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "proposeSCUpgradeFromSource",
             gasLimit: options.gasLimit,
@@ -285,8 +300,8 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Signs an action (by a board member)
      */
-    createTransactionForSignAction(sender: Address, options: resources.ActionInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForSignAction(sender: Address, options: resources.ActionInput): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "sign",
             gasLimit: options.gasLimit,
@@ -297,8 +312,8 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Signs all actions in a batch
      */
-    createTransactionForSignBatch(sender: Address, options: resources.GroupInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForSignBatch(sender: Address, options: resources.GroupInput): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "signBatch",
             gasLimit: options.gasLimit,
@@ -309,8 +324,8 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Signs and performs an action in one transaction
      */
-    createTransactionForSignAndPerform(sender: Address, options: resources.ActionInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForSignAndPerform(sender: Address, options: resources.ActionInput): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "signAndPerform",
             gasLimit: options.gasLimit,
@@ -321,8 +336,11 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Signs and performs all actions in a batch
      */
-    createTransactionForSignBatchAndPerform(sender: Address, options: resources.GroupInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForSignBatchAndPerform(
+        sender: Address,
+        options: resources.GroupInput,
+    ): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "signBatchAndPerform",
             gasLimit: options.gasLimit,
@@ -333,8 +351,8 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Withdraws signature from an action
      */
-    createTransactionForUnsign(sender: Address, options: resources.ActionInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForUnsign(sender: Address, options: resources.ActionInput): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "unsign",
             gasLimit: options.gasLimit,
@@ -345,8 +363,8 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Withdraws signatures from all actions in a batch
      */
-    createTransactionForUnsignBatch(sender: Address, options: resources.GroupInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForUnsignBatch(sender: Address, options: resources.GroupInput): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "unsignBatch",
             gasLimit: options.gasLimit,
@@ -357,12 +375,12 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Removes signatures from outdated board members
      */
-    createTransactionForUnsignForOutdatedBoardMembers(
+    async createTransactionForUnsignForOutdatedBoardMembers(
         sender: Address,
         options: resources.UnsignForOutdatedBoardMembersInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const outdatedBoardMembers: U32Value[] = options.outdatedBoardMembers.map((id) => new U32Value(id));
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "unsignForOutdatedBoardMembers",
             gasLimit: options.gasLimit,
@@ -373,8 +391,8 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Performs an action that has reached quorum
      */
-    createTransactionForPerformAction(sender: Address, options: resources.ActionInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForPerformAction(sender: Address, options: resources.ActionInput): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "performAction",
             gasLimit: options.gasLimit,
@@ -385,8 +403,8 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Performs all actions in a batch that have reached quorum
      */
-    createTransactionForPerformBatch(sender: Address, options: resources.GroupInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForPerformBatch(sender: Address, options: resources.GroupInput): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "performBatch",
             gasLimit: options.gasLimit,
@@ -397,8 +415,8 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Discards an action that is no longer needed
      */
-    createTransactionForDiscardAction(sender: Address, options: resources.ActionInput): Transaction {
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+    async createTransactionForDiscardAction(sender: Address, options: resources.ActionInput): Promise<Transaction> {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "discardAction",
             gasLimit: options.gasLimit,
@@ -409,9 +427,12 @@ export class MultisigTransactionsFactory extends BaseFactory {
     /**
      * Discards all actions in the provided list
      */
-    createTransactionForDiscardBatch(sender: Address, options: resources.DiscardBatchInput): Transaction {
+    async createTransactionForDiscardBatch(
+        sender: Address,
+        options: resources.DiscardBatchInput,
+    ): Promise<Transaction> {
         const actionIdsArgs = options.actionIds.map((id) => new U32Value(id));
-        return this.smartContractFactory.createTransactionForExecute(sender, {
+        return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
             function: "discardBatch",
             gasLimit: options.gasLimit,

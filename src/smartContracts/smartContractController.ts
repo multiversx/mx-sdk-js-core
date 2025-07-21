@@ -50,7 +50,7 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractDeployInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForDeploy(sender.address, options);
+        const transaction = await this.factory.createTransactionForDeploy(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -76,7 +76,7 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractUpgradeInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUpgrade(sender.address, options);
+        const transaction = await this.factory.createTransactionForUpgrade(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -93,7 +93,7 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractExecuteInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForExecute(sender.address, options);
+        const transaction = await this.factory.createTransactionForExecute(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();

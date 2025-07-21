@@ -162,7 +162,7 @@ describe("test transaction", function () {
         await bob.sync(provider);
         const initialBalanceOfBob = new BigNumber((await bob.getBalance(provider)).toString());
 
-        const transaction = factory.createTransactionForNativeTokenTransfer(alice.address, {
+        const transaction = await factory.createTransactionForNativeTokenTransfer(alice.address, {
             receiver: bob.address,
             nativeAmount: 42000000000000000000n,
         });

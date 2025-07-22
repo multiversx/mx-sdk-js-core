@@ -52,7 +52,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.DeployMultisigContractInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = await await this.multisigFactory.createTransactionForDeploy(sender.address, options);
+        const transaction = await this.multisigFactory.createTransactionForDeploy(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();

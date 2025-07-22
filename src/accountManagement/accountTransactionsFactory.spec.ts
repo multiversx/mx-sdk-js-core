@@ -75,7 +75,7 @@ describe("test account transactions factory", function () {
         assert.equal(transaction.gasLimit, 318000n);
     });
 
-    it("should create 'Transaction' for unguarding account", async function () {
+    it("should create 'Transaction' for unguarding account with guardian", async function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const guardian = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
@@ -92,11 +92,31 @@ describe("test account transactions factory", function () {
         assert.equal(Buffer.from(transaction.data).toString(), "UnGuardAccount");
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
-        assert.equal(transaction.gasLimit, 321000n);
+        assert.equal(transaction.gasLimit, 371000n);
         assert.equal(transaction.options, TRANSACTION_OPTIONS_TX_GUARDED);
         assert.deepEqual(
             transaction.guardian,
             Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"),
         );
+    });
+
+    it("should create 'Transaction' for unguarding account without guardian", async function () {
+        const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+
+        const transaction = await factory.createTransactionForUnguardingAccount(sender, {});
+
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.equal(Buffer.from(transaction.data).toString(), "UnGuardAccount");
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.chainID, config.chainID);
+        assert.equal(transaction.gasLimit, 321000n);
+        assert.equal(transaction.options, 0);
     });
 });

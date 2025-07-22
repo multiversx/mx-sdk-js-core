@@ -1,7 +1,7 @@
 import { IGasLimitEstimator } from "../core";
 import { Address } from "../core/address";
 import { BaseFactory } from "../core/baseFactory";
-import { TRANSACTION_OPTIONS_TX_GUARDED } from "../core/constants";
+import { EXTRA_GAS_LIMIT_FOR_GUARDED_TRANSACTIONS, TRANSACTION_OPTIONS_TX_GUARDED } from "../core/constants";
 import { Transaction } from "../core/transaction";
 import { SaveKeyValueInput, SetGuardianInput } from "./resources";
 
@@ -115,13 +115,16 @@ export class AccountTransactionsFactory extends BaseFactory {
             gasLimit: 0n,
         });
 
+        let gasLimit = this.config.gasLimitUnguardAccount;
+
         if (options.guardian) {
             transaction.guardian = options.guardian;
             transaction.options = TRANSACTION_OPTIONS_TX_GUARDED;
+            gasLimit += BigInt(EXTRA_GAS_LIMIT_FOR_GUARDED_TRANSACTIONS);
         }
 
         this.setTransactionPayload(transaction, dataParts);
-        await this.setGasLimit(transaction, undefined, this.config.gasLimitUnguardAccount);
+        await this.setGasLimit(transaction, undefined, gasLimit);
 
         return transaction;
     }

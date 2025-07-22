@@ -73,7 +73,6 @@ export class AccountController extends BaseController {
             guardian: options.guardian,
         });
 
-        transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.setTransactionGasOptions(transaction, options);

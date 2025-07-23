@@ -137,14 +137,18 @@ export class MultisigTransactionsFactory extends BaseFactory {
         sender: Address,
         options: resources.ProposeTransferExecuteInput,
     ): Promise<Transaction> {
-        const gasOption = new U64Value(options.optGasLimit ?? 0n);
-        const input = await ProposeTransferExecuteContractInput.newFromTransferExecuteInput({
-            multisig: options.multisigContract,
-            to: options.to,
-            functionName: options.functionName,
-            arguments: options.functionArguments,
-            abi: options.abi,
-        });
+        const gasOption = options.optGasLimit ? new U64Value(options.optGasLimit) : null;
+        let functionCall = [];
+        if (options.functionName) {
+            const input = await ProposeTransferExecuteContractInput.newFromTransferExecuteInput({
+                multisig: options.multisigContract,
+                to: options.to,
+                functionName: options.functionName,
+                arguments: options.functionArguments,
+                abi: options.abi,
+            });
+            functionCall = input.functionCall;
+        }
 
         return await this.smartContractFactory.createTransactionForExecute(sender, {
             contract: options.multisigContract,
@@ -154,7 +158,7 @@ export class MultisigTransactionsFactory extends BaseFactory {
                 new AddressValue(options.to),
                 new BigUIntValue(options.nativeTokenAmount),
                 new OptionValue(new OptionType(new U64Type()), gasOption),
-                VariadicValue.fromItems(...input.functionCall.map((value) => new BytesValue(value))),
+                VariadicValue.fromItems(...functionCall.map((value) => new BytesValue(value))),
             ],
         });
     }

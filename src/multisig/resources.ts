@@ -39,8 +39,8 @@ export type ProposeTransferExecuteInput = MultisigContractInput & {
     to: Address;
     nativeTokenAmount: bigint;
     optGasLimit?: bigint;
-    functionName: string;
-    functionArguments: any[];
+    functionName?: string;
+    functionArguments?: any[];
     abi?: Abi;
 };
 

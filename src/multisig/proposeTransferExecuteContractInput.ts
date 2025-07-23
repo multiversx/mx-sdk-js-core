@@ -21,7 +21,7 @@ export class ProposeTransferExecuteContractInput {
         multisig: Address;
         to: Address;
         functionName: string;
-        arguments: any[];
+        arguments?: any[];
         optGasLimit?: bigint;
         abi?: Abi;
     }): Promise<ProposeTransferExecuteContractInput> {

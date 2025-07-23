@@ -175,6 +175,54 @@ describe("test multisig transactions factory", function () {
         );
     });
 
+    it("should create transaction for propose transfer execute with EGLD send", async function () {
+        const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+
+        const multisigContractAddress = Address.newFromBech32(
+            "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms",
+        );
+        const amount = 1000000000000000000n; // 1 EGLD
+        const transaction = await factory.createTransactionForProposeTransferExecute(senderAddress, {
+            multisigContract: multisigContractAddress,
+            gasLimit: 60_000_000n,
+            nativeTokenAmount: amount,
+            to: multisigContractAddress,
+        });
+
+        assert.instanceOf(transaction, Transaction);
+        assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
+        assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
+        assert.equal(transaction.chainID, config.chainID);
+        assert.deepEqual(
+            transaction.data.toString(),
+            "proposeTransferExecute@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@0de0b6b3a7640000@",
+        );
+    });
+
+    it("should create transaction for propose transfer execute with EGLD send", async function () {
+        const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+
+        const multisigContractAddress = Address.newFromBech32(
+            "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms",
+        );
+        const amount = 1000000000000000000n; // 1 EGLD
+        const transaction = await factory.createTransactionForProposeTransferExecute(senderAddress, {
+            multisigContract: multisigContractAddress,
+            gasLimit: 60_000_000n,
+            nativeTokenAmount: amount,
+            to: multisigContractAddress,
+        });
+
+        assert.instanceOf(transaction, Transaction);
+        assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
+        assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
+        assert.equal(transaction.chainID, config.chainID);
+        assert.deepEqual(
+            transaction.data.toString(),
+            "proposeTransferExecute@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@0de0b6b3a7640000@",
+        );
+    });
+
     it("should create transaction for propose transfer execute ESDT", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const destinationContract = Address.newFromBech32(

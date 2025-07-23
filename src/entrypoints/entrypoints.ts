@@ -257,14 +257,14 @@ export class NetworkEntrypoint {
 }
 
 export class TestnetEntrypoint extends NetworkEntrypoint {
-    constructor(url?: string, kind?: string, clientName?: string, withGasLimitestimator?: boolean) {
+    constructor(url?: string, kind?: string, clientName?: string, withGasLimitEstimator?: boolean) {
         const entrypointConfig = new TestnetEntrypointConfig();
         super({
             networkProviderUrl: url || entrypointConfig.networkProviderUrl,
             networkProviderKind: kind || entrypointConfig.networkProviderKind,
             chainId: entrypointConfig.chainId,
             clientName: clientName,
-            withGasLimitEstimator: withGasLimitestimator,
+            withGasLimitEstimator: withGasLimitEstimator,
         });
     }
 }

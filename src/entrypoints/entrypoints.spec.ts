@@ -136,7 +136,7 @@ describe("TestEntrypoint", function () {
     });
 
     it("should estimate gas limit", async () => {
-        const entrypoint = new DevnetEntrypoint(undefined, undefined, undefined, true);
+        const entrypoint = new DevnetEntrypoint({ withGasLimitEstimator: true, gasLimitMultiplier: 1.5 });
         const controller = entrypoint.createTransfersController();
         const filePath = path.join("src", "testdata", "testwallets", "alice.pem");
         const sender = await Account.newFromPem(filePath);
@@ -146,6 +146,6 @@ describe("TestEntrypoint", function () {
             receiver: sender.address,
             nativeAmount: 10000000n,
         });
-        assert.equal(transaction.gasLimit, 50000n);
+        assert.equal(transaction.gasLimit, 75000n);
     });
 });

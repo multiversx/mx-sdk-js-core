@@ -2615,7 +2615,7 @@ Flow for Creating Guarded Relayed Transactions:
 
 ### Multisig
 
-The sdk contains components to interact with the (Multisig Contract)[https://github.com/multiversx/mx-contracts-rs/releases/tag/v0.45.5].
+The sdk contains components to interact with the [Multisig Contract](https://github.com/multiversx/mx-contracts-rs/releases/tag/v0.45.5).
 We can deploy a multisig smart contract, add members, propose and execute actions and query the contract.
 The same as the other components, to interact with a multisig smart contract we can use either the MultisigController or the MultisigTransactionsFactory.
 
@@ -2694,7 +2694,7 @@ These operations can be performed using both the **controller** and the **factor
 
 #### Propose an action using the controller
 We'll propose an action to send some EGLD to Carol. After we sent the proposal, we'll also parse the outcome of the transaction to get the `proposal id`.
-The id can be later for signing and performing the proposal.
+The id can be used later for signing and performing the proposal.
 
 ```js
 {
@@ -2731,7 +2731,7 @@ The id can be later for signing and performing the proposal.
 ```
 
 #### Propose an action using the factory
-Proposing an action for a multisig contract using the MultisigFactory is very similar to using the controller, but in order to get the proposal id we need to use MultisigTransactionsOutcomeParser.
+Proposing an action for a multisig contract using the MultisigFactory is very similar to using the controller, but in order to get the proposal id, we need to use MultisigTransactionsOutcomeParser.
 
 ```js
 {
@@ -2767,11 +2767,10 @@ Proposing an action for a multisig contract using the MultisigFactory is very si
 
     // wait for the transaction to execute
     const transactionAwaiter = new TransactionWatcher(provider);
-    transactionAwaiter.awaitCompleted(txHash);
+    const transactionOnNetwork = await transactionAwaiter.awaitCompleted(txHash);
 
     // parse the outcome of the transaction
     const parser = new MultisigTransactionsOutcomeParser({ abi });
-    const transactionOnNetwork = await provider.getTransaction(txHash);
     const actionId = parser.parseProposeAction(transactionOnNetwork);
 }
 ```
@@ -2790,7 +2789,7 @@ Let's query the contract to get all board members.
 
     const contract = Address.newFromBech32("erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqf8llllswuedva");
 
-    const boardMembers = controller.getAllBoardMembers({ multisigAddress: contract.toBech32() });
+    const boardMembers = await controller.getAllBoardMembers({ multisigAddress: contract.toBech32() });
 }
 ```
 

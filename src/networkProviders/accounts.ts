@@ -30,7 +30,7 @@ export class AccountOnNetwork {
     static fromApiHttpResponse(payload: any): AccountOnNetwork {
         const result = new AccountOnNetwork();
 
-        result.address = payload["address"] ? new Address(payload["address"]) : Address.empty();
+        result.address = payload["address"] ? Address.newFromBech32(payload["address"]) : Address.empty();
         result.nonce = BigInt(payload["nonce"] || 0);
         result.balance = BigInt(payload["balance"] || 0);
         result.userName = payload["username"] || undefined;
@@ -38,7 +38,9 @@ export class AccountOnNetwork {
         result.contractCodeHash = payload["codeHash"] || "";
         result.contractCode = Buffer.from(payload["code"] || "");
         result.contractDeveloperReward = payload["developerReward"] || 0n;
-        result.contractOwnerAddress = payload["ownerAddress"] ? new Address(payload["ownerAddress"]) : undefined;
+        result.contractOwnerAddress = payload["ownerAddress"]
+            ? Address.newFromBech32(payload["ownerAddress"])
+            : undefined;
         result.isContractUpgradable = Boolean(payload["isUpgradeable"]);
         result.isContractReadable = Boolean(payload["isReadable"]);
         result.isContractPayable = Boolean(payload["isPayable"]);
@@ -50,7 +52,7 @@ export class AccountOnNetwork {
     static fromProxyHttpResponse(payload: any): AccountOnNetwork {
         const result = new AccountOnNetwork();
 
-        result.address = payload["address"] ? new Address(payload["address"]) : Address.empty();
+        result.address = payload["address"] ? Address.newFromBech32(payload["address"]) : Address.empty();
         result.nonce = BigInt(payload["nonce"] || 0);
         result.balance = BigInt(payload["balance"] || 0);
         result.userName = payload["username"] || undefined;
@@ -71,7 +73,9 @@ export class AccountOnNetwork {
         result.contractCodeHash = payload["codeHash"] || "";
         result.contractCode = Buffer.from(payload["code"] || "");
         result.contractDeveloperReward = payload["developerReward"] || 0n;
-        result.contractOwnerAddress = payload["ownerAddress"] ? new Address(payload["ownerAddress"]) : undefined;
+        result.contractOwnerAddress = payload["ownerAddress"]
+            ? Address.newFromBech32(payload["ownerAddress"])
+            : undefined;
         result.isGuarded = Boolean(payload["isGuarded"]);
         return result;
     }
@@ -120,7 +124,7 @@ export class Guardian {
         const result = new Guardian();
 
         result.activationEpoch = Number(responsePart["activationEpoch"] || 0);
-        result.address = new Address(responsePart["address"] || "");
+        result.address = Address.newFromBech32(responsePart["address"] || "");
         result.serviceUID = responsePart["serviceUID"] || "";
 
         return result;

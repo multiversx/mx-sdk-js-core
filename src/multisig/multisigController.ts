@@ -68,9 +68,9 @@ export class MultisigController extends BaseController {
     /**
      * Gets quorum for specific multisig
      */
-    async getQuorum(options: { mutisigAddress: string }): Promise<number> {
+    async getQuorum(options: { multisigAddress: string }): Promise<number> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getQuorum",
             arguments: [],
         });
@@ -80,9 +80,9 @@ export class MultisigController extends BaseController {
     /**
      * Gets number of board members for specific multisig
      */
-    async getNumBoardMembers(options: { mutisigAddress: string }): Promise<number> {
+    async getNumBoardMembers(options: { multisigAddress: string }): Promise<number> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getNumBoardMembers",
             arguments: [],
         });
@@ -92,9 +92,9 @@ export class MultisigController extends BaseController {
     /**
      * Gets number of groups for specific multisig
      */
-    async getNumGroups(options: { mutisigAddress: string }): Promise<number> {
+    async getNumGroups(options: { multisigAddress: string }): Promise<number> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getNumGroups",
             arguments: [],
         });
@@ -105,9 +105,9 @@ export class MultisigController extends BaseController {
     /**
      * Gets number of proposers for specific multisig
      */
-    async getNumProposers(options: { mutisigAddress: string }): Promise<number> {
+    async getNumProposers(options: { multisigAddress: string }): Promise<number> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getNumProposers",
             arguments: [],
         });
@@ -118,9 +118,9 @@ export class MultisigController extends BaseController {
     /**
      * Gets action group for specific multisig
      */
-    async getActionGroup(options: { mutisigAddress: string; groupId: number }): Promise<number[]> {
+    async getActionGroup(options: { multisigAddress: string; groupId: number }): Promise<number[]> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getActionGroup",
             arguments: [options.groupId],
         });
@@ -131,9 +131,9 @@ export class MultisigController extends BaseController {
     /**
      * Gets last group action id specific multisig
      */
-    async getLastGroupActionId(options: { mutisigAddress: string }): Promise<number> {
+    async getLastGroupActionId(options: { multisigAddress: string }): Promise<number> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getLastGroupActionId",
             arguments: [],
         });
@@ -144,9 +144,9 @@ export class MultisigController extends BaseController {
     /**
      * Gets last action index specific multisig
      */
-    async getActionLastIndex(options: { mutisigAddress: string }): Promise<number> {
+    async getActionLastIndex(options: { multisigAddress: string }): Promise<number> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getActionLastIndex",
             arguments: [],
         });
@@ -159,12 +159,12 @@ export class MultisigController extends BaseController {
      * Does not check whether or not the user is still a board member and the signature valid.
      */
     async hasSignedAction(options: {
-        mutisigAddress: string;
+        multisigAddress: string;
         userAddress: string;
         actionId: number;
     }): Promise<boolean> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "signed",
             arguments: [Address.newFromBech32(options.userAddress), options.actionId],
         });
@@ -175,9 +175,9 @@ export class MultisigController extends BaseController {
     /**
      * Returns `true` (`1`) if `getActionValidSignerCount >= getQuorum`.
      */
-    async quorumReached(options: { mutisigAddress: string; actionId: number }): Promise<boolean> {
+    async quorumReached(options: { multisigAddress: string; actionId: number }): Promise<boolean> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "quorumReached",
             arguments: [options.actionId],
         });
@@ -188,9 +188,9 @@ export class MultisigController extends BaseController {
     /**
      * Lists all users that can sign actions.
      */
-    async getAllBoardMembers(options: { mutisigAddress: string }): Promise<string[]> {
+    async getAllBoardMembers(options: { multisigAddress: string }): Promise<string[]> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getAllBoardMembers",
             arguments: [],
         });
@@ -201,9 +201,9 @@ export class MultisigController extends BaseController {
     /**
      * Lists all proposers that are not board members.
      */
-    async getAllProposers(options: { mutisigAddress: string }): Promise<string[]> {
+    async getAllProposers(options: { multisigAddress: string }): Promise<string[]> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getAllProposers",
             arguments: [],
         });
@@ -216,9 +216,9 @@ export class MultisigController extends BaseController {
      * `1` = can propose, but not sign,
      * `2` = can propose and sign.
      */
-    async getUserRole(options: { mutisigAddress: string; userAddress: string }): Promise<resources.UserRoleEnum> {
+    async getUserRole(options: { multisigAddress: string; userAddress: string }): Promise<resources.UserRoleEnum> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "userRole",
             arguments: [Address.newFromBech32(options.userAddress)],
         });
@@ -229,9 +229,9 @@ export class MultisigController extends BaseController {
     /**
      * Serialized action data of an action with index.
      */
-    async getActionData(options: { mutisigAddress: string; actionId: number }): Promise<resources.MultisigAction> {
+    async getActionData(options: { multisigAddress: string; actionId: number }): Promise<resources.MultisigAction> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getActionData",
             arguments: [options.actionId],
         });
@@ -242,9 +242,9 @@ export class MultisigController extends BaseController {
     /**
      * Gets all pending actions.
      */
-    async getPendingActionFullInfo(options: { mutisigAddress: string }): Promise<resources.FullMultisigAction[]> {
+    async getPendingActionFullInfo(options: { multisigAddress: string }): Promise<resources.FullMultisigAction[]> {
         const [actions] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getPendingActionFullInfo",
             arguments: [],
         });
@@ -266,9 +266,9 @@ export class MultisigController extends BaseController {
      * Gets addresses of all users who signed an action.
      * Does not check if those users are still board members or not, so the result may contain invalid signers.
      */
-    async getActionSigners(options: { mutisigAddress: string; actionId: number }): Promise<string[]> {
+    async getActionSigners(options: { multisigAddress: string; actionId: number }): Promise<string[]> {
         const response = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getActionSigners",
             arguments: [options.actionId],
         });
@@ -280,9 +280,9 @@ export class MultisigController extends BaseController {
      * Gets addresses of all users who signed an action and are still board members.
      * All these signatures are currently valid.
      */
-    async getActionSignerCount(options: { mutisigAddress: string; actionId: number }): Promise<number> {
+    async getActionSignerCount(options: { multisigAddress: string; actionId: number }): Promise<number> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getActionSignerCount",
             arguments: [options.actionId],
         });
@@ -294,9 +294,9 @@ export class MultisigController extends BaseController {
      * Gets addresses of all users who signed an action and are still board members.
      * All these signatures are currently valid.
      */
-    async getActionValidSignerCount(options: { mutisigAddress: string; actionId: number }): Promise<number> {
+    async getActionValidSignerCount(options: { multisigAddress: string; actionId: number }): Promise<number> {
         const [value] = await this.smartContractController.query({
-            contract: Address.newFromBech32(options.mutisigAddress),
+            contract: Address.newFromBech32(options.multisigAddress),
             function: "getActionValidSignerCount",
             arguments: [options.actionId],
         });

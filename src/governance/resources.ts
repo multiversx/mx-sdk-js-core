@@ -64,6 +64,7 @@ export type CloseProposalOutcome = {
 
 export type GovernanceConfig = {
     proposalFee: bigint;
+    lostProposalFee: bigint;
     minQuorum: number;
     minPassThreshold: number;
     minVetoThreshold: number;

@@ -39,8 +39,8 @@ export type ProposeTransferExecuteInput = MultisigContractInput & {
     to: Address;
     nativeTokenAmount: bigint;
     optGasLimit?: bigint;
-    functionName: string;
-    functionArguments: any[];
+    functionName?: string;
+    functionArguments?: any[];
     abi?: Abi;
 };
 
@@ -174,7 +174,7 @@ export class ChangeQuorum extends MultisigAction {
 export class SendTransferExecuteEgld extends MultisigAction {
     receiver: Address;
     amount: bigint;
-    optionalGasLimit?: bigint;
+    optionalGasLimit: bigint;
     functionName: string;
     arguments: Uint8Array[];
 
@@ -184,15 +184,15 @@ export class SendTransferExecuteEgld extends MultisigAction {
         this.receiver = data.to;
         this.amount = BigInt(data.egld_amount?.toFixed() ?? 0);
         this.optionalGasLimit = BigInt(data.opt_gas_limit?.toFixed() ?? 0);
-        this.functionName = data.endpoint_name.toString();
-        this.arguments = data.arguments;
+        this.functionName = data.endpoint_name?.toString() ?? "";
+        this.arguments = data.arguments ?? [];
     }
 }
 export class SendTransferExecuteEsdt extends MultisigAction {
     receiver: Address;
     tokens: TokenTransfer[];
-    optionalGasLimit?: bigint;
-    funcionName: string;
+    optionalGasLimit: bigint;
+    functionName: string;
     arguments: Uint8Array[];
 
     constructor(data: any) {
@@ -206,18 +206,17 @@ export class SendTransferExecuteEsdt extends MultisigAction {
                     amount: token.amount,
                 }),
         );
-        this.optionalGasLimit = BigInt(data.opt_gas_limit.toFixed());
-
-        this.funcionName = Buffer.from(data.endpoint_name.toString(), "hex").toString();
-        this.arguments = data.arguments;
+        this.optionalGasLimit = BigInt(data.opt_gas_limit?.toFixed() ?? 0);
+        this.functionName = Buffer.from(data.endpoint_name?.toString() ?? "", "hex").toString();
+        this.arguments = data.arguments ?? [];
     }
 }
 
 export class SendAsyncCall extends MultisigAction {
     receiver: Address;
     amount: bigint;
-    optionalGasLimit?: bigint;
-    funcionName: string;
+    optionalGasLimit: bigint;
+    functionName: string;
     arguments: Uint8Array[];
 
     constructor(data: any) {
@@ -226,8 +225,8 @@ export class SendAsyncCall extends MultisigAction {
         this.receiver = data.to;
         this.amount = BigInt(data.egld_amount?.toFixed() ?? 0);
         this.optionalGasLimit = BigInt(data.opt_gas_limit?.toFixed() ?? 0);
-        this.funcionName = data.endpoint_name.toString();
-        this.arguments = data.arguments;
+        this.functionName = data.endpoint_name.toString();
+        this.arguments = data.arguments ?? [];
     }
 }
 

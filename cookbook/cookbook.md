@@ -2717,8 +2717,6 @@ The id can be later for signing and performing the proposal.
         {
             multisigContract: contract,
             to: Address.newFromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
-            functionName: "distribute",
-            functionArguments: [],
             gasLimit: 10000000n,
             nativeTokenAmount: 1000000000000000000n,
         },
@@ -2752,8 +2750,6 @@ Proposing an action for a multisig contract using the MultisigFactory is very si
     const transaction = await factory.createTransactionForProposeTransferExecute(alice.address, {
         multisigContract: contract,
         to: Address.newFromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
-        functionName: "distribute",
-        functionArguments: [],
         gasLimit: 10000000n,
         nativeTokenAmount: 1000000000000000000n,
     });

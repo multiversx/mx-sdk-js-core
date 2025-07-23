@@ -108,8 +108,6 @@ import { loadAbiRegistry, loadContractCode } from "../src/testutils";
             {
                 multisigContract: contract,
                 to: Address.newFromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
-                functionName: "distribute",
-                functionArguments: [],
                 gasLimit: 10000000n,
                 nativeTokenAmount: 1000000000000000000n,
             },
@@ -143,8 +141,6 @@ import { loadAbiRegistry, loadContractCode } from "../src/testutils";
         const transaction = await factory.createTransactionForProposeTransferExecute(alice.address, {
             multisigContract: contract,
             to: Address.newFromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8"),
-            functionName: "distribute",
-            functionArguments: [],
             gasLimit: 10000000n,
             nativeTokenAmount: 1000000000000000000n,
         });

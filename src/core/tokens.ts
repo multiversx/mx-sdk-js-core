@@ -37,27 +37,6 @@ export class TokenTransfer {
     readonly token: Token;
     readonly amount: bigint;
 
-    /**
-     * @deprecated field. Use "token.identifier" instead.
-     */
-    readonly tokenIdentifier: string;
-
-    /**
-     * @deprecated field. Use "token.nonce" instead.
-     */
-    readonly nonce: number;
-
-    /**
-     * @deprecated field. Use "amount" instead.
-     */
-    readonly amountAsBigInteger: BigNumber;
-
-    /**
-     * @deprecated field. The number of decimals is not a concern of "sdk-core".
-     * For formatting and parsing amounts, use "sdk-dapp" or "bignumber.js" directly.
-     */
-    readonly numDecimals: number;
-
     constructor(options: { token: Token; amount: bigint } | ILegacyTokenTransferOptions) {
         if (this.isLegacyTokenTransferOptions(options)) {
             // Handle legacy fields.
@@ -66,28 +45,17 @@ export class TokenTransfer {
                 throw new ErrInvalidArgument(`bad amountAsBigInteger: ${options.amountAsBigInteger}`);
             }
 
-            this.tokenIdentifier = options.tokenIdentifier;
-            this.nonce = options.nonce;
-            this.amountAsBigInteger = amount;
-            this.numDecimals = options.numDecimals || 0;
-
             // Handle new fields.
             this.token = new Token({
                 identifier: options.tokenIdentifier,
                 nonce: BigInt(options.nonce),
             });
 
-            this.amount = BigInt(this.amountAsBigInteger.toFixed(0));
+            this.amount = BigInt(options.amountAsBigInteger.toString());
         } else {
             // Handle new fields.
             this.token = options.token;
             this.amount = options.amount;
-
-            // Handle legacy fields.
-            this.tokenIdentifier = options.token.identifier;
-            this.nonce = Number(options.token.nonce);
-            this.amountAsBigInteger = new BigNumber(this.amount.toString());
-            this.numDecimals = 0;
         }
     }
 
@@ -104,134 +72,8 @@ export class TokenTransfer {
         return options.tokenIdentifier !== undefined;
     }
 
-    /**
-     * @deprecated Use {@link newFromNativeAmount} instead.
-     */
-    static egldFromAmount(amount: BigNumber.Value) {
-        const amountAsBigInteger = new BigNumber(amount).shiftedBy(EGLDNumDecimals).decimalPlaces(0);
-        return this.egldFromBigInteger(amountAsBigInteger);
-    }
-
-    /**
-     * @deprecated Use {@link newFromNativeAmount} instead.
-     */
-    static egldFromBigInteger(amountAsBigInteger: BigNumber.Value) {
-        return new TokenTransfer({
-            tokenIdentifier: EGLDTokenIdentifier,
-            nonce: 0,
-            amountAsBigInteger,
-            numDecimals: EGLDNumDecimals,
-        });
-    }
-
-    /**
-     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
-     */
-    static fungibleFromAmount(tokenIdentifier: string, amount: BigNumber.Value, numDecimals: number) {
-        const amountAsBigInteger = new BigNumber(amount).shiftedBy(numDecimals).decimalPlaces(0);
-        return this.fungibleFromBigInteger(tokenIdentifier, amountAsBigInteger, numDecimals);
-    }
-
-    /**
-     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
-     */
-    static fungibleFromBigInteger(
-        tokenIdentifier: string,
-        amountAsBigInteger: BigNumber.Value,
-        numDecimals: number = 0,
-    ) {
-        return new TokenTransfer({
-            tokenIdentifier,
-            nonce: 0,
-            amountAsBigInteger,
-            numDecimals,
-        });
-    }
-
-    /**
-     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
-     */
-    static nonFungible(tokenIdentifier: string, nonce: number) {
-        return new TokenTransfer({
-            tokenIdentifier,
-            nonce,
-            amountAsBigInteger: 1,
-            numDecimals: 0,
-        });
-    }
-
-    /**
-     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
-     */
-    static semiFungible(tokenIdentifier: string, nonce: number, quantity: number) {
-        return new TokenTransfer({
-            tokenIdentifier,
-            nonce,
-            amountAsBigInteger: quantity,
-            numDecimals: 0,
-        });
-    }
-
-    /**
-     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
-     */
-    static metaEsdtFromAmount(tokenIdentifier: string, nonce: number, amount: BigNumber.Value, numDecimals: number) {
-        const amountAsBigInteger = new BigNumber(amount).shiftedBy(numDecimals).decimalPlaces(0);
-        return this.metaEsdtFromBigInteger(tokenIdentifier, nonce, amountAsBigInteger, numDecimals);
-    }
-
-    /**
-     * @deprecated Use the constructor instead: new TokenTransfer({ token, amount });
-     */
-    static metaEsdtFromBigInteger(
-        tokenIdentifier: string,
-        nonce: number,
-        amountAsBigInteger: BigNumber.Value,
-        numDecimals = 0,
-    ) {
-        return new TokenTransfer({
-            tokenIdentifier,
-            nonce,
-            amountAsBigInteger,
-            numDecimals,
-        });
-    }
-
     toString() {
         return this.amount.toString();
-    }
-
-    /**
-     * @deprecated Use the "amount" field instead.
-     */
-    valueOf(): BigNumber {
-        return new BigNumber(this.amount.toString());
-    }
-
-    /**
-     * @deprecated For formatting and parsing amounts, use "sdk-dapp" or "bignumber.js" directly.
-     */
-    toPrettyString(): string {
-        return `${this.toAmount()} ${this.tokenIdentifier}`;
-    }
-
-    private toAmount(): string {
-        return this.amountAsBigInteger.shiftedBy(-this.numDecimals).toFixed(this.numDecimals);
-    }
-
-    /**
-     * @deprecated Within your code, don't mix native values (EGLD) and custom (ESDT) tokens.
-     * See "TransferTransactionsFactory.createTransactionForNativeTokenTransfer()" vs. "TransferTransactionsFactory.createTransactionForESDTTokenTransfer()".
-     */
-    isEgld(): boolean {
-        return this.token.identifier == EGLDTokenIdentifier;
-    }
-
-    /**
-     * @deprecated Use "TokenComputer.isFungible(token)" instead.
-     */
-    isFungible(): boolean {
-        return this.token.nonce == 0n;
     }
 }
 

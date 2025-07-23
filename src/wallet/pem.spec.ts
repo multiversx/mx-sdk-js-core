@@ -40,14 +40,14 @@ MWU0YzE3YTRjZDc3NDI0Nw==
 
     it("should parse multi-key PEM files", () => {
         // The user PEM files encode both the seed and the pubkey in their payloads.
-        let payloadAlice = Buffer.from(alice.secretKeyHex + alice.address.hex()).toString("base64");
-        let payloadBob = Buffer.from(bob.secretKeyHex + bob.address.hex()).toString("base64");
-        let payloadCarol = Buffer.from(carol.secretKeyHex + carol.address.hex()).toString("base64");
+        let payloadAlice = Buffer.from(alice.secretKeyHex + alice.address.toHex()).toString("base64");
+        let payloadBob = Buffer.from(bob.secretKeyHex + bob.address.toHex()).toString("base64");
+        let payloadCarol = Buffer.from(carol.secretKeyHex + carol.address.toHex()).toString("base64");
 
         let expected = [
-            Buffer.concat([alice.secretKey, alice.address.pubkey()]),
-            Buffer.concat([bob.secretKey, bob.address.pubkey()]),
-            Buffer.concat([carol.secretKey, carol.address.pubkey()]),
+            Buffer.concat([alice.secretKey, alice.address.getPublicKey()]),
+            Buffer.concat([bob.secretKey, bob.address.getPublicKey()]),
+            Buffer.concat([carol.secretKey, carol.address.getPublicKey()]),
         ];
 
         let trivialContent = `-----BEGIN PRIVATE KEY for alice

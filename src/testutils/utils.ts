@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import { PathLike } from "fs";
 import { resolve } from "path";
-import { Abi, Code } from "../abi";
+import { Abi } from "../abi";
 import { getAxios } from "../core/utils";
 
-export async function loadContractCode(path: PathLike): Promise<Code> {
+export async function loadContractCode(path: PathLike): Promise<Uint8Array> {
     if (isOnBrowserTests()) {
         const axios = await getAxios();
         let response: any = await axios.default.get(path.toString(), {
@@ -16,12 +16,12 @@ export async function loadContractCode(path: PathLike): Promise<Code> {
         });
 
         let buffer = Buffer.from(response.data);
-        return Code.fromBuffer(buffer);
+        return new Uint8Array(buffer);
     }
 
     // Load from file.
     let buffer: Buffer = await fs.promises.readFile(path);
-    return Code.fromBuffer(buffer);
+    return new Uint8Array(buffer);
 }
 
 export async function loadAbiRegistry(path: PathLike): Promise<Abi> {

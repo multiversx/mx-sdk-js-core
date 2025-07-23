@@ -94,15 +94,6 @@ export class Address {
     }
 
     /**
-     * @deprecated Use {@link newFromBech32} instead.
-     */
-    static fromBech32(value: string): Address {
-        // On this legacy flow, we do not accept addresses with custom hrp (in order to avoid behavioral breaking changes).
-        const { hrp, pubkey } = decodeFromBech32({ value, allowCustomHrp: false });
-        return new Address(pubkey, hrp);
-    }
-
-    /**
      * Named constructor
      * Creates an address object from a hex-encoded string
      */
@@ -112,24 +103,6 @@ export class Address {
         }
 
         return new Address(Buffer.from(value, "hex"), hrp);
-    }
-
-    /**
-     * @deprecated Use {@link newFromHex} instead.
-     */
-    static fromHex(value: string, hrp?: string): Address {
-        return Address.newFromHex(value, hrp);
-    }
-
-    private static isValidHex(value: string) {
-        return Buffer.from(value, "hex").length == PUBKEY_LENGTH;
-    }
-
-    /**
-     * @deprecated Use {@link toHex} instead.
-     */
-    hex(): string {
-        return this.toHex();
     }
 
     /**
@@ -144,13 +117,6 @@ export class Address {
     }
 
     /**
-     * @deprecated Use {@link toBech32} instead.
-     */
-    bech32(): string {
-        return this.toBech32();
-    }
-
-    /**
      * Returns the bech32 representation of the address
      */
     toBech32(): string {
@@ -161,13 +127,6 @@ export class Address {
         let words = bech32.toWords(this.getPublicKey());
         let address = bech32.encode(this.hrp, words);
         return address;
-    }
-
-    /**
-     * @deprecated Use {@link getPublicKey} instead.
-     */
-    pubkey(): Buffer {
-        return this.getPublicKey();
     }
 
     /**
@@ -205,6 +164,10 @@ export class Address {
         }
 
         return true;
+    }
+
+    private static isValidHex(value: string) {
+        return Buffer.from(value, "hex").length == PUBKEY_LENGTH;
     }
 
     /**
@@ -248,13 +211,6 @@ export class Address {
      */
     static Zero(): Address {
         return new Address("0".repeat(64));
-    }
-
-    /**
-     * @deprecated Use {@link isSmartContract} instead.
-     */
-    isContractAddress(): boolean {
-        return this.isSmartContract();
     }
 
     /**

@@ -29,14 +29,6 @@ export class TransactionStatus {
     }
 
     /**
-     * Returns whether the transaction has been executed (not necessarily with success).
-     * @deprecated This will be remove next version, please use {@link isCompleted} instead.
-     */
-    isExecuted(): boolean {
-        return this.isSuccessful() || this.isFailed() || this.isInvalid();
-    }
-
-    /**
      * Returns whether the transaction has been conpleted (not necessarily with success).
      */
     isCompleted(): boolean {

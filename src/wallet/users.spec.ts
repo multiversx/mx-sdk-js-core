@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import path from "path";
 import { Account } from "../accounts";
-import { Address, ErrBadMnemonicEntropy, ErrInvariantFailed, Message, Transaction } from "../core";
+import { Address, ErrBadMnemonicEntropy, ErrInvariantFailed, Message, Transaction, TransactionComputer } from "../core";
 import {
     DummyMnemonicOf12Words,
     loadMnemonic,
@@ -117,15 +117,15 @@ describe("test user wallets", () => {
         let secretKey: UserSecretKey;
 
         secretKey = new UserSecretKey(Buffer.from(alice.secretKeyHex, "hex"));
-        assert.equal(secretKey.generatePublicKey().hex(), alice.address.hex());
+        assert.equal(secretKey.generatePublicKey().hex(), alice.address.toHex());
         assert.deepEqual(secretKey.generatePublicKey().toAddress(), alice.address);
 
         secretKey = new UserSecretKey(Buffer.from(bob.secretKeyHex, "hex"));
-        assert.equal(secretKey.generatePublicKey().hex(), bob.address.hex());
+        assert.equal(secretKey.generatePublicKey().hex(), bob.address.toHex());
         assert.deepEqual(secretKey.generatePublicKey().toAddress(), bob.address);
 
         secretKey = new UserSecretKey(Buffer.from(carol.secretKeyHex, "hex"));
-        assert.equal(secretKey.generatePublicKey().hex(), carol.address.hex());
+        assert.equal(secretKey.generatePublicKey().hex(), carol.address.toHex());
         assert.deepEqual(secretKey.generatePublicKey().toAddress(), carol.address);
     });
 
@@ -299,6 +299,7 @@ describe("test user wallets", () => {
                 "1a927e2af5306a9bb2ea777f73e06ecc0ac9aaa72fb4ea3fecf659451394cccf",
             ).generatePublicKey(),
         );
+        const transactionComputer = new TransactionComputer();
 
         // With data field
         let transaction = new Transaction({
@@ -312,14 +313,11 @@ describe("test user wallets", () => {
             chainID: "1",
         });
 
-        let serialized = transaction.serializeForSigning();
+        let serialized = transactionComputer.computeBytesForSigning(transaction);
         let signature = await signer.sign(serialized);
 
         assert.deepEqual(await signer.sign(serialized), await signer.sign(Uint8Array.from(serialized)));
-        assert.deepEqual(
-            serialized.toString(),
-            `{"nonce":0,"value":"0","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"data":"Zm9v","chainID":"1","version":2}`,
-        );
+
         assert.equal(
             Buffer.from(signature).toString("hex"),
             "a5db62c6186612d44094f83576aa6a664299315fb6e42d0c17a40e9cd33efa9a9df8b76943aeac7dceaff3d78a16a7414c914f03f7a88e786c2cf939eb111c06",
@@ -337,14 +335,11 @@ describe("test user wallets", () => {
             chainID: "1",
         });
 
-        serialized = transaction.serializeForSigning();
+        serialized = transactionComputer.computeBytesForSigning(transaction);
         signature = await signer.sign(serialized);
 
         assert.deepEqual(await signer.sign(serialized), await signer.sign(Uint8Array.from(serialized)));
-        assert.equal(
-            serialized.toString(),
-            `{"nonce":8,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"chainID":"1","version":2}`,
-        );
+
         assert.equal(
             Buffer.from(signature).toString("hex"),
             "024f007f7eae87141b34708e33afd66c85a49ea8c8422e55292832ee870f879cdc033d2511c174d0f2ed62799b9f597c4a8399309578a258f558131d74374f0d",
@@ -362,6 +357,7 @@ describe("test user wallets", () => {
             ).generatePublicKey(),
         );
         let guardianSigner = new UserSigner(UserSecretKey.fromPem(bob.pemFileText));
+        const transactionComputer = new TransactionComputer();
 
         // With data field
         let transaction = new Transaction({
@@ -378,14 +374,10 @@ describe("test user wallets", () => {
             version: 2,
         });
 
-        let serialized = transaction.serializeForSigning();
+        let serialized = transactionComputer.computeBytesForSigning(transaction);
         let signature = await signer.sign(serialized);
         let guardianSignature = await guardianSigner.sign(serialized);
 
-        assert.deepEqual(
-            serialized.toString(),
-            `{"nonce":0,"value":"0","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"data":"Zm9v","chainID":"1","version":2,"options":2,"guardian":"erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"}`,
-        );
         assert.equal(
             Buffer.from(signature).toString("hex"),
             "fa067dc9508ec9df04896665fc9c9e3e7e9cbdc6577c10d56128e3c891ea502572be637bd7cdfb466779cee3e208a2be1f32b0267af1710a6532848e5e5e6f0d",
@@ -410,14 +402,10 @@ describe("test user wallets", () => {
             version: 2,
         });
 
-        serialized = transaction.serializeForSigning();
+        serialized = transactionComputer.computeBytesForSigning(transaction);
         signature = await signer.sign(serialized);
         guardianSignature = await guardianSigner.sign(serialized);
 
-        assert.equal(
-            serialized.toString(),
-            `{"nonce":8,"value":"10000000000000000000","receiver":"erd1cux02zersde0l7hhklzhywcxk4u9n4py5tdxyx7vrvhnza2r4gmq4vw35r","sender":"erd1l453hd0gt5gzdp7czpuall8ggt2dcv5zwmfdf3sd3lguxseux2fsmsgldz","gasPrice":1000000000,"gasLimit":50000,"chainID":"1","version":2,"options":2,"guardian":"erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"}`,
-        );
         assert.equal(
             Buffer.from(signature).toString("hex"),
             "50d61a408cf032b3e70b15ecc313dbea43e35a1b33ea89aadb42b25a672d3427147bcda0d911be539629fcd3183c22b30f8ac30023abb230b13abf2cd1befd04",
@@ -431,6 +419,7 @@ describe("test user wallets", () => {
 
     it("should sign transactions using PEM files", async () => {
         const signer = UserSigner.fromPem(alice.pemFileText);
+        const transactionComputer = new TransactionComputer();
 
         const transaction = new Transaction({
             nonce: 0n,
@@ -443,7 +432,7 @@ describe("test user wallets", () => {
             chainID: "1",
         });
 
-        const serialized = transaction.serializeForSigning();
+        const serialized = transactionComputer.computeBytesForSigning(transaction);
         const signature = await signer.sign(serialized);
 
         assert.deepEqual(await signer.sign(serialized), await signer.sign(Uint8Array.from(serialized)));

@@ -20,7 +20,7 @@ import { DevnetEntrypoint } from "../src"; // md-ignore
     // If you'd like to connect to a third-party API, you can specify the url parameter:
 
     // ```js
-    const apiEntrypoint = new DevnetEntrypoint("https://custom-multiversx-devnet-api.com");
+    const apiEntrypoint = new DevnetEntrypoint({ url: "https://custom-multiversx-devnet-api.com" });
     // ```
 
     // #### Using a Proxy
@@ -28,7 +28,7 @@ import { DevnetEntrypoint } from "../src"; // md-ignore
     // By default, the DevnetEntrypoint uses the standard API. However, you can create a custom entrypoint that interacts with a proxy by specifying the kind parameter:
 
     // ```js
-    const customEntrypoint = new DevnetEntrypoint("https://devnet-gateway.multiversx.com", "proxy");
+    const customEntrypoint = new DevnetEntrypoint({ url: "https://devnet-gateway.multiversx.com", kind: "proxy" });
     // ```
 })().catch((e) => {
     console.log({ e });

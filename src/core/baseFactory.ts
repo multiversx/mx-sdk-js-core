@@ -47,6 +47,6 @@ export class BaseFactory {
             return;
         }
 
-        throw new Error("Gas limit must be provided or a gas limit estimator must be set.");
+        throw new Error("Either provide a `gasLimit` parameter or initialize the factory with a `gasLimitEstimator`.");
     }
 }

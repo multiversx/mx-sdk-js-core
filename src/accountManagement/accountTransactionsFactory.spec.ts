@@ -1,5 +1,6 @@
 import { assert } from "chai";
 import { Address, TransactionsFactoryConfig } from "../core";
+import { TRANSACTION_OPTIONS_TX_GUARDED } from "../core/constants";
 import { AccountTransactionsFactory } from "./accountTransactionsFactory";
 
 describe("test account transactions factory", function () {
@@ -10,7 +11,7 @@ describe("test account transactions factory", function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const keyValuePairs = new Map([[Buffer.from("key0"), Buffer.from("value0")]]);
 
-        const transaction = factory.createTransactionForSavingKeyValue(sender, {
+        const transaction = await factory.createTransactionForSavingKeyValue(sender, {
             keyValuePairs: keyValuePairs,
         });
 
@@ -33,7 +34,7 @@ describe("test account transactions factory", function () {
         const guardian = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const serviceID = "MultiversXTCSService";
 
-        const transaction = factory.createTransactionForSettingGuardian(sender, {
+        const transaction = await factory.createTransactionForSettingGuardian(sender, {
             guardianAddress: guardian,
             serviceID: serviceID,
         });
@@ -58,7 +59,7 @@ describe("test account transactions factory", function () {
     it("should create 'Transaction' for guarding account", async function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
 
-        const transaction = factory.createTransactionForGuardingAccount(sender);
+        const transaction = await factory.createTransactionForGuardingAccount(sender);
 
         assert.deepEqual(
             transaction.sender,
@@ -74,10 +75,11 @@ describe("test account transactions factory", function () {
         assert.equal(transaction.gasLimit, 318000n);
     });
 
-    it("should create 'Transaction' for unguarding account", async function () {
+    it("should create 'Transaction' for unguarding account with guardian", async function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const guardian = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
-        const transaction = factory.createTransactionForUnguardingAccount(sender);
+        const transaction = await factory.createTransactionForUnguardingAccount(sender, { guardian });
 
         assert.deepEqual(
             transaction.sender,
@@ -91,5 +93,30 @@ describe("test account transactions factory", function () {
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
         assert.equal(transaction.gasLimit, 321000n);
+        assert.equal(transaction.options, TRANSACTION_OPTIONS_TX_GUARDED);
+        assert.deepEqual(
+            transaction.guardian,
+            Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx"),
+        );
+    });
+
+    it("should create 'Transaction' for unguarding account without guardian", async function () {
+        const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+
+        const transaction = await factory.createTransactionForUnguardingAccount(sender, {});
+
+        assert.deepEqual(
+            transaction.sender,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.deepEqual(
+            transaction.receiver,
+            Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th"),
+        );
+        assert.equal(Buffer.from(transaction.data).toString(), "UnGuardAccount");
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.chainID, config.chainID);
+        assert.equal(transaction.gasLimit, 321000n);
+        assert.equal(transaction.options, 0);
     });
 });

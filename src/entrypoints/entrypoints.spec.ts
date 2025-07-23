@@ -134,4 +134,18 @@ describe("TestEntrypoint", function () {
         assert.equal(account.secretKey.valueOf().length, 32);
         assert.equal(account.publicKey.valueOf().length, 32);
     });
+
+    it("should estimate gas limit", async () => {
+        const entrypoint = new DevnetEntrypoint(undefined, undefined, undefined, true);
+        const controller = entrypoint.createTransfersController();
+        const filePath = path.join("src", "testdata", "testwallets", "alice.pem");
+        const sender = await Account.newFromPem(filePath);
+        sender.nonce = await entrypoint.recallAccountNonce(sender.address);
+
+        const transaction = await controller.createTransactionForTransfer(sender, sender.getNonceThenIncrement(), {
+            receiver: sender.address,
+            nativeAmount: 10000000n,
+        });
+        assert.equal(transaction.gasLimit, 50000n);
+    });
 });

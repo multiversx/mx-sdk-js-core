@@ -1,6 +1,8 @@
+import { IGasLimitEstimator } from "../core";
 import { Address } from "../core/address";
+import { BaseFactory } from "../core/baseFactory";
+import { TRANSACTION_OPTIONS_TX_GUARDED } from "../core/constants";
 import { Transaction } from "../core/transaction";
-import { TransactionBuilder } from "../core/transactionBuilder";
 import { SaveKeyValueInput, SetGuardianInput } from "./resources";
 
 interface IConfig {
@@ -15,27 +17,31 @@ interface IConfig {
     gasLimitUnguardAccount: bigint;
 }
 
-export class AccountTransactionsFactory {
+export class AccountTransactionsFactory extends BaseFactory {
     private readonly config: IConfig;
 
-    constructor(options: { config: IConfig }) {
+    constructor(options: { config: IConfig; gasLimitEstimator?: IGasLimitEstimator }) {
+        super({ config: options.config, gasLimitEstimator: options.gasLimitEstimator });
         this.config = options.config;
     }
 
-    createTransactionForSavingKeyValue(sender: Address, options: SaveKeyValueInput): Transaction {
+    async createTransactionForSavingKeyValue(sender: Address, options: SaveKeyValueInput): Promise<Transaction> {
         const functionName = "SaveKeyValue";
         const keyValueParts = this.computeDataPartsForSavingKeyValue(options.keyValuePairs);
         const dataParts = [functionName, ...keyValueParts];
         const extraGas = this.computeExtraGasForSavingKeyValue(options.keyValuePairs);
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: extraGas,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, extraGas);
+
+        return transaction;
     }
 
     private computeExtraGasForSavingKeyValue(keyValuePairs: Map<Uint8Array, Uint8Array>): bigint {
@@ -60,46 +66,63 @@ export class AccountTransactionsFactory {
         return dataParts;
     }
 
-    createTransactionForSettingGuardian(sender: Address, options: SetGuardianInput): Transaction {
+    async createTransactionForSettingGuardian(sender: Address, options: SetGuardianInput): Promise<Transaction> {
         const dataParts = [
             "SetGuardian",
             options.guardianAddress.toHex(),
             Buffer.from(options.serviceID).toString("hex"),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitSetGuardian,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitSetGuardian);
+
+        return transaction;
     }
 
-    createTransactionForGuardingAccount(sender: Address): Transaction {
+    async createTransactionForGuardingAccount(sender: Address): Promise<Transaction> {
         const dataParts = ["GuardAccount"];
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitGuardAccount,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitGuardAccount);
+
+        return transaction;
     }
 
-    createTransactionForUnguardingAccount(sender: Address): Transaction {
+    async createTransactionForUnguardingAccount(
+        sender: Address,
+        options: { guardian?: Address },
+    ): Promise<Transaction> {
         const dataParts = ["UnGuardAccount"];
 
-        return new TransactionBuilder({
-            config: this.config,
-            sender: sender,
+        const transaction = new Transaction({
+            sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitUnguardAccount,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        if (options.guardian) {
+            transaction.guardian = options.guardian;
+            transaction.options = TRANSACTION_OPTIONS_TX_GUARDED;
+        }
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitUnguardAccount);
+
+        return transaction;
     }
 }

@@ -3,7 +3,11 @@ import { TokenTransfer } from "../core/tokens";
 
 export type ContractDeployInput = {
     bytecode: Uint8Array;
-    gasLimit: bigint;
+    /**
+     * The gas limit for the operation. If not provided, a gas limit estimator must be used.
+     * Failure to provide this parameter without an estimator may lead to runtime errors.
+     */
+    gasLimit?: bigint;
     arguments?: any[];
     nativeTransferAmount?: bigint;
     isUpgradeable?: boolean;
@@ -14,7 +18,7 @@ export type ContractDeployInput = {
 
 export type ContractExecuteInput = {
     contract: Address;
-    gasLimit: bigint;
+    gasLimit?: bigint;
     function: string;
     arguments?: any[];
     nativeTransferAmount?: bigint;

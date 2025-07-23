@@ -634,6 +634,26 @@ There are two ways to create controllers and factories:
 }
 ```
 
+### Estimating the Gas Limit for Transactions
+Additionally, when creating transaction factories or controllers, we can pass an additional argument, a **gas limit estimator**.
+This gas estimator simulates the transaction before being sent and computes the `gasLimit` that it will require.
+The `GasLimitEstimator` can be initialized with a multiplier, so that the estimated value will be multiplied by the specified value.
+The gas limit estimator can be provided to any factory or controller available. Let's see how we can create a `GasLimitEstimator` and use it.
+
+```js
+{
+    const api = new ApiNetworkProvider("https://devnet-api.multiversx.com");
+    let gasEstimator = new GasLimitEstimator({ networkProvider: api }); // create a gas limit estimator with default multiplier of 1.0
+    let gasEstimatorWithMultiplier = new GasLimitEstimator({ networkProvider: api, gasMultiplier: 1.5 }); // create a gas limit estimator with a multiplier of 1.5
+
+    const config = new TransactionsFactoryConfig({ chainID: "D" });
+    const transfersFactory = new TransferTransactionsFactory({
+        config: config,
+        gasLimitEstimator: gasEstimatorWithMultiplier, // or `gasEstimator`
+    });
+}
+```
+
 ### Token transfers
 We can send both native tokens (EGLD) and ESDT tokens using either the controller or the factory.
 #### Native Token Transfers Using the Controller
@@ -683,7 +703,7 @@ You will need to handle these aspects after the transaction is created.
 
     const bob = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
-    const transaction = factory.createTransactionForTransfer(alice.address, {
+    const transaction = await factory.createTransactionForTransfer(alice.address, {
         receiver: bob,
         nativeAmount: 1000000000000000000n,
     });
@@ -762,7 +782,7 @@ When using the factory, only the sender's address is required. As a result, the 
     const sft = new Token({ identifier: "SFT-987654", nonce: 10n });
     const thirdTransfer = new TokenTransfer({ token: sft, amount: 7n }); // for SFTs we set the desired amount we want to send
 
-    const transaction = factory.createTransactionForTransfer(alice.address, {
+    const transaction = await factory.createTransactionForTransfer(alice.address, {
         receiver: bob,
         tokenTransfers: [firstTransfer, secondTransfer, thirdTransfer],
     });
@@ -977,7 +997,7 @@ Even before broadcasting, at the moment you know the sender's address and the no
 
     const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
     const alice = await Account.newFromPem(filePath);
-    const deployTransaction = factory.createTransactionForDeploy(alice.address, {
+    const deployTransaction = await factory.createTransactionForDeploy(alice.address, {
         bytecode: bytecode,
         gasLimit: 6000000n,
         arguments: args,
@@ -1910,7 +1930,7 @@ Once a guardian is set, we must wait **20 epochs** before it can be activated. A
     const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
     const alice = await Account.newFromPem(filePath);
 
-    const transaction = await factory.createTransactionForUnguardingAccount(alice.address);
+    const transaction = await factory.createTransactionForUnguardingAccount(alice.address, {});
 
     // fetch the nonce of the network
     alice.nonce = await entrypoint.recallAccountNonce(alice.address);
@@ -2667,7 +2687,7 @@ These operations can be performed using both the **controller** and the **factor
 
     const commitHash = "1db734c0315f9ec422b88f679ccfe3e0197b9d67";
 
-    const transaction = factory.createTransactionForNewProposal(alice.address, {
+    const transaction = await factory.createTransactionForNewProposal(alice.address, {
         commitHash: commitHash,
         startVoteEpoch: 10,
         endVoteEpoch: 15,
@@ -2738,7 +2758,7 @@ These operations can be performed using both the **controller** and the **factor
     const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
     const alice = await Account.newFromPem(filePath);
 
-    const transaction = factory.createTransactionForVoting(alice.address, {
+    const transaction = await factory.createTransactionForVoting(alice.address, {
         proposalNonce: 1,
         vote: Vote.YES,
     });

@@ -185,7 +185,7 @@ import { loadAbiRegistry } from "../src/testutils";
 
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const alice = await Account.newFromPem(filePath);
-        const deployTransaction = factory.createTransactionForDeploy(alice.address, {
+        const deployTransaction = await factory.createTransactionForDeploy(alice.address, {
             bytecode: bytecode,
             gasLimit: 6000000n,
             arguments: args,

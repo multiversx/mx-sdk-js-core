@@ -29,7 +29,7 @@ describe("test multisig transactions factory", function () {
         });
     });
 
-    it("should create transaction for deploy multisig contract", function () {
+    it("should create transaction for deploy multisig contract", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const boardMemberOne = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
@@ -37,7 +37,7 @@ describe("test multisig transactions factory", function () {
 
         const board = [boardMemberOne, boardMemberTwo];
 
-        const transaction = factory.createTransactionForDeploy(senderAddress, {
+        const transaction = await factory.createTransactionForDeploy(senderAddress, {
             bytecode: bytecode.valueOf(),
             gasLimit: 5000000n,
             quorum: 2,
@@ -56,14 +56,14 @@ describe("test multisig transactions factory", function () {
         );
     });
 
-    it("should create transaction for propose add board member", function () {
+    it("should create transaction for propose add board member", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const boardMember = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForProposeAddBoardMember(senderAddress, {
+        const transaction = await factory.createTransactionForProposeAddBoardMember(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             boardMember: boardMember,
@@ -79,14 +79,14 @@ describe("test multisig transactions factory", function () {
         );
     });
 
-    it("should create transaction for propose add proposer", function () {
+    it("should create transaction for propose add proposer", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const proposer = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForProposeAddProposer(senderAddress, {
+        const transaction = await factory.createTransactionForProposeAddProposer(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             proposer: proposer,
@@ -102,14 +102,14 @@ describe("test multisig transactions factory", function () {
         );
     });
 
-    it("should create transaction for propose remove user", function () {
+    it("should create transaction for propose remove user", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const userAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForProposeRemoveUser(senderAddress, {
+        const transaction = await factory.createTransactionForProposeRemoveUser(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             userAddress: userAddress,
@@ -125,13 +125,13 @@ describe("test multisig transactions factory", function () {
         );
     });
 
-    it("should create transaction for propose change quorum", function () {
+    it("should create transaction for propose change quorum", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForProposeChangeQuorum(senderAddress, {
+        const transaction = await factory.createTransactionForProposeChangeQuorum(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             newQuorum: 3,
@@ -144,7 +144,7 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "proposeChangeQuorum@03");
     });
 
-    it("should create transaction for propose transfer execute", function () {
+    it("should create transaction for propose transfer execute", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const destinationContract = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms",
@@ -153,7 +153,7 @@ describe("test multisig transactions factory", function () {
             "erd1qqqqqqqqqqqqqpgq6kurkz43xq8t35kx9p8rvyz5kpxe9g7qd8ssefqjw8",
         );
         const amount = 1000000000000000000n; // 1 EGLD
-        const transaction = factory.createTransactionForProposeTransferExecute(senderAddress, {
+        const transaction = await factory.createTransactionForProposeTransferExecute(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             nativeTokenAmount: amount,
@@ -168,20 +168,21 @@ describe("test multisig transactions factory", function () {
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
         assert.equal(transaction.chainID, config.chainID);
+        assert.equal(transaction.gasLimit, 5000000n);
         assert.deepEqual(
             transaction.data.toString(),
             "proposeTransferExecute@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@0de0b6b3a7640000@0100000000004c4b40@616464@07",
         );
     });
 
-    it("should create transaction for propose transfer execute with EGLD send", function () {
+    it("should create transaction for propose transfer execute with EGLD send", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms",
         );
         const amount = 1000000000000000000n; // 1 EGLD
-        const transaction = factory.createTransactionForProposeTransferExecute(senderAddress, {
+        const transaction = await factory.createTransactionForProposeTransferExecute(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 60_000_000n,
             nativeTokenAmount: amount,
@@ -198,7 +199,31 @@ describe("test multisig transactions factory", function () {
         );
     });
 
-    it("should create transaction for propose transfer execute ESDT", function () {
+    it("should create transaction for propose transfer execute with EGLD send", async function () {
+        const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+
+        const multisigContractAddress = Address.newFromBech32(
+            "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms",
+        );
+        const amount = 1000000000000000000n; // 1 EGLD
+        const transaction = await factory.createTransactionForProposeTransferExecute(senderAddress, {
+            multisigContract: multisigContractAddress,
+            gasLimit: 60_000_000n,
+            nativeTokenAmount: amount,
+            to: multisigContractAddress,
+        });
+
+        assert.instanceOf(transaction, Transaction);
+        assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
+        assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
+        assert.equal(transaction.chainID, config.chainID);
+        assert.deepEqual(
+            transaction.data.toString(),
+            "proposeTransferExecute@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@0de0b6b3a7640000@",
+        );
+    });
+
+    it("should create transaction for propose transfer execute ESDT", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const destinationContract = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqpgqfxlljcaalgl2qfcnxcsftheju0ts36kvl3ts3qkewe",
@@ -212,7 +237,7 @@ describe("test multisig transactions factory", function () {
         });
         const tokenTransfer = new TokenTransfer({ token: token, amount: 10n });
 
-        const transaction = factory.createTransactionForProposeTransferExecuteEsdt(senderAddress, {
+        const transaction = await factory.createTransactionForProposeTransferExecuteEsdt(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             to: destinationContract,
@@ -226,13 +251,14 @@ describe("test multisig transactions factory", function () {
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
         assert.equal(transaction.chainID, config.chainID);
+        assert.equal(transaction.gasLimit, 5000000n);
         assert.deepEqual(
             transaction.data.toString(),
             "proposeTransferExecuteEsdt@0000000000000000050049bff963bdfa3ea02713362095df32e3d708eaccfc57@0000000c414c4943452d3536323766310000000000000000000000010a@0100000000004c4b40@3634363937333734373236393632373537343635",
         );
     });
 
-    it("should create transaction for propose async call", function () {
+    it("should create transaction for propose async call", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const destinationContract = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqpgq0rffvv4vk9vesqplv9ws55fxzdfaspqa8cfszy2hms",
@@ -240,7 +266,7 @@ describe("test multisig transactions factory", function () {
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqpgq6kurkz43xq8t35kx9p8rvyz5kpxe9g7qd8ssefqjw8",
         );
-        const transaction = factory.createTransactionForProposeAsyncCall(senderAddress, {
+        const transaction = await factory.createTransactionForProposeAsyncCall(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             nativeTransferAmount: 0n,
@@ -256,20 +282,21 @@ describe("test multisig transactions factory", function () {
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), multisigContractAddress.toBech32());
         assert.equal(transaction.chainID, config.chainID);
+        assert.equal(transaction.gasLimit, 5000000n);
         assert.equal(
             transaction.data.toString(),
             "proposeAsyncCall@0000000000000000050078d29632acb15998003f615d0a51261353d8041d3e13@@4c4b40@616464@07",
         );
     });
 
-    it("should create transaction for deposit the expected amount of egld", function () {
+    it("should create transaction for deposit the expected amount of egld", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
 
-        const transaction = factory.createTransactionForDeposit(senderAddress, {
+        const transaction = await factory.createTransactionForDeposit(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             nativeTokenAmount: 1n,
@@ -284,7 +311,7 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "deposit");
     });
 
-    it("should create transaction for deposit esdt token", function () {
+    it("should create transaction for deposit esdt token", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const multisigContractAddress = Address.newFromBech32(
@@ -295,7 +322,7 @@ describe("test multisig transactions factory", function () {
         });
         const tokenTransfer = new TokenTransfer({ token: token, amount: 100n });
 
-        const transaction = factory.createTransactionForDeposit(senderAddress, {
+        const transaction = await factory.createTransactionForDeposit(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             nativeTokenAmount: 0n,
@@ -310,7 +337,7 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "ESDTTransfer@414c4943452d353632376631@64@6465706f736974");
     });
 
-    it("should create transaction for propose SC deploy from source when abi is passed", function () {
+    it("should create transaction for propose SC deploy from source when abi is passed", async function () {
         const amount = BigInt(50000000000000000); // 0.05 EGLD
         const metadata = new CodeMetadata(true, true, false);
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
@@ -319,7 +346,7 @@ describe("test multisig transactions factory", function () {
             "erd1qqqqqqqqqqqqqpgq0cjuum0t436gmp446wf3yz43avp2gm2czeus8mctaf",
         );
 
-        const transaction = factory.createTransactionForProposeContractDeployFromSource(senderAddress, {
+        const transaction = await factory.createTransactionForProposeContractDeployFromSource(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             amount: amount,
@@ -339,7 +366,7 @@ describe("test multisig transactions factory", function () {
         );
     });
 
-    it("should create transaction for propose SC deploy from source when no abi is passed", function () {
+    it("should create transaction for propose SC deploy from source when no abi is passed", async function () {
         const amount = BigInt(50000000000000000); // 0.05 EGLD
         const metadata = new CodeMetadata(true, true, false);
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
@@ -348,7 +375,7 @@ describe("test multisig transactions factory", function () {
             "erd1qqqqqqqqqqqqqpgq0cjuum0t436gmp446wf3yz43avp2gm2czeus8mctaf",
         );
 
-        const transaction = factory.createTransactionForProposeContractDeployFromSource(senderAddress, {
+        const transaction = await factory.createTransactionForProposeContractDeployFromSource(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             amount: amount,
@@ -367,7 +394,7 @@ describe("test multisig transactions factory", function () {
         );
     });
 
-    it("should create transaction for propose SC upgrade from source when abi is passed", function () {
+    it("should create transaction for propose SC upgrade from source when abi is passed", async function () {
         const amount = BigInt(50000000000000000); // 0.05 EGLD
         const metadata = new CodeMetadata(true, true, false);
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
@@ -376,7 +403,7 @@ describe("test multisig transactions factory", function () {
             "erd1qqqqqqqqqqqqqpgq0cjuum0t436gmp446wf3yz43avp2gm2czeus8mctaf",
         );
 
-        const transaction = factory.createTransactionForProposeContractUpgradeFromSource(senderAddress, {
+        const transaction = await factory.createTransactionForProposeContractUpgradeFromSource(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             scAddress: multisigContractAddress,
@@ -401,7 +428,7 @@ describe("test multisig transactions factory", function () {
         );
     });
 
-    it("should create transaction for propose SC upgrade from source when no abi is passed", function () {
+    it("should create transaction for propose SC upgrade from source when no abi is passed", async function () {
         const amount = BigInt(50000000000000000); // 0.05 EGLD
         const metadata = new CodeMetadata(true, true, false);
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
@@ -410,7 +437,7 @@ describe("test multisig transactions factory", function () {
             "erd1qqqqqqqqqqqqqpgq0cjuum0t436gmp446wf3yz43avp2gm2czeus8mctaf",
         );
 
-        const transaction = factory.createTransactionForProposeContractUpgradeFromSource(senderAddress, {
+        const transaction = await factory.createTransactionForProposeContractUpgradeFromSource(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             scAddress: multisigContractAddress,
@@ -440,13 +467,13 @@ describe("test multisig transactions factory", function () {
         );
     });
 
-    it("should create transaction for sign action", function () {
+    it("should create transaction for sign action", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForSignAction(senderAddress, {
+        const transaction = await factory.createTransactionForSignAction(senderAddress, {
             multisigContract: multisigContractAddress,
             actionId: 42,
             gasLimit: 5000000n,
@@ -459,13 +486,13 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "sign@2a");
     });
 
-    it("should create transaction for sign batch", function () {
+    it("should create transaction for sign batch", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForSignBatch(senderAddress, {
+        const transaction = await factory.createTransactionForSignBatch(senderAddress, {
             multisigContract: multisigContractAddress,
             groupId: 5,
             gasLimit: 5000000n,
@@ -478,13 +505,13 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "signBatch@05");
     });
 
-    it("should create transaction for sign and perform", function () {
+    it("should create transaction for sign and perform", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForSignAndPerform(senderAddress, {
+        const transaction = await factory.createTransactionForSignAndPerform(senderAddress, {
             multisigContract: multisigContractAddress,
             actionId: 42,
             gasLimit: 5000000n,
@@ -497,13 +524,13 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "signAndPerform@2a");
     });
 
-    it("should create transaction for unsign", function () {
+    it("should create transaction for unsign", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForUnsign(senderAddress, {
+        const transaction = await factory.createTransactionForUnsign(senderAddress, {
             multisigContract: multisigContractAddress,
             actionId: 42,
             gasLimit: 5000000n,
@@ -515,12 +542,12 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "unsign@2a");
     });
 
-    it("should create transaction for unsign for outdated board members", function () {
+    it("should create transaction for unsign for outdated board members", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForUnsignForOutdatedBoardMembers(senderAddress, {
+        const transaction = await factory.createTransactionForUnsignForOutdatedBoardMembers(senderAddress, {
             multisigContract: multisigContractAddress,
             actionId: 42,
             outdatedBoardMembers: [1, 3, 5],
@@ -533,12 +560,12 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "unsignForOutdatedBoardMembers@2a@01@03@05");
     });
 
-    it("should create transaction for perform action", function () {
+    it("should create transaction for perform action", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForPerformAction(senderAddress, {
+        const transaction = await factory.createTransactionForPerformAction(senderAddress, {
             multisigContract: multisigContractAddress,
             actionId: 42,
             gasLimit: 5000000n,
@@ -550,12 +577,12 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "performAction@2a");
     });
 
-    it("should create transaction for perform batch", function () {
+    it("should create transaction for perform batch", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForPerformBatch(senderAddress, {
+        const transaction = await factory.createTransactionForPerformBatch(senderAddress, {
             multisigContract: multisigContractAddress,
             groupId: 5,
             gasLimit: 5000000n,
@@ -567,13 +594,13 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "performBatch@05");
     });
 
-    it("should create transaction for discard action", function () {
+    it("should create transaction for discard action", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForDiscardAction(senderAddress, {
+        const transaction = await factory.createTransactionForDiscardAction(senderAddress, {
             multisigContract: multisigContractAddress,
             actionId: 322,
             gasLimit: 5000000n,
@@ -586,13 +613,13 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(transaction.data.toString(), "discardAction@0142");
     });
 
-    it("should create transaction for discard batch", function () {
+    it("should create transaction for discard batch", async function () {
         const senderAddress = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
         const multisigContractAddress = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqylllslmq6y6",
         );
-        const transaction = factory.createTransactionForDiscardBatch(senderAddress, {
+        const transaction = await factory.createTransactionForDiscardBatch(senderAddress, {
             multisigContract: multisigContractAddress,
             gasLimit: 5000000n,
             actionIds: [24, 25],

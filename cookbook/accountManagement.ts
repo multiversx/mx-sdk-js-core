@@ -160,7 +160,7 @@ import { Account, Address, DevnetEntrypoint } from "../src"; // md-ignore
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const alice = await Account.newFromPem(filePath);
 
-        const transaction = await factory.createTransactionForUnguardingAccount(alice.address);
+        const transaction = await factory.createTransactionForUnguardingAccount(alice.address, {});
 
         // fetch the nonce of the network // md-as-comment
         alice.nonce = await entrypoint.recallAccountNonce(alice.address);

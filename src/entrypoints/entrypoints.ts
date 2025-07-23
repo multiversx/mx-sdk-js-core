@@ -12,6 +12,7 @@ import {
     TransactionWatcher,
 } from "../core";
 import { DelegationController, DelegationTransactionsFactory } from "../delegation";
+import { GasLimitEstimator } from "../gasEstimator";
 import { GovernanceController, GovernanceTransactionsFactory } from "../governance";
 import { MultisigTransactionsFactory } from "../multisig";
 import { MultisigController } from "../multisig/multisigController";
@@ -27,12 +28,14 @@ import { DevnetEntrypointConfig, MainnetEntrypointConfig, TestnetEntrypointConfi
 export class NetworkEntrypoint {
     private networkProvider: INetworkProvider;
     private chainId: string;
+    private withGasLimitEstimator?: boolean;
 
     constructor(options: {
         networkProviderUrl: string;
         networkProviderKind: string;
         chainId: string;
         clientName?: string;
+        withGasLimitEstimator?: boolean;
     }) {
         if (options.networkProviderKind === "proxy") {
             this.networkProvider = new ProxyNetworkProvider(options.networkProviderUrl, {
@@ -47,6 +50,7 @@ export class NetworkEntrypoint {
         }
 
         this.chainId = options.chainId;
+        this.withGasLimitEstimator = options.withGasLimitEstimator;
     }
 
     /**
@@ -138,107 +142,155 @@ export class NetworkEntrypoint {
         return this.networkProvider;
     }
 
+    protected createGasLimitEstimator(): GasLimitEstimator {
+        return new GasLimitEstimator({
+            networkProvider: this.networkProvider,
+        });
+    }
+
     createDelegationController(): DelegationController {
-        return new DelegationController({ chainID: this.chainId, networkProvider: this.networkProvider });
+        return new DelegationController({
+            chainID: this.chainId,
+            networkProvider: this.networkProvider,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
     }
 
     createDelegationTransactionsFactory(): DelegationTransactionsFactory {
-        return new DelegationTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: this.chainId }) });
+        return new DelegationTransactionsFactory({
+            config: new TransactionsFactoryConfig({ chainID: this.chainId }),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
     }
 
     createAccountController(): AccountController {
-        return new AccountController({ chainID: this.chainId });
+        return new AccountController({
+            chainID: this.chainId,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
     }
 
     createAccountTransactionsFactory(): AccountTransactionsFactory {
-        return new AccountTransactionsFactory({ config: new TransactionsFactoryConfig({ chainID: this.chainId }) });
+        return new AccountTransactionsFactory({
+            config: new TransactionsFactoryConfig({ chainID: this.chainId }),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
     }
 
     createSmartContractController(abi?: Abi): SmartContractController {
-        return new SmartContractController({ chainID: this.chainId, networkProvider: this.networkProvider, abi });
+        return new SmartContractController({
+            chainID: this.chainId,
+            networkProvider: this.networkProvider,
+            abi,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
     }
 
     createSmartContractTransactionsFactory(abi?: Abi): SmartContractTransactionsFactory {
         return new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
             abi: abi,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
     createTokenManagementController(): TokenManagementController {
-        return new TokenManagementController({ chainID: this.chainId, networkProvider: this.networkProvider });
+        return new TokenManagementController({
+            chainID: this.chainId,
+            networkProvider: this.networkProvider,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
     }
 
     createTokenManagementTransactionsFactory(): TokenManagementTransactionsFactory {
         return new TokenManagementTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
     createTransfersController(): TransfersController {
-        return new TransfersController({ chainID: this.chainId });
+        return new TransfersController({
+            chainID: this.chainId,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
     }
 
     createTransfersTransactionsFactory(): TransferTransactionsFactory {
         return new TransferTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
     createMultisigController(abi: Abi): MultisigController {
-        return new MultisigController({ chainID: this.chainId, networkProvider: this.networkProvider, abi: abi });
+        return new MultisigController({
+            chainID: this.chainId,
+            networkProvider: this.networkProvider,
+            abi: abi,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
     }
 
     createMultisigTransactionsFactory(abi: Abi): MultisigTransactionsFactory {
         return new MultisigTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
             abi: abi,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
     createGovernanceController(): GovernanceController {
-        return new GovernanceController({ chainID: this.chainId, networkProvider: this.networkProvider });
+        return new GovernanceController({
+            chainID: this.chainId,
+            networkProvider: this.networkProvider,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
     }
 
     createGovernanceTransactionsFactory(): GovernanceTransactionsFactory {
         return new GovernanceTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 }
 
 export class TestnetEntrypoint extends NetworkEntrypoint {
-    constructor(url?: string, kind?: string, clientName?: string) {
+    constructor(url?: string, kind?: string, clientName?: string, withGasLimitEstimator?: boolean) {
         const entrypointConfig = new TestnetEntrypointConfig();
         super({
             networkProviderUrl: url || entrypointConfig.networkProviderUrl,
             networkProviderKind: kind || entrypointConfig.networkProviderKind,
             chainId: entrypointConfig.chainId,
             clientName: clientName,
+            withGasLimitEstimator: withGasLimitEstimator,
         });
     }
 }
 
 export class DevnetEntrypoint extends NetworkEntrypoint {
-    constructor(url?: string, kind?: string, clientName?: string) {
+    constructor(url?: string, kind?: string, clientName?: string, withGasLimitestimator?: boolean) {
         const entrypointConfig = new DevnetEntrypointConfig();
         super({
             networkProviderUrl: url || entrypointConfig.networkProviderUrl,
             networkProviderKind: kind || entrypointConfig.networkProviderKind,
             chainId: entrypointConfig.chainId,
             clientName: clientName,
+            withGasLimitEstimator: withGasLimitestimator,
         });
     }
 }
 
 export class MainnetEntrypoint extends NetworkEntrypoint {
-    constructor(url?: string, kind?: string, clientName?: string) {
+    constructor(url?: string, kind?: string, clientName?: string, withGasLimitestimator?: boolean) {
         const entrypointConfig = new MainnetEntrypointConfig();
         super({
             networkProviderUrl: url || entrypointConfig.networkProviderUrl,
             networkProviderKind: kind || entrypointConfig.networkProviderKind,
             chainId: entrypointConfig.chainId,
             clientName: clientName,
+            withGasLimitEstimator: withGasLimitestimator,
         });
     }
 }

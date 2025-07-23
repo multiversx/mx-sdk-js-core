@@ -1,10 +1,11 @@
 import { AddressValue, ArgSerializer, BigUIntValue, BytesValue, StringValue } from "../abi";
+import { IGasLimitEstimator } from "../core";
 import { Address } from "../core/address";
+import { BaseFactory } from "../core/baseFactory";
 import { ESDT_CONTRACT_ADDRESS_HEX } from "../core/constants";
 import { ErrBadUsage } from "../core/errors";
 import { Logger } from "../core/logger";
 import { Transaction } from "../core/transaction";
-import { TransactionBuilder } from "../core/transactionBuilder";
 import * as resources from "./resources";
 
 interface IConfig {
@@ -39,14 +40,15 @@ interface IConfig {
 /**
  * Use this class to create token management transactions like issuing ESDTs, creating NFTs, setting roles, etc.
  */
-export class TokenManagementTransactionsFactory {
+export class TokenManagementTransactionsFactory extends BaseFactory {
     private readonly config: IConfig;
     private readonly argSerializer: ArgSerializer;
     private readonly trueAsString: string;
     private readonly falseAsString: string;
     private readonly esdtContractAddress: Address;
 
-    constructor(options: { config: IConfig }) {
+    constructor(options: { config: IConfig; gasLimitEstimator?: IGasLimitEstimator }) {
+        super({ config: options.config, gasLimitEstimator: options.gasLimitEstimator });
         this.config = options.config;
         this.argSerializer = new ArgSerializer();
         this.trueAsString = "true";
@@ -54,7 +56,10 @@ export class TokenManagementTransactionsFactory {
         this.esdtContractAddress = Address.newFromHex(ESDT_CONTRACT_ADDRESS_HEX, this.config.addressHrp);
     }
 
-    createTransactionForIssuingFungible(sender: Address, options: resources.IssueFungibleInput): Transaction {
+    async createTransactionForIssuingFungible(
+        sender: Address,
+        options: resources.IssueFungibleInput,
+    ): Promise<Transaction> {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const args = [
@@ -78,18 +83,24 @@ export class TokenManagementTransactionsFactory {
 
         const dataParts = ["issue", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitIssue,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+            value: this.config.issueCost,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitIssue);
+
+        return transaction;
     }
 
-    createTransactionForIssuingSemiFungible(sender: Address, options: resources.IssueSemiFungibleInput): Transaction {
+    async createTransactionForIssuingSemiFungible(
+        sender: Address,
+        options: resources.IssueSemiFungibleInput,
+    ): Promise<Transaction> {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const args = [
@@ -113,18 +124,24 @@ export class TokenManagementTransactionsFactory {
 
         const dataParts = ["issueSemiFungible", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitIssue,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+            value: this.config.issueCost,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitIssue);
+
+        return transaction;
     }
 
-    createTransactionForIssuingNonFungible(sender: Address, options: resources.IssueNonFungibleInput): Transaction {
+    async createTransactionForIssuingNonFungible(
+        sender: Address,
+        options: resources.IssueNonFungibleInput,
+    ): Promise<Transaction> {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const args = [
@@ -148,18 +165,24 @@ export class TokenManagementTransactionsFactory {
 
         const dataParts = ["issueNonFungible", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitIssue,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+            value: this.config.issueCost,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitIssue);
+
+        return transaction;
     }
 
-    createTransactionForRegisteringMetaESDT(sender: Address, options: resources.RegisterMetaESDTInput): Transaction {
+    async createTransactionForRegisteringMetaESDT(
+        sender: Address,
+        options: resources.RegisterMetaESDTInput,
+    ): Promise<Transaction> {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const args = [
@@ -184,21 +207,24 @@ export class TokenManagementTransactionsFactory {
 
         const dataParts = ["registerMetaESDT", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitIssue,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+            value: this.config.issueCost,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitIssue);
+
+        return transaction;
     }
 
-    createTransactionForRegisteringAndSettingRoles(
+    async createTransactionForRegisteringAndSettingRoles(
         sender: Address,
         options: resources.RegisterRolesInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         this.notifyAboutUnsettingBurnRoleGlobally();
 
         const dataParts = [
@@ -211,59 +237,68 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitIssue,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+            value: this.config.issueCost,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitIssue);
+
+        return transaction;
     }
 
-    createTransactionForSettingBurnRoleGlobally(
+    async createTransactionForSettingBurnRoleGlobally(
         sender: Address,
         options: resources.BurnRoleGloballyInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const dataParts = [
             "setBurnRoleGlobally",
             ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitToggleBurnRoleGlobally,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitToggleBurnRoleGlobally);
+
+        return transaction;
     }
 
-    createTransactionForUnsettingBurnRoleGlobally(
+    async createTransactionForUnsettingBurnRoleGlobally(
         sender: Address,
         options: resources.BurnRoleGloballyInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const dataParts = [
             "unsetBurnRoleGlobally",
             ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitToggleBurnRoleGlobally,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitToggleBurnRoleGlobally);
+
+        return transaction;
     }
 
-    createTransactionForSettingSpecialRoleOnFungibleToken(
+    async createTransactionForSettingSpecialRoleOnFungibleToken(
         sender: Address,
         options: resources.FungibleSpecialRoleInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
         options.addRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
@@ -272,20 +307,23 @@ export class TokenManagementTransactionsFactory {
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitSetSpecialRole);
+
+        return transaction;
     }
 
-    createTransactionForUnsettingSpecialRoleOnFungibleToken(
+    async createTransactionForUnsettingSpecialRoleOnFungibleToken(
         sender: Address,
         options: resources.UnsetFungibleSpecialRoleInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
         options.removeRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
@@ -294,20 +332,23 @@ export class TokenManagementTransactionsFactory {
 
         const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitSetSpecialRole);
+
+        return transaction;
     }
 
-    createTransactionForSettingSpecialRoleOnSemiFungibleToken(
+    async createTransactionForSettingSpecialRoleOnSemiFungibleToken(
         sender: Address,
         options: resources.SemiFungibleSpecialRoleInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
         options.addRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
@@ -322,20 +363,23 @@ export class TokenManagementTransactionsFactory {
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitSetSpecialRole);
+
+        return transaction;
     }
 
-    createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
+    async createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(
         sender: Address,
         options: resources.UnsetSemiFungibleSpecialRoleInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
         options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
@@ -349,34 +393,37 @@ export class TokenManagementTransactionsFactory {
 
         const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitSetSpecialRole);
+
+        return transaction;
     }
 
-    createTransactionForSettingSpecialRoleOnMetaESDT(
+    async createTransactionForSettingSpecialRoleOnMetaESDT(
         sender: Address,
         options: resources.SemiFungibleSpecialRoleInput,
-    ): Transaction {
-        return this.createTransactionForSettingSpecialRoleOnSemiFungibleToken(sender, options);
+    ): Promise<Transaction> {
+        return await this.createTransactionForSettingSpecialRoleOnSemiFungibleToken(sender, options);
     }
 
-    createTransactionForUnsettingSpecialRoleOnMetaESDT(
+    async createTransactionForUnsettingSpecialRoleOnMetaESDT(
         sender: Address,
         options: resources.UnsetSemiFungibleSpecialRoleInput,
-    ): Transaction {
-        return this.createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(sender, options);
+    ): Promise<Transaction> {
+        return await this.createTransactionForUnsettingSpecialRoleOnSemiFungibleToken(sender, options);
     }
 
-    createTransactionForSettingSpecialRoleOnNonFungibleToken(
+    async createTransactionForSettingSpecialRoleOnNonFungibleToken(
         sender: Address,
         options: resources.SpecialRoleInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
         options.addRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
@@ -391,20 +438,23 @@ export class TokenManagementTransactionsFactory {
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitSetSpecialRole);
+
+        return transaction;
     }
 
-    createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
+    async createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
         sender: Address,
         options: resources.UnsetSpecialRoleInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
         options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
@@ -418,17 +468,20 @@ export class TokenManagementTransactionsFactory {
 
         const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitSetSpecialRole,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitSetSpecialRole);
+
+        return transaction;
     }
 
-    createTransactionForCreatingNFT(sender: Address, options: resources.MintInput): Transaction {
+    async createTransactionForCreatingNFT(sender: Address, options: resources.MintInput): Promise<Transaction> {
         const dataParts = [
             "ESDTNFTCreate",
             ...this.argSerializer.valuesToStrings([
@@ -446,46 +499,55 @@ export class TokenManagementTransactionsFactory {
         const nftData = options.name + options.hash + options.attributes + options.uris.join("");
         const storageGasLimit = this.config.gasLimitStorePerByte + BigInt(nftData.length);
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtNftCreate + storageGasLimit,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitEsdtNftCreate + storageGasLimit);
+
+        return transaction;
     }
 
-    createTransactionForPausing(sender: Address, options: resources.PausingInput): Transaction {
+    async createTransactionForPausing(sender: Address, options: resources.PausingInput): Promise<Transaction> {
         const dataParts = ["pause", ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)])];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitPausing,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitPausing);
+
+        return transaction;
     }
 
-    createTransactionForUnpausing(sender: Address, options: resources.PausingInput): Transaction {
+    async createTransactionForUnpausing(sender: Address, options: resources.PausingInput): Promise<Transaction> {
         const dataParts = [
             "unPause",
             ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitPausing,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitPausing);
+
+        return transaction;
     }
 
-    createTransactionForFreezing(sender: Address, options: resources.ManagementInput): Transaction {
+    async createTransactionForFreezing(sender: Address, options: resources.ManagementInput): Promise<Transaction> {
         const dataParts = [
             "freeze",
             ...this.argSerializer.valuesToStrings([
@@ -494,17 +556,20 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitFreezing,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitFreezing);
+
+        return transaction;
     }
 
-    createTransactionForUnfreezing(sender: Address, options: resources.ManagementInput): Transaction {
+    async createTransactionForUnfreezing(sender: Address, options: resources.ManagementInput): Promise<Transaction> {
         const dataParts = [
             "UnFreeze",
             ...this.argSerializer.valuesToStrings([
@@ -513,17 +578,20 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitFreezing,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitFreezing);
+
+        return transaction;
     }
 
-    createTransactionForWiping(sender: Address, options: resources.ManagementInput): Transaction {
+    async createTransactionForWiping(sender: Address, options: resources.ManagementInput): Promise<Transaction> {
         const dataParts = [
             "wipe",
             ...this.argSerializer.valuesToStrings([
@@ -532,17 +600,20 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitWiping,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitWiping);
+
+        return transaction;
     }
 
-    createTransactionForLocalMint(sender: Address, options: resources.LocalMintInput): Transaction {
+    async createTransactionForLocalMint(sender: Address, options: resources.LocalMintInput): Promise<Transaction> {
         const dataParts = [
             "ESDTLocalMint",
             ...this.argSerializer.valuesToStrings([
@@ -551,17 +622,20 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtLocalMint,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitEsdtLocalMint);
+
+        return transaction;
     }
 
-    createTransactionForLocalBurning(sender: Address, options: resources.LocalBurnInput): Transaction {
+    async createTransactionForLocalBurning(sender: Address, options: resources.LocalBurnInput): Promise<Transaction> {
         const dataParts = [
             "ESDTLocalBurn",
             ...this.argSerializer.valuesToStrings([
@@ -570,17 +644,23 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtLocalBurn,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitEsdtLocalBurn);
+
+        return transaction;
     }
 
-    createTransactionForUpdatingAttributes(sender: Address, options: resources.UpdateAttributesInput): Transaction {
+    async createTransactionForUpdatingAttributes(
+        sender: Address,
+        options: resources.UpdateAttributesInput,
+    ): Promise<Transaction> {
         const dataParts = [
             "ESDTNFTUpdateAttributes",
             ...this.argSerializer.valuesToStrings([
@@ -590,17 +670,23 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtNftUpdateAttributes,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitEsdtNftUpdateAttributes);
+
+        return transaction;
     }
 
-    createTransactionForAddingQuantity(sender: Address, options: resources.UpdateQuantityInput): Transaction {
+    async createTransactionForAddingQuantity(
+        sender: Address,
+        options: resources.UpdateQuantityInput,
+    ): Promise<Transaction> {
         const dataParts = [
             "ESDTNFTAddQuantity",
             ...this.argSerializer.valuesToStrings([
@@ -610,17 +696,23 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtNftAddQuantity,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitEsdtNftAddQuantity);
+
+        return transaction;
     }
 
-    createTransactionForBurningQuantity(sender: Address, options: resources.UpdateQuantityInput): Transaction {
+    async createTransactionForBurningQuantity(
+        sender: Address,
+        options: resources.UpdateQuantityInput,
+    ): Promise<Transaction> {
         const dataParts = [
             "ESDTNFTBurn",
             ...this.argSerializer.valuesToStrings([
@@ -630,17 +722,23 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtNftBurn,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitEsdtNftBurn);
+
+        return transaction;
     }
 
-    createTransactionForModifyingRoyalties(sender: Address, options: resources.ModifyRoyaltiesInput): Transaction {
+    async createTransactionForModifyingRoyalties(
+        sender: Address,
+        options: resources.ModifyRoyaltiesInput,
+    ): Promise<Transaction> {
         const dataParts = [
             "ESDTModifyRoyalties",
             ...this.argSerializer.valuesToStrings([
@@ -650,17 +748,20 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtModifyRoyalties,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitEsdtModifyRoyalties);
+
+        return transaction;
     }
 
-    createTransactionForSettingNewUris(sender: Address, options: resources.SetNewUriInput): Transaction {
+    async createTransactionForSettingNewUris(sender: Address, options: resources.SetNewUriInput): Promise<Transaction> {
         if (!options.newUris.length) {
             throw new ErrBadUsage("No URIs provided");
         }
@@ -674,17 +775,23 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitSetNewUris,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitSetNewUris);
+
+        return transaction;
     }
 
-    createTransactionForModifyingCreator(sender: Address, options: resources.ModifyCreatorInput): Transaction {
+    async createTransactionForModifyingCreator(
+        sender: Address,
+        options: resources.ModifyCreatorInput,
+    ): Promise<Transaction> {
         const dataParts = [
             "ESDTModifyCreator",
             ...this.argSerializer.valuesToStrings([
@@ -693,17 +800,23 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtModifyCreator,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitEsdtModifyCreator);
+
+        return transaction;
     }
 
-    createTransactionForUpdatingMetadata(sender: Address, options: resources.ManageMetadataInput): Transaction {
+    async createTransactionForUpdatingMetadata(
+        sender: Address,
+        options: resources.ManageMetadataInput,
+    ): Promise<Transaction> {
         const dataParts = [
             "ESDTMetaDataUpdate",
             ...this.argSerializer.valuesToStrings([
@@ -717,17 +830,23 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitEsdtMetadataUpdate,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitEsdtMetadataUpdate);
+
+        return transaction;
     }
 
-    createTransactionForMetadataRecreate(sender: Address, options: resources.ManageMetadataInput): Transaction {
+    async createTransactionForMetadataRecreate(
+        sender: Address,
+        options: resources.ManageMetadataInput,
+    ): Promise<Transaction> {
         const dataParts = [
             "ESDTMetaDataRecreate",
             ...this.argSerializer.valuesToStrings([
@@ -741,55 +860,67 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: sender,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitNftMetadataRecreate,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitNftMetadataRecreate);
+
+        return transaction;
     }
 
-    createTransactionForChangingTokenToDynamic(
+    async createTransactionForChangingTokenToDynamic(
         sender: Address,
         options: resources.ChangeTokenToDynamicInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const dataParts = [
             "changeToDynamic",
             ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitNftChangeToDynamic,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitNftChangeToDynamic);
+
+        return transaction;
     }
 
-    createTransactionForUpdatingTokenId(sender: Address, options: resources.UpdateTokenIDInput): Transaction {
+    async createTransactionForUpdatingTokenId(
+        sender: Address,
+        options: resources.UpdateTokenIDInput,
+    ): Promise<Transaction> {
         const dataParts = [
             "updateTokenID",
             ...this.argSerializer.valuesToStrings([new StringValue(options.tokenIdentifier)]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitUpdateTokenId,
-            addDataMovementGas: true,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitUpdateTokenId);
+
+        return transaction;
     }
 
-    createTransactionForRegisteringDynamicToken(
+    async createTransactionForRegisteringDynamicToken(
         sender: Address,
         options: resources.RegisteringDynamicTokenInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const dataParts = [
             "registerDynamic",
             ...this.argSerializer.valuesToStrings([
@@ -799,21 +930,24 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitRegisterDynamic,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+            value: this.config.issueCost,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitRegisterDynamic);
+
+        return transaction;
     }
 
-    createTransactionForRegisteringDynamicAndSettingRoles(
+    async createTransactionForRegisteringDynamicAndSettingRoles(
         sender: Address,
         options: resources.RegisteringDynamicTokenInput,
-    ): Transaction {
+    ): Promise<Transaction> {
         const dataParts = [
             "registerAndSetAllRolesDynamic",
             ...this.argSerializer.valuesToStrings([
@@ -823,15 +957,18 @@ export class TokenManagementTransactionsFactory {
             ]),
         ];
 
-        return new TransactionBuilder({
-            config: this.config,
+        const transaction = new Transaction({
             sender: sender,
             receiver: this.esdtContractAddress,
-            dataParts: dataParts,
-            gasLimit: this.config.gasLimitRegisterDynamic,
-            addDataMovementGas: true,
-            amount: this.config.issueCost,
-        }).build();
+            chainID: this.config.chainID,
+            gasLimit: 0n,
+            value: this.config.issueCost,
+        });
+
+        this.setTransactionPayload(transaction, dataParts);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitRegisterDynamic);
+
+        return transaction;
     }
 
     private notifyAboutUnsettingBurnRoleGlobally() {

@@ -44,7 +44,7 @@ describe("test smart contract transactions factory", function () {
         }
     });
 
-    it.skip("should create 'Transaction' for deploy", async function () {
+    it("should create 'Transaction' for deploy", async function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const gasLimit = 6000000n;
         const args = [new U32Value(1)];
@@ -69,7 +69,7 @@ describe("test smart contract transactions factory", function () {
             transaction.receiver,
             Address.newFromBech32("erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu"),
         );
-        assert.deepEqual(transaction.data, Buffer.from(`${bytecode}@0500@0504@01`));
+        assert.deepEqual(transaction.data, Buffer.from(`${Buffer.from(bytecode).toString("hex")}@0500@0504@01`));
         assert.equal(transaction.gasLimit.valueOf(), gasLimit);
         assert.equal(transaction.value, 0n);
 
@@ -438,7 +438,7 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(transaction, transactionAbiAware);
     });
 
-    it.skip("should create 'Transaction' for upgrade", async function () {
+    it("should create 'Transaction' for upgrade", async function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const contract = Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4");
         const gasLimit = 6000000n;
@@ -466,7 +466,10 @@ describe("test smart contract transactions factory", function () {
             transaction.receiver,
             Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4"),
         );
-        assert.deepEqual(transaction.data!, Buffer.from(`upgradeContract@${bytecode}@0504@07`));
+        assert.deepEqual(
+            transaction.data!,
+            Buffer.from(`upgradeContract@${Buffer.from(bytecode).toString("hex")}@0504@07`),
+        );
         assert.equal(transaction.gasLimit, gasLimit);
         assert.equal(transaction.value, 0n);
 

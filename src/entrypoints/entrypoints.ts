@@ -28,14 +28,14 @@ import { DevnetEntrypointConfig, MainnetEntrypointConfig, TestnetEntrypointConfi
 export class NetworkEntrypoint {
     private networkProvider: INetworkProvider;
     private chainId: string;
-    private gasLimitMultiplier?: number;
+    private withGasLimitEstimator?: boolean;
 
     constructor(options: {
         networkProviderUrl: string;
         networkProviderKind: string;
         chainId: string;
         clientName?: string;
-        gasLimitMultiplier?: number;
+        withGasLimitEstimator?: boolean;
     }) {
         if (options.networkProviderKind === "proxy") {
             this.networkProvider = new ProxyNetworkProvider(options.networkProviderUrl, {
@@ -50,7 +50,7 @@ export class NetworkEntrypoint {
         }
 
         this.chainId = options.chainId;
-        this.gasLimitMultiplier = options.gasLimitMultiplier;
+        this.withGasLimitEstimator = options.withGasLimitEstimator;
     }
 
     /**
@@ -142,10 +142,9 @@ export class NetworkEntrypoint {
         return this.networkProvider;
     }
 
-    private initializeGasLimitEstimator(): GasLimitEstimator {
+    protected createGasLimitEstimator(): GasLimitEstimator {
         return new GasLimitEstimator({
             networkProvider: this.networkProvider,
-            gasMultiplier: this.gasLimitMultiplier,
         });
     }
 
@@ -153,25 +152,28 @@ export class NetworkEntrypoint {
         return new DelegationController({
             chainID: this.chainId,
             networkProvider: this.networkProvider,
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
     createDelegationTransactionsFactory(): DelegationTransactionsFactory {
         return new DelegationTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
     createAccountController(): AccountController {
-        return new AccountController({ chainID: this.chainId, gasLimitEstimator: this.initializeGasLimitEstimator() });
+        return new AccountController({
+            chainID: this.chainId,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
     }
 
     createAccountTransactionsFactory(): AccountTransactionsFactory {
         return new AccountTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
@@ -180,7 +182,7 @@ export class NetworkEntrypoint {
             chainID: this.chainId,
             networkProvider: this.networkProvider,
             abi,
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
@@ -188,40 +190,36 @@ export class NetworkEntrypoint {
         return new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
             abi: abi,
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
     createTokenManagementController(): TokenManagementController {
-        const gasLimitEstimator = new GasLimitEstimator({
-            networkProvider: this.networkProvider,
-            gasMultiplier: this.gasLimitMultiplier,
-        });
         return new TokenManagementController({
             chainID: this.chainId,
             networkProvider: this.networkProvider,
-            gasLimitEstimator: gasLimitEstimator,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
     createTokenManagementTransactionsFactory(): TokenManagementTransactionsFactory {
         return new TokenManagementTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
     createTransfersController(): TransfersController {
         return new TransfersController({
             chainID: this.chainId,
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
     createTransfersTransactionsFactory(): TransferTransactionsFactory {
         return new TransferTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
@@ -230,7 +228,7 @@ export class NetworkEntrypoint {
             chainID: this.chainId,
             networkProvider: this.networkProvider,
             abi: abi,
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
@@ -238,7 +236,7 @@ export class NetworkEntrypoint {
         return new MultisigTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
             abi: abi,
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
@@ -246,53 +244,53 @@ export class NetworkEntrypoint {
         return new GovernanceController({
             chainID: this.chainId,
             networkProvider: this.networkProvider,
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 
     createGovernanceTransactionsFactory(): GovernanceTransactionsFactory {
         return new GovernanceTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
-            gasLimitEstimator: this.initializeGasLimitEstimator(),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });
     }
 }
 
 export class TestnetEntrypoint extends NetworkEntrypoint {
-    constructor(url?: string, kind?: string, clientName?: string, gasLimitMultiplier?: number) {
+    constructor(url?: string, kind?: string, clientName?: string, withGasLimitestimator?: boolean) {
         const entrypointConfig = new TestnetEntrypointConfig();
         super({
             networkProviderUrl: url || entrypointConfig.networkProviderUrl,
             networkProviderKind: kind || entrypointConfig.networkProviderKind,
             chainId: entrypointConfig.chainId,
             clientName: clientName,
-            gasLimitMultiplier: gasLimitMultiplier,
+            withGasLimitEstimator: withGasLimitestimator,
         });
     }
 }
 
 export class DevnetEntrypoint extends NetworkEntrypoint {
-    constructor(url?: string, kind?: string, clientName?: string, gasLimitMultiplier?: number) {
+    constructor(url?: string, kind?: string, clientName?: string, withGasLimitestimator?: boolean) {
         const entrypointConfig = new DevnetEntrypointConfig();
         super({
             networkProviderUrl: url || entrypointConfig.networkProviderUrl,
             networkProviderKind: kind || entrypointConfig.networkProviderKind,
             chainId: entrypointConfig.chainId,
             clientName: clientName,
-            gasLimitMultiplier: gasLimitMultiplier,
+            withGasLimitEstimator: withGasLimitestimator,
         });
     }
 }
 
 export class MainnetEntrypoint extends NetworkEntrypoint {
-    constructor(url?: string, kind?: string, clientName?: string, gasLimitMultiplier?: number) {
+    constructor(url?: string, kind?: string, clientName?: string, withGasLimitestimator?: boolean) {
         const entrypointConfig = new MainnetEntrypointConfig();
         super({
             networkProviderUrl: url || entrypointConfig.networkProviderUrl,
             networkProviderKind: kind || entrypointConfig.networkProviderKind,
             chainId: entrypointConfig.chainId,
             clientName: clientName,
-            gasLimitMultiplier: gasLimitMultiplier,
+            withGasLimitEstimator: withGasLimitestimator,
         });
     }
 }

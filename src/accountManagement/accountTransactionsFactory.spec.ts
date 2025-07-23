@@ -92,7 +92,7 @@ describe("test account transactions factory", function () {
         assert.equal(Buffer.from(transaction.data).toString(), "UnGuardAccount");
         assert.equal(transaction.value, 0n);
         assert.equal(transaction.chainID, config.chainID);
-        assert.equal(transaction.gasLimit, 371000n);
+        assert.equal(transaction.gasLimit, 321000n);
         assert.equal(transaction.options, TRANSACTION_OPTIONS_TX_GUARDED);
         assert.deepEqual(
             transaction.guardian,

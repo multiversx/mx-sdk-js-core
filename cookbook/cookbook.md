@@ -636,8 +636,8 @@ There are two ways to create controllers and factories:
 
 ### Estimating the Gas Limit for Transactions
 Additionally, when creating transaction factories or controllers, we can pass an additional argument, a **gas limit estimator**.
-This gas estimator, simulates the transaction before being sent and computes the `gasLimit` that it will require.
-The `GasLimitEstimator` can be initiated with a multiplier, so that the estimated value will be multiplied by the specified value.
+This gas estimator simulates the transaction before being sent and computes the `gasLimit` that it will require.
+The `GasLimitEstimator` can be initialized with a multiplier, so that the estimated value will be multiplied by the specified value.
 The gas limit estimator can be provided to any factory or controller available. Let's see how we can create a `GasLimitEstimator` and use it.
 
 ```js
@@ -649,7 +649,7 @@ The gas limit estimator can be provided to any factory or controller available. 
     const config = new TransactionsFactoryConfig({ chainID: "D" });
     const transfersFactory = new TransferTransactionsFactory({
         config: config,
-        gasLimitEstimator: gasEstimatorWithMultiplier,
+        gasLimitEstimator: gasEstimatorWithMultiplier, // or `gasEstimator`
     });
 }
 ```

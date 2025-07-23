@@ -2726,7 +2726,7 @@ The id can be used later for signing and performing the proposal.
     const txHash = await entrypoint.sendTransaction(transaction);
 
     // parse the outcome and get the proposal id
-    const actionId = controller.awaitCompletedPerformAction(txHash);
+    const actionId = await controller.awaitCompletedPerformAction(txHash);
 }
 ```
 

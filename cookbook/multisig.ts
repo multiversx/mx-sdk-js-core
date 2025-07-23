@@ -117,7 +117,7 @@ import { loadAbiRegistry, loadContractCode } from "../src/testutils";
         const txHash = await entrypoint.sendTransaction(transaction);
 
         // parse the outcome and get the proposal id
-        const actionId = controller.awaitCompletedPerformAction(txHash);
+        const actionId = await controller.awaitCompletedPerformAction(txHash);
     }
     // ```
 

@@ -845,7 +845,7 @@ While interactions with the contract are possible without the ABI, they are much
 #### Loading the ABI from a file
 ```js
 {
-    let abiJson = await promises.readFile("../src/testData/adder.abi.json", { encoding: "utf8" });
+    let abiJson = await fs.promises.readFile("../src/testData/adder.abi.json", { encoding: "utf8" });
     let abiObj = JSON.parse(abiJson);
     let abi = Abi.create(abiObj);
 }
@@ -916,9 +916,13 @@ This allows arguments to be passed as native Javascript values. If the ABI is no
     sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 
     // load the contract bytecode
-    const bytecode = await promises.readFile("../src/testData/adder.wasm");
+    const bytecode = await fs.promises.readFile("../src/testData/adder.wasm");
     // load the abi file
-    const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
 
     const controller = entrypoint.createSmartContractController(abi);
 
@@ -954,8 +958,11 @@ let args = [new U32Value(42), "hello", { foo: "bar" }, new TokenIdentifierValue(
 ```js
 {
     // We use the transaction hash we got when broadcasting the transaction
-
-    const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
     const entrypoint = new DevnetEntrypoint();
     const controller = entrypoint.createSmartContractController(abi);
     const outcome = await controller.awaitCompletedDeploy("txHash"); // waits for transaction completion and parses the result
@@ -988,7 +995,7 @@ Even before broadcasting, at the moment you know the sender's address and the no
 {
     const entrypoint = new DevnetEntrypoint();
     const factory = entrypoint.createSmartContractTransactionsFactory();
-    const bytecode = await promises.readFile("../contracts/adder.wasm");
+    const bytecode = await fs.promises.readFile("../contracts/adder.wasm");
 
     // For deploy arguments, use "TypedValue" objects if you haven't provided an ABI to the factory:
     let args: any[] = [new BigUIntValue(42)];
@@ -1021,7 +1028,7 @@ After the transaction is created the nonce needs to be properly set and the tran
     const factory = entrypoint.createSmartContractTransactionsFactory();
 
     // load the contract bytecode
-    const bytecode = await promises.readFile("../src/testData/adder.wasm");
+    const bytecode = await fs.promises.readFile("../src/testData/adder.wasm");
 
     // For deploy arguments, use "TypedValue" objects if you haven't provided an ABI to the factory:
     let args: any[] = [new BigUIntValue(42)];
@@ -1077,7 +1084,11 @@ In this section we'll see how we can call an endpoint of our previously deployed
     sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 
     // load the abi file
-    const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
     const controller = entrypoint.createSmartContractController(abi);
 
     const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq7cmfueefdqkjsnnjnwydw902v8pwjqy3d8ssd4meug");
@@ -1129,7 +1140,11 @@ Both EGLD and ESDT tokens or a combination of both can be sent. This functionali
     sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 
     // load the abi file
-    const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
 
     // get the smart contracts controller
     const controller = entrypoint.createSmartContractController(abi);
@@ -1219,7 +1234,11 @@ As said before, the `add` endpoint we called does not return anything, but we co
 {
     // load the abi file
     const entrypoint = new DevnetEntrypoint();
-    const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
     const parser = new SmartContractTransactionsOutcomeParser({ abi });
     const txHash = "b3ae88ad05c464a74db73f4013de05abcfcb4fb6647c67a262a6cfdf330ef4a9";
     const transactionOnNetwork = await entrypoint.getTransaction(txHash);
@@ -1238,7 +1257,11 @@ First, we load the abi file, then we fetch the transaction, we extract the event
 {
     // load the abi files
     const entrypoint = new DevnetEntrypoint();
-    const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
     const parser = new TransactionEventsParser({ abi });
     const txHash = "b3ae88ad05c464a74db73f4013de05abcfcb4fb6647c67a262a6cfdf330ef4a9";
     const transactionOnNetwork = await entrypoint.getTransaction(txHash);
@@ -1253,7 +1276,11 @@ Whenever needed, the contract ABI can be used for manually encoding or decoding 
 Let's encode a struct called EsdtTokenPayment (of [multisig](https://github.com/multiversx/mx-contracts-rs/tree/main/contracts/multisig) contract) into binary data.
 ```js
 {
-    const abi = await loadAbiRegistry("../src/testdata/multisig-full.abi.json");
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
     const paymentType = abi.getStruct("EsdtTokenPayment");
     const codec = new BinaryCodec();
 
@@ -1272,7 +1299,11 @@ Let's encode a struct called EsdtTokenPayment (of [multisig](https://github.com/
 Now let's decode a struct using the ABI.
 ```js
 {
-    const abi = await loadAbiRegistry("../src/testdata/multisig-full.abi.json");
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
     const actionStructType = abi.getEnum("Action");
     const data = Buffer.from(
         "0500000000000000000500d006f73c4221216fa679bc559005584c4f1160e569e1000000012a0000000003616464000000010000000107",
@@ -1295,7 +1326,11 @@ In this example, we will query the **adder smart contract** by calling its `getS
 {
     const entrypoint = new DevnetEntrypoint();
     const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq7cmfueefdqkjsnnjnwydw902v8pwjqy3d8ssd4meug");
-    const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
 
     // create the controller
     const controller = entrypoint.createSmartContractController(abi);
@@ -1313,7 +1348,11 @@ This approach achieves the same result as the previous example.
     const entrypoint = new DevnetEntrypoint();
 
     // load the abi
-    const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
 
     // the contract address we'll query
     const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq7cmfueefdqkjsnnjnwydw902v8pwjqy3d8ssd4meug");
@@ -1346,13 +1385,17 @@ However, in this case, the contract address is already known. Like deploying a s
     sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 
     // load the abi
-    const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
 
     // create the controller
     const controller = entrypoint.createSmartContractController(abi);
 
     // load the contract bytecode; this is the new contract code, the one we want to upgrade to
-    const bytecode = await promises.readFile("../src/testData/adder.wasm");
+    const bytecode = await fs.promises.readFile("../src/testData/adder.wasm");
 
     // For deploy arguments, use "TypedValue" objects if you haven't provided an ABI to the factory:
     let args: any[] = [new U32Value(42)];
@@ -2646,8 +2689,12 @@ These operations can be performed using both the **controller** and the **factor
 #### Deploying a Multisig Smart Contract using the controller
 ```js
 {
-    const abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
-    const bytecode = await loadContractCode("src/testdata/multisig-full.wasm");
+    const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
+    const bytecode = await fs.promises.readFile("src/testdata/multisig-full.wasm");
 
     // create the entrypoint and the multisig controller
     const entrypoint = new DevnetEntrypoint();
@@ -2682,8 +2729,12 @@ These operations can be performed using both the **controller** and the **factor
 #### Deploying a Multisig Smart Contract using the factory
 ```js
 {
-    const abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
-    const bytecode = await loadContractCode("src/testdata/multisig-full.wasm");
+    const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
+    const bytecode = await fs.promises.readFile("src/testdata/multisig-full.wasm");
 
     // create the entrypoint and the multisig factory
     const entrypoint = new DevnetEntrypoint();
@@ -2718,9 +2769,13 @@ The id can be used later for signing and performing the proposal.
 
 ```js
 {
+    const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
     // create the entrypoint and the multisig controller
     const entrypoint = new DevnetEntrypoint();
-    const abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
     const controller = entrypoint.createMultisigController(abi);
 
     const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
@@ -2755,7 +2810,11 @@ Proposing an action for a multisig contract using the MultisigFactory is very si
 
 ```js
 {
-    const abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
+    const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
 
     // create the entrypoint and the multisig factory
     const entrypoint = new DevnetEntrypoint();
@@ -2801,7 +2860,11 @@ Let's query the contract to get all board members.
 
 ```js
 {
-    const abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
+    const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
+        encoding: "utf8",
+    });
+    const json = JSON.parse(jsonContent);
+    const abi = Abi.create(json);
 
     // create the entrypoint and the multisig controller
     const entrypoint = new DevnetEntrypoint();

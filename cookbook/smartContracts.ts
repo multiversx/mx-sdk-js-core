@@ -1,5 +1,5 @@
 import axios from "axios"; // md-ignore
-import { promises } from "fs"; // md-ignore
+import * as fs from "fs"; // md-ignore
 import path from "path"; // md-ignore
 import {
     Abi,
@@ -20,7 +20,6 @@ import {
     U32Value,
     U64Value,
 } from "../src"; // md-ignore
-import { loadAbiRegistry } from "../src/testutils";
 // md-start
 (async () => {
     // ### Smart Contracts
@@ -33,7 +32,7 @@ import { loadAbiRegistry } from "../src/testutils";
     // #### Loading the ABI from a file
     // ```js
     {
-        let abiJson = await promises.readFile("../src/testData/adder.abi.json", { encoding: "utf8" });
+        let abiJson = await fs.promises.readFile("../src/testData/adder.abi.json", { encoding: "utf8" });
         let abiObj = JSON.parse(abiJson);
         let abi = Abi.create(abiObj);
     }
@@ -104,9 +103,13 @@ import { loadAbiRegistry } from "../src/testutils";
         sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 
         // load the contract bytecode
-        const bytecode = await promises.readFile("../src/testData/adder.wasm");
+        const bytecode = await fs.promises.readFile("../src/testData/adder.wasm");
         // load the abi file
-        const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+            encoding: "utf8",
+        });
+        const json = JSON.parse(jsonContent);
+        const abi = Abi.create(json);
 
         const controller = entrypoint.createSmartContractController(abi);
 
@@ -142,8 +145,11 @@ import { loadAbiRegistry } from "../src/testutils";
     // ```js
     {
         // We use the transaction hash we got when broadcasting the transaction
-
-        const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+            encoding: "utf8",
+        });
+        const json = JSON.parse(jsonContent);
+        const abi = Abi.create(json);
         const entrypoint = new DevnetEntrypoint();
         const controller = entrypoint.createSmartContractController(abi);
         const outcome = await controller.awaitCompletedDeploy("txHash"); // waits for transaction completion and parses the result
@@ -176,7 +182,7 @@ import { loadAbiRegistry } from "../src/testutils";
     {
         const entrypoint = new DevnetEntrypoint();
         const factory = entrypoint.createSmartContractTransactionsFactory();
-        const bytecode = await promises.readFile("../contracts/adder.wasm");
+        const bytecode = await fs.promises.readFile("../contracts/adder.wasm");
 
         // For deploy arguments, use "TypedValue" objects if you haven't provided an ABI to the factory: // md-as-comment
         let args: any[] = [new BigUIntValue(42)];
@@ -209,7 +215,7 @@ import { loadAbiRegistry } from "../src/testutils";
         const factory = entrypoint.createSmartContractTransactionsFactory();
 
         // load the contract bytecode
-        const bytecode = await promises.readFile("../src/testData/adder.wasm");
+        const bytecode = await fs.promises.readFile("../src/testData/adder.wasm");
 
         // For deploy arguments, use "TypedValue" objects if you haven't provided an ABI to the factory: // md-as-comment
         let args: any[] = [new BigUIntValue(42)];
@@ -265,7 +271,11 @@ import { loadAbiRegistry } from "../src/testutils";
         sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 
         // load the abi file
-        const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+            encoding: "utf8",
+        });
+        const json = JSON.parse(jsonContent);
+        const abi = Abi.create(json);
         const controller = entrypoint.createSmartContractController(abi);
 
         const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq7cmfueefdqkjsnnjnwydw902v8pwjqy3d8ssd4meug");
@@ -317,7 +327,11 @@ import { loadAbiRegistry } from "../src/testutils";
         sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 
         // load the abi file
-        const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+            encoding: "utf8",
+        });
+        const json = JSON.parse(jsonContent);
+        const abi = Abi.create(json);
 
         // get the smart contracts controller
         const controller = entrypoint.createSmartContractController(abi);
@@ -407,7 +421,11 @@ import { loadAbiRegistry } from "../src/testutils";
     {
         // load the abi file
         const entrypoint = new DevnetEntrypoint();
-        const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+            encoding: "utf8",
+        });
+        const json = JSON.parse(jsonContent);
+        const abi = Abi.create(json);
         const parser = new SmartContractTransactionsOutcomeParser({ abi });
         const txHash = "b3ae88ad05c464a74db73f4013de05abcfcb4fb6647c67a262a6cfdf330ef4a9";
         const transactionOnNetwork = await entrypoint.getTransaction(txHash);
@@ -426,7 +444,11 @@ import { loadAbiRegistry } from "../src/testutils";
     {
         // load the abi files
         const entrypoint = new DevnetEntrypoint();
-        const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+            encoding: "utf8",
+        });
+        const json = JSON.parse(jsonContent);
+        const abi = Abi.create(json);
         const parser = new TransactionEventsParser({ abi });
         const txHash = "b3ae88ad05c464a74db73f4013de05abcfcb4fb6647c67a262a6cfdf330ef4a9";
         const transactionOnNetwork = await entrypoint.getTransaction(txHash);
@@ -441,7 +463,11 @@ import { loadAbiRegistry } from "../src/testutils";
     // Let's encode a struct called EsdtTokenPayment (of [multisig](https://github.com/multiversx/mx-contracts-rs/tree/main/contracts/multisig) contract) into binary data.
     // ```js
     {
-        const abi = await loadAbiRegistry("../src/testdata/multisig-full.abi.json");
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+            encoding: "utf8",
+        });
+        const json = JSON.parse(jsonContent);
+        const abi = Abi.create(json);
         const paymentType = abi.getStruct("EsdtTokenPayment");
         const codec = new BinaryCodec();
 
@@ -460,7 +486,11 @@ import { loadAbiRegistry } from "../src/testutils";
     // Now let's decode a struct using the ABI.
     // ```js
     {
-        const abi = await loadAbiRegistry("../src/testdata/multisig-full.abi.json");
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+            encoding: "utf8",
+        });
+        const json = JSON.parse(jsonContent);
+        const abi = Abi.create(json);
         const actionStructType = abi.getEnum("Action");
         const data = Buffer.from(
             "0500000000000000000500d006f73c4221216fa679bc559005584c4f1160e569e1000000012a0000000003616464000000010000000107",
@@ -483,7 +513,11 @@ import { loadAbiRegistry } from "../src/testutils";
     {
         const entrypoint = new DevnetEntrypoint();
         const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq7cmfueefdqkjsnnjnwydw902v8pwjqy3d8ssd4meug");
-        const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+            encoding: "utf8",
+        });
+        const json = JSON.parse(jsonContent);
+        const abi = Abi.create(json);
 
         // create the controller
         const controller = entrypoint.createSmartContractController(abi);
@@ -501,7 +535,11 @@ import { loadAbiRegistry } from "../src/testutils";
         const entrypoint = new DevnetEntrypoint();
 
         // load the abi
-        const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+            encoding: "utf8",
+        });
+        const json = JSON.parse(jsonContent);
+        const abi = Abi.create(json);
 
         // the contract address we'll query
         const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq7cmfueefdqkjsnnjnwydw902v8pwjqy3d8ssd4meug");
@@ -534,13 +572,17 @@ import { loadAbiRegistry } from "../src/testutils";
         sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 
         // load the abi
-        const abi = await loadAbiRegistry("../src/testdata/adder.abi.json");
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+            encoding: "utf8",
+        });
+        const json = JSON.parse(jsonContent);
+        const abi = Abi.create(json);
 
         // create the controller
         const controller = entrypoint.createSmartContractController(abi);
 
         // load the contract bytecode; this is the new contract code, the one we want to upgrade to
-        const bytecode = await promises.readFile("../src/testData/adder.wasm");
+        const bytecode = await fs.promises.readFile("../src/testData/adder.wasm");
 
         // For deploy arguments, use "TypedValue" objects if you haven't provided an ABI to the factory: // md-as-comment
         let args: any[] = [new U32Value(42)];

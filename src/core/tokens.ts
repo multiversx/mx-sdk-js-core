@@ -1,23 +1,6 @@
-import BigNumber from "bignumber.js";
 import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "./constants";
 import { ErrInvalidTokenIdentifier } from "./errors";
 import { numberToPaddedHex } from "./utils.codec";
-
-// Legacy constants:
-const EGLDTokenIdentifier = "EGLD";
-const EGLDNumDecimals = 18;
-
-// Legacy configuration.
-// Note: this will actually set the default rounding mode for all BigNumber objects in the environment (in the application / dApp).
-BigNumber.set({ ROUNDING_MODE: 1 });
-
-interface ILegacyTokenTransferOptions {
-    tokenIdentifier: string;
-    nonce: number;
-    amountAsBigInteger: BigNumber.Value;
-    numDecimals?: number;
-}
-
 export type TokenType = "NFT" | "SFT" | "META" | "FNG";
 
 export class Token {

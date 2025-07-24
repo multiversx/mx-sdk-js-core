@@ -17,7 +17,7 @@ describe("test address", () => {
 
         encryptedDataOfAliceForBob = PubkeyEncryptor.encrypt(
             sensitiveData,
-            new UserPublicKey(bob.address.pubkey()),
+            new UserPublicKey(bob.address.getPublicKey()),
             new UserSecretKey(alice.secretKey),
         );
     });

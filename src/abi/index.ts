@@ -1,6 +1,5 @@
 export * from "./argSerializer";
 export * from "./argumentErrorContext";
-export * from "./code";
 export * from "./codec";
 export * from "./function";
 export * from "./interface";

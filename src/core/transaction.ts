@@ -1,8 +1,6 @@
-import { BigNumber } from "bignumber.js";
 import { Address } from "./address";
 import { TRANSACTION_MIN_GAS_PRICE, TRANSACTION_OPTIONS_DEFAULT, TRANSACTION_VERSION_DEFAULT } from "./constants";
-import { INetworkConfig, IPlainTransactionObject } from "./interfaces";
-import { interpretSignatureAsBuffer } from "./signature";
+import { IPlainTransactionObject } from "./interfaces";
 import { TransactionComputer } from "./transactionComputer";
 
 /**
@@ -138,202 +136,6 @@ export class Transaction {
     }
 
     /**
-     * @deprecated method, use {@link nonce} property instead.
-     */
-    getNonce(): bigint {
-        return this.nonce;
-    }
-
-    /**
-     * @deprecated method, use {@link nonce} property instead.
-     * Sets the account sequence number of the sender. Must be done prior signing.
-     */
-    setNonce(nonce: bigint) {
-        this.nonce = nonce;
-    }
-
-    /**
-     * @deprecated method, use {@link value} property instead.
-     */
-    getValue(): bigint {
-        return this.value;
-    }
-
-    /**
-     * @deprecated method, use {@link value} property instead.
-     */
-    setValue(value: bigint) {
-        this.value = value;
-    }
-
-    /**
-     * @deprecated method, use {@link sender} property instead.
-     */
-    getSender(): Address {
-        return this.sender;
-    }
-
-    /**
-     * @deprecated method, use {@link sender} property instead.
-     */
-    setSender(sender: Address) {
-        this.sender = sender;
-    }
-
-    /**
-     * @deprecated method, use {@link receiver} property instead.
-     */
-    getReceiver(): Address {
-        return this.receiver;
-    }
-
-    /**
-     * @deprecated method, use {@link senderUsername} property instead.
-     */
-    getSenderUsername(): string {
-        return this.senderUsername;
-    }
-
-    /**
-     * @deprecated method, use {@link senderUsername} property instead.
-     */
-    setSenderUsername(senderUsername: string) {
-        this.senderUsername = senderUsername;
-    }
-
-    /**
-     * @deprecated method, use {@link receiverUsername} property instead.
-     */
-    getReceiverUsername(): string {
-        return this.receiverUsername;
-    }
-
-    /**
-     * @deprecated method, use {@link receiverUsername} property instead.
-     */
-    setReceiverUsername(receiverUsername: string) {
-        this.receiverUsername = receiverUsername;
-    }
-
-    /**
-     * @deprecated method, use {@link guardian} property instead.
-     */
-    getGuardian(): Address {
-        return this.guardian;
-    }
-
-    /**
-     * @deprecated method, use {@link gasPrice} property instead.
-     */
-    getGasPrice(): bigint {
-        return this.gasPrice;
-    }
-
-    /**
-     * @deprecated method, use {@link gasPrice} property instead.
-     */
-    setGasPrice(gasPrice: bigint) {
-        this.gasPrice = gasPrice;
-    }
-
-    /**
-     * @deprecated method, use {@link gasLimit} property instead.
-     */
-    getGasLimit(): bigint {
-        return this.gasLimit;
-    }
-
-    /**
-     * @deprecated method, use {@link gasLimit} property instead.
-     */
-    setGasLimit(gasLimit: bigint) {
-        this.gasLimit = gasLimit;
-    }
-
-    /**
-     * @deprecated method, use {@link data} property instead.
-     */
-    getData(): Uint8Array {
-        return this.data;
-    }
-
-    /**
-     * @deprecated method, use {@link chainID} property instead.
-     */
-    getChainID(): string {
-        return this.chainID;
-    }
-
-    /**
-     * @deprecated method, use {@link chainID} property instead.
-     */
-    setChainID(chainID: string) {
-        this.chainID = chainID;
-    }
-
-    /**
-     * @deprecated method, use {@link version} property instead.
-     */
-    getVersion(): number {
-        return this.version;
-    }
-
-    /**
-     * @deprecated method, use {@link version} property instead.
-     */
-    setVersion(version: number) {
-        this.version = version;
-    }
-
-    /**
-     * @deprecated method, use {@link options} property instead.
-     */
-    getOptions(): number {
-        return this.options;
-    }
-
-    /**
-     * @deprecated method, use {@link options} property instead.
-     *
-     * Question for review: check how the options are set by sdk-dapp, wallet, ledger, extension.
-     */
-    setOptions(options: number) {
-        this.options = options;
-    }
-
-    /**
-     * @deprecated method, use{@link signature} property instead.
-     */
-    getSignature(): Buffer {
-        return Buffer.from(this.signature);
-    }
-
-    /**
-     * @deprecated method, use {@link guardianSignature} property instead.
-     */
-    getGuardianSignature(): Buffer {
-        return Buffer.from(this.guardianSignature);
-    }
-
-    /**
-     * @deprecated method, use {@link guardian} property instead.
-     */
-    setGuardian(guardian: Address) {
-        this.guardian = guardian;
-    }
-
-    /**
-     * @deprecated method, use "TransactionComputer.computeBytesForSigning()" instead.
-     * Serializes a transaction to a sequence of bytes, ready to be signed.
-     * This function is called internally by signers.
-     */
-    serializeForSigning(): Buffer {
-        const computer = new TransactionComputer();
-        const bytes = computer.computeBytesForSigning(this);
-        return Buffer.from(bytes);
-    }
-
-    /**
      * Checks the integrity of the guarded transaction
      */
     isGuardedTransaction(): boolean {
@@ -372,16 +174,6 @@ export class Transaction {
     }
 
     /**
-     * @deprecated method, use {@link toPlainObject} instead.
-     * Converts a plain object transaction into a Transaction Object.
-     *
-     * @param plainObjectTransaction Raw data of a transaction, usually obtained by calling toPlainObject()
-     */
-    static fromPlainObject(plainObjectTransaction: IPlainTransactionObject): Transaction {
-        return Transaction.newFromPlainObject(plainObjectTransaction);
-    }
-
-    /**
      * Converts a plain object transaction into a Transaction Object.
      *
      * @param plainObjectTransaction Raw data of a transaction, usually obtained by calling toPlainObject()
@@ -415,43 +207,11 @@ export class Transaction {
     }
 
     /**
-     * @deprecated method, use {@link signature} property instead.
-     * Applies the signature on the transaction.
-     *
-     * @param signature The signature, as computed by a signer.
-     */
-    applySignature(signature: Uint8Array) {
-        this.signature = interpretSignatureAsBuffer(signature);
-    }
-
-    /**
-     * @deprecated method, use {@link guardianSignature} property instead.
-     * Applies the guardian signature on the transaction.
-     *
-     * @param guardianSignature The signature, as computed by a signer.
-     */
-    applyGuardianSignature(guardianSignature: Uint8Array) {
-        this.guardianSignature = interpretSignatureAsBuffer(guardianSignature);
-    }
-
-    /**
      * Converts a transaction to a ready-to-broadcast object.
      * Called internally by the network provider.
      */
     toSendable(): any {
         return this.toPlainObject();
-    }
-
-    /**
-     * @deprecated method, use "TransactionComputer.computeTransactionFee()" instead.
-     *
-     * Computes the current transaction fee based on the {@link NetworkConfig} and transaction properties
-     * @param networkConfig {@link NetworkConfig}
-     */
-    computeFee(networkConfig: INetworkConfig): BigNumber {
-        const computer = new TransactionComputer();
-        const fee = computer.computeTransactionFee(this, networkConfig);
-        return new BigNumber(fee.toString());
     }
 
     private toBase64OrUndefined(value?: string | Uint8Array) {

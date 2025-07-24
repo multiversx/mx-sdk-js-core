@@ -1276,7 +1276,7 @@ Whenever needed, the contract ABI can be used for manually encoding or decoding 
 Let's encode a struct called EsdtTokenPayment (of [multisig](https://github.com/multiversx/mx-contracts-rs/tree/main/contracts/multisig) contract) into binary data.
 ```js
 {
-    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+    const jsonContent: string = await fs.promises.readFile("../src/testdata/multisig-full.abi", {
         encoding: "utf8",
     });
     const json = JSON.parse(jsonContent);
@@ -1299,7 +1299,7 @@ Let's encode a struct called EsdtTokenPayment (of [multisig](https://github.com/
 Now let's decode a struct using the ABI.
 ```js
 {
-    const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
+    const jsonContent: string = await fs.promises.readFile("../src/testdata//multisig-full.abi", {
         encoding: "utf8",
     });
     const json = JSON.parse(jsonContent);

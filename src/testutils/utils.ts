@@ -15,13 +15,12 @@ export async function loadContractCode(path: PathLike): Promise<Uint8Array> {
             },
         });
 
-        let buffer = Buffer.from(response.data);
-        return new Uint8Array(buffer);
+        return Buffer.from(response.data);
     }
 
     // Load from file.
     let buffer: Buffer = await fs.promises.readFile(path);
-    return new Uint8Array(buffer);
+    return buffer;
 }
 
 export async function loadAbiRegistry(path: PathLike): Promise<Abi> {

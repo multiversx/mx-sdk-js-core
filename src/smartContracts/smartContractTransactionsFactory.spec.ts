@@ -56,10 +56,11 @@ describe("test smart contract transactions factory", function () {
         });
 
         const transactionAbiAware = await abiAwareFactory.createTransactionForDeploy(sender, {
-            bytecode: bytecode.valueOf(),
+            bytecode: bytecode,
             gasLimit: gasLimit,
             arguments: args,
         });
+        const bytecodeHex = Buffer.from(bytecode).toString("hex");
 
         assert.deepEqual(
             transaction.sender,
@@ -69,7 +70,7 @@ describe("test smart contract transactions factory", function () {
             transaction.receiver,
             Address.newFromBech32("erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu"),
         );
-        assert.deepEqual(transaction.data, Buffer.from(`${Buffer.from(bytecode).toString("hex")}@0500@0504@01`));
+        assert.deepEqual(transaction.data, Buffer.from(`${bytecodeHex}@0500@0504@01`));
         assert.equal(transaction.gasLimit.valueOf(), gasLimit);
         assert.equal(transaction.value, 0n);
 
@@ -446,17 +447,18 @@ describe("test smart contract transactions factory", function () {
 
         const transaction = await factory.createTransactionForUpgrade(sender, {
             contract: contract,
-            bytecode: bytecode.valueOf(),
+            bytecode: bytecode,
             gasLimit: gasLimit,
             arguments: args,
         });
 
         const transactionAbiAware = await abiAwareFactory.createTransactionForUpgrade(sender, {
             contract: contract,
-            bytecode: bytecode.valueOf(),
+            bytecode: bytecode,
             gasLimit: gasLimit,
             arguments: args,
         });
+        const bytecodeHex = Buffer.from(bytecode).toString("hex");
 
         assert.deepEqual(
             transaction.sender,
@@ -466,10 +468,7 @@ describe("test smart contract transactions factory", function () {
             transaction.receiver,
             Address.newFromBech32("erd1qqqqqqqqqqqqqpgqhy6nl6zq07rnzry8uyh6rtyq0uzgtk3e69fqgtz9l4"),
         );
-        assert.deepEqual(
-            transaction.data!,
-            Buffer.from(`upgradeContract@${Buffer.from(bytecode).toString("hex")}@0504@07`),
-        );
+        assert.deepEqual(transaction.data!, Buffer.from(`upgradeContract@${bytecodeHex}@0504@07`));
         assert.equal(transaction.gasLimit, gasLimit);
         assert.equal(transaction.value, 0n);
 

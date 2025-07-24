@@ -43,6 +43,7 @@ describe("test multisig transactions factory", function () {
             quorum: 2,
             board,
         });
+        const bytecodeHex = Buffer.from(bytecode).toString("hex");
         assert.instanceOf(transaction, Transaction);
         assert.equal(transaction.sender.toBech32(), senderAddress.toBech32());
         assert.equal(transaction.receiver.toBech32(), "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu");
@@ -51,7 +52,7 @@ describe("test multisig transactions factory", function () {
         assert.deepEqual(
             Buffer.from(transaction.data),
             Buffer.from(
-                `${Buffer.from(bytecode).toString("hex")}@0500@0504@02@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@b2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba`,
+                `${bytecodeHex}@0500@0504@02@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@b2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba`,
             ),
         );
     });

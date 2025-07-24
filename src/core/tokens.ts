@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER } from "./constants";
-import { ErrInvalidArgument, ErrInvalidTokenIdentifier } from "./errors";
+import { ErrInvalidTokenIdentifier } from "./errors";
 import { numberToPaddedHex } from "./utils.codec";
 
 // Legacy constants:
@@ -37,26 +37,9 @@ export class TokenTransfer {
     readonly token: Token;
     readonly amount: bigint;
 
-    constructor(options: { token: Token; amount: bigint } | ILegacyTokenTransferOptions) {
-        if (this.isLegacyTokenTransferOptions(options)) {
-            // Handle legacy fields.
-            const amount = new BigNumber(options.amountAsBigInteger);
-            if (!amount.isInteger() || amount.isNegative()) {
-                throw new ErrInvalidArgument(`bad amountAsBigInteger: ${options.amountAsBigInteger}`);
-            }
-
-            // Handle new fields.
-            this.token = new Token({
-                identifier: options.tokenIdentifier,
-                nonce: BigInt(options.nonce),
-            });
-
-            this.amount = BigInt(options.amountAsBigInteger.toString());
-        } else {
-            // Handle new fields.
-            this.token = options.token;
-            this.amount = options.amount;
-        }
+    constructor(options: { token: Token; amount: bigint }) {
+        this.token = options.token;
+        this.amount = options.amount;
     }
 
     /**     *
@@ -66,10 +49,6 @@ export class TokenTransfer {
     static newFromNativeAmount(amount: bigint): TokenTransfer {
         const token = new Token({ identifier: EGLD_IDENTIFIER_FOR_MULTI_ESDTNFT_TRANSFER });
         return new TokenTransfer({ token, amount });
-    }
-
-    private isLegacyTokenTransferOptions(options: any): options is ILegacyTokenTransferOptions {
-        return options.tokenIdentifier !== undefined;
     }
 
     toString() {

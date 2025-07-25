@@ -32,7 +32,7 @@ import {
     // #### Loading the ABI from a file
     // ```js
     {
-        let abiJson = await fs.promises.readFile("../src/testData/adder.abi.json", { encoding: "utf8" });
+        let abiJson = await fs.promises.readFile("../src/testdata/adder.abi.json", { encoding: "utf8" });
         const abi = Abi.create(JSON.parse(abiJson));
     }
     // ```
@@ -102,7 +102,7 @@ import {
         sender.nonce = await entrypoint.recallAccountNonce(sender.address);
 
         // load the contract bytecode
-        const bytecode = await fs.promises.readFile("../src/testData/adder.wasm");
+        const bytecode = await fs.promises.readFile("../src/testdata/adder.wasm");
         // load the abi file
         const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
             encoding: "utf8",
@@ -212,7 +212,7 @@ import {
         const factory = entrypoint.createSmartContractTransactionsFactory();
 
         // load the contract bytecode
-        const bytecode = await fs.promises.readFile("../src/testData/adder.wasm");
+        const bytecode = await fs.promises.readFile("../src/testdata/adder.wasm");
 
         // For deploy arguments, use "TypedValue" objects if you haven't provided an ABI to the factory: // md-as-comment
         let args: any[] = [new BigUIntValue(42)];
@@ -570,7 +570,7 @@ import {
         const controller = entrypoint.createSmartContractController(abi);
 
         // load the contract bytecode; this is the new contract code, the one we want to upgrade to
-        const bytecode = await fs.promises.readFile("../src/testData/adder.wasm");
+        const bytecode = await fs.promises.readFile("../src/testdata/adder.wasm");
 
         // For deploy arguments, use "TypedValue" objects if you haven't provided an ABI to the factory: // md-as-comment
         let args: any[] = [new U32Value(42)];

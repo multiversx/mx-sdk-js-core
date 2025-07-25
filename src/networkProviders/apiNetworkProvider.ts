@@ -125,6 +125,23 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     async estimateTransactionCost(tx: Transaction): Promise<TransactionCostResponse> {
+        const copiedTx = Transaction.newFromPlainObject(tx.toPlainObject());
+        if (!copiedTx.nonce) {
+            copiedTx.nonce = (await this.getAccount(copiedTx.sender)).nonce;
+        }
+
+        if (!copiedTx.signature.length) {
+            copiedTx.signature = new Uint8Array(64);
+        }
+
+        if (!copiedTx.guardian.isEmpty() && !copiedTx.guardianSignature.length) {
+            copiedTx.guardianSignature = new Uint8Array(64);
+        }
+
+        if (!copiedTx.relayer.isEmpty() && !copiedTx.relayerSignature.length) {
+            copiedTx.relayerSignature = new Uint8Array(64);
+        }
+
         const transaction = prepareTransactionForBroadcasting(tx);
         const response = await this.doPostGeneric("transaction/cost", transaction);
         return TransactionCostResponse.fromHttpResponse(response.data);

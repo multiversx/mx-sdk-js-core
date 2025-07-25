@@ -125,9 +125,7 @@ export class ApiNetworkProvider implements INetworkProvider {
     }
 
     async estimateTransactionCost(tx: Transaction): Promise<TransactionCostResponse> {
-        const transaction = prepareTransactionForBroadcasting(tx);
-        const response = await this.doPostGeneric("transaction/cost", transaction);
-        return TransactionCostResponse.fromHttpResponse(response.data);
+        return this.backingProxyNetworkProvider.estimateTransactionCost(tx);
     }
 
     async sendTransactions(txs: Transaction[]): Promise<[number, string[]]> {

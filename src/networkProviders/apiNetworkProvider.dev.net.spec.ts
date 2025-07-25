@@ -403,4 +403,17 @@ describe("ApiNetworkProvider Tests", function () {
         );
         assert.isTrue(transactions.length > 0);
     });
+
+    it("should estimate transaction cost", async function () {
+        const bob = await Account.newFromPem(`${getTestWalletsPath()}/bob.pem`);
+        let transaction = new Transaction({
+            sender: bob.address,
+            receiver: bob.address,
+            gasLimit: 0n,
+            chainID: "D",
+        });
+
+        const gasCost = await apiProvider.estimateTransactionCost(transaction);
+        assert.equal(gasCost.gasLimit, 50000);
+    });
 });

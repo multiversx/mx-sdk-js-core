@@ -415,5 +415,7 @@ describe("ApiNetworkProvider Tests", function () {
 
         const gasCost = await apiProvider.estimateTransactionCost(transaction);
         assert.equal(gasCost.gasLimit, 50000);
+        assert.equal(transaction.nonce, 0n);
+        assert.deepEqual(transaction.signature, new Uint8Array());
     });
 });

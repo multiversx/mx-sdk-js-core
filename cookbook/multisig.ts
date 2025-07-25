@@ -19,8 +19,7 @@ import { Abi, Account, Address, DevnetEntrypoint, MultisigTransactionsOutcomePar
         const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
         const bytecode = await fs.promises.readFile("src/testdata/multisig-full.wasm");
 
         // create the entrypoint and the multisig controller // md-as-comment
@@ -59,8 +58,7 @@ import { Abi, Account, Address, DevnetEntrypoint, MultisigTransactionsOutcomePar
         const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
         const bytecode = await fs.promises.readFile("src/testdata/multisig-full.wasm");
 
         // create the entrypoint and the multisig factory // md-as-comment
@@ -99,8 +97,7 @@ import { Abi, Account, Address, DevnetEntrypoint, MultisigTransactionsOutcomePar
         const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
         // create the entrypoint and the multisig controller // md-as-comment
         const entrypoint = new DevnetEntrypoint();
         const controller = entrypoint.createMultisigController(abi);
@@ -140,8 +137,7 @@ import { Abi, Account, Address, DevnetEntrypoint, MultisigTransactionsOutcomePar
         const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
 
         // create the entrypoint and the multisig factory // md-as-comment
         const entrypoint = new DevnetEntrypoint();
@@ -190,8 +186,7 @@ import { Abi, Account, Address, DevnetEntrypoint, MultisigTransactionsOutcomePar
         const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
 
         // create the entrypoint and the multisig controller // md-as-comment
         const entrypoint = new DevnetEntrypoint();

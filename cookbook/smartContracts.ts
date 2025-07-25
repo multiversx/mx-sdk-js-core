@@ -33,8 +33,7 @@ import {
     // ```js
     {
         let abiJson = await fs.promises.readFile("../src/testData/adder.abi.json", { encoding: "utf8" });
-        let abiObj = JSON.parse(abiJson);
-        let abi = Abi.create(abiObj);
+        const abi = Abi.create(JSON.parse(abiJson));
     }
     // ```
 
@@ -108,8 +107,7 @@ import {
         const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
 
         const controller = entrypoint.createSmartContractController(abi);
 
@@ -148,8 +146,7 @@ import {
         const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
         const entrypoint = new DevnetEntrypoint();
         const controller = entrypoint.createSmartContractController(abi);
         const outcome = await controller.awaitCompletedDeploy("txHash"); // waits for transaction completion and parses the result
@@ -274,8 +271,7 @@ import {
         const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
         const controller = entrypoint.createSmartContractController(abi);
 
         const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq7cmfueefdqkjsnnjnwydw902v8pwjqy3d8ssd4meug");
@@ -330,8 +326,7 @@ import {
         const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
 
         // get the smart contracts controller
         const controller = entrypoint.createSmartContractController(abi);
@@ -424,8 +419,7 @@ import {
         const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
         const parser = new SmartContractTransactionsOutcomeParser({ abi });
         const txHash = "b3ae88ad05c464a74db73f4013de05abcfcb4fb6647c67a262a6cfdf330ef4a9";
         const transactionOnNetwork = await entrypoint.getTransaction(txHash);
@@ -447,8 +441,7 @@ import {
         const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
         const parser = new TransactionEventsParser({ abi });
         const txHash = "b3ae88ad05c464a74db73f4013de05abcfcb4fb6647c67a262a6cfdf330ef4a9";
         const transactionOnNetwork = await entrypoint.getTransaction(txHash);
@@ -463,11 +456,10 @@ import {
     // Let's encode a struct called EsdtTokenPayment (of [multisig](https://github.com/multiversx/mx-contracts-rs/tree/main/contracts/multisig) contract) into binary data.
     // ```js
     {
-        const jsonContent: string = await fs.promises.readFile("../src/testdata/multisig-full.abi", {
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/multisig-full.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
         const paymentType = abi.getStruct("EsdtTokenPayment");
         const codec = new BinaryCodec();
 
@@ -486,11 +478,10 @@ import {
     // Now let's decode a struct using the ABI.
     // ```js
     {
-        const jsonContent: string = await fs.promises.readFile("../src/testdata//multisig-full.abi", {
+        const jsonContent: string = await fs.promises.readFile("../src/testdata/multisig-full.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
         const actionStructType = abi.getEnum("Action");
         const data = Buffer.from(
             "0500000000000000000500d006f73c4221216fa679bc559005584c4f1160e569e1000000012a0000000003616464000000010000000107",
@@ -516,8 +507,7 @@ import {
         const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
 
         // create the controller
         const controller = entrypoint.createSmartContractController(abi);
@@ -538,8 +528,7 @@ import {
         const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
 
         // the contract address we'll query
         const contractAddress = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq7cmfueefdqkjsnnjnwydw902v8pwjqy3d8ssd4meug");
@@ -575,8 +564,7 @@ import {
         const jsonContent: string = await fs.promises.readFile("../src/testdata/adder.abi.json", {
             encoding: "utf8",
         });
-        const json = JSON.parse(jsonContent);
-        const abi = Abi.create(json);
+        const abi = Abi.create(JSON.parse(jsonContent));
 
         // create the controller
         const controller = entrypoint.createSmartContractController(abi);

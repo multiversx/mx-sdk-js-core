@@ -1,7 +1,6 @@
+import * as fs from "fs"; // md-ignore
 import path from "path"; // md-ignore
-import { Account, Address, DevnetEntrypoint, TransactionWatcher } from "../src"; // md-ignore
-import { MultisigTransactionsOutcomeParser } from "../src/multisig/multisigTransactionsOutcomeParser";
-import { loadAbiRegistry, loadContractCode } from "../src/testutils";
+import { Abi, Account, Address, DevnetEntrypoint, MultisigTransactionsOutcomeParser, TransactionWatcher } from "../src"; // md-ignore
 // md-start
 (async () => {
     // ### Multisig
@@ -17,8 +16,11 @@ import { loadAbiRegistry, loadContractCode } from "../src/testutils";
     // #### Deploying a Multisig Smart Contract using the controller
     // ```js
     {
-        const abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
-        const bytecode = await loadContractCode("src/testdata/multisig-full.wasm");
+        const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
+            encoding: "utf8",
+        });
+        const abi = Abi.create(JSON.parse(jsonContent));
+        const bytecode = await fs.promises.readFile("src/testdata/multisig-full.wasm");
 
         // create the entrypoint and the multisig controller // md-as-comment
         const entrypoint = new DevnetEntrypoint();
@@ -53,8 +55,11 @@ import { loadAbiRegistry, loadContractCode } from "../src/testutils";
     // #### Deploying a Multisig Smart Contract using the factory
     // ```js
     {
-        const abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
-        const bytecode = await loadContractCode("src/testdata/multisig-full.wasm");
+        const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
+            encoding: "utf8",
+        });
+        const abi = Abi.create(JSON.parse(jsonContent));
+        const bytecode = await fs.promises.readFile("src/testdata/multisig-full.wasm");
 
         // create the entrypoint and the multisig factory // md-as-comment
         const entrypoint = new DevnetEntrypoint();
@@ -89,9 +94,12 @@ import { loadAbiRegistry, loadContractCode } from "../src/testutils";
 
     // ```js
     {
+        const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
+            encoding: "utf8",
+        });
+        const abi = Abi.create(JSON.parse(jsonContent));
         // create the entrypoint and the multisig controller // md-as-comment
         const entrypoint = new DevnetEntrypoint();
-        const abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
         const controller = entrypoint.createMultisigController(abi);
 
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
@@ -126,7 +134,10 @@ import { loadAbiRegistry, loadContractCode } from "../src/testutils";
 
     // ```js
     {
-        const abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
+        const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
+            encoding: "utf8",
+        });
+        const abi = Abi.create(JSON.parse(jsonContent));
 
         // create the entrypoint and the multisig factory // md-as-comment
         const entrypoint = new DevnetEntrypoint();
@@ -172,7 +183,10 @@ import { loadAbiRegistry, loadContractCode } from "../src/testutils";
 
     // ```js
     {
-        const abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
+        const jsonContent: string = await fs.promises.readFile("src/testdata/multisig-full.abi.json", {
+            encoding: "utf8",
+        });
+        const abi = Abi.create(JSON.parse(jsonContent));
 
         // create the entrypoint and the multisig controller // md-as-comment
         const entrypoint = new DevnetEntrypoint();

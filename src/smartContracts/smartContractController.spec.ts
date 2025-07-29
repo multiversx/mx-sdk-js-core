@@ -1,8 +1,10 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
 import { Abi, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value } from "../abi";
+import { Account } from "../accounts";
 import { Address, SmartContractQueryResponse } from "../core";
-import { MockNetworkProvider, loadAbiRegistry } from "../testutils";
+import { GasLimitEstimator } from "../gasEstimator";
+import { MockNetworkProvider, getTestWalletsPath, loadAbiRegistry } from "../testutils";
 import { bigIntToBuffer } from "../tokenOperations/codec";
 import { SmartContractController } from "./smartContractController";
 
@@ -232,6 +234,47 @@ describe("test smart contract queries controller", () => {
                 prize_distribution: Buffer.from([0x64]),
                 prize_pool: new BigNumber("94720000000000000000000"),
             });
+        });
+    });
+
+    describe("set gasLimit", () => {
+        it("should set the specified gasLimit", async function () {
+            const alice = await Account.newFromPem(`${getTestWalletsPath()}/alice.pem`);
+            const networkProvider = new MockNetworkProvider();
+            const controller = new SmartContractController({
+                chainID: "D",
+                networkProvider: networkProvider,
+            });
+
+            const transaction = await controller.createTransactionForExecute(alice, 0n, {
+                contract: Address.empty(),
+                function: "dummyFunction",
+                arguments: [],
+                gasLimit: 123456789n,
+            });
+
+            assert.equal(transaction.gasLimit, 123456789n);
+        });
+
+        it("should set the specified gasLimit even when gasLimitEstimator is provided", async function () {
+            const alice = await Account.newFromPem(`${getTestWalletsPath()}/alice.pem`);
+            const networkProvider = new MockNetworkProvider();
+
+            const gasLimitEstimator = new GasLimitEstimator({ networkProvider: networkProvider, gasMultiplier: 1.5 });
+            const controller = new SmartContractController({
+                chainID: "D",
+                networkProvider: networkProvider,
+                gasLimitEstimator: gasLimitEstimator,
+            });
+
+            const transaction = await controller.createTransactionForExecute(alice, 0n, {
+                contract: Address.empty(),
+                function: "dummyFunction",
+                arguments: [],
+                gasLimit: 123456789n,
+            });
+
+            assert.equal(transaction.gasLimit, 123456789n);
         });
     });
 });

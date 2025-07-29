@@ -403,7 +403,7 @@ export namespace NativeSerializer {
         native: NativeTypes.NativeAddress,
         errorContext: ArgumentErrorContext,
     ): Address {
-        if ((<any>native).bech32) {
+        if ((<any>native).toBech32) {
             return <Address>native;
         }
         if ((<any>native).getAddress) {

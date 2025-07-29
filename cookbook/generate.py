@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Dict, List
+from typing import List
 
 current_dir = Path(__file__).parent.absolute()
 
@@ -32,7 +32,7 @@ TO_UNINDENT_SPACE = "    "
 
 # we don't want this ceremonial piece of code to show up in the rendered cookbook
 TO_REMOVE = [
-    """(async () => {""", 
+    """(async () => {""",
     """})().catch((e) => {
     console.log({ e });
 });"""]
@@ -59,12 +59,12 @@ def main():
 def render_file(input_file: Path) -> List[str]:
     input_text = input_file.read_text()
 
-    for item in TO_REMOVE: 
+    for item in TO_REMOVE:
         input_text = input_text.replace(item, "")
 
     input_lines = input_text.splitlines()
     start = input_lines.index(DIRECTIVE_START)
-    
+
     input_lines = input_lines[start:]
     output_lines: List[str] = []
 
@@ -86,9 +86,9 @@ def render_file(input_file: Path) -> List[str]:
 
         if is_comment and not should_keep_as_comment:
             line = line.strip().strip("/").strip()
-        else: 
+        else:
             if line.startswith(TO_UNINDENT_SPACE):
-                line = line[len(TO_UNINDENT_SPACE):] 
+                line = line[len(TO_UNINDENT_SPACE):]
 
 
 

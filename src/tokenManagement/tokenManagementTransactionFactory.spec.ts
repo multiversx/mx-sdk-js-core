@@ -15,8 +15,8 @@ describe("test token management transactions factory", () => {
         tokenManagementFactory = new TokenManagementTransactionsFactory({ config: config });
     });
 
-    it("should create 'Transaction' for registering and setting roles", () => {
-        const transaction = tokenManagementFactory.createTransactionForRegisteringAndSettingRoles(frank.address, {
+    it("should create 'Transaction' for registering and setting roles", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForRegisteringAndSettingRoles(frank.address, {
             tokenName: "TEST",
             tokenTicker: "TEST",
             tokenType: "FNG",
@@ -33,8 +33,8 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(transaction.gasLimit, 60125000n);
     });
 
-    it("should create 'Transaction' for issuing fungible token", () => {
-        const transaction = tokenManagementFactory.createTransactionForIssuingFungible(frank.address, {
+    it("should create 'Transaction' for issuing fungible token", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForIssuingFungible(frank.address, {
             tokenName: "FRANK",
             tokenTicker: "FRANK",
             initialSupply: 100n,
@@ -58,8 +58,8 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
-    it("should create 'Transaction' for issuing semi-fungible token", () => {
-        const transaction = tokenManagementFactory.createTransactionForIssuingSemiFungible(frank.address, {
+    it("should create 'Transaction' for issuing semi-fungible token", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForIssuingSemiFungible(frank.address, {
             tokenName: "FRANK",
             tokenTicker: "FRANK",
             canFreeze: true,
@@ -82,8 +82,8 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
-    it("should create 'Transaction' for issuing non-fungible token", () => {
-        const transaction = tokenManagementFactory.createTransactionForIssuingNonFungible(frank.address, {
+    it("should create 'Transaction' for issuing non-fungible token", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForIssuingNonFungible(frank.address, {
             tokenName: "FRANK",
             tokenTicker: "FRANK",
             canFreeze: true,
@@ -106,8 +106,8 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
-    it("should create 'Transaction' for registering metaEsdt", () => {
-        const transaction = tokenManagementFactory.createTransactionForRegisteringMetaESDT(frank.address, {
+    it("should create 'Transaction' for registering metaEsdt", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForRegisteringMetaESDT(frank.address, {
             tokenName: "FRANK",
             tokenTicker: "FRANK",
             numDecimals: 10n,
@@ -131,8 +131,8 @@ describe("test token management transactions factory", () => {
         assert.deepEqual(transaction.value, config.issueCost);
     });
 
-    it("should create 'Transaction' for setting special role on fungible token", () => {
-        const transaction = tokenManagementFactory.createTransactionForSettingSpecialRoleOnFungibleToken(
+    it("should create 'Transaction' for setting special role on fungible token", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForSettingSpecialRoleOnFungibleToken(
             frank.address,
             {
                 user: grace.address,
@@ -154,8 +154,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.value, 0n);
     });
 
-    it("should create 'Transaction' for unsetting special role on fungible token", () => {
-        const transaction = tokenManagementFactory.createTransactionForUnsettingSpecialRoleOnFungibleToken(
+    it("should create 'Transaction' for unsetting special role on fungible token", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForUnsettingSpecialRoleOnFungibleToken(
             frank.address,
             {
                 user: grace.address,
@@ -177,8 +177,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.value, 0n);
     });
 
-    it("should create 'Transaction' for setting all special roles on fungible token", () => {
-        const transaction = tokenManagementFactory.createTransactionForSettingSpecialRoleOnFungibleToken(
+    it("should create 'Transaction' for setting all special roles on fungible token", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForSettingSpecialRoleOnFungibleToken(
             frank.address,
             {
                 user: grace.address,
@@ -200,8 +200,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.value, 0n);
     });
 
-    it("should create 'Transaction' for setting special role on non-fungible token", () => {
-        const transaction = tokenManagementFactory.createTransactionForSettingSpecialRoleOnNonFungibleToken(
+    it("should create 'Transaction' for setting special role on non-fungible token", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForSettingSpecialRoleOnNonFungibleToken(
             frank.address,
             {
                 user: grace.address,
@@ -227,8 +227,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.value, 0n);
     });
 
-    it("should create 'Transaction' for unsetting special role on non-fungible token", () => {
-        const transaction = tokenManagementFactory.createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
+    it("should create 'Transaction' for unsetting special role on non-fungible token", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForUnsettingSpecialRoleOnNonFungibleToken(
             frank.address,
             {
                 user: grace.address,
@@ -253,8 +253,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.value, 0n);
     });
 
-    it("should create 'Transaction' for creating nft", () => {
-        const transaction = tokenManagementFactory.createTransactionForCreatingNFT(grace.address, {
+    it("should create 'Transaction' for creating nft", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForCreatingNFT(grace.address, {
             tokenIdentifier: "FRANK-aa9e8d",
             initialQuantity: 1n,
             name: "test",
@@ -273,8 +273,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.value, 0n);
     });
 
-    it("should create 'Transaction' for modifying royalties", () => {
-        const transaction = tokenManagementFactory.createTransactionForModifyingRoyalties(grace.address, {
+    it("should create 'Transaction' for modifying royalties", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForModifyingRoyalties(grace.address, {
             tokenIdentifier: "TEST-123456",
             tokenNonce: 1n,
             newRoyalties: 1234n,
@@ -287,8 +287,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.gasLimit, 60125000n);
     });
 
-    it("should create 'Transaction' for setting new URIs", () => {
-        const transaction = tokenManagementFactory.createTransactionForSettingNewUris(grace.address, {
+    it("should create 'Transaction' for setting new URIs", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForSettingNewUris(grace.address, {
             tokenIdentifier: "TEST-123456",
             tokenNonce: 1n,
             newUris: ["firstURI", "secondURI"],
@@ -304,8 +304,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.gasLimit, 60164000n);
     });
 
-    it("should create 'Transaction' for modifying creator", () => {
-        const transaction = tokenManagementFactory.createTransactionForModifyingCreator(grace.address, {
+    it("should create 'Transaction' for modifying creator", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForModifyingCreator(grace.address, {
             tokenIdentifier: "TEST-123456",
             tokenNonce: 1n,
         });
@@ -317,8 +317,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.gasLimit, 60114500n);
     });
 
-    it("should create 'Transaction' for updating metadata", () => {
-        const transaction = tokenManagementFactory.createTransactionForUpdatingMetadata(grace.address, {
+    it("should create 'Transaction' for updating metadata", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForUpdatingMetadata(grace.address, {
             tokenIdentifier: "TEST-123456",
             tokenNonce: 1n,
             newTokenName: "Test",
@@ -340,8 +340,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.gasLimit, 60218000n);
     });
 
-    it("should create 'Transaction' for recreating metadata", () => {
-        const transaction = tokenManagementFactory.createTransactionForMetadataRecreate(grace.address, {
+    it("should create 'Transaction' for recreating metadata", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForMetadataRecreate(grace.address, {
             tokenIdentifier: "TEST-123456",
             tokenNonce: 1n,
             newTokenName: "Test",
@@ -363,8 +363,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.gasLimit, 60221000n);
     });
 
-    it("should create 'Transaction' for changing to dynamic", () => {
-        const transaction = tokenManagementFactory.createTransactionForChangingTokenToDynamic(grace.address, {
+    it("should create 'Transaction' for changing to dynamic", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForChangingTokenToDynamic(grace.address, {
             tokenIdentifier: "TEST-123456",
         });
 
@@ -375,8 +375,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.gasLimit, 60107000n);
     });
 
-    it("should create 'Transaction' for updating token id", () => {
-        const transaction = tokenManagementFactory.createTransactionForUpdatingTokenId(grace.address, {
+    it("should create 'Transaction' for updating token id", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForUpdatingTokenId(grace.address, {
             tokenIdentifier: "TEST-123456",
         });
 
@@ -387,8 +387,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.gasLimit, 60104000n);
     });
 
-    it("should create 'Transaction' for registering dynamic", () => {
-        const transaction = tokenManagementFactory.createTransactionForRegisteringDynamicToken(grace.address, {
+    it("should create 'Transaction' for registering dynamic", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForRegisteringDynamicToken(grace.address, {
             tokenName: "Test",
             tokenTicker: "TEST-123456",
             tokenType: "FNG",
@@ -401,8 +401,8 @@ describe("test token management transactions factory", () => {
         assert.equal(transaction.gasLimit, 60131000n);
     });
 
-    it("should create 'Transaction' for registering and setting all roles", () => {
-        const transaction = tokenManagementFactory.createTransactionForRegisteringDynamicAndSettingRoles(
+    it("should create 'Transaction' for registering and setting all roles", async () => {
+        const transaction = await tokenManagementFactory.createTransactionForRegisteringDynamicAndSettingRoles(
             grace.address,
             {
                 tokenName: "Test",

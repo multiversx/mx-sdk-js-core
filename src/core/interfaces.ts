@@ -43,3 +43,7 @@ export interface INetworkConfig {
     gasPriceModifier: number;
     chainID: string;
 }
+
+export interface IGasLimitEstimator {
+    estimateGasLimit(options: { transaction: Transaction }): Promise<bigint>;
+}

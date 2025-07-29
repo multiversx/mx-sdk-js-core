@@ -92,7 +92,7 @@ describe("test token transfer", () => {
         const nonce = 1n;
         const transfer = new TokenTransfer({ token: new Token({ identifier, nonce }), amount: 1n });
 
-        assert.equal(transfer.tokenIdentifier, identifier);
+        assert.equal(transfer.token.identifier, identifier);
         assert.equal(transfer.token.nonce, nonce);
         assert.equal(transfer.amount, 1n);
     });

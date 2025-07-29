@@ -2,7 +2,9 @@ import path from "path"; // md-ignore
 import {
     Account,
     Address,
+    ApiNetworkProvider,
     DevnetEntrypoint,
+    GasLimitEstimator,
     Token,
     TokenTransfer,
     TransactionsFactoryConfig,
@@ -38,6 +40,26 @@ import {
 
         const config = new TransactionsFactoryConfig({ chainID: "D" });
         const factory = new TransferTransactionsFactory({ config });
+    }
+    // ```
+
+    // ### Estimating the Gas Limit for Transactions
+    // Additionally, when creating transaction factories or controllers, we can pass an additional argument, a **gas limit estimator**.
+    // This gas estimator simulates the transaction before being sent and computes the `gasLimit` that it will require.
+    // The `GasLimitEstimator` can be initialized with a multiplier, so that the estimated value will be multiplied by the specified value.
+    // The gas limit estimator can be provided to any factory or controller available. Let's see how we can create a `GasLimitEstimator` and use it.
+
+    // ```js
+    {
+        const api = new ApiNetworkProvider("https://devnet-api.multiversx.com");
+        let gasEstimator = new GasLimitEstimator({ networkProvider: api }); // create a gas limit estimator with default multiplier of 1.0
+        let gasEstimatorWithMultiplier = new GasLimitEstimator({ networkProvider: api, gasMultiplier: 1.5 }); // create a gas limit estimator with a multiplier of 1.5
+
+        const config = new TransactionsFactoryConfig({ chainID: "D" });
+        const transfersFactory = new TransferTransactionsFactory({
+            config: config,
+            gasLimitEstimator: gasEstimatorWithMultiplier, // or `gasEstimator`
+        });
     }
     // ```
 
@@ -90,7 +112,7 @@ import {
 
         const bob = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
 
-        const transaction = factory.createTransactionForTransfer(alice.address, {
+        const transaction = await factory.createTransactionForTransfer(alice.address, {
             receiver: bob,
             nativeAmount: 1000000000000000000n,
         });
@@ -169,7 +191,7 @@ import {
         const sft = new Token({ identifier: "SFT-987654", nonce: 10n });
         const thirdTransfer = new TokenTransfer({ token: sft, amount: 7n }); // for SFTs we set the desired amount we want to send
 
-        const transaction = factory.createTransactionForTransfer(alice.address, {
+        const transaction = await factory.createTransactionForTransfer(alice.address, {
             receiver: bob,
             tokenTransfers: [firstTransfer, secondTransfer, thirdTransfer],
         });

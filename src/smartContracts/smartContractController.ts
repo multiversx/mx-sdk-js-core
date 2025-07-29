@@ -6,6 +6,7 @@ import {
     Err,
     ErrSmartContractQuery,
     IAccount,
+    IGasLimitEstimator,
     SmartContractQuery,
     SmartContractQueryInput,
     SmartContractQueryResponse,
@@ -26,11 +27,17 @@ export class SmartContractController extends BaseController {
     private networkProvider: INetworkProvider;
     protected abi?: Abi;
 
-    constructor(options: { chainID: string; networkProvider: INetworkProvider; abi?: Abi }) {
+    constructor(options: {
+        chainID: string;
+        networkProvider: INetworkProvider;
+        abi?: Abi;
+        gasLimitEstimator?: IGasLimitEstimator;
+    }) {
         super();
         this.factory = new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
             abi: options.abi,
+            gasLimitEstimator: options.gasLimitEstimator,
         });
         this.parser = new SmartContractTransactionsOutcomeParser(options);
         this.transactionWatcher = new TransactionWatcher(options.networkProvider);
@@ -43,7 +50,7 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractDeployInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForDeploy(sender.address, options);
+        const transaction = await this.factory.createTransactionForDeploy(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -69,7 +76,7 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractUpgradeInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForUpgrade(sender.address, options);
+        const transaction = await this.factory.createTransactionForUpgrade(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -86,7 +93,7 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractExecuteInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = this.factory.createTransactionForExecute(sender.address, options);
+        const transaction = await this.factory.createTransactionForExecute(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();

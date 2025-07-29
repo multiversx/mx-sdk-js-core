@@ -14,10 +14,10 @@ describe("test governance transactions factory", function () {
     const alice = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
     const governanceAddress = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrlllsrujgla";
 
-    it("should create transaction for creating new proposal", function () {
+    it("should create transaction for creating new proposal", async function () {
         const expectedData = `proposal@${Buffer.from(commitHash).toString("hex")}@0a@0f`;
 
-        const transaction = factory.createTransactionForNewProposal(alice, {
+        const transaction = await factory.createTransactionForNewProposal(alice, {
             commitHash: commitHash,
             startVoteEpoch: 10,
             endVoteEpoch: 15,
@@ -32,8 +32,8 @@ describe("test governance transactions factory", function () {
         assert.equal(transaction.data.toString(), expectedData);
     });
 
-    it("should create transaction for voting", function () {
-        const transaction = factory.createTransactionForVoting(alice, {
+    it("should create transaction for voting", async function () {
+        const transaction = await factory.createTransactionForVoting(alice, {
             proposalNonce: 1,
             vote: Vote.YES,
         });
@@ -46,8 +46,8 @@ describe("test governance transactions factory", function () {
         assert.equal(transaction.data.toString(), "vote@01@796573");
     });
 
-    it("should create transaction for closing proposal", function () {
-        const transaction = factory.createTransactionForClosingProposal(alice, {
+    it("should create transaction for closing proposal", async function () {
+        const transaction = await factory.createTransactionForClosingProposal(alice, {
             proposalNonce: 1,
         });
 
@@ -59,11 +59,11 @@ describe("test governance transactions factory", function () {
         assert.equal(transaction.data.toString(), "closeProposal@01");
     });
 
-    it("should create transaction for clearing ended proposals", function () {
+    it("should create transaction for clearing ended proposals", async function () {
         const expectedData =
             "clearEndedProposals@0139472eff6886771a982f3083da5d421f24c29181e63888228dc81ca60d69e1@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8";
 
-        const transaction = factory.createTransactionForClearingEndedProposals(alice, {
+        const transaction = await factory.createTransactionForClearingEndedProposals(alice, {
             proposers: [alice, Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx")],
         });
 
@@ -75,8 +75,8 @@ describe("test governance transactions factory", function () {
         assert.equal(transaction.data.toString(), expectedData);
     });
 
-    it("should create transaction for claiming accumulated fees", function () {
-        const transaction = factory.createTransactionForClaimingAccumulatedFees(alice);
+    it("should create transaction for claiming accumulated fees", async function () {
+        const transaction = await factory.createTransactionForClaimingAccumulatedFees(alice);
 
         assert.equal(transaction.sender.toBech32(), alice.toBech32());
         assert.equal(transaction.receiver.toBech32(), governanceAddress);
@@ -86,11 +86,11 @@ describe("test governance transactions factory", function () {
         assert.equal(transaction.data.toString(), "claimAccumulatedFees");
     });
 
-    it("should create transaction for changing config", function () {
+    it("should create transaction for changing config", async function () {
         const expectedData =
             "changeConfig@31303030303030303030303030303030303030303030@3130303030303030303030303030303030303030@35303030@33303030@36303030";
 
-        const transaction = factory.createTransactionForChangingConfig(alice, {
+        const transaction = await factory.createTransactionForChangingConfig(alice, {
             proposalFee: 1000000000000000000000n,
             lastProposalFee: 10000000000000000000n,
             minQuorum: 5000,

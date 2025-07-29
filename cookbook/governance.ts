@@ -56,7 +56,7 @@ import { Account, DevnetEntrypoint, GovernanceTransactionsOutcomeParser, Vote } 
 
         const commitHash = "1db734c0315f9ec422b88f679ccfe3e0197b9d67";
 
-        const transaction = factory.createTransactionForNewProposal(alice.address, {
+        const transaction = await factory.createTransactionForNewProposal(alice.address, {
             commitHash: commitHash,
             startVoteEpoch: 10,
             endVoteEpoch: 15,
@@ -127,7 +127,7 @@ import { Account, DevnetEntrypoint, GovernanceTransactionsOutcomeParser, Vote } 
         const filePath = path.join("../src", "testdata", "testwallets", "alice.pem");
         const alice = await Account.newFromPem(filePath);
 
-        const transaction = factory.createTransactionForVoting(alice.address, {
+        const transaction = await factory.createTransactionForVoting(alice.address, {
             proposalNonce: 1,
             vote: Vote.YES,
         });

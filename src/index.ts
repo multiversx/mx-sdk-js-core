@@ -10,6 +10,7 @@ export * from "./accounts";
 export * from "./core";
 export * from "./delegation";
 export * from "./entrypoints";
+export * from "./gasEstimator";
 export * from "./governance";
 export * from "./multisig";
 export * from "./networkProviders";

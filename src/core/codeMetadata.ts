@@ -63,14 +63,6 @@ export class CodeMetadata {
     }
 
     /**
-     * @deprecated Use {@link newFromBytes} instead.
-     * Creates a metadata object from a buffer.
-     */
-    static newFromBuffer(buffer: Buffer): CodeMetadata {
-        return this.newFromBytes(buffer);
-    }
-
-    /**
      * Converts the metadata to the protocol-friendly representation.
      */
     toBytes(): Uint8Array {
@@ -91,29 +83,6 @@ export class CodeMetadata {
         }
 
         return new Uint8Array(Buffer.from([byteZero, byteOne]));
-    }
-
-    /**
-     * @deprecated Use {@link toBytes} instead.
-     */
-    toBuffer(): Buffer {
-        let byteZero = 0;
-        let byteOne = 0;
-
-        if (this.upgradeable) {
-            byteZero |= CodeMetadata.ByteZero.Upgradeable;
-        }
-        if (this.readable) {
-            byteZero |= CodeMetadata.ByteZero.Readable;
-        }
-        if (this.payable) {
-            byteOne |= CodeMetadata.ByteOne.Payable;
-        }
-        if (this.payableBySc) {
-            byteOne |= CodeMetadata.ByteOne.PayableBySc;
-        }
-
-        return Buffer.from([byteZero, byteOne]);
     }
 
     /**

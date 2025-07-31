@@ -1,6 +1,7 @@
 import {
     Address,
     ErrContractQuery,
+    ErrEstimateTransactionCost,
     ErrNetworkProvider,
     getAxios,
     prepareTransactionForBroadcasting,
@@ -148,6 +149,10 @@ export class ProxyNetworkProvider implements INetworkProvider {
 
         const transaction = prepareTransactionForBroadcasting(copiedTx);
         const response = await this.doPostGeneric("transaction/cost", transaction);
+        const returnMessage: string = response.returnMessage;
+        if (returnMessage) {
+            throw new ErrEstimateTransactionCost(returnMessage);
+        }
         return TransactionCostResponse.fromHttpResponse(response);
     }
 

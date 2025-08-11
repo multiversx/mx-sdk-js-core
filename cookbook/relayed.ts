@@ -3,18 +3,16 @@ import { Account, Address, DevnetEntrypoint, Transaction } from "../src"; // md-
 // md-start
 (async () => {
     // ### Relayed transactions
-    // We are currently on the `third iteration (V3)` of relayed transactions. V1 and V2 will soon be deactivated, so we will focus on V3.
-
-    // For V3, two new fields have been added to transactions:
-    // - relayer
-    // - relayerSignature
-
-    // Signing Process:
-    // 1. The relayer must be set before the sender signs the transaction.
-    // 2. Once the sender has signed, the relayer can also sign the transaction and broadcast it.
-
-    // **Important Consideration**:
-    // Relayed V3 transactions require an additional `50,000` gas.
+    // We are currently on the third iteration (V3) of relayed transactions. V1 and V2 will be deactivated soon, so we'll focus on V3.
+    //
+    // For V3, two new fields have been added on transactions: `relayer` and `relayerSignature`.
+    //
+    // Note that:
+    // 1. the sender and the relayer can sign the transaction in any order.
+    // 2. before any of the sender or relayer can sign the transaction, the `relayer` field must be set.
+    // 3. relayed transactions require an additional `50,000` of gas.
+    // 4. the sender and the relayer must be in the same network shard.
+    //
     // Let’s see how to create a relayed transaction:
 
     // ```js

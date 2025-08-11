@@ -40,18 +40,15 @@ export class NetworkEntrypoint {
         withGasLimitEstimator?: boolean;
         gasLimitMultiplier?: number;
     }) {
-        options.networkProviderConfig = options.networkProviderConfig || {};
-
-        if (options.clientName) {
-            options.networkProviderConfig.clientName = options.clientName;
-        } else if (options.networkProviderConfig?.headers?.["User-Agent"]) {
-            options.networkProviderConfig.clientName = options.networkProviderConfig.headers["User-Agent"];
-        }
+        const networkProviderOptions: NetworkProviderConfig = {
+            ...(options.networkProviderConfig ?? {}),
+            ...(options.clientName && { clientName: options.clientName }),
+        };
 
         if (options.networkProviderKind === "proxy") {
-            this.networkProvider = new ProxyNetworkProvider(options.networkProviderUrl, options.networkProviderConfig);
+            this.networkProvider = new ProxyNetworkProvider(options.networkProviderUrl, networkProviderOptions);
         } else if (options.networkProviderKind === "api") {
-            this.networkProvider = new ApiNetworkProvider(options.networkProviderUrl, options.networkProviderConfig);
+            this.networkProvider = new ApiNetworkProvider(options.networkProviderUrl, networkProviderOptions);
         } else {
             throw new ErrInvalidNetworkProviderKind();
         }

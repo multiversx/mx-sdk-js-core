@@ -40,15 +40,15 @@ export class NetworkEntrypoint {
         withGasLimitEstimator?: boolean;
         gasLimitMultiplier?: number;
     }) {
-        const networkProviderOptions: NetworkProviderConfig = {
+        const networkProviderConfig: NetworkProviderConfig = {
             ...(options.networkProviderConfig ?? {}),
             ...(options.clientName && { clientName: options.clientName }),
         };
 
         if (options.networkProviderKind === "proxy") {
-            this.networkProvider = new ProxyNetworkProvider(options.networkProviderUrl, networkProviderOptions);
+            this.networkProvider = new ProxyNetworkProvider(options.networkProviderUrl, networkProviderConfig);
         } else if (options.networkProviderKind === "api") {
-            this.networkProvider = new ApiNetworkProvider(options.networkProviderUrl, networkProviderOptions);
+            this.networkProvider = new ApiNetworkProvider(options.networkProviderUrl, networkProviderConfig);
         } else {
             throw new ErrInvalidNetworkProviderKind();
         }

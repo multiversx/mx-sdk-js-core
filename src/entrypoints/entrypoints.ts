@@ -16,7 +16,7 @@ import { GasLimitEstimator } from "../gasEstimator";
 import { GovernanceController, GovernanceTransactionsFactory } from "../governance";
 import { MultisigTransactionsFactory } from "../multisig";
 import { MultisigController } from "../multisig/multisigController";
-import { ApiNetworkProvider, ProxyNetworkProvider } from "../networkProviders";
+import { ApiNetworkProvider, NetworkProviderConfig, ProxyNetworkProvider } from "../networkProviders";
 import { INetworkProvider } from "../networkProviders/interface";
 import { SmartContractTransactionsFactory } from "../smartContracts";
 import { SmartContractController } from "../smartContracts/smartContractController";
@@ -34,19 +34,21 @@ export class NetworkEntrypoint {
     constructor(options: {
         networkProviderUrl: string;
         networkProviderKind: string;
+        networkProviderConfig?: NetworkProviderConfig;
         chainId: string;
         clientName?: string;
         withGasLimitEstimator?: boolean;
         gasLimitMultiplier?: number;
     }) {
+        const networkProviderConfig: NetworkProviderConfig = {
+            ...(options.networkProviderConfig ?? {}),
+            ...(options.clientName && { clientName: options.clientName }),
+        };
+
         if (options.networkProviderKind === "proxy") {
-            this.networkProvider = new ProxyNetworkProvider(options.networkProviderUrl, {
-                clientName: options.clientName,
-            });
+            this.networkProvider = new ProxyNetworkProvider(options.networkProviderUrl, networkProviderConfig);
         } else if (options.networkProviderKind === "api") {
-            this.networkProvider = new ApiNetworkProvider(options.networkProviderUrl, {
-                clientName: options.clientName,
-            });
+            this.networkProvider = new ApiNetworkProvider(options.networkProviderUrl, networkProviderConfig);
         } else {
             throw new ErrInvalidNetworkProviderKind();
         }
@@ -267,12 +269,14 @@ export class TestnetEntrypoint extends NetworkEntrypoint {
         clientName?: string;
         withGasLimitEstimator?: boolean;
         gasLimitMultiplier?: number;
+        networkProviderConfig?: NetworkProviderConfig;
     }) {
         const entrypointConfig = new TestnetEntrypointConfig();
         options = options || {};
         super({
             networkProviderUrl: options.url || entrypointConfig.networkProviderUrl,
             networkProviderKind: options.kind || entrypointConfig.networkProviderKind,
+            networkProviderConfig: options.networkProviderConfig,
             chainId: entrypointConfig.chainId,
             clientName: options.clientName,
             withGasLimitEstimator: options.withGasLimitEstimator,
@@ -288,12 +292,14 @@ export class DevnetEntrypoint extends NetworkEntrypoint {
         clientName?: string;
         withGasLimitEstimator?: boolean;
         gasLimitMultiplier?: number;
+        networkProviderConfig?: NetworkProviderConfig;
     }) {
         const entrypointConfig = new DevnetEntrypointConfig();
         options = options || {};
         super({
             networkProviderUrl: options.url || entrypointConfig.networkProviderUrl,
             networkProviderKind: options.kind || entrypointConfig.networkProviderKind,
+            networkProviderConfig: options.networkProviderConfig,
             chainId: entrypointConfig.chainId,
             clientName: options.clientName,
             withGasLimitEstimator: options.withGasLimitEstimator,
@@ -309,12 +315,14 @@ export class MainnetEntrypoint extends NetworkEntrypoint {
         clientName?: string;
         withGasLimitEstimator?: boolean;
         gasLimitMultiplier?: number;
+        networkProviderConfig?: NetworkProviderConfig;
     }) {
         const entrypointConfig = new MainnetEntrypointConfig();
         options = options || {};
         super({
             networkProviderUrl: options.url || entrypointConfig.networkProviderUrl,
             networkProviderKind: options.kind || entrypointConfig.networkProviderKind,
+            networkProviderConfig: options.networkProviderConfig,
             chainId: entrypointConfig.chainId,
             clientName: options.clientName,
             withGasLimitEstimator: options.withGasLimitEstimator,

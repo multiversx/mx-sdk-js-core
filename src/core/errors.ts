@@ -445,6 +445,12 @@ export class ExpectedAccountConditionNotReachedError extends Err {
  */
 export class ErrGasLimitCannotBeEstimated extends Err {
     public constructor(error: Error) {
-        super(`Failed to estimate gas limit: ${error}`, error);
+        super(`Failed to estimate gas limit: [${error}]`, error);
+    }
+}
+
+export class ErrEstimateTransactionCost extends Err {
+    public constructor(message: string) {
+        super(message);
     }
 }

@@ -8,4 +8,5 @@ export * from "./userSigner";
 export * from "./userVerifier";
 export * from "./userWallet";
 export * from "./validatorKeys";
+export * from "./validatorPem";
 export * from "./validatorSigner";

@@ -7,7 +7,7 @@ import { ValidatorPublicKey } from "../wallet";
 import { ValidatorsSigners } from "./validatorsSigner";
 import { ValidatorsTransactionsFactory } from "./validatorsTransactionsFactory";
 
-describe("test delegation transactions factory", function () {
+describe("test validator transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });
     const validatorsFactory = new ValidatorsTransactionsFactory({ config: config });
     const validatorsPath = `${getTestWalletsPath()}/validators.pem`;

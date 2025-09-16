@@ -181,7 +181,7 @@ describe("test delegation transactions factory", function () {
     });
 
     it("should create 'Transaction' for unstaking tokens", async function () {
-        const transaction = await validatorsFactory.createTransactionFoUnstakingTokens(alice, {
+        const transaction = await validatorsFactory.createTransactionForUnstakingTokens(alice, {
             amount: 11000000000000000000n,
         });
 

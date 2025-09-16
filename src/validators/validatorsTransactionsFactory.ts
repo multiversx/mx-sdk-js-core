@@ -52,6 +52,29 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         return transaction;
     }
 
+    private prepareDataPartsForStaking(options: {
+        nodeOperator: Address;
+        validatorsFile: ValidatorsSigners;
+        rewardsAddress: Address | undefined;
+    }) {
+        const dataParts = ["stake"];
+        const numOfNodes = options.validatorsFile.getNumOfNodes();
+
+        const callArguments = [];
+        callArguments.push(new U32Value(numOfNodes));
+
+        for (const signer of options.validatorsFile.getSigners()) {
+            const signedMessages = signer.sign(options.nodeOperator.getPublicKey());
+            callArguments.push(new BytesValue(Buffer.from(signer.getPubkey())));
+            callArguments.push(new BytesValue(Buffer.from(signedMessages)));
+        }
+        if (options.rewardsAddress) {
+            callArguments.push(new AddressValue(options.rewardsAddress));
+        }
+        const args = this.argSerializer.valuesToStrings(callArguments);
+        return dataParts.concat(args);
+    }
+
     async createTransactionForToppingUp(sender: Address, options: resources.ToppingUpInput): Promise<Transaction> {
         const data = ["stake"];
 
@@ -97,7 +120,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         let dataParts = ["unJail"];
 
         for (const key of options.publicKeys) {
-            dataParts = dataParts.concat(key.hex());
+            dataParts.push(key.hex());
         }
 
         const transaction = new Transaction({
@@ -121,7 +144,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         let dataParts = ["unBond"];
 
         for (const key of options.publicKeys) {
-            dataParts = dataParts.concat(key.hex());
+            dataParts.push(key.hex());
         }
 
         const transaction = new Transaction({
@@ -179,7 +202,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
     async createTransactionForUnstakingNodes(sender: Address, options: resources.UnstakingInput): Promise<Transaction> {
         let dataParts = ["unStakeNodes"];
         for (const key of options.publicKeys) {
-            dataParts = dataParts.concat(key.hex());
+            dataParts.push(key.hex());
         }
 
         const transaction = new Transaction({
@@ -199,7 +222,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         return transaction;
     }
 
-    async createTransactionFoUnstakingTokens(
+    async createTransactionForUnstakingTokens(
         sender: Address,
         options: resources.UnstakingTokensInput,
     ): Promise<Transaction> {
@@ -221,7 +244,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
     async createTransactionForUnboundingNodes(sender: Address, options: resources.UnboundInput): Promise<Transaction> {
         let dataParts = ["unBondNodes"];
         for (const key of options.publicKeys) {
-            dataParts = dataParts.concat(key.hex());
+            dataParts.push(key.hex());
         }
         const transaction = new Transaction({
             sender,
@@ -281,7 +304,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
     ): Promise<Transaction> {
         let dataParts = ["reStakeUnStakedNodes"];
         for (const key of options.publicKeys) {
-            dataParts = dataParts.concat(key.hex());
+            dataParts.push(key.hex());
         }
         const transaction = new Transaction({
             sender,
@@ -364,26 +387,5 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         await this.setGasLimit(transaction, undefined, this.config.gasLimitForMergingValidatorToDelegation);
 
         return transaction;
-    }
-
-    private prepareDataPartsForStaking(options: {
-        nodeOperator: Address;
-        validatorsFile: import("./validatorsSigner").ValidatorsSigners;
-        rewardsAddress: Address | undefined;
-    }) {
-        const dataParts = ["stake"];
-        const numOfNodes = options.validatorsFile.getNumOfNodes();
-        const callArguments = [];
-        callArguments.push(new U32Value(numOfNodes));
-        for (const signer of options.validatorsFile.getSigners()) {
-            const signedMessages = signer.sign(options.nodeOperator.getPublicKey());
-            callArguments.push(new BytesValue(Buffer.from(signer.getPubkey())));
-            callArguments.push(new BytesValue(Buffer.from(signedMessages)));
-        }
-        if (options.rewardsAddress) {
-            callArguments.push(new AddressValue(options.rewardsAddress));
-        }
-        const args = this.argSerializer.valuesToStrings(callArguments);
-        return dataParts.concat(args);
     }
 }

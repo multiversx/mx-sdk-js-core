@@ -57,4 +57,15 @@ describe("test ValidatorPEMs", () => {
         );
         assert.equal(entry.secretKey.hex(), "3034b1d58628a842984da0c70da0b5a251ebb2aebf51afc5b586e2839b5e5263");
     });
+
+    it("should convert to text", async function () {
+        let text = fs.readFileSync(path.join(walletsPath, "validatorKey00.pem"), "utf-8").trim();
+        const entry = await ValidatorPEM.fromTextAll(text);
+        assert.deepEqual(entry[0].toText(), text);
+
+        text = fs.readFileSync(path.join(walletsPath, "multipleValidatorKeys.pem"), "utf-8").trim();
+        const entries = await ValidatorPEM.fromTextAll(text);
+        const actualText = entries.map((entry) => entry.toText()).join("\n");
+        assert.deepEqual(actualText, text);
+    });
 });

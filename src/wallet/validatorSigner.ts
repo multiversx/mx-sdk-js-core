@@ -11,7 +11,9 @@ export class ValidatorSigner {
     constructor(secretKey: ValidatorSecretKey) {
         this.secretKey = secretKey;
     }
+
     /**
+     * * @deprecated This method will be deprecated! Use the sign method directly.
      * Signs a message.
      */
     static async signUsingPem(

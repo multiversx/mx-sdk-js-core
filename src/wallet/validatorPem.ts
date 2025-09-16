@@ -4,8 +4,8 @@ import { PemEntry } from "../wallet/pemEntry";
 import { BLS, ValidatorSecretKey } from "../wallet/validatorKeys";
 
 export class ValidatorPEM {
-    label: string;
-    secretKey: ValidatorSecretKey;
+    readonly label: string;
+    readonly secretKey: ValidatorSecretKey;
 
     constructor(label: string, secretKey: ValidatorSecretKey) {
         this.label = label;
@@ -30,8 +30,8 @@ export class ValidatorPEM {
         const entries = PemEntry.fromTextAll(text);
         const resultItems: ValidatorPEM[] = [];
 
+        await BLS.initIfNecessary();
         for (const entry of entries) {
-            await BLS.initIfNecessary();
             const secretKey = new ValidatorSecretKey(entry.message);
             const item = new ValidatorPEM(entry.label, secretKey);
             resultItems.push(item);

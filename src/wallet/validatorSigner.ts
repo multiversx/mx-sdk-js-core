@@ -6,7 +6,7 @@ import { ValidatorPEM } from "./validatorPem";
  * Validator signer (BLS signer)
  */
 export class ValidatorSigner {
-    private secretKey: ValidatorSecretKey;
+    private readonly secretKey: ValidatorSecretKey;
 
     constructor(secretKey: ValidatorSecretKey) {
         this.secretKey = secretKey;
@@ -14,7 +14,11 @@ export class ValidatorSigner {
     /**
      * Signs a message.
      */
-    async signUsingPem(pemText: string, pemIndex: number = 0, signable: Buffer | Uint8Array): Promise<Uint8Array> {
+    static async signUsingPem(
+        pemText: string,
+        pemIndex: number = 0,
+        signable: Buffer | Uint8Array,
+    ): Promise<Uint8Array> {
         await BLS.initIfNecessary();
 
         try {

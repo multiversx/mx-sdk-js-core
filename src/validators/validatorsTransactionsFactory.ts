@@ -68,9 +68,11 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
             callArguments.push(new BytesValue(Buffer.from(signer.getPubkey())));
             callArguments.push(new BytesValue(Buffer.from(signedMessages)));
         }
+
         if (options.rewardsAddress) {
             callArguments.push(new AddressValue(options.rewardsAddress));
         }
+
         const args = this.argSerializer.valuesToStrings(callArguments);
         return dataParts.concat(args);
     }
@@ -117,7 +119,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
     }
 
     async createTransactionForUnjailing(sender: Address, options: resources.UnjailingInput): Promise<Transaction> {
-        let dataParts = ["unJail"];
+        const dataParts = ["unJail"];
 
         for (const key of options.publicKeys) {
             dataParts.push(key.hex());
@@ -140,8 +142,8 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         return transaction;
     }
 
-    async createTransactionForUnbounding(sender: Address, options: resources.UnboundInput): Promise<Transaction> {
-        let dataParts = ["unBond"];
+    async createTransactionForUnbonding(sender: Address, options: resources.UnbondingInput): Promise<Transaction> {
+        const dataParts = ["unBond"];
 
         for (const key of options.publicKeys) {
             dataParts.push(key.hex());
@@ -166,9 +168,9 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
 
     async createTransactionForChangingRewardsAddress(
         sender: Address,
-        options: resources.ChangeRewardsAddressInput,
+        options: resources.ChangingRewardsAddressInput,
     ): Promise<Transaction> {
-        let dataParts = ["changeRewardAddress", options.rewardsAddress.toHex()];
+        const dataParts = ["changeRewardAddress", options.rewardsAddress.toHex()];
 
         const transaction = new Transaction({
             sender,
@@ -200,7 +202,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
     }
 
     async createTransactionForUnstakingNodes(sender: Address, options: resources.UnstakingInput): Promise<Transaction> {
-        let dataParts = ["unStakeNodes"];
+        const dataParts = ["unStakeNodes"];
         for (const key of options.publicKeys) {
             dataParts.push(key.hex());
         }
@@ -236,13 +238,13 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         });
 
         this.setTransactionPayload(transaction, dataParts);
-        await this.setGasLimit(transaction, undefined, this.config.gasLimitForRestakingUnstakedTokens);
+        await this.setGasLimit(transaction, undefined, this.config.gasLimitForUnstakingTokens);
 
         return transaction;
     }
 
-    async createTransactionForUnboundingNodes(sender: Address, options: resources.UnboundInput): Promise<Transaction> {
-        let dataParts = ["unBondNodes"];
+    async createTransactionForUnbondingNodes(sender: Address, options: resources.UnbondingInput): Promise<Transaction> {
+        const dataParts = ["unBondNodes"];
         for (const key of options.publicKeys) {
             dataParts.push(key.hex());
         }
@@ -265,7 +267,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
 
     async createTransactionForUnboundingTokens(
         sender: Address,
-        options: resources.UnboundTokensInput,
+        options: resources.UnbondingTokensInput,
     ): Promise<Transaction> {
         const dataParts = ["unBondTokens", this.argSerializer.valuesToStrings([new BigUIntValue(options.amount)])[0]];
 
@@ -302,7 +304,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         sender: Address,
         options: resources.RestakingInput,
     ): Promise<Transaction> {
-        let dataParts = ["reStakeUnStakedNodes"];
+        const dataParts = ["reStakeUnStakedNodes"];
         for (const key of options.publicKeys) {
             dataParts.push(key.hex());
         }
@@ -327,7 +329,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         sender: Address,
         options: resources.NewDelegationContractInput,
     ): Promise<Transaction> {
-        let dataParts = [
+        const dataParts = [
             "makeNewContractFromValidatorData",
             ...this.argSerializer.valuesToStrings([new BigUIntValue(options.maxCap), new BigUIntValue(options.fee)]),
         ];
@@ -349,7 +351,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         sender: Address,
         options: resources.MergeValidatorToDelegationInput,
     ): Promise<Transaction> {
-        let dataParts = [
+        const dataParts = [
             "mergeValidatorToDelegationWithWhitelist",
             this.argSerializer.valuesToStrings([new AddressValue(options.delegationAddress)])[0],
         ];
@@ -371,7 +373,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         sender: Address,
         options: resources.MergeValidatorToDelegationInput,
     ): Promise<Transaction> {
-        let dataParts = [
+        const dataParts = [
             "mergeValidatorToDelegationSameOwner",
             this.argSerializer.valuesToStrings([new AddressValue(options.delegationAddress)])[0],
         ];

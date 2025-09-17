@@ -265,7 +265,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
         return transaction;
     }
 
-    async createTransactionForUnboundingTokens(
+    async createTransactionForUnbondingTokens(
         sender: Address,
         options: resources.UnbondingTokensInput,
     ): Promise<Transaction> {

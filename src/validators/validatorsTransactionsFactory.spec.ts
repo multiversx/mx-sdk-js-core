@@ -7,7 +7,7 @@ import { ValidatorPublicKey } from "../wallet";
 import { ValidatorsSigners } from "./validatorsSigner";
 import { ValidatorsTransactionsFactory } from "./validatorsTransactionsFactory";
 
-describe("test delegation transactions factory", function () {
+describe("test validator transactions factory", function () {
     const config = new TransactionsFactoryConfig({ chainID: "D" });
     const validatorsFactory = new ValidatorsTransactionsFactory({ config: config });
     const validatorsPath = `${getTestWalletsPath()}/validators.pem`;
@@ -181,7 +181,7 @@ describe("test delegation transactions factory", function () {
     });
 
     it("should create 'Transaction' for unstaking tokens", async function () {
-        const transaction = await validatorsFactory.createTransactionFoUnstakingTokens(alice, {
+        const transaction = await validatorsFactory.createTransactionForUnstakingTokens(alice, {
             amount: 11000000000000000000n,
         });
 
@@ -198,8 +198,8 @@ describe("test delegation transactions factory", function () {
         assert.deepEqual(Buffer.from(transaction.data).toString(), "unStakeTokens@98a7d9b8314c0000");
     });
 
-    it("should create 'Transaction' for unbounding nodes", async function () {
-        const transaction = await validatorsFactory.createTransactionForUnboundingNodes(alice, {
+    it("should create 'Transaction' for unbonding nodes", async function () {
+        const transaction = await validatorsFactory.createTransactionForUnbondingNodes(alice, {
             publicKeys: [validatorPubkey],
         });
 
@@ -219,8 +219,8 @@ describe("test delegation transactions factory", function () {
         );
     });
 
-    it("should create 'Transaction' for unbounding tokens", async function () {
-        const transaction = await validatorsFactory.createTransactionForUnboundingTokens(alice, {
+    it("should create 'Transaction' for unbonding tokens", async function () {
+        const transaction = await validatorsFactory.createTransactionForUnbondingTokens(alice, {
             amount: 20000000000000000000n,
         });
 

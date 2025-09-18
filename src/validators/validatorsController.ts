@@ -97,9 +97,9 @@ export class ValidatorsController extends BaseController {
     async createTransactionForUnbounding(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UnboundInput & BaseControllerInput,
+        options: resources.UnbondingInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = await this.factory.createTransactionForUnbounding(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnbonding(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -114,7 +114,7 @@ export class ValidatorsController extends BaseController {
     async createTransactionForChangingRewardsAddress(
         sender: IAccount,
         nonce: bigint,
-        options: resources.ChangeRewardsAddressInput & BaseControllerInput,
+        options: resources.ChangingRewardsAddressInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForChangingRewardsAddress(sender.address, options);
 
@@ -162,12 +162,12 @@ export class ValidatorsController extends BaseController {
         return transaction;
     }
 
-    async createTransactionFoUnstakingTokens(
+    async createTransactionForUnstakingTokens(
         sender: IAccount,
         nonce: bigint,
         options: resources.UnstakingTokensInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = await this.factory.createTransactionFoUnstakingTokens(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnstakingTokens(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -182,9 +182,9 @@ export class ValidatorsController extends BaseController {
     async createTransactionForUnboundingNodes(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UnboundInput & BaseControllerInput,
+        options: resources.UnbondingInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = await this.factory.createTransactionForUnboundingNodes(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnbondingNodes(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
@@ -196,12 +196,12 @@ export class ValidatorsController extends BaseController {
         return transaction;
     }
 
-    async createTransactionForUnboundingTokens(
+    async createTransactionForUnbondingTokens(
         sender: IAccount,
         nonce: bigint,
-        options: resources.UnboundTokensInput & BaseControllerInput,
+        options: resources.UnbondingTokensInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = await this.factory.createTransactionForUnboundingTokens(sender.address, options);
+        const transaction = await this.factory.createTransactionForUnbondingTokens(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();

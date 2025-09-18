@@ -11,6 +11,7 @@ describe("test validator controller", function () {
     const walletsPath = path.join("src", "testdata", "testwallets");
     const validatorsPath = path.join(walletsPath, "validators.pem");
     const entrypoint = new DevnetEntrypoint();
+    let alice: Account;
 
     const rewardAddress = Address.newFromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
     const validatorPubkey = new ValidatorPublicKey(
@@ -19,11 +20,13 @@ describe("test validator controller", function () {
             "hex",
         ),
     );
-
     const validatorController = entrypoint.createValidatorsController();
 
+    beforeEach(async function () {
+        alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
+    });
+
     it("should create 'Transaction' for staking from file path", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForStaking(
             alice,
@@ -53,7 +56,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for staking using validators file", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const validatorsFile = await ValidatorsSigners.newFromPem(validatorsPath);
         const transaction = await validatorController.createTransactionForStaking(
@@ -84,7 +86,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for topping up", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForToppingUp(
             alice,
@@ -106,7 +107,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for unstake", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForUnstaking(
             alice,
@@ -134,7 +134,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for unjail", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForUnjailing(
             alice,
@@ -163,7 +162,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for changing rewards address", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForChangingRewardsAddress(
             alice,
@@ -187,7 +185,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for claiming", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForClaiming(
             alice,
@@ -210,7 +207,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for unstaking nodes", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForUnstakingNodes(
             alice,
@@ -238,7 +234,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for unstaking tokens", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForUnstakingTokens(
             alice,
@@ -263,7 +258,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for unbonding nodes", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForUnbondingNodes(
             alice,
@@ -291,7 +285,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for unbonding tokens", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForUnbondingTokens(
             alice,
@@ -316,7 +309,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for cleaning registered data", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForCleaningRegisteredData(
             alice,
@@ -339,7 +331,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for restaking unstaked nodes", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForRestakingUnstakedNodes(
             alice,
@@ -367,7 +358,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for new delegation contract from validator", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const transaction = await validatorController.createTransactionForNewDelegationContractFromValidatorData(
             alice,
@@ -393,7 +383,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for merging validator to delegation whitelisting", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const delegationContract = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc",
@@ -425,7 +414,6 @@ describe("test validator controller", function () {
     });
 
     it("should create 'Transaction' for merging validator to delegation same owner", async function () {
-        const alice = await Account.newFromPem(path.join(walletsPath, "alice.pem"));
         alice.nonce = 77777n;
         const delegationContract = Address.newFromBech32(
             "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqtllllls002zgc",

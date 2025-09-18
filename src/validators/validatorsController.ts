@@ -94,7 +94,7 @@ export class ValidatorsController extends BaseController {
         return transaction;
     }
 
-    async createTransactionForUnbounding(
+    async createTransactionForUnbonding(
         sender: IAccount,
         nonce: bigint,
         options: resources.UnbondingInput & BaseControllerInput,
@@ -179,7 +179,7 @@ export class ValidatorsController extends BaseController {
         return transaction;
     }
 
-    async createTransactionForUnboundingNodes(
+    async createTransactionForUnbondingNodes(
         sender: IAccount,
         nonce: bigint,
         options: resources.UnbondingInput & BaseControllerInput,

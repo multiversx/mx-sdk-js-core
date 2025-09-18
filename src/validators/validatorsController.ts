@@ -33,12 +33,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForStaking(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -50,12 +45,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForToppingUp(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -67,12 +57,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnstaking(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -84,12 +69,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnjailing(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -101,12 +81,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnbonding(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -118,12 +93,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForChangingRewardsAddress(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -135,12 +105,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForClaiming(sender.address);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -152,12 +117,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnstakingNodes(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -169,12 +129,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnstakingTokens(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -186,12 +141,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnbondingNodes(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -203,12 +153,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnbondingTokens(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -220,12 +165,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForCleaningRegisteredData(sender.address);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -237,12 +177,7 @@ export class ValidatorsController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForRestakingUnstakedNodes(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -257,12 +192,7 @@ export class ValidatorsController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -277,12 +207,7 @@ export class ValidatorsController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -297,13 +222,22 @@ export class ValidatorsController extends BaseController {
             options,
         );
 
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
+
+        return transaction;
+    }
+
+    private async setupAndSignTransaction(
+        transaction: Transaction,
+        options: BaseControllerInput,
+        nonce: bigint,
+        sender: IAccount,
+    ) {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.setTransactionGasOptions(transaction, options);
         this.setVersionAndOptionsForGuardian(transaction);
         transaction.signature = await sender.signTransaction(transaction);
-
-        return transaction;
     }
 }

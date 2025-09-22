@@ -22,6 +22,8 @@ import { SmartContractTransactionsFactory } from "../smartContracts";
 import { SmartContractController } from "../smartContracts/smartContractController";
 import { TokenManagementController, TokenManagementTransactionsFactory } from "../tokenManagement";
 import { TransfersController, TransferTransactionsFactory } from "../transfers";
+import { ValidatorsTransactionsFactory } from "../validators";
+import { ValidatorsController } from "../validators/validatorsController";
 import { UserSecretKey } from "../wallet";
 import { DevnetEntrypointConfig, MainnetEntrypointConfig, TestnetEntrypointConfig } from "./config";
 
@@ -256,6 +258,21 @@ export class NetworkEntrypoint {
 
     createGovernanceTransactionsFactory(): GovernanceTransactionsFactory {
         return new GovernanceTransactionsFactory({
+            config: new TransactionsFactoryConfig({ chainID: this.chainId }),
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
+    }
+
+    createValidatorsController(): ValidatorsController {
+        return new ValidatorsController({
+            chainID: this.chainId,
+            networkProvider: this.networkProvider,
+            gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
+        });
+    }
+
+    createValidatorsTransactionsFactory(): ValidatorsTransactionsFactory {
+        return new ValidatorsTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: this.chainId }),
             gasLimitEstimator: this.withGasLimitEstimator ? this.createGasLimitEstimator() : undefined,
         });

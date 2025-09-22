@@ -11,6 +11,7 @@ import {
     calcBNLoopLikeHerumi,
     calcBNLoopLikeHerumiIteration0,
     getPublicKeyBytesForShortSignaturesLikeHerumi,
+    getWeierstrassLikeHerumi,
     hashAndMapToG1LikeHerumi,
     projectivePointG1ToBytes,
     setArrayMaskLikeHerumi,
@@ -599,6 +600,18 @@ describe("test BLS compatibility and adapters (noble crypto and herumi)", () => 
         const w = nobleUtils.bytesToNumberLE(Buffer.from(wHex, "hex"));
         const t = nobleUtils.bytesToNumberLE(Buffer.from(tHex, "hex"));
         const output = calcBNLoopLikeHerumiIteration0(w, t);
+        const outputHex = Buffer.from(nobleUtils.numberToBytesLE(output, Fp.BYTES)).toString("hex");
+
+        assert.equal(outputHex, expectedOutputHex);
+    });
+
+    it("test getWeierstrassLikeHerumi", async function () {
+        const inputHex =
+            "b14695c802ca943acc28d5e47aec2ce163d3004559fc9d2e1659f5f22ca363f96548e504a6f2b9cab57bcce75c4e9309";
+        const expectedOutputHex =
+            "fd15a70e718737b6457701e2c134b254d797837f7166300f46360974e3b51ac4d679f7de76d488d52da1c13a3f1bb719";
+        const input = nobleUtils.bytesToNumberLE(Buffer.from(inputHex, "hex"));
+        const output = getWeierstrassLikeHerumi(input);
         const outputHex = Buffer.from(nobleUtils.numberToBytesLE(output, Fp.BYTES)).toString("hex");
 
         assert.equal(outputHex, expectedOutputHex);

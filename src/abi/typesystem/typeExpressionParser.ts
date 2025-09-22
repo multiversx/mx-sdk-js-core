@@ -13,7 +13,7 @@ export class TypeExpressionParser {
     parse(expression: string): Type {
         try {
             return this.doParse(expression);
-        } catch (e) {
+        } catch (e: any) {
             throw new ErrTypingSystem(`Failed to parse type expression: ${expression}. Error: ${e}`);
         }
     }

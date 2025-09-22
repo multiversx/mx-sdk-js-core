@@ -13,7 +13,7 @@ export class BLS {
         if (!BLS.bls) {
             try {
                 BLS.bls = require("@multiversx/sdk-bls-wasm");
-            } catch (error) {
+            } catch (error: any) {
                 throw new Error("BLS module is required but not installed. Please install '@multiversx/sdk-bls-wasm'.");
             }
         }

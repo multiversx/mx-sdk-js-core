@@ -39,7 +39,7 @@ export class ValidatorSigner {
     sign(data: Uint8Array): Uint8Array {
         try {
             return this.trySign(data);
-        } catch (err) {
+        } catch (err: any) {
             throw new ErrSignerCannotSign(err as Error);
         }
     }

@@ -164,7 +164,7 @@ export class SmartContractTransactionsFactory extends BaseFactory {
 
         try {
             return this.abi.getEndpoint("upgrade");
-        } catch (error) {
+        } catch (error: any) {
             // Contracts written using an old Rust framework and deployed prior Sirius might not describe the 'upgrade' endpoint in the ABI.
 
             Logger.warn(

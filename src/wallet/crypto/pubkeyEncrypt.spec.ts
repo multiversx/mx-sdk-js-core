@@ -36,7 +36,7 @@ describe("test address", () => {
         try {
             await PubkeyDecryptor.decrypt(encryptedDataOfAliceForBob, new UserSecretKey(bob.secretKey));
             assert.fail("Invalid authentication for encrypted message originator");
-        } catch (error) {
+        } catch (error: any) {
             assert(
                 error.message.includes("Invalid authentication for encrypted message originator"),
                 `Unexpected error message: ${error.message}`,
@@ -50,7 +50,7 @@ describe("test address", () => {
         try {
             await PubkeyDecryptor.decrypt(encryptedDataOfAliceForBob, new UserSecretKey(bob.secretKey));
             assert.fail("Expected an error but none was thrown");
-        } catch (error) {
+        } catch (error: any) {
             assert(
                 error.message.includes("Invalid authentication for encrypted message originator"),
                 `Unexpected error message: ${error.message}`,

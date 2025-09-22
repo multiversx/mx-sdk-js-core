@@ -13,7 +13,7 @@ const G1 = nobleBls.G1;
 const G2 = nobleBls.G2;
 const CompressedFlagMask = 0b1000_0000;
 
-describe.only("test BLS compatibility (noble crypto and herumi)", () => {
+describe("test BLS compatibility (noble crypto and herumi)", () => {
     before(() => {
         setupG2GeneratorPointsLikeHerumi();
     });
@@ -28,7 +28,7 @@ describe.only("test BLS compatibility (noble crypto and herumi)", () => {
         const numVectors = 256;
 
         for (let i = 0; i < numVectors; i++) {
-            console.log(`Running test vector ${i++}`);
+            console.log(`Running test vector ${i}`);
 
             const {
                 secretKey,

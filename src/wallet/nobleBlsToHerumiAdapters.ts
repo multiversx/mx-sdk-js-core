@@ -15,21 +15,8 @@ const HERUMI_C1_HEX =
 const HERUMI_C2_HEX =
     "fefffeffffff012e02000a6213d817de8896f8e63ba9b3ddea770f6a07c669ba51ce76df2f67195f0000000000000000";
 
-// Herumi code: https://github.com/herumi/mcl/blob/v2.00/include/mcl/bn.hpp#L475
-// void initBLS12(const mpz_class& z, int curveType) { ... }
-// const char *c1 = "be32ce5fbeed9ca374d38c0ed41eefd5bb675277cdf12d11bc2fb026c41400045c03fffffffdfffd";
-// const char *c2 = "5f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffefffe";
-export function getHerumiConstants() {
-    const c1Bytes = Buffer.from(HERUMI_C1_HEX, "hex");
-    const c2Bytes = Buffer.from(HERUMI_C2_HEX, "hex");
-
-    const c1 = nobleUtils.bytesToNumberLE(c1Bytes);
-    const c2 = nobleUtils.bytesToNumberLE(c2Bytes);
-
-    return { c1, c2 };
-}
-
-// Must be called before any BLS operations.
+// Set custom generators for G2. Must be called before any BLS operations.
+// Reason: in "mx-chain-crypto-go", we use Herumi with these custom generators.
 export function setupG2GeneratorPointsLikeHerumi() {
     nobleBls.G2.CURVE.Gx.c0 = BigInt(
         "0xf3d011af81acf00140aab3c122c61bbdf0628db81c37664bdfc828163ce074ee33a1a5ce5488556603bc5d8d9f21ecc",
@@ -46,7 +33,23 @@ export function setupG2GeneratorPointsLikeHerumi() {
     );
 }
 
+// Herumi code: https://github.com/herumi/mcl/blob/v2.00/include/mcl/bn.hpp#L475
+// void initBLS12(const mpz_class& z, int curveType) { ... }
+// const char *c1 = "be32ce5fbeed9ca374d38c0ed41eefd5bb675277cdf12d11bc2fb026c41400045c03fffffffdfffd";
+// const char *c2 = "5f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffefffe";
+export function getHerumiBlsConstants() {
+    const c1Bytes = Buffer.from(HERUMI_C1_HEX, "hex");
+    const c2Bytes = Buffer.from(HERUMI_C2_HEX, "hex");
+
+    const c1 = nobleUtils.bytesToNumberLE(c1Bytes);
+    const c2 = nobleUtils.bytesToNumberLE(c2Bytes);
+
+    return { c1, c2 };
+}
+
+// Signs a message, given a secret key.
 export function signMessage(message: Uint8Array, secretKey: Uint8Array): { point: any; bytes: Uint8Array } {
+    // First, map the message as a point on the G1 curve.
     const messagePoint = hashAndMapToG1LikeHerumi(message).point;
     return doSignMessage(messagePoint, secretKey);
 }
@@ -124,7 +127,7 @@ function calcBNLikeHerumi(t: Uint8Array): any {
 }
 
 export function calcBNComputeWLikeHerumi(t: bigint): bigint {
-    const { c1 } = getHerumiConstants();
+    const { c1 } = getHerumiBlsConstants();
 
     // Herumi code: if (t.isZero()) return false;
     if (Fp.eql(t, Fp.ZERO)) {
@@ -197,7 +200,7 @@ export function calcBNLoopLikeHerumi(w: bigint, t: bigint): any {
 }
 
 export function calcBNLoopLikeHerumiIteration0(w: bigint, t: bigint): bigint {
-    const { c2 } = getHerumiConstants();
+    const { c2 } = getHerumiBlsConstants();
 
     // Herumi code:
     // F::mul(x, t, w);
@@ -270,7 +273,7 @@ export function getWeierstrassLikeHerumi(x: bigint): bigint {
 }
 
 // We don't directly use Noble Crypto's toBytes(), since that handles not only the "compressed" flag, but also the flags "infinity" and "sort",
-// which aren't handled in Herumi's implementation.
+// which aren't handled in Herumi's implementation (at least, not in the version that the Protocol relies on).
 // See: https://github.com/paulmillr/noble-curves/blob/1.6.0/src/bls12-381.ts#L382
 // This works for "G1" points. It does not work for "G2" points.
 export function projectivePointG1ToBytes(point: any): Uint8Array {
@@ -285,12 +288,15 @@ export function projectivePointG1ToBytes(point: any): Uint8Array {
     return bytesCompressed;
 }
 
+// Verifies a message signature.
 export function verifySignature(signature: Uint8Array, message: Uint8Array, publicKey: Uint8Array) {
+    // Both the signature and the messages are mapped to points on G1.
     const signaturePoint = bytesToG1ProjectivePoint(signature);
     const messagePoint = hashAndMapToG1LikeHerumi(message).point;
-    const publicKeyBestEffort = bytesToG2ProjectivePoint(publicKey);
+    // ... while the public key is on G2.
+    const publicKeyPoint = bytesToG2ProjectivePoint(publicKey);
 
-    return doVerifySignature(signaturePoint, messagePoint, publicKeyBestEffort);
+    return doVerifySignature(signaturePoint, messagePoint, publicKeyPoint);
 }
 
 export function bytesToG1ProjectivePoint(bytes: Uint8Array): any {
@@ -318,6 +324,9 @@ export function bytesToG1ProjectivePoint(bytes: Uint8Array): any {
     return point;
 }
 
+// This function is extremely fragile. It relies on internals of Noble Curves,
+// while trying to **implement issues** (e.g. bugs or non-standard features) of the Herumi library,
+// issues which we depend on (through "mx-chain-crypto-go").
 export function bytesToG2ProjectivePoint(bytes: Uint8Array): any {
     const bytesReversed = Buffer.from(bytes).reverse();
 
@@ -343,7 +352,8 @@ export function bytesToG2ProjectivePoint(bytes: Uint8Array): any {
     return point;
 }
 
-// We cannot directly use Noble Crypto's verifyShortSignatureLikeHerumi(), since that performs its own (standard) hashing and mapping to G1.
+// We cannot directly use Noble Crypto's verifyShortSignature(), since that performs its own (standard) hashing and mapping to G1,
+// which differs from the one in Herumi's library.
 // See: https://github.com/paulmillr/noble-curves/blob/1.6.0/src/abstract/bls.ts#L420
 function doVerifySignature(signaturePoint: any, messagePoint: any, publicKeyPoint: any): boolean {
     const P = publicKeyPoint;
@@ -359,6 +369,7 @@ function doVerifySignature(signaturePoint: any, messagePoint: any, publicKeyPoin
     return Fp12.eql(exp, Fp12.ONE);
 }
 
+// Generates a public key, given a secret key.
 export function getPublicKeyBytesForShortSignaturesLikeHerumi(secretKeyBytes: Uint8Array): {
     point: any;
     bytes: Uint8Array;

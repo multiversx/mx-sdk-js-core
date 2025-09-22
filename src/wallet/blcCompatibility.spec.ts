@@ -740,7 +740,7 @@ function calcBNComputeWLikeHerumi(t: bigint): bigint {
     let w = Fp.sqr(t);
 
     // Herumi code: w += G::b_;
-    w += G1.CURVE.b;
+    w = Fp.add(w, G1.CURVE.b);
 
     // Herumi code: *w.getFp0() += Fp::one();
     w = Fp.add(w, Fp.ONE);
@@ -810,7 +810,7 @@ function calcBNLoopLikeHerumiIteration0(w: bigint, t: bigint): bigint {
     // *x.getFp0() += c2_;
     let x = Fp.mul(t, w);
     x = Fp.neg(x);
-    x += c2;
+    x = Fp.add(x, c2);
 
     return x;
 }
@@ -821,7 +821,7 @@ function calcBNLoopLikeHerumiIteration1(x: bigint): bigint {
     // *x.getFp0() -= Fp::one();
 
     x = Fp.neg(x);
-    x -= Fp.ONE;
+    x = Fp.sub(x, Fp.ONE);
 
     return x;
 }
@@ -834,7 +834,7 @@ function calcBNLoopLikeHerumiIteration2(w: bigint): bigint {
 
     let x = Fp.sqr(w);
     x = Fp.inv(x);
-    x += Fp.ONE;
+    x = Fp.add(x, Fp.ONE);
 
     return x;
 }

@@ -23,15 +23,6 @@ npm install @multiversx/sdk-core
 
 Feel free to skip this section if you are not a contributor.
 
-### Prerequisites
-
-`browserify` and `esmify` are required to compile the browser-friendly versions of `sdk-core`. They can be installed as follows:
-
-```
-npm install --global browserify
-npm install esmify --no-save
-```
-
 ## Optional Dependencies
 
 ### axios

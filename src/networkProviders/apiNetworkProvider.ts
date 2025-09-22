@@ -260,7 +260,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         try {
             const response = await this.axios.default.get(url, this.config);
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             this.handleApiError(error, resourceUrl);
         }
     }
@@ -278,7 +278,7 @@ export class ApiNetworkProvider implements INetworkProvider {
             });
             const responsePayload = response.data;
             return responsePayload;
-        } catch (error) {
+        } catch (error: any) {
             this.handleApiError(error, resourceUrl);
         }
     }

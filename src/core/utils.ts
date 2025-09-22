@@ -60,7 +60,7 @@ export function isEmpty(value: { isEmpty?: () => boolean; length?: number }): bo
 export function getAxios() {
     try {
         return require("axios");
-    } catch (error) {
+    } catch (error: any) {
         throw new Error("axios is required but not installed. Please install axios to make network requests.");
     }
 }

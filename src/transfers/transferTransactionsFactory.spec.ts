@@ -23,7 +23,7 @@ describe("test transfer transactions factory", function () {
             });
 
             assert.fail("Expected error was not thrown");
-        } catch (err) {
+        } catch (err: any) {
             assert.instanceOf(err, ErrBadUsage);
             assert.match(err.message, /No token transfer has been provided/);
         }
@@ -180,7 +180,7 @@ describe("test transfer transactions factory", function () {
             });
 
             assert.fail("Expected error was not thrown");
-        } catch (err) {
+        } catch (err: any) {
             assert.match(err.message, /Can't set data field when sending esdt tokens/);
         }
     });

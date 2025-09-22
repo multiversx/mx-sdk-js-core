@@ -156,7 +156,7 @@ export class TransactionWatcher {
                 if (satisfied || stop) {
                     break;
                 }
-            } catch (error) {
+            } catch (error: any) {
                 Logger.debug("TransactionWatcher.awaitConditionally(): cannot (yet) fetch data.");
 
                 if (error instanceof ErrIsCompletedFieldIsMissingOnTransaction) {

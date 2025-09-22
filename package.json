@@ -71,7 +71,7 @@
     "protobufjs-cli": "1.1.2",
     "ts-node": "9.1.1",
     "typescript": "5.9.2",
-    "@noble/curves": "1.8.2"
+    "@noble/curves": "1.9.0"
   },
   "peerDependencies": {
     "bignumber.js": "^9.0.1",

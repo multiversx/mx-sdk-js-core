@@ -164,7 +164,7 @@ export function calcBNLoopLikeHerumi(w: bigint, t: bigint): any {
     let x = BigInt(0);
     let y = BigInt(0);
 
-    const legendreOfT = legendreLikeHerumi(t);
+    const legendreOfT = FpLegendre(Fp, t);
     const legendreOfTIsNegative = legendreOfT < 0;
 
     for (let i = 0; i < 3; i++) {
@@ -235,21 +235,6 @@ function calcBNLoopLikeHerumiIteration2(w: bigint): bigint {
     x = Fp.add(x, Fp.ONE);
 
     return x;
-}
-
-export function legendreLikeHerumi(x: bigint): number {
-    const legendre = FpLegendre(Fp.ORDER);
-    const legendreSymbol = legendre(Fp, x);
-
-    if (Fp.eql(legendreSymbol, Fp.ZERO)) {
-        return 0;
-    }
-
-    if (Fp.eql(legendreSymbol, Fp.ONE)) {
-        return 1;
-    }
-
-    return -1;
 }
 
 // Herumi code: https://github.com/herumi/mcl/blob/v2.00/include/mcl/ec.hpp#L1954

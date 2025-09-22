@@ -13,7 +13,6 @@ import {
     getPublicKeyBytesForShortSignaturesLikeHerumi,
     getWeierstrassLikeHerumi,
     hashAndMapToG1LikeHerumi,
-    legendreLikeHerumi,
     projectivePointG1ToBytes,
     setArrayMaskLikeHerumi,
     setupG2GeneratorPointsLikeHerumi,
@@ -604,44 +603,6 @@ describe("test BLS compatibility and adapters (noble crypto and herumi)", () => 
         const outputHex = Buffer.from(nobleUtils.numberToBytesLE(output, Fp.BYTES)).toString("hex");
 
         assert.equal(outputHex, expectedOutputHex);
-    });
-
-    it("test legendreLikeHerumi", async function () {
-        assert.equal(
-            legendreLikeHerumi(
-                BigInt(
-                    "1947061557619909257923000199957305913149841919217032399369035888886860867324583869022231864956010426593339565155799",
-                ),
-            ),
-            1,
-        );
-
-        assert.equal(
-            legendreLikeHerumi(
-                BigInt(
-                    "2287818845157091648072502000506798783829628305119603561063065856040047081993849512757193454722385904601543331168919",
-                ),
-            ),
-            -1,
-        );
-
-        assert.equal(
-            legendreLikeHerumi(
-                BigInt(
-                    "2070452443764583481186658592096648212376618667920360235487557759555714167455481586459773229376884059003467086956271",
-                ),
-            ),
-            1,
-        );
-
-        assert.equal(
-            legendreLikeHerumi(
-                BigInt(
-                    "3066392673129170662178293883062051604774809620215180153438624189323843912738694122128372094104009713090321523946449",
-                ),
-            ),
-            -1,
-        );
     });
 
     it("test getWeierstrassLikeHerumi", async function () {

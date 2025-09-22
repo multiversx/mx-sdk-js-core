@@ -5,6 +5,7 @@ import { sha512 } from "@noble/hashes/sha512";
 import { assert } from "chai";
 import path from "path";
 import { readTestFile } from "../testutils/files";
+import { getHerumiConstants } from "./nobleBlsToHerumiAdapters";
 
 const Fp = nobleBls.fields.Fp;
 const Fp2 = nobleBls.fields.Fp2;
@@ -13,7 +14,7 @@ const G1 = nobleBls.G1;
 const G2 = nobleBls.G2;
 const CompressedFlagMask = 0b1000_0000;
 
-describe("test BLS compatibility (noble crypto and herumi)", () => {
+describe("test BLS compatibility and adapters (noble crypto and herumi)", () => {
     before(() => {
         setupG2GeneratorPointsLikeHerumi();
     });
@@ -636,17 +637,17 @@ describe("test BLS compatibility (noble crypto and herumi)", () => {
 });
 
 function setupG2GeneratorPointsLikeHerumi() {
-    (<any>nobleBls).G2.CURVE.Gx.c0 = BigInt(
+    nobleBls.G2.CURVE.Gx.c0 = BigInt(
         "0xf3d011af81acf00140aab3c122c61bbdf0628db81c37664bdfc828163ce074ee33a1a5ce5488556603bc5d8d9f21ecc",
     );
-    (<any>nobleBls).G2.CURVE.Gx.c1 = BigInt(
+    nobleBls.G2.CURVE.Gx.c1 = BigInt(
         "0x171df7a5080f908a16c2658ea90164e28c924c3f0e6655f6d82adca6bfbdfb5f9efca82c1609676fa15cd30396f1a4b3",
     );
 
-    (<any>nobleBls).G2.CURVE.Gy.c0 = BigInt(
+    nobleBls.G2.CURVE.Gy.c0 = BigInt(
         "0x738a4db169d33b52ecdf6470030add6488ec3e8fc746734b9107c5315b6352675479f364fc210e5e46857278215abd1",
     );
-    (<any>nobleBls).G2.CURVE.Gy.c1 = BigInt(
+    nobleBls.G2.CURVE.Gy.c1 = BigInt(
         "0x19e96417debc6d686aead20955eacc0c18fa0ec8162a32f18e5e390bee6bc4f3c80be4ba018d7f6b488f2445de040696",
     );
 }
@@ -874,27 +875,6 @@ function getWeierstrassLikeHerumi(x: bigint): bigint {
     return yy;
 }
 
-// Herumi code: https://github.com/herumi/mcl/blob/v2.00/include/mcl/bn.hpp#L475
-// void initBLS12(const mpz_class& z, int curveType) { ... }
-// const char *c1 = "be32ce5fbeed9ca374d38c0ed41eefd5bb675277cdf12d11bc2fb026c41400045c03fffffffdfffd";
-// const char *c2 = "5f19672fdf76ce51ba69c6076a0f77eaddb3a93be6f89688de17d813620a00022e01fffffffefffe";
-function getHerumiConstants() {
-    const c1Bytes = Buffer.from(
-        "fdfffdffffff035c040014c426b02fbc112df1cd775267bbd5ef1ed40e8cd374a39cedbe5fce32be0000000000000000",
-        "hex",
-    );
-
-    const c2Bytes = Buffer.from(
-        "fefffeffffff012e02000a6213d817de8896f8e63ba9b3ddea770f6a07c669ba51ce76df2f67195f0000000000000000",
-        "hex",
-    );
-
-    const c1 = nobleUtils.bytesToNumberLE(c1Bytes);
-    const c2 = nobleUtils.bytesToNumberLE(c2Bytes);
-
-    return { c1, c2 };
-}
-
 // We don't directly use Noble Crypto's toBytes(), since that handles not only the "compressed" flag, but also the flags "infinity" and "sort",
 // which aren't handled in Herumi's implementation.
 // See: https://github.com/paulmillr/noble-curves/blob/1.6.0/src/bls12-381.ts#L382
@@ -931,7 +911,7 @@ function bytesToG1ProjectivePoint(bytes: Uint8Array): any {
 
     const point = G1.ProjectivePoint.fromHex(bytesReversed);
     const isYOdd = Fp.isOdd!(point.py);
-    const yNegated = Fp.neg(point.y);
+    const yNegated = Fp.neg(point.py);
 
     // Herumi does not handle the "sort" flag; we need to correct the y-coordinate if necessary.
     const shouldApplyCorrection = (!isCompressed && isYOdd) || (isCompressed && !isYOdd);

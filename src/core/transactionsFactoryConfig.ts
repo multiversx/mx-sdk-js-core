@@ -50,6 +50,22 @@ export class TransactionsFactoryConfig {
     gasLimitForClearProposals: bigint;
     gasLimitForChangeConfig: bigint;
     gasLimitForClaimAccumulatedFees: bigint;
+    gasLimitForStaking: bigint;
+    gasLimitForToppingUp: bigint;
+    gasLimitForUnstaking: bigint;
+    gasLimitForUnjailing: bigint;
+    gasLimitForUnbonding: bigint;
+    gasLimitForChangingRewardsAddress: bigint;
+    gasLimitForClaiming: bigint;
+    gasLimitForUnstakingNodes: bigint;
+    gasLimitForUnstakingTokens: bigint;
+    gasLimitForUnbondingNodes: bigint;
+    gasLimitForUnbondingTokens: bigint;
+    gasLimitForCleaningRegisteredData: bigint;
+    gasLimitForRestakingUnstakedTokens: bigint;
+    gasLimitForCreatingDelegationContractFromValidator: bigint;
+    gasLimitForWhitelistForMerge: bigint;
+    gasLimitForMergingValidatorToDelegation: bigint;
 
     constructor(options: { chainID: string }) {
         // General-purpose configuration
@@ -114,5 +130,23 @@ export class TransactionsFactoryConfig {
         this.gasLimitForClearProposals = 50_000_000n;
         this.gasLimitForChangeConfig = 50_000_000n;
         this.gasLimitForClaimAccumulatedFees = 1_000_000n;
+
+        // Configuration for staking operations
+        this.gasLimitForStaking = 5_000_000n;
+        this.gasLimitForToppingUp = 5_000_000n;
+        this.gasLimitForUnstaking = 5_000_000n;
+        this.gasLimitForUnjailing = 5_000_000n;
+        this.gasLimitForUnbonding = 5_000_000n;
+        this.gasLimitForChangingRewardsAddress = 5_000_000n;
+        this.gasLimitForClaiming = 5_000_000n;
+        this.gasLimitForUnstakingNodes = 5_000_000n;
+        this.gasLimitForUnstakingTokens = 5_000_000n;
+        this.gasLimitForUnbondingNodes = 5_000_000n;
+        this.gasLimitForUnbondingTokens = 5_000_000n;
+        this.gasLimitForCleaningRegisteredData = 5_000_000n;
+        this.gasLimitForRestakingUnstakedTokens = 5_000_000n;
+        this.gasLimitForCreatingDelegationContractFromValidator = 51_000_000n;
+        this.gasLimitForWhitelistForMerge = 5_000_000n;
+        this.gasLimitForMergingValidatorToDelegation = 50_000_000n;
     }
 }

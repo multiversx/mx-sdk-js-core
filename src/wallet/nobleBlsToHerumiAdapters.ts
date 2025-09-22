@@ -177,7 +177,7 @@ export function calcBNLoopLikeHerumi(w: bigint, t: bigint): any {
         }
 
         // Herumi code: G::getWeierstrass(y, x);
-        y = getWeierstrassLikeHerumi(x);
+        y = G1.weierstrassEquation(x);
 
         // Herumi code: if (F::squareRoot(y, y)) { ... }
         try {
@@ -235,26 +235,6 @@ function calcBNLoopLikeHerumiIteration2(w: bigint): bigint {
     x = Fp.add(x, Fp.ONE);
 
     return x;
-}
-
-// Herumi code: https://github.com/herumi/mcl/blob/v2.00/include/mcl/ec.hpp#L1954
-// void getWeierstrass(Fp& yy, const Fp& x)
-// {
-//     Fp t;
-//     Fp::sqr(t, x);
-//     t += a_;
-//     t *= x;
-//     Fp::add(yy, t, b_);
-// }
-export function getWeierstrassLikeHerumi(x: bigint): bigint {
-    const a = Fp.ZERO;
-    const b = G1.CURVE.b;
-
-    let t = Fp.sqr(x);
-    t = Fp.add(t, a);
-    t = Fp.mul(t, x);
-    const yy = Fp.add(t, b);
-    return yy;
 }
 
 // We don't directly use Noble Crypto's toBytes(), since that handles not only the "compressed" flag, but also the flags "infinity" and "sort",

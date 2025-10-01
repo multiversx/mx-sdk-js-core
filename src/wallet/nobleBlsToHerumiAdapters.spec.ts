@@ -552,6 +552,18 @@ describe("test BLS compatibility and adapters (noble crypto and herumi)", () => 
     });
 
     it("test setArrayMaskLikeHerumi", async function () {
+        // Learning test - Herumi's "mask1" and "mask2":
+        assert.equal("1".repeat(381), ((1n << 381n) - 1n).toString(2));
+        assert.equal("1".repeat(380), ((1n << 380n) - 1n).toString(2));
+
+        // Learning test - the way we build "mask1" and "mask2" (through "bitMask" utility function):
+        assert.equal(381, Fp.BITS);
+        assert.equal(380, Fp.BITS - 1);
+        assert.equal("1".repeat(381), nobleUtils.bitMask(Fp.BITS).toString(2));
+        assert.equal("1".repeat(380), nobleUtils.bitMask(Fp.BITS - 1).toString(2));
+
+        // Actual tests:
+
         assert.equal(
             toHex(setArrayMaskLikeHerumi(sha512(Buffer.from("aaaaaaaa")))),
             "f74f2603939a53656948480ce71f1ce466685b6654fd22c61c1f2ce4e2c96d1cd02d162b560c4beaf1ae45f3471dc50b",

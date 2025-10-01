@@ -72,8 +72,9 @@ export function hashAndMapToG1LikeHerumi(message: Uint8Array): { point: any; byt
 }
 
 // Herumi code: https://github.com/herumi/mcl/blob/v2.00/include/mcl/fp.hpp#L371
-// x &= (1 << bitLen) - 1
-// x &= (1 << (bitLen - 1)) - 1 if x >= p
+// treat x as little endian                     // Documenting comment in Herumi's code.
+// x &= (1 << bitLen) - 1                       // Documenting comment in Herumi's code.
+// x &= (1 << (bitLen - 1)) - 1 if x >= p       // Documenting comment in Herumi's code (order of operations is depicted ambiguously).
 // void setArrayMask(const S *x, size_t n)
 // {
 //     const size_t dstByte = sizeof(Unit) * op_.N;
@@ -90,12 +91,15 @@ export function hashAndMapToG1LikeHerumi(message: Uint8Array): { point: any; byt
 //     toMont();
 // }
 export function setArrayMaskLikeHerumi(x: Uint8Array): Uint8Array {
+    // Note: "nobleUtils.bitMask()" is implemented as follows:
+    // export const bitMask = (n: number): bigint => (_1n << BigInt(n)) - _1n;
     const mask1 = nobleUtils.bitMask(Fp.BITS);
     const mask2 = nobleUtils.bitMask(Fp.BITS - 1);
 
     let xAsBigInt = nobleUtils.bytesToNumberLE(x);
     xAsBigInt = xAsBigInt & mask1;
 
+    // "if x >= p"
     if (xAsBigInt >= Fp.ORDER) {
         xAsBigInt = xAsBigInt & mask2;
     }

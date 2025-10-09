@@ -1,5 +1,4 @@
 import {
-    Address,
     BaseController,
     BaseControllerInput,
     IAccount,
@@ -24,10 +23,9 @@ export class TokenManagementController extends BaseController {
         networkProvider: INetworkProvider;
         gasLimitEstimator?: IGasLimitEstimator;
     }) {
-        super();
+        super({ gasLimitEstimator: options.gasLimitEstimator });
         this.factory = new TokenManagementTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
-            gasLimitEstimator: options.gasLimitEstimator,
         });
         this.transactionAwaiter = new TransactionWatcher(options.networkProvider);
         this.parser = new TokenManagementTransactionsOutcomeParser();
@@ -40,12 +38,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForIssuingFungible(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -66,12 +59,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForIssuingSemiFungible(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -92,12 +80,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForIssuingNonFungible(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -118,12 +101,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForRegisteringMetaESDT(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -144,12 +122,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForRegisteringAndSettingRoles(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -170,12 +143,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForSettingBurnRoleGlobally(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -196,12 +164,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnsettingBurnRoleGlobally(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -225,12 +188,7 @@ export class TokenManagementController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -254,12 +212,7 @@ export class TokenManagementController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -274,12 +227,7 @@ export class TokenManagementController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -303,12 +251,7 @@ export class TokenManagementController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -323,12 +266,7 @@ export class TokenManagementController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -352,12 +290,7 @@ export class TokenManagementController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -372,12 +305,7 @@ export class TokenManagementController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -401,12 +329,7 @@ export class TokenManagementController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -418,12 +341,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForCreatingNFT(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -444,12 +362,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForPausing(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -470,12 +383,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnpausing(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -496,12 +404,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForFreezing(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -522,12 +425,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnfreezing(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -548,12 +446,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForWiping(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -574,12 +467,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForLocalMint(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -600,12 +488,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForLocalBurning(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -626,12 +509,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUpdatingAttributes(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -652,12 +530,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForAddingQuantity(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -678,12 +551,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForBurningQuantity(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -704,12 +572,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForModifyingRoyalties(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -730,12 +593,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForSettingNewUris(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -756,12 +614,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForModifyingCreator(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -782,12 +635,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForModifyingCreator(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -808,12 +656,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForMetadataRecreate(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -834,12 +677,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForChangingTokenToDynamic(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -860,12 +698,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUpdatingTokenId(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -882,12 +715,7 @@ export class TokenManagementController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForRegisteringDynamicToken(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -911,12 +739,7 @@ export class TokenManagementController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }

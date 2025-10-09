@@ -56,7 +56,7 @@ export class MultisigController extends BaseController {
         transaction.guardian = options.guardian ?? Address.empty();
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
+        await this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;

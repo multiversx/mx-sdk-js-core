@@ -1,5 +1,4 @@
 import {
-    Address,
     BaseController,
     BaseControllerInput,
     IAccount,
@@ -156,12 +155,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForSettingAutomaticActivation(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }

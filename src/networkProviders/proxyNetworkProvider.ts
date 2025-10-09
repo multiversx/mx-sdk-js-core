@@ -131,6 +131,10 @@ export class ProxyNetworkProvider implements INetworkProvider {
 
     async estimateTransactionCost(tx: Transaction): Promise<TransactionCostResponse> {
         const copiedTx = Transaction.newFromPlainObject(tx.toPlainObject());
+
+        // we set gas_limit to 0 for the /cost endpoint which is not really working as expected if gas_limit is set
+        copiedTx.gasLimit = 0n;
+
         if (!copiedTx.nonce) {
             copiedTx.nonce = (await this.getAccount(copiedTx.sender)).nonce;
         }

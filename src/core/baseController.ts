@@ -21,13 +21,15 @@ export class BaseController {
         transaction: Transaction,
         options: { gasLimit?: bigint; gasPrice?: bigint },
     ) {
-        if (options.gasLimit) {
-            transaction.gasLimit = options.gasLimit;
-        } else {
-            this.addExtraGasLimitIfRequired(transaction);
-        }
         if (options.gasPrice) {
             transaction.gasPrice = options.gasPrice;
+        }
+
+        if (options.gasLimit) {
+            transaction.gasLimit = options.gasLimit;
+            return;
+        } else {
+            this.addExtraGasLimitIfRequired(transaction);
         }
 
         if (this.gasLimitEstimator) {
@@ -62,7 +64,7 @@ export class BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.setVersionAndOptionsForGuardian(transaction);
-        this.setTransactionGasOptions(transaction, options);
+        await this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
     }
 }

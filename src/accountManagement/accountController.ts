@@ -47,7 +47,7 @@ export class AccountController extends BaseController {
         const transaction = await this.factory.createTransactionForGuardingAccount(sender.address);
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
+        await this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;
@@ -65,7 +65,7 @@ export class AccountController extends BaseController {
         transaction.relayer = options.relayer ?? Address.empty();
         transaction.nonce = nonce;
         this.setVersionAndOptionsForGuardian(transaction);
-        this.setTransactionGasOptions(transaction, options);
+        await this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
 
         return transaction;

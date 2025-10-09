@@ -1,5 +1,4 @@
 import {
-    Address,
     BaseController,
     BaseControllerInput,
     IAccount,
@@ -24,11 +23,10 @@ export class DelegationController extends BaseController {
         networkProvider: INetworkProvider;
         gasLimitEstimator?: IGasLimitEstimator;
     }) {
-        super();
+        super({ gasLimitEstimator: options.gasLimitEstimator });
         this.transactionAwaiter = new TransactionWatcher(options.networkProvider);
         this.factory = new DelegationTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
-            gasLimitEstimator: options.gasLimitEstimator,
         });
         this.parser = new DelegationTransactionsOutcomeParser();
     }
@@ -40,12 +38,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForNewDelegationContract(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -66,12 +59,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForAddingNodes(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -83,12 +71,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForRemovingNodes(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -100,12 +83,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForStakingNodes(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -117,12 +95,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnbondingNodes(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -134,12 +107,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnstakingNodes(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -151,12 +119,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUnjailingNodes(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -168,12 +131,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForChangingServiceFee(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -185,12 +143,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForModifyingDelegationCap(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -202,12 +155,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForSettingAutomaticActivation(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -222,12 +170,7 @@ export class DelegationController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -242,12 +185,7 @@ export class DelegationController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -262,12 +200,7 @@ export class DelegationController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -279,12 +212,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForSettingMetadata(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -296,12 +224,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForDelegating(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -313,12 +236,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForClaimingRewards(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -330,12 +248,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForRedelegatingRewards(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -347,12 +260,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForUndelegating(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -364,13 +272,7 @@ export class DelegationController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForWithdrawing(sender.address, options);
 
-        transaction.nonce = nonce;
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }

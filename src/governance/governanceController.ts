@@ -45,10 +45,9 @@ export class GovernanceController extends BaseController {
         addressHrp?: string;
         gasLimitEstimator?: IGasLimitEstimator;
     }) {
-        super();
+        super({ gasLimitEstimator: options.gasLimitEstimator });
         this.governanceFactory = new GovernanceTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
-            gasLimitEstimator: options.gasLimitEstimator,
         });
         this.smartContractController = new SmartContractController({
             chainID: options.chainID,
@@ -68,12 +67,7 @@ export class GovernanceController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.governanceFactory.createTransactionForNewProposal(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -94,12 +88,7 @@ export class GovernanceController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.governanceFactory.createTransactionForVoting(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -120,12 +109,7 @@ export class GovernanceController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.governanceFactory.createTransactionForClosingProposal(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -149,12 +133,7 @@ export class GovernanceController extends BaseController {
             options,
         );
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -166,12 +145,7 @@ export class GovernanceController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.governanceFactory.createTransactionForClaimingAccumulatedFees(sender.address);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -183,12 +157,7 @@ export class GovernanceController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.governanceFactory.createTransactionForChangingConfig(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }

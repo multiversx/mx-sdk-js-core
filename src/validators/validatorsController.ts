@@ -1,5 +1,4 @@
 import {
-    Address,
     BaseController,
     BaseControllerInput,
     IAccount,
@@ -19,10 +18,9 @@ export class ValidatorsController extends BaseController {
         networkProvider: INetworkProvider;
         gasLimitEstimator?: IGasLimitEstimator;
     }) {
-        super();
+        super({ gasLimitEstimator: options.gasLimitEstimator });
         this.factory = new ValidatorsTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
-            gasLimitEstimator: options.gasLimitEstimator,
         });
     }
 
@@ -225,19 +223,5 @@ export class ValidatorsController extends BaseController {
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
-    }
-
-    private async setupAndSignTransaction(
-        transaction: Transaction,
-        options: BaseControllerInput,
-        nonce: bigint,
-        sender: IAccount,
-    ) {
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
     }
 }

@@ -1,5 +1,4 @@
 import {
-    Address,
     BaseController,
     BaseControllerInput,
     IAccount,
@@ -14,10 +13,9 @@ export class TransfersController extends BaseController {
     private factory: TransferTransactionsFactory;
 
     constructor(options: { chainID: string; gasLimitEstimator?: IGasLimitEstimator }) {
-        super();
+        super({ gasLimitEstimator: options.gasLimitEstimator });
         this.factory = new TransferTransactionsFactory({
             config: new TransactionsFactoryConfig(options),
-            gasLimitEstimator: options.gasLimitEstimator,
         });
     }
 
@@ -28,12 +26,7 @@ export class TransfersController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForNativeTokenTransfer(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -45,12 +38,7 @@ export class TransfersController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForESDTTokenTransfer(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -62,12 +50,7 @@ export class TransfersController extends BaseController {
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForTransfer(sender.address, options);
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }

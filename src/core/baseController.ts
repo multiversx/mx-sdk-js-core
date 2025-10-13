@@ -1,5 +1,6 @@
 import { Address } from "./address";
 import { EXTRA_GAS_LIMIT_FOR_GUARDED_TRANSACTIONS, EXTRA_GAS_LIMIT_FOR_RELAYED_TRANSACTIONS } from "./constants";
+import { IAccount, IGasLimitEstimator } from "./interfaces";
 import { Transaction } from "./transaction";
 import { TransactionComputer } from "./transactionComputer";
 
@@ -11,14 +12,28 @@ export type BaseControllerInput = {
 };
 
 export class BaseController {
-    protected setTransactionGasOptions(transaction: Transaction, options: { gasLimit?: bigint; gasPrice?: bigint }) {
+    private gasLimitEstimator?: IGasLimitEstimator;
+    constructor(options?: { gasLimitEstimator?: IGasLimitEstimator }) {
+        this.gasLimitEstimator = options?.gasLimitEstimator;
+    }
+
+    protected async setTransactionGasOptions(
+        transaction: Transaction,
+        options: { gasLimit?: bigint; gasPrice?: bigint },
+    ) {
+        if (options.gasPrice) {
+            transaction.gasPrice = options.gasPrice;
+        }
+
         if (options.gasLimit) {
             transaction.gasLimit = options.gasLimit;
+            return;
         } else {
             this.addExtraGasLimitIfRequired(transaction);
         }
-        if (options.gasPrice) {
-            transaction.gasPrice = options.gasPrice;
+
+        if (this.gasLimitEstimator) {
+            transaction.gasLimit = await this.gasLimitEstimator.estimateGasLimit({ transaction });
         }
     }
 
@@ -37,5 +52,19 @@ export class BaseController {
             const txComputer = new TransactionComputer();
             txComputer.applyGuardian(transaction, transaction.guardian);
         }
+    }
+
+    protected async setupAndSignTransaction(
+        transaction: Transaction,
+        options: BaseControllerInput,
+        nonce: bigint,
+        sender: IAccount,
+    ) {
+        transaction.guardian = options.guardian ?? Address.empty();
+        transaction.relayer = options.relayer ?? Address.empty();
+        transaction.nonce = nonce;
+        this.setVersionAndOptionsForGuardian(transaction);
+        await this.setTransactionGasOptions(transaction, options);
+        transaction.signature = await sender.signTransaction(transaction);
     }
 }

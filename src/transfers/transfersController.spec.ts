@@ -19,7 +19,7 @@ describe("test transfers controller", function () {
         grace = await Account.newFromPem(path.join(walletsPath, "grace.pem"));
     });
 
-    it("should send relayed with ho native balance", async function () {
+    it("should send relayed with no native balance", async function () {
         sender.nonce = await entrypoint.recallAccountNonce(sender.address);
         const token = new Token({ identifier: "USDC-350c4e" });
         const transfer = new TokenTransfer({ token: token, amount: 7n });

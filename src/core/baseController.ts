@@ -12,29 +12,9 @@ export type BaseControllerInput = {
 };
 
 export class BaseController {
-    private gasLimitEstimator?: IGasLimitEstimator;
+    readonly gasLimitEstimator?: IGasLimitEstimator;
     constructor(options?: { gasLimitEstimator?: IGasLimitEstimator }) {
         this.gasLimitEstimator = options?.gasLimitEstimator;
-    }
-
-    protected async setTransactionGasOptions(
-        transaction: Transaction,
-        options: { gasLimit?: bigint; gasPrice?: bigint },
-    ) {
-        if (options.gasPrice) {
-            transaction.gasPrice = options.gasPrice;
-        }
-
-        if (options.gasLimit) {
-            transaction.gasLimit = options.gasLimit;
-            return;
-        } else {
-            this.addExtraGasLimitIfRequired(transaction);
-        }
-
-        if (this.gasLimitEstimator) {
-            transaction.gasLimit = await this.gasLimitEstimator.estimateGasLimit({ transaction });
-        }
     }
 
     protected addExtraGasLimitIfRequired(transaction: Transaction): void {
@@ -44,13 +24,6 @@ export class BaseController {
 
         if (transaction.relayer && !transaction.relayer.isEmpty()) {
             transaction.gasLimit += BigInt(EXTRA_GAS_LIMIT_FOR_RELAYED_TRANSACTIONS);
-        }
-    }
-
-    protected setVersionAndOptionsForGuardian(transaction: Transaction): void {
-        if (transaction.guardian && !transaction.guardian.isEmpty()) {
-            const txComputer = new TransactionComputer();
-            txComputer.applyGuardian(transaction, transaction.guardian);
         }
     }
 
@@ -66,5 +39,32 @@ export class BaseController {
         this.setVersionAndOptionsForGuardian(transaction);
         await this.setTransactionGasOptions(transaction, options);
         transaction.signature = await sender.signTransaction(transaction);
+    }
+
+    protected setVersionAndOptionsForGuardian(transaction: Transaction): void {
+        if (transaction.guardian && !transaction.guardian.isEmpty()) {
+            const txComputer = new TransactionComputer();
+            txComputer.applyGuardian(transaction, transaction.guardian);
+        }
+    }
+
+    protected async setTransactionGasOptions(
+        transaction: Transaction,
+        options: { gasLimit?: bigint; gasPrice?: bigint },
+    ) {
+        if (options.gasPrice) {
+            transaction.gasPrice = options.gasPrice;
+        }
+
+        if (options.gasLimit) {
+            transaction.gasLimit = options.gasLimit;
+            return;
+        }
+
+        this.addExtraGasLimitIfRequired(transaction);
+
+        if (this.gasLimitEstimator) {
+            transaction.gasLimit = await this.gasLimitEstimator.estimateGasLimit({ transaction });
+        }
     }
 }

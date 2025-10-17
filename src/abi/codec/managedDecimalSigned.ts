@@ -13,14 +13,14 @@ export class ManagedDecimalSignedCodec {
 
     decodeNested(buffer: Buffer, type: ManagedDecimalSignedType): [ManagedDecimalSignedValue, number] {
         let payload: Buffer;
-        let length: number = 0;
+        let length: number;
 
         if (type.isVariable()) {
-            // read biguint value length
-            const bigUintSizeBytes = buffer.slice(0, SizeOfU32);
-            const bigUintLength = bigUintSizeBytes.readUInt32BE(0);
+            // read BigInt value length
+            const bigIntSizeBytes = buffer.slice(0, SizeOfU32);
+            const bigIntLength = bigIntSizeBytes.readUInt32BE(0);
 
-            length = SizeOfU32 + bigUintLength + SizeOfU32;
+            length = SizeOfU32 + bigIntLength + SizeOfU32;
             payload = buffer.slice(0, length);
         } else {
             length = buffer.readUInt32BE(0);

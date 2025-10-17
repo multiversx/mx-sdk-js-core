@@ -13,10 +13,10 @@ export class ManagedDecimalCodec {
 
     decodeNested(buffer: Buffer, type: ManagedDecimalType): [ManagedDecimalValue, number] {
         let payload: Buffer;
-        let length: number = 0;
+        let length: number;
 
         if (type.isVariable()) {
-            // read biguint value length
+            // read BigUInt value length
             const bigUintSizeBytes = buffer.slice(0, SizeOfU32);
             const bigUintLength = bigUintSizeBytes.readUInt32BE(0);
 

@@ -48,8 +48,9 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractDeployInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = await this.factory.createTransactionForDeploy(sender.address, options);
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
 
+        const transaction = await this.factory.createTransactionForDeploy(sender.address, options);
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
@@ -69,8 +70,9 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractUpgradeInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = await this.factory.createTransactionForUpgrade(sender.address, options);
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
 
+        const transaction = await this.factory.createTransactionForUpgrade(sender.address, options);
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
@@ -81,8 +83,9 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractExecuteInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = await this.factory.createTransactionForExecute(sender.address, options);
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
 
+        const transaction = await this.factory.createTransactionForExecute(sender.address, options);
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;

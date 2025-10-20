@@ -40,7 +40,7 @@ describe("test smart contract transactions factory", function () {
             assert.fail("Expected error was not thrown");
         } catch (err) {
             assert.instanceOf(err, Err);
-            assert.match(err.message, /Can't convert args to TypedValues/);
+            assert.match((err as Error).message, /Can't convert args to TypedValues/);
         }
     });
 
@@ -570,7 +570,7 @@ describe("test smart contract transactions factory", function () {
             assert.fail("Expected error was not thrown");
         } catch (err) {
             assert.instanceOf(err, Err);
-            assert.match(err.message, /Can't convert args to TypedValues/);
+            assert.match((err as Error).message, /Can't convert args to TypedValues/);
         }
     });
 

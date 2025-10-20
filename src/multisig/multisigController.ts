@@ -51,6 +51,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.DeployMultisigContractInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForDeploy(sender.address, options);
 
         transaction.guardian = options.guardian ?? Address.empty();
@@ -318,6 +319,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeAddBoardMemberInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForProposeAddBoardMember(
             sender.address,
             options,
@@ -336,6 +338,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeAddProposerInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForProposeAddProposer(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -351,6 +354,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeRemoveUserInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForProposeRemoveUser(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -366,6 +370,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeChangeQuorumInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForProposeChangeQuorum(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -390,6 +395,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ActionInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForSignAction(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -405,6 +411,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ActionInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForPerformAction(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -429,6 +436,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ActionInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForUnsign(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -444,6 +452,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ActionInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForDiscardAction(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -459,6 +468,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.DepositExecuteInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForDeposit(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -474,6 +484,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeTransferExecuteInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForProposeTransferExecute(
             sender.address,
             options,
@@ -492,6 +503,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeTransferExecuteEsdtInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForProposeTransferExecuteEsdt(
             sender.address,
             options,
@@ -510,6 +522,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeAsyncCallInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForProposeAsyncCall(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -525,6 +538,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeContractDeployFromSourceInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForProposeContractDeployFromSource(
             sender.address,
             options,
@@ -543,6 +557,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ProposeContractUpgradeFromSourceInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForProposeContractUpgradeFromSource(
             sender.address,
             options,
@@ -561,6 +576,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.GroupInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForSignBatch(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -576,6 +592,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.ActionInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForSignAndPerform(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -591,6 +608,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.UnsignForOutdatedBoardMembersInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForUnsignForOutdatedBoardMembers(
             sender.address,
             options,
@@ -609,6 +627,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.GroupInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForPerformBatch(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);
@@ -624,6 +643,7 @@ export class MultisigController extends BaseController {
         nonce: bigint,
         options: resources.DiscardBatchInput & BaseControllerInput,
     ): Promise<Transaction> {
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
         const transaction = await this.multisigFactory.createTransactionForDiscardBatch(sender.address, options);
 
         await this.setupAndSignTransaction(transaction, options, nonce, sender);

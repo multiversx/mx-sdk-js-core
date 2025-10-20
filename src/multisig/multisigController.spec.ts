@@ -1,6 +1,9 @@
 import { assert } from "chai";
+import { Account } from "../accounts";
 import { Address, CodeMetadata, SmartContractQueryResponse } from "../core";
-import { loadAbiRegistry, MockNetworkProvider } from "../testutils";
+import { GasLimitEstimator } from "../gasEstimator";
+import { ProxyNetworkProvider } from "../networkProviders";
+import { getTestWalletsPath, loadAbiRegistry, loadContractCode, MockNetworkProvider } from "../testutils";
 import { MultisigController } from "./multisigController";
 import * as resources from "./resources";
 
@@ -18,6 +21,48 @@ describe("test multisig controller query methods", () => {
             networkProvider: networkProvider,
             abi: await loadAbiRegistry("src/testdata/multisig-full.abi.json"),
         });
+    });
+
+    it("should create transaction for deploy multisig contract", async function () {
+        const alice = await Account.newFromPem(`${getTestWalletsPath()}/alice.pem`);
+
+        const boardMemberOne = Address.newFromBech32("erd1spyavw0956vq68xj8y4tenjpq2wd5a9p2c6j8gsz7ztyrnpxrruqzu66jx");
+        const boardMemberTwo = Address.newFromBech32("erd1k2s324ww2g0yj38qn2ch2jwctdy8mnfxep94q9arncc6xecg3xaq6mjse8");
+
+        const board = [boardMemberOne, boardMemberTwo];
+
+        const bytecode = await loadContractCode("src/testdata/multisig-full.wasm");
+        const abi = await loadAbiRegistry("src/testdata/multisig-full.abi.json");
+
+        const networkProvider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
+        const gasLimitEstimator = new GasLimitEstimator({ networkProvider: networkProvider });
+
+        const controller = new MultisigController({
+            chainID: "D",
+            networkProvider: networkProvider,
+            abi: abi,
+            gasLimitEstimator: gasLimitEstimator,
+        });
+
+        alice.nonce = (await networkProvider.getAccount(alice.address)).nonce;
+
+        const transaction = await controller.createTransactionForDeploy(alice, alice.getNonceThenIncrement(), {
+            bytecode: bytecode,
+            quorum: 2,
+            board,
+        });
+        const bytecodeHex = Buffer.from(bytecode).toString("hex");
+        assert.equal(transaction.sender.toBech32(), alice.address.toBech32());
+        assert.equal(transaction.receiver.toBech32(), "erd1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq6gq4hu");
+        assert.equal(transaction.value, 0n);
+        assert.equal(transaction.chainID, "D");
+        assert.isTrue(transaction.gasLimit > 0n);
+        assert.deepEqual(
+            Buffer.from(transaction.data),
+            Buffer.from(
+                `${bytecodeHex}@0500@0504@02@8049d639e5a6980d1cd2392abcce41029cda74a1563523a202f09641cc2618f8@b2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba`,
+            ),
+        );
     });
 
     it("getQuorum returns the quorum value", async function () {

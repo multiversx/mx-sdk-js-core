@@ -33,8 +33,10 @@ import {
     I8Value,
     List,
     ListType,
+    ManagedDecimalType,
     NumericalType,
     NumericalValue,
+    OptionType,
     StringType,
     StringValue,
     Struct,
@@ -477,6 +479,30 @@ describe("test binary codec (advanced)", () => {
         assert.deepEqual(decoded, blue);
         decoded = codec.decodeTopLevel(blueEncodedTopLevel, enumType);
         assert.deepEqual(decoded, blue);
+    });
+
+    it("should decode struct", async () => {
+        let codec = new BinaryCodec();
+        let fooType = new StructType("DepositEvent", [
+            new FieldDefinition("tx_nonce", "", new U64Type()),
+            new FieldDefinition("opt_function", "", new OptionType(new BytesType())),
+            new FieldDefinition("opt_arguments", "", new OptionType(new ListType(new BytesType()))),
+            new FieldDefinition("opt_gas_limit", "", new OptionType(new U64Type())),
+            new FieldDefinition("managed_decimal", "", new ManagedDecimalType("usize")),
+        ]);
+
+        const encoded = Buffer.from("00000000000003db0000000000000202bc00000002", "hex");
+
+        let [decoded] = codec.decodeNested(encoded, fooType);
+
+        let plainFoo = decoded.valueOf();
+        assert.deepEqual(plainFoo, {
+            tx_nonce: new BigNumber(987),
+            opt_function: null,
+            opt_arguments: null,
+            opt_gas_limit: null,
+            managed_decimal: new BigNumber(7),
+        });
     });
 });
 

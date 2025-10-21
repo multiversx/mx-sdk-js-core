@@ -1,8 +1,8 @@
 import BigNumber from "bignumber.js";
 import { BigUIntType, BigUIntValue, ManagedDecimalType, ManagedDecimalValue, U32Value } from "../typesystem";
 import { BinaryCodec } from "./binary";
-import { bufferToBigInt } from "./utils";
 import { SizeOfU32 } from "./constants";
+import { bufferToBigInt } from "./utils";
 
 export class ManagedDecimalCodec {
     private readonly binaryCodec: BinaryCodec;
@@ -12,8 +12,20 @@ export class ManagedDecimalCodec {
     }
 
     decodeNested(buffer: Buffer, type: ManagedDecimalType): [ManagedDecimalValue, number] {
-        const length = buffer.readUInt32BE(0);
-        const payload = buffer.slice(0, length);
+        let payload: Buffer;
+        let length: number;
+
+        if (type.isVariable()) {
+            // read BigUInt value length
+            const bigUintSizeBytes = buffer.slice(0, SizeOfU32);
+            const bigUintLength = bigUintSizeBytes.readUInt32BE(0);
+
+            length = SizeOfU32 + bigUintLength + SizeOfU32;
+            payload = buffer.slice(0, length);
+        } else {
+            length = buffer.readUInt32BE(0);
+            payload = buffer.slice(0, length);
+        }
 
         const result = this.decodeTopLevel(payload, type);
         return [result, length];
@@ -29,13 +41,15 @@ export class ManagedDecimalCodec {
 
             const [value] = this.binaryCodec.decodeNested(buffer.slice(0, bigUintSize), new BigUIntType());
             const scale = buffer.readUInt32BE(bigUintSize);
-            return new ManagedDecimalValue(value.valueOf().shiftedBy(-scale), scale);
+            return new ManagedDecimalValue(value.valueOf().shiftedBy(-scale), scale, true);
         }
 
         const value = bufferToBigInt(buffer);
         const metadata = type.getMetadata();
+
+        // if this code executes, metadata is guaranteed to be a number
         const scale = metadata !== "usize" ? parseInt(metadata.toString()) : 0;
-        return new ManagedDecimalValue(value.shiftedBy(-scale), scale);
+        return new ManagedDecimalValue(value.shiftedBy(-scale), scale, false);
     }
 
     encodeNested(value: ManagedDecimalValue): Buffer {

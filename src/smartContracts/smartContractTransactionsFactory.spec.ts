@@ -59,7 +59,7 @@ describe("test smart contract transactions factory", function () {
         assert.deepEqual(transaction.data, Buffer.from(`${bytecodeHex}@0500@0504@07`));
     });
 
-    it.only("should allow args of type bytes", async function () {
+    it("should allow args of type bytes", async function () {
         const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
         const gasLimit = 6000000n;
         let args = [Buffer.from([7]), new Uint8Array([7])];

@@ -11,7 +11,7 @@ import { Logger } from "../core/logger";
 import { TokenComputer, TokenTransfer } from "../core/tokens";
 import { TokenTransfersDataBuilder } from "../core/tokenTransfersDataBuilder";
 import { Transaction } from "../core/transaction";
-import { byteArrayToHex, utf8ToHex, zeroPadStringIfOddLength } from "../core/utils.codec";
+import { byteArrayToHex, utf8ToHex } from "../core/utils.codec";
 import * as resources from "./resources";
 
 interface IConfig {
@@ -227,7 +227,7 @@ export class SmartContractTransactionsFactory extends BaseFactory {
         }
 
         if (this.areArgsBuffers(args)) {
-            return args.map((arg) => zeroPadStringIfOddLength(Buffer.from(arg).toString("hex")));
+            return args.map((arg) => Buffer.from(arg).toString("hex"));
         }
 
         throw new Err("Can't convert args to TypedValues");

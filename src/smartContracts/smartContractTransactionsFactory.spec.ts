@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { Abi, U32Value } from "../abi";
+import { Abi, BigUIntValue, U32Value } from "../abi";
 import { Address, Err, Token, TokenTransfer, TransactionsFactoryConfig } from "../core";
 import { loadAbiRegistry, loadContractCode } from "../testutils/utils";
 import { SmartContractTransactionsFactory } from "./smartContractTransactionsFactory";
@@ -42,6 +42,45 @@ describe("test smart contract transactions factory", function () {
             assert.instanceOf(err, Err);
             assert.match((err as Error).message, /Can't convert args to TypedValues/);
         }
+    });
+
+    it("should allow args of type 'TypedValue'", async function () {
+        const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const gasLimit = 6000000n;
+        const args = [new BigUIntValue(7)];
+
+        const transaction = await factory.createTransactionForDeploy(sender, {
+            bytecode: bytecode.valueOf(),
+            gasLimit: gasLimit,
+            arguments: args,
+        });
+
+        const bytecodeHex = Buffer.from(bytecode).toString("hex");
+        assert.deepEqual(transaction.data, Buffer.from(`${bytecodeHex}@0500@0504@07`));
+    });
+
+    it("should allow args of type bytes", async function () {
+        const sender = Address.newFromBech32("erd1qyu5wthldzr8wx5c9ucg8kjagg0jfs53s8nr3zpz3hypefsdd8ssycr6th");
+        const gasLimit = 6000000n;
+        let args = [Buffer.from([7]), new Uint8Array([7])];
+        const bytecodeHex = Buffer.from(bytecode).toString("hex");
+
+        let transaction = await factory.createTransactionForDeploy(sender, {
+            bytecode: bytecode.valueOf(),
+            gasLimit: gasLimit,
+            arguments: args,
+        });
+
+        assert.deepEqual(transaction.data, Buffer.from(`${bytecodeHex}@0500@0504@07@07`));
+
+        args = [new Uint8Array([7]), Buffer.from("6161626261", "hex")];
+        transaction = await factory.createTransactionForDeploy(sender, {
+            bytecode: bytecode.valueOf(),
+            gasLimit: gasLimit,
+            arguments: args,
+        });
+
+        assert.deepEqual(transaction.data, Buffer.from(`${bytecodeHex}@0500@0504@07@6161626261`));
     });
 
     it("should create 'Transaction' for deploy", async function () {

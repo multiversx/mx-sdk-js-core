@@ -226,7 +226,21 @@ export class SmartContractTransactionsFactory extends BaseFactory {
             return new ArgSerializer().valuesToStrings(args);
         }
 
+        if (this.areArgsBuffers(args)) {
+            return args.map((arg) => Buffer.from(arg).toString("hex"));
+        }
+
         throw new Err("Can't convert args to TypedValues");
+    }
+
+    private areArgsBuffers(args: any[]): boolean {
+        for (const arg of args) {
+            if (!ArrayBuffer.isView(arg)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private areArgsOfTypedValue(args: any[]): boolean {

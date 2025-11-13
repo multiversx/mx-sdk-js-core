@@ -104,6 +104,7 @@ export class TypeMapper {
             ["utf-8 string", new StringType()],
             ["TokenIdentifier", new TokenIdentifierType()],
             ["EgldOrEsdtTokenIdentifier", new TokenIdentifierType()],
+            ["EsdtTokenIdentifier", new TokenIdentifierType()],
             ["CodeMetadata", new CodeMetadataType()],
             ["nothing", new NothingType()],
             ["AsyncCall", new NothingType()],

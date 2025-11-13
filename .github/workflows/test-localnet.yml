@@ -54,7 +54,22 @@ jobs:
           echo "Starting localnet..."
           nohup mxpy localnet start --configfile=${GITHUB_WORKSPACE}/localnet.toml > localnet.log 2>&1 & echo $! > localnet.pid
           echo "Localnet started, waiting for it to be fully operational..."
-          sleep 120 # Allow time for the testnet to fully start
+
+          # Allow time for the testnet to fully start
+          timeout=300
+          elapsed=0
+          while ! curl -s http://127.0.0.1:7950/network/config > /dev/null; do
+            if [ $elapsed -ge $timeout ]; then
+              echo "Timeout waiting for localnet to start"
+              cat ~/localnet/localnet.log
+              exit 1
+            fi
+            echo "Waiting for localnet... ($elapsed/$timeout seconds)"
+            sleep 10
+            elapsed=$((elapsed + 10))
+          done
+
+          echo "Localnet is ready!"
 
       # Step 6: Install Node.js and dependencies
       - name: Set up Node.js environment

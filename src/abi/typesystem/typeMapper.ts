@@ -9,7 +9,6 @@ import { EnumType, EnumVariantDefinition } from "./enum";
 import { ExplicitEnumType, ExplicitEnumVariantDefinition } from "./explicit-enum";
 import { FieldDefinition } from "./fields";
 import { ListType, OptionType } from "./generic";
-import { ArrayVecType } from "./genericArray";
 import { H256Type } from "./h256";
 import { ManagedDecimalType } from "./managedDecimal";
 import { ManagedDecimalSignedType } from "./managedDecimalSigned";
@@ -30,6 +29,7 @@ import { StringType } from "./string";
 import { StructType } from "./struct";
 import { TokenIdentifierType } from "./tokenIdentifier";
 import { TupleType } from "./tuple";
+import { parseArrayType } from "./typeExpressionParser";
 import { CustomType, Type } from "./types";
 import { VariadicType } from "./variadic";
 
@@ -66,19 +66,7 @@ export class TypeMapper {
             ["tuple6", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
             ["tuple7", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
             ["tuple8", (...typeParameters: Type[]) => new TupleType(...typeParameters)],
-            // Known-length arrays.
-            // TODO: Handle these in typeExpressionParser!
-            ["array2", (...typeParameters: Type[]) => new ArrayVecType(2, typeParameters[0])],
-            ["array6", (...typeParameters: Type[]) => new ArrayVecType(6, typeParameters[0])],
-            ["array8", (...typeParameters: Type[]) => new ArrayVecType(8, typeParameters[0])],
-            ["array16", (...typeParameters: Type[]) => new ArrayVecType(16, typeParameters[0])],
-            ["array20", (...typeParameters: Type[]) => new ArrayVecType(20, typeParameters[0])],
-            ["array32", (...typeParameters: Type[]) => new ArrayVecType(32, typeParameters[0])],
-            ["array46", (...typeParameters: Type[]) => new ArrayVecType(46, typeParameters[0])],
-            ["array48", (...typeParameters: Type[]) => new ArrayVecType(48, typeParameters[0])],
-            ["array64", (...typeParameters: Type[]) => new ArrayVecType(64, typeParameters[0])],
-            ["array128", (...typeParameters: Type[]) => new ArrayVecType(128, typeParameters[0])],
-            ["array256", (...typeParameters: Type[]) => new ArrayVecType(256, typeParameters[0])],
+            // Array types are now handled dynamically by parseArrayType() in mapGenericType()
             ["ManagedDecimal", (...metadata: any) => new ManagedDecimalType(metadata)],
             ["ManagedDecimalSigned", (...metadata: any) => new ManagedDecimalSignedType(metadata)],
         ]);
@@ -230,6 +218,13 @@ export class TypeMapper {
 
         let factory = this.openTypesFactories.get(type.getName());
         if (!factory) {
+            // Try dynamic array type parsing (e.g., array2, array16, array256, etc.)
+            if (mappedTypeParameters.length > 0) {
+                const arrayType = parseArrayType(type.getName(), mappedTypeParameters[0]);
+                if (arrayType) {
+                    return arrayType;
+                }
+            }
             throw new errors.ErrTypingSystem(`Cannot map the generic type "${type.getName()}" to a known type`);
         }
         if (type.hasMetadata()) {

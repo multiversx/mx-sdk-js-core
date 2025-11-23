@@ -73,6 +73,12 @@ describe("test mapper", () => {
         testArrayMapping("array256<BigUint>", 256, new BigUIntType());
     });
 
+    it("should map arrays with arbitrary sizes", () => {
+        testArrayMapping("array999<u32>", 999, new U32Type());
+        testArrayMapping("array1000<bytes>", 1000, new BytesType());
+        testArrayMapping("array5<Address>", 5, new AddressType());
+    });
+
     function testArrayMapping(expression: string, size: number, typeParameter: Type) {
         let type = parser.parse(expression);
         let mappedType = mapper.mapType(type);

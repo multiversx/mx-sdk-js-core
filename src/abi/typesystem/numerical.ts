@@ -181,6 +181,40 @@ export class NumericalValue extends PrimitiveValue {
     }
 
     /**
+     * Creates appropriate numerical TypedValue from native number based on the type.
+     * @param value - Native BigNumber or bigint value
+     * @param type - Target numerical type
+     * @returns Appropriate numerical TypedValue
+     * @throws ErrInvalidArgument if type is not supported
+     */
+    static fromNative(value: BigNumber.Value | bigint, type: NumericalType): NumericalValue {
+        switch (type.constructor) {
+            case U8Type:
+                return new U8Value(value);
+            case I8Type:
+                return new I8Value(value);
+            case U16Type:
+                return new U16Value(value);
+            case I16Type:
+                return new I16Value(value);
+            case U32Type:
+                return new U32Value(value);
+            case I32Type:
+                return new I32Value(value);
+            case U64Type:
+                return new U64Value(value);
+            case I64Type:
+                return new I64Value(value);
+            case BigUIntType:
+                return new BigUIntValue(value);
+            case BigIntType:
+                return new BigIntValue(value);
+            default:
+                throw new errors.ErrInvalidArgument(`Unsupported numerical type: ${type.getName()}`);
+        }
+    }
+
+    /**
      * Returns whether two objects have the same value.
      *
      * @param other another NumericalValue

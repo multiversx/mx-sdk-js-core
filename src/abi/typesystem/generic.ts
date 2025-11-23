@@ -1,3 +1,4 @@
+import * as errors from "../../core/errors";
 import { guardValueIsSet } from "../../core/utils";
 import { CollectionOfTypedValues } from "./collections";
 import { NullType, Type, TypedValue, TypePlaceholder } from "./types";
@@ -46,7 +47,11 @@ export class OptionValue extends TypedValue {
     constructor(type: OptionType, value: TypedValue | null = null) {
         super(type);
 
-        // TODO: assert value is of type type.getFirstTypeParameter()
+        if (value !== null && !value.getType().equals(type.getFirstTypeParameter())) {
+            throw new errors.ErrInvariantFailed(
+                `OptionValue: value type mismatch. Expected: ${type.getFirstTypeParameter().getName()}, got: ${value.getType().getName()}`,
+            );
+        }
 
         this.value = value;
     }
@@ -108,7 +113,14 @@ export class List extends TypedValue {
     constructor(type: ListType, items: TypedValue[]) {
         super(type);
 
-        // TODO: assert items are of type type.getFirstTypeParameter()
+        const expectedType = type.getFirstTypeParameter();
+        for (let i = 0; i < items.length; i++) {
+            if (!items[i].getType().equals(expectedType)) {
+                throw new errors.ErrInvariantFailed(
+                    `List: item[${i}] type mismatch. Expected: ${expectedType.getName()}, got: ${items[i].getType().getName()}`,
+                );
+            }
+        }
 
         this.backingCollection = new CollectionOfTypedValues(items);
     }

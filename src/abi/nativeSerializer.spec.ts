@@ -171,7 +171,7 @@ describe("test native serializer", () => {
         assert.deepEqual(typedValues[1].valueOf(), [Buffer.from("a"), Buffer.from("b"), Buffer.from("c")]);
     });
 
-    it("should handle optionals in a strict manner (but it does not)", async () => {
+    it("should handle optionals in a strict manner", async () => {
         const endpoint = Abi.create({
             endpoints: [
                 {
@@ -186,16 +186,16 @@ describe("test native serializer", () => {
             ],
         }).getEndpoint("foo");
 
+        // Creating OptionalValue with wrong type parameter should throw
+        assert.throws(() => new OptionalValue(new BooleanType() as any, new BooleanValue(true)), /Invariant failed/);
+
         let typedValues = NativeSerializer.nativeToTypedValues(
-            [new OptionalValue(new BooleanType(), new BooleanValue(true))],
+            [new OptionalValue(new OptionalType(new BooleanType()), new BooleanValue(true))],
             endpoint,
         );
 
-        // Isn't this a bug? Shouldn't it be be OptionalType(BooleanType()), instead?
-        assert.deepEqual(typedValues[0].getType(), new BooleanType());
-
-        // Isn't this a bug? Shouldn't it be OptionalValue(OptionalType(BooleanType()), BooleanValue(true)), instead?
-        assert.deepEqual(typedValues[0], new OptionalValue(new BooleanType(), new BooleanValue(true)));
+        assert.deepEqual(typedValues[0].getType(), new OptionalType(new BooleanType()));
+        assert.isTrue(typedValues[0].valueOf());
     });
 
     it("should accept a mix between typed values and regular JavaScript objects", async () => {

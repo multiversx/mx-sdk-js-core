@@ -8,6 +8,9 @@ describe("export governance proofs JSON file", function () {
     it.only("should work", async function () {
         this.timeout(7_200_000);
 
+        // Input files from:
+        // https://github.com/multiversx/multiversx-improvement-documents/blob/main/snapshots
+
         const markleTreeHatom = await createMerkleTree(
             "snapshots/erd1qqqqqqqqqqqqqpgq2khda0rx207gvlqg92dq5rh0z03a8dqf78ssu0qlcc/2.json",
             "e8fe84b2dcf17376a30cb99b4097a5493d94a81d39138874591762fb68506255",
@@ -17,6 +20,9 @@ describe("export governance proofs JSON file", function () {
             "snapshots/erd1qqqqqqqqqqqqqpgqdnpmeseu3j5t7grds9dfj8ttt70pev66ah0sydkq9x/2.json",
             "8d45b99f1b9ccb1eb5abb0c817fc160be792543dcbdbc53a6a2281b047e72ff2",
         );
+
+        // Output files for:
+        // https://github.com/multiversx/mx-bulk-ops-wizard/tree/main/governance_proofs
 
         exportLeaves(
             markleTreeHatom,

@@ -18,8 +18,14 @@ describe("export governance proofs JSON file", function () {
             "8d45b99f1b9ccb1eb5abb0c817fc160be792543dcbdbc53a6a2281b047e72ff2",
         );
 
-        exportLeaves(markleTreeHatom, "mainnet/erd1qqqqqqqqqqqqqpgq2khda0rx207gvlqg92dq5rh0z03a8dqf78ssu0qlcc/2.json");
-        exportLeaves(markleTreeXLend, "mainnet/erd1qqqqqqqqqqqqqpgqdnpmeseu3j5t7grds9dfj8ttt70pev66ah0sydkq9x/2.json");
+        exportLeaves(
+            markleTreeHatom,
+            "governance_proofs/mainnet/erd1qqqqqqqqqqqqqpgq2khda0rx207gvlqg92dq5rh0z03a8dqf78ssu0qlcc/2.json",
+        );
+        exportLeaves(
+            markleTreeXLend,
+            "governance_proofs/mainnet/erd1qqqqqqqqqqqqqpgqdnpmeseu3j5t7grds9dfj8ttt70pev66ah0sydkq9x/2.json",
+        );
     });
 });
 

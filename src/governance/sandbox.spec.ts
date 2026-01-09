@@ -1,41 +1,68 @@
 import * as fs from "fs";
-import { GovernanceTokenSnapshotMerkleService } from "./governance.token.snapshot.merkle.service";
+import { MerkleTreeUtils } from "./markle-tree.utils";
+
+import { promises } from "fs";
+import path from "path";
 
 describe("export governance proofs JSON file", function () {
-    it.only("should not deserialize", async function () {
+    it.only("should work", async function () {
         this.timeout(7_200_000);
 
-        const thisGovernanceMerkle = new GovernanceTokenSnapshotMerkleService();
+        const markleTreeHatom = await createMerkleTree(
+            "snapshots/erd1qqqqqqqqqqqqqpgq2khda0rx207gvlqg92dq5rh0z03a8dqf78ssu0qlcc/2.json",
+            "e8fe84b2dcf17376a30cb99b4097a5493d94a81d39138874591762fb68506255",
+        );
 
-        const rootHash = "785141c50d4a7bcd983467e181e73eec1d77a4149bdee503063fadb11149a9bf";
-        const governanceMerkle = await thisGovernanceMerkle.getMerkleTree(rootHash);
+        const markleTreeXLend = await createMerkleTree(
+            "snapshots/erd1qqqqqqqqqqqqqpgqdnpmeseu3j5t7grds9dfj8ttt70pev66ah0sydkq9x/2.json",
+            "8d45b99f1b9ccb1eb5abb0c817fc160be792543dcbdbc53a6a2281b047e72ff2",
+        );
 
-        const output: any[] = [];
-        const leaves = governanceMerkle.getLeaves();
-
-        let index = 0;
-
-        for (const element of leaves) {
-            index++;
-
-            if (index % 1_000 == 0) {
-                console.log(`${index} out of ${leaves.length} ...`);
-            }
-
-            const addressLeaf = governanceMerkle.getUserLeaf(element.address);
-            if (!addressLeaf) {
-                throw new Error(`Cannot get leaf for ${element.address}`);
-            }
-
-            const proofBuffer = governanceMerkle.getProofBuffer(addressLeaf);
-
-            output.push({
-                address: element.address,
-                balance: element.balance,
-                proof: proofBuffer.toString("hex"),
-            });
-        }
-
-        fs.writeFileSync("proofs.json", JSON.stringify(output, null, 4));
+        exportLeaves(markleTreeHatom, "mainnet/erd1qqqqqqqqqqqqqpgq2khda0rx207gvlqg92dq5rh0z03a8dqf78ssu0qlcc/2.json");
+        exportLeaves(markleTreeXLend, "mainnet/erd1qqqqqqqqqqqqqpgqdnpmeseu3j5t7grds9dfj8ttt70pev66ah0sydkq9x/2.json");
     });
 });
+
+// Functionality copied from "https://github.com/multiversx/mx-governance-service".
+async function createMerkleTree(snapshot: string, rootHash: string): Promise<MerkleTreeUtils> {
+    const jsonContent: string = await promises.readFile(snapshot, {
+        encoding: "utf8",
+    });
+
+    const leaves = JSON.parse(jsonContent);
+    const newMT = new MerkleTreeUtils(leaves);
+    if (newMT.getRootHash() !== `0x${rootHash}`) {
+        throw new Error("Computed root hash doesn't match the provided root hash.");
+    }
+
+    return newMT;
+}
+
+function exportLeaves(tree: MerkleTreeUtils, file: string) {
+    const output: any[] = [];
+    const leaves = tree.getLeaves();
+
+    for (const element of leaves) {
+        const addressLeaf = tree.getUserLeaf(element.address);
+        if (!addressLeaf) {
+            throw new Error(`Cannot get leaf for ${element.address}`);
+        }
+
+        const proofBuffer = tree.getProofBuffer(addressLeaf);
+
+        output.push({
+            address: element.address,
+            balance: element.balance,
+            proof: proofBuffer.toString("hex"),
+        });
+    }
+
+    const dirname = path.dirname(file);
+
+    if (!fs.existsSync(dirname)) {
+        fs.mkdirSync(dirname, { recursive: true });
+    }
+
+    fs.writeFileSync(file, JSON.stringify(output, null, 4));
+    console.log(`Saved file: ${file}.`);
+}

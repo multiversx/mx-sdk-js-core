@@ -25,6 +25,7 @@ describe("test mapper", () => {
         testMapping("BigUint", new BigUIntType());
         testMapping("TokenIdentifier", new TokenIdentifierType());
         testMapping("EsdtTokenIdentifier", new TokenIdentifierType());
+        testMapping("TokenId", new TokenIdentifierType());
     });
 
     it("should map generic types", () => {

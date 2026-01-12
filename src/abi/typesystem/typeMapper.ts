@@ -103,6 +103,7 @@ export class TypeMapper {
             ["H256", new H256Type()],
             ["utf-8 string", new StringType()],
             ["TokenIdentifier", new TokenIdentifierType()],
+            ["TokenId", new TokenIdentifierType()],
             ["EgldOrEsdtTokenIdentifier", new TokenIdentifierType()],
             ["EsdtTokenIdentifier", new TokenIdentifierType()],
             ["CodeMetadata", new CodeMetadataType()],

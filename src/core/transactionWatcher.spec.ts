@@ -84,7 +84,6 @@ describe("test transactionWatcher", () => {
                 new TransactionStatus("pending"),
                 new Wait(40),
                 new TransactionStatus("not-executable-in-block"),
-                new MarkCompleted(),
             ]),
             watcher.awaitCompleted(hash),
         ]);

@@ -62,4 +62,33 @@ describe("test transactionWatcher", () => {
 
         assert.isTrue((await provider.getTransactionStatus(hash)).isCompleted());
     });
+
+    it("should await status == not-executable-in-block using transaction", async () => {
+        let hash = "abbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabbaabba";
+        let provider = new MockNetworkProvider();
+        let watcher = new TransactionWatcher(provider, {
+            pollingIntervalMilliseconds: 42,
+            timeoutMilliseconds: 42 * 42,
+        });
+
+        provider.mockPutTransaction(
+            hash,
+            new TransactionOnNetwork({
+                status: new TransactionStatus("unknown"),
+            }),
+        );
+
+        await Promise.all([
+            provider.mockTransactionTimelineByHash(hash, [
+                new Wait(40),
+                new TransactionStatus("pending"),
+                new Wait(40),
+                new TransactionStatus("not-executable-in-block"),
+                new MarkCompleted(),
+            ]),
+            watcher.awaitCompleted(hash),
+        ]);
+
+        assert.isTrue((await provider.getTransactionStatus(hash)).isFailed());
+    });
 });

@@ -1,5 +1,10 @@
 import { AsyncTimer } from "./asyncTimer";
 import {
+    DEFAULT_ACCOUNT_AWAITING_PATIENCE_IN_MILLISECONDS,
+    DEFAULT_TRANSACTION_AWAITING_POLLING_TIMEOUT_IN_MILLISECONDS,
+    DEFAULT_TRANSACTION_AWAITING_TIMEOUT_IN_MILLISECONDS,
+} from "./constants";
+import {
     Err,
     ErrExpectedTransactionEventsNotFound,
     ErrExpectedTransactionStatusNotReached,
@@ -17,9 +22,9 @@ export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
  * TransactionWatcher allows one to continuously watch (monitor), by means of polling, the status of a given transaction.
  */
 export class TransactionWatcher {
-    private static DefaultPollingInterval: number = 6000;
-    private static DefaultTimeout: number = TransactionWatcher.DefaultPollingInterval * 15;
-    private static DefaultPatience: number = 0;
+    private static DefaultPollingInterval: number = DEFAULT_TRANSACTION_AWAITING_POLLING_TIMEOUT_IN_MILLISECONDS;
+    private static DefaultTimeout: number = DEFAULT_TRANSACTION_AWAITING_TIMEOUT_IN_MILLISECONDS;
+    private static DefaultPatience: number = DEFAULT_ACCOUNT_AWAITING_PATIENCE_IN_MILLISECONDS;
 
     static NoopOnStatusReceived = (_: TransactionStatus) => {};
 

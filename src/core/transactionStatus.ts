@@ -46,7 +46,13 @@ export class TransactionStatus {
      * Returns whether the transaction has been executed, but with a failure.
      */
     isFailed(): boolean {
-        return this.status == "fail" || this.status == "failed" || this.status == "unsuccessful" || this.isInvalid();
+        return (
+            this.status == "fail" ||
+            this.status == "failed" ||
+            this.status == "unsuccessful" ||
+            this.isInvalid() ||
+            this.status == "not-executable-in-block"
+        );
     }
 
     /**

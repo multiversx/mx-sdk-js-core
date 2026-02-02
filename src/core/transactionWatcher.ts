@@ -1,6 +1,6 @@
 import { AsyncTimer } from "./asyncTimer";
 import {
-    DEFAULT_ACCOUNT_AWAITING_PATIENCE_IN_MILLISECONDS,
+    DEFAULT_TRANSACTION_AWAITING_PATIENCE_IN_MILLISECONDS,
     DEFAULT_TRANSACTION_AWAITING_POLLING_TIMEOUT_IN_MILLISECONDS,
     DEFAULT_TRANSACTION_AWAITING_TIMEOUT_IN_MILLISECONDS,
 } from "./constants";
@@ -24,7 +24,7 @@ export type PredicateIsAwaitedStatus = (status: TransactionStatus) => boolean;
 export class TransactionWatcher {
     private static DefaultPollingInterval: number = DEFAULT_TRANSACTION_AWAITING_POLLING_TIMEOUT_IN_MILLISECONDS;
     private static DefaultTimeout: number = DEFAULT_TRANSACTION_AWAITING_TIMEOUT_IN_MILLISECONDS;
-    private static DefaultPatience: number = DEFAULT_ACCOUNT_AWAITING_PATIENCE_IN_MILLISECONDS;
+    private static DefaultPatience: number = DEFAULT_TRANSACTION_AWAITING_PATIENCE_IN_MILLISECONDS;
 
     static NoopOnStatusReceived = (_: TransactionStatus) => {};
 

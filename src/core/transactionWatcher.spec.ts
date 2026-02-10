@@ -85,9 +85,9 @@ describe("test transactionWatcher", () => {
                 new Wait(40),
                 new TransactionStatus("not-executable-in-block"),
             ]),
-            watcher.awaitCompleted(hash),
+            watcher.awaitOnCondition(hash, (tx) => tx.status.isNotExecutableInBlock()),
         ]);
 
-        assert.isTrue((await provider.getTransactionStatus(hash)).isFailed());
+        assert.isTrue((await provider.getTransactionStatus(hash)).isNotExecutableInBlock());
     });
 });

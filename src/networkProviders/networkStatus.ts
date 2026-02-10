@@ -10,6 +10,11 @@ export class NetworkStatus {
     public blockTimestamp: number;
 
     /**
+     * The block timestamp in milliseconds.
+     */
+    public blockTimestampMs: number;
+
+    /**
      * The block nonce.
      */
     public blockNonce: bigint;
@@ -35,6 +40,7 @@ export class NetworkStatus {
         this.highestFinalNonce = 0n;
         this.blockNonce = 0n;
         this.blockTimestamp = 0;
+        this.blockTimestampMs = 0;
     }
 
     /**
@@ -49,6 +55,7 @@ export class NetworkStatus {
         networkStatus.highestFinalNonce = BigInt(payload["erd_highest_final_nonce"]);
         networkStatus.blockNonce = BigInt(payload["erd_nonce"]);
         networkStatus.blockTimestamp = Number(payload["erd_block_timestamp"]);
+        networkStatus.blockTimestampMs = Number(payload["erd_block_timestamp_ms"]);
 
         return networkStatus;
     }

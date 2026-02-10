@@ -15,6 +15,36 @@ export class DelegationTransactionsOutcomeParser {
         return events.map((event) => ({ contractAddress: this.extractContractAddress(event) }));
     }
 
+    parseClaimRewards(transaction: TransactionOnNetwork): { amount: bigint }[] {
+        this.ensureNoError(transaction.logs.events);
+
+        const events = findEventsByIdentifier(transaction, "claimRewards");
+
+        return events.map((event) => ({ amount: this.extractAmount(event) }));
+    }
+
+    parseDelegate(transaction: TransactionOnNetwork): { amount: bigint }[] {
+        this.ensureNoError(transaction.logs.events);
+
+        const events = findEventsByIdentifier(transaction, "delegate");
+
+        return events.map((event) => ({ amount: this.extractAmount(event) }));
+    }
+
+    parseUndelegate(transaction: TransactionOnNetwork): { amount: bigint }[] {
+        this.ensureNoError(transaction.logs.events);
+
+        const events = findEventsByIdentifier(transaction, "unDelegate");
+
+        return events.map((event) => ({ amount: this.extractAmount(event) }));
+    }
+
+    parseRedelegateRewards(transaction: TransactionOnNetwork): { amount: bigint }[] {
+        this.ensureNoError(transaction.logs.events);
+
+        return this.parseDelegate(transaction);
+    }
+
     private ensureNoError(transactionEvents: TransactionEvent[]) {
         for (const event of transactionEvents) {
             if (event.identifier == "signalError") {
@@ -38,5 +68,14 @@ export class DelegationTransactionsOutcomeParser {
 
     private decodeTopicAsString(topic: Uint8Array): string {
         return Buffer.from(topic).toString();
+    }
+
+    private extractAmount(event: TransactionEvent): bigint {
+        if (!event.topics[0]?.length) {
+            return 0n;
+        }
+
+        const amount = Buffer.from(event.topics[0]);
+        return BigInt("0x" + amount.toString("hex"));
     }
 }

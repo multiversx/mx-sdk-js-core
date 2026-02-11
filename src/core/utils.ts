@@ -8,16 +8,25 @@ export function guardTrue(value: boolean, what: string) {
     }
 }
 
-// TODO: merge with guardValueIsSetWithMessage
-export function guardValueIsSet(name: string, value?: any | null | undefined) {
-    guardValueIsSetWithMessage(`${name} isn't set (null or undefined)`, value);
-}
-
-// TODO: merge with guardValueIsSet
-export function guardValueIsSetWithMessage(message: string, value?: any | null | undefined) {
+/**
+ * Guards that a value is set (not null or undefined).
+ * @param nameOrMessage - Either a variable name or a custom error message
+ * @param value - The value to check
+ */
+export function guardValueIsSet(nameOrMessage: string, value?: any | null | undefined) {
     if (value == null || value === undefined) {
+        const message = nameOrMessage.includes(" ") 
+            ? nameOrMessage 
+            : `${nameOrMessage} isn't set (null or undefined)`;
         throw new errors.ErrInvariantFailed(message);
     }
+}
+
+/**
+ * @deprecated Use guardValueIsSet instead. This function is kept for backward compatibility.
+ */
+export function guardValueIsSetWithMessage(message: string, value?: any | null | undefined) {
+    guardValueIsSet(message, value);
 }
 
 export function guardSameLength(a: any[], b: any[]) {

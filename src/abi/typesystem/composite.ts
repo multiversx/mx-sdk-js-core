@@ -1,3 +1,4 @@
+import * as errors from "../../core/errors";
 import { guardLength } from "../../core/utils";
 import { Type, TypeCardinality, TypedValue } from "./types";
 
@@ -22,7 +23,14 @@ export class CompositeValue extends TypedValue {
 
         guardLength(items, type.getTypeParameters().length);
 
-        // TODO: assert type of each item (wrt. type.getTypeParameters()).
+        const typeParameters = type.getTypeParameters();
+        for (let i = 0; i < items.length; i++) {
+            if (!items[i].getType().equals(typeParameters[i])) {
+                throw new errors.ErrInvariantFailed(
+                    `CompositeValue: item[${i}] type mismatch. Expected: ${typeParameters[i].getName()}, got: ${items[i].getType().getName()}`,
+                );
+            }
+        }
 
         this.items = items;
     }

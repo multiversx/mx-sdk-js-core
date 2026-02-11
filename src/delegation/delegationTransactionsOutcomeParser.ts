@@ -40,8 +40,6 @@ export class DelegationTransactionsOutcomeParser {
     }
 
     parseRedelegateRewards(transaction: TransactionOnNetwork): { amount: bigint }[] {
-        this.ensureNoError(transaction.logs.events);
-
         return this.parseDelegate(transaction);
     }
 

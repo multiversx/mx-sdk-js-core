@@ -3,6 +3,10 @@
         "module": "CommonJS",
         "target": "ES2020",
         "outDir": "out-tests",
+        "types": [
+            "node",
+            "mocha"
+        ],
         "lib": [
             "ES2020",
             "DOM"
@@ -20,7 +24,7 @@
         "declaration": true
     },
     "include": [
-        "src/**/*",
+        "src/**/*"
     ],
     "exclude": [
         "node_modules",

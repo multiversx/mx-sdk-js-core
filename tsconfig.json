@@ -2,10 +2,13 @@
     "compilerOptions": {
         "module": "CommonJS",
         "target": "ES2020",
-        "outDir": "out",
         "lib": [
             "ES2020",
             "DOM"
+        ],
+        "types": [
+            "node",
+            "mocha"
         ],
         "sourceMap": true,
         "allowJs": true,
@@ -17,13 +20,9 @@
         "noFallthroughCasesInSwitch": true,
         "noUnusedParameters": true,
         "esModuleInterop": true,
-        "declaration": true
+        "declaration": true,
+        "noEmit": true
     },
-    "references": [
-        {
-            "path": "./tsconfig.tests.json"
-        }
-    ],
     "include": [
         "src/**/*"
     ],
@@ -33,8 +32,6 @@
         "out-tests",
         "out-browser",
         "out-browser-tests",
-        "**/*.spec.ts",
-        "src/testutils",
         "cookbook"
     ]
 }

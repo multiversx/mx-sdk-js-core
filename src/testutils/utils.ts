@@ -68,7 +68,7 @@ export const stringifyBigIntJSON = (jsonString: any): any => {
     const JSONBig = require("json-bigint")({ constructorAction: "ignore" });
     try {
         return JSONBig.stringify(jsonString);
-    } catch (error) {
+    } catch (error: any) {
         throw new Error(`Failed to parse JSON: ${error.message}`);
     }
 };

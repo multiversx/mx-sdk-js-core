@@ -1,7 +1,10 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-        "outDir": "out-tests",
+        "outDir": "out",
+        "types": [
+            "node"
+        ],
         "noEmit": false
     },
     "exclude": [
@@ -10,6 +13,8 @@
         "out-tests",
         "out-browser",
         "out-browser-tests",
+        "**/*.spec.ts",
+        "src/testutils",
         "cookbook"
     ]
 }

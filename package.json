@@ -1,6 +1,6 @@
 {
   "name": "@multiversx/sdk-core",
-  "version": "15.4.0",
+  "version": "15.4.1",
   "description": "MultiversX SDK for JavaScript and TypeScript",
   "author": "MultiversX",
   "homepage": "https://multiversx.com",
@@ -27,8 +27,8 @@
     "tests-testnet": "mocha $(find . -name '*.test.net.spec.ts')",
     "tests-devnet": "mocha $(find . -name '*.dev.net.spec.ts')",
     "tests-mainnet": "mocha $(find . -name '*.main.net.spec.ts')",
-    "compile-browser": "tsc -p tsconfig.json && browserify out/index.js -o out-browser/sdk-core.js --standalone multiversxSdkCore -p esmify",
-    "compile": "tsc -p tsconfig.json",
+    "compile-browser": "tsc -p tsconfig.build.json && browserify out/index.js -o out-browser/sdk-core.js --standalone multiversxSdkCore -p esmify",
+    "compile": "tsc -p tsconfig.build.json",
     "compile-proto": "npx pbjs -t static-module -w default -o src/proto/compiled.js src/proto/transaction.proto",
     "browser-tests": "make clean && make browser-tests && http-server --port=9876 -o browser-tests/index.html",
     "lint": "eslint .",
@@ -66,19 +66,19 @@
     "chai": "4.2.0",
     "eslint": "8.28.0",
     "eslint-config-prettier": "9.1.0",
-    "mocha": "11.5.0",
+    "mocha": "11.7.5",
     "prettier": "3.2.4",
-    "protobufjs-cli": "1.1.2",
+    "protobufjs-cli": "1.2.1",
     "ts-node": "9.1.1",
     "typescript": "4.1.2"
   },
   "peerDependencies": {
     "bignumber.js": "^9.0.1",
-    "protobufjs": "^7.2.6"
+    "protobufjs": "^7.5.6"
   },
   "optionalDependencies": {
     "@multiversx/sdk-bls-wasm": "0.3.5",
-    "axios": "^1.10.0",
+    "axios": "^1.15.2",
     "bip39": "3.1.0"
   }
 }

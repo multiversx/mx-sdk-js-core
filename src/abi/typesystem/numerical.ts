@@ -159,6 +159,11 @@ export class NumericalValue extends PrimitiveValue {
     constructor(type: NumericalType, value: BigNumber.Value | bigint) {
         super(type);
 
+        const originalValue = value;
+        if (typeof value === "number" && Number.isInteger(value) && !Number.isSafeInteger(value)) {
+            throw new errors.ErrInvalidArgument(`unsafe JavaScript integer: ${value}; use bigint or a decimal string`);
+        }
+
         if (typeof value === "bigint") {
             value = value.toString();
         }
@@ -171,8 +176,33 @@ export class NumericalValue extends PrimitiveValue {
             throw new errors.ErrInvalidArgument(`not a number: ${value}`);
         }
 
+        if (!this.value.isFinite()) {
+            throw new errors.ErrInvalidArgument(`not a finite number: ${value}`);
+        }
+
+        if (!this.value.isInteger()) {
+            throw new errors.ErrInvalidArgument(`not an integer: ${value}`);
+        }
+
         if (!this.withSign && this.value.isNegative()) {
             throw new errors.ErrInvalidArgument(`negative, but type is unsigned: ${value}`);
+        }
+
+        if (type.hasFixedSize()) {
+            this.checkFixedSizeRange(type, originalValue);
+        }
+    }
+
+    private checkFixedSizeRange(type: NumericalType, originalValue: BigNumber.Value | bigint): void {
+        const numberOfBits = type.sizeInBytes * 8;
+        const limit = new BigNumber(2).pow(type.withSign ? numberOfBits - 1 : numberOfBits);
+        const minimum = type.withSign ? limit.negated() : new BigNumber(0);
+        const maximum = limit.minus(1);
+
+        if (this.value.isLessThan(minimum) || this.value.isGreaterThan(maximum)) {
+            throw new errors.ErrInvalidArgument(
+                `value out of range for ${type}: ${originalValue}; expected ${minimum.toFixed()} through ${maximum.toFixed()}`,
+            );
         }
     }
 

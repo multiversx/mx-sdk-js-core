@@ -460,7 +460,7 @@ export class TokenManagementController extends BaseController {
         return this.parser.parseWipe(transactionOnNetwork);
     }
 
-    async createTransactionForLocaMinting(
+    async createTransactionForLocalMinting(
         sender: IAccount,
         nonce: bigint,
         options: resources.LocalMintInput & BaseControllerInput,

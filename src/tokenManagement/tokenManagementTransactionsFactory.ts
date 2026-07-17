@@ -327,7 +327,7 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
         options.removeRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
-        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
+        options.removeRoleLocalBurn ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
         options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
 
         const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
@@ -517,7 +517,7 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
 
         const transaction = new Transaction({
             sender: sender,
-            receiver: sender,
+            receiver: this.esdtContractAddress,
             chainID: this.config.chainID,
             gasLimit: 0n,
         });
@@ -536,7 +536,7 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
 
         const transaction = new Transaction({
             sender: sender,
-            receiver: sender,
+            receiver: this.esdtContractAddress,
             chainID: this.config.chainID,
             gasLimit: 0n,
         });
@@ -558,7 +558,7 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
 
         const transaction = new Transaction({
             sender: sender,
-            receiver: sender,
+            receiver: this.esdtContractAddress,
             chainID: this.config.chainID,
             gasLimit: 0n,
         });
@@ -580,7 +580,7 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
 
         const transaction = new Transaction({
             sender: sender,
-            receiver: sender,
+            receiver: this.esdtContractAddress,
             chainID: this.config.chainID,
             gasLimit: 0n,
         });
@@ -602,7 +602,7 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
 
         const transaction = new Transaction({
             sender: sender,
-            receiver: sender,
+            receiver: this.esdtContractAddress,
             chainID: this.config.chainID,
             gasLimit: 0n,
         });

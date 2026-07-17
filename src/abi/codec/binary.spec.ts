@@ -145,8 +145,8 @@ describe("test binary codec (basic)", () => {
         assert.deepEqual(new BigUIntValue("0xabcdefabcdefabcdef"), new BigUIntValue(BigInt("0xabcdefabcdefabcdef")));
         assert.deepEqual(new U64Value("0xabcdef"), new U64Value(BigInt(0xabcdef)));
         assert.deepEqual(new U32Value("0xabcdef"), new U32Value(BigInt(0xabcdef)));
-        assert.deepEqual(new U16Value("0xabcdef"), new U16Value(BigInt(0xabcdef)));
-        assert.deepEqual(new U8Value("0xabcdef"), new U8Value(BigInt(0xabcdef)));
+        assert.deepEqual(new U16Value("0xabcd"), new U16Value(BigInt(0xabcd)));
+        assert.deepEqual(new U8Value("0xab"), new U8Value(BigInt(0xab)));
 
         assert.deepEqual(
             new BigIntValue(BigInt("0xabcdefabcdefabcdef")),
@@ -154,8 +154,19 @@ describe("test binary codec (basic)", () => {
         );
         assert.deepEqual(new I64Value("0xabcdef"), new I64Value(BigInt(0xabcdef)));
         assert.deepEqual(new I32Value("0xabcdef"), new I32Value(BigInt(0xabcdef)));
-        assert.deepEqual(new I16Value("0xabcdef"), new I16Value(BigInt(0xabcdef)));
-        assert.deepEqual(new I8Value("0xabcdef"), new I8Value(BigInt(0xabcdef)));
+        assert.deepEqual(new I16Value("0x7abc"), new I16Value(BigInt(0x7abc)));
+        assert.deepEqual(new I8Value("0x7f"), new I8Value(BigInt(0x7f)));
+    });
+
+    it("should reject out-of-range fixed-size values when decoding", () => {
+        assert.throws(
+            () => codec.decodeTopLevel<NumericalValue>(Buffer.from([0x01, 0x00]), new U8Type()),
+            errors.ErrInvalidArgument,
+        );
+        assert.throws(
+            () => codec.decodeTopLevel<NumericalValue>(Buffer.from([0x00, 0x80]), new I8Type()),
+            errors.ErrInvalidArgument,
+        );
     });
 
     it("should create bytes and strings, encode and decode", async () => {

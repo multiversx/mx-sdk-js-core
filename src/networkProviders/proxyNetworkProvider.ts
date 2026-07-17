@@ -59,7 +59,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
         let response;
         if (args.blockHash) {
             response = await this.doGetGeneric(`block/${args.shard}/by-hash/${args.blockHash}`);
-        } else if (args.blockNonce) {
+        } else if (args.blockNonce !== undefined) {
             response = await this.doGetGeneric(`block/${args.shard}/by-nonce/${args.blockNonce}`);
         } else throw new Error("Block hash or block nonce not provided.");
         return BlockOnNetwork.fromHttpResponse(response.block);
@@ -68,7 +68,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
     async getLatestBlock(shard: number = METACHAIN_ID): Promise<BlockOnNetwork> {
         const blockNonce = (await this.getNetworkStatus(shard)).blockNonce;
         const response = await this.doGetGeneric(`block/${shard}/by-nonce/${blockNonce}`);
-        return BlockOnNetwork.fromHttpResponse(response);
+        return BlockOnNetwork.fromHttpResponse(response.block);
     }
 
     async getAccount(address: Address): Promise<AccountOnNetwork> {
@@ -126,7 +126,7 @@ export class ProxyNetworkProvider implements INetworkProvider {
             url = "transaction/simulate";
         }
         const response = await this.doPostGeneric(url, transaction);
-        return TransactionOnNetwork.fromSimulateResponse(transaction, response["result"] ?? {});
+        return TransactionOnNetwork.fromSimulateResponse(tx, response["result"] ?? {});
     }
 
     async estimateTransactionCost(tx: Transaction): Promise<TransactionCostResponse> {

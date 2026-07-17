@@ -11,5 +11,5 @@ export type RestakingInput = { publicKeys: ValidatorPublicKey[] };
 export type UnbondingInput = { publicKeys: ValidatorPublicKey[] };
 export type UnbondingTokensInput = { amount: bigint };
 export type UnjailingInput = { publicKeys: ValidatorPublicKey[]; amount: bigint };
-export type NewDelegationContractInput = { maxCap: bigint; fee: bigint };
+export type NewDelegationContractFromValidatorDataInput = { maxCap: bigint; fee: bigint };
 export type MergeValidatorToDelegationInput = { delegationAddress: Address };

@@ -183,7 +183,7 @@ export class ValidatorsController extends BaseController {
     async createTransactionForNewDelegationContractFromValidatorData(
         sender: IAccount,
         nonce: bigint,
-        options: resources.NewDelegationContractInput & BaseControllerInput,
+        options: resources.NewDelegationContractFromValidatorDataInput & BaseControllerInput,
     ): Promise<Transaction> {
         const transaction = await this.factory.createTransactionForNewDelegationContractFromValidatorData(
             sender.address,

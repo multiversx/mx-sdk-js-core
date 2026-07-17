@@ -114,6 +114,9 @@ describe("ProxyNetworkProvider Tests", function () {
         const address = Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl");
         const tokens = await proxy.getNonFungibleTokensOfAccount(address);
         assert.isTrue(tokens.length > 0);
+        tokens.forEach((token) => {
+            assert.isTrue(token.raw.type !== "FungibleESDT");
+        });
 
         const filtered = tokens.filter((token) => token.token.identifier === "NFTEST-ec88b8-01");
         assert.equal(filtered.length, 1);

@@ -54,7 +54,7 @@ export class AccountOnNetwork {
         result.address = payload["address"] ? Address.newFromBech32(payload["address"]) : Address.empty();
         result.nonce = BigInt(payload["nonce"] || 0);
         result.balance = BigInt(payload["balance"] || 0);
-        result.userName = payload["username"] || undefined;
+        result.userName = payload["username"] || "";
 
         const codeMetadata = payload["codeMetadata"] ?? null;
         result.isContractUpgradable = false;

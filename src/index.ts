@@ -18,4 +18,5 @@ export * from "./smartContracts";
 export * from "./tokenManagement";
 export * from "./transactionsOutcomeParsers";
 export * from "./transfers";
+export * from "./validators";
 export * from "./wallet";

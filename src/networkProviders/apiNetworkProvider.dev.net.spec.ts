@@ -47,14 +47,14 @@ describe("ApiNetworkProvider Tests", function () {
         const result1 = await apiProvider.getAccount(address1);
 
         assert.equal(result1.address.toBech32(), "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl");
-        assert.isUndefined(result1.userName);
+        assert.equal(result1.userName, "");
         assert.isUndefined(result1.contractOwnerAddress);
 
         const address2 = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen");
         const result2 = await apiProvider.getAccount(address2);
 
         assert.equal(result2.address.toBech32(), "erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen");
-        assert.isUndefined(result2.userName);
+        assert.equal(result2.userName, "");
         assert.equal(
             result2.contractOwnerAddress?.toBech32(),
             "erd1wzx0tak22f2me4g7wpxfae2w3htfue7khrg28fy6wu8x9hzq05vqm8qhnm",
@@ -299,7 +299,7 @@ describe("ApiNetworkProvider Tests", function () {
         transaction = new Transaction({
             sender: bob.address,
             receiver: Address.newFromBech32("erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen"),
-            gasLimit: 10000000n,
+            gasLimit: 1500000n,
             chainID: "D",
             gasPrice: 1000000000n,
             version: 2,

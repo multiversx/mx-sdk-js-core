@@ -37,6 +37,20 @@ import {
 } from "./typesystem";
 
 describe("test native serializer", () => {
+    it("should reject invalid fixed-size numerical arguments", () => {
+        const endpoint = new EndpointDefinition(
+            "foo",
+            [new EndpointParameterDefinition("value", "", new U8Type())],
+            [],
+            new EndpointModifiers("", []),
+        );
+
+        assert.deepEqual(NativeSerializer.nativeToTypedValues([255], endpoint), [new U8Value(255)]);
+        assert.throws(() => NativeSerializer.nativeToTypedValues([-1], endpoint), ErrInvalidArgument);
+        assert.throws(() => NativeSerializer.nativeToTypedValues([256], endpoint), ErrInvalidArgument);
+        assert.throws(() => NativeSerializer.nativeToTypedValues([1.5], endpoint), ErrInvalidArgument);
+    });
+
     it("should perform type inference", async () => {
         const endpointModifiers = new EndpointModifiers("", []);
         const inputParameters = [

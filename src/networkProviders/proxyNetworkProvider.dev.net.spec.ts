@@ -52,14 +52,14 @@ describe("ProxyNetworkProvider Tests", function () {
         const result1 = await proxy.getAccount(address1);
 
         assert.equal(result1.address.toBech32(), "erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl");
-        assert.isUndefined(result1.userName);
+        assert.equal(result1.userName, "");
         assert.isUndefined(result1.contractOwnerAddress);
 
         const address2 = Address.newFromBech32("erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen");
         const result2 = await proxy.getAccount(address2);
 
         assert.equal(result2.address.toBech32(), "erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen");
-        assert.isUndefined(result2.userName);
+        assert.equal(result2.userName, "");
         assert.equal(
             result2.contractOwnerAddress?.toBech32(),
             "erd1wzx0tak22f2me4g7wpxfae2w3htfue7khrg28fy6wu8x9hzq05vqm8qhnm",
@@ -114,6 +114,9 @@ describe("ProxyNetworkProvider Tests", function () {
         const address = Address.newFromBech32("erd1487vz5m4zpxjyqw4flwa3xhnkzg4yrr3mkzf5sf0zgt94hjprc8qazcccl");
         const tokens = await proxy.getNonFungibleTokensOfAccount(address);
         assert.isTrue(tokens.length > 0);
+        tokens.forEach((token) => {
+            assert.isTrue(token.raw.type !== "FungibleESDT");
+        });
 
         const filtered = tokens.filter((token) => token.token.identifier === "NFTEST-ec88b8-01");
         assert.equal(filtered.length, 1);
@@ -299,7 +302,7 @@ describe("ProxyNetworkProvider Tests", function () {
         transaction = new Transaction({
             sender: bob.address,
             receiver: Address.newFromBech32("erd1qqqqqqqqqqqqqpgq076flgeualrdu5jyyj60snvrh7zu4qrg05vqez5jen"),
-            gasLimit: 10000000n,
+            gasLimit: 1500000n,
             chainID: "D",
             gasPrice: 1000000000n,
             version: 2,
@@ -358,7 +361,11 @@ describe("ProxyNetworkProvider Tests", function () {
         transaction.nonce = nonce;
         transaction.signature = await bob.signTransaction(transaction);
         let hash = await proxy.sendTransaction(transaction);
-        let transactionOnNetwork = await proxy.awaitTransactionCompleted(hash);
+        let transactionOnNetwork = await proxy.awaitTransactionCompleted(hash, {
+            pollingIntervalInMilliseconds: 6000,
+            timeoutInMilliseconds: 50000,
+            patienceInMilliseconds: 0,
+        });
         assert.isTrue(transactionOnNetwork.status.isCompleted());
 
         transaction = new Transaction({

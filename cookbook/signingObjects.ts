@@ -78,7 +78,7 @@ import { Account, Address, Message, MessageComputer, Transaction, TransactionCom
         const hash = transactionComputer.computeHashForSigning(transaction);
 
         // sign and apply the signature on the transaction // md-as-comment
-        transaction.signature = await alice.signTransaction(transaction);
+        transaction.signature = await alice.sign(hash);
 
         console.log(transaction.toPlainObject());
     }

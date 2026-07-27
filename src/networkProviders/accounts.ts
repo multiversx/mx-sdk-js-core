@@ -1,4 +1,3 @@
-import { BytesValue } from "../abi";
 import { Address, CodeMetadata } from "../core";
 import { BlockCoordinates } from "./blocks";
 
@@ -33,11 +32,11 @@ export class AccountOnNetwork {
         result.address = payload["address"] ? Address.newFromBech32(payload["address"]) : Address.empty();
         result.nonce = BigInt(payload["nonce"] || 0);
         result.balance = BigInt(payload["balance"] || 0);
-        result.userName = payload["username"] || undefined;
+        result.userName = payload["username"] || "";
 
         result.contractCodeHash = payload["codeHash"] || "";
         result.contractCode = Buffer.from(payload["code"] || "");
-        result.contractDeveloperReward = payload["developerReward"] || 0n;
+        result.contractDeveloperReward = BigInt(payload["developerReward"] || 0);
         result.contractOwnerAddress = payload["ownerAddress"]
             ? Address.newFromBech32(payload["ownerAddress"])
             : undefined;
@@ -55,7 +54,7 @@ export class AccountOnNetwork {
         result.address = payload["address"] ? Address.newFromBech32(payload["address"]) : Address.empty();
         result.nonce = BigInt(payload["nonce"] || 0);
         result.balance = BigInt(payload["balance"] || 0);
-        result.userName = payload["username"] || undefined;
+        result.userName = payload["username"] || "";
 
         const codeMetadata = payload["codeMetadata"] ?? null;
         result.isContractUpgradable = false;
@@ -72,7 +71,7 @@ export class AccountOnNetwork {
         }
         result.contractCodeHash = payload["codeHash"] || "";
         result.contractCode = Buffer.from(payload["code"] || "");
-        result.contractDeveloperReward = payload["developerReward"] || 0n;
+        result.contractDeveloperReward = BigInt(payload["developerReward"] || 0);
         result.contractOwnerAddress = payload["ownerAddress"]
             ? Address.newFromBech32(payload["ownerAddress"])
             : undefined;
@@ -146,7 +145,7 @@ export class AccountStorageEntry {
 
         result.raw = payload;
         result.key = key;
-        result.value = BytesValue.fromHex(value).toString();
+        result.value = value;
 
         return result;
     }

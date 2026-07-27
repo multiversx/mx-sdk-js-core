@@ -1,3 +1,4 @@
+import * as errors from "../../core/errors";
 import { PrimitiveType, PrimitiveValue } from "./types";
 
 export class StringType extends PrimitiveType {
@@ -38,6 +39,27 @@ export class StringValue extends PrimitiveValue {
     static fromHex(value: string): StringValue {
         let decodedValue = Buffer.from(value, "hex").toString();
         return new StringValue(decodedValue);
+    }
+
+    /**
+     * Creates a StringValue from native JavaScript types.
+     * @param native - Native value (Buffer or string)
+     * @returns StringValue instance
+     * @throws ErrInvalidArgument if conversion fails
+     */
+    static fromNative(native: Buffer | string): StringValue {
+        if (native === undefined) {
+            throw new errors.ErrInvalidArgument("Cannot convert undefined to StringValue");
+        }
+
+        if (native instanceof Buffer) {
+            return new StringValue(native.toString());
+        }
+        if (typeof native === "string") {
+            return new StringValue(native);
+        }
+
+        throw new errors.ErrInvalidArgument(`Cannot convert value to StringValue: ${native}`);
     }
 
     getLength(): number {

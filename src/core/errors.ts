@@ -237,6 +237,15 @@ export class ErrTypingSystem extends Err {
 }
 
 /**
+ * Signals an invalid tuple construction.
+ */
+export class ErrInvalidTuple extends Err {
+    public constructor(message: string) {
+        super(`Invalid tuple: ${message}`);
+    }
+}
+
+/**
  * Signals a missing field on a struct.
  */
 export class ErrMissingFieldOnStruct extends Err {

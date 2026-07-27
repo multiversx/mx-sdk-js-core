@@ -48,8 +48,9 @@ export class Tuple extends Struct {
 
     static fromItems(items: TypedValue[]): Tuple {
         if (items.length < 1) {
-            // TODO: Define a better error.
-            throw new errors.ErrTypingSystem("bad tuple items");
+            throw new errors.ErrInvalidTuple(
+                "Cannot create tuple from empty items array. At least one item is required.",
+            );
         }
 
         let fieldsTypes = items.map((item) => item.getType());

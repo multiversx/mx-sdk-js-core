@@ -1,23 +1,20 @@
 import * as errors from "../../core/errors";
 import { guardValueIsSet } from "../../core/utils";
-import { NullType, Type, TypeCardinality, TypedValue } from "./types";
+import { NullType, Type, TypedValue } from "./types";
 
-/**
- * An optional is an algebraic type. It holds zero or one values.
- */
-export class OptionalType extends Type {
-    static ClassName = "OptionalType";
+export class OptionType extends Type {
+    static ClassName = "OptionType";
 
     constructor(typeParameter: Type) {
-        super("Optional", [typeParameter], TypeCardinality.variable(1));
+        super("Option", [typeParameter]);
     }
 
     getClassName(): string {
-        return OptionalType.ClassName;
+        return OptionType.ClassName;
     }
 
     isAssignableFrom(type: Type): boolean {
-        if (!type.hasExactClass(OptionalType.ClassName)) {
+        if (!type.hasExactClass(OptionType.ClassName)) {
             return false;
         }
 
@@ -27,16 +24,16 @@ export class OptionalType extends Type {
     }
 }
 
-export class OptionalValue extends TypedValue {
-    static ClassName = "OptionalValue";
+export class OptionValue extends TypedValue {
+    static ClassName = "OptionValue";
     private readonly value: TypedValue | null;
 
-    constructor(type: OptionalType, value: TypedValue | null = null) {
+    constructor(type: OptionType, value: TypedValue | null = null) {
         super(type);
 
         if (value !== null && !value.getType().equals(type.getFirstTypeParameter())) {
             throw new errors.ErrInvariantFailed(
-                `OptionalValue: value type mismatch. Expected: ${type.getFirstTypeParameter().getName()}, got: ${value.getType().getName()}`,
+                `OptionValue: value type mismatch. Expected: ${type.getFirstTypeParameter().getName()}, got: ${value.getType().getName()}`,
             );
         }
 
@@ -44,15 +41,27 @@ export class OptionalValue extends TypedValue {
     }
 
     getClassName(): string {
-        return OptionalValue.ClassName;
+        return OptionValue.ClassName;
     }
 
     /**
-     * Creates an OptionalValue, as not provided (missing).
+     * Creates an OptionValue, as a missing option argument.
      */
-    static newMissing(): OptionalValue {
-        let type = new OptionalType(new NullType());
-        return new OptionalValue(type);
+    static newMissing(): OptionValue {
+        let type = new OptionType(new NullType());
+        return new OptionValue(type);
+    }
+
+    static newMissingTyped(type: Type): OptionValue {
+        return new OptionValue(new OptionType(type));
+    }
+
+    /**
+     * Creates an OptionValue, as a provided option argument.
+     */
+    static newProvided(typedValue: TypedValue): OptionValue {
+        let type = new OptionType(typedValue.getType());
+        return new OptionValue(type, typedValue);
     }
 
     isSet(): boolean {
@@ -68,7 +77,7 @@ export class OptionalValue extends TypedValue {
         return this.value ? this.value.valueOf() : null;
     }
 
-    equals(other: OptionalValue): boolean {
+    equals(other: OptionValue): boolean {
         return this.value?.equals(other.value) || false;
     }
 }

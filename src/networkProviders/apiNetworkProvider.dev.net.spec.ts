@@ -11,7 +11,7 @@ describe("ApiNetworkProvider Tests", function () {
         const result = await apiProvider.getNetworkConfig();
         assert.equal(result.chainID, "D");
         assert.equal(result.gasPerDataByte, 1500n);
-        assert.equal(result.roundDuration, 6000);
+        assert.equal(result.roundDuration, 600);
         assert.equal(result.minGasLimit, 50000n);
         assert.equal(result.minGasPrice, 1_000_000_000n);
         assert.exists(result.raw);

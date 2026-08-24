@@ -1,5 +1,5 @@
 import * as errors from "../../core/errors";
-import { OptionValue, Type } from "../typesystem";
+import { OptionType, OptionValue, Type } from "../typesystem";
 import { BinaryCodec } from "./binary";
 
 /**
@@ -26,8 +26,10 @@ export class OptionValueBinaryCodec {
     }
 
     decodeTopLevel(buffer: Buffer, type: Type): OptionValue {
+        const optionType = new OptionType(type);
+
         if (buffer.length == 0) {
-            return new OptionValue(type);
+            return new OptionValue(optionType);
         }
 
         if (buffer[0] != 0x01) {
@@ -35,7 +37,7 @@ export class OptionValueBinaryCodec {
         }
 
         let [decoded, _decodedLength] = this.binaryCodec.decodeNested(buffer.slice(1), type);
-        return new OptionValue(type, decoded);
+        return new OptionValue(optionType, decoded);
     }
 
     encodeNested(optionValue: OptionValue): Buffer {

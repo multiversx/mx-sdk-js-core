@@ -1,3 +1,5 @@
+import * as errors from "../../core/errors";
+import { numberToPaddedHex } from "../../core/utils.codec";
 import { PrimitiveType, PrimitiveValue } from "./types";
 
 export class BytesType extends PrimitiveType {
@@ -39,6 +41,35 @@ export class BytesValue extends PrimitiveValue {
     static fromHex(value: string): BytesValue {
         let buffer = Buffer.from(value, "hex");
         return new BytesValue(buffer);
+    }
+
+    /**
+     * Creates a BytesValue from various native JavaScript types.
+     * @param native - Native value (Buffer, string, or object with valueOf())
+     * @returns BytesValue instance
+     * @throws ErrInvalidArgument if conversion fails
+     */
+    static fromNative(native: Buffer | string | { valueOf(): Buffer | number }): BytesValue {
+        if (native === undefined) {
+            throw new errors.ErrInvalidArgument("Cannot convert undefined to BytesValue");
+        }
+
+        const innerValue = native.valueOf();
+
+        if (native instanceof Buffer) {
+            return new BytesValue(native);
+        }
+        if (typeof native === "string") {
+            return BytesValue.fromUTF8(native);
+        }
+        if (innerValue instanceof Buffer) {
+            return new BytesValue(innerValue);
+        }
+        if (typeof innerValue === "number") {
+            return BytesValue.fromHex(numberToPaddedHex(innerValue));
+        }
+
+        throw new errors.ErrInvalidArgument(`Cannot convert value to BytesValue: ${native}`);
     }
 
     getLength(): number {

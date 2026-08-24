@@ -2,15 +2,10 @@
 import BigNumber from "bignumber.js";
 import { Address } from "../core/address";
 import { ErrInvalidArgument } from "../core/errors";
-import { numberToPaddedHex } from "../core/utils.codec";
 import { ArgumentErrorContext } from "./argumentErrorContext";
 import {
     AddressType,
     AddressValue,
-    BigIntType,
-    BigIntValue,
-    BigUIntType,
-    BigUIntValue,
     BooleanType,
     BooleanValue,
     BytesType,
@@ -24,25 +19,19 @@ import {
     ExplicitEnumType,
     ExplicitEnumValue,
     Field,
-    I16Type,
-    I16Value,
-    I32Type,
-    I32Value,
-    I64Type,
-    I64Value,
-    I8Type,
-    I8Value,
     isTyped,
     List,
     ListType,
     ManagedDecimalType,
     ManagedDecimalValue,
     NumericalType,
+    NumericalValue,
     OptionalType,
     OptionalValue,
     OptionType,
     OptionValue,
     PrimitiveType,
+    StringValue,
     Struct,
     StructType,
     TokenIdentifierType,
@@ -51,14 +40,6 @@ import {
     TupleType,
     Type,
     TypedValue,
-    U16Type,
-    U16Value,
-    U32Type,
-    U32Value,
-    U64Type,
-    U64Value,
-    U8Type,
-    U8Value,
     VariadicType,
     VariadicValue,
 } from "./typesystem";
@@ -361,93 +342,44 @@ export namespace NativeSerializer {
         errorContext.throwError(`(function: toManagedDecimal) unsupported native type ${typeof native}`);
     }
 
-    // TODO: move logic to typesystem/bytes.ts
     function convertNativeToBytesValue(native: NativeTypes.NativeBytes, errorContext: ArgumentErrorContext) {
-        const innerValue = native.valueOf();
-
-        if (native === undefined) {
+        try {
+            return BytesValue.fromNative(native);
+        } catch (error) {
             errorContext.convertError(native, "BytesValue");
         }
-        if (native instanceof Buffer) {
-            return new BytesValue(native);
-        }
-        if (typeof native === "string") {
-            return BytesValue.fromUTF8(native);
-        }
-        if (innerValue instanceof Buffer) {
-            return new BytesValue(innerValue);
-        }
-        if (typeof innerValue === "number") {
-            return BytesValue.fromHex(numberToPaddedHex(innerValue));
-        }
-
-        errorContext.convertError(native, "BytesValue");
     }
 
-    // TODO: move logic to typesystem/string.ts
     function convertNativeToString(native: NativeTypes.NativeBuffer, errorContext: ArgumentErrorContext): string {
-        if (native === undefined) {
+        try {
+            const stringValue = StringValue.fromNative(native);
+            return stringValue.valueOf();
+        } catch (error) {
             errorContext.convertError(native, "Buffer");
         }
-        if (native instanceof Buffer) {
-            return native.toString();
-        }
-        if (typeof native === "string") {
-            return native;
-        }
-        errorContext.convertError(native, "Buffer");
     }
 
-    // TODO: move logic to typesystem/address.ts
     export function convertNativeToAddress(
         native: NativeTypes.NativeAddress,
         errorContext: ArgumentErrorContext,
     ): Address {
-        if ((<any>native).toBech32) {
-            return <Address>native;
-        }
-        if ((<any>native).getAddress) {
-            return (<any>native).getAddress();
-        }
-
-        switch (native.constructor) {
-            case Buffer:
-            case String:
-                return new Address(<Buffer | string>native);
-            default:
-                errorContext.convertError(native, "Address");
+        try {
+            const addressValue = AddressValue.fromNative(native);
+            return addressValue.valueOf();
+        } catch (error) {
+            errorContext.convertError(native, "Address");
         }
     }
 
-    // TODO: move logic to typesystem/numerical.ts
     function convertNumericalType(
         number: NativeTypes.NativeBigNumber,
         type: Type,
         errorContext: ArgumentErrorContext,
     ): TypedValue {
-        switch (type.constructor) {
-            case U8Type:
-                return new U8Value(number);
-            case I8Type:
-                return new I8Value(number);
-            case U16Type:
-                return new U16Value(number);
-            case I16Type:
-                return new I16Value(number);
-            case U32Type:
-                return new U32Value(number);
-            case I32Type:
-                return new I32Value(number);
-            case U64Type:
-                return new U64Value(number);
-            case I64Type:
-                return new I64Value(number);
-            case BigUIntType:
-                return new BigUIntValue(number);
-            case BigIntType:
-                return new BigIntValue(number);
-            default:
-                errorContext.unhandledType("convertNumericalType", type);
+        try {
+            return NumericalValue.fromNative(number, <NumericalType>type);
+        } catch (error) {
+            errorContext.unhandledType("convertNumericalType", type);
         }
     }
 }

@@ -79,10 +79,11 @@ export class NonFungibleTokenOfAccountOnNetwork {
         result.name = payload.name || "";
         result.creator = new Address(payload.creator || "");
         result.decimals = Number(payload.decimals || 0);
-        result.supply = new BigNumber(payload.balance || 1);
+        const rawBalance = payload.balance ?? 1;
+        result.supply = new BigNumber(rawBalance);
         result.royalties = new BigNumber(payload.royalties || 0);
         result.assets = payload.assets || [];
-        result.balance = new BigNumber(payload.balance || 1);
+        result.balance = new BigNumber(rawBalance);
 
         return result;
     }

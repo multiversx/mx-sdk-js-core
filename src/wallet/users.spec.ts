@@ -1,7 +1,19 @@
 import { assert } from "chai";
 import path from "path";
+import * as vm from "vm";
 import { Account } from "../accounts";
-import { Address, ErrBadMnemonicEntropy, ErrInvariantFailed, Message, Transaction, TransactionComputer } from "../core";
+import {
+    Address,
+    ErrBadKeystore,
+    ErrBadMnemonicEntropy,
+    ErrBadType,
+    ErrInvalidArgument,
+    ErrInvariantFailed,
+    ErrSignerCannotSign,
+    Message,
+    Transaction,
+    TransactionComputer,
+} from "../core";
 import {
     DummyMnemonicOf12Words,
     loadMnemonic,
@@ -10,7 +22,7 @@ import {
     loadTestWallet,
     TestWallet,
 } from "./../testutils/wallets";
-import { Randomness } from "./crypto";
+import { Encryptor, Randomness } from "./crypto";
 import { Mnemonic } from "./mnemonic";
 import { UserSecretKey } from "./userKeys";
 import { UserSigner } from "./userSigner";
@@ -516,5 +528,423 @@ describe("test user wallets", () => {
         assert.throws(() => {
             UserWallet.decryptSecretKey(keystoreMnemonic, ``);
         }, `Expected keystore kind to be secretKey, but it was mnemonic.`);
+    });
+});
+
+describe("test keystore files that are damaged or tampered with", () => {
+    let alice: TestWallet, bob: TestWallet;
+    let password: string;
+    let dummyMnemonic: string;
+
+    before(async function () {
+        alice = await loadTestWallet("alice");
+        bob = await loadTestWallet("bob");
+        password = await loadPassword();
+        dummyMnemonic = await loadMnemonic();
+    });
+
+    function clone(keyFileObject: any): any {
+        return JSON.parse(JSON.stringify(keyFileObject));
+    }
+
+    // Creates a keystore of kind "secretKey", holding an arbitrary plaintext, and having the "address" and "bech32" fields of the given wallet.
+    function createKeystoreWithPlaintext(plaintext: Buffer, wallet: TestWallet): any {
+        const encryptedData = Encryptor.encrypt(plaintext, password);
+
+        return {
+            version: encryptedData.version,
+            kind: "secretKey",
+            id: encryptedData.id,
+            address: wallet.address.toHex(),
+            bech32: wallet.address.toBech32(),
+            crypto: encryptedData.toJSON().crypto,
+        };
+    }
+
+    it("should load a keystore holding the secret key only (without the public key)", async function () {
+        const keyFileObject = createKeystoreWithPlaintext(Buffer.from(alice.secretKeyHex, "hex"), alice);
+        const secretKey = UserWallet.decryptSecretKey(keyFileObject, password);
+
+        assert.equal(secretKey.hex(), alice.secretKeyHex);
+    });
+
+    it("should load a keystore saved with a custom HRP", async function () {
+        const secretKey = UserSecretKey.fromString(alice.secretKeyHex);
+        const keyFileObject = UserWallet.fromSecretKey({ secretKey, password }).toJSON("test");
+
+        assert.isTrue(keyFileObject.bech32.startsWith("test1"));
+        assert.equal(UserWallet.decryptSecretKey(keyFileObject, password).hex(), alice.secretKeyHex);
+    });
+
+    it("should still throw on wrong password", async function () {
+        assert.throws(
+            () => UserWallet.decryptSecretKey(alice.keyFileObject, "wrong password"),
+            "MAC mismatch, possibly wrong password",
+        );
+    });
+
+    it("should reject a keystore with a modified IV", async function () {
+        // The MAC doesn't cover the IV, so the decryption succeeds, but yields a different secret key.
+        const keyFileObject = clone(alice.keyFileObject);
+        const iv = Buffer.from(keyFileObject.crypto.cipherparams.iv, "hex");
+        iv[0] ^= 0x01;
+        keyFileObject.crypto.cipherparams.iv = iv.toString("hex");
+
+        assert.throws(
+            () => UserWallet.decryptSecretKey(keyFileObject, password),
+            ErrBadKeystore,
+            "the embedded public key does not match the secret key",
+        );
+    });
+
+    it("should reject a keystore whose 'address' field does not match", async function () {
+        const keyFileObject = clone(alice.keyFileObject);
+        keyFileObject.address = bob.address.toHex();
+
+        assert.throws(
+            () => UserWallet.decryptSecretKey(keyFileObject, password),
+            ErrBadKeystore,
+            "the 'address' field does not match the secret key",
+        );
+    });
+
+    it("should reject a keystore whose 'bech32' field does not match", async function () {
+        const keyFileObject = clone(alice.keyFileObject);
+        keyFileObject.bech32 = bob.address.toBech32();
+
+        assert.throws(
+            () => UserWallet.decryptSecretKey(keyFileObject, password),
+            ErrBadKeystore,
+            "the 'bech32' field does not match the secret key",
+        );
+
+        keyFileObject.bech32 = "not a bech32 address";
+
+        assert.throws(
+            () => UserWallet.decryptSecretKey(keyFileObject, password),
+            ErrBadKeystore,
+            "the 'bech32' field does not match the secret key",
+        );
+    });
+
+    it("should reject a keystore without 'address' or 'bech32' field", async function () {
+        for (const field of ["address", "bech32"]) {
+            const keyFileObject = clone(alice.keyFileObject);
+            delete keyFileObject[field];
+
+            assert.throws(
+                () => UserWallet.decryptSecretKey(keyFileObject, password),
+                ErrBadKeystore,
+                "missing 'address' or 'bech32' field",
+            );
+        }
+    });
+
+    it("should reject a keystore whose decrypted data has an unexpected length", async function () {
+        for (const plaintext of [Buffer.from([1, 2, 3, 4, 5]), Buffer.alloc(33, 1), Buffer.alloc(65, 1)]) {
+            const keyFileObject = createKeystoreWithPlaintext(plaintext, alice);
+
+            assert.throws(
+                () => UserWallet.decryptSecretKey(keyFileObject, password),
+                ErrBadKeystore,
+                `unexpected length of decrypted data: ${plaintext.length}`,
+            );
+        }
+    });
+
+    it("should reject a keystore whose embedded public key does not match", async function () {
+        const plaintext = Buffer.concat([Buffer.from(alice.secretKeyHex, "hex"), bob.address.getPublicKey()]);
+        const keyFileObject = createKeystoreWithPlaintext(plaintext, alice);
+
+        assert.throws(
+            () => UserWallet.decryptSecretKey(keyFileObject, password),
+            ErrBadKeystore,
+            "the embedded public key does not match the secret key",
+        );
+    });
+
+    it("should reject a mnemonic keystore without 'kind' field", async function () {
+        this.timeout(10000);
+
+        // Without the "kind" field, the file is treated as a keystore of kind "secretKey".
+        // The decrypted mnemonic must not be interpreted as a secret key.
+        const keyFileObject = UserWallet.fromMnemonic({ mnemonic: dummyMnemonic, password }).toJSON();
+        delete keyFileObject.kind;
+
+        assert.throws(
+            () => UserWallet.decrypt(keyFileObject, password),
+            ErrBadKeystore,
+            "missing 'address' or 'bech32' field",
+        );
+
+        keyFileObject.address = alice.address.toHex();
+        keyFileObject.bech32 = alice.address.toBech32();
+
+        assert.throws(
+            () => UserWallet.decrypt(keyFileObject, password),
+            ErrBadKeystore,
+            "unexpected length of decrypted data",
+        );
+    });
+});
+
+describe("test signing and verifying, with bad input", () => {
+    const secretKey = new UserSecretKey(
+        Buffer.from("413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9", "hex"),
+    );
+    const publicKey = secretKey.generatePublicKey();
+    const data = Buffer.from("hello");
+    const signatureOfData = secretKey.sign(data);
+    const signatureOfEmpty = secretKey.sign(new Uint8Array());
+
+    // "new Uint8Array(value)" would have silently converted these to the empty message (or to zero bytes).
+    const badInputs: [string, any][] = [
+        ["string", "hello"],
+        ["empty string", ""],
+        ["numeric string", "5"],
+        ["number", 5],
+        ["null", null],
+        ["undefined", undefined],
+        ["object", { data: "hello" }],
+        ["serialized Buffer", Buffer.from("hello").toJSON()],
+        ["Int16Array", new Int16Array([258])],
+        ["DataView", new DataView(new ArrayBuffer(2))],
+        ["array with out-of-range values", [300, -1]],
+        ["array with non-integers", [1.5]],
+        ["array with strings", ["h", "e"]],
+        ["sparse array", [104, , 105]],
+    ];
+
+    let originalConsoleError: any;
+
+    beforeEach(() => {
+        // "verify" logs the errors it handles.
+        originalConsoleError = console.error;
+        console.error = () => {};
+    });
+
+    afterEach(() => {
+        console.error = originalConsoleError;
+    });
+
+    it("should throw when signing bad input", async () => {
+        for (const [label, input] of badInputs) {
+            let error: any;
+            try {
+                secretKey.sign(input);
+            } catch (err) {
+                error = err;
+            }
+            assert.instanceOf(error, ErrBadType, label);
+
+            const signerError = await new UserSigner(secretKey).sign(input).catch((err) => err);
+            assert.instanceOf(signerError, ErrSignerCannotSign, label);
+
+            const accountError = await new Account(secretKey).sign(input).catch((err) => err);
+            assert.instanceOf(accountError, ErrBadType, label);
+        }
+    });
+
+    it("should return false when verifying bad input (data)", async () => {
+        for (const [label, input] of badInputs) {
+            assert.isFalse(await publicKey.verify(input, signatureOfEmpty), label);
+            assert.isFalse(await publicKey.verify(input, signatureOfData), label);
+        }
+    });
+
+    it("should not accept the signature of the empty message (or of zero bytes) for strings", async () => {
+        const verifier = new UserVerifier(publicKey);
+        const account = new Account(secretKey);
+
+        for (const input of ["hello", "anything at all", ""]) {
+            assert.isFalse(await publicKey.verify(input as any, signatureOfEmpty), input);
+            assert.isFalse(await verifier.verify(input as any, signatureOfEmpty), input);
+            assert.isFalse(await account.verify(input as any, signatureOfEmpty), input);
+        }
+
+        assert.isFalse(await publicKey.verify("5" as any, secretKey.sign(Buffer.alloc(5))));
+    });
+
+    it("should return false when verifying bad input (signature)", async () => {
+        const signatureAsHex = Buffer.from(signatureOfData).toString("hex");
+
+        assert.isFalse(await publicKey.verify(data, signatureAsHex as any));
+        assert.isFalse(await publicKey.verify(data, null as any));
+        assert.isFalse(await publicKey.verify(data, Array.from(signatureOfData).concat([300]) as any));
+    });
+
+    it("should sign and verify binary data given in any of the supported forms (backwards compatibility)", async () => {
+        // Signature of "hello", as computed before adding the input checks.
+        const expectedSignature =
+            "66dd503199222d3104cb5381da953b14c895ca564579f98934c4e54a45d75f097da2a0c30060c0e7d014928b8e54509335cadc69b2bb1940cd59bd0c1bb80b0b";
+
+        const forms = (bytes: Buffer): [string, any][] => [
+            ["Buffer", bytes],
+            ["Uint8Array", new Uint8Array(bytes)],
+            ["Uint8Array (view with offset)", new Uint8Array(Buffer.concat([Buffer.from("__"), bytes])).subarray(2)],
+            [
+                "Uint8Array (from another realm)",
+                vm.runInNewContext("(bytes) => new Uint8Array(bytes)")(Array.from(bytes)),
+            ],
+            ["ArrayBuffer", new Uint8Array(bytes).buffer],
+            ["array of bytes", Array.from(bytes)],
+        ];
+
+        for (const [label, input] of forms(data)) {
+            assert.equal(Buffer.from(secretKey.sign(input)).toString("hex"), expectedSignature, label);
+            assert.isTrue(await publicKey.verify(input, Buffer.from(expectedSignature, "hex")), label);
+        }
+
+        for (const [label, input] of forms(Buffer.from(expectedSignature, "hex"))) {
+            assert.isTrue(await publicKey.verify(data, input), label);
+        }
+
+        assert.isTrue(await publicKey.verify(new Uint8Array(), signatureOfEmpty));
+    });
+});
+
+describe("test the buffers returned by the keys", () => {
+    let alice: TestWallet;
+
+    before(async function () {
+        alice = await loadTestWallet("alice");
+    });
+
+    it("should return copies, so that the keys can't be altered through them", async () => {
+        const secretKey = UserSecretKey.fromString(alice.secretKeyHex);
+        const publicKey = secretKey.generatePublicKey();
+        const data = Buffer.from("hello");
+        const signature = secretKey.sign(data);
+
+        assert.deepEqual(secretKey.valueOf(), Buffer.from(alice.secretKeyHex, "hex"));
+        assert.deepEqual(publicKey.valueOf(), alice.address.getPublicKey());
+        assert.notStrictEqual(secretKey.valueOf(), secretKey.valueOf());
+        assert.notStrictEqual(publicKey.valueOf(), publicKey.valueOf());
+
+        secretKey.valueOf().fill(0);
+        publicKey.valueOf()[0] ^= 1;
+
+        assert.equal(secretKey.hex(), alice.secretKeyHex);
+        assert.deepEqual(secretKey.sign(data), signature);
+        assert.equal(publicKey.toAddress().toBech32(), alice.address.toBech32());
+        assert.isTrue(await publicKey.verify(data, signature));
+    });
+
+    it("should not allow altering the keys of an account or signer", async () => {
+        const account = await Account.newFromPem(path.resolve(__dirname, "..", "testdata/testwallets/alice.pem"));
+        const signer = UserSigner.fromPem(alice.pemFileText);
+        const data = Buffer.from("hello");
+        const signature = await signer.sign(data);
+
+        account.secretKey.valueOf().fill(0);
+        account.publicKey.valueOf().fill(0);
+        signer.secretKey.valueOf().fill(0);
+
+        assert.deepEqual(await account.sign(data), signature);
+        assert.isTrue(await account.verify(data, signature));
+        assert.equal(account.address.toBech32(), alice.address.toBech32());
+        assert.deepEqual(await signer.sign(data), signature);
+        assert.equal(signer.getAddress().toBech32(), alice.address.toBech32());
+    });
+});
+
+describe("test address index validation", () => {
+    let mnemonic: Mnemonic;
+    let mnemonicText: string;
+    let password: string;
+    let keyFileObject: any;
+
+    // Such values were either silently treated as index 0 or 1 (e.g. NaN, "1"), or inserted as text in the derivation path (e.g. "0'/1").
+    const badIndexes: any[] = [
+        -1,
+        2 ** 31,
+        2 ** 32,
+        1.5,
+        NaN,
+        Infinity,
+        -Infinity,
+        "1",
+        "01",
+        "0'/1",
+        "",
+        null,
+        1n,
+        true,
+        [1],
+        {},
+    ];
+
+    before(async function () {
+        this.timeout(10000);
+
+        mnemonicText = await loadMnemonic();
+        mnemonic = Mnemonic.fromString(mnemonicText);
+        password = await loadPassword();
+        keyFileObject = UserWallet.fromMnemonic({ mnemonic: mnemonicText, password }).toJSON();
+    });
+
+    function catchError(fn: () => any): any {
+        try {
+            fn();
+        } catch (err) {
+            return err;
+        }
+    }
+
+    it("should derive keys for indexes in range (including the largest)", () => {
+        assert.equal(mnemonic.deriveKey().hex(), "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9");
+        assert.equal(mnemonic.deriveKey(0).hex(), "413f42575f7f26fad3317a778771212fdb80245850981e48b58a4f25e344e8f9");
+        assert.equal(mnemonic.deriveKey(1).hex(), "b8ca6f8203fb4b545a8e83c5384da033c415db155b53fb5b8eba7ff5a039d639");
+
+        // Same as computed by mx-sdk-py.
+        assert.equal(
+            mnemonic.deriveKey(2 ** 31 - 1).hex(),
+            "7ee7bce4e4e4a5aa73184bc759684b3b613f1e18af8caa8c0cc6b2530a112765",
+        );
+    });
+
+    it("should reject bad indexes when deriving keys", () => {
+        for (const index of badIndexes) {
+            const error = catchError(() => mnemonic.deriveKey(index));
+            assert.instanceOf(error, ErrInvalidArgument, String(index));
+            assert.include(error.message, "invalid address index", String(index));
+
+            assert.instanceOf(
+                catchError(() => Account.newFromMnemonic(mnemonicText, index)),
+                ErrInvalidArgument,
+                String(index),
+            );
+        }
+    });
+
+    it("should reject bad indexes when loading keystores (instead of falling back to index 0)", async function () {
+        this.timeout(20000);
+
+        for (const index of [NaN, "", "0'/1", -1]) {
+            assert.instanceOf(
+                catchError(() => UserWallet.decrypt(keyFileObject, password, index as any)),
+                ErrInvalidArgument,
+            );
+            assert.instanceOf(
+                catchError(() => UserSigner.fromWallet(keyFileObject, password, index as any)),
+                ErrInvalidArgument,
+            );
+        }
+
+        const keystorePath = path.resolve(__dirname, "..", "testdata/testwallets/withDummyMnemonic.json");
+        assert.instanceOf(
+            catchError(() => UserWallet.loadSecretKey(keystorePath, password, NaN)),
+            ErrInvalidArgument,
+        );
+    });
+
+    it("should still use index 0 when no index is given (undefined or null), as before", async function () {
+        this.timeout(20000);
+
+        const expected = mnemonic.deriveKey(0).hex();
+        assert.equal(UserWallet.decrypt(keyFileObject, password).hex(), expected);
+        assert.equal(UserWallet.decrypt(keyFileObject, password, undefined).hex(), expected);
+        assert.equal(UserWallet.decrypt(keyFileObject, password, null as any).hex(), expected);
+        assert.equal(UserWallet.decrypt(keyFileObject, password, 1).hex(), mnemonic.deriveKey(1).hex());
     });
 });

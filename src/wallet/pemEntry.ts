@@ -1,3 +1,11 @@
+import { ErrBadPEM, ErrInvalidArgument } from "../core/errors";
+
+// Any kind of entry is accepted (e.g. "-----BEGIN foobar"), as before. Generally, the entries are "PRIVATE KEY for <label>".
+const HEADER_PREFIX = "-----BEGIN";
+const FOOTER_PREFIX = "-----END";
+const LABEL_PREFIX = "PRIVATE KEY for";
+const DELIMITER = "-----";
+
 export class PemEntry {
     label: string;
     message: Uint8Array;
@@ -9,57 +17,89 @@ export class PemEntry {
 
     static fromTextAll(pemText: string): PemEntry[] {
         const lines = PemEntry.cleanLines(pemText.split("\n"));
+        const result: PemEntry[] = [];
 
-        // Group PEM entries into blocks of header, content, and footer
-        const blocks: string[][] = PemEntry.groupBlocks(lines);
-
-        return blocks.map((block) => {
-            // Extract label from the header line
-            const header = block[0];
-            const footer = block[block.length - 1];
-            if (!header.startsWith("-----BEGIN PRIVATE KEY for") || !footer.startsWith("-----END PRIVATE KEY for")) {
-                throw new Error("Invalid PEM format");
+        // Each entry is parsed on its own (header, message lines, footer), so that labels can't be paired with the wrong messages.
+        for (const { header, messageLines, footer } of PemEntry.groupBlocks(lines)) {
+            const title = PemEntry.parseTitle(header, HEADER_PREFIX);
+            if (PemEntry.parseTitle(footer, FOOTER_PREFIX) !== title) {
+                throw new ErrBadPEM("the END line does not match the BEGIN line");
             }
 
-            const label = header.replace("-----BEGIN PRIVATE KEY for", "").replace("-----", "").trim();
+            if (messageLines.length == 0) {
+                throw new ErrBadPEM("an entry has no content");
+            }
 
-            // Join all content lines between header and footer
-            const base64Message = block.slice(1, block.length - 1).join("");
+            const messageBase64 = messageLines.join("");
+            const messageBytes = PemEntry.decodeMessage(messageBase64);
+            const label = title.startsWith(LABEL_PREFIX) ? title.slice(LABEL_PREFIX.length).trim() : title;
+            result.push(new PemEntry(label, messageBytes));
+        }
 
-            // Decode Base64 to Uint8Array
-            const messageBytes = Buffer.from(Buffer.from(base64Message, "base64").toString(), "hex");
-
-            return new PemEntry(label, messageBytes);
-        });
+        return result;
     }
 
-    private static groupBlocks(lines: string[]): string[][] {
-        const blocks: string[][] = [];
-        let currentBlock: string[] = [];
+    private static groupBlocks(lines: string[]): { header: string; messageLines: string[]; footer: string }[] {
+        const blocks: { header: string; messageLines: string[]; footer: string }[] = [];
+        let header: string | undefined = undefined;
+        let messageLines: string[] = [];
 
         for (const line of lines) {
-            if (line.startsWith("-----BEGIN PRIVATE KEY for")) {
-                if (currentBlock.length > 0) {
-                    blocks.push(currentBlock);
+            if (line.startsWith(HEADER_PREFIX)) {
+                if (header !== undefined) {
+                    throw new ErrBadPEM("missing END line");
                 }
-                currentBlock = [line]; // Start a new block
-            } else if (line.startsWith("-----END PRIVATE KEY for")) {
-                currentBlock.push(line);
-                blocks.push(currentBlock); // Finalize the current block
-                currentBlock = [];
+
+                header = line;
+                messageLines = [];
+            } else if (line.startsWith(FOOTER_PREFIX)) {
+                if (header === undefined) {
+                    throw new ErrBadPEM("missing BEGIN line");
+                }
+
+                blocks.push({ header, messageLines, footer: line });
+                header = undefined;
+            } else if (header === undefined) {
+                // The content of the line is not included in the error message, since it could be secret.
+                throw new ErrBadPEM("unexpected line outside of an entry");
             } else {
-                currentBlock.push(line); // Add content to the current block
+                messageLines.push(line);
             }
         }
 
-        if (currentBlock.length > 0) {
-            throw new Error("Invalid PEM format: Missing END line for a block");
+        if (header !== undefined) {
+            throw new ErrBadPEM("missing END line");
         }
 
         return blocks;
     }
 
+    private static parseTitle(line: string, prefix: string): string {
+        // Only the delimiters are removed, so that dashes within the label are kept.
+        // The trailing delimiter is handled leniently (e.g. "---" instead of "-----"), as before: such files exist in the wild.
+        return line.slice(prefix.length).replace(/-+$/, "").trim();
+    }
+
+    private static decodeMessage(messageBase64: string): Buffer {
+        // "Buffer.from()" silently skips (or stops at) invalid characters, thus the explicit checks.
+        // The content is not included in the error message, since it could be secret.
+        const isBase64 = messageBase64.length % 4 == 0 && /^[A-Za-z0-9+/]*={0,2}$/.test(messageBase64);
+        const messageHex = isBase64 ? Buffer.from(messageBase64, "base64").toString() : "";
+        const isHex = /^([0-9a-fA-F]{2})*$/.test(messageHex);
+
+        if (!isBase64 || !isHex) {
+            throw new ErrBadPEM("the content of an entry is not properly encoded");
+        }
+
+        return Buffer.from(messageHex, "hex");
+    }
+
     toText(): string {
+        // Such labels would break the structure of the file.
+        if (this.label.includes(DELIMITER) || /[\n\r\v\f\x1c-\x1e\x85\u2028\u2029]/.test(this.label)) {
+            throw new ErrBadPEM(`the label must not contain line breaks or '${DELIMITER}'`);
+        }
+
         const header = `-----BEGIN PRIVATE KEY for ${this.label}-----`;
         const footer = `-----END PRIVATE KEY for ${this.label}-----`;
 
@@ -81,5 +121,14 @@ export class PemEntry {
             lines.push(text.slice(i, i + width));
         }
         return lines;
+    }
+}
+
+export function assertIndexIsValid(index: number, numberOfEntries: number) {
+    // Otherwise, the caller would silently get "undefined" (e.g. for an off-by-one error), instead of a secret key.
+    if (!Number.isInteger(index) || index < 0 || index >= numberOfEntries) {
+        throw new ErrInvalidArgument(
+            `PEM entry index ${index} is out of range (number of entries: ${numberOfEntries})`,
+        );
     }
 }

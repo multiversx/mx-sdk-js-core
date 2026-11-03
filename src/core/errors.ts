@@ -386,6 +386,15 @@ export class ErrBadPEM extends Err {
 }
 
 /**
+ * Signals a bad (damaged, tampered with or unsupported) keystore file.
+ */
+export class ErrBadKeystore extends Err {
+    public constructor(message: string) {
+        super(`Bad keystore: ${message}`);
+    }
+}
+
+/**
  * Signals an error related to signing a message (a transaction).
  */
 export class ErrSignerCannotSign extends Err {

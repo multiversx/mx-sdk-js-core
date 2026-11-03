@@ -275,6 +275,17 @@ describe("test PEM validation", () => {
         }
     });
 
+    it("should parse long BEGIN and END lines in linear time", () => {
+        const dashes = "-".repeat(200_000);
+        const texts = [`-----BEGIN ${dashes}x\nAAAA\n-----END x-----`, `-----BEGIN x-----\nAAAA\n-----END ${dashes}x`];
+
+        for (const text of texts) {
+            const start = Date.now();
+            assert.throws(() => PemEntry.fromTextAll(text), ErrBadPEM, "the END line does not match the BEGIN line");
+            assert.isBelow(Date.now() - start, 100);
+        }
+    });
+
     it("should accept any kind of entry (e.g. 'BEGIN foobar'), as 'fromPem()' did before", () => {
         const text = alice.pemFileText.replace(/(BEGIN|END) PRIVATE KEY for erd1\w+/g, "$1 foobar");
 

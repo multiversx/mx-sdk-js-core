@@ -77,7 +77,13 @@ export class PemEntry {
     private static parseTitle(line: string, prefix: string): string {
         // Only the delimiters are removed, so that dashes within the label are kept.
         // The trailing delimiter is handled leniently (e.g. "---" instead of "-----"), as before: such files exist in the wild.
-        return line.slice(prefix.length).replace(/-+$/, "").trim();
+        // A loop, not a regex such as /-+$/, which would take quadratic time on long runs of dashes.
+        let end = line.length;
+        while (end > prefix.length && line[end - 1] === "-") {
+            end--;
+        }
+
+        return line.slice(prefix.length, end).trim();
     }
 
     private static decodeMessage(messageBase64: string): Buffer {

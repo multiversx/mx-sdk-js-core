@@ -214,11 +214,11 @@ describe("test network providers on devnet: Proxy and API", function () {
         assert.exists(proxyResponse.logs);
         assert.exists(apiResponse.logs.events);
         assert.exists(proxyResponse.logs.events);
-        assert.equal(Buffer.from(apiResponse.logs.events[0].topics[0]).toString("hex"), "414c4943452d353632376631");
-        assert.equal(Buffer.from(apiResponse.logs.events[0].topics[1]).toString("hex"), "");
-        assert.equal(Buffer.from(apiResponse.logs.events[0].topics[2]).toString("hex"), "01");
+        assert.equal(Buffer.from(apiResponse.logs.events[1].topics[0]).toString("hex"), "414c4943452d353632376631");
+        assert.equal(Buffer.from(apiResponse.logs.events[1].topics[1]).toString("hex"), "");
+        assert.equal(Buffer.from(apiResponse.logs.events[1].topics[2]).toString("hex"), "01");
         assert.equal(
-            Buffer.from(apiResponse.logs.events[0].topics[3]).toString("hex"),
+            Buffer.from(apiResponse.logs.events[1].topics[3]).toString("hex"),
             "0000000000000000050032e141d21536e2dfc3d64b9e7dd0c2c53f201dc469e1",
         );
         assert.equal(

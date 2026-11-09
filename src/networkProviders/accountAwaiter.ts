@@ -34,13 +34,13 @@ export class AccountAwaiter {
         this.fetcher = options.fetcher;
 
         this.pollingIntervalInMilliseconds =
-            options.pollingIntervalInMilliseconds ?? DEFAULT_ACCOUNT_AWAITING_POLLING_TIMEOUT_IN_MILLISECONDS;
+            options.pollingIntervalInMilliseconds || DEFAULT_ACCOUNT_AWAITING_POLLING_TIMEOUT_IN_MILLISECONDS;
 
         this.timeoutIntervalInMilliseconds =
-            options.timeoutIntervalInMilliseconds ?? DEFAULT_ACCOUNT_AWAITING_TIMEOUT_IN_MILLISECONDS;
+            options.timeoutIntervalInMilliseconds || DEFAULT_ACCOUNT_AWAITING_TIMEOUT_IN_MILLISECONDS;
 
         this.patienceTimeInMilliseconds =
-            options.patienceTimeInMilliseconds ?? DEFAULT_ACCOUNT_AWAITING_PATIENCE_IN_MILLISECONDS;
+            options.patienceTimeInMilliseconds || DEFAULT_ACCOUNT_AWAITING_PATIENCE_IN_MILLISECONDS;
     }
 
     /**

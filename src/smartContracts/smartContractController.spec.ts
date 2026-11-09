@@ -4,7 +4,8 @@ import { Abi, BigUIntValue, BooleanValue, BytesValue, Tuple, U16Value, U64Value 
 import { Account } from "../accounts";
 import { Address, SmartContractQueryResponse } from "../core";
 import { GasLimitEstimator } from "../gasEstimator";
-import { MockNetworkProvider, getTestWalletsPath, loadAbiRegistry } from "../testutils";
+import { ProxyNetworkProvider } from "../networkProviders";
+import { MockNetworkProvider, getTestWalletsPath, loadAbiRegistry, loadContractCode } from "../testutils";
 import { bigIntToBuffer } from "../tokenOperations/codec";
 import { SmartContractController } from "./smartContractController";
 
@@ -275,6 +276,27 @@ describe("test smart contract queries controller", () => {
             });
 
             assert.equal(transaction.gasLimit, 123456789n);
+        });
+
+        it("should estimate gas using gasLimitEstimator", async function () {
+            const alice = await Account.newFromPem(`${getTestWalletsPath()}/alice.pem`);
+            const networkProvider = new ProxyNetworkProvider("https://devnet-gateway.multiversx.com");
+
+            const gasLimitEstimator = new GasLimitEstimator({ networkProvider: networkProvider });
+            const controller = new SmartContractController({
+                chainID: "D",
+                networkProvider: networkProvider,
+                gasLimitEstimator: gasLimitEstimator,
+            });
+
+            const bytecode = await loadContractCode("src/testdata/adder.wasm");
+
+            const transaction = await controller.createTransactionForDeploy(alice, 0n, {
+                bytecode: bytecode,
+                arguments: [new BigUIntValue(0)],
+            });
+
+            assert.isTrue(transaction.gasLimit > 0n);
         });
     });
 });

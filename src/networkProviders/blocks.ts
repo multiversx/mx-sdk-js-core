@@ -73,7 +73,7 @@ export class BlockCoordinates {
         const result = new BlockCoordinates();
         const value = payload["blockInfo"] || {};
 
-        result.nonce = value["nonce"] || 0n;
+        result.nonce = BigInt(value["nonce"] || 0);
         result.hash = value["hash"] || "";
         result.rootHash = value["rootHash"] || "";
 

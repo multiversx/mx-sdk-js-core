@@ -1,9 +1,10 @@
 import { derivePath } from "ed25519-hd-key";
-import { ErrBadMnemonicEntropy, ErrWrongMnemonic } from "../core/errors";
+import { ErrBadMnemonicEntropy, ErrInvalidArgument, ErrWrongMnemonic } from "../core/errors";
 import { UserSecretKey } from "./userKeys";
 
 const MNEMONIC_STRENGTH = 256;
 const BIP44_DERIVATION_PREFIX = "m/44'/508'/0'/0'";
+const HARDENED_OFFSET = 0x80000000;
 
 let bip39: any;
 
@@ -59,6 +60,13 @@ export class Mnemonic {
     }
 
     deriveKey(addressIndex: number = 0, password: string = ""): UserSecretKey {
+        // The index is hardened (index + 2^31) and serialized on 32 bits, so it must be lower than 2^31.
+        // Also, it must be a number: e.g. the string "0'/1" would be inserted as such in the derivation path (adding a level).
+        if (!Number.isSafeInteger(addressIndex) || addressIndex < 0 || addressIndex >= HARDENED_OFFSET) {
+            const type = typeof addressIndex === "number" ? "" : ` (${typeof addressIndex})`;
+            throw new ErrInvalidArgument(`invalid address index: ${String(addressIndex)}${type}`);
+        }
+
         loadBip39();
         let seed = bip39.mnemonicToSeedSync(this.text, password);
         let derivationPath = `${BIP44_DERIVATION_PREFIX}/${addressIndex}'`;

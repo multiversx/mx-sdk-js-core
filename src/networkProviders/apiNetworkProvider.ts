@@ -121,7 +121,7 @@ export class ApiNetworkProvider implements INetworkProvider {
         }
         const response = await this.doPostGeneric(url, transaction);
         const data = response["data"] ?? {};
-        return TransactionOnNetwork.fromSimulateResponse(transaction, data["result"] ?? {});
+        return TransactionOnNetwork.fromSimulateResponse(tx, data["result"] ?? {});
     }
 
     async estimateTransactionCost(tx: Transaction): Promise<TransactionCostResponse> {

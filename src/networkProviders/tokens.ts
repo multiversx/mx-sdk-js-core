@@ -109,7 +109,10 @@ export class TokenAmountOnNetwork {
 
         result.raw = payload;
         result.amount = BigInt(payload["balance"] ?? 0);
-        result.token = new Token({ identifier: payload["tokenIdentifier"] ?? "", nonce: payload["nonce"] ?? 0 });
+        result.token = new Token({
+            identifier: payload["tokenIdentifier"] ?? "",
+            nonce: BigInt(payload["nonce"] ?? 0),
+        });
 
         return result;
     }
@@ -119,7 +122,7 @@ export class TokenAmountOnNetwork {
 
         result.raw = payload;
         result.amount = BigInt(payload["balance"] ?? 0);
-        result.token = new Token({ identifier: payload["identifier"] ?? "", nonce: payload["nonce"] ?? 0 });
+        result.token = new Token({ identifier: payload["identifier"] ?? "", nonce: BigInt(payload["nonce"] ?? 0) });
 
         return result;
     }

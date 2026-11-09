@@ -29,7 +29,7 @@ export class TransactionStatus {
     }
 
     /**
-     * Returns whether the transaction has been conpleted (not necessarily with success).
+     * Returns whether the transaction has been completed (not necessarily with success).
      */
     isCompleted(): boolean {
         return this.isSuccessful() || this.isFailed() || this.isInvalid();
@@ -54,6 +54,13 @@ export class TransactionStatus {
      */
     isInvalid(): boolean {
         return this.status == "invalid";
+    }
+
+    /**
+     * Returns whether the transaction cannot be executed in the current block.
+     */
+    isNotExecutableInBlock(): boolean {
+        return this.status == "not-executable-in-block";
     }
 
     toString(): string {

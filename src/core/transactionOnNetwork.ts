@@ -123,7 +123,7 @@ export class TransactionOnNetwork {
         result.gasPrice = BigInt(originalTx.gasPrice) || 0n;
         result.gasLimit = BigInt(originalTx.gasLimit) || 0n;
         result.function = "";
-        result.data = originalTx.data ? Buffer.from(originalTx.data?.toString()) : Buffer.from("");
+        result.data = originalTx.data ? Buffer.from(originalTx.data) : Buffer.from("");
         result.version = originalTx.version || 1;
         result.options = originalTx.options || 0;
         result.timestamp = 0;

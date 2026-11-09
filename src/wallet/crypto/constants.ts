@@ -1,6 +1,8 @@
 export const CipherAlgorithm = "aes-128-ctr";
 export const DigestAlgorithm = "sha256";
 export const KeyDerivationFunction = "scrypt";
+export const DerivedKeyLength = 32;
+export const IVLength = 16;
 
 // X25519 public key encryption
 export const PubKeyEncVersion = 1;

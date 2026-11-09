@@ -1,6 +1,5 @@
 import { Abi, ArgSerializer, isTyped, NativeSerializer } from "../abi";
 import {
-    Address,
     BaseController,
     BaseControllerInput,
     Err,
@@ -33,11 +32,10 @@ export class SmartContractController extends BaseController {
         abi?: Abi;
         gasLimitEstimator?: IGasLimitEstimator;
     }) {
-        super();
+        super({ gasLimitEstimator: options.gasLimitEstimator });
         this.factory = new SmartContractTransactionsFactory({
             config: new TransactionsFactoryConfig({ chainID: options.chainID }),
             abi: options.abi,
-            gasLimitEstimator: options.gasLimitEstimator,
         });
         this.parser = new SmartContractTransactionsOutcomeParser(options);
         this.transactionWatcher = new TransactionWatcher(options.networkProvider);
@@ -50,14 +48,10 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractDeployInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = await this.factory.createTransactionForDeploy(sender.address, options);
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        const transaction = await this.factory.createTransactionForDeploy(sender.address, options);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -76,14 +70,10 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractUpgradeInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = await this.factory.createTransactionForUpgrade(sender.address, options);
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        const transaction = await this.factory.createTransactionForUpgrade(sender.address, options);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }
@@ -93,14 +83,10 @@ export class SmartContractController extends BaseController {
         nonce: bigint,
         options: resources.ContractExecuteInput & BaseControllerInput,
     ): Promise<Transaction> {
-        const transaction = await this.factory.createTransactionForExecute(sender.address, options);
+        options.gasLimit = options.gasLimit ? options.gasLimit : 0n;
 
-        transaction.guardian = options.guardian ?? Address.empty();
-        transaction.relayer = options.relayer ?? Address.empty();
-        transaction.nonce = nonce;
-        this.setTransactionGasOptions(transaction, options);
-        this.setVersionAndOptionsForGuardian(transaction);
-        transaction.signature = await sender.signTransaction(transaction);
+        const transaction = await this.factory.createTransactionForExecute(sender.address, options);
+        await this.setupAndSignTransaction(transaction, options, nonce, sender);
 
         return transaction;
     }

@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
-import { PemEntry } from "../wallet/pemEntry";
+import { assertIndexIsValid, PemEntry } from "../wallet/pemEntry";
 import { BLS, ValidatorSecretKey } from "../wallet/validatorKeys";
 
 export class ValidatorPEM {
@@ -13,7 +13,9 @@ export class ValidatorPEM {
     }
 
     static async fromFile(path: string, index = 0): Promise<ValidatorPEM> {
-        return (await this.fromFileAll(path))[index];
+        const items = await this.fromFileAll(path);
+        assertIndexIsValid(index, items.length);
+        return items[index];
     }
 
     static async fromFileAll(path: string): Promise<ValidatorPEM[]> {
@@ -23,7 +25,9 @@ export class ValidatorPEM {
     }
 
     static async fromText(text: string, index = 0): Promise<ValidatorPEM> {
-        return (await ValidatorPEM.fromTextAll(text))[index];
+        const items = await ValidatorPEM.fromTextAll(text);
+        assertIndexIsValid(index, items.length);
+        return items[index];
     }
 
     static async fromTextAll(text: string): Promise<ValidatorPEM[]> {

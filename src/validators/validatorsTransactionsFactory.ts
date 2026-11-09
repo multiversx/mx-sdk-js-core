@@ -327,7 +327,7 @@ export class ValidatorsTransactionsFactory extends BaseFactory {
 
     async createTransactionForNewDelegationContractFromValidatorData(
         sender: Address,
-        options: resources.NewDelegationContractInput,
+        options: resources.NewDelegationContractFromValidatorDataInput,
     ): Promise<Transaction> {
         const dataParts = [
             "makeNewContractFromValidatorData",

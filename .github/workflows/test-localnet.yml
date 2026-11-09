@@ -14,15 +14,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Install system dependencies
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libusb-1.0-0-dev libudev-dev pkg-config
+
       # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
       # Step 2: Set up Python environment
-      - name: Set up Python 3.x
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: '3.11'
 
     # Step 3: Install pipx (to manage Python tools)
       - name: Install pipx
@@ -44,8 +50,26 @@ jobs:
           # Start the local testnet with mxpy
           mkdir -p ~/localnet && cd ~/localnet
           mxpy localnet setup --configfile=${GITHUB_WORKSPACE}/localnet.toml
+          echo "Localnet setup completed."
+          echo "Starting localnet..."
           nohup mxpy localnet start --configfile=${GITHUB_WORKSPACE}/localnet.toml > localnet.log 2>&1 & echo $! > localnet.pid
-          sleep 120 # Allow time for the testnet to fully start
+          echo "Localnet started, waiting for it to be fully operational..."
+
+          # Allow time for the testnet to fully start
+          timeout=300
+          elapsed=0
+          while ! curl -s http://127.0.0.1:7950/network/config > /dev/null; do
+            if [ $elapsed -ge $timeout ]; then
+              echo "Timeout waiting for localnet to start"
+              cat ~/localnet/localnet.log
+              exit 1
+            fi
+            echo "Waiting for localnet... ($elapsed/$timeout seconds)"
+            sleep 10
+            elapsed=$((elapsed + 10))
+          done
+
+          echo "Localnet is ready!"
 
       # Step 6: Install Node.js and dependencies
       - name: Set up Node.js environment

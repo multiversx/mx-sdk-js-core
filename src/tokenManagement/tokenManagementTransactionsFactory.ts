@@ -301,9 +301,9 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
     ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.addRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
-        options.addRoleLocalBurn ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
-        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        if (options.addRoleLocalMint) args.push(new StringValue("ESDTRoleLocalMint"));
+        if (options.addRoleLocalBurn) args.push(new StringValue("ESDTRoleLocalBurn"));
+        if (options.addRoleESDTTransferRole) args.push(new StringValue("ESDTTransferRole"));
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -326,9 +326,9 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
     ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.removeRoleLocalMint ? args.push(new StringValue("ESDTRoleLocalMint")) : 0;
-        options.removeRoleLocalBurn ? args.push(new StringValue("ESDTRoleLocalBurn")) : 0;
-        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
+        if (options.removeRoleLocalMint) args.push(new StringValue("ESDTRoleLocalMint"));
+        if (options.removeRoleLocalBurn) args.push(new StringValue("ESDTRoleLocalBurn"));
+        if (options.removeRoleESDTTransferRole) args.push(new StringValue("ESDTTransferRole"));
 
         const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -351,15 +351,15 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
     ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.addRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
-        options.addRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
-        options.addRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
-        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
-        options.addRoleNFTUpdate ? args.push(new StringValue("ESDTRoleNFTUpdate")) : 0;
-        options.addRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
-        options.addRoleESDTSetNewUri ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
-        options.addRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
-        options.addRoleNFTRecreate ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
+        if (options.addRoleNFTCreate) args.push(new StringValue("ESDTRoleNFTCreate"));
+        if (options.addRoleNFTBurn) args.push(new StringValue("ESDTRoleNFTBurn"));
+        if (options.addRoleNFTAddQuantity) args.push(new StringValue("ESDTRoleNFTAddQuantity"));
+        if (options.addRoleESDTTransferRole) args.push(new StringValue("ESDTTransferRole"));
+        if (options.addRoleNFTUpdate) args.push(new StringValue("ESDTRoleNFTUpdate"));
+        if (options.addRoleESDTModifyRoyalties) args.push(new StringValue("ESDTRoleModifyRoyalties"));
+        if (options.addRoleESDTSetNewUri) args.push(new StringValue("ESDTRoleSetNewURI"));
+        if (options.addRoleESDTModifyCreator) args.push(new StringValue("ESDTRoleModifyCreator"));
+        if (options.addRoleNFTRecreate) args.push(new StringValue("ESDTRoleNFTRecreate"));
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -382,14 +382,14 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
     ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
-        options.removeRoleNFTAddQuantity ? args.push(new StringValue("ESDTRoleNFTAddQuantity")) : 0;
-        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
-        options.removeRoleNFTUpdate ? args.push(new StringValue("ESDTRoleNFTUpdate")) : 0;
-        options.removeRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
-        options.removeRoleESDTSetNewUri ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
-        options.removeRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
-        options.removeRoleNFTRecreate ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
+        if (options.removeRoleNFTBurn) args.push(new StringValue("ESDTRoleNFTBurn"));
+        if (options.removeRoleNFTAddQuantity) args.push(new StringValue("ESDTRoleNFTAddQuantity"));
+        if (options.removeRoleESDTTransferRole) args.push(new StringValue("ESDTTransferRole"));
+        if (options.removeRoleNFTUpdate) args.push(new StringValue("ESDTRoleNFTUpdate"));
+        if (options.removeRoleESDTModifyRoyalties) args.push(new StringValue("ESDTRoleModifyRoyalties"));
+        if (options.removeRoleESDTSetNewUri) args.push(new StringValue("ESDTRoleSetNewURI"));
+        if (options.removeRoleESDTModifyCreator) args.push(new StringValue("ESDTRoleModifyCreator"));
+        if (options.removeRoleNFTRecreate) args.push(new StringValue("ESDTRoleNFTRecreate"));
 
         const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -426,15 +426,15 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
     ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.addRoleNFTCreate ? args.push(new StringValue("ESDTRoleNFTCreate")) : 0;
-        options.addRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
-        options.addRoleNFTUpdateAttributes ? args.push(new StringValue("ESDTRoleNFTUpdateAttributes")) : 0;
-        options.addRoleNFTAddURI ? args.push(new StringValue("ESDTRoleNFTAddURI")) : 0;
-        options.addRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
-        options.addRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
-        options.addRoleNFTRecreate ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
-        options.addRoleESDTSetNewURI ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
-        options.addRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
+        if (options.addRoleNFTCreate) args.push(new StringValue("ESDTRoleNFTCreate"));
+        if (options.addRoleNFTBurn) args.push(new StringValue("ESDTRoleNFTBurn"));
+        if (options.addRoleNFTUpdateAttributes) args.push(new StringValue("ESDTRoleNFTUpdateAttributes"));
+        if (options.addRoleNFTAddURI) args.push(new StringValue("ESDTRoleNFTAddURI"));
+        if (options.addRoleESDTTransferRole) args.push(new StringValue("ESDTTransferRole"));
+        if (options.addRoleESDTModifyCreator) args.push(new StringValue("ESDTRoleModifyCreator"));
+        if (options.addRoleNFTRecreate) args.push(new StringValue("ESDTRoleNFTRecreate"));
+        if (options.addRoleESDTSetNewURI) args.push(new StringValue("ESDTRoleSetNewURI"));
+        if (options.addRoleESDTModifyRoyalties) args.push(new StringValue("ESDTRoleModifyRoyalties"));
 
         const dataParts = ["setSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 
@@ -457,14 +457,14 @@ export class TokenManagementTransactionsFactory extends BaseFactory {
     ): Promise<Transaction> {
         const args = [new StringValue(options.tokenIdentifier), new AddressValue(options.user)];
 
-        options.removeRoleNFTBurn ? args.push(new StringValue("ESDTRoleNFTBurn")) : 0;
-        options.removeRoleNFTUpdateAttributes ? args.push(new StringValue("ESDTRoleNFTUpdateAttributes")) : 0;
-        options.removeRoleNFTAddURI ? args.push(new StringValue("ESDTRoleNFTAddURI")) : 0;
-        options.removeRoleESDTTransferRole ? args.push(new StringValue("ESDTTransferRole")) : 0;
-        options.removeRoleESDTModifyCreator ? args.push(new StringValue("ESDTRoleModifyCreator")) : 0;
-        options.removeRoleNFTRecreate ? args.push(new StringValue("ESDTRoleNFTRecreate")) : 0;
-        options.removeRoleESDTSetNewURI ? args.push(new StringValue("ESDTRoleSetNewURI")) : 0;
-        options.removeRoleESDTModifyRoyalties ? args.push(new StringValue("ESDTRoleModifyRoyalties")) : 0;
+        if (options.removeRoleNFTBurn) args.push(new StringValue("ESDTRoleNFTBurn"));
+        if (options.removeRoleNFTUpdateAttributes) args.push(new StringValue("ESDTRoleNFTUpdateAttributes"));
+        if (options.removeRoleNFTAddURI) args.push(new StringValue("ESDTRoleNFTAddURI"));
+        if (options.removeRoleESDTTransferRole) args.push(new StringValue("ESDTTransferRole"));
+        if (options.removeRoleESDTModifyCreator) args.push(new StringValue("ESDTRoleModifyCreator"));
+        if (options.removeRoleNFTRecreate) args.push(new StringValue("ESDTRoleNFTRecreate"));
+        if (options.removeRoleESDTSetNewURI) args.push(new StringValue("ESDTRoleSetNewURI"));
+        if (options.removeRoleESDTModifyRoyalties) args.push(new StringValue("ESDTRoleModifyRoyalties"));
 
         const dataParts = ["unSetSpecialRole", ...this.argSerializer.valuesToStrings(args)];
 

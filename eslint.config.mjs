@@ -13,6 +13,7 @@ export default defineConfig(
         "out-browser",
         "out-browser-tests",
         "cookbook",
+        "package-tests",
         "src/proto/compiled.js",
         "eslint.config.mjs",
     ]),

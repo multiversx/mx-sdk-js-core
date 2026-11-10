@@ -16,18 +16,20 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [16.x]
+        node-version: [22.13.0, 22.x, 24.x, 26.x]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v7
       with:
         node-version: ${{ matrix.node-version }}
+        cache: npm
     - run: npm ci
     - run: npm run lint
     - run: npm run compile
-    - run: npm install esmify && npm run compile-browser
+    - run: npm run compile-browser
     - run: npm run tests-unit
     # - run: npm run tests-devnet  TODO: Enable this later

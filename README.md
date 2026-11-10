@@ -25,11 +25,10 @@ Feel free to skip this section if you are not a contributor.
 
 ### Prerequisites
 
-`browserify` and `esmify` are required to compile the browser-friendly versions of `sdk-core`. They can be installed as follows:
+Use the Node.js version given in `.nvmrc`, then install the dependencies:
 
 ```
-npm install --global browserify
-npm install esmify --no-save
+npm ci
 ```
 
 ## Optional Dependencies

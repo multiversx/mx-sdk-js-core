@@ -39,8 +39,9 @@
     "prepare": "npm run compile"
   },
   "dependencies": {
+    "@noble/curves": "1.9.7",
     "@noble/ed25519": "1.7.3",
-    "@noble/hashes": "1.3.0",
+    "@noble/hashes": "1.8.0",
     "bech32": "1.1.4",
     "blake2b": "2.1.3",
     "buffer": "6.0.3",
@@ -52,6 +53,7 @@
     "tweetnacl": "1.0.3"
   },
   "devDependencies": {
+    "@multiversx/sdk-bls-wasm": "0.3.6",
     "@types/assert": "1.4.6",
     "@types/chai": "4.2.11",
     "@types/ed2curve": "0.2.2",

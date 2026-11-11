@@ -235,10 +235,55 @@ describe("test validator secret key", () => {
             assert.equal(secretKey.sign("" as any).toString("hex"), signatureOfNothingHex);
         });
 
+        it("should sign a string as one byte per character (the low byte of its code), not as UTF-8", () => {
+            const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
+
+            for (const text of ["é", "héllo", "€", "🔐", "aĀb"]) {
+                const lowBytes = Buffer.alloc(text.length);
+                for (let i = 0; i < text.length; i++) {
+                    lowBytes[i] = text.charCodeAt(i) & 0xff;
+                }
+
+                const signature = secretKey.sign(text as any).toString("hex");
+
+                assert.equal(signature, secretKey.sign(lowBytes).toString("hex"), text);
+                assert.notEqual(signature, secretKey.sign(Buffer.from(text, "utf-8")).toString("hex"), text);
+            }
+
+            assert.equal(
+                secretKey.sign("héllo" as any).toString("hex"),
+                secretKey.sign(Buffer.from([0x68, 0xe9, 0x6c, 0x6c, 0x6f])).toString("hex"),
+            );
+        });
+
+        it("should sign an array as if converted by Uint8Array.from()", () => {
+            const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
+            const arrays: any[][] = [[256, 257, -1, 1.9, 104], [104, undefined, null, "7", NaN], [104, , 108], []];
+            const expectedBytes = ["0001ff0168", "6800000700", "68006c", ""];
+
+            for (const [index, array] of arrays.entries()) {
+                const bytes = Uint8Array.from(array);
+
+                assert.equal(Buffer.from(bytes).toString("hex"), expectedBytes[index]);
+                assert.equal(secretKey.sign(array as any).toString("hex"), secretKey.sign(bytes).toString("hex"));
+            }
+        });
+
         it("should not sign something that isn't binary data", () => {
             const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
 
-            for (const message of [undefined, null, 42, {}, true, new ArrayBuffer(5), new Uint16Array(5)]) {
+            for (const message of [
+                undefined,
+                null,
+                42,
+                {},
+                true,
+                new ArrayBuffer(5),
+                new Uint16Array(5),
+                new Uint8ClampedArray(5),
+                new DataView(new ArrayBuffer(5)),
+                { length: 5 },
+            ]) {
                 assert.throws(() => secretKey.sign(message as any));
             }
         });

@@ -1,10 +1,8 @@
-import { BLS } from "../wallet/validatorKeys";
-
 /**
- * The reference implementation of the validator (BLS) keys: the Herumi (MCL) WebAssembly build, "@multiversx/sdk-bls-wasm".
+ * The reference implementation of the validator (BLS) keys: the Herumi (MCL) WebAssembly build, "@multiversx/sdk-bls-wasm",
+ * which the SDK itself used before switching to "@noble/curves".
  *
- * It is loaded here directly, not through the SDK, so that the tests relying on it keep comparing the SDK against Herumi
- * even after the SDK itself stops using this module (the module then has to stay as a "devDependency").
+ * It is a "devDependency", loaded by the tests only, so that the outcomes of the SDK can be compared against Herumi's.
  */
 export class ReferenceBls {
     private constructor(private readonly module: any) {}
@@ -12,6 +10,7 @@ export class ReferenceBls {
     private static loading: Promise<ReferenceBls> | undefined;
 
     static async load(): Promise<ReferenceBls> {
+        // The module must be initialized only once: each "init()" creates a new WASM instance.
         if (!ReferenceBls.loading) {
             ReferenceBls.loading = ReferenceBls.doLoad();
         }
@@ -22,23 +21,8 @@ export class ReferenceBls {
     private static async doLoad(): Promise<ReferenceBls> {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const module = require("@multiversx/sdk-bls-wasm");
-
-        // As long as the SDK runs on this very module, the SDK has to be the one that initializes it:
-        // each "init()" creates a new WASM instance, and the SDK guards against that.
-        await BLS.initIfNecessary();
-
-        if ((BLS as any).bls !== module) {
-            await module.init(module.BLS12_381);
-        }
-
+        await module.init(module.BLS12_381);
         return new ReferenceBls(module);
-    }
-
-    /**
-     * Whether the SDK computes on the reference module itself (in which case comparing the two proves nothing).
-     */
-    isUsedBySdk(): boolean {
-        return (BLS as any).bls === this.module;
     }
 
     getPublicKey(secretKey: Uint8Array): Buffer {

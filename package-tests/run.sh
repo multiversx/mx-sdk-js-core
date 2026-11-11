@@ -8,7 +8,7 @@
 #      which TypeScript < 5.7 cannot parse;
 #   2. a consumer can type-check against the package with the oldest supported and the newest TypeScript;
 #   3. the built JavaScript loads and works through both require() and import;
-#   4. the package still loads when the optional dependencies (axios, bip39, bls-wasm) are not installed.
+#   4. the package still loads when the optional dependencies (axios, bip39) are not installed.
 #
 # Usage: npm run test-package
 

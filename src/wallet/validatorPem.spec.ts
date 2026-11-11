@@ -1,7 +1,9 @@
 import { assert } from "chai";
 import * as fs from "fs";
 import path from "path";
+import { ErrInvariantFailed } from "../core/errors";
 import { getTestWalletsPath } from "../testutils";
+import { BLS, ValidatorSecretKey } from "./validatorKeys";
 import { ValidatorPEM } from "./validatorPem";
 
 describe("test ValidatorPEMs", () => {
@@ -56,6 +58,72 @@ describe("test ValidatorPEMs", () => {
             "1b4e60e6d100cdf234d3427494dac55fbac49856cadc86bcb13a01b9bb05a0d9143e86c186c948e7ae9e52427c9523102efe9019a2a9c06db02993f2e3e6756576ae5a3ec7c235d548bc79de1a6990e1120ae435cb48f7fc436c9f9098b92a0d",
         );
         assert.equal(entry.secretKey.hex(), "3034b1d58628a842984da0c70da0b5a251ebb2aebf51afc5b586e2839b5e5263");
+    });
+
+    it("should load the entry at the given index (by default, the first one)", async function () {
+        const multiplePath = path.join(walletsPath, "multipleValidatorKeys.pem");
+        const text = fs.readFileSync(multiplePath, "utf-8");
+        const expectedSecretKeys = [
+            "7c19bf3a0c57cdd1fb08e4607cebaa3647d6b9261b4693f61e96e54b218d442a",
+            "3034b1d58628a842984da0c70da0b5a251ebb2aebf51afc5b586e2839b5e5263",
+            "de7e1b385edbb0e1e8f9fc25d91bd8eed71a1da7caab732e6b47a48042d8523d",
+            "8ebeb07d296ad2529400b40687a741a135f8357f79f39fcb2894a6f9703a5816",
+        ];
+
+        assert.equal((await ValidatorPEM.fromFile(multiplePath)).secretKey.hex(), expectedSecretKeys[0]);
+        assert.equal((await ValidatorPEM.fromText(text)).secretKey.hex(), expectedSecretKeys[0]);
+
+        const all = await ValidatorPEM.fromFileAll(multiplePath);
+        assert.lengthOf(all, 4);
+        assert.deepEqual(
+            all.map((item) => item.secretKey.hex()),
+            expectedSecretKeys,
+        );
+
+        for (const [index, secretKeyHex] of expectedSecretKeys.entries()) {
+            const fromFile = await ValidatorPEM.fromFile(multiplePath, index);
+            const fromText = await ValidatorPEM.fromText(text, index);
+
+            assert.equal(fromFile.secretKey.hex(), secretKeyHex);
+            assert.equal(fromText.secretKey.hex(), secretKeyHex);
+
+            // In the test files, the label of an entry is the public key.
+            assert.equal(fromFile.label, fromFile.secretKey.generatePublicKey().hex());
+            assert.equal(fromText.label, all[index].label);
+        }
+    });
+
+    it("should load nothing from an empty text", async function () {
+        assert.deepEqual(await ValidatorPEM.fromTextAll(""), []);
+    });
+
+    it("should reject entries that don't hold a validator key", async function () {
+        const userKeyError = await ValidatorPEM.fromFile(path.join(walletsPath, "alice.pem")).catch((err) => err);
+        assert.instanceOf(userKeyError, ErrInvariantFailed);
+        assert.include(userKeyError.message, "wrong length, expected: 32, actual: 64");
+
+        const shortKey = `-----BEGIN PRIVATE KEY for foo-----\n${Buffer.from("aabb").toString("base64")}\n-----END PRIVATE KEY for foo-----`;
+        const shortKeyError = await ValidatorPEM.fromText(shortKey).catch((err) => err);
+        assert.instanceOf(shortKeyError, ErrInvariantFailed);
+    });
+
+    it("should create the text from a label and a secret key", async function () {
+        await BLS.initIfNecessary();
+
+        const expectedText = fs.readFileSync(pemPath, "utf-8").trim();
+        const secretKey = new ValidatorSecretKey(
+            Buffer.from("7cff99bd671502db7d15bc8abc0c9a804fb925406fbdd50f1e4c17a4cd774247", "hex"),
+        );
+        const pem = new ValidatorPEM(secretKey.generatePublicKey().hex(), secretKey);
+
+        assert.equal(pem.toText(), expectedText);
+
+        // Round-trip.
+        const loaded = await ValidatorPEM.fromText(pem.toText());
+        assert.equal(loaded.label, pem.label);
+        assert.equal(loaded.secretKey.hex(), secretKey.hex());
+        assert.equal(loaded.secretKey.generatePublicKey().hex(), pem.label);
+        assert.deepEqual(loaded.secretKey.sign(Buffer.from("hello")), secretKey.sign(Buffer.from("hello")));
     });
 
     it("should convert to text", async function () {

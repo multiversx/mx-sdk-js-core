@@ -6,41 +6,40 @@ import { getTestWalletsPath } from "../testutils";
 import { BLS, ValidatorSecretKey } from "./validatorKeys";
 import { ValidatorPEM } from "./validatorPem";
 
-describe("test BLS initialization", () => {
-    // Puts the class back into its "never initialized" state, so that the next call goes through a cold start.
-    function resetBLS() {
-        (BLS as any).isInitialized = false;
-        (BLS as any).initPromise = undefined;
-    }
+describe("test BLS initialization (not necessary anymore)", () => {
+    const secretKeyHex = "7cff99bd671502db7d15bc8abc0c9a804fb925406fbdd50f1e4c17a4cd774247";
+    const publicKeyHex =
+        "e7beaa95b3877f47348df4dd1cb578a4f7cabf7a20bfeefe5cdd263878ff132b765e04fef6f40c93512b666c47ed7719b8902f6c922c04247989b7137e837cc81a62e54712471c97a2ddab75aa9c2f58f813ed4c0fa722bde0ab718bff382208";
+    const signatureOfHelloHex =
+        "84fd0a3a9d4f1ea2d4b40c6da67f9b786284a1c3895b7253fec7311597cda3f757862bb0690a92a13ce612c33889fd86";
 
-    it("should initialize the BLS module only once, even if called concurrently", async () => {
-        await BLS.initIfNecessary();
+    it("should handle validator keys without any initialization, synchronously", () => {
+        const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
 
-        const originalInit = BLS.bls.init;
-        let numCalls = 0;
-        BLS.bls.init = (...args: any[]) => {
-            numCalls++;
-            return originalInit(...args);
-        };
-
-        try {
-            resetBLS();
-            await Promise.all([BLS.initIfNecessary(), BLS.initIfNecessary(), BLS.initIfNecessary()]);
-            await BLS.initIfNecessary();
-        } finally {
-            BLS.bls.init = originalInit;
-        }
-
-        assert.equal(numCalls, 1);
-        assert.doesNotThrow(() => BLS.guardInitialized());
+        assert.equal(secretKey.generatePublicKey().hex(), publicKeyHex);
+        assert.equal(secretKey.sign(Buffer.from("hello")).toString("hex"), signatureOfHelloHex);
     });
 
-    it("should load the correct keys when validator PEMs are loaded concurrently, on first use", async () => {
+    it("should still provide BLS.initIfNecessary() and BLS.guardInitialized(), for the existing code that calls them", async () => {
+        assert.doesNotThrow(() => BLS.guardInitialized());
+
+        assert.instanceOf(BLS.initIfNecessary(), Promise);
+        assert.isUndefined(await BLS.initIfNecessary());
+        await Promise.all([BLS.initIfNecessary(), BLS.initIfNecessary(), BLS.initIfNecessary()]);
+
+        assert.doesNotThrow(() => BLS.guardInitialized());
+
+        // The usual sequence, as documented for the previous versions.
+        await BLS.initIfNecessary();
+        const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
+        assert.equal(secretKey.generatePublicKey().hex(), publicKeyHex);
+    });
+
+    it("should load the correct keys when validator PEMs are loaded concurrently", async () => {
         const text = fs.readFileSync(path.join(getTestWalletsPath(), "multipleValidatorKeys.pem"), "utf-8").trim();
         const blocks = text.split(/\n(?=-----BEGIN)/);
         const data = Buffer.from("hello");
 
-        resetBLS();
         const pems = await Promise.all(blocks.map((block) => ValidatorPEM.fromText(block)));
 
         assert.lengthOf(pems, 4);
@@ -55,27 +54,6 @@ describe("test BLS initialization", () => {
             assert.deepEqual(pem.secretKey.sign(data), freshlyLoadedKey.sign(data));
             assert.equal(pem.toText(), blocks[i]);
         }
-    });
-
-    it("should allow a retry after a failed initialization", async () => {
-        const originalInit = BLS.bls.init;
-        BLS.bls.init = () => Promise.reject(new Error("init failed"));
-
-        let error: any;
-        try {
-            resetBLS();
-            await BLS.initIfNecessary();
-        } catch (err) {
-            error = err;
-        } finally {
-            BLS.bls.init = originalInit;
-        }
-
-        assert.equal(error?.message, "init failed");
-        assert.throws(() => BLS.guardInitialized());
-
-        await BLS.initIfNecessary();
-        assert.doesNotThrow(() => BLS.guardInitialized());
     });
 });
 

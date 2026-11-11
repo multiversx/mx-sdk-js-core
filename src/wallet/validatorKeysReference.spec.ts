@@ -8,11 +8,8 @@ import { IBlsExtendedVector, IBlsVector, loadBlsExtendedVectors, loadBlsVectors 
 import { BLS, ValidatorSecretKey } from "./validatorKeys";
 import { ValidatorPEM } from "./validatorPem";
 
-// The SDK, compared against the reference implementation (Herumi, as WebAssembly), which is loaded directly by the tests.
-//
-// While the SDK itself computes on the reference implementation, the tests that compare the outcomes of the two
-// ("should produce the same ... as the reference") cannot fail. They become the actual safety net once the SDK
-// switches to another implementation. The tests that verify signatures are meaningful in both situations.
+// The SDK, compared against the reference implementation (Herumi, as WebAssembly), which the SDK used before switching
+// to "@noble/curves". The reference is loaded by the tests only (see "testutils/blsReference.ts").
 describe("test validator keys against the reference BLS implementation", function () {
     this.timeout(300000);
 
@@ -92,6 +89,22 @@ describe("test validator keys against the reference BLS implementation", functio
                     vector.note,
                 );
             }
+        });
+
+        it("should tell the parity of a public key's 'y' by its first coefficient only", () => {
+            // A point of the curve of G2 (not of the group itself, which the reference does not check when decoding),
+            // picked so that the first coefficient of "y" is zero: y = (0, b). The two roots are (0, b) and (0, -b); one of
+            // "b" and "-b" is odd. No actual public key is like this, so this is the only way to observe the rule: Herumi
+            // looks at the first coefficient alone (both roots are "even"), whereas other libraries (e.g. "@noble/curves")
+            // fall back to the second coefficient when the first one is zero.
+            const x =
+                "b04d38491b0ae9875ffad5903668bf556873073c13ace18480792b149ba8552e3148266933647ef8f799b1f4d2aa310e" +
+                "020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+            const withFlag = fromHex(x);
+            withFlag[95] |= 0x80;
+
+            assert.equal(reference.reencodePublicKey(fromHex(x)).toString("hex"), x);
+            assert.equal(reference.reencodePublicKey(withFlag).toString("hex"), x);
         });
 
         it("should not verify when the message, the public key or the signature is another one", () => {
@@ -174,12 +187,6 @@ describe("test validator keys against the reference BLS implementation", functio
         });
 
         it("should produce the same public keys and signatures as the reference (random keys and messages)", function () {
-            if (reference.isUsedBySdk()) {
-                console.info(
-                    "        (the SDK computes on the reference implementation: this comparison is trivial, for now)",
-                );
-            }
-
             for (let i = 0; i < 300; i++) {
                 const secretKeyBytes = createRandomSecretKey();
                 const message = randomBytes(randomInt(0, 400));

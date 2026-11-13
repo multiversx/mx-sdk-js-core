@@ -5,7 +5,7 @@ import { Address } from "../core/address";
 import { ErrInvalidArgument, ErrSignerCannotSign } from "../core/errors";
 import { getTestWalletsPath } from "../testutils";
 import { ValidatorsSigners } from "../validators/validatorsSigner";
-import { BLS, ValidatorPublicKey, ValidatorSecretKey } from "./validatorKeys";
+import { ValidatorPublicKey, ValidatorSecretKey } from "./validatorKeys";
 import { ValidatorSigner } from "./validatorSigner";
 
 // These tests must pass, unchanged, on any implementation of the BLS operations.
@@ -63,10 +63,6 @@ describe("test validator signer", () => {
         signatureOfAlice:
             "604882237a9845f508ad03877b5aab90569683eeb51fafcbbeb87440ba359992b3c0b837a8757c25be18132549404f88",
     };
-
-    before(async () => {
-        await BLS.initIfNecessary();
-    });
 
     function toHex(bytes: Uint8Array): string {
         return Buffer.from(bytes).toString("hex");

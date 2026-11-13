@@ -3,7 +3,7 @@ import * as fs from "fs";
 import path from "path";
 import { ErrInvariantFailed } from "../core/errors";
 import { getTestWalletsPath } from "../testutils";
-import { BLS, ValidatorSecretKey } from "./validatorKeys";
+import { ValidatorSecretKey } from "./validatorKeys";
 import { ValidatorPEM } from "./validatorPem";
 
 describe("test ValidatorPEMs", () => {
@@ -108,8 +108,6 @@ describe("test ValidatorPEMs", () => {
     });
 
     it("should create the text from a label and a secret key", async function () {
-        await BLS.initIfNecessary();
-
         const expectedText = fs.readFileSync(pemPath, "utf-8").trim();
         const secretKey = new ValidatorSecretKey(
             Buffer.from("7cff99bd671502db7d15bc8abc0c9a804fb925406fbdd50f1e4c17a4cd774247", "hex"),

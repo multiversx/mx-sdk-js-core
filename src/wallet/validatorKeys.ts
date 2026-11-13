@@ -21,22 +21,6 @@ function getHerumiBls(): HerumiBls {
     return herumiBls!;
 }
 
-/**
- * @deprecated The BLS operations do not require an initialization anymore. This class is kept so that existing code
- * (which calls "await BLS.initIfNecessary()" before handling validator keys) continues to work.
- */
-export class BLS {
-    /**
-     * @deprecated Not necessary anymore. Does nothing.
-     */
-    static async initIfNecessary(): Promise<void> {}
-
-    /**
-     * @deprecated Not necessary anymore. Does nothing.
-     */
-    static guardInitialized(): void {}
-}
-
 export class ValidatorSecretKey {
     private readonly secretKey: Buffer;
     private readonly scalar: bigint;
@@ -128,6 +112,23 @@ export class ValidatorPublicKey {
         guardLength(buffer, VALIDATOR_PUBKEY_LENGTH);
 
         this.buffer = Buffer.from(buffer);
+    }
+
+    /**
+     * Tells whether the signature is the one of the data, under this public key.
+     *
+     * Resolves to "false" for any signature that is not valid, including the ones that are malformed (e.g. wrong length, not a point of the curve).
+     * Also resolves to "false" if the public key itself is not valid (the constructor only checks its length).
+     * Rejects with "ErrBadType" if the data or the signature are not bytes.
+     *
+     * Asynchronous, as "UserPublicKey.verify()" is: the outcome must be awaited (a promise that is not awaited is always truthy).
+     */
+    async verify(data: Buffer | Uint8Array, signature: Buffer | Uint8Array): Promise<boolean> {
+        // Same conversion as for "ValidatorSecretKey.sign()", so that whatever can be signed can also be verified.
+        const dataBytes = messageToBytes(data);
+        const signatureBytes = bytesFromInput(signature, "signature");
+
+        return getHerumiBls().verify(this.buffer, dataBytes, signatureBytes);
     }
 
     hex(): string {

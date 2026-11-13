@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { IBlsExtendedVector, IBlsVector, loadBlsExtendedVectors, loadBlsVectors } from "../testutils/blsVectors";
-import { BLS, ValidatorSecretKey } from "./validatorKeys";
+import { ValidatorPublicKey, ValidatorSecretKey } from "./validatorKeys";
 
 // These tests go through the public API only, so they must pass, unchanged, on any implementation of the validator keys.
 // See "src/testdata/README.md" for where the vectors come from.
@@ -15,8 +15,6 @@ describe("test validator keys against the BLS test vectors", function () {
     let extendedVectors: IBlsExtendedVector[];
 
     before(async () => {
-        await BLS.initIfNecessary();
-
         vectors = loadBlsVectors();
         extendedVectors = loadBlsExtendedVectors();
     });
@@ -62,6 +60,47 @@ describe("test validator keys against the BLS test vectors", function () {
 
             for (const [message, messageMapped] of mappedByMessage) {
                 assert.equal(secretKey.sign(Buffer.from(message)).toString("hex"), messageMapped, message);
+            }
+        });
+    });
+
+    describe("verifying the signatures held by the vectors", () => {
+        it("should verify the signatures generated with the Go implementation (one vector out of 25)", async () => {
+            const selected = vectors.filter((_, index) => index % 25 == 0);
+            assert.lengthOf(selected, 50);
+
+            for (const vector of selected) {
+                const publicKey = new ValidatorPublicKey(fromHex(vector.publicKey));
+
+                assert.isTrue(
+                    await publicKey.verify(Buffer.from(vector.message), fromHex(vector.signature)),
+                    vector.secretKey,
+                );
+                assert.isFalse(await publicKey.verify(Buffer.from(vector.message + "!"), fromHex(vector.signature)));
+            }
+        });
+
+        it("should verify the signatures of the extended vectors (edge keys, message lengths, all the paths of the map to G1)", async () => {
+            for (const vector of extendedVectors) {
+                const publicKey = new ValidatorPublicKey(fromHex(vector.publicKey));
+
+                assert.isTrue(
+                    await publicKey.verify(fromHex(vector.messageHex), fromHex(vector.signature)),
+                    vector.note,
+                );
+            }
+        });
+
+        it("should not verify a signature under the public key of another vector", async () => {
+            const selected = extendedVectors.filter((vector) => vector.group == "edge-keys");
+
+            for (let i = 1; i < selected.length; i++) {
+                if (selected[i].publicKey == selected[i - 1].publicKey) {
+                    continue;
+                }
+
+                const publicKey = new ValidatorPublicKey(fromHex(selected[i - 1].publicKey));
+                assert.isFalse(await publicKey.verify(fromHex(selected[i].messageHex), fromHex(selected[i].signature)));
             }
         });
     });

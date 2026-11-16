@@ -254,10 +254,6 @@ describe("test the BLS implementation (Herumi-compatible, on top of noble curves
     describe("points (coordinates from the vectors generated with the Go implementation)", () => {
         it("should compute the public keys", () => {
             for (const [index, vector] of vectors.entries()) {
-                if (index % 20 != 0) {
-                    continue;
-                }
-
                 const point = herumiBls.computePublicKeyPoint(scalarOf(vector.secretKey));
                 const { x, y } = point.toAffine();
                 const expected = vector.publicKeyAsPoint;
@@ -275,10 +271,6 @@ describe("test the BLS implementation (Herumi-compatible, on top of noble curves
 
         it("should compute the signatures", () => {
             for (const [index, vector] of vectors.entries()) {
-                if (index % 20 != 0) {
-                    continue;
-                }
-
                 const point = herumiBls.signToPoint(scalarOf(vector.secretKey), Buffer.from(vector.message));
                 const { x, y } = point.toAffine();
                 const expected = vector.signatureAsPoint;
@@ -375,7 +367,7 @@ describe("test the BLS implementation (Herumi-compatible, on top of noble curves
         const G2 = bls12_381.G2.Point;
 
         it("should deserialize what was serialized (signatures and public keys of the vectors)", () => {
-            for (const vector of [...vectors.filter((_, index) => index % 10 == 0), ...extendedVectors]) {
+            for (const vector of [...vectors, ...extendedVectors]) {
                 const scalar = scalarOf(vector.secretKey);
                 const message = "messageHex" in vector ? fromHex(vector.messageHex) : Buffer.from(vector.message);
 

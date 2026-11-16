@@ -65,11 +65,10 @@ describe("test validator keys against the BLS test vectors", function () {
     });
 
     describe("verifying the signatures held by the vectors", () => {
-        it("should verify the signatures generated with the Go implementation (one vector out of 25)", async () => {
-            const selected = vectors.filter((_, index) => index % 25 == 0);
-            assert.lengthOf(selected, 50);
+        it("should verify the signatures generated with the Go implementation (all of them)", async () => {
+            assert.lengthOf(vectors, 1250);
 
-            for (const vector of selected) {
+            for (const vector of vectors) {
                 const publicKey = new ValidatorPublicKey(fromHex(vector.publicKey));
 
                 assert.isTrue(
@@ -163,7 +162,7 @@ describe("test validator keys against the BLS test vectors", function () {
         });
 
         it("should produce the same signatures when the messages are given as Uint8Array", () => {
-            for (const vector of extendedVectors.filter((_, index) => index % 5 == 0)) {
+            for (const vector of extendedVectors) {
                 const secretKey = new ValidatorSecretKey(Uint8Array.from(fromHex(vector.secretKey)));
                 const signature = secretKey.sign(Uint8Array.from(fromHex(vector.messageHex)));
                 assert.equal(Buffer.from(signature).toString("hex"), vector.signature, vector.note);

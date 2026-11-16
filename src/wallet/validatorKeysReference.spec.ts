@@ -63,10 +63,6 @@ describe("test validator keys against the reference BLS implementation", functio
     describe("the reference itself", () => {
         it("should agree with the test vectors", () => {
             for (const [index, vector] of vectors.entries()) {
-                if (index % 10 != 0) {
-                    continue;
-                }
-
                 const secretKey = fromHex(vector.secretKey);
                 const message = Buffer.from(vector.message);
 
@@ -138,7 +134,7 @@ describe("test validator keys against the reference BLS implementation", functio
 
     describe("the SDK", () => {
         it("should produce public keys and signatures that the reference decodes, in their canonical form", () => {
-            for (const vector of extendedVectors.filter((_, index) => index % 4 == 0)) {
+            for (const vector of extendedVectors) {
                 const secretKey = new ValidatorSecretKey(fromHex(vector.secretKey));
                 const publicKey = secretKey.generatePublicKey().valueOf();
                 const signature = secretKey.sign(fromHex(vector.messageHex));
@@ -174,9 +170,7 @@ describe("test validator keys against the reference BLS implementation", functio
         });
 
         it("should produce signatures that the reference verifies (edge keys, all the paths of the map to G1)", () => {
-            for (const vector of extendedVectors.filter(
-                (vector, index) => vector.group == "edge-keys" || index % 3 == 0,
-            )) {
+            for (const vector of extendedVectors) {
                 const secretKey = new ValidatorSecretKey(fromHex(vector.secretKey));
                 const publicKey = secretKey.generatePublicKey().valueOf();
                 const message = fromHex(vector.messageHex);
@@ -208,9 +202,7 @@ describe("test validator keys against the reference BLS implementation", functio
                     context,
                 );
 
-                if (i % 10 == 0) {
-                    assert.isTrue(referenceVerifies(publicKey, message, signature), context);
-                }
+                assert.isTrue(referenceVerifies(publicKey, message, signature), context);
             }
         });
 
@@ -252,7 +244,7 @@ describe("test validator keys against the reference BLS implementation", functio
         });
 
         it("should verify the signatures produced by the reference", async () => {
-            for (const vector of extendedVectors.filter((_, index) => index % 8 == 0)) {
+            for (const vector of extendedVectors) {
                 const secretKeyBytes = fromHex(vector.secretKey);
                 const message = fromHex(vector.messageHex);
                 const publicKey = new ValidatorPublicKey(reference.getPublicKey(secretKeyBytes));

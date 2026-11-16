@@ -1,5 +1,5 @@
 import { ErrBadType, ErrInvalidArgument } from "../core/errors";
-import { bytesFromInput, guardLength } from "./assertions";
+import { bytesFromInput, guardLength, isUint8Array } from "./assertions";
 import { parseValidatorKey } from "./pem";
 
 export const VALIDATOR_SECRETKEY_LENGTH = 32;
@@ -24,7 +24,7 @@ function getHerumiBls(): HerumiBls {
 export class ValidatorSecretKey {
     private readonly secretKey: Buffer;
     private readonly scalar: bigint;
-    private publicKey: Buffer | undefined;
+    private readonly publicKey: Buffer;
 
     constructor(buffer: Buffer | Uint8Array) {
         guardLength(buffer, VALIDATOR_SECRETKEY_LENGTH);
@@ -45,6 +45,7 @@ export class ValidatorSecretKey {
 
         this.secretKey = bytes;
         this.scalar = scalar;
+        this.publicKey = Buffer.from(bls.computePublicKey(scalar));
     }
 
     static fromPem(text: string, index: number = 0) {
@@ -52,10 +53,6 @@ export class ValidatorSecretKey {
     }
 
     generatePublicKey(): ValidatorPublicKey {
-        if (!this.publicKey) {
-            this.publicKey = Buffer.from(getHerumiBls().computePublicKey(this.scalar));
-        }
-
         return new ValidatorPublicKey(this.publicKey);
     }
 
@@ -79,16 +76,21 @@ export class ValidatorSecretKey {
  * have always been accepted as well (and converted as below). Kept for backwards compatibility.
  */
 function messageToBytes(message: any): Uint8Array {
-    // Not "instanceof", so that a Uint8Array (or Buffer) created in another realm (e.g. iframe, "vm" context) is accepted, as well.
-    const tag = Object.prototype.toString.call(message);
-
-    if (tag === "[object Uint8Array]") {
-        return message;
+    // Not "instanceof", so that a Uint8Array (or Buffer) created in another realm (e.g. iframe, "vm" context, jest with jsdom) is accepted, as well.
+    if (isUint8Array(message)) {
+        try {
+            // A copy, as a Uint8Array of this realm: the underlying library would reject, e.g., a Buffer created in another one.
+            // The actual content is copied, no matter what the properties of the object (e.g. "length", "buffer") claim.
+            return new Uint8Array(message);
+        } catch {
+            throw new ErrBadType("message", "Uint8Array", "a Uint8Array whose memory is not available (e.g. detached)");
+        }
     }
 
-    if (tag === "[object String]") {
+    const text = stringValueOf(message);
+
+    if (text !== undefined) {
         // One byte per character (UTF-16 code unit): the low byte of its code. For ASCII strings, this is the usual encoding.
-        const text = String(message);
         const bytes = new Uint8Array(text.length);
 
         for (let i = 0; i < text.length; i++) {
@@ -98,11 +100,30 @@ function messageToBytes(message: any): Uint8Array {
         return bytes;
     }
 
-    if (tag === "[object Array]") {
+    if (Array.isArray(message)) {
         return Uint8Array.from(message);
     }
 
-    throw new ErrBadType("message", "Uint8Array", tag);
+    // The type is not decided by "Object.prototype.toString()": any object can claim any tag (by means of "Symbol.toStringTag").
+    const tag = Object.prototype.toString.call(message);
+    const isMisleadingTag = ["[object Uint8Array]", "[object String]", "[object Array]"].includes(tag);
+    throw new ErrBadType("message", "Uint8Array", isMisleadingTag ? `an object that only claims to be ${tag}` : tag);
+}
+
+/**
+ * Gives the content of a string or of a String object (no matter the realm it was created in), and "undefined" for anything else.
+ */
+function stringValueOf(value: any): string | undefined {
+    if (typeof value === "string") {
+        return value;
+    }
+
+    try {
+        // Reads the internal slot of a String object (and throws for anything else).
+        return String.prototype.valueOf.call(value);
+    } catch {
+        return undefined;
+    }
 }
 
 export class ValidatorPublicKey {

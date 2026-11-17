@@ -201,29 +201,29 @@ describe("test multisig controller query methods", () => {
         });
 
         assert.isTrue(result);
-
-        it("returns false when user has not signed", async function () {
-            networkProvider.mockQueryContractOnFunction(
-                "signed",
-                new SmartContractQueryResponse({
-                    function: "signed",
-                    returnDataParts: [Buffer.from("00", "hex")], // 0 = false
-                    returnCode: "ok",
-                    returnMessage: "ok",
-                }),
-            );
-
-            const result = await controller.hasSignedAction({
-                multisigAddress: mockMultisigAddress,
-                userAddress: mockProposerAddress,
-                actionId: 42,
-            });
-
-            assert.isFalse(result);
-        });
     });
 
-    it("quorumReached returns false when quorum reached", async function () {
+    it("returns false when user has not signed", async function () {
+        networkProvider.mockQueryContractOnFunction(
+            "signed",
+            new SmartContractQueryResponse({
+                function: "signed",
+                returnDataParts: [Buffer.from("00", "hex")], // 0 = false
+                returnCode: "ok",
+                returnMessage: "ok",
+            }),
+        );
+
+        const result = await controller.hasSignedAction({
+            multisigAddress: mockMultisigAddress,
+            userAddress: mockProposerAddress,
+            actionId: 42,
+        });
+
+        assert.isFalse(result);
+    });
+
+    it("quorumReached returns true when quorum reached", async function () {
         networkProvider.mockQueryContractOnFunction(
             "quorumReached",
             new SmartContractQueryResponse({
@@ -240,25 +240,25 @@ describe("test multisig controller query methods", () => {
         });
 
         assert.isTrue(result);
+    });
 
-        it("quorumReached returns false when quorum not reached", async function () {
-            networkProvider.mockQueryContractOnFunction(
-                "quorumReached",
-                new SmartContractQueryResponse({
-                    function: "quorumReached",
-                    returnDataParts: [Buffer.from("00", "hex")], // 0 = false
-                    returnCode: "ok",
-                    returnMessage: "ok",
-                }),
-            );
+    it("quorumReached returns false when quorum not reached", async function () {
+        networkProvider.mockQueryContractOnFunction(
+            "quorumReached",
+            new SmartContractQueryResponse({
+                function: "quorumReached",
+                returnDataParts: [Buffer.from("00", "hex")], // 0 = false
+                returnCode: "ok",
+                returnMessage: "ok",
+            }),
+        );
 
-            const result = await controller.quorumReached({
-                multisigAddress: mockMultisigAddress,
-                actionId: 42,
-            });
-
-            assert.isFalse(result);
+        const result = await controller.quorumReached({
+            multisigAddress: mockMultisigAddress,
+            actionId: 42,
         });
+
+        assert.isFalse(result);
     });
 
     it("getUserRole returns the user role", async function () {

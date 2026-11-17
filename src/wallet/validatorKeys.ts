@@ -69,6 +69,22 @@ export class ValidatorSecretKey {
         // A copy, so that the key can't be altered through the returned buffer.
         return Buffer.from(this.secretKey);
     }
+
+    /**
+     * Used by "JSON.stringify()", also when the key is held by another object (e.g. a signer).
+     * The secret key is deliberately left out: use "hex()" or "valueOf()" to export it.
+     */
+    toJSON(): object {
+        return {};
+    }
+
+    /**
+     * Used by Node.js when the key is displayed (e.g. "console.log()", "util.inspect()"), also when the key is held by another object.
+     * The secret key is deliberately left out, so that it does not end up in logs.
+     */
+    [Symbol.for("nodejs.util.inspect.custom")](): string {
+        return "ValidatorSecretKey {}";
+    }
 }
 
 /**

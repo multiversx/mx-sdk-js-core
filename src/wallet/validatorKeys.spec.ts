@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import * as fs from "fs";
 import path from "path";
+import * as util from "util";
 import * as vm from "vm";
 import { ErrBadPEM, ErrBadType, ErrInvariantFailed } from "../core/errors";
 import { getTestWalletsPath } from "../testutils";
@@ -10,6 +11,7 @@ import {
     ValidatorPublicKey,
     ValidatorSecretKey,
 } from "./validatorKeys";
+import { ValidatorPEM } from "./validatorPem";
 import { ValidatorSigner } from "./validatorSigner";
 
 // The behaviour of the validator keys, as seen through the public API (see "validators.spec.ts", as well).
@@ -214,6 +216,119 @@ describe("test validator secret key", () => {
 
         assert.equal(new Set(expected.map((item) => item.publicKey)).size, 4);
         assert.equal(new Set(expected.flatMap((item) => item.signatures)).size, 12);
+    });
+
+    describe("keeping the secret key out of serialized and displayed output", () => {
+        // The forms in which the secret key could show up: hex, the bytes (as printed for a Buffer, and as numbers), the scalar (decimal).
+        const secretBytes = Buffer.from(secretKeyHex, "hex");
+        const secretScalar = BigInt("0x" + Buffer.from(secretBytes).reverse().toString("hex")).toString();
+        const forbidden = [
+            secretKeyHex,
+            secretBytes.toString("hex").replace(/(..)(?=.)/g, "$1 "),
+            Array.from(secretBytes).join(","),
+            Array.from(secretBytes).join(", "),
+            secretBytes.toString("base64"),
+            secretScalar,
+        ];
+
+        function assertHoldsNoSecret(output: string) {
+            const normalized = output.replace(/\s+/g, " ");
+
+            for (const item of forbidden) {
+                assert.notInclude(normalized, item);
+            }
+        }
+
+        function createHolders(): [string, any][] {
+            const secretKey = new ValidatorSecretKey(secretBytes);
+            const signer = new ValidatorSigner(secretKey);
+            const pem = new ValidatorPEM("some label", secretKey);
+
+            return [
+                ["key", secretKey],
+                ["signer", signer],
+                ["pem", pem],
+                ["object holding them", { name: "node-0", keys: [secretKey], nested: { signer, pem } }],
+            ];
+        }
+
+        it("should serialize with JSON.stringify() (and not throw)", () => {
+            const secretKey = new ValidatorSecretKey(secretBytes);
+
+            assert.equal(JSON.stringify(secretKey), "{}");
+            assert.equal(JSON.stringify(new ValidatorSigner(secretKey)), `{"secretKey":{}}`);
+            assert.equal(
+                JSON.stringify(new ValidatorPEM("some label", secretKey)),
+                `{"label":"some label","secretKey":{}}`,
+            );
+            assert.equal(JSON.stringify({ keys: [secretKey] }, null, 2), `{\n  "keys": [\n    {}\n  ]\n}`);
+
+            // Applications that taught JSON about bigint (globally, or by means of a replacer) aren't handed the secret key, either.
+            const replacer = (_key: string, value: any) => (typeof value === "bigint" ? value.toString() : value);
+
+            for (const [name, holder] of createHolders()) {
+                assert.doesNotThrow(() => JSON.stringify(holder), name);
+                assertHoldsNoSecret(JSON.stringify(holder));
+                assertHoldsNoSecret(JSON.stringify(holder, replacer));
+                assertHoldsNoSecret(JSON.stringify(holder, null, 4));
+            }
+        });
+
+        it("should serialize the same before and after the key was used", () => {
+            const secretKey = new ValidatorSecretKey(secretBytes);
+            const before = JSON.stringify(secretKey);
+
+            secretKey.generatePublicKey();
+            secretKey.sign(Buffer.from("hello"));
+
+            assert.equal(JSON.stringify(secretKey), before);
+        });
+
+        it("should not display the secret key when inspected by Node.js (e.g. console.log)", () => {
+            const secretKey = new ValidatorSecretKey(secretBytes);
+
+            assert.equal(util.inspect(secretKey), "ValidatorSecretKey {}");
+            assert.equal(
+                util.inspect(new ValidatorSigner(secretKey)),
+                "ValidatorSigner { secretKey: ValidatorSecretKey {} }",
+            );
+            assert.equal(util.format("%o", secretKey), "ValidatorSecretKey {}");
+            assert.equal(util.format("%s", secretKey), "ValidatorSecretKey {}");
+
+            for (const [, holder] of createHolders()) {
+                assertHoldsNoSecret(util.inspect(holder));
+                assertHoldsNoSecret(util.inspect(holder, { depth: Infinity, colors: true }));
+                assertHoldsNoSecret(util.inspect(holder, { depth: Infinity, compact: false, breakLength: 20 }));
+                assertHoldsNoSecret(util.format("%o %O %j", holder, holder, holder));
+            }
+        });
+
+        it("should not display the secret key when converted to a string", () => {
+            const secretKey = new ValidatorSecretKey(secretBytes);
+
+            assertHoldsNoSecret(String(secretKey));
+            assertHoldsNoSecret(`${secretKey}`);
+            assertHoldsNoSecret("" + secretKey);
+        });
+
+        it("should still export the secret key and the public key, when asked to", () => {
+            const secretKey = new ValidatorSecretKey(secretBytes);
+
+            assert.equal(secretKey.hex(), secretKeyHex);
+            assert.equal(secretKey.valueOf().toString("hex"), secretKeyHex);
+            assert.equal(secretKey.generatePublicKey().hex(), publicKeyHex);
+
+            // The public key is not a secret.
+            assert.include(JSON.stringify(secretKey.generatePublicKey()), "buffer");
+        });
+
+        it("should not affect deep equality: equal keys are equal, different keys are not", () => {
+            assert.deepEqual(new ValidatorSecretKey(secretBytes), new ValidatorSecretKey(secretBytes));
+            assert.notDeepEqual(
+                new ValidatorSecretKey(secretBytes),
+                new ValidatorSecretKey(Buffer.from(otherSecretKeyHex, "hex")),
+            );
+        });
     });
 
     it("should not change as an object when used (the public key is computed when the key is created)", () => {

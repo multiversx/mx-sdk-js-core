@@ -24,6 +24,20 @@ export function bytesFromInput(value: any, name: string): Uint8Array {
     throw new ErrBadType(name, "Uint8Array", tag);
 }
 
+const getTypedArrayName = Object.getOwnPropertyDescriptor(
+    Object.getPrototypeOf(Uint8Array.prototype),
+    Symbol.toStringTag,
+)!.get!;
+
+/**
+ * Tells whether the value is a Uint8Array (or a subclass, e.g. Buffer), no matter the realm it was created in (e.g. iframe, "vm" context).
+ * Objects that merely claim to be one (by means of "Symbol.toStringTag") aren't.
+ */
+export function isUint8Array(value: any): value is Uint8Array {
+    // The getter reads the internal slot of the typed array (and gives "undefined" for anything else).
+    return getTypedArrayName.call(value) === "Uint8Array";
+}
+
 function isArrayOfBytes(value: any): boolean {
     if (!Array.isArray(value)) {
         return false;

@@ -254,10 +254,6 @@ describe("test the BLS implementation (Herumi-compatible, on top of noble curves
     describe("points (coordinates from the vectors generated with the Go implementation)", () => {
         it("should compute the public keys", () => {
             for (const [index, vector] of vectors.entries()) {
-                if (index % 20 != 0) {
-                    continue;
-                }
-
                 const point = herumiBls.computePublicKeyPoint(scalarOf(vector.secretKey));
                 const { x, y } = point.toAffine();
                 const expected = vector.publicKeyAsPoint;
@@ -275,10 +271,6 @@ describe("test the BLS implementation (Herumi-compatible, on top of noble curves
 
         it("should compute the signatures", () => {
             for (const [index, vector] of vectors.entries()) {
-                if (index % 20 != 0) {
-                    continue;
-                }
-
                 const point = herumiBls.signToPoint(scalarOf(vector.secretKey), Buffer.from(vector.message));
                 const { x, y } = point.toAffine();
                 const expected = vector.signatureAsPoint;
@@ -367,6 +359,271 @@ describe("test the BLS implementation (Herumi-compatible, on top of noble curves
 
             // One of the two roots is odd, by the rule of the library underneath (which is why that rule is not used).
             assert.equal(Number(Fp2.isOdd!({ c0: 0n, c1: b })) + Number(Fp2.isOdd!({ c0: 0n, c1: Fp.neg(b) })), 1);
+        });
+    });
+
+    describe("deserialization", () => {
+        const G1 = bls12_381.G1.Point;
+        const G2 = bls12_381.G2.Point;
+
+        it("should deserialize what was serialized (signatures and public keys of the vectors)", () => {
+            for (const vector of [...vectors, ...extendedVectors]) {
+                const scalar = scalarOf(vector.secretKey);
+                const message = "messageHex" in vector ? fromHex(vector.messageHex) : Buffer.from(vector.message);
+
+                const signaturePoint = herumiBls.deserializeG1Point(fromHex(vector.signature))!;
+                const publicKeyPoint = herumiBls.deserializeG2Point(fromHex(vector.publicKey))!;
+
+                assert.isTrue(signaturePoint.equals(herumiBls.signToPoint(scalar, message)), vector.secretKey);
+                assert.isTrue(publicKeyPoint.equals(herumiBls.computePublicKeyPoint(scalar)), vector.secretKey);
+
+                assert.equal(toHex(herumiBls.serializeG1Point(signaturePoint)), vector.signature);
+                assert.equal(toHex(herumiBls.serializeG2Point(publicKeyPoint)), vector.publicKey);
+            }
+        });
+
+        it("should deserialize zeros as the point at infinity", () => {
+            assert.isTrue(herumiBls.deserializeG1Point(new Uint8Array(48))!.is0());
+            assert.isTrue(herumiBls.deserializeG2Point(new Uint8Array(96))!.is0());
+        });
+
+        it("should pick 'y' by the flag held by the last byte", () => {
+            const signature = fromHex(extendedVectors[0].signature);
+            const publicKey = fromHex(extendedVectors[0].publicKey);
+
+            const signaturePoint = herumiBls.deserializeG1Point(signature)!;
+            const publicKeyPoint = herumiBls.deserializeG2Point(publicKey)!;
+
+            signature[47] ^= 0x80;
+            publicKey[95] ^= 0x80;
+
+            assert.isTrue(herumiBls.deserializeG1Point(signature)!.equals(signaturePoint.negate()));
+            assert.isTrue(herumiBls.deserializeG2Point(publicKey)!.equals(publicKeyPoint.negate()));
+        });
+
+        it("should not deserialize bytes of a wrong length", () => {
+            for (const length of [0, 1, 47, 49, 95, 96, 97]) {
+                assert.isUndefined(herumiBls.deserializeG1Point(new Uint8Array(length)), `G1, length: ${length}`);
+            }
+
+            for (const length of [0, 1, 47, 48, 49, 95, 97, 192]) {
+                assert.isUndefined(herumiBls.deserializeG2Point(new Uint8Array(length)), `G2, length: ${length}`);
+            }
+        });
+
+        it("should not deserialize a coordinate that is not lower than the field modulus", () => {
+            const modulus = fromHex(Fp.ORDER.toString(16).padStart(96, "0")).reverse();
+            const belowModulus = fromHex((Fp.ORDER - 1n).toString(16).padStart(96, "0")).reverse();
+
+            // G1: "x" is the modulus itself, with and without the flag; then, all the bits set.
+            assert.isUndefined(herumiBls.deserializeG1Point(modulus));
+            assert.isUndefined(
+                herumiBls.deserializeG1Point(
+                    Buffer.concat([modulus.subarray(0, 47), Buffer.from([modulus[47] | 0x80])]),
+                ),
+            );
+            assert.isUndefined(herumiBls.deserializeG1Point(Buffer.alloc(48, 0xff)));
+
+            // The largest "x" is accepted, if it belongs to a point of the curve: x = -1, y^2 = 3.
+            const largest = herumiBls.deserializeG1Point(belowModulus);
+            assert.equal(largest === undefined, Fp.pow(3n, (Fp.ORDER - 1n) / 2n) != 1n);
+
+            // G2: either coefficient of "x".
+            const one = Buffer.concat([Buffer.from([1]), Buffer.alloc(47)]);
+            assert.isUndefined(herumiBls.deserializeG2Point(Buffer.concat([modulus, one])));
+            assert.isUndefined(herumiBls.deserializeG2Point(Buffer.concat([one, modulus])));
+            assert.isUndefined(herumiBls.deserializeG2Point(Buffer.alloc(96, 0xff)));
+        });
+
+        it("should not deserialize an 'x' that does not belong to a point of the curve", () => {
+            let onCurve = 0;
+            let notOnCurve = 0;
+
+            for (let x = 1; x <= 40; x++) {
+                const bytes = new Uint8Array(48);
+                bytes[0] = x;
+
+                // y^2 = x^3 + 4 has a solution only if the right side is a square.
+                const isSquare = Fp.pow(Fp.create(BigInt(x * x * x + 4)), (Fp.ORDER - 1n) / 2n) == 1n;
+                const point = herumiBls.deserializeG1Point(bytes);
+
+                assert.equal(point !== undefined, isSquare, `x = ${x}`);
+
+                if (point) {
+                    const { x: px, y: py } = point.toAffine();
+                    assert.equal(px, BigInt(x));
+                    assert.equal(Fp.sqr(py), Fp.create(BigInt(x * x * x + 4)));
+                    assert.equal(toHex(herumiBls.serializeG1Point(point)), toHex(bytes));
+                    onCurve++;
+                } else {
+                    notOnCurve++;
+                }
+            }
+
+            assert.isAbove(onCurve, 5);
+            assert.isAbove(notOnCurve, 5);
+
+            let onCurveG2 = 0;
+            let notOnCurveG2 = 0;
+
+            for (let c0 = 1; c0 <= 40; c0++) {
+                const bytes = new Uint8Array(96);
+                bytes[0] = c0;
+                bytes[48] = 1;
+
+                const point = herumiBls.deserializeG2Point(bytes);
+
+                if (point) {
+                    const { x, y } = point.toAffine();
+                    assert.deepEqual(x, { c0: BigInt(c0), c1: 1n });
+                    assert.isTrue(Fp2.eql(Fp2.sqr(y), Fp2.add(Fp2.mul(Fp2.sqr(x), x), Fp2.create({ c0: 4n, c1: 4n }))));
+                    assert.equal(toHex(herumiBls.serializeG2Point(point)), toHex(bytes));
+                    onCurveG2++;
+                } else {
+                    notOnCurveG2++;
+                }
+            }
+
+            assert.isAbove(onCurveG2, 5);
+            assert.isAbove(notOnCurveG2, 5);
+        });
+
+        it("should deserialize points of the curve that are outside of the groups (which is checked when verifying)", () => {
+            const pointOfOrderThree = G1.fromAffine({ x: 0n, y: Fp.neg(2n) });
+            const bytes = herumiBls.serializeG1Point(pointOfOrderThree);
+            const point = herumiBls.deserializeG1Point(bytes)!;
+
+            assert.equal(toHex(bytes), "00".repeat(47) + "80");
+            assert.isTrue(point.equals(pointOfOrderThree));
+            assert.isTrue(point.multiplyUnsafe(3n).is0());
+            assert.isFalse(point.isTorsionFree());
+        });
+
+        it("should deserialize a point of G2 whose 'y' has the first coefficient zero (with or without the flag)", () => {
+            // See "should tell the parity of 'y' (G2) by its first coefficient only, as Herumi does".
+            const encoded =
+                "b04d38491b0ae9875ffad5903668bf556873073c13ace18480792b149ba8552e3148266933647ef8f799b1f4d2aa310e" +
+                "020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+            const withFlag = fromHex(encoded);
+            withFlag[95] |= 0x80;
+
+            for (const bytes of [fromHex(encoded), withFlag]) {
+                const point = herumiBls.deserializeG2Point(bytes)!;
+
+                assert.equal(point.toAffine().y.c0, 0n);
+                assert.equal(toHex(herumiBls.serializeG2Point(point)), encoded);
+            }
+
+            assert.isFalse(herumiBls.deserializeG2Point(fromHex(encoded))!.isTorsionFree());
+            assert.isFalse(G2.ZERO.equals(herumiBls.deserializeG2Point(fromHex(encoded))!));
+        });
+    });
+
+    describe("verifying", () => {
+        const secretScalar = 0x1234567890abcdefn;
+        const message = Buffer.from("hello");
+        let publicKey: Uint8Array;
+        let signature: Uint8Array;
+
+        before(() => {
+            publicKey = herumiBls.computePublicKey(secretScalar);
+            signature = herumiBls.sign(secretScalar, message);
+        });
+
+        it("should verify: e(signature, generator) = e(message mapped to G1, public key)", () => {
+            assert.isTrue(herumiBls.verify(publicKey, message, signature));
+            assert.isFalse(herumiBls.verify(publicKey, Buffer.from("hello!"), signature));
+            assert.isFalse(herumiBls.verify(herumiBls.computePublicKey(secretScalar + 1n), message, signature));
+            assert.isFalse(herumiBls.verify(publicKey, message, herumiBls.sign(secretScalar + 1n, message)));
+
+            // The same check, by the two pairings computed apart.
+            const left = bls12_381.pairing(herumiBls.signToPoint(secretScalar, message), G2_GENERATOR);
+            const right = bls12_381.pairing(
+                herumiBls.hashAndMapToG1(message),
+                herumiBls.computePublicKeyPoint(secretScalar),
+            );
+            assert.isTrue(bls12_381.fields.Fp12.eql(left, right));
+        });
+
+        it("should not verify against the standard generator of G2 (the one of Herumi's default mode is not the standard one)", () => {
+            const standardPublicKey = herumiBls.serializeG2Point(bls12_381.G2.Point.BASE.multiply(secretScalar));
+
+            assert.isFalse(herumiBls.verify(standardPublicKey, message, signature));
+        });
+
+        it("should verify for the smallest and the largest secret keys", () => {
+            for (const scalar of [1n, 2n, herumiBls.GROUP_ORDER - 2n, herumiBls.GROUP_ORDER - 1n]) {
+                const key = herumiBls.computePublicKey(scalar);
+
+                assert.isTrue(herumiBls.verify(key, message, herumiBls.sign(scalar, message)), scalar.toString(16));
+                assert.isFalse(herumiBls.verify(key, message, signature), scalar.toString(16));
+            }
+        });
+
+        it("should not verify the opposite signature, nor under the opposite public key", () => {
+            const oppositeSignature = Uint8Array.from(signature);
+            oppositeSignature[47] ^= 0x80;
+            const oppositePublicKey = Uint8Array.from(publicKey);
+            oppositePublicKey[95] ^= 0x80;
+
+            assert.isFalse(herumiBls.verify(publicKey, message, oppositeSignature));
+            assert.isFalse(herumiBls.verify(oppositePublicKey, message, signature));
+
+            // Both of them negated: this is the public key, and the signature, of the opposite secret key (order - secret key).
+            assert.isTrue(herumiBls.verify(oppositePublicKey, message, oppositeSignature));
+            assert.equal(
+                toHex(oppositePublicKey),
+                toHex(herumiBls.computePublicKey(herumiBls.GROUP_ORDER - secretScalar)),
+            );
+            assert.equal(
+                toHex(oppositeSignature),
+                toHex(herumiBls.sign(herumiBls.GROUP_ORDER - secretScalar, message)),
+            );
+        });
+
+        it("should not verify when the lengths are wrong", () => {
+            assert.isFalse(herumiBls.verify(publicKey, message, signature.subarray(0, 47)));
+            assert.isFalse(herumiBls.verify(publicKey, message, Buffer.concat([signature, Buffer.from([0])])));
+            assert.isFalse(herumiBls.verify(publicKey.subarray(0, 95), message, signature));
+            assert.isFalse(herumiBls.verify(Buffer.concat([publicKey, Buffer.from([0])]), message, signature));
+            assert.isFalse(herumiBls.verify(signature, message, publicKey));
+        });
+
+        it("should not verify with the point at infinity, as public key or as signature", () => {
+            const zeroPublicKey = new Uint8Array(96);
+            const zeroSignature = new Uint8Array(48);
+
+            assert.isFalse(herumiBls.verify(zeroPublicKey, message, zeroSignature));
+            assert.isFalse(herumiBls.verify(zeroPublicKey, message, signature));
+            assert.isFalse(herumiBls.verify(publicKey, message, zeroSignature));
+        });
+
+        it("should not verify a signature that is not a point of G1 (the signature, plus a point of order 3)", () => {
+            const pointOfOrderThree = bls12_381.G1.Point.fromAffine({ x: 0n, y: 2n });
+            const forgedPoint = herumiBls.deserializeG1Point(signature)!.add(pointOfOrderThree);
+            const forged = herumiBls.serializeG1Point(forgedPoint);
+
+            assert.isFalse(forgedPoint.isTorsionFree());
+            assert.isTrue(herumiBls.deserializeG1Point(forged)!.equals(forgedPoint));
+            assert.isFalse(herumiBls.verify(publicKey, message, forged));
+        });
+
+        it("should not verify under a public key that is not a point of G2", () => {
+            // A point of the curve of G2, multiplied by the order of the group: what is left is outside of the group.
+            const bytes = new Uint8Array(96);
+            bytes[0] = 2;
+            const pointOfTheCurve = herumiBls.deserializeG2Point(bytes)!;
+            const outsideOfTheGroup = pointOfTheCurve.multiplyUnsafe(herumiBls.GROUP_ORDER - 1n).add(pointOfTheCurve);
+
+            assert.isFalse(outsideOfTheGroup.is0());
+            assert.isFalse(outsideOfTheGroup.isTorsionFree());
+
+            const forgedPoint = herumiBls.deserializeG2Point(publicKey)!.add(outsideOfTheGroup);
+            const forged = herumiBls.serializeG2Point(forgedPoint);
+
+            assert.isTrue(herumiBls.deserializeG2Point(forged)!.equals(forgedPoint));
+            assert.isFalse(herumiBls.verify(forged, message, signature));
+            assert.isFalse(herumiBls.verify(bytes, message, signature));
         });
     });
 });

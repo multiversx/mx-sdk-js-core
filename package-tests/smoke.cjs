@@ -29,7 +29,7 @@ async function main() {
     const computer = new sdk.TransactionComputer();
     const bytesForSigning = computer.computeBytesForSigning(transaction);
     transaction.signature = secretKey.sign(bytesForSigning);
-    assert.ok(publicKey.verify(bytesForSigning, transaction.signature));
+    assert.strictEqual(await publicKey.verify(bytesForSigning, transaction.signature), true);
     assert.strictEqual(computer.computeTransactionHash(transaction), EXPECTED_TRANSACTION_HASH);
 
     // Keystore encryption and decryption.
@@ -41,10 +41,6 @@ async function main() {
         Object.keys(require.cache).some((file) => /@noble[\\/]curves[\\/]bls12-381/.test(file));
     assert.ok(!isBlsCurveLoaded(), "the BLS curve must not be loaded along with the package");
 
-    // Not necessary anymore, but existing code calls it.
-    await sdk.BLS.initIfNecessary();
-    assert.ok(!isBlsCurveLoaded());
-
     const validatorSecretKey = new sdk.ValidatorSecretKey(
         Buffer.from("7cff99bd671502db7d15bc8abc0c9a804fb925406fbdd50f1e4c17a4cd774247", "hex"),
     );
@@ -54,6 +50,11 @@ async function main() {
         Buffer.from(validatorSecretKey.sign(Buffer.from("hello"))).toString("hex"),
         EXPECTED_VALIDATOR_SIGNATURE,
     );
+
+    const validatorPublicKey = validatorSecretKey.generatePublicKey();
+    const validatorSignature = Buffer.from(EXPECTED_VALIDATOR_SIGNATURE, "hex");
+    assert.strictEqual(await validatorPublicKey.verify(Buffer.from("hello"), validatorSignature), true);
+    assert.strictEqual(await validatorPublicKey.verify(Buffer.from("hello!"), validatorSignature), false);
 
     // Network providers (optional dependency axios). Nothing is sent over the network.
     new sdk.ProxyNetworkProvider("https://localhost", { clientName: "package-tests" });

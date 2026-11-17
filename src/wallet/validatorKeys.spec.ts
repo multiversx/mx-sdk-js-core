@@ -1,15 +1,16 @@
 import { assert } from "chai";
 import * as fs from "fs";
 import path from "path";
-import { ErrBadPEM, ErrInvariantFailed } from "../core/errors";
+import * as vm from "vm";
+import { ErrBadPEM, ErrBadType, ErrInvariantFailed } from "../core/errors";
 import { getTestWalletsPath } from "../testutils";
 import {
-    BLS,
     VALIDATOR_PUBKEY_LENGTH,
     VALIDATOR_SECRETKEY_LENGTH,
     ValidatorPublicKey,
     ValidatorSecretKey,
 } from "./validatorKeys";
+import { ValidatorSigner } from "./validatorSigner";
 
 // The behaviour of the validator keys, as seen through the public API (see "validators.spec.ts", as well).
 // These tests must pass, unchanged, on any implementation of the BLS operations.
@@ -25,10 +26,6 @@ describe("test validator secret key", () => {
     const otherSecretKeyHex = "8085ba1d7f7c3db938ad70595a2bdab09644f1ec3803be171c33f14bc80d4e3b";
     const otherSignatureOfHelloHex =
         "be2e593ff10899a2ee8e1d5c8094e36c9f48e04b87e129991ff09475808743e07bb41bf6e7bc1463fa554c4b46594b98";
-
-    before(async () => {
-        await BLS.initIfNecessary();
-    });
 
     /**
      * Places the bytes in the middle of a larger buffer, so that the returned views have a non-zero offset.
@@ -219,6 +216,32 @@ describe("test validator secret key", () => {
         assert.equal(new Set(expected.flatMap((item) => item.signatures)).size, 12);
     });
 
+    it("should not change as an object when used (the public key is computed when the key is created)", () => {
+        const bytes = Buffer.from(secretKeyHex, "hex");
+        const used = new ValidatorSecretKey(bytes);
+        const propertiesBefore = Object.getOwnPropertyNames(used);
+
+        const publicKeyHex = used.generatePublicKey().hex();
+        used.sign(Buffer.from("hello"));
+
+        // Equal keys are deeply equal, no matter which of them were used. Different keys are not.
+        const unused = new ValidatorSecretKey(bytes);
+        assert.deepEqual(Object.getOwnPropertyNames(used), propertiesBefore);
+        assert.deepEqual(used, unused);
+        assert.deepEqual(unused, used);
+        assert.notDeepEqual(used, new ValidatorSecretKey(Buffer.alloc(32, 1)));
+
+        // A frozen key is usable.
+        const frozen = Object.freeze(new ValidatorSecretKey(bytes));
+        assert.equal(frozen.generatePublicKey().hex(), publicKeyHex);
+        assert.equal(frozen.generatePublicKey().hex(), publicKeyHex);
+        assert.equal(frozen.sign(Buffer.from("hello")).toString("hex"), signatureOfHelloHex);
+
+        // The key isn't altered through the public keys that were handed out.
+        used.generatePublicKey().valueOf().fill(0);
+        assert.equal(used.generatePublicKey().hex(), publicKeyHex);
+    });
+
     // The declared type of the message is "Buffer | Uint8Array". JavaScript callers aren't held to it, though.
     describe("messages that aren't of the declared type", () => {
         it("should sign an array of bytes as the bytes", () => {
@@ -267,6 +290,131 @@ describe("test validator secret key", () => {
                 assert.equal(Buffer.from(bytes).toString("hex"), expectedBytes[index]);
                 assert.equal(secretKey.sign(array as any).toString("hex"), secretKey.sign(bytes).toString("hex"));
             }
+        });
+
+        it("should sign a Uint8Array, a Buffer or another subclass created in another realm", async () => {
+            const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
+            const context = vm.createContext({});
+            const hello = Array.from(Buffer.from("hello"));
+
+            const foreignArray = vm.runInContext("(bytes) => new Uint8Array(bytes)", context)(hello);
+            const foreignSubclass = vm.runInContext(
+                "(bytes) => new (class Bytes extends Uint8Array {})(bytes)",
+                context,
+            )(hello);
+            // Stands for a Buffer of another realm (e.g. the "buffer" polyfill, or Node's Buffer under jest with jsdom).
+            const foreignBuffer = vm.runInContext(
+                "(bytes) => new (class Buffer extends Uint8Array {})(bytes)",
+                context,
+            )(hello);
+            // A part of a larger array: only that part must be signed.
+            const foreignPart = vm.runInContext(
+                "(bytes) => new (class Buffer extends Uint8Array {})(Uint8Array.from([1, 2, ...bytes, 3]).buffer, 2, 5)",
+                context,
+            )(hello);
+
+            for (const message of [foreignArray, foreignSubclass, foreignBuffer, foreignPart]) {
+                assert.isFalse(message instanceof Uint8Array);
+                assert.equal(secretKey.sign(message).toString("hex"), signatureOfHelloHex);
+                const signedBySigner = await new ValidatorSigner(secretKey).sign(message);
+                assert.equal(Buffer.from(signedBySigner).toString("hex"), signatureOfHelloHex);
+                // The message is not altered.
+                assert.deepEqual(Array.from(message as Uint8Array), hello);
+            }
+
+            assert.equal(foreignBuffer.constructor.name, "Buffer");
+            assert.equal(
+                secretKey.sign(vm.runInContext("new Uint8Array(0)", context)).toString("hex"),
+                signatureOfNothingHex,
+            );
+        });
+
+        it("should verify a message and a signature created in another realm", async () => {
+            const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
+            const publicKey = secretKey.generatePublicKey();
+            const toForeign = vm.runInNewContext("(bytes) => new (class Buffer extends Uint8Array {})(bytes)");
+            const message = toForeign(Array.from(Buffer.from("hello")));
+            const signature = toForeign(Array.from(Buffer.from(signatureOfHelloHex, "hex")));
+
+            assert.isFalse(message instanceof Uint8Array);
+            assert.isTrue(await publicKey.verify(message, signature));
+            assert.isFalse(await publicKey.verify(toForeign([104]), signature));
+        });
+
+        it("should not sign an object that only claims to be a Uint8Array, a string or an array", () => {
+            const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
+
+            const taggedView = new DataView(new ArrayBuffer(5));
+            Object.defineProperty(taggedView, Symbol.toStringTag, { value: "Uint8Array" });
+            const taggedOtherArray = new Uint16Array(5);
+            Object.defineProperty(taggedOtherArray, Symbol.toStringTag, { value: "Uint8Array" });
+
+            const messages: [any, string][] = [
+                [{ [Symbol.toStringTag]: "Uint8Array", length: 5 }, "[object Uint8Array]"],
+                [taggedView, "[object Uint8Array]"],
+                [taggedOtherArray, "[object Uint8Array]"],
+                [{ [Symbol.toStringTag]: "String", length: 5 }, "[object String]"],
+                [{ [Symbol.toStringTag]: "Array", length: 5 }, "[object Array]"],
+            ];
+
+            for (const [message, tag] of messages) {
+                assert.equal(Object.prototype.toString.call(message), tag);
+                assert.throws(
+                    () => secretKey.sign(message),
+                    ErrBadType,
+                    `Bad type of "message": an object that only claims to be ${tag}. Expected type: Uint8Array`,
+                );
+            }
+        });
+
+        it("should sign a String object (also when created in another realm) as the string", () => {
+            const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
+            const foreignString = vm.runInNewContext("new String('hello')");
+            const misleading = Object.assign(new String("hello"), { toString: () => "bye", valueOf: () => "bye" });
+
+            assert.isFalse(foreignString instanceof String);
+
+            for (const message of [new String("hello"), foreignString, misleading]) {
+                assert.equal(secretKey.sign(message as any).toString("hex"), signatureOfHelloHex);
+            }
+        });
+
+        it("should sign the actual content of a Uint8Array, no matter what its properties claim", () => {
+            const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
+            const other = Buffer.from("something else");
+
+            const message = new Uint8Array(Buffer.from("hello"));
+            Object.defineProperty(message, "buffer", { value: other.buffer });
+            Object.defineProperty(message, "byteOffset", { value: other.byteOffset });
+            Object.defineProperty(message, "byteLength", { value: other.byteLength });
+            Object.defineProperty(message, "length", { value: other.length });
+            Object.defineProperty(message, Symbol.toStringTag, { value: "Object" });
+
+            assert.equal(secretKey.sign(message).toString("hex"), signatureOfHelloHex);
+        });
+
+        it("should not alter the message", () => {
+            const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
+            const message = Buffer.from("hello");
+
+            assert.equal(secretKey.sign(message).toString("hex"), signatureOfHelloHex);
+            assert.equal(message.toString(), "hello");
+        });
+
+        it("should not sign a Uint8Array that was detached", () => {
+            const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
+            const message = new Uint8Array(Buffer.from("hello"));
+            // Transferring the memory elsewhere detaches the array.
+            const channel = new MessageChannel();
+            channel.port1.postMessage(message.buffer, [message.buffer]);
+            channel.port1.close();
+
+            assert.equal(message.buffer.byteLength, 0);
+            assert.throws(
+                () => secretKey.sign(message),
+                ErrBadType,
+                `Bad type of "message": a Uint8Array whose memory is not available (e.g. detached). Expected type: Uint8Array`,
+            );
         });
 
         it("should not sign something that isn't binary data", () => {
@@ -369,5 +517,183 @@ describe("test validator public key", () => {
         for (const bytes of [Buffer.alloc(96), Buffer.alloc(96, 0xff), Buffer.alloc(96, 1)]) {
             assert.equal(new ValidatorPublicKey(bytes).hex(), bytes.toString("hex"));
         }
+    });
+
+    describe("verifying signatures", function () {
+        this.timeout(60000);
+
+        const secretKeyHex = "7cff99bd671502db7d15bc8abc0c9a804fb925406fbdd50f1e4c17a4cd774247";
+        const signatureOfHelloHex =
+            "84fd0a3a9d4f1ea2d4b40c6da67f9b786284a1c3895b7253fec7311597cda3f757862bb0690a92a13ce612c33889fd86";
+        const signatureOfNothingHex =
+            "e4afbdfee382f863b5b37df2c6c7b8142490dcb38fee310841a7161c98c268d202ace286e044a268f92b82a7d8b04395";
+
+        const otherSecretKeyHex = "8085ba1d7f7c3db938ad70595a2bdab09644f1ec3803be171c33f14bc80d4e3b";
+        const otherSignatureOfHelloHex =
+            "be2e593ff10899a2ee8e1d5c8094e36c9f48e04b87e129991ff09475808743e07bb41bf6e7bc1463fa554c4b46594b98";
+
+        const hello = Buffer.from("hello");
+        const publicKey = new ValidatorPublicKey(Buffer.from(publicKeyHex, "hex"));
+        const signatureOfHello = Buffer.from(signatureOfHelloHex, "hex");
+
+        function flipBit(bytes: Uint8Array, byteIndex: number, bit: number): Buffer {
+            const copy = Buffer.from(bytes);
+            copy[byteIndex] ^= 1 << bit;
+            return copy;
+        }
+
+        it("should verify a signature, and resolve to a boolean", async () => {
+            assert.instanceOf(publicKey.verify(hello, signatureOfHello), Promise);
+
+            assert.strictEqual(await publicKey.verify(hello, signatureOfHello), true);
+            assert.strictEqual(
+                await publicKey.verify(Buffer.alloc(0), Buffer.from(signatureOfNothingHex, "hex")),
+                true,
+            );
+            assert.strictEqual(await publicKey.verify(Buffer.from("hello!"), signatureOfHello), false);
+        });
+
+        it("should verify what the secret key signs", async () => {
+            const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
+            const otherSecretKey = new ValidatorSecretKey(Buffer.from(otherSecretKeyHex, "hex"));
+
+            const messages = [
+                Buffer.alloc(0),
+                Buffer.from([0]),
+                Buffer.from("hello"),
+                Buffer.alloc(127, 7),
+                Buffer.alloc(128, 7),
+                Buffer.alloc(129, 7),
+                Buffer.alloc(100000, 0xab),
+            ];
+
+            for (const message of messages) {
+                for (const key of [secretKey, otherSecretKey]) {
+                    const signature = key.sign(message);
+
+                    assert.isTrue(
+                        await key.generatePublicKey().verify(message, signature),
+                        `length: ${message.length}`,
+                    );
+                }
+
+                // The signature of one key is not valid under the public key of the other.
+                assert.isFalse(await otherSecretKey.generatePublicKey().verify(message, secretKey.sign(message)));
+            }
+        });
+
+        it("should not verify when the message, the public key or the signature is another one", async () => {
+            const otherPublicKey = new ValidatorSecretKey(Buffer.from(otherSecretKeyHex, "hex")).generatePublicKey();
+            const otherSignatureOfHello = Buffer.from(otherSignatureOfHelloHex, "hex");
+
+            assert.isTrue(await otherPublicKey.verify(hello, otherSignatureOfHello));
+
+            assert.isFalse(await publicKey.verify(hello, otherSignatureOfHello));
+            assert.isFalse(await otherPublicKey.verify(hello, signatureOfHello));
+            assert.isFalse(await publicKey.verify(hello, Buffer.from(signatureOfNothingHex, "hex")));
+
+            assert.isFalse(await publicKey.verify(Buffer.from("Hello"), signatureOfHello));
+            assert.isFalse(await publicKey.verify(Buffer.from("hell"), signatureOfHello));
+            assert.isFalse(await publicKey.verify(Buffer.from("hello\0"), signatureOfHello));
+            assert.isFalse(await publicKey.verify(Buffer.alloc(0), signatureOfHello));
+        });
+
+        it("should not verify a signature that was altered (any single bit)", async () => {
+            for (let byteIndex = 0; byteIndex < 48; byteIndex++) {
+                for (const bit of [0, 7]) {
+                    const altered = flipBit(signatureOfHello, byteIndex, bit);
+                    assert.isFalse(await publicKey.verify(hello, altered), `byte ${byteIndex}, bit ${bit}`);
+                }
+            }
+        });
+
+        it("should not verify under a public key that was altered", async () => {
+            for (let byteIndex = 0; byteIndex < 96; byteIndex += 5) {
+                const altered = new ValidatorPublicKey(flipBit(publicKey.valueOf(), byteIndex, 0));
+                assert.isFalse(await altered.verify(hello, signatureOfHello), `byte ${byteIndex}`);
+            }
+
+            // The highest bit of the last byte carries the parity of "y": when flipped, the point is the opposite one.
+            assert.isFalse(
+                await new ValidatorPublicKey(flipBit(publicKey.valueOf(), 95, 7)).verify(hello, signatureOfHello),
+            );
+        });
+
+        it("should verify the same, however the bytes are given", async () => {
+            const larger = Buffer.concat([Buffer.alloc(9, 0xee), hello, signatureOfHello, Buffer.alloc(9, 0xee)]);
+            const messageView = larger.subarray(9, 9 + hello.length);
+            const signatureView = new Uint8Array(larger.buffer, larger.byteOffset + 9 + hello.length, 48);
+
+            assert.isTrue(await publicKey.verify(messageView, signatureView));
+            assert.isTrue(await publicKey.verify(Uint8Array.from(hello), Uint8Array.from(signatureOfHello)));
+
+            // As for signing, arrays of bytes and ASCII strings are accepted as messages, even though they aren't of the declared type.
+            assert.isTrue(await publicKey.verify([...hello] as any, signatureOfHello));
+            assert.isTrue(await publicKey.verify("hello" as any, signatureOfHello));
+            assert.isTrue(await publicKey.verify(hello, [...signatureOfHello] as any));
+        });
+
+        it("should not alter the message, the signature or the public key", async () => {
+            const message = Buffer.from(hello);
+            const signature = Buffer.from(signatureOfHello);
+
+            assert.isTrue(await publicKey.verify(message, signature));
+            assert.isFalse(await publicKey.verify(message, flipBit(signature, 3, 3)));
+
+            assert.equal(message.toString(), "hello");
+            assert.equal(signature.toString("hex"), signatureOfHelloHex);
+            assert.equal(publicKey.hex(), publicKeyHex);
+            assert.isTrue(await publicKey.verify(message, signature));
+        });
+
+        it("should not verify (and not reject) when the signature is malformed", async () => {
+            const malformed = [
+                Buffer.alloc(0),
+                signatureOfHello.subarray(0, 47),
+                Buffer.concat([signatureOfHello, Buffer.from([0])]),
+                Buffer.concat([signatureOfHello, signatureOfHello]),
+                publicKey.valueOf(),
+                // Not the encoding of a point of the curve.
+                Buffer.alloc(48, 0xff),
+                Buffer.alloc(48, 0x01),
+                // The point at infinity.
+                Buffer.alloc(48),
+            ];
+
+            for (const signature of malformed) {
+                assert.isFalse(await publicKey.verify(hello, signature), signature.toString("hex"));
+            }
+        });
+
+        it("should not verify (and not reject) when the public key is not a valid one", async () => {
+            for (const bytes of [Buffer.alloc(96), Buffer.alloc(96, 0xff), Buffer.alloc(96, 1)]) {
+                assert.isFalse(
+                    await new ValidatorPublicKey(bytes).verify(hello, signatureOfHello),
+                    bytes.toString("hex"),
+                );
+            }
+        });
+
+        it("should not accept the 'zero' signature under the 'zero' public key", async () => {
+            // Otherwise, anyone could produce a "valid" signature, for any message.
+            const zeroPublicKey = new ValidatorPublicKey(Buffer.alloc(96));
+
+            for (const message of [hello, Buffer.alloc(0), Buffer.alloc(300, 1)]) {
+                assert.isFalse(await zeroPublicKey.verify(message, Buffer.alloc(48)));
+            }
+        });
+
+        it("should reject when the message or the signature isn't binary data", async () => {
+            for (const message of [undefined, null, 5, {}, true]) {
+                const error = await publicKey.verify(message as any, signatureOfHello).catch((err) => err);
+                assert.instanceOf(error, ErrBadType);
+            }
+
+            // A hex-encoded signature is not a signature.
+            for (const signature of [undefined, null, 5, {}, signatureOfHelloHex, ["84"]]) {
+                const error = await publicKey.verify(hello, signature as any).catch((err) => err);
+                assert.instanceOf(error, ErrBadType);
+            }
+        });
     });
 });

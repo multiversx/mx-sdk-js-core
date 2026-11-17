@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import { assertIndexIsValid, PemEntry } from "../wallet/pemEntry";
-import { BLS, ValidatorSecretKey } from "../wallet/validatorKeys";
+import { ValidatorSecretKey } from "../wallet/validatorKeys";
 
 export class ValidatorPEM {
     readonly label: string;
@@ -34,7 +34,6 @@ export class ValidatorPEM {
         const entries = PemEntry.fromTextAll(text);
         const resultItems: ValidatorPEM[] = [];
 
-        await BLS.initIfNecessary();
         for (const entry of entries) {
             const secretKey = new ValidatorSecretKey(entry.message);
             const item = new ValidatorPEM(entry.label, secretKey);

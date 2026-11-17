@@ -1,5 +1,5 @@
 import { ErrSignerCannotSign } from "../core/errors";
-import { BLS, ValidatorPublicKey, ValidatorSecretKey } from "./validatorKeys";
+import { ValidatorPublicKey, ValidatorSecretKey } from "./validatorKeys";
 import { ValidatorPEM } from "./validatorPem";
 
 /**
@@ -21,8 +21,6 @@ export class ValidatorSigner {
         pemIndex: number = 0,
         signable: Buffer | Uint8Array,
     ): Promise<Uint8Array> {
-        await BLS.initIfNecessary();
-
         try {
             let secretKey = ValidatorSecretKey.fromPem(pemText, pemIndex);
             return secretKey.sign(signable);

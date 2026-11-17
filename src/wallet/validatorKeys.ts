@@ -1,59 +1,48 @@
-import { ErrInvalidArgument, ErrInvariantFailed } from "../core/errors";
+import { ErrBadType, ErrInvalidArgument } from "../core/errors";
 import { bytesFromInput, guardLength } from "./assertions";
 import { parseValidatorKey } from "./pem";
 
 export const VALIDATOR_SECRETKEY_LENGTH = 32;
 export const VALIDATOR_PUBKEY_LENGTH = 96;
 
+type HerumiBls = typeof import("./herumiBls");
+let herumiBls: HerumiBls | undefined;
+
+/**
+ * The BLS operations are loaded on first use (not when the package is loaded): setting up the curve takes a while,
+ * and most applications never handle validator keys.
+ */
+function getHerumiBls(): HerumiBls {
+    if (!herumiBls) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        herumiBls = require("./herumiBls");
+    }
+
+    return herumiBls!;
+}
+
+/**
+ * @deprecated The BLS operations do not require an initialization anymore. This class is kept so that existing code
+ * (which calls "await BLS.initIfNecessary()" before handling validator keys) continues to work.
+ */
 export class BLS {
-    private static isInitialized: boolean = false;
-    private static initPromise: Promise<void> | undefined;
-    public static bls: any;
+    /**
+     * @deprecated Not necessary anymore. Does nothing.
+     */
+    static async initIfNecessary(): Promise<void> {}
 
-    private static loadBLSModule() {
-        if (!BLS.bls) {
-            try {
-                BLS.bls = require("@multiversx/sdk-bls-wasm");
-            } catch (error: any) {
-                throw new Error("BLS module is required but not installed. Please install '@multiversx/sdk-bls-wasm'.");
-            }
-        }
-    }
-
-    static async initIfNecessary() {
-        // Concurrent callers must share a single initialization: each "init()" of the BLS module
-        // creates a new WASM instance, which corrupts the keys created on top of the previous one.
-        if (!BLS.initPromise) {
-            BLS.loadBLSModule();
-            BLS.initPromise = BLS.bls.init(BLS.bls.BLS12_381).then(
-                () => {
-                    BLS.isInitialized = true;
-                },
-                (error: any) => {
-                    BLS.initPromise = undefined;
-                    throw error;
-                },
-            );
-        }
-
-        await BLS.initPromise;
-    }
-
-    static guardInitialized() {
-        if (!BLS.isInitialized) {
-            throw new ErrInvariantFailed(
-                "BLS modules are not initalized. Make sure that 'await BLS.initIfNecessary()' is called correctly.",
-            );
-        }
-    }
+    /**
+     * @deprecated Not necessary anymore. Does nothing.
+     */
+    static guardInitialized(): void {}
 }
 
 export class ValidatorSecretKey {
-    private readonly secretKey: any;
-    private readonly publicKey: any;
+    private readonly secretKey: Buffer;
+    private readonly scalar: bigint;
+    private publicKey: Buffer | undefined;
 
     constructor(buffer: Buffer | Uint8Array) {
-        BLS.guardInitialized();
         guardLength(buffer, VALIDATOR_SECRETKEY_LENGTH);
         const bytes = Buffer.from(bytesFromInput(buffer, "buffer"));
 
@@ -62,15 +51,16 @@ export class ValidatorSecretKey {
             throw new ErrInvalidArgument("the validator secret key must not be zero");
         }
 
-        this.secretKey = new BLS.bls.SecretKey();
-        this.secretKey.setLittleEndian(new Uint8Array(bytes));
+        const bls = getHerumiBls();
+        const scalar = bls.secretKeyToScalar(bytes);
 
-        // "setLittleEndian()" doesn't reject values that aren't lower than the order of the group: it silently changes them, instead.
-        if (!Buffer.from(this.secretKey.serialize()).equals(bytes)) {
+        // The secret key has to be lower than the order of the group. Such values are not reduced (which would silently change the key).
+        if (!bls.isValidSecretScalar(scalar)) {
             throw new ErrInvalidArgument("the validator secret key is out of range");
         }
 
-        this.publicKey = this.secretKey.getPublicKey();
+        this.secretKey = bytes;
+        this.scalar = scalar;
     }
 
     static fromPem(text: string, index: number = 0) {
@@ -78,14 +68,16 @@ export class ValidatorSecretKey {
     }
 
     generatePublicKey(): ValidatorPublicKey {
-        let buffer = Buffer.from(this.publicKey.serialize());
-        return new ValidatorPublicKey(buffer);
+        if (!this.publicKey) {
+            this.publicKey = Buffer.from(getHerumiBls().computePublicKey(this.scalar));
+        }
+
+        return new ValidatorPublicKey(this.publicKey);
     }
 
     sign(message: Buffer | Uint8Array): Buffer {
-        let signatureObject = this.secretKey.sign(message);
-        let signature = Buffer.from(signatureObject.serialize());
-        return signature;
+        const signature = getHerumiBls().sign(this.scalar, messageToBytes(message));
+        return Buffer.from(signature);
     }
 
     hex(): string {
@@ -93,8 +85,40 @@ export class ValidatorSecretKey {
     }
 
     valueOf(): Buffer {
-        return Buffer.from(this.secretKey.serialize());
+        // A copy, so that the key can't be altered through the returned buffer.
+        return Buffer.from(this.secretKey);
     }
+}
+
+/**
+ * The declared type of a message is "Buffer | Uint8Array". Though, types are erased at runtime, and strings and arrays
+ * have always been accepted as well (and converted as below). Kept for backwards compatibility.
+ */
+function messageToBytes(message: any): Uint8Array {
+    // Not "instanceof", so that a Uint8Array (or Buffer) created in another realm (e.g. iframe, "vm" context) is accepted, as well.
+    const tag = Object.prototype.toString.call(message);
+
+    if (tag === "[object Uint8Array]") {
+        return message;
+    }
+
+    if (tag === "[object String]") {
+        // One byte per character (UTF-16 code unit): the low byte of its code. For ASCII strings, this is the usual encoding.
+        const text = String(message);
+        const bytes = new Uint8Array(text.length);
+
+        for (let i = 0; i < text.length; i++) {
+            bytes[i] = text.charCodeAt(i) & 0xff;
+        }
+
+        return bytes;
+    }
+
+    if (tag === "[object Array]") {
+        return Uint8Array.from(message);
+    }
+
+    throw new ErrBadType("message", "Uint8Array", tag);
 }
 
 export class ValidatorPublicKey {

@@ -9,6 +9,8 @@
  *    (as described by Fouque and Tibouchi), instead of the standard "hash_to_curve";
  *  - a point is serialized as its "x" coordinate, little-endian, plus one flag: the parity of "y".
  *
+ * A signature is valid if e(signature, generator of G2) = e(hash of the message, mapped to G1; public key).
+ *
  * The references to the source code of MCL are for the version 2.00: https://github.com/herumi/mcl/tree/v2.00
  *
  * This module is internal (it is not a part of the public API of the package). It is loaded on first use (see "validatorKeys.ts"),
@@ -19,6 +21,7 @@ import { sha512 } from "@noble/hashes/sha2.js";
 
 const Fp = bls12_381.fields.Fp;
 const Fp2 = bls12_381.fields.Fp2;
+const Fp12 = bls12_381.fields.Fp12;
 const G1 = bls12_381.G1.Point;
 const G2 = bls12_381.G2.Point;
 
@@ -47,6 +50,11 @@ const FP_BITS = 381;
  * The curve of G1 is y^2 = x^3 + 4.
  */
 const G1_B = 4n;
+
+/**
+ * The curve of G2 is y^2 = x^3 + 4 * (1 + i).
+ */
+const G2_B: Fp2Element = Fp2.create({ c0: 4n, c1: 4n });
 
 /**
  * The cofactor of G1: (z - 1)^2 / 3, where "z" is the parameter of the curve.
@@ -165,6 +173,55 @@ export function sign(secretScalar: bigint, message: Uint8Array): Uint8Array {
 }
 
 /**
+ * Tells whether the signature is the one of the message, under the given public key.
+ *
+ * Returns "false" (it does not throw) for a public key or a signature that is not acceptable:
+ *  - wrong length (e.g. trailing bytes), or not the encoding of a point of the curve;
+ *  - a point outside of the group (G2 for public keys, G1 for signatures): on the curve, but not of the right order;
+ *  - the point at infinity (all bytes are zero): otherwise, the "zero" signature would be valid for the "zero" public key, for any message.
+ *
+ * Herumi's library, as it was used through "@multiversx/sdk-bls-wasm", was more lenient with respect to the above.
+ */
+export function verify(publicKey: Uint8Array, message: Uint8Array, signature: Uint8Array): boolean {
+    const publicKeyPoint = deserializeG2Point(publicKey);
+    const signaturePoint = deserializeG1Point(signature);
+
+    if (!publicKeyPoint || !signaturePoint) {
+        return false;
+    }
+
+    if (publicKeyPoint.is0() || signaturePoint.is0()) {
+        return false;
+    }
+
+    if (!publicKeyPoint.isTorsionFree() || !signaturePoint.isTorsionFree()) {
+        return false;
+    }
+
+    let messagePoint: G1Point;
+
+    try {
+        messagePoint = hashAndMapToG1(message);
+    } catch {
+        // A message whose hash cannot be mapped to G1 cannot be signed, either. Not reachable in practice (it takes a preimage of SHA-512).
+        return false;
+    }
+
+    if (messagePoint.is0()) {
+        return false;
+    }
+
+    // e(signature, generator) = e(messagePoint, publicKey), checked as: e(signature, generator) * e(-messagePoint, publicKey) = 1.
+    // This way, the (expensive) final exponentiation of the pairing is computed only once.
+    const product = bls12_381.pairingBatch([
+        { g1: signaturePoint, g2: G2_GENERATOR },
+        { g1: messagePoint.negate(), g2: publicKeyPoint },
+    ]);
+
+    return Fp12.eql(product, Fp12.ONE);
+}
+
+/**
  * MCL: "hashAndMapToG1()" (bn.hpp).
  */
 export function hashAndMapToG1(message: Uint8Array): G1Point {
@@ -253,6 +310,45 @@ function sqrtFp(value: bigint): bigint | undefined {
 }
 
 /**
+ * The square root in the quadratic extension (i^2 = -1), by the "complex" method.
+ * Returns "undefined" if the value is not a square. Which of the two roots is returned does not matter to the callers.
+ */
+function sqrtFp2(value: Fp2Element): Fp2Element | undefined {
+    const { c0: a, c1: b } = value;
+    let root: Fp2Element;
+
+    if (Fp.is0(b)) {
+        // The value belongs to the base field. Since the modulus is 3 (mod 4), either "a" or "-a" is a square there.
+        const real = sqrtFp(a);
+        const imaginary = real === undefined ? sqrtFp(Fp.neg(a)) : undefined;
+
+        if (real !== undefined) {
+            root = Fp2.create({ c0: real, c1: Fp.ZERO });
+        } else if (imaginary !== undefined) {
+            root = Fp2.create({ c0: Fp.ZERO, c1: imaginary });
+        } else {
+            return undefined;
+        }
+    } else {
+        // (c0 + c1 * i)^2 = a + b * i, where c0^2 = (a +/- sqrt(a^2 + b^2)) / 2 and c1 = b / (2 * c0).
+        const norm = sqrtFp(Fp.add(Fp.sqr(a), Fp.sqr(b)));
+        if (norm === undefined) {
+            return undefined;
+        }
+
+        const half = Fp.inv(2n);
+        const c0 = sqrtFp(Fp.mul(Fp.add(a, norm), half)) ?? sqrtFp(Fp.mul(Fp.sub(a, norm), half));
+        if (c0 === undefined || Fp.is0(c0)) {
+            return undefined;
+        }
+
+        root = Fp2.create({ c0, c1: Fp.mul(b, Fp.inv(Fp.add(c0, c0))) });
+    }
+
+    return Fp2.eql(Fp2.sqr(root), value) ? root : undefined;
+}
+
+/**
  * MCL: "EcT::save()", with "IoSerialize" (ec.hpp).
  */
 export function serializeG1Point(point: G1Point): Uint8Array {
@@ -298,4 +394,85 @@ export function serializeG2Coordinates(x: Fp2Element, y: Fp2Element): Uint8Array
     }
 
     return bytes;
+}
+
+/**
+ * MCL: "EcT::load()", with "IoSerialize" (ec.hpp).
+ *
+ * Returns "undefined" if the bytes are not the encoding of a point of the curve.
+ * The outcome is not necessarily a point of G1 (of the right order); see "verify()".
+ */
+export function deserializeG1Point(bytes: Uint8Array): G1Point | undefined {
+    if (bytes.length != SIGNATURE_LENGTH) {
+        return undefined;
+    }
+
+    // The point at infinity is encoded as zeros (thus, the flag is looked at only afterwards).
+    if (bytes.every((byte) => byte == 0)) {
+        return G1.ZERO;
+    }
+
+    const { value: x, isYOdd } = readFpWithFlag(bytes);
+    if (!Fp.isValid(x)) {
+        return undefined;
+    }
+
+    // y^2 = x^3 + b
+    let y = sqrtFp(Fp.add(Fp.mul(Fp.sqr(x), x), G1_B));
+    if (y === undefined) {
+        return undefined;
+    }
+
+    if (((y & 1n) == 1n) != isYOdd) {
+        y = Fp.neg(y);
+    }
+
+    return G1.fromAffine({ x, y });
+}
+
+/**
+ * MCL: "EcT::load()", with "IoSerialize" (ec.hpp).
+ *
+ * Returns "undefined" if the bytes are not the encoding of a point of the curve.
+ * The outcome is not necessarily a point of G2 (of the right order); see "verify()".
+ */
+export function deserializeG2Point(bytes: Uint8Array): G2Point | undefined {
+    if (bytes.length != PUBLIC_KEY_LENGTH) {
+        return undefined;
+    }
+
+    // The point at infinity is encoded as zeros (thus, the flag is looked at only afterwards).
+    if (bytes.every((byte) => byte == 0)) {
+        return G2.ZERO;
+    }
+
+    // The flag is held by the last byte, thus by the second coefficient of "x".
+    const c0 = littleEndianToBigInt(bytes.subarray(0, FP_LENGTH));
+    const { value: c1, isYOdd } = readFpWithFlag(bytes.subarray(FP_LENGTH));
+    if (!Fp.isValid(c0) || !Fp.isValid(c1)) {
+        return undefined;
+    }
+
+    // y^2 = x^3 + b
+    const x = Fp2.create({ c0, c1 });
+    let y = sqrtFp2(Fp2.add(Fp2.mul(Fp2.sqr(x), x), G2_B));
+    if (y === undefined) {
+        return undefined;
+    }
+
+    // MCL: the parity of "y" is the one of its first coefficient (see "serializeG2Coordinates()").
+    // If that coefficient is zero, the flag cannot tell the two roots apart; for a random point, this happens with negligible probability.
+    if (((y.c0 & 1n) == 1n) != isYOdd) {
+        y = Fp2.neg(y);
+    }
+
+    return G2.fromAffine({ x, y });
+}
+
+function readFpWithFlag(bytes: Uint8Array): { value: bigint; isYOdd: boolean } {
+    const last = bytes[bytes.length - 1];
+    const copy = Uint8Array.from(bytes);
+    copy[copy.length - 1] = last & ~FLAG_Y_IS_ODD;
+
+    return { value: littleEndianToBigInt(copy), isYOdd: (last & FLAG_Y_IS_ODD) != 0 };
 }

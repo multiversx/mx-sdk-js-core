@@ -11,7 +11,7 @@ import { PemEntry } from "./pemEntry";
 import { UserSecretKey } from "./userKeys";
 import { UserPem } from "./userPem";
 import { UserSigner } from "./userSigner";
-import { BLS, ValidatorSecretKey } from "./validatorKeys";
+import { ValidatorSecretKey } from "./validatorKeys";
 import { ValidatorPEM } from "./validatorPem";
 
 describe("test PEMs", () => {
@@ -31,8 +31,6 @@ describe("test PEMs", () => {
     });
 
     it("should parseValidatorKey", async () => {
-        await BLS.initIfNecessary();
-
         let pem = `-----BEGIN PRIVATE KEY for e7beaa95b3877f47348df4dd1cb578a4f7cabf7a20bfeefe5cdd263878ff132b765e04fef6f40c93512b666c47ed7719b8902f6c922c04247989b7137e837cc81a62e54712471c97a2ddab75aa9c2f58f813ed4c0fa722bde0ab718bff382208-----
 N2NmZjk5YmQ2NzE1MDJkYjdkMTViYzhhYmMwYzlhODA0ZmI5MjU0MDZmYmRkNTBm
 MWU0YzE3YTRjZDc3NDI0Nw==
@@ -171,8 +169,6 @@ describe("test PEM validation", () => {
     });
 
     it("should reject a validator key index out of range", async () => {
-        await BLS.initIfNecessary();
-
         const text = fs.readFileSync(path.join(walletsPath, "multipleValidatorKeys.pem"), "utf-8");
         assert.equal((await ValidatorPEM.fromText(text, 3)).secretKey.hex(), parseValidatorKey(text, 3).hex());
 

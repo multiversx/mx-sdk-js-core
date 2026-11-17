@@ -3,10 +3,10 @@ import * as fs from "fs";
 import path from "path";
 import { ErrBadType, ErrInvalidArgument } from "../core/errors";
 import { getTestWalletsPath } from "../testutils";
-import { BLS, ValidatorSecretKey } from "./validatorKeys";
+import { ValidatorSecretKey } from "./validatorKeys";
 import { ValidatorPEM } from "./validatorPem";
 
-describe("test BLS initialization (not necessary anymore)", () => {
+describe("test validator keys (no initialization is necessary)", () => {
     const secretKeyHex = "7cff99bd671502db7d15bc8abc0c9a804fb925406fbdd50f1e4c17a4cd774247";
     const publicKeyHex =
         "e7beaa95b3877f47348df4dd1cb578a4f7cabf7a20bfeefe5cdd263878ff132b765e04fef6f40c93512b666c47ed7719b8902f6c922c04247989b7137e837cc81a62e54712471c97a2ddab75aa9c2f58f813ed4c0fa722bde0ab718bff382208";
@@ -18,21 +18,6 @@ describe("test BLS initialization (not necessary anymore)", () => {
 
         assert.equal(secretKey.generatePublicKey().hex(), publicKeyHex);
         assert.equal(secretKey.sign(Buffer.from("hello")).toString("hex"), signatureOfHelloHex);
-    });
-
-    it("should still provide BLS.initIfNecessary() and BLS.guardInitialized(), for the existing code that calls them", async () => {
-        assert.doesNotThrow(() => BLS.guardInitialized());
-
-        assert.instanceOf(BLS.initIfNecessary(), Promise);
-        assert.isUndefined(await BLS.initIfNecessary());
-        await Promise.all([BLS.initIfNecessary(), BLS.initIfNecessary(), BLS.initIfNecessary()]);
-
-        assert.doesNotThrow(() => BLS.guardInitialized());
-
-        // The usual sequence, as documented for the previous versions.
-        await BLS.initIfNecessary();
-        const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
-        assert.equal(secretKey.generatePublicKey().hex(), publicKeyHex);
     });
 
     it("should load the correct keys when validator PEMs are loaded concurrently", async () => {
@@ -59,8 +44,6 @@ describe("test BLS initialization (not necessary anymore)", () => {
 
 describe("test validator keys", () => {
     it("should return copies of the internal buffers, so that the keys can't be altered through them", async () => {
-        await BLS.initIfNecessary();
-
         const secretKeyHex = "7cff99bd671502db7d15bc8abc0c9a804fb925406fbdd50f1e4c17a4cd774247";
         const secretKey = new ValidatorSecretKey(Buffer.from(secretKeyHex, "hex"));
         const publicKey = secretKey.generatePublicKey();
@@ -77,8 +60,6 @@ describe("test validator keys", () => {
     });
 
     it("should create secret key and sign a message", async () => {
-        await BLS.initIfNecessary();
-
         let secretKey = Buffer.from(
             Buffer.from(
                 "N2NmZjk5YmQ2NzE1MDJkYjdkMTViYzhhYmMwYzlhODA0ZmI5MjU0MDZmYmRkNTBmMWU0YzE3YTRjZDc3NDI0Nw==",
@@ -127,8 +108,6 @@ describe("test validator keys", () => {
     });
 
     it("should handle PEM files", async () => {
-        await BLS.initIfNecessary();
-
         let text = `-----BEGIN foobar
 N2NmZjk5YmQ2NzE1MDJkYjdkMTViYzhhYmMwYzlhODA0ZmI5MjU0MDZmYmRkNTBmMWU0YzE3YTRjZDc3NDI0Nw==
 -----END foobar`;
@@ -169,10 +148,6 @@ describe("test validator secret keys that are not valid", () => {
             return err;
         }
     }
-
-    before(async () => {
-        await BLS.initIfNecessary();
-    });
 
     it("should reject the zero key", async () => {
         const zeroHex = "00".repeat(32);

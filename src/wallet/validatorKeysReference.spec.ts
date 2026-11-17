@@ -1,3 +1,4 @@
+import { bls12_381 } from "@noble/curves/bls12-381.js";
 import { assert } from "chai";
 import { randomBytes, randomInt } from "crypto";
 import * as fs from "fs";
@@ -5,7 +6,8 @@ import path from "path";
 import { getTestWalletsPath } from "../testutils";
 import { ReferenceBls } from "../testutils/blsReference";
 import { IBlsExtendedVector, IBlsVector, loadBlsExtendedVectors, loadBlsVectors } from "../testutils/blsVectors";
-import { BLS, ValidatorSecretKey } from "./validatorKeys";
+import * as herumiBls from "./herumiBls";
+import { ValidatorPublicKey, ValidatorSecretKey } from "./validatorKeys";
 import { ValidatorPEM } from "./validatorPem";
 
 // The SDK, compared against the reference implementation (Herumi, as WebAssembly), which the SDK used before switching
@@ -21,8 +23,6 @@ describe("test validator keys against the reference BLS implementation", functio
     let extendedVectors: IBlsExtendedVector[];
 
     before(async () => {
-        await BLS.initIfNecessary();
-
         reference = await ReferenceBls.load();
         vectors = loadBlsVectors();
         extendedVectors = loadBlsExtendedVectors();
@@ -63,10 +63,6 @@ describe("test validator keys against the reference BLS implementation", functio
     describe("the reference itself", () => {
         it("should agree with the test vectors", () => {
             for (const [index, vector] of vectors.entries()) {
-                if (index % 10 != 0) {
-                    continue;
-                }
-
                 const secretKey = fromHex(vector.secretKey);
                 const message = Buffer.from(vector.message);
 
@@ -138,7 +134,7 @@ describe("test validator keys against the reference BLS implementation", functio
 
     describe("the SDK", () => {
         it("should produce public keys and signatures that the reference decodes, in their canonical form", () => {
-            for (const vector of extendedVectors.filter((_, index) => index % 4 == 0)) {
+            for (const vector of extendedVectors) {
                 const secretKey = new ValidatorSecretKey(fromHex(vector.secretKey));
                 const publicKey = secretKey.generatePublicKey().valueOf();
                 const signature = secretKey.sign(fromHex(vector.messageHex));
@@ -174,9 +170,7 @@ describe("test validator keys against the reference BLS implementation", functio
         });
 
         it("should produce signatures that the reference verifies (edge keys, all the paths of the map to G1)", () => {
-            for (const vector of extendedVectors.filter(
-                (vector, index) => vector.group == "edge-keys" || index % 3 == 0,
-            )) {
+            for (const vector of extendedVectors) {
                 const secretKey = new ValidatorSecretKey(fromHex(vector.secretKey));
                 const publicKey = secretKey.generatePublicKey().valueOf();
                 const message = fromHex(vector.messageHex);
@@ -208,10 +202,93 @@ describe("test validator keys against the reference BLS implementation", functio
                     context,
                 );
 
-                if (i % 10 == 0) {
-                    assert.isTrue(referenceVerifies(publicKey, message, signature), context);
+                assert.isTrue(referenceVerifies(publicKey, message, signature), context);
+            }
+        });
+
+        it("should verify the same as the reference (random keys and messages; valid and altered signatures)", async function () {
+            for (let i = 0; i < 40; i++) {
+                const secretKeyBytes = createRandomSecretKey();
+                const message = randomBytes(randomInt(0, 400));
+                const context = `secret key: ${secretKeyBytes.toString("hex")}, message: ${message.toString("hex")}`;
+
+                const secretKey = new ValidatorSecretKey(secretKeyBytes);
+                const publicKey = secretKey.generatePublicKey();
+                const signature = secretKey.sign(message);
+
+                const otherSecretKey = new ValidatorSecretKey(createRandomSecretKey());
+                const alteredMessage = Buffer.concat([message, Buffer.from([i])]);
+                const alteredSignature = flipBit(signature, randomInt(0, 48), randomInt(0, 8));
+                const alteredPublicKey = flipBit(publicKey.valueOf(), randomInt(0, 96), randomInt(0, 8));
+
+                const cases: [string, Uint8Array, Uint8Array, Uint8Array, boolean][] = [
+                    ["valid", publicKey.valueOf(), message, signature, true],
+                    ["other message", publicKey.valueOf(), alteredMessage, signature, false],
+                    ["other key", otherSecretKey.generatePublicKey().valueOf(), message, signature, false],
+                    ["other signature", publicKey.valueOf(), message, otherSecretKey.sign(message), false],
+                    ["altered signature", publicKey.valueOf(), message, alteredSignature, false],
+                    ["altered public key", alteredPublicKey, message, signature, false],
+                ];
+
+                for (const [name, publicKeyBytes, messageBytes, signatureBytes, expected] of cases) {
+                    const details = `${name}; ${context}; signature: ${Buffer.from(signatureBytes).toString("hex")}`;
+
+                    assert.equal(
+                        await new ValidatorPublicKey(publicKeyBytes).verify(messageBytes, signatureBytes),
+                        expected,
+                        details,
+                    );
+                    assert.equal(referenceVerifies(publicKeyBytes, messageBytes, signatureBytes), expected, details);
                 }
             }
+        });
+
+        it("should verify the signatures produced by the reference", async () => {
+            for (const vector of extendedVectors) {
+                const secretKeyBytes = fromHex(vector.secretKey);
+                const message = fromHex(vector.messageHex);
+                const publicKey = new ValidatorPublicKey(reference.getPublicKey(secretKeyBytes));
+
+                assert.isTrue(await publicKey.verify(message, reference.sign(secretKeyBytes, message)), vector.note);
+            }
+        });
+
+        it("should be stricter than the reference: no 'zero' signature under the 'zero' public key", async () => {
+            const message = Buffer.from("hello");
+
+            assert.isTrue(referenceVerifies(Buffer.alloc(96), message, Buffer.alloc(48)));
+            assert.isFalse(await new ValidatorPublicKey(Buffer.alloc(96)).verify(message, Buffer.alloc(48)));
+        });
+
+        it("should be stricter than the reference: no trailing bytes after the signature", async () => {
+            const secretKey = new ValidatorSecretKey(fromHex(extendedVectors[0].secretKey));
+            const message = Buffer.from("hello");
+            const signature = Buffer.concat([secretKey.sign(message), Buffer.from([0xff])]);
+
+            assert.isTrue(referenceVerifies(secretKey.generatePublicKey().valueOf(), message, signature));
+            assert.isFalse(await secretKey.generatePublicKey().verify(message, signature));
+        });
+
+        it("should be stricter than the reference: no signature outside of the group G1 (a second 'valid' signature for the same message)", async () => {
+            const secretKey = new ValidatorSecretKey(fromHex(extendedVectors[0].secretKey));
+            const publicKey = secretKey.generatePublicKey();
+            const message = Buffer.from("hello");
+            const signature = secretKey.sign(message);
+
+            // A point of order 3 (thus, not of G1) is added to the signature. The pairing does not "see" such a point,
+            // so that the outcome passes the check of the pairings; it has to be rejected when decoded.
+            const pointOfOrderThree = bls12_381.G1.Point.fromAffine({ x: 0n, y: 2n });
+            const signaturePoint = herumiBls.deserializeG1Point(signature)!;
+            const forged = Buffer.from(herumiBls.serializeG1Point(signaturePoint.add(pointOfOrderThree)));
+
+            assert.isTrue(pointOfOrderThree.multiplyUnsafe(3n).is0());
+            assert.notEqual(forged.toString("hex"), signature.toString("hex"));
+
+            assert.isTrue(referenceVerifies(publicKey.valueOf(), message, signature));
+            assert.isTrue(referenceVerifies(publicKey.valueOf(), message, forged));
+
+            assert.isTrue(await publicKey.verify(message, signature));
+            assert.isFalse(await publicKey.verify(message, forged));
         });
 
         it("should produce the same public keys as the reference (smallest and largest keys)", () => {

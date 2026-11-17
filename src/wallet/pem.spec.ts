@@ -6,7 +6,7 @@ import { Account } from "../accounts";
 import { Address } from "../core/address";
 import { ErrBadPEM, ErrInvalidArgument } from "../core/errors";
 import { loadTestWallet, TestWallet } from "./../testutils/wallets";
-import { parse, parseUserKey, parseValidatorKey, parseValidatorKeys } from "./pem";
+import { parse, parseUserKey, parseUserKeys, parseValidatorKey, parseValidatorKeys } from "./pem";
 import { PemEntry } from "./pemEntry";
 import { UserSecretKey } from "./userKeys";
 import { UserPem } from "./userPem";
@@ -120,6 +120,7 @@ describe("test PEM validation", () => {
     }
 
     // Both "UserSecretKey.fromPem()" (and the functions built on it) and "UserPem" use the same parser.
+    // The only difference: "UserPem" also accepts entries that hold the secret key only (32 bytes).
     function loadUserKeyInAllWays(text: string, index: number = 0): string[] {
         return [
             parseUserKey(text, index).hex(),
@@ -130,10 +131,15 @@ describe("test PEM validation", () => {
     }
 
     function assertRejectedInAllWays(text: string, errorType: any, message: string, index: number = 0) {
+        assertRejectedByFromPem(text, errorType, message, index);
+        assert.throws(() => UserPem.fromText(text, index), errorType, message);
+    }
+
+    // "UserSecretKey.fromPem()" and the functions built on it (all but "UserPem").
+    function assertRejectedByFromPem(text: string, errorType: any, message: string, index: number = 0) {
         assert.throws(() => parseUserKey(text, index), errorType, message);
         assert.throws(() => UserSecretKey.fromPem(text, index), errorType, message);
         assert.throws(() => UserSigner.fromPem(text, index), errorType, message);
-        assert.throws(() => UserPem.fromText(text, index), errorType, message);
     }
 
     it("should load all test wallets, in all ways", () => {
@@ -205,9 +211,65 @@ describe("test PEM validation", () => {
         assertRejectedInAllWays(text, ErrBadPEM, "the embedded public key does not match the secret key");
     });
 
-    it("should accept a message holding the secret key only", () => {
+    it("should accept a message holding the secret key only, when using 'UserPem' (as before)", () => {
         const text = createEntry(alice.address.toBech32(), alice.secretKeyHex);
-        assert.deepEqual(loadUserKeyInAllWays(text), Array(4).fill(alice.secretKeyHex));
+
+        assert.equal(UserPem.fromText(text).secretKey.hex(), alice.secretKeyHex);
+        assert.equal(UserPem.fromTextAll(text).length, 1);
+    });
+
+    it("should reject a message holding the secret key only, when using 'fromPem()' (as before)", () => {
+        const text = createEntry(alice.address.toBech32(), alice.secretKeyHex);
+        const message = "incorrect key length: expected 64, found 32";
+
+        assertRejectedByFromPem(text, ErrBadPEM, message);
+        assert.throws(() => parseUserKeys(text), ErrBadPEM, message);
+
+        // As before, the length is checked before the index.
+        for (const index of [1, -1, 0.5, NaN]) {
+            assertRejectedByFromPem(text, ErrBadPEM, message, index);
+        }
+    });
+
+    it("should not load the keys of a validator or the p2p keys as the secret key of a user", async () => {
+        const message = "incorrect key length: expected 64, found 32";
+        const validatorFiles = ["validatorKey00.pem", "multipleValidatorKeys.pem"];
+
+        for (const file of validatorFiles) {
+            const filePath = path.join(walletsPath, file);
+            const text = fs.readFileSync(filePath, "utf-8");
+            const numEntries = PemEntry.fromTextAll(text).length;
+
+            for (let index = 0; index < numEntries; index++) {
+                assertRejectedByFromPem(text, ErrBadPEM, message, index);
+            }
+
+            assert.throws(() => parseUserKeys(text), ErrBadPEM, message);
+
+            const error = await Account.newFromPem(filePath).catch((err) => err);
+            assert.instanceOf(error, ErrBadPEM, file);
+            assert.include(error.message, message, file);
+        }
+
+        // The label of a "p2pKey.pem" is the ID of the peer, and the message holds 32 bytes.
+        const p2pText = createEntry("16Uiu2HAmSDFaXsdxFHfQxBnEzGJXsDvmfFf8kUo5TKBKRKH1eG5B", "ab".repeat(32));
+        assertRejectedByFromPem(p2pText, ErrBadPEM, message);
+        assert.throws(() => parseUserKeys(p2pText), ErrBadPEM, message);
+    });
+
+    it("should reject a text that mixes messages of 64 bytes and of 32 bytes, when using 'fromPem()'", () => {
+        const text = alice.pemFileText + "\n" + createEntry(bob.address.toBech32(), bob.secretKeyHex);
+        const message = "incorrect key length: expected 64, found 32";
+
+        assertRejectedByFromPem(text, ErrBadPEM, message, 0);
+        assertRejectedByFromPem(text, ErrBadPEM, message, 1);
+        assert.throws(() => parseUserKeys(text), ErrBadPEM, message);
+
+        const items = UserPem.fromTextAll(text);
+        assert.deepEqual(
+            items.map((item) => item.secretKey.hex()),
+            [alice.secretKeyHex, bob.secretKeyHex],
+        );
     });
 
     it("should reject a message of unexpected length", () => {
@@ -217,10 +279,14 @@ describe("test PEM validation", () => {
             alice.secretKeyHex + alice.address.toHex() + alice.address.toHex(),
         ]) {
             const text = createEntry("alice", messageHex);
-            assertRejectedInAllWays(
-                text,
+            const length = messageHex.length / 2;
+
+            assertRejectedByFromPem(text, ErrBadPEM, `incorrect key length: expected 64, found ${length}`);
+            assert.throws(() => parseUserKeys(text), ErrBadPEM, `incorrect key length: expected 64, found ${length}`);
+            assert.throws(
+                () => UserPem.fromText(text),
                 ErrBadPEM,
-                `incorrect key length: expected 32 or 64, found ${messageHex.length / 2}`,
+                `incorrect key length: expected 32 or 64, found ${length}`,
             );
         }
     });

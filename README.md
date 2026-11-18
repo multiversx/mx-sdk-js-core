@@ -19,6 +19,15 @@ MultiversX SDK for JavaScript and TypeScript (written in TypeScript).
 npm install @multiversx/sdk-core
 ```
 
+## Requirements
+
+- **Node.js 22.13 or later.** The package declares this in `engines`; it is tested on Node.js 22.13.0, 22, 24 and 26. For older versions of Node.js, use v16 of the package.
+- **TypeScript 5.0 or later**, for projects written in TypeScript. With strict library checks (`skipLibCheck: false`), `@types/node` has to be installed as well.
+- **Peer dependencies:** `bignumber.js` (`^9.0.1`) and `protobufjs` (`^7.6.5`) have to be installed alongside the package.
+- **Optional dependencies:** `axios` (for the network providers) and `bip39` (for mnemonics), see [below](#optional-dependencies).
+
+Support policy: the package supports the Node.js release lines that are maintained upstream. Dropping a release line that reached its end-of-life is not considered a breaking change, and is done in a minor release.
+
 ## Development
 
 Feel free to skip this section if you are not a contributor.

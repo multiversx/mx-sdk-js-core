@@ -1,9 +1,8 @@
 import { PathLike, readFileSync, writeFileSync } from "fs";
 import { isAbsolute, join, resolve } from "path";
-import { Address } from "../core/address";
-import { ErrBadPEM } from "../core/errors";
 import { assertIndexIsValid, PemEntry } from "./pemEntry";
-import { USER_PUBKEY_LENGTH, USER_SEED_LENGTH, UserPublicKey, UserSecretKey } from "./userKeys";
+import { UserPublicKey, UserSecretKey } from "./userKeys";
+import { checkIdentityOfUserPemEntry, checkLengthOfUserPemEntry, secretKeyOfUserPemEntry } from "./userPemEntries";
 
 export class UserPem {
     label: string;
@@ -17,65 +16,42 @@ export class UserPem {
     }
 
     static fromFile(path: PathLike, index: number = 0): UserPem {
-        const items = this.fromFileAll(path);
-        assertIndexIsValid(index, items.length);
-        return items[index];
+        return this.fromText(UserPem.readFile(path), index);
     }
 
     static fromFileAll(path: PathLike): UserPem[] {
+        return this.fromTextAll(UserPem.readFile(path));
+    }
+
+    private static readFile(path: PathLike): string {
         const resolvedPath = isAbsolute(path.toString())
             ? resolve(path.toString())
             : resolve(join(process.cwd(), path.toString()));
-        const text = readFileSync(resolvedPath, "utf-8");
-        return this.fromTextAll(text);
+        return readFileSync(resolvedPath, "utf-8");
     }
 
+    /**
+     * Loads the entry at the given index.
+     *
+     * The structure of the whole text and the length of each entry are checked. Though, only the requested entry is checked
+     * against its embedded public key and its label (which requires deriving the public key - by far, the most expensive step).
+     * Use "fromTextAll()" to have all the entries checked.
+     */
     static fromText(text: string, index: number = 0): UserPem {
-        const items = this.fromTextAll(text);
-        assertIndexIsValid(index, items.length);
-        return items[index];
+        const entries = PemEntry.fromTextAll(text);
+        entries.forEach((entry) => checkLengthOfUserPemEntry(entry));
+        assertIndexIsValid(index, entries.length);
+        return UserPem.fromEntry(entries[index]);
     }
 
     static fromTextAll(text: string): UserPem[] {
-        const entries = PemEntry.fromTextAll(text);
-        const resultItems: UserPem[] = [];
-
-        for (const entry of entries) {
-            // The message holds the secret key, optionally followed by the public key.
-            const length = entry.message.length;
-            if (length != USER_SEED_LENGTH && length != USER_SEED_LENGTH + USER_PUBKEY_LENGTH) {
-                throw new ErrBadPEM(
-                    `incorrect key length: expected ${USER_SEED_LENGTH} or ${USER_SEED_LENGTH + USER_PUBKEY_LENGTH}, found ${length}`,
-                );
-            }
-
-            const secretKey = new UserSecretKey(entry.message.slice(0, USER_SEED_LENGTH));
-            const item = new UserPem(entry.label, secretKey);
-            UserPem.checkIdentity(entry, item.publicKey);
-            resultItems.push(item);
-        }
-
-        return resultItems;
+        return PemEntry.fromTextAll(text).map((entry) => UserPem.fromEntry(entry));
     }
 
-    private static checkIdentity(entry: PemEntry, publicKey: UserPublicKey) {
-        const embeddedPublicKey = Buffer.from(entry.message.slice(USER_SEED_LENGTH));
-        if (embeddedPublicKey.length && !embeddedPublicKey.equals(publicKey.valueOf())) {
-            throw new ErrBadPEM("the embedded public key does not match the secret key");
-        }
-
-        // Generally, the label is the bech32 address of the account. Other labels (e.g. custom ones) are accepted, as before.
-        // The HRP isn't checked, so that files saved with a custom HRP can be loaded, as well.
-        let labelPublicKey: Buffer;
-        try {
-            labelPublicKey = Address.newFromBech32(entry.label).getPublicKey();
-        } catch {
-            return;
-        }
-
-        if (!labelPublicKey.equals(publicKey.valueOf())) {
-            throw new ErrBadPEM("the label (address) does not match the secret key");
-        }
+    private static fromEntry(entry: PemEntry): UserPem {
+        const item = new UserPem(entry.label, secretKeyOfUserPemEntry(entry));
+        checkIdentityOfUserPemEntry(entry, item.publicKey);
+        return item;
     }
 
     save(path: PathLike): void {

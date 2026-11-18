@@ -576,6 +576,14 @@ describe("test keystore files that are damaged or tampered with", () => {
         assert.equal(UserWallet.decryptSecretKey(keyFileObject, password).hex(), alice.secretKeyHex);
     });
 
+    it("should load a keystore saved with a custom upper case HRP", async function () {
+        const secretKey = UserSecretKey.fromString(alice.secretKeyHex);
+        const keyFileObject = UserWallet.fromSecretKey({ secretKey, password }).toJSON("TEST");
+
+        assert.isTrue(keyFileObject.bech32.startsWith("test1"));
+        assert.equal(UserWallet.decryptSecretKey(keyFileObject, password).hex(), alice.secretKeyHex);
+    });
+
     it("should still throw on wrong password", async function () {
         assert.throws(
             () => UserWallet.decryptSecretKey(alice.keyFileObject, "wrong password"),

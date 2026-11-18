@@ -211,6 +211,175 @@ describe("test PEM validation", () => {
         assertRejectedInAllWays(text, ErrBadPEM, "the embedded public key does not match the secret key");
     });
 
+    describe("loading one entry of a text that holds several", () => {
+        function createValidEntry(secretKey: UserSecretKey): string {
+            const address = secretKey.generatePublicKey().toAddress();
+            return createEntry(address.toBech32(), secretKey.hex() + address.toHex());
+        }
+
+        /**
+         * Counts the derivations of public keys that take place while the function runs.
+         */
+        function countDerivations(run: () => void): number {
+            const original = UserSecretKey.prototype.generatePublicKey;
+            let count = 0;
+
+            UserSecretKey.prototype.generatePublicKey = function () {
+                count++;
+                return original.call(this);
+            };
+
+            try {
+                run();
+            } finally {
+                UserSecretKey.prototype.generatePublicKey = original;
+            }
+
+            return count;
+        }
+
+        it("should derive the public key of the requested entry only", () => {
+            const secretKeys = Array.from({ length: 12 }, () => UserSecretKey.generate());
+            const text = secretKeys.map((secretKey) => createValidEntry(secretKey)).join("\n");
+
+            for (const index of [0, 5, 11]) {
+                const expected = secretKeys[index].hex();
+
+                assert.equal(
+                    countDerivations(() => assert.equal(parseUserKey(text, index).hex(), expected)),
+                    1,
+                );
+                assert.equal(
+                    countDerivations(() => assert.equal(UserSecretKey.fromPem(text, index).hex(), expected)),
+                    1,
+                );
+                assert.equal(
+                    countDerivations(() => assert.equal(UserSigner.fromPem(text, index).secretKey.hex(), expected)),
+                    1,
+                );
+                assert.equal(
+                    countDerivations(() => assert.equal(UserPem.fromText(text, index).secretKey.hex(), expected)),
+                    1,
+                );
+            }
+
+            // No derivation at all when the index is out of range.
+            assert.equal(
+                countDerivations(() => assert.throws(() => parseUserKey(text, 12), ErrInvalidArgument)),
+                0,
+            );
+            assert.equal(
+                countDerivations(() => assert.throws(() => UserPem.fromText(text, 12), ErrInvalidArgument)),
+                0,
+            );
+
+            // All the entries, when all are requested.
+            assert.equal(
+                countDerivations(() => assert.lengthOf(parseUserKeys(text), 12)),
+                12,
+            );
+            assert.equal(
+                countDerivations(() => assert.lengthOf(UserPem.fromTextAll(text), 12)),
+                12,
+            );
+        });
+
+        it("should load the same keys one by one as when loading all of them", () => {
+            const text = fs.readFileSync(path.join(walletsPath, "multipleUserKeys.pem"), "utf-8");
+            const all = parseUserKeys(text).map((secretKey) => secretKey.hex());
+            const items = UserPem.fromTextAll(text);
+
+            assert.isAbove(all.length, 1);
+
+            for (let index = 0; index < all.length; index++) {
+                assert.deepEqual(loadUserKeyInAllWays(text, index), Array(4).fill(all[index]));
+                assert.deepEqual(UserPem.fromText(text, index), items[index]);
+                assert.equal(UserPem.fromText(text, index).toText(), items[index].toText());
+            }
+        });
+
+        it("should load an entry from a file, as well", () => {
+            const file = path.join(walletsPath, "multipleUserKeys.pem");
+            const items = UserPem.fromFileAll(file);
+
+            assert.isAbove(items.length, 1);
+
+            for (let index = 0; index < items.length; index++) {
+                assert.equal(
+                    countDerivations(() => assert.deepEqual(UserPem.fromFile(file, index), items[index])),
+                    1,
+                );
+            }
+
+            assert.throws(() => UserPem.fromFile(file, items.length), ErrInvalidArgument);
+        });
+
+        it("should check the identity (embedded public key, label) of the requested entry only", () => {
+            const good = createValidEntry(UserSecretKey.fromString(alice.secretKeyHex));
+            const badPublicKey = createEntry(bob.address.toBech32(), bob.secretKeyHex + alice.address.toHex());
+            const badLabel = createEntry(alice.address.toBech32(), bob.secretKeyHex + bob.address.toHex());
+
+            for (const [bad, message] of [
+                [badPublicKey, "the embedded public key does not match the secret key"],
+                [badLabel, "the label (address) does not match the secret key"],
+            ]) {
+                for (const [text, goodIndex, badIndex] of [
+                    [`${good}\n${bad}`, 0, 1],
+                    [`${bad}\n${good}`, 1, 0],
+                ] as [string, number, number][]) {
+                    assert.deepEqual(loadUserKeyInAllWays(text, goodIndex), Array(4).fill(alice.secretKeyHex));
+                    assertRejectedInAllWays(text, ErrBadPEM, message, badIndex);
+
+                    // When all the entries are requested, all are checked.
+                    assert.throws(() => parseUserKeys(text), ErrBadPEM, message);
+                    assert.throws(() => UserPem.fromTextAll(text), ErrBadPEM, message);
+                }
+            }
+        });
+
+        it("should still reject the whole text when another entry is broken (structure, encoding, length)", () => {
+            const good = createValidEntry(UserSecretKey.fromString(alice.secretKeyHex));
+
+            const broken: [string, string][] = [
+                [createEntry("bob", bob.secretKeyHex + "00"), "incorrect key length"],
+                [createEntry("bob", bob.secretKeyHex.slice(0, 32)), "incorrect key length"],
+                [createEntry("bob", ""), "an entry has no content"],
+                [
+                    "-----BEGIN PRIVATE KEY for bob-----\n!!!!\n-----END PRIVATE KEY for bob-----",
+                    "not properly encoded",
+                ],
+                ["-----BEGIN PRIVATE KEY for bob-----\nAAAA", "missing END line"],
+                ["some text", "unexpected line outside of an entry"],
+            ];
+
+            for (const [other, message] of broken) {
+                assertRejectedInAllWays(`${good}\n${other}`, ErrBadPEM, message, 0);
+                assert.throws(() => parseUserKeys(`${good}\n${other}`), ErrBadPEM, message);
+            }
+
+            for (const [other, message] of broken.slice(0, 4)) {
+                assertRejectedInAllWays(`${other}\n${good}`, ErrBadPEM, message, 1);
+            }
+
+            // An entry of 32 bytes elsewhere in the text: rejected by "fromPem()", accepted by "UserPem" (as before).
+            const seedOnly = createEntry("bob", bob.secretKeyHex);
+            assertRejectedByFromPem(
+                `${good}\n${seedOnly}`,
+                ErrBadPEM,
+                "incorrect key length: expected 64, found 32",
+                0,
+            );
+            assert.equal(UserPem.fromText(`${good}\n${seedOnly}`, 0).secretKey.hex(), alice.secretKeyHex);
+        });
+
+        it("should report a broken entry before an index out of range (as before)", () => {
+            const good = createValidEntry(UserSecretKey.fromString(alice.secretKeyHex));
+            const text = `${good}\n${createEntry("bob", bob.secretKeyHex + "00")}`;
+
+            assertRejectedInAllWays(text, ErrBadPEM, "incorrect key length", 7);
+        });
+    });
+
     it("should accept a message holding the secret key only, when using 'UserPem' (as before)", () => {
         const text = createEntry(alice.address.toBech32(), alice.secretKeyHex);
 

@@ -1,5 +1,4 @@
 import { assert } from "chai";
-import * as fs from "fs";
 import path from "path";
 import { Address } from "../core/address";
 import { ErrInvalidArgument, ErrSignerCannotSign } from "../core/errors";
@@ -136,40 +135,6 @@ describe("test validator signer", () => {
         for (const message of [undefined, null, 42, {}]) {
             assert.throws(() => signer.sign(message as any), ErrSignerCannotSign);
         }
-    });
-
-    describe("signUsingPem (deprecated)", () => {
-        const text = fs.readFileSync(path.join(walletsPath, "multipleValidatorKeys.pem"), "utf-8");
-
-        it("should sign using the key at the given index", async () => {
-            for (const [index, validator] of validators.entries()) {
-                const signature = await ValidatorSigner.signUsingPem(text, index, Buffer.from("hello"));
-
-                assert.lengthOf(signature, 48);
-                assert.equal(toHex(signature), validator.signatureOfHello);
-
-                const signatureOfAlice = await ValidatorSigner.signUsingPem(text, index, alice.getPublicKey());
-                assert.equal(toHex(signatureOfAlice), validator.signatureOfAlice);
-            }
-        });
-
-        it("should report failures as ErrSignerCannotSign", async () => {
-            const zeroKeyPem = `-----BEGIN PRIVATE KEY for foo-----\n${Buffer.from("00".repeat(32)).toString("base64")}\n-----END PRIVATE KEY for foo-----`;
-
-            const attempts = [
-                ValidatorSigner.signUsingPem(text, 4, Buffer.from("hello")),
-                ValidatorSigner.signUsingPem(text, -1, Buffer.from("hello")),
-                ValidatorSigner.signUsingPem("not a PEM", 0, Buffer.from("hello")),
-                ValidatorSigner.signUsingPem("", 0, Buffer.from("hello")),
-                ValidatorSigner.signUsingPem(zeroKeyPem, 0, Buffer.from("hello")),
-                ValidatorSigner.signUsingPem(text, 0, undefined as any),
-            ];
-
-            for (const attempt of attempts) {
-                const error = await attempt.catch((err) => err);
-                assert.instanceOf(error, ErrSignerCannotSign);
-            }
-        });
     });
 
     describe("validators signers (used when staking)", () => {

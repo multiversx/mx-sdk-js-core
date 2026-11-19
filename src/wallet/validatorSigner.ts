@@ -12,23 +12,6 @@ export class ValidatorSigner {
         this.secretKey = secretKey;
     }
 
-    /**
-     * * @deprecated This method will be deprecated! Use the sign method directly.
-     * Signs a message.
-     */
-    static async signUsingPem(
-        pemText: string,
-        pemIndex: number = 0,
-        signable: Buffer | Uint8Array,
-    ): Promise<Uint8Array> {
-        try {
-            let secretKey = ValidatorSecretKey.fromPem(pemText, pemIndex);
-            return secretKey.sign(signable);
-        } catch (err: any) {
-            throw new ErrSignerCannotSign(err);
-        }
-    }
-
     static async fromPemFile(path: string, index = 0): Promise<ValidatorSigner> {
         const secretKey = (await ValidatorPEM.fromFile(path, index)).secretKey;
         return new ValidatorSigner(secretKey);

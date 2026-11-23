@@ -1,5 +1,4 @@
-import BigNumber from "bignumber.js";
-import { bufferToBigInt } from "../abi/codec/utils";
+import { decodeUnsignedBigInt } from "../abi/codec/utils";
 import { Address } from "../core/address";
 import { ErrParseTransactionOutcome } from "../core/errors";
 import { TransactionEvent } from "../core/transactionEvents";
@@ -369,9 +368,7 @@ export class TokenManagementTransactionsOutcomeParser {
     private getOutputForESDTModifyRoyaltiesEvent(event: TransactionEvent): ModifyRoyaltiesOutput {
         const tokenIdentifier = this.extractTokenIdentifier(event);
         const nonce = this.extractNonce(event);
-        const royalties = !event.topics[3]?.length
-            ? BigInt(0)
-            : BigInt(new BigNumber(Buffer.from(event.topics[3]).toString("hex"), 16).toFixed());
+        const royalties = this.decodeNumericTopic(event.topics[3]);
 
         return {
             tokenIdentifier: tokenIdentifier,
@@ -509,19 +506,15 @@ export class TokenManagementTransactionsOutcomeParser {
     }
 
     private extractNonce(event: TransactionEvent): bigint {
-        if (!event.topics[1]?.length) {
-            return BigInt(0);
-        }
-        const nonce = Buffer.from(event.topics[1]);
-        return BigInt(bufferToBigInt(nonce).toFixed(0));
+        return this.decodeNumericTopic(event.topics[1]);
     }
 
     private extractAmount(event: TransactionEvent): bigint {
-        if (!event.topics[2]?.length) {
-            return BigInt(0);
-        }
-        const amount = Buffer.from(event.topics[2]);
-        return BigInt(bufferToBigInt(amount).toFixed(0));
+        return this.decodeNumericTopic(event.topics[2]);
+    }
+
+    private decodeNumericTopic(topic?: Uint8Array): bigint {
+        return topic ? decodeUnsignedBigInt(topic) : 0n;
     }
 
     private extractAddress(event: TransactionEvent): string {

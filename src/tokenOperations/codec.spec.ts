@@ -1,8 +1,13 @@
 import BigNumber from "bignumber.js";
 import { assert } from "chai";
+import { MaxNumericByteLength } from "../abi/codec/constants";
 import { bigIntToBuffer, bigIntToHex, bufferToBigInt, bufferToHex, stringToBuffer, utf8ToHex } from "./codec";
 
 describe("test codec", () => {
+    it("bounds integer conversion before decoding", () => {
+        assert.throws(() => bufferToBigInt(Buffer.alloc(MaxNumericByteLength + 1)), "Numeric payload too large");
+    });
+
     it("should properly encode and decode values", () => {
         assert.deepEqual(stringToBuffer("hello"), Buffer.from("hello"));
         assert.deepEqual(bufferToBigInt(Buffer.from("075bcd15", "hex")), new BigNumber("123456789"));

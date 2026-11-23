@@ -6,13 +6,7 @@ export function stringToBuffer(value: string): Buffer {
     return Buffer.from(value);
 }
 
-export function bufferToBigInt(buffer: Buffer): BigNumber {
-    if (buffer.length == 0) {
-        return new BigNumber(0);
-    }
-
-    return contractsCodecUtils.bufferToBigInt(buffer);
-}
+export { bufferToBigInt } from "../abi/codec/utils";
 
 export function bigIntToBuffer(value: BigNumber.Value): Buffer {
     if (value == 0) {

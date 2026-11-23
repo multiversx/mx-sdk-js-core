@@ -33,6 +33,7 @@ import {
     I8Value,
     List,
     ListType,
+    ManagedDecimalSignedType,
     ManagedDecimalType,
     NumericalType,
     NumericalValue,
@@ -54,10 +55,44 @@ import {
     U8Value,
 } from "../typesystem";
 import { BinaryCodec, BinaryCodecConstraints } from "./binary";
+import { MaxNumericByteLength } from "./constants";
 import { isMsbOne } from "./utils";
 
 describe("test binary codec (basic)", () => {
     let codec = new BinaryCodec();
+
+    it("rejects over-width integers even when the padded value fits", () => {
+        for (const type of [new U8Type(), new I16Type(), new U32Type(), new I64Type()]) {
+            assert.throws(
+                () => codec.decodeTopLevel(Buffer.alloc(type.sizeInBytes + 1), type),
+                errors.ErrInvalidArgument,
+            );
+        }
+    });
+
+    it("bounds the encoded integer payload at top level and inside nested values", () => {
+        const maximum = Buffer.alloc(MaxNumericByteLength, 255);
+        const oversized = Buffer.alloc(MaxNumericByteLength + 1);
+        const length = Buffer.alloc(4);
+        length.writeUInt32BE(oversized.length);
+        for (const type of [new BigIntType(), new BigUIntType()]) {
+            const expected = type.withSign ? -1n : (1n << BigInt(maximum.length * 8)) - 1n;
+            assert.equal(codec.decodeTopLevel(maximum, type).valueOf().toFixed(), expected.toString());
+            assert.throws(() => codec.decodeTopLevel(oversized, type), errors.ErrCodec);
+            assert.throws(() => codec.decodeNested(Buffer.concat([length, oversized]), type), errors.ErrCodec);
+        }
+    });
+
+    it("applies the numeric limit to signed and unsigned managed decimal payloads", () => {
+        const oversized = Buffer.alloc(MaxNumericByteLength + 1);
+        const length = Buffer.alloc(4);
+        length.writeUInt32BE(oversized.length);
+        const variable = Buffer.concat([length, oversized, Buffer.alloc(4)]);
+        for (const Decimal of [ManagedDecimalType, ManagedDecimalSignedType]) {
+            assert.throws(() => codec.decodeTopLevel(oversized, new Decimal(1)), errors.ErrCodec);
+            assert.throws(() => codec.decodeTopLevel(variable, new Decimal("usize")), errors.ErrCodec);
+        }
+    });
 
     it("should create boolean values, encode and decode", async () => {
         checkBoolean(true, [0x01], [0x01]);

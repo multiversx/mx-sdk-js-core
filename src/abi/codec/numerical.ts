@@ -1,10 +1,10 @@
 import BigNumber from "bignumber.js";
 import { NumericalType, NumericalValue } from "../typesystem";
+import { ErrInvalidArgument } from "../../core/errors";
 import { SizeOfU32 } from "./constants";
 import {
     bigIntToBuffer,
-    bufferToBigInt,
-    cloneBuffer,
+    decodeUnsignedBigInt,
     flipBufferBitsInPlace,
     isMsbOne,
     isMsbZero,
@@ -33,26 +33,12 @@ export class NumericalBinaryCodec {
     }
 
     decodeTopLevel(buffer: Buffer, type: NumericalType): NumericalValue {
-        let payload = cloneBuffer(buffer);
-
-        let empty = buffer.length == 0;
-        if (empty) {
-            return new NumericalValue(type, new BigNumber(0));
+        if (type.hasFixedSize() && buffer.length > type.sizeInBytes) {
+            throw new ErrInvalidArgument(`Encoded ${type} exceeds ${type.sizeInBytes} bytes`);
         }
-
-        let isPositive = !type.withSign || isMsbZero(payload);
-        if (isPositive) {
-            let value = bufferToBigInt(payload);
-            return new NumericalValue(type, value);
-        }
-
-        // Also see: https://github.com/multiversx/mx-components-big-int/blob/master/twos-complement/twos2bigint.go
-        flipBufferBitsInPlace(payload);
-        let value = bufferToBigInt(payload);
-        let negativeValue = value.multipliedBy(new BigNumber(-1));
-        let negativeValueMinusOne = negativeValue.minus(new BigNumber(1));
-
-        return new NumericalValue(type, negativeValueMinusOne);
+        const magnitude = decodeUnsignedBigInt(buffer);
+        const value = type.withSign ? BigInt.asIntN(buffer.length * 8, magnitude) : magnitude;
+        return new NumericalValue(type, value);
     }
 
     encodeNested(primitive: NumericalValue): Buffer {

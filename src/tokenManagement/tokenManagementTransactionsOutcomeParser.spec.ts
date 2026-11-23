@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import { MaxNumericByteLength } from "../abi/codec/constants";
 import { Address, ErrParseTransactionOutcome, TransactionEvent, TransactionLogs, TransactionOnNetwork } from "../core";
 import { b64TopicsToBytes } from "../testutils";
 import { SmartContractResult } from "../transactionsOutcomeParsers";
@@ -599,6 +600,23 @@ describe("test token management transactions outcome parser", () => {
         assert.equal(outcome[0].tokenIdentifier, identifier);
         assert.equal(outcome[0].nonce, nonce);
         assert.equal(outcome[0].burntQuantity, burntQuantity);
+    });
+
+    it("bounds numeric event topics, including royalties", () => {
+        const oversized = new Uint8Array(MaxNumericByteLength + 1);
+        const event = new TransactionEvent({ identifier: "ESDTModifyRoyalties", topics: [] });
+        const transaction = new TransactionOnNetwork({ logs: new TransactionLogs({ events: [event] }) });
+        assert.equal(parser.parseModifyRoyalties(transaction)[0].royalties, 0n);
+        event.topics[3] = oversized;
+        assert.throws(() => parser.parseModifyRoyalties(transaction), "Numeric payload too large");
+        event.topics[3] = Uint8Array.of(255);
+        assert.equal(parser.parseModifyRoyalties(transaction)[0].royalties, 255n);
+        event.topics[1] = oversized;
+        assert.throws(() => parser.parseModifyRoyalties(transaction), "Numeric payload too large");
+        event.identifier = "ESDTNFTAddQuantity";
+        event.topics[1] = Uint8Array.of(1);
+        event.topics[2] = oversized;
+        assert.throws(() => parser.parseAddQuantity(transaction), "Numeric payload too large");
     });
 
     it("should test parse modify royalties", () => {

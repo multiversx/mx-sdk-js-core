@@ -45,6 +45,49 @@ describe("test address", () => {
     assert.throws(() => Decryptor.decrypt(encryptedData, "password123"), ErrBadKeystore, "unexpected length of IV: 8");
   });
 
+  it("rejects invalid scrypt costs before deriving a key", () => {
+    const encrypted = Encryptor.encrypt(Buffer.from("my mnemonic"), "password123");
+    const invalid = {
+      n: [0, 1, 3, 2 ** 19, "4096"],
+      r: [0, 9, 1.5],
+      p: [0, 5, true, null],
+      dklen: ["32"],
+    };
+
+    for (const [param, values] of Object.entries(invalid)) {
+      for (const value of values) {
+        const json = encrypted.toJSON();
+        json.crypto.kdfparams[param] = value;
+        const data = EncryptedData.fromJSON(json);
+        data.kdfparams.generateDerivedKey = () => {
+          throw new Error("unexpected key derivation");
+        };
+        assert.throws(() => Decryptor.decrypt(data, "password123"), ErrBadKeystore, "scrypt parameter");
+      }
+    }
+  });
+
+  it("accepts the inclusive scrypt cost limits", () => {
+    const data = Encryptor.encrypt(Buffer.from("my mnemonic"), "password123");
+    for (const [n, r, p] of [[2, 1, 1], [2 ** 18, 8, 4]]) {
+      data.kdfparams = new ScryptKeyDerivationParams(n, r, p);
+      data.kdfparams.generateDerivedKey = () => Buffer.alloc(32);
+      assert.throws(() => Decryptor.decrypt(data, "password123"), "MAC mismatch");
+    }
+  });
+
+  it("rejects array-like salt, IV and ciphertext before buffer conversion", () => {
+    const data = Encryptor.encrypt(Buffer.from("my mnemonic"), "password123");
+    for (const field of ["salt", "iv", "ciphertext"]) {
+      const malformed = Object.assign(new EncryptedData(data), { [field]: { length: 16 } });
+      assert.throws(
+        () => Decryptor.decrypt(malformed, "password123"),
+        ErrBadKeystore,
+        "salt, IV and ciphertext must be hex strings",
+      );
+    }
+  });
+
   it("rejects shorter derived key, even if the MAC matches", () => {
     // With "dklen = 16", the MAC key would be empty: anyone could compute the MAC, and any password would be accepted.
     const encryptedData = Encryptor.encrypt(Buffer.from("my mnemonic"), "password123");

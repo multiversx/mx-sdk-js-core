@@ -1,4 +1,6 @@
 import BigNumber from "bignumber.js";
+import { ErrCodec } from "../../core/errors";
+import { MaxNumericByteLength } from "./constants";
 import { numberToPaddedHex } from "../../core/utils.codec";
 
 /**
@@ -28,10 +30,17 @@ export function cloneBuffer(buffer: Buffer): Buffer {
     return clone;
 }
 
+export function decodeUnsignedBigInt(bytes: Uint8Array): bigint {
+    if (bytes.length > MaxNumericByteLength) {
+        throw new ErrCodec(`Numeric payload too large: ${bytes.length} > ${MaxNumericByteLength}`);
+    }
+
+    const hex = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString("hex");
+    return hex ? BigInt(`0x${hex}`) : 0n;
+}
+
 export function bufferToBigInt(buffer: Buffer): BigNumber {
-    // Currently, in JavaScript, this is the feasible way to achieve reliable, arbitrary-size Buffer to BigInt conversion.
-    let hex = buffer.toString("hex");
-    return new BigNumber(`0x${hex}`, 16);
+    return new BigNumber(decodeUnsignedBigInt(buffer).toString());
 }
 
 export function bigIntToBuffer(value: BigNumber.Value): Buffer {

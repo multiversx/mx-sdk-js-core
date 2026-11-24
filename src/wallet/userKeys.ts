@@ -2,7 +2,7 @@ import * as ed from "@noble/ed25519";
 import { sha512 } from "@noble/hashes/sha512";
 import nacl from "tweetnacl";
 import { Address } from "../core/address";
-import { guardLength } from "./assertions";
+import { bytesFromInput, guardLength } from "./assertions";
 import { parseUserKey } from "./pem";
 
 export const USER_SEED_LENGTH = 32;
@@ -46,7 +46,8 @@ export class UserSecretKey {
     }
 
     sign(message: Uint8Array): Uint8Array {
-        const signature = ed.sync.sign(new Uint8Array(message), new Uint8Array(this.buffer));
+        const data = bytesFromInput(message, "message");
+        const signature = ed.sync.sign(data, new Uint8Array(this.buffer));
         return signature;
     }
 
@@ -55,7 +56,8 @@ export class UserSecretKey {
     }
 
     valueOf(): Buffer {
-        return this.buffer;
+        // A copy, so that the key can't be altered through the returned buffer.
+        return Buffer.from(this.buffer);
     }
 }
 
@@ -70,7 +72,10 @@ export class UserPublicKey {
 
     async verify(data: Buffer | Uint8Array, signature: Buffer | Uint8Array): Promise<boolean> {
         try {
-            const ok = ed.sync.verify(new Uint8Array(signature), new Uint8Array(data), new Uint8Array(this.buffer));
+            // Bad input (e.g. a string) is handled as an invalid signature.
+            const dataBytes = bytesFromInput(data, "data");
+            const signatureBytes = bytesFromInput(signature, "signature");
+            const ok = ed.sync.verify(signatureBytes, dataBytes, new Uint8Array(this.buffer));
             return ok;
         } catch (err: any) {
             console.error(err);
@@ -87,6 +92,7 @@ export class UserPublicKey {
     }
 
     valueOf(): Buffer {
-        return this.buffer;
+        // A copy, so that the key can't be altered through the returned buffer.
+        return Buffer.from(this.buffer);
     }
 }

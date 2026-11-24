@@ -1,5 +1,5 @@
-import { ErrInvariantFailed } from "../core/errors";
-import { guardLength } from "./assertions";
+import { ErrInvalidArgument, ErrInvariantFailed } from "../core/errors";
+import { bytesFromInput, guardLength } from "./assertions";
 import { parseValidatorKey } from "./pem";
 
 export const VALIDATOR_SECRETKEY_LENGTH = 32;
@@ -7,6 +7,7 @@ export const VALIDATOR_PUBKEY_LENGTH = 96;
 
 export class BLS {
     private static isInitialized: boolean = false;
+    private static initPromise: Promise<void> | undefined;
     public static bls: any;
 
     private static loadBLSModule() {
@@ -20,13 +21,22 @@ export class BLS {
     }
 
     static async initIfNecessary() {
-        if (BLS.isInitialized) {
-            return;
+        // Concurrent callers must share a single initialization: each "init()" of the BLS module
+        // creates a new WASM instance, which corrupts the keys created on top of the previous one.
+        if (!BLS.initPromise) {
+            BLS.loadBLSModule();
+            BLS.initPromise = BLS.bls.init(BLS.bls.BLS12_381).then(
+                () => {
+                    BLS.isInitialized = true;
+                },
+                (error: any) => {
+                    BLS.initPromise = undefined;
+                    throw error;
+                },
+            );
         }
-        BLS.loadBLSModule();
-        await BLS.bls.init(BLS.bls.BLS12_381);
 
-        BLS.isInitialized = true;
+        await BLS.initPromise;
     }
 
     static guardInitialized() {
@@ -45,9 +55,21 @@ export class ValidatorSecretKey {
     constructor(buffer: Buffer | Uint8Array) {
         BLS.guardInitialized();
         guardLength(buffer, VALIDATOR_SECRETKEY_LENGTH);
+        const bytes = Buffer.from(bytesFromInput(buffer, "buffer"));
+
+        // Fail fast (e.g. when loading a corrupted PEM file), instead of producing an all-zeros public key and signatures.
+        if (!bytes.some((byte) => byte != 0)) {
+            throw new ErrInvalidArgument("the validator secret key must not be zero");
+        }
 
         this.secretKey = new BLS.bls.SecretKey();
-        this.secretKey.setLittleEndian(Uint8Array.from(buffer));
+        this.secretKey.setLittleEndian(new Uint8Array(bytes));
+
+        // "setLittleEndian()" doesn't reject values that aren't lower than the order of the group: it silently changes them, instead.
+        if (!Buffer.from(this.secretKey.serialize()).equals(bytes)) {
+            throw new ErrInvalidArgument("the validator secret key is out of range");
+        }
+
         this.publicKey = this.secretKey.getPublicKey();
     }
 
@@ -89,6 +111,7 @@ export class ValidatorPublicKey {
     }
 
     valueOf(): Buffer {
-        return this.buffer;
+        // A copy, so that the key can't be altered through the returned buffer.
+        return Buffer.from(this.buffer);
     }
 }

@@ -1,12 +1,13 @@
 import { PathLike, readFileSync, writeFileSync } from "fs";
 import path, { isAbsolute, join, resolve } from "path";
+import { Address } from "../core/address";
 import { LibraryConfig } from "../core/config";
-import { Err } from "../core/errors";
+import { Err, ErrBadKeystore } from "../core/errors";
 import { Logger } from "../core/logger";
 import { CipherAlgorithm, Decryptor, EncryptedData, Encryptor, KeyDerivationFunction, Randomness } from "./crypto";
 import { ScryptKeyDerivationParams } from "./crypto/derivationParams";
 import { Mnemonic } from "./mnemonic";
-import { UserPublicKey, UserSecretKey } from "./userKeys";
+import { USER_PUBKEY_LENGTH, USER_SEED_LENGTH, UserPublicKey, UserSecretKey } from "./userKeys";
 
 interface IRandomness {
     id: string;
@@ -98,7 +99,7 @@ export class UserWallet {
             secretKey = UserWallet.decryptSecretKey(keyFileObject, password);
         } else if (kind === UserWalletKind.Mnemonic.valueOf()) {
             const mnemonic = UserWallet.decryptMnemonic(keyFileObject, password);
-            secretKey = mnemonic.deriveKey(addressIndex || 0);
+            secretKey = mnemonic.deriveKey(addressIndex ?? 0);
         } else {
             throw new Error(`Unknown kind: ${kind}`);
         }
@@ -119,21 +120,15 @@ export class UserWallet {
 
         if (kind == UserWalletKind.Mnemonic) {
             const mnemonic = this.decryptMnemonic(keyFileObject, password);
-            return mnemonic.deriveKey(addressIndex || 0);
+            return mnemonic.deriveKey(addressIndex ?? 0);
         }
 
         throw new Err(`Unknown kind: ${kind}`);
     }
 
     /**
-     * Copied from: https://github.com/multiversx/mx-deprecated-core-js/blob/v1.28.0/src/account.js#L42
-     * Notes: adjustements (code refactoring, no change in logic), in terms of:
-     *  - typing (since this is the TypeScript version)
-     *  - error handling (in line with sdk-core's error system)
-     *  - references to crypto functions
-     *  - references to object members
-     *
-     * From an encrypted keyfile, given the password, loads the secret key and the public key.
+     * From an encrypted keyfile, given the password, loads the secret key.
+     * The secret key is checked against the public key (if embedded in the encrypted data) and against the "address" and "bech32" fields of the file.
      */
     static decryptSecretKey(keyFileObject: any, password: string): UserSecretKey {
         // Here, we check the "kind" field only for files that have it. Older keystore files (holding only secret keys) do not have this field.
@@ -142,16 +137,48 @@ export class UserWallet {
             throw new Err(`Expected keystore kind to be ${UserWalletKind.SecretKey}, but it was ${kind}.`);
         }
 
-        const encryptedData = UserWallet.edFromJSON(keyFileObject);
-
-        let text = Decryptor.decrypt(encryptedData, password);
-        while (text.length < 32) {
-            let zeroPadding = Buffer.from([0x00]);
-            text = Buffer.concat([zeroPadding, text]);
+        const addressHex = keyFileObject.address;
+        const addressBech32 = keyFileObject.bech32;
+        if (typeof addressHex !== "string" || typeof addressBech32 !== "string") {
+            throw new ErrBadKeystore("missing 'address' or 'bech32' field");
         }
 
-        const seed = text.slice(0, 32);
-        return new UserSecretKey(seed);
+        const encryptedData = UserWallet.edFromJSON(keyFileObject);
+        const text = Decryptor.decrypt(encryptedData, password);
+
+        // The plaintext holds the secret key, optionally followed by the public key.
+        if (text.length !== USER_SEED_LENGTH && text.length !== USER_SEED_LENGTH + USER_PUBKEY_LENGTH) {
+            throw new ErrBadKeystore(`unexpected length of decrypted data: ${text.length}`);
+        }
+
+        const secretKey = new UserSecretKey(text.subarray(0, USER_SEED_LENGTH));
+        const publicKey = secretKey.generatePublicKey().valueOf();
+
+        // The MAC covers the ciphertext, but not the IV: a damaged or tampered file can decrypt to a different, valid-looking key.
+        // Thus, we make sure we've recovered the very account recorded in the file.
+        const embeddedPublicKey = text.subarray(USER_SEED_LENGTH);
+        if (embeddedPublicKey.length && !embeddedPublicKey.equals(publicKey)) {
+            throw new ErrBadKeystore("the embedded public key does not match the secret key");
+        }
+
+        if (addressHex !== publicKey.toString("hex")) {
+            throw new ErrBadKeystore("the 'address' field does not match the secret key");
+        }
+
+        if (!UserWallet.getPublicKeyFromBech32(addressBech32).equals(publicKey)) {
+            throw new ErrBadKeystore("the 'bech32' field does not match the secret key");
+        }
+
+        return secretKey;
+    }
+
+    private static getPublicKeyFromBech32(value: string): Buffer {
+        // The HRP isn't checked, so that keystores saved with a custom HRP can be loaded, as well.
+        try {
+            return Address.newFromBech32(value).getPublicKey();
+        } catch {
+            return Buffer.alloc(0);
+        }
     }
 
     static decryptMnemonic(keyFileObject: any, password: string): Mnemonic {

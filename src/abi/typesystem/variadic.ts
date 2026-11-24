@@ -1,3 +1,4 @@
+import * as errors from "../../core/errors";
 import { Type, TypeCardinality, TypedValue, TypePlaceholder } from "./types";
 
 export class VariadicType extends Type {
@@ -44,7 +45,14 @@ export class VariadicValue extends TypedValue {
     constructor(type: VariadicType, items: TypedValue[]) {
         super(type);
 
-        // TODO: assert items are of type type.getFirstTypeParameter()
+        const expectedType = type.getFirstTypeParameter();
+        for (let i = 0; i < items.length; i++) {
+            if (!items[i].getType().equals(expectedType)) {
+                throw new errors.ErrInvariantFailed(
+                    `VariadicValue: item[${i}] type mismatch. Expected: ${expectedType.getName()}, got: ${items[i].getType().getName()}`,
+                );
+            }
+        }
 
         this.items = items;
     }

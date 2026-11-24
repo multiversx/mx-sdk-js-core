@@ -1,9 +1,10 @@
 import { ARGUMENTS_SEPARATOR } from "../core/constants";
 import { BinaryCodec } from "./codec";
-import { Type, TypedValue, U32Type, U32Value } from "./typesystem";
-import { OptionalType, OptionalValue } from "./typesystem/algebraic";
-import { CompositeType, CompositeValue } from "./typesystem/composite";
-import { VariadicType, VariadicValue } from "./typesystem/variadic";
+import { Type, TypedValue } from "./typesystem";
+import { BufferReader } from "./bufferReader";
+import { BufferWriter } from "./bufferWriter";
+import { TypeValueReader } from "./typeValueReader";
+import { TypeValueWriter } from "./typeValueWriter";
 
 interface IArgSerializerOptions {
     codec: ICodec;
@@ -53,83 +54,13 @@ export class ArgSerializer {
      * Decodes a set of buffers into a set of typed values, given parameter definitions.
      */
     buffersToValues(buffers: Buffer[], parameters: IParameterDefinition[]): TypedValue[] {
-        // TODO: Refactor, split (function is quite complex).
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const self = this;
+        const bufferReader = new BufferReader(buffers, this.codec);
+        const valueReader = new TypeValueReader(bufferReader);
+        const values: TypedValue[] = [];
 
-        buffers = buffers || [];
-
-        let values: TypedValue[] = [];
-        let bufferIndex = 0;
-        let numBuffers = buffers.length;
-
-        for (let i = 0; i < parameters.length; i++) {
-            let parameter = parameters[i];
-            let type = parameter.type;
-            let value = readValue(type);
+        for (const parameter of parameters) {
+            const value = valueReader.readValue(parameter.type);
             values.push(value);
-        }
-
-        // This is a recursive function.
-        function readValue(type: Type): TypedValue {
-            if (type.hasExactClass(OptionalType.ClassName)) {
-                const typedValue = readValue(type.getFirstTypeParameter());
-                return new OptionalValue(type, typedValue);
-            }
-
-            if (type.hasExactClass(VariadicType.ClassName)) {
-                return readVariadicValue(type);
-            }
-
-            if (type.hasExactClass(CompositeType.ClassName)) {
-                const typedValues = [];
-
-                for (const typeParameter of type.getTypeParameters()) {
-                    typedValues.push(readValue(typeParameter));
-                }
-
-                return new CompositeValue(type, typedValues);
-            }
-
-            // Non-composite (singular), non-variadic (fixed) type.
-            // The only branching without a recursive call.
-            const typedValue = decodeNextBuffer(type);
-
-            // TODO: Handle the case (maybe throw error) when "typedValue" is, actually, null.
-            return typedValue!;
-        }
-
-        function readVariadicValue(type: Type): TypedValue {
-            const variadicType = <VariadicType>type;
-            const typedValues = [];
-
-            if (variadicType.isCounted) {
-                const count: number = readValue(new U32Type()).valueOf().toNumber();
-
-                for (let i = 0; i < count; i++) {
-                    typedValues.push(readValue(type.getFirstTypeParameter()));
-                }
-            } else {
-                while (!hasReachedTheEnd()) {
-                    typedValues.push(readValue(type.getFirstTypeParameter()));
-                }
-            }
-
-            return new VariadicValue(variadicType, typedValues);
-        }
-
-        function decodeNextBuffer(type: Type): TypedValue | null {
-            if (hasReachedTheEnd()) {
-                return null;
-            }
-
-            let buffer = buffers[bufferIndex++];
-            let decodedValue = self.codec.decodeTopLevel(buffer, type);
-            return decodedValue;
-        }
-
-        function hasReachedTheEnd() {
-            return bufferIndex >= numBuffers;
         }
 
         return values;
@@ -159,62 +90,13 @@ export class ArgSerializer {
      * Variadic types and composite types might result into none, one or more buffers.
      */
     valuesToBuffers(values: TypedValue[]): Buffer[] {
-        // TODO: Refactor, split (function is quite complex).
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const self = this;
-
-        const buffers: Buffer[] = [];
+        const bufferWriter = new BufferWriter(this.codec);
+        const valueWriter = new TypeValueWriter(bufferWriter);
 
         for (const value of values) {
-            handleValue(value);
+            valueWriter.writeValue(value);
         }
 
-        // This is a recursive function. It appends to the "buffers" variable.
-        function handleValue(value: TypedValue): void {
-            if (value.hasExactClass(OptionalValue.ClassName)) {
-                const valueAsOptional = <OptionalValue>value;
-
-                if (valueAsOptional.isSet()) {
-                    handleValue(valueAsOptional.getTypedValue());
-                }
-
-                return;
-            }
-
-            if (value.hasExactClass(VariadicValue.ClassName)) {
-                handleVariadicValue(<VariadicValue>value);
-                return;
-            }
-
-            if (value.hasExactClass(CompositeValue.ClassName)) {
-                const valueAsComposite = <CompositeValue>value;
-
-                for (const item of valueAsComposite.getItems()) {
-                    handleValue(item);
-                }
-
-                return;
-            }
-
-            // Non-composite (singular), non-variadic (fixed) type.
-            // The only branching without a recursive call.
-            const buffer: Buffer = self.codec.encodeTopLevel(value);
-            buffers.push(buffer);
-        }
-
-        function handleVariadicValue(value: VariadicValue): void {
-            const variadicType = <VariadicType>value.getType();
-
-            if (variadicType.isCounted) {
-                const countValue = new U32Value(value.getItems().length);
-                buffers.push(self.codec.encodeTopLevel(countValue));
-            }
-
-            for (const item of value.getItems()) {
-                handleValue(item);
-            }
-        }
-
-        return buffers;
+        return bufferWriter.getBuffers();
     }
 }

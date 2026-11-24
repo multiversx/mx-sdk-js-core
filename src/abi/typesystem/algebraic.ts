@@ -1,3 +1,4 @@
+import * as errors from "../../core/errors";
 import { guardValueIsSet } from "../../core/utils";
 import { NullType, Type, TypeCardinality, TypedValue } from "./types";
 
@@ -33,7 +34,11 @@ export class OptionalValue extends TypedValue {
     constructor(type: OptionalType, value: TypedValue | null = null) {
         super(type);
 
-        // TODO: assert value is of type type.getFirstTypeParameter()
+        if (value !== null && !value.getType().equals(type.getFirstTypeParameter())) {
+            throw new errors.ErrInvariantFailed(
+                `OptionalValue: value type mismatch. Expected: ${type.getFirstTypeParameter().getName()}, got: ${value.getType().getName()}`,
+            );
+        }
 
         this.value = value;
     }

@@ -5,6 +5,7 @@ import { Decryptor } from "./decryptor";
 import { ScryptKeyDerivationParams } from "./derivationParams";
 import { EncryptedData } from "./encryptedData";
 import { Encryptor } from "./encryptor";
+import { Randomness } from "./randomness";
 
 describe("test address", () => {
   it("encrypts/decrypts", () => {
@@ -56,5 +57,18 @@ describe("test address", () => {
     for (const password of ["password123", "any password at all"]) {
       assert.throws(() => Decryptor.decrypt(encryptedData, password), ErrBadKeystore, "unsupported scrypt parameter: dklen = 16");
     }
+  });
+
+  it("generates random version 4 UUIDs as ids", () => {
+    const ids = new Set<string>();
+
+    for (let i = 0; i < 1000; i++) {
+      const id = new Randomness().id;
+      assert.match(id, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+      ids.add(id);
+    }
+
+    assert.equal(ids.size, 1000);
+    assert.equal(new Randomness({ id: "my-id" }).id, "my-id");
   });
 });

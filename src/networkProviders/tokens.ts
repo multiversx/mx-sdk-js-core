@@ -1,4 +1,4 @@
-import { BigNumber } from "bignumber.js";
+import BigNumber from "bignumber.js";
 import { Address, Token } from "../core";
 import { numberToPaddedHex } from "../core/utils.codec";
 import { BlockCoordinates } from "./blocks";

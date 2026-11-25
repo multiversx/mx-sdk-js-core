@@ -22,11 +22,11 @@ jobs:
 
       # Step 1: Checkout the repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       # Step 2: Set up Python environment
       - name: Set up Python 3.11
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v7
         with:
           python-version: '3.11'
 
@@ -73,12 +73,12 @@ jobs:
 
       # Step 6: Install Node.js and dependencies
       - name: Set up Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
-          node-version: '16.x'
+          node-version: '26.x'
 
       - name: Install Node.js dependencies
-        run: npm install
+        run: npm ci
 
       # Step 7: Run integration tests
       - name: Run integration tests

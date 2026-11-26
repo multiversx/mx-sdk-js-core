@@ -161,7 +161,7 @@ export class UserWallet {
             throw new ErrBadKeystore("the embedded public key does not match the secret key");
         }
 
-        if (addressHex !== publicKey.toString("hex")) {
+        if (addressHex.toLowerCase() !== publicKey.toString("hex")) {
             throw new ErrBadKeystore("the 'address' field does not match the secret key");
         }
 

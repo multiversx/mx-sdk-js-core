@@ -22,7 +22,7 @@ export function isMsbZero(buffer: Buffer, byteIndex: number = 0): boolean {
     return !isMsbOne(buffer, byteIndex);
 }
 
-export function cloneBuffer(buffer: Buffer) {
+export function cloneBuffer(buffer: Buffer): Buffer {
     let clone = Buffer.alloc(buffer.length);
     buffer.copy(clone);
     return clone;
@@ -60,6 +60,6 @@ export function flipBufferBitsInPlace(buffer: Buffer) {
     }
 }
 
-export function prependByteToBuffer(buffer: Buffer, byte: number) {
+export function prependByteToBuffer(buffer: Buffer, byte: number): Buffer {
     return Buffer.concat([Buffer.from([byte]), buffer]);
 }

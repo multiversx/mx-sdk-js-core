@@ -19,6 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         node-version: [22.13.0, 22.x, 24.x, 26.x]
+      max-parallel: 1  # This ensures jobs run sequentially, not concurrently
 
     steps:
     - uses: actions/checkout@v7
@@ -29,6 +30,7 @@ jobs:
         cache: npm
     - run: npm ci
     - run: npm run lint
+    - run: npm run typecheck
     - run: npm run compile
     - run: npm run compile-browser
     - run: npm run tests-unit
